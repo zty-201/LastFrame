@@ -31,6 +31,12 @@
     <Filter Include="Resource Files\GLAD\Release">
       <UniqueIdentifier>{63595509-b6b9-4ff7-93ff-b1ab411fad78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics">
+      <UniqueIdentifier>{9d1209e6-3d34-4f2a-a93a-9313bea44272}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{4dd42245-8533-41a2-8cc9-3bb42bd49362}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Source\main.cpp">
@@ -92,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="Lib\Debug_Desktop\imgui-docking\misc\cpp\imgui_stdlib.cpp">
       <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\GraphicsSystem.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="Lib\Debug_Desktop\imgui-docking\misc\cpp\imgui_stdlib.h">
       <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\GraphicsSystem.hpp">
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
