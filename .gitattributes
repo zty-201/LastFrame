@@ -1,16 +1,16 @@
 * text=auto
 
-*.c text
-*.cpp text
-*.h text
+*.c text eol=crlf
+*.cpp text eol=crlf
+*.h text eol=crlf
 *.m text
 *.mm text
 *.md text
-*.txt text
+*.txt text eol=crlf
 *.html text
 *.bat text
-*.frag text
-*.vert text
+*.frag text eol=crlf
+*.vert text eol=crlf
 *.mkb text
 *.icf text
 
