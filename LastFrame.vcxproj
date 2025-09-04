@@ -52,14 +52,14 @@
     <IntDir>$(SolutionDir)temp\$(Platform)\$(Configuration)\</IntDir>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
     <ClangTidyChecks>clang-analyzer-*,bugprone-*,modernize-*,readability-*</ClangTidyChecks>
-    <ExternalIncludePath>C:\Users\Asus\repos\LastFrame-Cheerios\Lib;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(SolutionDir)Lib;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\$(Platform)\$(Configuration)\</IntDir>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
     <ClangTidyChecks>clang-analyzer-*,bugprone-*,modernize-*,readability-*</ClangTidyChecks>
-    <ExternalIncludePath>C:\Users\Asus\repos\LastFrame-Cheerios\Lib;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(SolutionDir)Lib;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -68,7 +68,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios\Source\Header;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Debug_Desktop;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Debug_Desktop\glad_debug\include;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Debug_Desktop\glfw_debug\include;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Debug_Desktop\glm;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Debug_Desktop\imgui-docking;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Debug_Desktop\imgui-docking\backends;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Debug_Desktop\imgui-docking\misc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Lib\Debug_Desktop;$(SolutionDir)Lib\Debug_Desktop\glad_debug\include;$(SolutionDir)Lib\Debug_Desktop\glfw_debug\include;$(SolutionDir)Lib\Debug_Desktop\glm;$(SolutionDir)Lib\Debug_Desktop\imgui-docking;$(SolutionDir)Lib\Debug_Desktop\imgui-docking\backends;$(SolutionDir)Lib\Debug_Desktop\imgui-docking\misc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
@@ -79,7 +79,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Debug_Desktop;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Debug_Desktop\glfw_debug\binary;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Lib\Debug_Desktop;$(SolutionDir)Lib\Debug_Desktop\glfw_debug\binary;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -95,7 +95,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios\Source\Header;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Release_Desktop;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Release_Desktop\glad_release\include;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Release_Desktop\glfw_release\include;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Release_Desktop\glm;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Release_Desktop\imgui-docking;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Release_Desktop\imgui-docking\backends;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Release_Desktop\imgui-docking\misc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Lib\Release_Desktop;$(SolutionDir)Lib\Release_Desktop\glad_release\include;$(SolutionDir)Lib\Release_Desktop\glfw_release\include;$(SolutionDir)Lib\Release_Desktop\glm;$(SolutionDir)Lib\Release_Desktop\imgui-docking;$(SolutionDir)Lib\Release_Desktop\imgui-docking\backends;$(SolutionDir)Lib\Release_Desktop\imgui-docking\misc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
@@ -107,7 +107,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Release_Desktop;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Release_Desktop\glfw_release\binary;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Lib\Release_Desktop;$(SolutionDir)Lib\Release_Desktop\glfw_release\binary;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
