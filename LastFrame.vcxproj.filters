@@ -21,6 +21,12 @@
     <ClCompile Include="Source\Source\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Lib\Debug_Desktop\glad_debug\src\glad.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Release_Desktop\glad_release\src\glad.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Header\pch.hpp">
