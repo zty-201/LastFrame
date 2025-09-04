@@ -13,6 +13,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\GLAD">
+      <UniqueIdentifier>{c30137c2-209f-4d2b-8d77-69fd63477dad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\ImGui">
+      <UniqueIdentifier>{dda1b017-3d8f-42a2-8778-bbedf68941ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\ImGui\Debug">
+      <UniqueIdentifier>{e0f0e51a-1d3b-40f7-9ec3-fa858b4b7d2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\ImGui\Release">
+      <UniqueIdentifier>{750fa4c6-26d1-4d3d-bcea-e46e2d65bb37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\GLAD\Debug">
+      <UniqueIdentifier>{9fbdaf96-34e7-4c07-8356-617df5c8c952}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\GLAD\Release">
+      <UniqueIdentifier>{63595509-b6b9-4ff7-93ff-b1ab411fad78}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Source\main.cpp">
@@ -21,11 +39,59 @@
     <ClCompile Include="Source\Source\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Lib\Debug_Desktop\imgui-docking\imgui.cpp">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Debug_Desktop\imgui-docking\imgui_demo.cpp">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Debug_Desktop\imgui-docking\imgui_draw.cpp">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Debug_Desktop\imgui-docking\backends\imgui_impl_glfw.cpp">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Debug_Desktop\imgui-docking\backends\imgui_impl_opengl3.cpp">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Debug_Desktop\imgui-docking\imgui_tables.cpp">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Debug_Desktop\imgui-docking\imgui_widgets.cpp">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Release_Desktop\imgui-docking\imgui.cpp">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Release_Desktop\imgui-docking\imgui_demo.cpp">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Release_Desktop\imgui-docking\imgui_draw.cpp">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Release_Desktop\imgui-docking\imgui_tables.cpp">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Release_Desktop\imgui-docking\imgui_widgets.cpp">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Release_Desktop\imgui-docking\backends\imgui_impl_glfw.cpp">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Release_Desktop\imgui-docking\backends\imgui_impl_opengl3.cpp">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClCompile>
     <ClCompile Include="Lib\Debug_Desktop\glad_debug\src\glad.c">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\GLAD\Debug</Filter>
     </ClCompile>
     <ClCompile Include="Lib\Release_Desktop\glad_release\src\glad.c">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\GLAD\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Release_Desktop\imgui-docking\misc\cpp\imgui_stdlib.cpp">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Debug_Desktop\imgui-docking\misc\cpp\imgui_stdlib.cpp">
+      <Filter>Resource Files\ImGui\Debug</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -35,5 +101,81 @@
     <ClInclude Include="Source\Header\macros.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Lib\Debug_Desktop\imgui-docking\imconfig.h">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Debug_Desktop\imgui-docking\imgui.h">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Debug_Desktop\imgui-docking\backends\imgui_impl_glfw.h">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Debug_Desktop\imgui-docking\backends\imgui_impl_opengl3.h">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Debug_Desktop\imgui-docking\backends\imgui_impl_opengl3_loader.h">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Debug_Desktop\imgui-docking\imgui_internal.h">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Debug_Desktop\imgui-docking\imstb_rectpack.h">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Debug_Desktop\imgui-docking\imstb_textedit.h">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Debug_Desktop\imgui-docking\imstb_truetype.h">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Release_Desktop\imgui-docking\imconfig.h">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Release_Desktop\imgui-docking\imgui.h">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Release_Desktop\imgui-docking\imgui_internal.h">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Release_Desktop\imgui-docking\imstb_rectpack.h">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Release_Desktop\imgui-docking\imstb_textedit.h">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Release_Desktop\imgui-docking\imstb_truetype.h">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Release_Desktop\imgui-docking\backends\imgui_impl_glfw.h">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Release_Desktop\imgui-docking\backends\imgui_impl_opengl3.h">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Release_Desktop\imgui-docking\backends\imgui_impl_opengl3_loader.h">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Release_Desktop\imgui-docking\misc\cpp\imgui_stdlib.h">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Debug_Desktop\imgui-docking\misc\cpp\imgui_stdlib.h">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Lib\Debug_Desktop\imgui-docking\misc\debuggers\imgui.natstepfilter">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </None>
+    <None Include="Lib\Release_Desktop\imgui-docking\misc\debuggers\imgui.natstepfilter">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Lib\Debug_Desktop\imgui-docking\misc\debuggers\imgui.natvis">
+      <Filter>Resource Files\ImGui\Debug</Filter>
+    </Natvis>
+    <Natvis Include="Lib\Release_Desktop\imgui-docking\misc\debuggers\imgui.natvis">
+      <Filter>Resource Files\ImGui\Release</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

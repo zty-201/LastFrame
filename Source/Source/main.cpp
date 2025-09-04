@@ -1,3 +1,16 @@
+/******************************************************************************/
+/*!
+\file		main.cpp
+\author 	Joel Lee Jie
+\par    	joeljie.lee\@digipen.edu
+\brief  	Entry point of the application
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior
+written consent of DigiPen Institute of Technology is prohibited.
+*/
+/******************************************************************************/
+
 #include "pch.hpp"
 #include <iostream>
 //Debug mem leak check
