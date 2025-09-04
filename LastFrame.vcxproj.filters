@@ -170,7 +170,7 @@
     <ClInclude Include="Lib\Debug_Desktop\imgui-docking\misc\cpp\imgui_stdlib.h">
       <Filter>Resource Files\ImGui\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\GraphicsSystem.hpp">
+    <ClInclude Include="Source\Header\GraphicsSystem.hpp">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
