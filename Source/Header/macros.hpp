@@ -10,6 +10,11 @@ Reproduction or disclosure of this file or its contents without the prior
 written consent of DigiPen Institute of Technology is prohibited.
 */
 /******************************************************************************/
+#ifndef MACROS_HPP
+#define MACROS_HPP
 
 //Used to denote a variable is unused.
 #define UNREFERENCED_PARAMETER(P) (P)
+
+
+#endif

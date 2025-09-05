@@ -51,14 +51,14 @@
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\$(Platform)\$(Configuration)\</IntDir>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
-    <ClangTidyChecks>clang-analyzer-*,bugprone-*,modernize-*,readability-*</ClangTidyChecks>
+    <ClangTidyChecks>clang-analyzer-*,bugprone-*,modernize-*,readability-*,-modernize-use-trailing-return-type</ClangTidyChecks>
     <ExternalIncludePath>$(SolutionDir)Lib;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\$(Platform)\$(Configuration)\</IntDir>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
-    <ClangTidyChecks>clang-analyzer-*,bugprone-*,modernize-*,readability-*</ClangTidyChecks>
+    <ClangTidyChecks>clang-analyzer-*,bugprone-*,modernize-*,readability-*,-modernize-use-trailing-return-type</ClangTidyChecks>
     <ExternalIncludePath>$(SolutionDir)Lib;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -205,7 +205,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\Source\ISystem.cpp" />
+    <ClCompile Include="Source\Source\CoreEngine.cpp" />
     <ClCompile Include="Source\Source\main.cpp" />
     <ClCompile Include="Source\Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -273,6 +273,7 @@
     <ClInclude Include="Lib\Release_Desktop\imgui-docking\misc\cpp\imgui_stdlib.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Source\Header\CoreEngine.hpp" />
     <ClInclude Include="Source\Header\ISystem.hpp" />
     <ClInclude Include="Source\Header\macros.hpp" />
     <ClInclude Include="Source\Header\pch.hpp" />
