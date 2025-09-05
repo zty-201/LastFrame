@@ -1,11 +1,11 @@
 /*
 	Implementation of CoreEngine, the backbone class that manages all game systems.
+	//TODO: Unit tests
 */
 
 #include "pch.hpp"
 #include <algorithm>
 #include "CoreEngine.hpp"
-
 namespace EngineFramework
 {
 	//Singleton pattern: Everyone shares the only instance of the core engine.
