@@ -17,7 +17,12 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <crtdbg.h>
 //#include <WinBase.h>
 #include <windows.h>
+//Measurement of delta time.
+#include <chrono>
+
+
 /*
+	The entry point of the program.
 	Open Console in DEBUG mode (Project --> Linker --> System --> Subsystem == Console)
 	Open without console in RELEASE mode (Subsystem == Windows).
 */
@@ -54,10 +59,59 @@ int main(int argc, char* argv[])
 //		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 //		_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 //#endif
-		
+		/*
+			Process
+			1. Initialize all external libraries that cannot be initialized normally (maybe the initialization order is finicky).
+			2. Add systems to CoreEngine
+			3. Initialize systems
+			4. While loop (while the opengl window is open and has not received request to close).
+			- Get delta time
+			- Calculate FPS (not using delta time, but rather counting the number of frames/s
+			- Update systems
+			- PostUpdate Systems
+			- Limit FPS if needed (possibly by sleeping the pc).
+			6. Deallocate external libraries that aren't deallocated in the next step
+			7. Deallocate CoreEngine and all attached systems. Due to RAII, it'll be automatically done when the program ends so nothing needs to be done here.
+			- Note: Sometimes this step must be done before deallocation of external libraries. If so, CoreEngine should not be deallocated via RAII but rather via a manual function call before the previous step.
+		*/
+		EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
+
+		//=Adding Systems
+		//core_engine.AddSystem
+
+		//=Initialize Systems
+		try
+		{
+			core_engine.InitializeSystems();
+		}
+		catch (std::exception& e)
+		{
+			std::cout << "Game Aborted due to failure to initialize systems.\n"
+				<< e.what() << std::endl;
+			std::abort();
+		}
+
+		//Keeps track of the current delta time. Use a small arbitrary value for the first update loop.
+		float delta_time{0.0001f};
+		std::chrono::steady_clock::time_point time_before_loop{};
+		std::chrono::steady_clock::time_point time_after_loop{};
+		while (/*opengl window */true)
+		{
+			time_before_loop = std::chrono::steady_clock::now();
+
+			//TODO: Try-Catch handling in Update/PostUpdate.
+			core_engine.UpdateSystems(delta_time);
+			core_engine.PostUpdateSystems(delta_time);
+
+			time_after_loop = std::chrono::steady_clock::now();
+
+			//Convert microseconds into seconds, set the delta time.
+			delta_time = static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(time_after_loop - time_before_loop).count()) / 1000000.f;
+			//Limit the delta time value.
+			delta_time = (delta_time < MAX_DELTA_TIME) ? delta_time : MAX_DELTA_TIME;
+		}
 
 
 
 		return 0;
-
-}
+	}
