@@ -1,0 +1,8 @@
+
+namespace EngineFramework
+{
+	class ISystem
+	{
+
+	};
+}
