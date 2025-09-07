@@ -205,18 +205,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\Source\Camera.cpp" />
-    <ClCompile Include="Source\Source\GraphicsSystem.cpp" />
     <ClCompile Include="Source\Source\CoreEngine.cpp" />
-    <ClCompile Include="Source\Source\Lighting.cpp" />
     <ClCompile Include="Source\Source\main.cpp" />
-    <ClCompile Include="Source\Source\Mesh.cpp" />
     <ClCompile Include="Source\Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\Source\Renderer.cpp" />
-    <ClCompile Include="Source\Source\ShaderManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lib\Debug_Desktop\imgui-docking\backends\imgui_impl_glfw.h">
@@ -279,17 +273,10 @@
     <ClInclude Include="Lib\Release_Desktop\imgui-docking\misc\cpp\imgui_stdlib.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Source\Header\Camera.h" />
-    <ClInclude Include="Source\Header\GraphicsSystem.hpp" />
     <ClInclude Include="Source\Header\CoreEngine.hpp" />
-    <ClInclude Include="Source\Header\GraphicTypes.h" />
     <ClInclude Include="Source\Header\ISystem.hpp" />
-    <ClInclude Include="Source\Header\Lighting.h" />
     <ClInclude Include="Source\Header\macros.hpp" />
-    <ClInclude Include="Source\Header\Mesh.h" />
     <ClInclude Include="Source\Header\pch.hpp" />
-    <ClInclude Include="Source\Header\Renderer.h" />
-    <ClInclude Include="Source\Header\ShaderManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Lib\Debug_Desktop\imgui-docking\misc\debuggers\imgui.natstepfilter">
@@ -298,8 +285,6 @@
     <None Include="Lib\Release_Desktop\imgui-docking\misc\debuggers\imgui.natstepfilter">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="Source\Source\FragmentShader.frag" />
-    <None Include="Source\Source\VertexShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Lib\Debug_Desktop\imgui-docking\misc\debuggers\imgui.natvis">
