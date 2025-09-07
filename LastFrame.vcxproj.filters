@@ -33,6 +33,9 @@
     <Filter Include="Source Files\Utility">
       <UniqueIdentifier>{30e6067e-05dd-451e-9786-bfa18ad4d82c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{7d6e8e78-7b56-4497-a23d-ff9f91d8dfb3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Lib\Debug_Desktop\imgui-docking\imgui.cpp">
@@ -92,11 +95,29 @@
     <ClCompile Include="Source\Source\main.cpp">
       <Filter>Source Files\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Source\ISystem.cpp">
-      <Filter>Source Files\Framework</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Source\pch.cpp">
       <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\CoreEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\GraphicsSystem.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\Camera.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\Lighting.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\Mesh.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\ShaderManager.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\Renderer.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +190,30 @@
     <ClInclude Include="Source\Header\macros.hpp">
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Header\GraphicsSystem.hpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\CoreEngine.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Mesh.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Lighting.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ShaderManager.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Renderer.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Camera.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\GraphicTypes.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Lib\Debug_Desktop\imgui-docking\misc\debuggers\imgui.natstepfilter">
@@ -176,6 +221,12 @@
     </None>
     <None Include="Lib\Release_Desktop\imgui-docking\misc\debuggers\imgui.natstepfilter">
       <Filter>Resource Files\ImGui\Release</Filter>
+    </None>
+    <None Include="Source\Source\VertexShader.vert">
+      <Filter>Source Files\Graphics</Filter>
+    </None>
+    <None Include="Source\Source\FragmentShader.frag">
+      <Filter>Source Files\Graphics</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
