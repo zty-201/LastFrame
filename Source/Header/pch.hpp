@@ -8,7 +8,7 @@
 #include <memory>
 #include <vector>
 #include <algorithm>
-#include "macros.hpp"
+#include "global.hpp"
 #include "ISystem.hpp"
 #include "CoreEngine.hpp"
 

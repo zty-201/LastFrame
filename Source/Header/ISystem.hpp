@@ -6,7 +6,7 @@
 
 #ifndef I_SYSTEM_HPP
 #define I_SYSTEM_HPP
-#include "macros.hpp"
+#include "global.hpp"
 #include "CoreEngine.hpp"
 namespace EngineFramework
 {

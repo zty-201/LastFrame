@@ -42,6 +42,9 @@
     <Filter Include="Source Files\Framework\Component">
       <UniqueIdentifier>{50e626cd-efdb-42d2-acbc-7707272acb47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Reflection">
+      <UniqueIdentifier>{e60ad7d8-25f6-41f9-b240-6319ca7ec7e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Lib\Debug_Desktop\imgui-docking\imgui.cpp">
@@ -106,6 +109,15 @@
     </ClCompile>
     <ClCompile Include="Source\Source\CoreEngine.cpp">
       <Filter>Source Files\Framework\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\System_GameObjectSystem.cpp">
+      <Filter>Source Files\Framework\Gameobject</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\global.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\ReflectionRegister.cpp">
+      <Filter>Source Files\Reflection</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -172,14 +184,23 @@
     <ClInclude Include="Source\Header\pch.hpp">
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\macros.hpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Header\CoreEngine.hpp">
       <Filter>Source Files\Framework\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\ISystem.hpp">
       <Filter>Source Files\Framework\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\System_GameObjectSystem.hpp">
+      <Filter>Source Files\Framework\Gameobject</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\IGameComponent.hpp">
+      <Filter>Source Files\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\global.hpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ReflectionRegister.hpp">
+      <Filter>Source Files\Reflection</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
