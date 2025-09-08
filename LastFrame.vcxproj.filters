@@ -33,8 +33,14 @@
     <Filter Include="Source Files\Utility">
       <UniqueIdentifier>{30e6067e-05dd-451e-9786-bfa18ad4d82c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\NewFilter1">
-      <UniqueIdentifier>{18b62485-275d-443e-b353-c8bb04cfed9e}</UniqueIdentifier>
+    <Filter Include="Source Files\Framework\System">
+      <UniqueIdentifier>{5c301cc3-3031-469f-84f7-2e2954aba447}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Framework\Gameobject">
+      <UniqueIdentifier>{ffa86557-77ca-4e8f-90c9-9b4d22d7b29f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Framework\Component">
+      <UniqueIdentifier>{50e626cd-efdb-42d2-acbc-7707272acb47}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -99,7 +105,7 @@
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Source\Source\CoreEngine.cpp">
-      <Filter>Source Files\Framework</Filter>
+      <Filter>Source Files\Framework\System</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -163,9 +169,6 @@
     <ClInclude Include="Lib\Debug_Desktop\imgui-docking\misc\cpp\imgui_stdlib.h">
       <Filter>Resource Files\ImGui\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\ISystem.hpp">
-      <Filter>Source Files\Framework</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Header\pch.hpp">
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
@@ -173,7 +176,10 @@
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\CoreEngine.hpp">
-      <Filter>Source Files\Framework</Filter>
+      <Filter>Source Files\Framework\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\ISystem.hpp">
+      <Filter>Source Files\Framework\System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
