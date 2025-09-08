@@ -26,6 +26,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <random>
 #include "macros.hpp"
 #include "ISystem.hpp"
 #include "CoreEngine.hpp"

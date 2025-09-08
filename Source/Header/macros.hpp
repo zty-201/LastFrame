@@ -17,5 +17,6 @@ written consent of DigiPen Institute of Technology is prohibited.
 #define UNREFERENCED_PARAMETER(P) (P)
 //Defines max delta time so the game doesn't have too big of a delta time value, like if the user shifts the window. Arbitrary value.
 #define MAX_DELTA_TIME 0.1f
+#define PI 3.14159265358979323846f
 
 #endif
