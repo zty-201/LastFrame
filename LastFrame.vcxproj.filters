@@ -33,8 +33,14 @@
     <Filter Include="Source Files\Utility">
       <UniqueIdentifier>{30e6067e-05dd-451e-9786-bfa18ad4d82c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Graphics">
-      <UniqueIdentifier>{7d6e8e78-7b56-4497-a23d-ff9f91d8dfb3}</UniqueIdentifier>
+    <Filter Include="Source Files\Framework\System">
+      <UniqueIdentifier>{5c301cc3-3031-469f-84f7-2e2954aba447}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Framework\Gameobject">
+      <UniqueIdentifier>{ffa86557-77ca-4e8f-90c9-9b4d22d7b29f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Framework\Component">
+      <UniqueIdentifier>{50e626cd-efdb-42d2-acbc-7707272acb47}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -99,28 +105,7 @@
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Source\Source\CoreEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Source\geomlib-advanced.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Source\object.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Source\scene.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Source\shader.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Source\shapes.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Source\transform.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Source\GraphicsSystem.cpp">
-      <Filter>Source Files\Graphics</Filter>
+      <Filter>Source Files\Framework\System</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -184,9 +169,6 @@
     <ClInclude Include="Lib\Debug_Desktop\imgui-docking\misc\cpp\imgui_stdlib.h">
       <Filter>Resource Files\ImGui\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\ISystem.hpp">
-      <Filter>Source Files\Framework</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Header\pch.hpp">
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
@@ -194,28 +176,10 @@
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\CoreEngine.hpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Framework\System</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Header\geomlib.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\object.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\scene.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\shader.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\shapes.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\transform.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\GraphicsSystem.h">
-      <Filter>Source Files\Graphics</Filter>
+    <ClInclude Include="Source\Header\ISystem.hpp">
+      <Filter>Source Files\Framework\System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -225,13 +189,6 @@
     <None Include="Lib\Release_Desktop\imgui-docking\misc\debuggers\imgui.natstepfilter">
       <Filter>Resource Files\ImGui\Release</Filter>
     </None>
-    <None Include="Source\Source\lightingPhong.frag">
-      <Filter>Source Files\Graphics</Filter>
-    </None>
-    <None Include="Source\Source\lightingPhong.vert">
-      <Filter>Source Files\Graphics</Filter>
-    </None>
-    <None Include="glsl lightingPhong.frag" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Lib\Debug_Desktop\imgui-docking\misc\debuggers\imgui.natvis">
