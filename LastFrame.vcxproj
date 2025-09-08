@@ -293,7 +293,6 @@
     <ClInclude Include="Source\Header\transform.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="glsl lightingPhong.frag" />
     <None Include="Lib\Debug_Desktop\imgui-docking\misc\debuggers\imgui.natstepfilter">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
