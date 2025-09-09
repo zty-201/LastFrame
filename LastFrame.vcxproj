@@ -68,7 +68,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Lib\Debug_Desktop;$(SolutionDir)Lib\Debug_Desktop\glad_debug\include;$(SolutionDir)Lib\Debug_Desktop\glfw_debug\include;$(SolutionDir)Lib\Debug_Desktop\glm;$(SolutionDir)Lib\Debug_Desktop\imgui-docking;$(SolutionDir)Lib\Debug_Desktop\imgui-docking\backends;$(SolutionDir)Lib\Debug_Desktop\imgui-docking\misc;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Debug_Desktop\entt-master\src;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Debug_Desktop\json-develop\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Lib\Debug_Desktop;$(SolutionDir)Lib\Debug_Desktop\glad_debug\include;$(SolutionDir)Lib\Debug_Desktop\glfw_debug\include;$(SolutionDir)Lib\Debug_Desktop\glm;$(SolutionDir)Lib\Debug_Desktop\imgui-docking;$(SolutionDir)Lib\Debug_Desktop\imgui-docking\backends;$(SolutionDir)Lib\Debug_Desktop\imgui-docking\misc;$(SolutionDir)Lib\Debug_Desktop\entt-master\src;$(SolutionDir)Lib\Debug_Desktop\json-develop\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
@@ -95,7 +95,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Lib\Release_Desktop;$(SolutionDir)Lib\Release_Desktop\glad_release\include;$(SolutionDir)Lib\Release_Desktop\glfw_release\include;$(SolutionDir)Lib\Release_Desktop\glm;$(SolutionDir)Lib\Release_Desktop\imgui-docking;$(SolutionDir)Lib\Release_Desktop\imgui-docking\backends;$(SolutionDir)Lib\Release_Desktop\imgui-docking\misc;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Release_Desktop\entt-master\src;C:\Users\Asus\repos\LastFrame-Cheerios\Lib\Release_Desktop\json-develop\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source\Header;$(SolutionDir)Lib\Release_Desktop;$(SolutionDir)Lib\Release_Desktop\glad_release\include;$(SolutionDir)Lib\Release_Desktop\glfw_release\include;$(SolutionDir)Lib\Release_Desktop\glm;$(SolutionDir)Lib\Release_Desktop\imgui-docking;$(SolutionDir)Lib\Release_Desktop\imgui-docking\backends;$(SolutionDir)Lib\Release_Desktop\imgui-docking\misc;$(SolutionDir)Lib\Release_Desktop\entt-master\src;$(SolutionDir)Lib\Release_Desktop\json-develop\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>

@@ -52,8 +52,10 @@ namespace EngineFramework
 		*/
 		entt::meta_factory<EngineFramework::TODELETE>()
 			.type("TestClass"_hs)
-			.data<&TODELETE::a>("a")
+			.data<&TODELETE::a>("player_health")
 			.data<&TODELETE::b>("b")
 			.data<&TODELETE::c>("c");
+
+		
 	}
 }
