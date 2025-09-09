@@ -34,6 +34,7 @@
       <UniqueIdentifier>{30e6067e-05dd-451e-9786-bfa18ad4d82c}</UniqueIdentifier>
     </Filter>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     <Filter Include="Source Files\Framework\System">
       <UniqueIdentifier>{5c301cc3-3031-469f-84f7-2e2954aba447}</UniqueIdentifier>
     </Filter>
@@ -42,6 +43,10 @@
     </Filter>
     <Filter Include="Source Files\Framework\Component">
       <UniqueIdentifier>{50e626cd-efdb-42d2-acbc-7707272acb47}</UniqueIdentifier>
+=======
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{eb4c324b-7c02-4140-8fa5-911e65f62fae}</UniqueIdentifier>
+>>>>>>> Stashed changes
 =======
     <Filter Include="Source Files\Input">
       <UniqueIdentifier>{eb4c324b-7c02-4140-8fa5-911e65f62fae}</UniqueIdentifier>
@@ -111,12 +116,18 @@
     </ClCompile>
     <ClCompile Include="Source\Source\CoreEngine.cpp">
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       <Filter>Source Files\Framework\System</Filter>
 =======
+=======
+>>>>>>> Stashed changes
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Source\InputManager.cpp">
       <Filter>Source Files\Input</Filter>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     </ClCompile>
   </ItemGroup>
@@ -188,11 +199,17 @@
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     <ClInclude Include="Source\Header\CoreEngine.hpp">
       <Filter>Source Files\Framework\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\ISystem.hpp">
       <Filter>Source Files\Framework\System</Filter>
+=======
+    <ClInclude Include="Source\Header\CoreEngine.hpp" />
+    <ClInclude Include="Source\Header\InputManager.hpp">
+      <Filter>Source Files\Input</Filter>
+>>>>>>> Stashed changes
 =======
     <ClInclude Include="Source\Header\CoreEngine.hpp" />
     <ClInclude Include="Source\Header\InputManager.hpp">
