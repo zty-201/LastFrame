@@ -209,6 +209,7 @@
     <ClCompile Include="Source\Source\geomlib-advanced.cpp" />
     <ClCompile Include="Source\Source\GraphicsSystem.cpp" />
     <ClCompile Include="Source\Source\main.cpp" />
+    <ClCompile Include="Source\Source\Mesh.cpp" />
     <ClCompile Include="Source\Source\object.cpp" />
     <ClCompile Include="Source\Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -285,6 +286,7 @@
     <ClInclude Include="Source\Header\GraphicsSystem.h" />
     <ClInclude Include="Source\Header\ISystem.hpp" />
     <ClInclude Include="Source\Header\macros.hpp" />
+    <ClInclude Include="Source\Header\Mesh.h" />
     <ClInclude Include="Source\Header\object.h" />
     <ClInclude Include="Source\Header\pch.hpp" />
     <ClInclude Include="Source\Header\scene.h" />

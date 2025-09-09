@@ -131,6 +131,9 @@
     <ClCompile Include="Source\Source\transform.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Source\Mesh.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lib\Debug_Desktop\imgui-docking\imconfig.h">
@@ -224,6 +227,9 @@
       <Filter>Source Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\transform.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Mesh.h">
       <Filter>Source Files\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
