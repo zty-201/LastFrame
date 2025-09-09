@@ -20,6 +20,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 //Measurement of delta time.
 #include <chrono>
 
+#include "InputManager.hpp"
 
 /*
 	The entry point of the program.
