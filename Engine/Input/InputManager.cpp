@@ -15,28 +15,31 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 /* *******************************************************************/
 
 #include "InputManager.hpp"
-
+#include "global.hpp"
 void InputManager::Update(float delta_time)
 {
-
+    UNREFERENCED_PARAMETER(delta_time);
 }
 
 void InputManager::PostUpdate(float delta_time)
 {
-
+    UNREFERENCED_PARAMETER(delta_time);
 }
 
 bool InputManager::GetKey(int key)
 {
-
+    UNREFERENCED_PARAMETER(key);
+    return false;
 }
 
 bool InputManager::GetKeyDown(int key)
 {
-
+    UNREFERENCED_PARAMETER(key);
+    return false;
 }
 
 bool InputManager::GetKeyUp(int key)
 {
-
+    UNREFERENCED_PARAMETER(key);
+    return false;
 }

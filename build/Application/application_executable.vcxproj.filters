@@ -4,6 +4,9 @@
     <ClCompile Include="C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\build\Application\CMakeFiles\application_executable.dir\cmake_pch.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection\ReflectionRegister.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

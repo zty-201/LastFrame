@@ -43,6 +43,7 @@ cd build
 REM Configure with CMake
 echo [3/4] Configuring project with CMake...
 cmake .. -G "Visual Studio 17 2022" -A x64
+cmake -S .. -B build -DBUILD_GUI_APP=ON
 if %errorlevel% neq 0 (
     echo ERROR: CMake configuration failed
     cd ..
@@ -52,7 +53,7 @@ if %errorlevel% neq 0 (
 
 REM Build the project
 echo [4/4] Building project...
-cmake --build . --config Debug
+cmake --build . --config Release
 if %errorlevel% neq 0 (
     echo ERROR: Build failed
     cd ..
@@ -65,19 +66,6 @@ echo ===============================================
 echo   Build completed successfully!
 echo ===============================================
 echo.
-
-REM Run the application
-echo Running the application...
-echo.
-cd Sandbox\Debug
-MyGame.exe
-if %errorlevel% neq 0 (
-    echo.
-    echo Application exited with error code: %errorlevel%
-) else (
-    echo.
-    echo Application completed successfully!
-)
 
 echo.
 echo Press any key to exit...

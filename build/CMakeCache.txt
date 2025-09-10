@@ -14,6 +14,9 @@
 # EXTERNAL cache entries
 ########################
 
+//Build as a GUI application (no console window)
+BUILD_GUI_APP:BOOL=OFF
+
 //Path to a program.
 CMAKE_AR:FILEPATH=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.42.34433/bin/Hostx64/x64/lib.exe
 
@@ -346,8 +349,10 @@ CMAKE_STATIC_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+GLFW_BINARY:INTERNAL=C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/Lib/Windows_x64/Shared/glfw/binary
+GLFW_INCLUDE_DIRECTORY:INTERNAL=C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/Lib/Windows_x64/Shared/glfw/include
 SHARED_LIBRARIES:INTERNAL=entt;glm;json
 WINDOWS_DEBUG_LIBRARIES:INTERNAL=glad_debug;imgui
 WINDOWS_RELEASE_LIBRARIES:INTERNAL=glad_release
-WINDOWS_SHARED_LIBRARIES:INTERNAL=glfw
+WINDOWS_SHARED_LIBRARIES:INTERNAL=opengl32;gdi32;user32;kernel32;glfw3
 

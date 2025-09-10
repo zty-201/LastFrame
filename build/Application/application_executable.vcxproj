@@ -63,34 +63,34 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\build\Application\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\bin\Windows\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">application_executable.dir\Debug\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">application_executable</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">LastFrame</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\build\Application\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\bin\Windows\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">application_executable.dir\Release\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">application_executable</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">LastFrame</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\build\Application\MinSizeRel\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\bin\Windows\MinSizeRel\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">application_executable.dir\MinSizeRel\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">application_executable</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">LastFrame</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\build\Application\RelWithDebInfo\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\bin\Windows\RelWithDebInfo\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">application_executable.dir\RelWithDebInfo\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">application_executable</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">LastFrame</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Debug\glad_debug\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Debug\imgui;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Debug\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -108,16 +108,16 @@
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;DEBUG;/W4;/WX;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;DEBUG;/W4;/WX;/02;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;DEBUG;/W4;/WX;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;DEBUG;/W4;/WX;/02;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Debug\glad_debug\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Debug\imgui;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Debug\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Debug\glad_debug\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Debug\imgui;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Debug\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -125,16 +125,16 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>EXTERNAL_LIBRARY_DEPENDENCIES.lib;..\Engine\Debug\engine_library.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\bin\Windows\lib\Debug\EngineLibrary.lib;opengl32.lib;gdi32.lib;user32.lib;kernel32.lib;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\bin\Windows\lib\Debug\glad_debug.lib;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\bin\Windows\lib\Debug\imgui.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/Lib/Windows_x64/Shared/glfw/binary;C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/Lib/Windows_x64/Shared/glfw/binary/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/Debug/application_executable.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/bin/Windows/Debug/LastFrame.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/Debug/application_executable.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/bin/Windows/Debug/LastFrame.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -144,7 +144,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Release\glad_release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -161,18 +161,18 @@
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;/02;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;/02;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Release\glad_release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Release\glad_release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -180,16 +180,16 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>EXTERNAL_LIBRARY_DEPENDENCIES.lib;..\Engine\Release\engine_library.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\bin\Windows\lib\Release\EngineLibrary.lib;opengl32.lib;gdi32.lib;user32.lib;kernel32.lib;glfw3.lib;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\bin\Windows\lib\Release\glad_release.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/Lib/Windows_x64/Shared/glfw/binary;C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/Lib/Windows_x64/Shared/glfw/binary/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/Release/application_executable.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/bin/Windows/Release/LastFrame.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/Release/application_executable.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/bin/Windows/Release/LastFrame.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -199,7 +199,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -216,18 +216,18 @@
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;/02;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;/02;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -235,16 +235,16 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>EXTERNAL_LIBRARY_DEPENDENCIES.lib;..\Engine\MinSizeRel\engine_library.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\bin\Windows\lib\MinSizeRel\EngineLibrary.lib;opengl32.lib;gdi32.lib;user32.lib;kernel32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/Lib/Windows_x64/Shared/glfw/binary;C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/Lib/Windows_x64/Shared/glfw/binary/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/MinSizeRel/application_executable.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/bin/Windows/MinSizeRel/LastFrame.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/MinSizeRel/application_executable.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/bin/Windows/MinSizeRel/LastFrame.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -254,7 +254,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -272,16 +272,16 @@
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;/02;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;/W4;/WX;/02;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Component;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\Entity;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\ECS\System;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Drawable;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Mesh;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Renderer;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Shader;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Texture;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Graphics\Window;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Input;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Engine\Math;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Utility;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Windows_x64\Shared\glfw\include;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\entt\src;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\glm;C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Lib\Shared\json\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -289,16 +289,16 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>EXTERNAL_LIBRARY_DEPENDENCIES.lib;..\Engine\RelWithDebInfo\engine_library.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\bin\Windows\lib\RelWithDebInfo\EngineLibrary.lib;opengl32.lib;gdi32.lib;user32.lib;kernel32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/Lib/Windows_x64/Shared/glfw/binary;C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/Lib/Windows_x64/Shared/glfw/binary/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/RelWithDebInfo/application_executable.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/bin/Windows/RelWithDebInfo/LastFrame.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/RelWithDebInfo/application_executable.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/bin/Windows/RelWithDebInfo/LastFrame.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -385,6 +385,12 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/CMakeFiles/application_executable.dir/RelWithDebInfo/cmake_pch.hxx</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/application_executable.dir/RelWithDebInfo/cmake_pch.pch</PrecompiledHeaderOutputFile>
       <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\main.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/CMakeFiles/application_executable.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/CMakeFiles/application_executable.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/CMakeFiles/application_executable.dir/MinSizeRel/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/CMakeFiles/application_executable.dir/RelWithDebInfo/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\Application\Reflection\ReflectionRegister.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/CMakeFiles/application_executable.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -486,6 +492,14 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ProjectReference Include="C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\build\Engine\engine_library.vcxproj">
       <Project>{1BEE4C69-1011-36FF-A8A0-F73353DFA7AC}</Project>
       <Name>engine_library</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\build\Lib\Windows_x64\Debug\glad_debug\glad_debug.vcxproj">
+      <Project>{FE2DA251-AAB0-3BD6-AF59-6A768FB79AAC}</Project>
+      <Name>glad_debug</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Asus\repos\LastFrame-Cheerios_CMAKE\build\Lib\Windows_x64\Debug\imgui\imgui.vcxproj">
+      <Project>{DC9E82DA-882C-3473-A775-5F8BA293668D}</Project>
+      <Name>imgui</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

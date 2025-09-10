@@ -26,6 +26,7 @@ x64/
 x86/
 bin/
 temp/
+build/
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/

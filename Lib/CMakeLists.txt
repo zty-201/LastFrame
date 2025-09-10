@@ -20,12 +20,5 @@ add_subdirectory(Windows_x64/Release/glad_release)
 
 
 #Settle external interdependencies
-target_link_libraries(imgui PRIVATE glfw)
-
-
-# Set variables for top-level cmake to easily use.
-set(SHARED_LIBRARIES entt glm json CACHE INTERNAL "")
-set(WINDOWS_SHARED_LIBRARIES glfw CACHE INTERNAL "")
-set(WINDOWS_DEBUG_LIBRARIES glad_debug imgui CACHE INTERNAL "")
-set(WINDOWS_RELEASE_LIBRARIES glad_release CACHE INTERNAL "")
-set(ANDROID_LIBRARIES "" CACHE INTERNAL "")
+target_include_directories(imgui PUBLIC "${GLFW_INCLUDE_DIRECTORY}")
+target_link_libraries(imgui PUBLIC glfw3)
