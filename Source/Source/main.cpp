@@ -21,6 +21,10 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <chrono>
 #include "GraphicsSystem.h" // Include GraphicsSystem header
 
+#include "ReflectionRegister.hpp"
+#include "System_GameObjectSystem.hpp"
+
+
 
 /*
 	The entry point of the program.
@@ -75,9 +79,13 @@ int main(int argc, char* argv[])
 			7. Deallocate CoreEngine and all attached systems. Due to RAII, it'll be automatically done when the program ends so nothing needs to be done here.
 			- Note: Sometimes this step must be done before deallocation of external libraries. If so, CoreEngine should not be deallocated via RAII but rather via a manual function call before the previous step.
 		*/
+		//Initialize Entt Reflection System by registering all components.
+		EngineFramework::RegisterReflection();
 		EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 
 		//=Adding Systems
+		core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 1, 1, 1);
+		
 		// Create GraphicsSystem (which will set its static instance)
 		auto graphics_system = std::make_unique<EngineFramework::GraphicsSystem>();
 		
@@ -106,7 +114,7 @@ int main(int argc, char* argv[])
 		}
 
 		//Keeps track of the current delta time. Use a small arbitrary value for the first update loop.
-		float delta_time{0.0001f};
+		float delta_time{ 0.0001f };
 		std::chrono::steady_clock::time_point time_before_loop{};
 		std::chrono::steady_clock::time_point time_after_loop{};
 		
@@ -128,4 +136,4 @@ int main(int argc, char* argv[])
 		}
 
 		return 0;
-	}
+}
