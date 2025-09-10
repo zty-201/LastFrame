@@ -10,7 +10,7 @@
 #		build/buildx/lib: The static library (engine). 
 #Note: When building, files are placed in different build subfolders (buildx) corresponding to the platform they are built for.
 
-#Setup cmake and project properties, compile flags and preprocessor definitions.
+#Setup cmake and project properties
 cmake_minimum_required(VERSION 3.30)
 
 project("LastFrame" VERSION 1.0 LANGUAGES C CXX)
@@ -51,3 +51,23 @@ add_subdirectory(Application)
 #Add precompiled headers to speed up compilation times
 target_precompile_headers(engine_library PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
 target_precompile_headers(application_executable PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
+
+
+#Preprocessor Definitions 
+target_compile_definitions(engine_library PRIVATE $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Release>:NDEBUG>)
+target_compile_definitions(application_executable PRIVATE $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Release>:NDEBUG>)
+#Compiler Flags, use a high warning level and treat warnings as errors.
+target_compile_definitions(engine_library PRIVATE 
+    # MSVC (Windows) specific warnings
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+    # GCC/Clang specific warnings
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+)
+target_compile_definitions(application_executable PRIVATE 
+    # MSVC (Windows) specific warnings
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+    # GCC/Clang specific warnings
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+)
+
+
