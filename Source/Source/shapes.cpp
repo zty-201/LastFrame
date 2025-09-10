@@ -21,7 +21,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include "pch.hpp"
-#include "macros.hpp"
+#include "global.hpp"
 #include "shapes.h"
 
 const float rad = PI/180.0f;

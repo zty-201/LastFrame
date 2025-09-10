@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "macros.hpp"
+#include "global.hpp"
 #include "GraphicsSystem.h"
 
 namespace EngineFramework

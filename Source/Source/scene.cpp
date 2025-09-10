@@ -13,7 +13,7 @@
  // intewractions.  All of them can be used to draw the scene.
 
  #include "pch.hpp"
- #include "macros.hpp"
+ #include "global.hpp"
  #include "scene.h"
 
 
