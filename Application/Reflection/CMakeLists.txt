@@ -1,2 +1,2 @@
-target_sources(application_executable ReflectionRegister.cpp)
+target_sources(application_executable PUBLIC ReflectionRegister.cpp)
 target_include_directories(engine_library PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

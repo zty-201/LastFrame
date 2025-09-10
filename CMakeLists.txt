@@ -34,7 +34,7 @@ add_subdirectory(Lib)
 set(EXTERNAL_LIBRARY_DEPENDENCIES SHARED_LIBRARIES)
 #Windows
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-	list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES $<$<CONFIG:Debug>:WINDOWS_DEBUG_LIBRARIES> $<$<CONFIG:Release>:WINDOWS_RELEASE_LIBRARIES>)
+	list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES WINDOWS_SHARED_LIBRARIES $<$<CONFIG:Debug>:WINDOWS_DEBUG_LIBRARIES> $<$<CONFIG:Release>:WINDOWS_RELEASE_LIBRARIES>)
 endif()
 #Android
 if(CMAKE_SYSTEM_NAME STREQUAL "Android")
@@ -44,9 +44,11 @@ endif()
 
 #Build Engine as static lib
 add_subdirectory(Engine)
+target_link_libraries(engine_library EXTERNAL_LIBRARY_DEPENDENCIES)
 
 #Build Application as executable
 add_subdirectory(Application)
+target_link_libraries(application_executable EXTERNAL_LIBRARY_DEPENDENCIES engine_library)
 
 #Add precompiled headers to speed up compilation times
 target_precompile_headers(engine_library PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)

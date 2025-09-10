@@ -19,6 +19,10 @@ add_subdirectory(Windows_x64/Release/glad_release)
 # Android ARM64
 
 
+#Settle external interdependencies
+target_link_libraries(imgui PRIVATE glfw)
+
+
 # Set variables for top-level cmake to easily use.
 set(SHARED_LIBRARIES entt glm json CACHE INTERNAL "")
 set(WINDOWS_SHARED_LIBRARIES glfw CACHE INTERNAL "")

@@ -12,7 +12,7 @@
 #endif
 
 // GLEW & GLFW (OpenGL Context & Extensions)
-#include <GLAD/glad.h>
+#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
 // GLM (OpenGL Mathematics)
