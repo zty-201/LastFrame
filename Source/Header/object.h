@@ -8,43 +8,32 @@
 //
 // Methods consist of a constructor, and a Draw procedure, and an
 // append for building hierarchies of objects.
-
 #ifndef _OBJECT
 #define _OBJECT
 
-#include "shapes.h"
-#include "shader.h"
-#include <utility>              // for pair<Object*,mat4>
+#include "transform.h"
+#include "Mesh.h" // Use Mesh.h instead of shapes.h
+#include <vector>
+#include <memory>
 
-class Shader;
-class Object;
+class ShaderProgram;
 
-typedef std::pair<Object*,mat4> INSTANCE;
-
-// Object:: A shape, and its transformations, colors, and textures and sub-objects.
 class Object
 {
- public:
-    Shape* shape;               // Polygons 
-    int objectId;               // Object id to be sent to the shader
+public:
+    std::vector<std::pair<Object*,mat4> > instances;
+    vec3 diffuseColor, specularColor;
+    float shininess;
+    int objectId;
 
-    vec3 diffuseColor;          // Diffuse color of object
-    vec3 specularColor;         // Specular color of object
-    float shininess;            // Surface roughness value
+    std::shared_ptr<Mesh> mesh; // Changed from Shape* to shared_ptr<Mesh>
 
-    std::vector<INSTANCE> instances; // Pairs of sub-objects and transformations 
+    Object(std::shared_ptr<Mesh> _mesh, const int _objectId,
+           const vec3 _diffuseColor=vec3(0.5,0.5,0.5),
+           const vec3 _specularColor=vec3(0.5,0.5,0.5),
+           const float _shininess=1.0f);
 
-    Object(Shape* _shape, const int objectId,
-           const vec3 _d=vec3(), const vec3 _s=vec3(), const float _n=1);
-
-    // If this object is to be drawn with a texture, this is a good
-    // place to store the texture id (a small positive integer).  The
-    // texture id should be set in Scene::InitializeScene and used in
-    // Object::Draw.
-    
     void Draw(ShaderProgram* program, mat4& objectTr);
-
-    void add(Object* m, mat4 tr=mat4()) { instances.push_back(std::make_pair(m,tr)); }
 };
 
 #endif

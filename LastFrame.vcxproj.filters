@@ -128,9 +128,6 @@
     <ClCompile Include="Source\Source\shader.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Source\shapes.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Source\transform.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
@@ -230,9 +227,6 @@
       <Filter>Source Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\shader.h">
-      <Filter>Source Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Header\shapes.h">
       <Filter>Source Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Header\transform.h">

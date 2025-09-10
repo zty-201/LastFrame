@@ -218,7 +218,6 @@
     </ClCompile>
     <ClCompile Include="Source\Source\scene.cpp" />
     <ClCompile Include="Source\Source\shader.cpp" />
-    <ClCompile Include="Source\Source\shapes.cpp" />
     <ClCompile Include="Source\Source\transform.cpp" />
     <ClCompile Include="Source\Source\ReflectionRegister.cpp" />
     <ClCompile Include="Source\Source\System_GameObjectSystem.cpp" />
@@ -295,7 +294,6 @@
     <ClInclude Include="Source\Header\pch.hpp" />
     <ClInclude Include="Source\Header\scene.h" />
     <ClInclude Include="Source\Header\shader.h" />
-    <ClInclude Include="Source\Header\shapes.h" />
     <ClInclude Include="Source\Header\transform.h" />
     <ClInclude Include="Source\Header\ReflectionRegister.hpp" />
     <ClInclude Include="Source\Header\System_GameObjectSystem.hpp" />

@@ -11,9 +11,9 @@
 // Some of these parameters are set when the scene is built, and
 // others are set by the framework in response to user mouse/keyboard
 // interactions.  All of them can be used to draw the scene.
-
+#ifndef SCENE_H
+#define SCENE_H
 #include "geomlib.h"
-#include "shapes.h"
 #include "object.h"
 #include "shader.h"
 #include "transform.h"
@@ -53,7 +53,7 @@ public:
     // Ray traced image
     int raysize = 0;
     float* rayimage = NULL;
-    PlaneObj* fsq;
+    std::shared_ptr<Mesh> fsq; // Changed from PlaneObj*
     ShaderProgram* raytraceProgram;
     unsigned int rtTextureId = 0;
 
@@ -64,7 +64,7 @@ public:
     Object* objectRoot;
     Object *sky, *ground, *sea, *objects;
 
-    ProceduralGround* proceduralground;
+    std::shared_ptr<Mesh> proceduralground; // Changed from ProceduralGround*
 
     // Shader programs
     ShaderProgram* lightingProgram;
@@ -85,3 +85,5 @@ public:
     int grndCount = 20;      // Controls ground detail
     int GOAL = 10000;        // Target complexity value
 };
+
+#endif

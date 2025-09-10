@@ -10,11 +10,12 @@
  //
  // Some of these parameters are set when the scene is built, and
  // others are set by the framework in response to user mouse/keyboard
- // intewractions.  All of them can be used to draw the scene.
+ // interactions.  All of them can be used to draw the scene.
 
  #include "pch.hpp"
  #include "global.hpp"
  #include "scene.h"
+ #include "Mesh.h"  
 
 
  #if 0
@@ -32,7 +33,7 @@
 
  const float rad = PI/180.0f;    // Convert degrees to radians
 
- mat4 Identity;
+ mat4 Identity = mat4(1.0f);  // FIX: Initialize to identity matrix!
 
  const float grndSize = 60.0f;    // Island radius;  Minimum about 20;  Maximum 1000 or so
  const float grndOctaves = 4.0f;  // Number of levels of detail to compute
@@ -65,24 +66,23 @@ vec3 HSV2RGB(const float h, const float s, const float v)
 // InitializeScene is called once during setup to create all the
 // textures, shape VAOs, and shader programs as well as setting a
 // number of other parameters.
-int total(int p, int e, int g) { return (4*p*p)*(2*e+1)*(2*e+1) + 2*g*g; }
 void Scene::InitializeScene()
 {
-    while (total(polyCount,ellipsoidCount, grndCount) <= GOAL) {
-        polyCount++;
-        
-        if (total(polyCount,ellipsoidCount+1, grndCount) <= GOAL) {
-            ellipsoidCount += 1; }
-        if (total(polyCount,ellipsoidCount, grndCount+10) <= GOAL) {
-            grndCount += 10; }
-    }
+    std::cout << "=== Scene::InitializeScene() starting ===" << std::endl;
+    
+    std::cout << "=== Scene::InitializeScene() starting ===" << std::endl;
     
     glEnable(GL_DEPTH_TEST);
+    std::cout << "Depth test enabled" << std::endl;
+    std::cout << "Depth test enabled" << std::endl;
+    std::cout << "Depth test enabled" << std::endl;
+    std::cout << "Depth test enabled" << std::endl;
 
     // Set initial light parameters
     lightSpin = 150.0f;
     lightTilt = 5.0f;
     lightDist = 100.0f;
+    std::cout << "Light parameters set: spin=" << lightSpin << ", tilt=" << lightTilt << ", dist=" << lightDist << std::endl;
     
     w_down = false;
     s_down = false;
@@ -90,8 +90,8 @@ void Scene::InitializeScene()
     d_down = false;
     nav = true;
     spin = 0.0f;        // Looking along negative Y axis
-    tilt = 45.0f;       // Looking downward at 45 degrees
-    eye = vec3(0.0f, 20.0f, 20.0f); // Position above and behind origin
+    tilt = 0.0f;       // Look horizontally
+    eye = vec3(0.0f, 0.0f, 50.0f); // Move camera much further back
     speed = 300.0f/30.0f;
     last_time = static_cast<float>(glfwGetTime());
     tr = vec3(0.0f, 0.0f, 25.0f);
@@ -100,8 +100,12 @@ void Scene::InitializeScene()
     front = 0.1f;       // See closer objects
     back = 5000.0f;     // See far away objects
 
-    objectRoot = new Object(NULL, nullId);
+    std::cout << "Camera parameters set: eye=(" << eye.x << "," << eye.y << "," << eye.z << ")" << std::endl;
 
+    objectRoot = new Object(nullptr, nullId);
+    std::cout << "Object root created" << std::endl;
+    std::cout << "Object root created" << std::endl;
+        
     // Create the lighting shader program from source code files.
     lightingProgram = new ShaderProgram();
     lightingProgram->AddShader("./Source/Source/lightingPhong.vert", GL_VERTEX_SHADER);
@@ -113,103 +117,19 @@ void Scene::InitializeScene()
     glBindAttribLocation(lightingProgram->GetProgramID(), 3, "vertexTangent");
     lightingProgram->LinkProgram();
     
-    // Check for OpenGL errors
-    GLenum err;
-    if ((err = glGetError()) != GL_NO_ERROR) {
-        std::cout << "OpenGL error after shader compilation: " << err << std::endl;
-    }
-
-    // Test if shader is valid
-    GLint status;
-    glGetProgramiv(lightingProgram->GetProgramID(), GL_LINK_STATUS, &status);
-    if (status != GL_TRUE) {
-        std::cout << "Shader linking failed!" << std::endl;
-        // Get log
-        GLint logLen;
-        glGetProgramiv(lightingProgram->GetProgramID(), GL_INFO_LOG_LENGTH, &logLen);
-        if (logLen > 0) {
-            char* log = new char[logLen];
-            glGetProgramInfoLog(lightingProgram->GetProgramID(), logLen, NULL, log);
-            std::cout << "Linking log: " << log << std::endl;
-            delete[] log;
-        }
-    }
-    
-    // Create all the Polygon shapes
-    proceduralground = new ProceduralGround(grndSize, grndCount,
-                                     grndOctaves, grndFreq, grndPersistence,
-                                     grndLow, grndHigh);
-    
-    Shape* SpherePolygons = new SphereObj(polyCount);
-    Shape* SeaPolygons = new PlaneObj(2000.0, 1);
-    Shape* GroundPolygons = proceduralground;
-
-    // Various colors used in the subsequent models
-    vec3 woodColor(87.0/255.0, 51.0/255.0, 35.0/255.0);
-    vec3 brickColor(134.0/255.0, 60.0/255.0, 56.0/255.0);
-    vec3 floorColor(6*16/255.0, 5.5*16/255.0, 3*16/255.0);
-    vec3 brassColor(0.5, 0.5, 0.1);
-    vec3 grassColor(62.0/255.0, 102.0/255.0, 38.0/255.0);
-    vec3 waterColor(0.3, 0.3, 1.0);
-
-    vec3 black(0.0, 0.0, 0.0);
-    vec3 brightSpec(0.5, 0.5, 0.5);
-    vec3 polishedSpec(0.3, 0.3, 0.3);
- 
-    // Creates all the models from which the scene is composed.
-
-    ground     = new Object(GroundPolygons, groundId, grassColor, black, 1);
-    sea        = new Object(SeaPolygons, seaId, waterColor, brightSpec, 120);
-
-    for (int i=-ellipsoidCount; i<=ellipsoidCount; i++) {
-        for (int j=-ellipsoidCount; j<=ellipsoidCount; j++) {
-            vec3 hue = HSV2RGB(static_cast<float>(myrandom(RG)), 1.0f, 1.0f);
-            float r = 0.5f*(0.5f+2* static_cast<float>(myrandom(RG)));
-            float h = 2* static_cast<float>(myrandom(RG));
-            vec3 s(r, r, h);
-            int v = (i==0 && j==0) ? 0 : 1;
-            vec3 t(5*i + v*2* static_cast<float>(BALrandom(RG)),
-                        5*j + v*2* static_cast<float>(BALrandom(RG)),
-                        0.0);
-            t[2] = proceduralground->HeightAt(t[0], t[1]) + s[2]*0.9f;
-            Object* ellipsoid = new Object(SpherePolygons, 4, hue, vec3(0.5f), 120);
-            objectRoot->add(ellipsoid, Translate(t)*Scale(s)); 
-        } 
-    }
-
-    // Scene is composed of some scene objects, and the sky, ground, and sea
-    objectRoot->add(ground);
-    objectRoot->add(sea); 
-
-    // Count the number of triangles
-    triangleCount = 0;
-    for (INSTANCE instance : objectRoot->instances) {
-        Object* object = instance.first;
-        std::vector<ivec3>& Tri = object->shape->Tri; 
-        triangleCount += static_cast<int>(Tri.size());
-    }
-
-    fsq = new PlaneObj(1.0, 1);
-
-    // Make ground more visible
-    ground->diffuseColor = vec3(0.5f, 0.8f, 0.3f); // Brighter green
-    sea->diffuseColor = vec3(0.1f, 0.4f, 0.9f);     // Brighter blue
-
-    // Add a large visible test object in the scene center
-    Object* testSphere = new Object(new SphereObj(30), 4, 
+    // Create a reasonably sized sphere that you can see from outside
+    std::shared_ptr<Mesh> sphereMesh = Mesh::CreateSphere(30);
+    Object* testSphere = new Object(sphereMesh, debugId, 
                                    vec3(1.0f, 0.3f, 0.3f), // Bright red
                                    vec3(1.0f), 120);
-    objectRoot->add(testSphere, Translate(0.0f, 0.0f, 10.0f) * Scale(5.0f, 5.0f, 5.0f));
-
-    // Print camera position
+    
+    // Make it smaller - scale 2x instead of 20x
+    mat4 sphereTransform = Translate(0.0f, 0.0f, 0.0f) * Scale(2.0f, 2.0f, 2.0f);
+    objectRoot->instances.push_back({testSphere, sphereTransform});
+    
+    // Print camera position for debugging
     std::cout << "Camera initial position: " << eye.x << ", " << eye.y << ", " << eye.z << std::endl;
-    std::cout << "Ground count: " << grndCount << " Ellipsoid count: " << ellipsoidCount << std::endl;
-    std::cout << "Triangle count: " << triangleCount << std::endl;
-
-    // Make ground more visible
-    ground->diffuseColor = vec3(0.5f, 0.8f, 0.3f); // Brighter green
-    sea->diffuseColor = vec3(0.1f, 0.4f, 0.9f);     // Brighter blue
-    }
+}
 
 void Scene::DrawGUI()
 {
@@ -232,13 +152,11 @@ void Scene::BuildTransforms()
     if (a_down)
         stepDir = -vec3(cos(spin*rad), -sin(spin*rad), 0.0);
 
-    // Simple movement without student code check
+    // Simple movement 
     eye += stepDist*stepDir;
-    if (proceduralground)
-        eye[2] = proceduralground->HeightAt(eye[0], eye[1]) + 1.5f; // Set the height of the eye
 
     if (nav)
-        WorldView = Rotate(0, tilt-90)*Rotate(2, spin) *Translate(-eye[0], -eye[1], -eye[2]);
+        WorldView = lookAt(eye, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
     else
         WorldView = Translate(tr[0], tr[1], -tr[2]) *Rotate(0, tilt-90)*Rotate(2, spin);
     WorldProj = Perspective((ry*width)/height, ry, front, (mode==0) ? 1000 : back);
@@ -278,7 +196,7 @@ void Scene::DrawScene()
     glDisable(GL_CULL_FACE);
     
     // Clear with a distinctive color
-    glClearColor(0.2f, 0.3f, 0.8f, 1.0f); // Blue background
+    glClearColor(0.5, 0.5, 0.5, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Calculate the light's position from lightSpin, lightTilt, lightDist
@@ -298,17 +216,18 @@ void Scene::DrawScene()
     lightingProgram->UseShader();
     programId = lightingProgram->GetProgramID();
 
-    // Set the viewport, and clear the screen
-    glViewport(0, 0, width, height);
-    glClearColor(0.5, 0.5, 0.5, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     loc = glGetUniformLocation(programId, "WorldProj");
     glUniformMatrix4fv(loc, 1, GL_FALSE, Pntr(WorldProj));
     loc = glGetUniformLocation(programId, "WorldView");
     glUniformMatrix4fv(loc, 1, GL_FALSE, Pntr(WorldView));
     loc = glGetUniformLocation(programId, "WorldInverse");
     glUniformMatrix4fv(loc, 1, GL_FALSE, Pntr(viewInverse));
+    
+    // ADD THIS: Set NormalTr matrix
+    mat4 normalTr = transpose(inverse(Identity)); // For identity transform, this is just Identity
+    loc = glGetUniformLocation(programId, "NormalTr");
+    glUniformMatrix4fv(loc, 1, GL_FALSE, Pntr(normalTr));
+    
     loc = glGetUniformLocation(programId, "lightPos");
     glUniform3fv(loc, 1, &(lightPos[0]));   
     loc = glGetUniformLocation(programId, "mode");
@@ -319,15 +238,21 @@ void Scene::DrawScene()
     objectRoot->Draw(lightingProgram, Identity);
     glDisable(GL_POLYGON_OFFSET_FILL);
     
+    // TEMPORARILY COMMENT OUT WIREFRAME DRAWING
+    /*
     // Debug drawing - add wireframe overlay to see object shapes
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glLineWidth(1.0f);
     objectRoot->Draw(lightingProgram, Identity);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    */
     
     // Turn off the shader
     lightingProgram->UnuseShader();
 
+    // Enable face culling to see only front faces
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 }
 
                                                     
