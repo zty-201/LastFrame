@@ -38,12 +38,14 @@ if exist build (
 REM Create build directory
 echo [2/4] Creating build directory...
 mkdir build
-cd build
+
+REM Used to reconfigure via indicating the cmakelists file has changed. 
+copy /b "CMakeLists.txt" +,,
+
 
 REM Configure with CMake
 echo [3/4] Configuring project with CMake...
-cmake .. -G "Visual Studio 17 2022" -A x64
-cmake -S .. -B build -DBUILD_GUI_APP=ON -DConfiguration="Release"
+cmake --preset visual_studio_x64
 if %errorlevel% neq 0 (
     echo ERROR: CMake configuration failed
     cd ..
@@ -51,19 +53,9 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Build the project
-echo [4/4] Building project...
-cmake --build . --config Release
-if %errorlevel% neq 0 (
-    echo ERROR: Build failed
-    cd ..
-    pause
-    exit /b 1
-)
-
 echo.
 echo ===============================================
-echo   Build completed successfully!
+echo   Configuration completed successfully!
 echo ===============================================
 echo.
 

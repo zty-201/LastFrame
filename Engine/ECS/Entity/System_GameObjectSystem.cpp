@@ -2,7 +2,7 @@
 		Controls serialization, deserialization, safe deletion of instances.
 		Also controls serialization and deserialization for archtypes.
 
-		Uses Entt as the backbone.
+		Uses Entt as the backbone library.
 */
 #include "pch.hpp"
 

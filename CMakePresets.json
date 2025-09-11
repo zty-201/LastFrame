@@ -1,0 +1,19 @@
+{
+  "version": 4,
+  "configurePresets": [
+    {
+      "name": "visual_studio_x64",
+      "displayName": "Visual Studio x64",
+      "description": "A basic desktop build for Visual Studio.",
+      "generator": "Visual Studio 17 2022",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "binaryDir": "${sourceDir}/build/VisualStudio",
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release"
+      }
+    }
+  ]
+}
