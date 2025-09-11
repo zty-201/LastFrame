@@ -1,7 +1,0 @@
-C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Lib/Windows_x64/Debug/glad_debug/CMakeFiles/glad_debug.dir
-C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Lib/Windows_x64/Debug/imgui/CMakeFiles/imgui.dir
-C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Lib/Windows_x64/Release/glad_release/CMakeFiles/glad_release.dir
-C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Engine/CMakeFiles/engine_library.dir
-C:/Users/Asus/repos/LastFrame-Cheerios_CMAKE/build/Application/CMakeFiles/application_executable.dir

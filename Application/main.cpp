@@ -11,6 +11,13 @@ written consent of DigiPen Institute of Technology is prohibited.
 */
 /******************************************************************************/
 
+/*
+	Sets the application to not use console if in release mode.
+*/
+#ifdef NDEBUG
+#pragma comment(linker, "/SUBSYSTEM:WINDOWS")
+#endif
+
 #include "pch.hpp"
 #include <iostream>
 //Debug mem leak check

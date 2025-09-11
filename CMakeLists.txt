@@ -72,8 +72,8 @@ add_subdirectory(Application)
 target_link_libraries(application_executable PUBLIC engine_library)
 
 
-# Adding glfw.lib library path to both executable and library
-# TODO: May not need this.
+# Adding glfw.lib library path to both executable and library, as glfw target was unable to link in the previous step.
+#TODO: Temporary(?) solution.
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	target_link_directories(engine_library PUBLIC ${GLFW_BINARY}/)
 	target_link_directories(imgui PRIVATE ${GLFW_BINARY}/)
@@ -95,13 +95,7 @@ target_precompile_headers(application_executable PRIVATE ${CMAKE_CURRENT_LIST_DI
 target_compile_definitions(engine_library PRIVATE $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Release>:NDEBUG>)
 target_compile_definitions(application_executable PRIVATE $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Release>:NDEBUG>)
 
-#Toggle between console and windows app (on desktop) based on option passed in.
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-	if(BUILD_GUI_APP)
-    		set_target_properties(application_executable PROPERTIES WIN32_EXECUTABLE TRUE)
-		message("Windows Application Chosen")
-	endif()
-endif()
+
 
 #Compiler Flags, use a high warning level and treat warnings as errors.
 target_compile_definitions(engine_library PRIVATE 
@@ -120,6 +114,3 @@ target_compile_definitions(application_executable PRIVATE
 #Output Names
 set_target_properties(application_executable PROPERTIES OUTPUT_NAME LastFrame)
 set_target_properties(engine_library PROPERTIES OUTPUT_NAME EngineLibrary)
-
-
-
