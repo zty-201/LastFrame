@@ -43,7 +43,7 @@ cd build
 REM Configure with CMake
 echo [3/4] Configuring project with CMake...
 cmake .. -G "Visual Studio 17 2022" -A x64
-cmake -S .. -B build -DBUILD_GUI_APP=ON
+cmake -S .. -B build -DBUILD_GUI_APP=ON -DConfiguration="Release"
 if %errorlevel% neq 0 (
     echo ERROR: CMake configuration failed
     cd ..

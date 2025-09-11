@@ -15,7 +15,7 @@ option(BUILD_GUI_APP "Build as a GUI application (no console window)" OFF)
 
 
 #Setup cmake and project properties
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.25)
 
 project("LastFrame" VERSION 1.0 LANGUAGES C CXX)
 
@@ -26,13 +26,15 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_LIST_DIR}/bin/${CMAKE_SYSTEM_NAME}/${CONFIG}")
 set(LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_LIST_DIR}/bin/${CMAKE_SYSTEM_NAME}/${CONFIG}/lib")
 
+#Copying assets to executable folder
+file(COPY "${CMAKE_CURRENT_LIST_DIR}/Extern" DESTINATION "${CMAKE_CURRENT_LIST_DIR}/bin/${CMAKE_SYSTEM_NAME}/${Configuration}")
+
 #C++20 standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #Use filters to separate folders.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
 
 
 #Build external dependencies.
@@ -114,3 +116,6 @@ target_compile_definitions(application_executable PRIVATE
 #Output Names
 set_target_properties(application_executable PROPERTIES OUTPUT_NAME LastFrame)
 set_target_properties(engine_library PROPERTIES OUTPUT_NAME EngineLibrary)
+
+
+
