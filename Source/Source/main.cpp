@@ -20,6 +20,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 //Measurement of delta time.
 #include <chrono>
 #include "GraphicsSystem.h" // Include GraphicsSystem header
+#include "InputManager.hpp" //Include InputManager
 
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
@@ -98,8 +99,11 @@ int main(int argc, char* argv[])
 			std::move(graphics_system),  // Transfer ownership to CoreEngine
 			1,                          // Init order (low = init first)
 			1,                          // Update order (low = update first)
-			100                         // Destruct order (high = destroy last)
+			3                         // Destruct order (high = destroy last)
 		);
+
+		//Add Input Manager to engine
+		core_engine.AddSystem("InputManager", std::make_unique<InputManager>(), 1, 1, 2);
 
 		//=Initialize Systems
 		try

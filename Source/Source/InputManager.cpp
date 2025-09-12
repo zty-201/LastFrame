@@ -14,6 +14,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 */
 /* *******************************************************************/
 
+#include "pch.hpp"
 #include "InputManager.hpp"
 
 // Static member definitions
@@ -64,27 +65,40 @@ void InputManager::KeyCallback(GLFWwindow* window, int key, int scancode, int ac
     }
 }
 
-void InputManager::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+void InputManager::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    (void)window;
+    (void)button;
+    (void)mods;
+
     if (action == GLFW_PRESS) mouseButtonStates[button] = KeyState::Pressed;
     else if (action == GLFW_RELEASE) mouseButtonStates[button] = KeyState::Released;
 }
 
-void InputManager::CursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
+void InputManager::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+{
+    (void)window;
     mouseX = xpos;
     mouseY = ypos;
 }
 
-void InputManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+void InputManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    (void)window;
     scrollX = xoffset;
     scrollY = yoffset;
 }
 
-void InputManager::WindowSizeCallback(GLFWwindow* window, int width, int height) {
+void InputManager::WindowSizeCallback(GLFWwindow* window, int width, int height)
+{
+    (void)window;
     windowWidth = width;
     windowHeight = height;
 }
 
-void InputManager::ErrorCallback(int error, const char* description) {
+void InputManager::ErrorCallback(int error, const char* description)
+{
+    (void)error;
     fprintf(stderr, "GLFW Error: %s\n", description);
 }
 
@@ -144,14 +158,21 @@ std::pair<int, int> InputManager::GetWindowSize()
     return { windowWidth, windowHeight };
 }
 
-void InputManager::Update(float delta_time)
+void InputManager::Initialize()
 {
+    //Do nothing
+}
+
+void InputManager::Update(float deltaTime)
+{
+    (void)deltaTime;
     lastMouseX = mouseX;
     lastMouseY = mouseY;
 }
 
-void InputManager::PostUpdate(float delta_time)
+void InputManager::PostUpdate(float deltaTime)
 {
+    (void)deltaTime;
     for (auto& [key, state] : keyStates)
     {
         switch (state)
@@ -185,4 +206,3 @@ void InputManager::PostUpdate(float delta_time)
     scrollX = 0.0;
     scrollY = 0.0;
 }
-#include "pch.hpp"

@@ -18,6 +18,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include <unordered_map>
 #include "ISystem.hpp"
+#include "GLFW/glfw3.h"
 
 enum class KeyState
 {
@@ -30,9 +31,10 @@ enum class KeyState
 class InputManager : public EngineFramework::ISystem
 {
 public:
-    // --- Lifecycle ---
-    static void Update(float delta_time);      // promote transitions
-    static void PostUpdate(float delta_time);  // finalize states
+    //ISystem implementation
+    void Initialize() override;
+    void Update(float deltaTime) override;      // promote transitions
+    void PostUpdate(float deltaTime) override;  // finalize states
 
     // --- Keyboard API ---
     static bool GetKey(int key);       // true while held
