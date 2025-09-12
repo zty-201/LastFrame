@@ -80,7 +80,8 @@ add_custom_command(
 #==========Building of External Dependencies==========
 # Include project-wide utility and dependency modules
 include(ImportDependencies)
-importDependencies()
+#NOTE: importDependencies is failing and I don't know how to debug it, so Vendoring will be used instead.
+#importDependencies()
 
 #Build external dependencies.
 add_subdirectory(Lib)
@@ -124,9 +125,10 @@ target_link_libraries(application_executable PUBLIC engine_library)
 #TODO: NOTE: it only works for paths without spaces.
 # Get all cpp files in the engine folder and its subdirectories
 file(GLOB_RECURSE ENGINE_SOURCE "Engine/*.cpp" "Engine/*.c")
-file(GLOB_RECURSE ENGINE_HEADER_DIRECTORIES LIST_DIRECTORIES true "Engine/")
-
 target_sources(engine_library PUBLIC ${ENGINE_SOURCE})
+
+file(GLOB_RECURSE ENGINE_HEADER_DIRECTORIES LIST_DIRECTORIES true "Engine/*")
+list(APPEND ENGINE_HEADER_DIRECTORIES "Engine/")
 #Only include subdirectories.
 foreach(item ${ENGINE_HEADER_DIRECTORIES})
 	if(IS_DIRECTORY "${item}")
@@ -136,10 +138,11 @@ endforeach()
 
 # Get all cpp files in the application folder and its subdirectories
 file(GLOB_RECURSE APPLICATION_SOURCE "Application/*.cpp" "Application/*.c")
-#Only get subdirectory paths instead of the hpp files.
-file(GLOB_RECURSE APPLICATION_HEADER_DIRECTORIES LIST_DIRECTORIES true "Application/")
-
 target_sources(application_executable PUBLIC ${APPLICATION_SOURCE})
+
+#Only get subdirectory paths instead of the hpp files.
+file(GLOB_RECURSE APPLICATION_HEADER_DIRECTORIES LIST_DIRECTORIES true "Application/*")
+list(APPEND APPLICATION_HEADER_DIRECTORIES "Application/")
 #Only include subdirectories.
 foreach(item ${APPLICATION_HEADER_DIRECTORIES})
 	if(IS_DIRECTORY "${item}")
