@@ -58,23 +58,36 @@ target_compile_definitions(application_executable PRIVATE
 set_target_properties(application_executable PROPERTIES OUTPUT_NAME LastFrame)
 set_target_properties(engine_library PROPERTIES OUTPUT_NAME EngineLibrary)
 
-#Output paths
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_NAME}/$<CONFIG>")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_NAME}/$<CONFIG>")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_NAME}/$<CONFIG>")
+# #Output paths
+# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_NAME}/$<CONFIG>")
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_NAME}/$<CONFIG>")
+# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_NAME}/$<CONFIG>")
 
 
-#Copies assets to executable directory.
+#Copies assets to build directory, every build (to refresh assets)
+#This is necessary when run from visual studio (instead of running the executable)
 add_custom_command(
   TARGET application_executable
   POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
           ${CMAKE_SOURCE_DIR}/Extern
-          $<TARGET_FILE_DIR:application_executable>
+          ${CMAKE_BINARY_DIR}/Extern
+  COMMENT "Copying Extern/ to build directory ${CMAKE_BINARY_DIR}/"
+)
+
+#Copies assets to executable directory.
+#This is necessary for executable to find it.
+add_custom_command(
+  TARGET application_executable
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_SOURCE_DIR}/Extern
+          $<TARGET_FILE_DIR:application_executable>/Extern
   COMMENT "Copying Extern/ to executable directory"
 )
 
-
+#Sets the default startup project for visual studio to application_executable, other IDEs will ignore this.
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT application_executable)
 
 
 #==========Building of External Dependencies==========
@@ -109,7 +122,6 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Android")
 	list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES ${ANDROID_LIBRARIES})
 endif()
-message("External Libs: ${EXTERNAL_LIBRARY_DEPENDENCIES}")
 
 #Linking Libraries
 target_link_libraries(engine_library PUBLIC ${EXTERNAL_LIBRARY_DEPENDENCIES})
@@ -123,52 +135,52 @@ target_link_libraries(application_executable PUBLIC engine_library)
 
 # ======================= AUTO PROJECT DISCOVERY =========================
 #TODO: NOTE: it only works for paths without spaces.
+
 # Get all cpp files in the engine folder and its subdirectories
-file(GLOB_RECURSE ENGINE_SOURCE "Engine/*.cpp" "Engine/*.c")
+file(GLOB_RECURSE ENGINE_SOURCE "Engine/*.cpp" "Engine/*.c" "Engine/*.hpp" "Engine/*.h")
 target_sources(engine_library PUBLIC ${ENGINE_SOURCE})
 
+# Get all cpp files in the application folder and its subdirectories
+file(GLOB_RECURSE APPLICATION_SOURCE "Application/*.cpp" "Application/*.c" "Application/*.hpp" "Application/*.h")
+target_sources(application_executable PUBLIC ${APPLICATION_SOURCE})
+
+#Set folder properties on each file so visual studio knows how to set up filters.
+foreach(file IN LISTS ENGINE_SOURCE APPLICATION_SOURCE)
+    #get the folder path of the file.
+    file(RELATIVE_PATH relative_path "${CMAKE_SOURCE_DIR}" "${file}")
+    get_filename_component(folder_path "${relative_path}" PATH)
+    message("${folder_path}")
+    #Account for different filepath slash on windows.
+    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+      string(REPLACE "/" "\\" file_path_msvc "${folder_path}")
+      set(folder_path "${file_path_msvc}")
+    endif()
+    source_group("${folder_path}" FILES "${file}")
+endforeach()
+
+#Combined Include Directories of Engine and Application.
+set(ENGINE_APPLICATION_INCLUDE_DIRECTORIES "Engine/" "Application/")
+
+#Engine includes
 file(GLOB_RECURSE ENGINE_HEADER_DIRECTORIES LIST_DIRECTORIES true "Engine/*")
-list(APPEND ENGINE_HEADER_DIRECTORIES "Engine/")
 #Only include subdirectories.
 foreach(item ${ENGINE_HEADER_DIRECTORIES})
 	if(IS_DIRECTORY "${item}")
-		target_include_directories(engine_library PUBLIC "${item}")
+		list(APPEND ENGINE_APPLICATION_INCLUDE_DIRECTORIES "${item}")
 	endif()
 endforeach()
 
-# Get all cpp files in the application folder and its subdirectories
-file(GLOB_RECURSE APPLICATION_SOURCE "Application/*.cpp" "Application/*.c")
-target_sources(application_executable PUBLIC ${APPLICATION_SOURCE})
-
-#Only get subdirectory paths instead of the hpp files.
+#Application includes
 file(GLOB_RECURSE APPLICATION_HEADER_DIRECTORIES LIST_DIRECTORIES true "Application/*")
-list(APPEND APPLICATION_HEADER_DIRECTORIES "Application/")
 #Only include subdirectories.
 foreach(item ${APPLICATION_HEADER_DIRECTORIES})
 	if(IS_DIRECTORY "${item}")
-		target_include_directories(application_executable PUBLIC "${item}")
+		list(APPEND ENGINE_APPLICATION_INCLUDE_DIRECTORIES "${item}")
 	endif()
 endforeach()
+
+#TODO: By right, the engine shouldn't need to include application headers? Need to research more on this.
+target_include_directories(engine_library PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
+target_include_directories(application_executable PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
+
 # ======================= END AUTO CONFIGURATION =========================
-
-
-# Adding glfw.lib library path to both executable and library, as glfw target was unable to link in the previous step.
-#TODO: Temporary(?) solution.
-# if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-# 	target_link_directories(engine_library PUBLIC ${GLFW_BINARY}/)
-# 	target_link_directories(imgui PRIVATE ${GLFW_BINARY}/)
-
-# 	target_include_directories(engine_library PUBLIC ${GLFW_INCLUDE_DIRECTORY})
-# 	target_include_directories(imgui PRIVATE ${GLFW_INCLUDE_DIRECTORY})
-# endif()
-
-
-
-
-
-
-
-
-
-#Copying assets to executable folder
-file(COPY "${CMAKE_CURRENT_LIST_DIR}/Extern" DESTINATION "${CMAKE_CURRENT_LIST_DIR}/bin/${CMAKE_SYSTEM_NAME}/${Configuration}")

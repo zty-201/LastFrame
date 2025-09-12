@@ -20,5 +20,4 @@ add_subdirectory(Windows_x64/Release/glad_release)
 
 
 #Settle external interdependencies
-# target_include_directories(imgui PUBLIC "${GLFW_INCLUDE_DIRECTORY}")
-# target_link_libraries(imgui PUBLIC glfw3)
+target_link_libraries(imgui PUBLIC glfw3)
