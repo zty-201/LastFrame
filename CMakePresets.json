@@ -13,7 +13,14 @@
       "binaryDir": "${sourceDir}/build/VisualStudio",
       "cacheVariables": {
         "CMAKE_CONFIGURATION_TYPES": "Debug;Release"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+        "clangTidyChecks": "clang-analyzer-*,cppcoreguidelines-*,bugprone-*,modernize-*,readability-*,-modernize-use-trailing-return-type",
+        "enableMicrosoftCodeAnalysis": true,
+        "enableClangTidyCodeAnalysis": false
       }
+    }
     }
   ]
 }

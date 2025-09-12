@@ -30,28 +30,55 @@ add_library(engine_library STATIC)
 
 
 
-#Add precompiled headers to speed up compilation times
-target_precompile_headers(engine_library PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
-target_precompile_headers(application_executable PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
+#Add precompiled headers to speed up compilation times. application_executable will also use pch as it links to this lib.
+target_precompile_headers(engine_library PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
 
 
 #Preprocessor Definitions 
-target_compile_definitions(engine_library PUBLIC $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Release>:NDEBUG>)
-target_compile_definitions(application_executable PUBLIC $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Release>:NDEBUG>)
+target_compile_definitions(engine_library PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG>)
+target_compile_definitions(application_executable PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG>)
 
 
 #Compiler Flags, use a high warning level and treat warnings as errors.
+#Note: In Debug mode, ASAN and UBSAN can incur alot of performance slowdown. Only toggle in debug mode.
+#Note: To enable mem leak checks, temporarily disable (remb to enable back) /fsanitize=address for both targets.
 target_compile_options(engine_library PUBLIC 
     # MSVC (Windows) specific warnings
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+    # /fsanitize=address is enabled for ASAN. /Zi generates a pdb for debugging purposes.
+    $<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address /Zi>>
     # GCC/Clang specific warnings
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+    $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
 )
 target_compile_options(application_executable PUBLIC 
     # MSVC (Windows) specific warnings
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+    # /fsanitize=address is enabled for ASAN. /Zi generates a pdb for debugging purposes.
+    $<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address /Zi>>
     # GCC/Clang specific warnings
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+    $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
+)
+
+#Code analysis for Visual Studio
+#Enable VS code analysis for faster checks.
+#Enable clang tidy code analysis for more checks.
+set_target_properties(engine_library PROPERTIES
+    VS_GLOBAL_RunCodeAnalysis true
+    # Do not use visual studio core guidelines if clang tidy is enabled.
+    VS_GLOBAL_EnableMicrosoftCodeAnalysis true
+    # Use clangtidy
+    VS_GLOBAL_EnableClangTidyCodeAnalysis false
+    VS_GLOBAL_ClangTidyChecks -checks=-*,clang-analyzer-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type
+)
+set_target_properties(application_executable PROPERTIES
+    VS_GLOBAL_RunCodeAnalysis true
+    # Do not use visual studio core guidelines if clang tidy is enabled.
+    VS_GLOBAL_EnableMicrosoftCodeAnalysis true
+    # Use clangtidy
+    VS_GLOBAL_EnableClangTidyCodeAnalysis false
+    VS_GLOBAL_ClangTidyChecks -checks=-*,clang-analyzer-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type
 )
 
 #Output Names
@@ -89,6 +116,17 @@ add_custom_command(
 #Sets the default startup project for visual studio to application_executable, other IDEs will ignore this.
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT application_executable)
 
+#Sets console or windows subsystem for windows.
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+set_target_properties(application_executable PROPERTIES
+    WIN32_EXECUTABLE "$<$<CONFIG:Debug>:FALSE> $<$<CONFIG:Release>:TRUE>"
+)
+target_link_options(application_executable PRIVATE
+        "$<$<CONFIG:Debug>:/SUBSYSTEM:CONSOLE>"
+        "$<$<CONFIG:Release>:/SUBSYSTEM:WINDOWS>"
+    )
+endif()
+
 
 #==========Building of External Dependencies==========
 # Include project-wide utility and dependency modules
@@ -106,6 +144,20 @@ set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL
 set(WINDOWS_DEBUG_LIBRARIES glad_debug imgui CACHE INTERNAL "")
 set(WINDOWS_RELEASE_LIBRARIES glad_release CACHE INTERNAL "")
 set(ANDROID_LIBRARIES "" CACHE INTERNAL "")
+
+# Disable code analysis like clang-tidy for External Libraries (for msvc, gnu. If needed, add clang here too.)
+# This prevents false positives for 3rd party code.
+foreach(extern_dependency IN LISTS SHARED_LIBRARIES WINDOWS_SHARED_LIBRARIES WINDOWS_DEBUG_LIBRARIES WINDOWS_RELEASE_LIBRARIES ANDROID_LIBRARIES)
+  #Check if target is valid, or if it is empty/not defined.
+  if(${extern_dependency})
+    target_compile_options(${extern_dependency} PRIVATE
+      $<$<CXX_COMPILER_ID:MSVC>:/analyze->
+      $<$<CXX_COMPILER_ID:GNU>:-fno-analyzer>
+    )
+    message("${extern_dependency} analysis off")
+  endif()
+endforeach()
+
 
 
 #Determine the external dependencies for this platform.

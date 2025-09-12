@@ -17,11 +17,14 @@ written consent of DigiPen Institute of Technology is prohibited.
 #ifdef NDEBUG
 #pragma comment(linker, "/SUBSYSTEM:WINDOWS")
 #endif
-
-#include "pch.hpp"
-#include <iostream>
+#ifdef DEBUG
+#define _CRTDBG_MAP_ALLOC
+#endif
 //Debug mem leak check
 #include <crtdbg.h>
+#include "pch.hpp"
+#include <iostream>
+
 //#include <WinBase.h>
 #include <windows.h>
 //Measurement of delta time.
@@ -64,13 +67,15 @@ int main(int argc, char* argv[])
 			2. Asan
 			- Checks for mem fault locations like double deletion, use after free, buffer overflow etc.
 			- May have to disable incremental linking, hot reloading (and maybe /RTC1) before use.
+		
+			To disable asan, temporarily comment out /fsanitize=address in cmake file, then enable it back after checking
 		*/
 		// Enable run-time memory check for debug builds.
-		//Disable asan if enabled (but remb to enable it).
-//#if defined(DEBUG) | defined(_DEBUG)
-//		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-//		_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
-//#endif
+		//Disable /fsanitize=address temporarily to use, remember to enable afterwards
+#if defined(DEBUG)
+		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+		_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+#endif
 		/*
 			Process
 			1. Initialize all external libraries that cannot be initialized normally (maybe the initialization order is finicky).
