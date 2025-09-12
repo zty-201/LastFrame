@@ -42,6 +42,9 @@
     <Filter Include="Source Files\Framework\Component">
       <UniqueIdentifier>{50e626cd-efdb-42d2-acbc-7707272acb47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{098f3f3a-94f7-40a1-85d6-f40cc690251e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files\Reflection">
       <UniqueIdentifier>{e60ad7d8-25f6-41f9-b240-6319ca7ec7e0}</UniqueIdentifier>
     </Filter>
@@ -112,6 +115,27 @@
     </ClCompile>
     <ClCompile Include="Source\Source\CoreEngine.cpp">
       <Filter>Source Files\Framework\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\geomlib-advanced.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\GraphicsSystem.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\object.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\scene.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\shader.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\transform.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\Mesh.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Source\System_GameObjectSystem.cpp">
       <Filter>Source Files\Framework\Gameobject</Filter>
@@ -196,6 +220,27 @@
     <ClInclude Include="Source\Header\ISystem.hpp">
       <Filter>Source Files\Framework\System</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Header\geomlib.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\GraphicsSystem.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\object.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\scene.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\shader.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\transform.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\Mesh.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Header\System_GameObjectSystem.hpp">
       <Filter>Source Files\Framework\Gameobject</Filter>
     </ClInclude>
@@ -218,6 +263,12 @@
     </None>
     <None Include="Lib\Release_Desktop\imgui-docking\misc\debuggers\imgui.natstepfilter">
       <Filter>Resource Files\ImGui\Release</Filter>
+    </None>
+    <None Include="Source\Source\lightingPhong.frag">
+      <Filter>Source Files\Graphics</Filter>
+    </None>
+    <None Include="Source\Source\lightingPhong.vert">
+      <Filter>Source Files\Graphics</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

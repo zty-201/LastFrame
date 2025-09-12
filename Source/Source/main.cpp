@@ -19,7 +19,8 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <windows.h>
 //Measurement of delta time.
 #include <chrono>
-#include "InputManager.hpp"
+#include "GraphicsSystem.h" // Include GraphicsSystem header
+
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
 
@@ -84,6 +85,21 @@ int main(int argc, char* argv[])
 
 		//=Adding Systems
 		core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 1, 1, 1);
+		
+		// Create GraphicsSystem (which will set its static instance)
+		auto graphics_system = std::make_unique<EngineFramework::GraphicsSystem>();
+		
+		// Store a raw pointer to the GraphicsSystem before transferring ownership
+		EngineFramework::GraphicsSystem* graphics_ptr = graphics_system.get();
+		
+		// Add the GraphicsSystem to the CoreEngine
+		core_engine.AddSystem(
+			"GraphicsSystem",            // Name
+			std::move(graphics_system),  // Transfer ownership to CoreEngine
+			1,                          // Init order (low = init first)
+			1,                          // Update order (low = update first)
+			100                         // Destruct order (high = destroy last)
+		);
 
 		//=Initialize Systems
 		try
@@ -101,7 +117,9 @@ int main(int argc, char* argv[])
 		float delta_time{ 0.0001f };
 		std::chrono::steady_clock::time_point time_before_loop{};
 		std::chrono::steady_clock::time_point time_after_loop{};
-		while (/*opengl window */true)
+		
+		// Use the stored GraphicsSystem pointer to check window state
+		while (!graphics_ptr->ShouldClose()) // Replace 'true' with window check
 		{
 			time_before_loop = std::chrono::steady_clock::now();
 
@@ -116,8 +134,6 @@ int main(int argc, char* argv[])
 			//Limit the delta time value.
 			delta_time = (delta_time < MAX_DELTA_TIME) ? delta_time : MAX_DELTA_TIME;
 		}
-
-
 
 		return 0;
 }

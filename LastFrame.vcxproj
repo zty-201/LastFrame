@@ -206,13 +206,20 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Source\Source\CoreEngine.cpp" />
+    <ClCompile Include="Source\Source\geomlib-advanced.cpp" />
+    <ClCompile Include="Source\Source\GraphicsSystem.cpp" />
     <ClCompile Include="Source\Source\global.cpp" />
     <ClCompile Include="Source\Source\InputManager.cpp" />
     <ClCompile Include="Source\Source\main.cpp" />
+    <ClCompile Include="Source\Source\Mesh.cpp" />
+    <ClCompile Include="Source\Source\object.cpp" />
     <ClCompile Include="Source\Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Source\scene.cpp" />
+    <ClCompile Include="Source\Source\shader.cpp" />
+    <ClCompile Include="Source\Source\transform.cpp" />
     <ClCompile Include="Source\Source\ReflectionRegister.cpp" />
     <ClCompile Include="Source\Source\System_GameObjectSystem.cpp" />
   </ItemGroup>
@@ -278,11 +285,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Source\Header\CoreEngine.hpp" />
+    <ClInclude Include="Source\Header\geomlib.h" />
+    <ClInclude Include="Source\Header\GraphicsSystem.h" />
     <ClInclude Include="Source\Header\global.hpp" />
     <ClInclude Include="Source\Header\IGameComponent.hpp" />
     <ClInclude Include="Source\Header\InputManager.hpp" />
     <ClInclude Include="Source\Header\ISystem.hpp" />
+    <ClInclude Include="Source\Header\Mesh.h" />
+    <ClInclude Include="Source\Header\object.h" />
     <ClInclude Include="Source\Header\pch.hpp" />
+    <ClInclude Include="Source\Header\scene.h" />
+    <ClInclude Include="Source\Header\shader.h" />
+    <ClInclude Include="Source\Header\transform.h" />
     <ClInclude Include="Source\Header\ReflectionRegister.hpp" />
     <ClInclude Include="Source\Header\System_GameObjectSystem.hpp" />
   </ItemGroup>
@@ -293,6 +307,8 @@
     <None Include="Lib\Release_Desktop\imgui-docking\misc\debuggers\imgui.natstepfilter">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="Source\Source\lightingPhong.frag" />
+    <None Include="Source\Source\lightingPhong.vert" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Lib\Debug_Desktop\imgui-docking\misc\debuggers\imgui.natvis">
