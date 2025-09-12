@@ -45,6 +45,9 @@
     <Filter Include="Source Files\Reflection">
       <UniqueIdentifier>{e60ad7d8-25f6-41f9-b240-6319ca7ec7e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Framework\Input">
+      <UniqueIdentifier>{dadd522c-a9be-4cfb-bb27-08b7b64b9c4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Lib\Debug_Desktop\imgui-docking\imgui.cpp">
@@ -118,6 +121,9 @@
     </ClCompile>
     <ClCompile Include="Source\Source\ReflectionRegister.cpp">
       <Filter>Source Files\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Source\InputManager.cpp">
+      <Filter>Source Files\Framework\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -201,6 +207,9 @@
     </ClInclude>
     <ClInclude Include="Source\Header\ReflectionRegister.hpp">
       <Filter>Source Files\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Header\InputManager.hpp">
+      <Filter>Source Files\Framework\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

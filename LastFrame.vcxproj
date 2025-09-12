@@ -207,6 +207,7 @@
     </ClCompile>
     <ClCompile Include="Source\Source\CoreEngine.cpp" />
     <ClCompile Include="Source\Source\global.cpp" />
+    <ClCompile Include="Source\Source\InputManager.cpp" />
     <ClCompile Include="Source\Source\main.cpp" />
     <ClCompile Include="Source\Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -279,6 +280,7 @@
     <ClInclude Include="Source\Header\CoreEngine.hpp" />
     <ClInclude Include="Source\Header\global.hpp" />
     <ClInclude Include="Source\Header\IGameComponent.hpp" />
+    <ClInclude Include="Source\Header\InputManager.hpp" />
     <ClInclude Include="Source\Header\ISystem.hpp" />
     <ClInclude Include="Source\Header\pch.hpp" />
     <ClInclude Include="Source\Header\ReflectionRegister.hpp" />

@@ -19,7 +19,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <windows.h>
 //Measurement of delta time.
 #include <chrono>
-
+#include "InputManager.hpp"
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
 
