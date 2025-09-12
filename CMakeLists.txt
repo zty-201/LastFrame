@@ -36,18 +36,18 @@ target_precompile_headers(application_executable PRIVATE ${CMAKE_CURRENT_LIST_DI
 
 
 #Preprocessor Definitions 
-target_compile_definitions(engine_library PRIVATE $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Release>:NDEBUG>)
-target_compile_definitions(application_executable PRIVATE $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Release>:NDEBUG>)
+target_compile_definitions(engine_library PUBLIC $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Release>:NDEBUG>)
+target_compile_definitions(application_executable PUBLIC $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Release>:NDEBUG>)
 
 
 #Compiler Flags, use a high warning level and treat warnings as errors.
-target_compile_definitions(engine_library PRIVATE 
+target_compile_options(engine_library PUBLIC 
     # MSVC (Windows) specific warnings
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
     # GCC/Clang specific warnings
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
 )
-target_compile_definitions(application_executable PRIVATE 
+target_compile_options(application_executable PUBLIC 
     # MSVC (Windows) specific warnings
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
     # GCC/Clang specific warnings
@@ -149,7 +149,6 @@ foreach(file IN LISTS ENGINE_SOURCE APPLICATION_SOURCE)
     #get the folder path of the file.
     file(RELATIVE_PATH relative_path "${CMAKE_SOURCE_DIR}" "${file}")
     get_filename_component(folder_path "${relative_path}" PATH)
-    message("${folder_path}")
     #Account for different filepath slash on windows.
     if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
       string(REPLACE "/" "\\" file_path_msvc "${folder_path}")
