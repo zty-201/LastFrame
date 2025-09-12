@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 		);
 
 		//Add Input Manager to engine
-		core_engine.AddSystem("InputManager", std::make_unique<InputManager>(), 1, 1, 2);
+		core_engine.AddSystem("InputManager", std::make_unique<InputManager>(), 2, 1, 2);
 
 		//=Initialize Systems
 		try
