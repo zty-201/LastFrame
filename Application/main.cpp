@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
 		std::chrono::steady_clock::time_point time_after_loop{};
 		
 		// Use the stored GraphicsSystem pointer to check window state
-		while (!graphics_ptr->ShouldClose()) // Replace 'true' with window check
+		while (graphics_ptr->GetGLFWwindow()) // Replace 'true' with window check
 		{
 			time_before_loop = std::chrono::steady_clock::now();
 

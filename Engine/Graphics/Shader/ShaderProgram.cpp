@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include "pch.hpp"
-#include "shader.h"
+#include "ShaderProgram.h"
 
 // Function to convert OpenGL shader data type enums to strings.
 const char* getTypeString(GLenum type)
