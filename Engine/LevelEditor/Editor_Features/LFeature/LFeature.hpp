@@ -16,18 +16,23 @@
 
 namespace EngineFramework
 {
+	struct iEditorView; //forward declaration
 
 	class LFeature
 	{
+	protected:
+		iEditorView* editor_ptr = nullptr;// back-pointer to the limited variables
 	public:
-		LFeature();
-		
-		void Initialize();
-		void Run();
-		void Close();
-		//void Update(float delta_time);
 
+		bool is_enabled = false;
+		virtual ~LFeature() = default;		
+		virtual void Initialize() = 0;
+		virtual void Run() = 0;
+		virtual void Close() = 0;
+		void set_Pointer(iEditorView* ptr) { editor_ptr = ptr; }
+		
 	};
+
 
 
 }

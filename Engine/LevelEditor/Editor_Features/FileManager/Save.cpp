@@ -21,29 +21,30 @@
 //Casting meta data to type.
 #include "ReflectionRegister.hpp"
 
-#include "LFeature.hpp"
+#include "Save.hpp"
+
 
 namespace EngineFramework
 {
-	LFeature::LFeature()
-	{
-		
-	}
+    Save::Save() {
+        std::cout << "Lfeature: Save CREATED\n";
+    }
+    Save::~Save() {
 
-	void LFeature::Initialize()
-	{
-		std::cout << "level editor Lfeature ONLINE!\n";
-	}
+    }
+    void Save::Initialize() {
 
-	void LFeature::Run()
-	{
+    }
+    void Save::Run() {
 
-	}
+        //since saving is a one time event, is_enabled should be set to false when done.
+        std::cout << "Saved\n";
+        is_enabled = false;
+        
 
-	void LFeature::Close()
-	{
+    }
+    void Save::Close() {
 
-
-	}
+    }
 
 }

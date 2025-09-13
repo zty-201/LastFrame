@@ -33,27 +33,23 @@ namespace EngineFramework
 	void LevelEditorSystem::Initialize()
 	{
 		application = std::make_unique<LevelEditor>();
+		application->Initialize();
 		std::cout << "level editor system ONLINE!\n";
 	}
 	void LevelEditorSystem::Update(float delta_time)
 	{
 		UNREFERENCED_PARAMETER(delta_time);
 
-		if (application->Get_Editor_State()){
+		if (application->To_Close()) {
+			application->Close();
+
+		}else if(application->Get_Editor_State()){
 
 			//open is a 1 time thing, it shouldnt be called everyframe
-			//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed
-			if (application->To_Open()) {
-				application->Open();
-			}
+			//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed			
 			application->Run();
 		}
-		else{
-			//closing is a 1 time thing, it shouldnt be called everyframe
-			if (application->To_Close()) {
-				application->Close();
-			}
-		}
+		
 		
 	}
 

@@ -41,6 +41,8 @@ written consent of DigiPen Institute of Technology is prohibited.
 	Open Console in DEBUG mode (Project --> Linker --> System --> Subsystem == Console)
 	Open without console in RELEASE mode (Subsystem == Windows).
 */
+EngineFramework::GraphicsSystem* g_graphics_ptr = nullptr;
+
 #ifdef _DEBUG
 int main(int argc, char* argv[])
 {
@@ -97,10 +99,11 @@ int main(int argc, char* argv[])
 
 		//=Adding Systems
 		core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 1, 1, 1);
-		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
+		
 		
 		// Create GraphicsSystem (which will set its static instance)
 		auto graphics_system = std::make_unique<EngineFramework::GraphicsSystem>();
+		g_graphics_ptr = graphics_system.get();
 		
 		// Store a raw pointer to the GraphicsSystem before transferring ownership
 		EngineFramework::GraphicsSystem* graphics_ptr = graphics_system.get();
@@ -113,6 +116,8 @@ int main(int argc, char* argv[])
 			1,                          // Update order (low = update first)
 			100                         // Destruct order (high = destroy last)
 		);
+
+		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
 
 		//=Initialize Systems
 		try
