@@ -33,7 +33,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
-
+#include "System_LevelEditor.hpp"
 
 
 /*
@@ -97,6 +97,7 @@ int main(int argc, char* argv[])
 
 		//=Adding Systems
 		core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 1, 1, 1);
+		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
 		
 		// Create GraphicsSystem (which will set its static instance)
 		auto graphics_system = std::make_unique<EngineFramework::GraphicsSystem>();

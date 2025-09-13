@@ -25,6 +25,8 @@ namespace EngineFramework
         SetupGLFW();
         SetupImGui();
         SetupGraphics();
+        //need to have a function for input handling
+        //since input handling is part of glfw , at least for the callbacks
     }
 
     void GraphicsSystem::SetupGLFW()
@@ -67,6 +69,7 @@ namespace EngineFramework
 
     void GraphicsSystem::SetupImGui()
     {
+        //imgui should not be an entity of graphics
         /*ImGui::CreateContext();
         ImGui_ImplGlfw_InitForOpenGL(scene.window, true);
         ImGui_ImplOpenGL3_Init();*/
