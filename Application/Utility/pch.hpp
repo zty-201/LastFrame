@@ -11,7 +11,7 @@
 #include <windows.h>
 #endif
 
-// GLEW & GLFW (OpenGL Context & Extensions)
+// GLAD & GLFW (OpenGL Context & Extensions)
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
