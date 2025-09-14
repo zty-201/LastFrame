@@ -33,6 +33,8 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "Input/InputManager.hpp"
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
+#include "Assets/AssetManager.hpp"
+
 #include "System_LevelEditor.hpp"
 
 
@@ -107,7 +109,10 @@ int main(int argc, char* argv[])
 		EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 
 		//=Adding Systems
-		core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 1, 1, 1);
+		core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 1, 1, 100);
+		core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 2, 2, 1);
+
+
 		
 		
 		// Create GraphicsSystem (which will set its static instance)
@@ -125,6 +130,8 @@ int main(int argc, char* argv[])
 			1,                          // Update order (low = update first)
 			3                         // Destruct order (high = destroy last)
 		);
+		
+		core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 3, 1, 4);
 
 		core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 1, 3);
 
@@ -146,6 +153,7 @@ int main(int argc, char* argv[])
 		float delta_time{ 0.0001f };
 		std::chrono::steady_clock::time_point time_before_loop{};
 		std::chrono::steady_clock::time_point time_after_loop{};
+
 		
 		// Use the stored GraphicsSystem pointer to check window state
 		while (graphics_ptr->GetGLFWwindow()) // Replace 'true' with window check
