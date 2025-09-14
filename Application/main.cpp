@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 			3                         // Destruct order (high = destroy last)
 		);
 
-		core_engine.AddSystem("InputManager", std::make_unique<InputManager>(), 2, 1, 3);
+		core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 1, 3);
 
 		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
 
