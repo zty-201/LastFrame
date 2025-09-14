@@ -97,9 +97,9 @@ int main(int argc, char* argv[])
 		EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 
 		//=Adding Systems
-		core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 1, 1, 1);
+		core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 1, 1, 100);
+		core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 2, 2, 1);
 
-		
 
 		
 		// Create GraphicsSystem (which will set its static instance)
@@ -133,62 +133,6 @@ int main(int argc, char* argv[])
 		float delta_time{ 0.0001f };
 		std::chrono::steady_clock::time_point time_before_loop{};
 		std::chrono::steady_clock::time_point time_after_loop{};
-
-		// ---- AssetManager smoke test (paste here) ----
-		{
-			using EngineFramework::AssetManagerSystem;
-			auto& AM = AssetManagerSystem::GetInstance();
-
-			// Show working directory (so paths make sense)
-			std::cout << "[AM] CWD = " << std::filesystem::current_path().string() << "\n";
-
-			// Ensure root and a subfolder exist
-			AM.SetRoot("Assets"); // all relative paths under Assets/
-			std::filesystem::create_directories("Assets/Texture");
-
-			// Create a tiny dummy file so we don’t depend on manual setup
-			{
-				std::ofstream f("Assets/Texture/test.png", std::ios::binary);
-				f << "not-a-real-png"; // we don't open/parse; file just needs to exist
-			}
-
-			// Register by name -> relative path
-			EngineFramework::AssetID id = AM.Register("test", "Texture/test.png");
-			std::cout << "[AM] Registered 'test' as id " << id << "\n";
-
-			// Query paths and existence
-			std::cout << "[AM] Has('test')      = " << AM.Has("test") << "\n";
-			std::cout << "[AM] Rel path          = " << AM.GetRelativePath(id).string() << "\n";
-			std::cout << "[AM] Abs path          = " << AM.GetAbsolutePath(id).string() << "\n";
-			std::cout << "[AM] Exists on disk?   = " << (AM.ExistsOnDisk(id) ? "yes" : "no") << "\n";
-
-			// Move the file to a new place inside the root (and update the record)
-			bool moved = AM.RelocateByName(
-				"test",
-				"Images/brick.png",
-				AssetManagerSystem::MovePolicy::MoveOnDisk,   // Move physically
-				/*allowOverwrite=*/false
-			);
-			std::cout << "[AM] Moved to Images/? = " << (moved ? "yes" : "no") << "\n";
-			std::cout << "[AM] New rel path      = " << AM.GetRelativePath(id).string() << "\n";
-			std::cout << "[AM] New abs path      = " << AM.GetAbsolutePath(id).string() << "\n";
-			std::cout << "[AM] Exists at new?    = " << (AM.ExistsOnDisk(id) ? "yes" : "no") << "\n";
-
-			// Rename the asset's *name* (record only, file unchanged)
-			bool renamed = AM.RenameName("test", "testworks");
-			std::cout << "[AM] Renamed name?     = " << (renamed ? "yes" : "no") << "\n";
-			std::cout << "[AM] FindId('testworks') = " << AM.FindId("testworks") << "\n";
-
-			// Import a folder: auto-register all .png and .obj under Assets/Texture
-			std::size_t added = AM.ImportFolder("Texture", { ".png", ".obj" }, /*recursive=*/true);
-			std::cout << "[AM] ImportFolder added " << added << " assets\n";
-
-			// List all current records
-			for (auto& [name, rel] : AM.List()) {
-				std::cout << "[AM] " << name << " -> " << rel.string() << "\n";
-			}
-		}
-		// ---- end smoke test ----
 
 		
 		// Use the stored GraphicsSystem pointer to check window state
