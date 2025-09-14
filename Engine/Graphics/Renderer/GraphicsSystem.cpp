@@ -3,6 +3,14 @@
 #include "GraphicsSystem.h"
 #include "Input/InputManager.hpp"
 
+
+#ifdef _DEBUG
+#include "System_LevelEditor.hpp"
+class LevelEditor; //forward declaration
+#endif
+
+
+
 namespace EngineFramework
 {
     GraphicsSystem::GraphicsSystem()
@@ -211,8 +219,16 @@ namespace EngineFramework
         }
         
         //Input Callbacks
-        InputManager::RegisterCallbacks(window);
+        //When Level Editor is enabled, disable the input callbacks from core engine. Because imgui have its own sets of inputs.
 
+#ifdef _DEBUG
+        if (!LevelEditor::Get_Editor_State()) {
+            InputManager::RegisterCallbacks(window);
+        }
+#else
+        InputManager::RegisterCallbacks(window);
+#endif        
+        
         // Draw scene
         scene.render();
     }

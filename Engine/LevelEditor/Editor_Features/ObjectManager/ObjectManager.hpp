@@ -1,7 +1,4 @@
-/*
-
-        Uses Entt as the backbone.
-*/
+#ifdef _DEBUG
 #ifndef OBJECTMANAGER_LFEATURE_HPP
 #define OBJECTMANAGER_LFEATURE_HPP
 #include <unordered_map>
@@ -21,7 +18,7 @@ namespace EngineFramework
     class ObjectManager : public LFeature
     {
     public:
-        
+
         ObjectManager();
         ~ObjectManager() override;
 
@@ -36,4 +33,5 @@ namespace EngineFramework
 
 
 
+#endif
 #endif

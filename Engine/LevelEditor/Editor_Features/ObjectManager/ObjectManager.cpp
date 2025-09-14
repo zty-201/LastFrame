@@ -1,9 +1,4 @@
-/*
-        Controls serialization, deserialization, safe deletion of instances.
-        Also controls serialization and deserialization for archtypes.
-
-        Uses Entt as the backbone library.
-*/
+#ifdef _DEBUG
 #include "pch.hpp"
 
 //File management, JSON file parser/writer
@@ -43,16 +38,16 @@ namespace EngineFramework
         ImGui::SetNextWindowSize(ImVec2(420, 260), ImGuiCond_FirstUseEver);
 
         // No flags that block move/resize
-        ImGui::Begin("Object Manager", &is_enabled);            
+        ImGui::Begin("Object Manager", &is_enabled);
         ImGui::Text("Drag my title bar / edges.");
         // --- per frame UI ---
         static int click_count = 0;
 
         if (ImGui::Button("Click me")) {
-        	++click_count;
-        	std::cout << "[ImGui] Button clicked: " << click_count << " times\n";
+            ++click_count;
+            std::cout << "[ImGui] Button clicked: " << click_count << " times\n";
         }
-        
+
         ImGui::End();
 
     }
@@ -61,3 +56,4 @@ namespace EngineFramework
     }
 
 }
+#endif

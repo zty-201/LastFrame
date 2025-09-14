@@ -1,7 +1,4 @@
-/*
-		
-		Uses Entt as the backbone.
-*/
+#ifdef _DEBUG
 #ifndef LEVEL_EDITOR_LFEATURE_HPP
 #define LEVEL_EDITOR_LFEATURE_HPP
 #include <unordered_map>
@@ -25,12 +22,12 @@ namespace EngineFramework
 	public:
 
 		bool is_enabled = false;
-		virtual ~LFeature() = default;		
+		virtual ~LFeature() = default;
 		virtual void Initialize() = 0;
 		virtual void Run() = 0;
 		virtual void Close() = 0;
 		void set_Pointer(iEditorView* ptr) { editor_ptr = ptr; }
-		
+
 	};
 
 
@@ -40,4 +37,5 @@ namespace EngineFramework
 
 
 
+#endif
 #endif

@@ -1,8 +1,5 @@
 
-/*
-
-		Uses Entt as the backbone.
-*/
+#ifdef _DEBUG
 #include "pch.hpp"
 
 #ifndef LEVEL_EDITOR_HPP
@@ -19,13 +16,13 @@
 namespace EngineFramework
 {
 	//for 1 time init to be used in run()
-	struct Imgui_const_Flags{
+	struct Imgui_const_Flags {
 
 		ImGuiWindowFlags DockWindowFlags;
 	};
 
 	//limiting the accessable variables for Lfeature, only able to change certain variables
-	struct iEditorView{
+	struct iEditorView {
 
 		int selected_objectID;
 		int selected_modelID;
@@ -36,8 +33,8 @@ namespace EngineFramework
 	public:
 		LevelEditor();
 		~LevelEditor();
-		
-		bool Get_Editor_State() const {
+
+		static bool Get_Editor_State() {
 			return is_enabled;
 		}
 		bool To_Close() const {
@@ -61,7 +58,7 @@ namespace EngineFramework
 	private:
 		//Keeps track of the one and only instance of this system, created by core engine.
 		static inline LevelEditor* this_system{};
-		bool is_enabled;
+		static bool is_enabled;
 		bool to_close;
 		bool to_open;
 		Imgui_const_Flags imgui_flags;
@@ -82,3 +79,6 @@ namespace EngineFramework
 
 
 #endif
+#endif
+
+

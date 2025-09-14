@@ -1,8 +1,5 @@
 
-/*
-
-		Uses Entt as the backbone.
-*/
+#ifdef _DEBUG
 #ifndef SYSTEM_LEVEL_EDITOR_HPP
 #define SYSTEM_LEVEL_EDITOR_HPP
 #include <unordered_map>
@@ -22,6 +19,7 @@ namespace EngineFramework
 	{
 	public:
 		LevelEditorSystem();
+
 	private:
 		void Initialize() override;
 		void Update(float delta_time) override;
@@ -30,6 +28,9 @@ namespace EngineFramework
 		static inline LevelEditorSystem* this_system{};
 
 		std::unique_ptr<LevelEditor> application;
+	public:
+
+		static bool Get_Enable();
 
 	};
 
@@ -39,4 +40,5 @@ namespace EngineFramework
 
 
 
+#endif
 #endif

@@ -1,9 +1,5 @@
-/*
-		Controls serialization, deserialization, safe deletion of instances.
-		Also controls serialization and deserialization for archtypes.
+#ifdef _DEBUG
 
-		Uses Entt as the backbone library.
-*/
 #include "pch.hpp"
 #include "global.hpp"
 //File management, JSON file parser/writer
@@ -27,6 +23,7 @@
 
 namespace EngineFramework
 {
+	bool LevelEditor::is_enabled = true;
 
 	LevelEditor::LevelEditor()
 	{
@@ -49,7 +46,7 @@ namespace EngineFramework
 
 	void LevelEditor::addFeature(const std::string& feature_name, std::unique_ptr<LFeature> feature_class, bool enabled) {
 
-		feature_class->set_Pointer(&variables);	
+		feature_class->set_Pointer(&variables);
 		feature_class->is_enabled = enabled;
 		featureMap[feature_name] = std::move(feature_class);
 
@@ -69,9 +66,9 @@ namespace EngineFramework
 		return it->second->is_enabled;
 	}
 
-	
-	
-	
+
+
+
 	void LevelEditor::Initialize()
 	{
 		IMGUI_CHECKVERSION();
@@ -99,7 +96,7 @@ namespace EngineFramework
 			ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
 			ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
 			ImGuiWindowFlags_NoBackground;
-		
+
 		// If using GLFW for input, you can still initialize the input handling, but use your custom window
 		if (g_graphics_ptr->GetGLFWwindow() == nullptr) {
 			std::cout << "level editor app cannot be initialised\n";
@@ -115,7 +112,7 @@ namespace EngineFramework
 		/*add the following submenu here*/
 		addFeature("ObjectManager", std::make_unique<ObjectManager>());
 		addFeature("Save", std::make_unique<Save>());
-		
+
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {
 
@@ -123,7 +120,7 @@ namespace EngineFramework
 				feature->Initialize();
 			}
 		}
-		
+
 	}
 
 	void LevelEditor::Open()
@@ -146,7 +143,7 @@ namespace EngineFramework
 		ImGui::End();
 	}
 
-	void LevelEditor::main_window(){
+	void LevelEditor::main_window() {
 
 		//MAIN MENU SHOULD CONTAIN THE SUB MENUS
 
@@ -168,7 +165,7 @@ namespace EngineFramework
 						ImGui::MenuItem("Level", NULL);
 						ImGui::EndMenu();
 					}
-					
+
 					ImGui::MenuItem("Open Existing", NULL);
 					ImGui::Separator();
 					ImGui::MenuItem("Save", NULL, &featureFlag("Save"));
@@ -198,7 +195,7 @@ namespace EngineFramework
 				}
 
 				ImGui::EndMenuBar();
-				
+
 			}
 
 			ImGui::PopStyleColor();
@@ -221,7 +218,7 @@ namespace EngineFramework
 
 	void LevelEditor::Run()
 	{
-		
+		//std::cout << "yo!\n";
 		// Start ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -241,7 +238,7 @@ namespace EngineFramework
 		//RENDERING ===============================================
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		
+
 	}
 
 	void LevelEditor::Close()
@@ -273,3 +270,6 @@ namespace EngineFramework
 	}
 
 }
+#endif
+
+
