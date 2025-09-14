@@ -43,6 +43,15 @@ written consent of DigiPen Institute of Technology is prohibited.
 */
 EngineFramework::GraphicsSystem* g_graphics_ptr = nullptr;
 
+void DebugInputTest(InputManager* input)
+{
+	if (input->GetKey(GLFW_KEY_W))
+		std::cout << "[Input] W is being held\n";
+
+	if (input->GetMouseButton(GLFW_MOUSE_BUTTON_1))
+		std::cout << "[Input] Left Mouse is being held\n";
+}
+
 #ifdef _DEBUG
 int main(int argc, char* argv[])
 {
@@ -148,6 +157,8 @@ int main(int argc, char* argv[])
 
 			//TODO: Try-Catch handling in Update/PostUpdate.
 			core_engine.UpdateSystems(delta_time);
+
+			DebugInputTest(input_ptr);
 
 			core_engine.PostUpdateSystems(delta_time);
 
