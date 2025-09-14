@@ -36,6 +36,10 @@ public:
     void Update(float deltaTime) override;      // promote transitions
     void PostUpdate(float deltaTime) override;  // finalize states
 
+    InputManager() { this_class = *this; }
+    static InputManager& GetInstance() { return this_class; }
+    static InputManager this_class;
+
     // --- Keyboard API ---
     static bool GetKey(int key);       // true while held
     static bool GetKeyDown(int key);   // true on press

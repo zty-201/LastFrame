@@ -43,14 +43,14 @@ written consent of DigiPen Institute of Technology is prohibited.
 */
 EngineFramework::GraphicsSystem* g_graphics_ptr = nullptr;
 
-void DebugInputTest(InputManager* input)
-{
-	if (input->GetKey(GLFW_KEY_W))
-		std::cout << "[Input] W is being held\n";
-
-	if (input->GetMouseButton(GLFW_MOUSE_BUTTON_1))
-		std::cout << "[Input] Left Mouse is being held\n";
-}
+//void DebugInputTest(InputManager* input)
+//{
+//	if (input->GetKey(GLFW_KEY_W))
+//		std::cout << "[Input] W is being held\n";
+//
+//	if (input->GetMouseButton(GLFW_MOUSE_BUTTON_1))
+//		std::cout << "[Input] Left Mouse is being held\n";
+//}
 
 #ifdef _DEBUG
 int main(int argc, char* argv[])
@@ -126,10 +126,7 @@ int main(int argc, char* argv[])
 			3                         // Destruct order (high = destroy last)
 		);
 
-		auto input_manager = std::make_unique<InputManager>();
-		InputManager* input_ptr = input_manager.get();
-
-		core_engine.AddSystem("InputManager", std::move(input_manager), 2, 1, 3);
+		core_engine.AddSystem("InputManager", std::make_unique<InputManager>(), 2, 1, 3);
 
 		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
 
@@ -158,8 +155,7 @@ int main(int argc, char* argv[])
 			//TODO: Try-Catch handling in Update/PostUpdate.
 			core_engine.UpdateSystems(delta_time);
 
-			DebugInputTest(input_ptr);
-
+			//DebugInputTest(input_ptr);
 			core_engine.PostUpdateSystems(delta_time);
 
 			time_after_loop = std::chrono::steady_clock::now();
