@@ -5,19 +5,21 @@
 #ifndef PRECOMPILED_HEADER_HPP
 #define PRECOMPILED_HEADER_HPP
 
-// Windows API headers
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN  // Exclude rarely-used stuff from Windows headers
-#include <windows.h>
-#endif
+//// Windows API headers
+//#ifdef _WIN32
+//#define WIN32_LEAN_AND_MEAN  // Exclude rarely-used stuff from Windows headers
+//#include <windows.h>
+//#endif
 
-// GLEW & GLFW (OpenGL Context & Extensions)
+// GLAD & GLFW (OpenGL Context & Extensions)
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 // GLM (OpenGL Mathematics)
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/ext.hpp> // For mathematical constants like pi
+#include <glm/gtc/matrix_transform.hpp> // Utility functions for matrix transformations
 
 #include <string>
 #include <memory>

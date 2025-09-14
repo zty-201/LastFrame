@@ -113,6 +113,7 @@ add_custom_command(
   COMMENT "Copying Extern/ to executable directory"
 )
 
+
 #Sets the default startup project for visual studio to application_executable, other IDEs will ignore this.
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT application_executable)
 
@@ -138,7 +139,7 @@ include(ImportDependencies)
 add_subdirectory(Lib)
 
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod CACHE INTERNAL "")
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
 set(WINDOWS_DEBUG_LIBRARIES glad_debug imgui CACHE INTERNAL "")
@@ -235,3 +236,15 @@ target_include_directories(engine_library PUBLIC ${ENGINE_APPLICATION_INCLUDE_DI
 target_include_directories(application_executable PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
 
 # ======================= END AUTO CONFIGURATION =========================
+
+
+#Copying of dlls
+#Copies fmod dll to executable path
+add_custom_command(
+  TARGET application_executable
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+          $<TARGET_FILE:fmod>
+          $<TARGET_FILE_DIR:application_executable>
+  COMMENT "Copying fmod dll to executable directory"
+)

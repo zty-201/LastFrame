@@ -2,7 +2,33 @@
 #define GRAPHICS_SYSTEM_HPP
 
 #include "ISystem.hpp"
-#include "scene.h"
+#include "Scene.h"
+
+#define ANINSTANCE(x, z)\
+         { MATERIAL_OBJECT, glm::translate(glm::mat4(1.0f), {x, 0.0f, z}) }
+
+#define INSTANCES(x)\
+                   ANINSTANCE(x, -20.0f-5.0f),\
+                   ANINSTANCE(x, -18.0f-5.0f),\
+                   ANINSTANCE(x, -16.0f-5.0f),\
+                   ANINSTANCE(x, -14.0f-5.0f),\
+                   ANINSTANCE(x, -12.0f-5.0f),\
+                   ANINSTANCE(x, -10.0f-5.0f),\
+                   ANINSTANCE(x,  -8.0f-5.0f),\
+                   ANINSTANCE(x,  -6.0f-5.0f),\
+                   ANINSTANCE(x,  -4.0f-5.0f),\
+                   ANINSTANCE(x,  -2.0f-5.0f),\
+                   ANINSTANCE(x,   0.0f-5.0f),\
+                   ANINSTANCE(x,   2.0f-5.0f),\
+                   ANINSTANCE(x,   4.0f-5.0f),\
+                   ANINSTANCE(x,   6.0f-5.0f),\
+                   ANINSTANCE(x,   8.0f-5.0f),\
+                   ANINSTANCE(x,  10.0f-5.0f),\
+                   ANINSTANCE(x,  12.0f-5.0f),\
+                   ANINSTANCE(x,  14.0f-5.0f),\
+                   ANINSTANCE(x,  16.0f-5.0f),\
+                   ANINSTANCE(x,  18.0f-5.0f),\
+                   ANINSTANCE(x,  20.0f-5.0f)
 
 namespace EngineFramework
 {
@@ -16,14 +42,16 @@ namespace EngineFramework
         void Initialize() override;
         void Update(float deltaTime) override;
         void PostUpdate(float deltaTime) override;
-        
-        // Graphics-specific methods
-        GLFWwindow* GetWindow() const { return scene.window; }
-        bool ShouldClose() const { return glfwWindowShouldClose(scene.window); }
-        
+
+		// Accessor for the scene
+        GLFWwindow* GetGLFWwindow() { return window; }
+		Scene* GetScene() { return &scene; }
     private:
+
         Scene scene;
-        
+        glm::vec2 screen = { WIDTH,HEIGHT };
+		GLFWwindow* window = nullptr;
+
         // Setup methods
         void SetupGLFW();
         void SetupImGui();

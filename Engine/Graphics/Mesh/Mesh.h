@@ -1,32 +1,45 @@
 #ifndef MESH_H
 #define MESH_H
 
-class Mesh {
-private:
-    std::vector<glm::vec4> vertices;
-    std::vector<glm::vec3> normals;
-    std::vector<glm::vec2> texCoords;
-    std::vector<glm::vec3> tangents;
-    std::vector<glm::ivec3> triangles;
+//
+//  Represents a 3D triangle mesh for rendering and scene definitions.
+// 
+//  The TriangleMesh structure encapsulates the geometry data required to define
+//  and render a triangle mesh in a 3D scene, including vertices, normals, texture
+//  coordinates, and tangents. This data is typically used in rendering pipelines
+//  with OpenGL.
+//
+struct TriangleMesh
+{
+    // Indices defining the connectivity of the mesh. Each group of three indices
+    // corresponds to a single triangle.
+    std::vector<GLuint> indices;
 
-    GLuint vaoID;
-    unsigned int count;
+    // Vertex positions of the mesh. Each set of three consecutive floats represents
+    // a single vertex position (x, y, z).
+    std::vector<GLfloat> points;
 
-public:
-    // Factory functions for procedural geometry
-    static std::shared_ptr<Mesh> CreateSphere(int subdivisions);
-    static std::shared_ptr<Mesh> CreatePlane(float size, int subdivisions);
-    static std::shared_ptr<Mesh> CreateCube(float size);
-    static std::shared_ptr<Mesh> CreateCylinder(float radius, float height, int segments);
+    // Vertex normals used for lighting calculations. Each set of three consecutive
+    // floats represents a normal vector (nx, ny, nz).
+    std::vector<GLfloat> normals;
 
-    // For loading from files
-    static std::shared_ptr<Mesh> LoadFromFile(const std::string& path);
-    void PushQuad(std::vector<glm::ivec3>& Tri, int i, int j, int k, int l);
+    // Texture coordinates for mapping textures to the mesh surface. Each set of
+    // two consecutive floats represents a texture coordinate (u, v).
+    std::vector<GLfloat> texCoords;
 
-    void Draw();
-    void MakeVAO();
+    // Tangent vectors for each vertex. These are used in advanced lighting techniques,
+    // such as normal mapping, to compute tangent-space transformations. Each set of
+    // three consecutive floats represents a tangent vector (tx, ty, tz).
+    std::vector<GLfloat> tangents;
+
+    //
+    // Constructs a TriangleMesh object.
+    //
+    // Optionally, a file name can be provided to initialize the mesh from
+    // an external resource. The exact loading mechanism is not defined in
+    // this declaration and would typically be implemented in the corresponding
+    // source file.
+    //
+    TriangleMesh(const char* fileName = "");
 };
-
-
-
-#endif
+#endif // !MESH_H

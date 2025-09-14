@@ -30,11 +30,12 @@ written consent of DigiPen Institute of Technology is prohibited.
 //Measurement of delta time.
 #include <chrono>
 #include "GraphicsSystem.h" // Include GraphicsSystem header
-
+#include "Input/InputManager.hpp"
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
 #include "Assets/AssetManager.hpp"
 
+#include "System_LevelEditor.hpp"
 
 
 /*
@@ -42,6 +43,8 @@ written consent of DigiPen Institute of Technology is prohibited.
 	Open Console in DEBUG mode (Project --> Linker --> System --> Subsystem == Console)
 	Open without console in RELEASE mode (Subsystem == Windows).
 */
+EngineFramework::GraphicsSystem* g_graphics_ptr = nullptr;
+
 #ifdef _DEBUG
 int main(int argc, char* argv[])
 {
@@ -102,8 +105,10 @@ int main(int argc, char* argv[])
 
 
 		
+		
 		// Create GraphicsSystem (which will set its static instance)
 		auto graphics_system = std::make_unique<EngineFramework::GraphicsSystem>();
+		g_graphics_ptr = graphics_system.get();
 		
 		// Store a raw pointer to the GraphicsSystem before transferring ownership
 		EngineFramework::GraphicsSystem* graphics_ptr = graphics_system.get();
@@ -114,8 +119,12 @@ int main(int argc, char* argv[])
 			std::move(graphics_system),  // Transfer ownership to CoreEngine
 			1,                          // Init order (low = init first)
 			1,                          // Update order (low = update first)
-			100                         // Destruct order (high = destroy last)
+			3                         // Destruct order (high = destroy last)
 		);
+
+		core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 1, 3);
+
+		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
 
 		//=Initialize Systems
 		try
@@ -136,12 +145,13 @@ int main(int argc, char* argv[])
 
 		
 		// Use the stored GraphicsSystem pointer to check window state
-		while (!graphics_ptr->ShouldClose()) // Replace 'true' with window check
+		while (graphics_ptr->GetGLFWwindow()) // Replace 'true' with window check
 		{
 			time_before_loop = std::chrono::steady_clock::now();
 
 			//TODO: Try-Catch handling in Update/PostUpdate.
 			core_engine.UpdateSystems(delta_time);
+
 			core_engine.PostUpdateSystems(delta_time);
 
 			time_after_loop = std::chrono::steady_clock::now();
