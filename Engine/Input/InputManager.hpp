@@ -52,11 +52,10 @@ public:
 
     // --- Window events ---
     static std::pair<int, int> GetWindowSize();
-
-private:
-    // --- Internal helpers ---
+    
     static void RegisterCallbacks(GLFWwindow* window);
 
+private:
     // --- GLFW Callbacks ---
     static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);

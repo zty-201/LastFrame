@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include "global.hpp"
 #include "GraphicsSystem.h"
+#include "Input/InputManager.hpp"
 
 namespace EngineFramework
 {
@@ -209,7 +210,9 @@ namespace EngineFramework
             // Later you might want a proper way to signal the CoreEngine
         }
         
-        
+        //Input Callbacks
+        InputManager::RegisterCallbacks(window);
+
         // Draw scene
         scene.render();
     }

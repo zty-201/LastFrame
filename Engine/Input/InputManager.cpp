@@ -106,7 +106,7 @@ void InputManager::ErrorCallback(int error, const char* description)
 bool InputManager::GetKey(int key)
 {
     auto it = keyStates.find(key);
-    return it != keyStates.end() && (it->second == KeyState::Down || it->second == KeyState::Pressed);
+    return it != keyStates.end() && (it->second == KeyState::Pressed || it->second == KeyState::Down);
 }
 
 bool InputManager::GetKeyDown(int key)
@@ -124,7 +124,7 @@ bool InputManager::GetKeyUp(int key)
 bool InputManager::GetMouseButton(int button)
 {
     auto it = mouseButtonStates.find(button);
-    return it != mouseButtonStates.end() && (it->second == KeyState::Down || it->second == KeyState::Pressed);
+    return it != mouseButtonStates.end() && (it->second == KeyState::Pressed || it->second == KeyState::Down);
 }
 
 bool InputManager::GetMouseButtonDown(int button)
@@ -174,32 +174,40 @@ void InputManager::Update(float deltaTime)
 void InputManager::PostUpdate(float deltaTime)
 {
     (void)deltaTime;
-    for (auto& [key, state] : keyStates)
+    // Keys
+    for (auto it = keyStates.begin(); it != keyStates.end(); )
     {
-        switch (state)
+        switch (it->second)
         {
-        case KeyState::Pressed: // Pressed → Down (after first frame)
-            state = KeyState::Down;
+        case KeyState::Pressed:
+            it->second = KeyState::Down;
+            ++it;
             break;
-        case KeyState::Released: // Released → None (after first frame)
-            state = KeyState::None;
+        case KeyState::Released:
+            it->second = KeyState::None;
+            ++it;
             break;
         default:
+            ++it;
             break;
         }
     }
 
-    for (auto& [key, state] : mouseButtonStates)
+    // Mouse buttons
+    for (auto it = mouseButtonStates.begin(); it != mouseButtonStates.end(); )
     {
-        switch (state)
+        switch (it->second)
         {
-        case KeyState::Pressed: // Pressed → Down (after first frame)
-            state = KeyState::Down;
+        case KeyState::Pressed:
+            it->second = KeyState::Down;
+            ++it;
             break;
-        case KeyState::Released: // Released → None (after first frame)
-            state = KeyState::None;
+        case KeyState::Released:
+            it->second = KeyState::None;
+            ++it;
             break;
         default:
+            ++it;
             break;
         }
     }
