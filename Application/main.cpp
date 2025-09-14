@@ -121,6 +121,8 @@ int main(int argc, char* argv[])
 			1,                          // Update order (low = update first)
 			3                         // Destruct order (high = destroy last)
 		);
+		
+		core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 3, 1, 4);
 
 		core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 1, 3);
 
