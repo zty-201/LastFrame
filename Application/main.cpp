@@ -117,10 +117,7 @@ int main(int argc, char* argv[])
 			3                         // Destruct order (high = destroy last)
 		);
 
-		auto input_manager = std::make_unique<InputManager>();
-		InputManager* input_ptr = input_manager.get();
-
-		core_engine.AddSystem("InputManager", std::move(input_manager), 2, 1, 3);
+		core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 1, 3);
 
 		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
 

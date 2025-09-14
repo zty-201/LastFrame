@@ -18,200 +18,204 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "global.hpp"
 #include "InputManager.hpp"
 
-// Static member definitions
-std::unordered_map<int, KeyState> InputManager::keyStates;
-std::unordered_map<int, KeyState> InputManager::mouseButtonStates;
-
-double InputManager::mouseX = 0.0;
-double InputManager::mouseY = 0.0;
-double InputManager::lastMouseX = 0.0;
-double InputManager::lastMouseY = 0.0;
-
-double InputManager::scrollX = 0.0;
-double InputManager::scrollY = 0.0;
-
-int InputManager::windowWidth = 0;
-int InputManager::windowHeight = 0;
-
-void InputManager::RegisterCallbacks(GLFWwindow* window)
+namespace EngineFramework
 {
-    glfwSetKeyCallback(window, KeyCallback);
-    glfwSetMouseButtonCallback(window, MouseButtonCallback);
-    glfwSetCursorPosCallback(window, CursorPosCallback);
-    glfwSetScrollCallback(window, ScrollCallback);
-    glfwSetWindowSizeCallback(window, WindowSizeCallback);
-    glfwSetErrorCallback(ErrorCallback);
-}
+    // Static member definitions
+    std::unordered_map<int, KeyState> InputManager::keyStates;
+    std::unordered_map<int, KeyState> InputManager::mouseButtonStates;
 
-void InputManager::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    (void)window;
-    (void)scancode;
-    (void)mods;
+    double InputManager::mouseX = 0.0;
+    double InputManager::mouseY = 0.0;
+    double InputManager::lastMouseX = 0.0;
+    double InputManager::lastMouseY = 0.0;
 
-    switch (action)
+    double InputManager::scrollX = 0.0;
+    double InputManager::scrollY = 0.0;
+
+    int InputManager::windowWidth = 0;
+    int InputManager::windowHeight = 0;
+
+    void InputManager::RegisterCallbacks(GLFWwindow* window)
     {
-    case GLFW_PRESS:
-        // Transition to Pressed (this frame only)
-        keyStates[key] = KeyState::Pressed;
-        break;
-    case GLFW_RELEASE:
-        // Transition to Released (this frame only)
-        keyStates[key] = KeyState::Released;
-        break;
-    case GLFW_REPEAT:
-        // Keep it as Down (held)
-        keyStates[key] = KeyState::Down;
-        break;
+        glfwSetKeyCallback(window, KeyCallback);
+        glfwSetMouseButtonCallback(window, MouseButtonCallback);
+        glfwSetCursorPosCallback(window, CursorPosCallback);
+        glfwSetScrollCallback(window, ScrollCallback);
+        glfwSetWindowSizeCallback(window, WindowSizeCallback);
+        glfwSetErrorCallback(ErrorCallback);
     }
-}
 
-void InputManager::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
-{
-    (void)window;
-    (void)button;
-    (void)mods;
-
-    if (action == GLFW_PRESS) mouseButtonStates[button] = KeyState::Pressed;
-    else if (action == GLFW_RELEASE) mouseButtonStates[button] = KeyState::Released;
-}
-
-void InputManager::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
-{
-    (void)window;
-    mouseX = xpos;
-    mouseY = ypos;
-}
-
-void InputManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    (void)window;
-    scrollX = xoffset;
-    scrollY = yoffset;
-}
-
-void InputManager::WindowSizeCallback(GLFWwindow* window, int width, int height)
-{
-    (void)window;
-    windowWidth = width;
-    windowHeight = height;
-}
-
-void InputManager::ErrorCallback(int error, const char* description)
-{
-    (void)error;
-    fprintf(stderr, "GLFW Error: %s\n", description);
-}
-
-bool InputManager::GetKey(int key)
-{
-    auto it = keyStates.find(key);
-    return it != keyStates.end() && (it->second == KeyState::Pressed || it->second == KeyState::Down);
-}
-
-bool InputManager::GetKeyDown(int key)
-{
-    auto it = keyStates.find(key);
-    return it != keyStates.end() && it->second == KeyState::Pressed;
-}
-
-bool InputManager::GetKeyUp(int key)
-{
-    auto it = keyStates.find(key);
-    return it != keyStates.end() && it->second == KeyState::Released;
-}
-
-bool InputManager::GetMouseButton(int button)
-{
-    auto it = mouseButtonStates.find(button);
-    return it != mouseButtonStates.end() && (it->second == KeyState::Pressed || it->second == KeyState::Down);
-}
-
-bool InputManager::GetMouseButtonDown(int button)
-{
-    auto it = mouseButtonStates.find(button);
-    return it != mouseButtonStates.end() && it->second == KeyState::Pressed;
-}
-
-bool InputManager::GetMouseButtonUp(int button)
-{
-    auto it = mouseButtonStates.find(button);
-    return it != mouseButtonStates.end() && it->second == KeyState::Released;
-}
-
-std::pair<double, double> InputManager::GetMousePosition()
-{
-    return { mouseX, mouseY };
-}
-
-std::pair<double, double> InputManager::GetMouseDelta()
-{
-    return { mouseX - lastMouseX, mouseY - lastMouseY };
-}
-
-std::pair<double, double> InputManager::GetScrollDelta()
-{
-    return { scrollX, scrollY };
-}
-
-std::pair<int, int> InputManager::GetWindowSize()
-{
-    return { windowWidth, windowHeight };
-}
-
-void InputManager::Initialize()
-{
-    //Do nothing
-}
-
-void InputManager::Update(float deltaTime)
-{
-    (void)deltaTime;
-    lastMouseX = mouseX;
-    lastMouseY = mouseY;
-}
-
-void InputManager::PostUpdate(float deltaTime)
-{
-    (void)deltaTime;
-    // Keys
-    for (auto it = keyStates.begin(); it != keyStates.end(); )
+    void InputManager::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
     {
-        switch (it->second)
+        (void)window;
+        (void)scancode;
+        (void)mods;
+
+        switch (action)
         {
-        case KeyState::Pressed:
-            it->second = KeyState::Down;
-            ++it;
+        case GLFW_PRESS:
+            // Transition to Pressed (this frame only)
+            keyStates[key] = KeyState::Pressed;
             break;
-        case KeyState::Released:
-            it->second = KeyState::None;
-            ++it;
+        case GLFW_RELEASE:
+            // Transition to Released (this frame only)
+            keyStates[key] = KeyState::Released;
             break;
-        default:
-            ++it;
+        case GLFW_REPEAT:
+            // Keep it as Down (held)
+            keyStates[key] = KeyState::Down;
             break;
         }
     }
 
-    // Mouse buttons
-    for (auto it = mouseButtonStates.begin(); it != mouseButtonStates.end(); )
+    void InputManager::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
-        switch (it->second)
-        {
-        case KeyState::Pressed:
-            it->second = KeyState::Down;
-            ++it;
-            break;
-        case KeyState::Released:
-            it->second = KeyState::None;
-            ++it;
-            break;
-        default:
-            ++it;
-            break;
-        }
+        (void)window;
+        (void)button;
+        (void)mods;
+
+        if (action == GLFW_PRESS) mouseButtonStates[button] = KeyState::Pressed;
+        else if (action == GLFW_RELEASE) mouseButtonStates[button] = KeyState::Released;
     }
 
-    scrollX = 0.0;
-    scrollY = 0.0;
+    void InputManager::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+    {
+        (void)window;
+        mouseX = xpos;
+        mouseY = ypos;
+    }
+
+    void InputManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+    {
+        (void)window;
+        scrollX = xoffset;
+        scrollY = yoffset;
+    }
+
+    void InputManager::WindowSizeCallback(GLFWwindow* window, int width, int height)
+    {
+        (void)window;
+        windowWidth = width;
+        windowHeight = height;
+    }
+
+    void InputManager::ErrorCallback(int error, const char* description)
+    {
+        (void)error;
+        fprintf(stderr, "GLFW Error: %s\n", description);
+    }
+
+    bool InputManager::GetKey(int key)
+    {
+        auto it = keyStates.find(key);
+        return it != keyStates.end() && (it->second == KeyState::Pressed || it->second == KeyState::Down);
+    }
+
+    bool InputManager::GetKeyDown(int key)
+    {
+        auto it = keyStates.find(key);
+        return it != keyStates.end() && it->second == KeyState::Pressed;
+    }
+
+    bool InputManager::GetKeyUp(int key)
+    {
+        auto it = keyStates.find(key);
+        return it != keyStates.end() && it->second == KeyState::Released;
+    }
+
+    bool InputManager::GetMouseButton(int button)
+    {
+        auto it = mouseButtonStates.find(button);
+        return it != mouseButtonStates.end() && (it->second == KeyState::Pressed || it->second == KeyState::Down);
+    }
+
+    bool InputManager::GetMouseButtonDown(int button)
+    {
+        auto it = mouseButtonStates.find(button);
+        return it != mouseButtonStates.end() && it->second == KeyState::Pressed;
+    }
+
+    bool InputManager::GetMouseButtonUp(int button)
+    {
+        auto it = mouseButtonStates.find(button);
+        return it != mouseButtonStates.end() && it->second == KeyState::Released;
+    }
+
+    std::pair<double, double> InputManager::GetMousePosition()
+    {
+        return { mouseX, mouseY };
+    }
+
+    std::pair<double, double> InputManager::GetMouseDelta()
+    {
+        return { mouseX - lastMouseX, mouseY - lastMouseY };
+    }
+
+    std::pair<double, double> InputManager::GetScrollDelta()
+    {
+        return { scrollX, scrollY };
+    }
+
+    std::pair<int, int> InputManager::GetWindowSize()
+    {
+        return { windowWidth, windowHeight };
+    }
+
+    void InputManager::Initialize()
+    {
+        //Do nothing
+    }
+
+    void InputManager::Update(float deltaTime)
+    {
+        (void)deltaTime;
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
+    }
+
+    void InputManager::PostUpdate(float deltaTime)
+    {
+        (void)deltaTime;
+        // Keys
+        for (auto it = keyStates.begin(); it != keyStates.end(); )
+        {
+            switch (it->second)
+            {
+            case KeyState::Pressed:
+                it->second = KeyState::Down;
+                ++it;
+                break;
+            case KeyState::Released:
+                it->second = KeyState::None;
+                ++it;
+                break;
+            default:
+                ++it;
+                break;
+            }
+        }
+
+        // Mouse buttons
+        for (auto it = mouseButtonStates.begin(); it != mouseButtonStates.end(); )
+        {
+            switch (it->second)
+            {
+            case KeyState::Pressed:
+                it->second = KeyState::Down;
+                ++it;
+                break;
+            case KeyState::Released:
+                it->second = KeyState::None;
+                ++it;
+                break;
+            default:
+                ++it;
+                break;
+            }
+        }
+
+        scrollX = 0.0;
+        scrollY = 0.0;
+    }
+
 }

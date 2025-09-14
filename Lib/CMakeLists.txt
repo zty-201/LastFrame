@@ -1,10 +1,11 @@
 #Libraries.
-#Build all libraries, and let top-level cmake decide which to link.
+#Configure all libraries, and let top-level cmake decide which to link.
 
 # Shared by all platforms.
 add_subdirectory(Shared/entt)
 add_subdirectory(Shared/glm)
 add_subdirectory(Shared/json)
+add_subdirectory(Shared/fmod)
 
 # Windowsx64 Shared
 add_subdirectory(Windows_x64/Shared/glfw)
