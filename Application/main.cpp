@@ -30,7 +30,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 //Measurement of delta time.
 #include <chrono>
 #include "GraphicsSystem.h" // Include GraphicsSystem header
-
+#include "Input/InputManager.hpp"
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
 #include "System_LevelEditor.hpp"
@@ -117,6 +117,11 @@ int main(int argc, char* argv[])
 			100                         // Destruct order (high = destroy last)
 		);
 
+		auto input_manager = std::make_unique<InputManager>();
+		InputManager* input_ptr = input_manager.get();
+
+		core_engine.AddSystem("InputManager", std::move(input_manager), 2, 1, 3);
+
 		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
 
 		//=Initialize Systems
@@ -143,6 +148,7 @@ int main(int argc, char* argv[])
 
 			//TODO: Try-Catch handling in Update/PostUpdate.
 			core_engine.UpdateSystems(delta_time);
+
 			core_engine.PostUpdateSystems(delta_time);
 
 			time_after_loop = std::chrono::steady_clock::now();
