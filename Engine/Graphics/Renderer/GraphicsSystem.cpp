@@ -28,6 +28,8 @@ namespace EngineFramework
         SetupGraphics();
         //need to have a function for input handling
         //since input handling is part of glfw , at least for the callbacks
+        //Input Callbacks
+        InputManager::RegisterCallbacks(window);
     }
 
     void GraphicsSystem::SetupGLFW()
@@ -209,9 +211,6 @@ namespace EngineFramework
             // For now, you can just use glfwSetWindowShouldClose
             // Later you might want a proper way to signal the CoreEngine
         }
-        
-        //Input Callbacks
-        InputManager::RegisterCallbacks(window);
 
         // Draw scene
         scene.render();
@@ -222,6 +221,6 @@ namespace EngineFramework
         UNREFERENCED_PARAMETER(deltaTime);
         // Swap buffers
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        //glfwPollEvents();
     }
 }

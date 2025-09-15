@@ -81,6 +81,8 @@ namespace EngineFramework
     void InputManager::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     {
         (void)window;
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
         mouseX = xpos;
         mouseY = ypos;
     }
@@ -169,53 +171,56 @@ namespace EngineFramework
     void InputManager::Update(float deltaTime)
     {
         (void)deltaTime;
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
     }
 
     void InputManager::PostUpdate(float deltaTime)
     {
         (void)deltaTime;
-        // Keys
-        for (auto it = keyStates.begin(); it != keyStates.end(); )
+
+        // --- Keyboard ---
+        for (auto& [key, state] : keyStates)
         {
-            switch (it->second)
+            switch (state)
             {
             case KeyState::Pressed:
-                it->second = KeyState::Down;
-                ++it;
+                state = KeyState::Down; // Pressed → Down
                 break;
             case KeyState::Released:
-                it->second = KeyState::None;
-                ++it;
+                state = KeyState::None; // Released → None
                 break;
-            default:
-                ++it;
+            case KeyState::Down:
+                break;
+            case KeyState::None:
+                // Nothing to print
                 break;
             }
         }
 
-        // Mouse buttons
-        for (auto it = mouseButtonStates.begin(); it != mouseButtonStates.end(); )
+        // --- Mouse ---
+        for (auto& [button, state] : mouseButtonStates)
         {
-            switch (it->second)
+            switch (state)
             {
             case KeyState::Pressed:
-                it->second = KeyState::Down;
-                ++it;
+                state = KeyState::Down; // Pressed → Down
                 break;
             case KeyState::Released:
-                it->second = KeyState::None;
-                ++it;
+                state = KeyState::None; // Released → None
                 break;
-            default:
-                ++it;
+            case KeyState::Down:
+                break;
+            case KeyState::None:
                 break;
             }
         }
 
+        // Reset scroll deltas every frame
         scrollX = 0.0;
         scrollY = 0.0;
+
+        // Update last mouse position
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
     }
 
 }

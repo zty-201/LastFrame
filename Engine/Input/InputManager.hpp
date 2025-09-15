@@ -37,14 +37,14 @@ namespace EngineFramework
         void Update(float deltaTime) override;      // promote transitions
         void PostUpdate(float deltaTime) override;  // finalize states
 
-    InputManager() { this_class = *this; }
-    static InputManager& GetInstance() { return this_class; }
-    static InputManager this_class;
+        InputManager() { this_class = this; }
+        static InputManager& GetInstance() { return *this_class; }
+        static inline InputManager *this_class = nullptr;
 
-    // --- Keyboard API ---
-    static bool GetKey(int key);       // true while held
-    static bool GetKeyDown(int key);   // true on press
-    static bool GetKeyUp(int key);     // true on release
+        // --- Keyboard API ---
+        static bool GetKey(int key);       // true while held
+        static bool GetKeyDown(int key);   // true on press
+        static bool GetKeyUp(int key);     // true on release
 
         // --- Mouse API ---
         static bool GetMouseButton(int button);
@@ -59,6 +59,9 @@ namespace EngineFramework
         static std::pair<int, int> GetWindowSize();
 
         static void RegisterCallbacks(GLFWwindow* window);
+
+        const std::unordered_map<int, KeyState>& GetKeyStates() const { return keyStates; }
+        const std::unordered_map<int, KeyState>& GetMouseButtonStates() const { return mouseButtonStates; }
 
     private:
         // --- GLFW Callbacks ---

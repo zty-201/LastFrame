@@ -1,4 +1,4 @@
-/******************************************************************************/
+﻿/******************************************************************************/
 /*!
 \file		main.cpp
 \author 	Joel Lee Jie
@@ -44,15 +44,6 @@ written consent of DigiPen Institute of Technology is prohibited.
 	Open without console in RELEASE mode (Subsystem == Windows).
 */
 EngineFramework::GraphicsSystem* g_graphics_ptr = nullptr;
-
-//void DebugInputTest(InputManager* input)
-//{
-//	if (input->GetKey(GLFW_KEY_W))
-//		std::cout << "[Input] W is being held\n";
-//
-//	if (input->GetMouseButton(GLFW_MOUSE_BUTTON_1))
-//		std::cout << "[Input] Left Mouse is being held\n";
-//}
 
 #ifdef _DEBUG
 int main(int argc, char* argv[])
@@ -133,7 +124,7 @@ int main(int argc, char* argv[])
 		
 		core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 3, 1, 4);
 
-		core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 1, 3);
+		core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 2, 3);
 
 		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
 
@@ -160,10 +151,11 @@ int main(int argc, char* argv[])
 		{
 			time_before_loop = std::chrono::steady_clock::now();
 
+			glfwPollEvents();
+
 			//TODO: Try-Catch handling in Update/PostUpdate.
 			core_engine.UpdateSystems(delta_time);
 
-			//DebugInputTest(input_ptr);
 			core_engine.PostUpdateSystems(delta_time);
 
 			time_after_loop = std::chrono::steady_clock::now();
