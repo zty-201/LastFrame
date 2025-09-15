@@ -29,7 +29,6 @@ add_executable(application_executable)
 add_library(engine_library STATIC)
 
 
-
 #Add precompiled headers to speed up compilation times. application_executable will also use pch as it links to this lib.
 target_precompile_headers(engine_library PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
 
