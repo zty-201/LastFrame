@@ -207,11 +207,8 @@ endif()
 
 # Get all cpp files in the engine folder and its subdirectories
 file(GLOB_RECURSE ENGINE_SOURCE "Engine/*.cpp" "Engine/*.c" "Engine/*.hpp" "Engine/*.h")
-target_sources(engine_library PUBLIC ${ENGINE_SOURCE})
-
 # Get all cpp files in the application folder and its subdirectories
 file(GLOB_RECURSE APPLICATION_SOURCE "Application/*.cpp" "Application/*.c" "Application/*.hpp" "Application/*.h")
-target_sources(application_executable PUBLIC ${APPLICATION_SOURCE})
 
 #Set folder properties on each file so visual studio knows how to set up filters.
 foreach(file IN LISTS ENGINE_SOURCE APPLICATION_SOURCE)
@@ -219,14 +216,14 @@ foreach(file IN LISTS ENGINE_SOURCE APPLICATION_SOURCE)
     file(RELATIVE_PATH relative_path "${CMAKE_SOURCE_DIR}" "${file}")
     get_filename_component(folder_path "${relative_path}" PATH)
     #Account for different filepath slash on windows.
-    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    if(WIN32)
       string(REPLACE "/" "\\" file_path_msvc "${folder_path}")
       set(folder_path "${file_path_msvc}")
     endif()
     source_group("${folder_path}" FILES "${file}")
 endforeach()
 
-#Combined Include Directories of Engine and Application.
+#Get the combined Include Directories of Engine and Application.
 set(ENGINE_APPLICATION_INCLUDE_DIRECTORIES "Engine/" "Application/")
 
 #Engine includes
@@ -247,20 +244,31 @@ foreach(item ${APPLICATION_HEADER_DIRECTORIES})
 	endif()
 endforeach()
 
-#TODO: By right, the engine shouldn't need to include application headers? Need to research more on this.
-target_include_directories(engine_library PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
-target_include_directories(application_executable PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
+
+#Adding include directories and sources
+if(WIN32)
+  target_sources(engine_library PUBLIC ${ENGINE_SOURCE})
+  target_sources(application_executable PUBLIC ${APPLICATION_SOURCE})
+  #TODO: By right, the engine shouldn't need to include application headers? Need to research more on this.
+  target_include_directories(engine_library PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
+  target_include_directories(application_executable PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
+elseif(ANDROID)
+  target_sources(jnicpp PUBLIC ${ENGINE_SOURCE} ${APPLICATION_SOURCE})
+  target_include_directories(jnicpp PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
+endif()
+
 
 # ======================= END AUTO CONFIGURATION =========================
 
-
 #Copying of dlls
 #Copies fmod dll to executable path
-add_custom_command(
-  TARGET application_executable
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy
-          $<TARGET_FILE:fmod>
-          $<TARGET_FILE_DIR:application_executable>
-  COMMENT "Copying fmod dll to executable directory"
-)
+if(WIN32)
+  add_custom_command(
+    TARGET application_executable
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            $<TARGET_FILE:fmod>
+            $<TARGET_FILE_DIR:application_executable>
+    COMMENT "Copying fmod dll to executable directory"
+  )
+endif()
