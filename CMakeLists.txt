@@ -157,12 +157,12 @@ endif()
 add_subdirectory(Lib)
 
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad CACHE INTERNAL "")
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
-set(WINDOWS_DEBUG_LIBRARIES glad_debug imgui CACHE INTERNAL "")
-set(WINDOWS_RELEASE_LIBRARIES glad_release CACHE INTERNAL "")
-set(ANDROID_LIBRARIES android log GLESv3 EGL glad_release imgui CACHE INTERNAL "")
+set(WINDOWS_DEBUG_LIBRARIES imgui CACHE INTERNAL "")
+set(WINDOWS_RELEASE_LIBRARIES CACHE INTERNAL "")
+set(ANDROID_LIBRARIES android log GLESv3 EGL CACHE INTERNAL "")
 
 # Disable code analysis like clang-tidy for External Libraries (for msvc, gnu. If needed, add clang here too.)
 # This prevents false positives for 3rd party code.
