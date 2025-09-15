@@ -169,11 +169,17 @@ set(ANDROID_LIBRARIES android log GLESv3 EGL CACHE INTERNAL "")
 foreach(extern_dependency IN LISTS SHARED_LIBRARIES WINDOWS_SHARED_LIBRARIES WINDOWS_DEBUG_LIBRARIES WINDOWS_RELEASE_LIBRARIES ANDROID_LIBRARIES)
   #Check if target is valid, or if it is empty/not defined.
   if(TARGET ${extern_dependency})
-    target_compile_options(${extern_dependency} PRIVATE
-      $<$<CXX_COMPILER_ID:MSVC>:/analyze->
-      $<$<CXX_COMPILER_ID:GNU,Clang>:-fno-analyzer>
-    )
-    message("${extern_dependency} analysis off")
+    #Can only set compile options on what is compiled. Avoid interface or imported libs.
+    get_target_property(target_type ${extern_dependency} TYPE)
+    get_target_property(is_imported ${extern_dependency} IMPORTED)
+    if(NOT (is_imported) AND NOT (target_type STREQUAL "INTERFACE_LIBRARY"))
+      target_compile_options(${extern_dependency} PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/analyze->
+        $<$<CXX_COMPILER_ID:GNU,Clang>:-fno-analyzer>
+      )
+      message("${extern_dependency} analysis off")
+    endif()
+
   endif()
 endforeach()
 

@@ -4,11 +4,11 @@
 if(WIN32)
 	add_library(glad STATIC)
 	target_sources(glad PRIVATE 
-		$<$<CONFIG:DEBUG>:"${CMAKE_CURRENT_LIST_DIR}/glad_debug/src/glad.c"> 
-		$<$<CONFIG:RELEASE>:"${CMAKE_CURRENT_LIST_DIR}/glad_release/src/glad.c"> 
+		$<$<CONFIG:DEBUG>:${CMAKE_CURRENT_LIST_DIR}/src_debug/glad.c> 
+		$<$<CONFIG:RELEASE>:${CMAKE_CURRENT_LIST_DIR}/src_release/glad.c> 
 	)
 	target_include_directories(glad PUBLIC 
-		$<$<CONFIG:DEBUG>:"${CMAKE_CURRENT_LIST_DIR}/glad_debug/include"> 
-		$<$<CONFIG:RELEASE>:"${CMAKE_CURRENT_LIST_DIR}/glad_release/include"> 
+		$<$<CONFIG:DEBUG>:${CMAKE_CURRENT_LIST_DIR}/include_debug> 
+		$<$<CONFIG:RELEASE>:${CMAKE_CURRENT_LIST_DIR}/include_release> 
 	)
 endif()
