@@ -24,20 +24,32 @@ project("jnicpp")
 # System.loadLibrary() and pass the name of the library defined here;
 # for GameActivity/NativeActivity derived applications, the same library name must be
 # used in the AndroidManifest.xml file.
-set(SRC_DIR ../../../../../my_gl_app)
+set(SRC_ENGINE_DIR ../../../../../Engine)
+set(SRC_APPLICATION_DIR ../../../../../Application)
 # Get source files from my_gl_app directory
-file(GLOB_RECURSE MY_GL_APP_SRC
-        "${SRC_DIR}/*.cpp"
-        "${SRC_DIR}/*.h"
-        "${SRC_DIR}/*.hpp"
+file(GLOB_RECURSE ENGINE_SOURCES
+        "${SRC_ENGINE_DIR}/*.cpp"
+        "${SRC_ENGINE_DIR}/*.c"
+        "${SRC_ENGINE_DIR}/*.h"
+        "${SRC_ENGINE_DIR}/*.hpp"
+)
+file(GLOB_RECURSE APPLICATION_SOURCES
+        "${SRC_APPLICATION_DIR}/*.cpp"
+        "${SRC_APPLICATION_DIR}/*.c"
+        "${SRC_APPLICATION_DIR}/*.h"
+        "${SRC_APPLICATION_DIR}/*.hpp"
 )
 # Include directories
-include_directories(${SRC_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(${CMAKE_PROJECT_NAME} SHARED
         # List C/C++ source files with relative paths to this CMakeLists.txt.
         NativeTemplate.cpp
-        ${MY_GL_APP_SRC})
+        ${ENGINE_SOURCES} ${APPLICATION_SOURCES})
+
+
+add_subdirectory(../../../../../Lib)
+
+
 # Specifies libraries CMake should link to your target library. You
 # can link libraries from various origins, such as libraries defined in this
 # build script, prebuilt third-party libraries, or Android system libraries.
@@ -46,4 +58,32 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         android
         log
         GLESv3
-        EGL)
+        EGL
+)
+
+
+
+#Combined Include Directories of Engine and Application.
+set(ENGINE_APPLICATION_INCLUDE_DIRECTORIES "${SRC_ENGINE_DIR}/" "${SRC_APPLICATION_DIR}/")
+
+#Engine includes
+file(GLOB_RECURSE ENGINE_HEADER_DIRECTORIES LIST_DIRECTORIES true "Engine/*")
+#Only include subdirectories.
+foreach(item ${ENGINE_HEADER_DIRECTORIES})
+    if(IS_DIRECTORY "${item}")
+        list(APPEND ENGINE_APPLICATION_INCLUDE_DIRECTORIES "${item}")
+    endif()
+endforeach()
+
+#Application includes
+file(GLOB_RECURSE APPLICATION_HEADER_DIRECTORIES LIST_DIRECTORIES true "Application/*")
+#Only include subdirectories.
+foreach(item ${APPLICATION_HEADER_DIRECTORIES})
+    if(IS_DIRECTORY "${item}")
+        list(APPEND ENGINE_APPLICATION_INCLUDE_DIRECTORIES "${item}")
+    endif()
+endforeach()
+
+#TODO: By right, the engine shouldn't need to include application headers? Need to research more on this.
+target_include_directories(engine_library PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
+target_include_directories(application_executable PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
