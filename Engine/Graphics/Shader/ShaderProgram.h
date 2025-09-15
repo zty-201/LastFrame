@@ -62,10 +62,10 @@ public:
         glBindAttribLocation(handle, location, name);
     }
 
-    // Bind a fragment data location (for output of the fragment shader)
-    void bindFragDataLocation(GLuint location, const char* name) {
-        glBindFragDataLocation(handle, location, name);
-    }
+    //// Bind a fragment data location (for output of the fragment shader)
+    //void bindFragDataLocation(GLuint location, const char* name) {
+    //    glBindFragDataLocation(handle, location, name);
+    //}
 
     // Set a uniform variable of type vec3 (float x, y, z)
     void setUniform(const std::string& name, float x, float y, float z) {

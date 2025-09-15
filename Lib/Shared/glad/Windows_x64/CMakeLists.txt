@@ -1,4 +1,4 @@
-# glad for windows
+# glad es 3.2 for windows
 # Load only if windows.
 
 if(WIN32)

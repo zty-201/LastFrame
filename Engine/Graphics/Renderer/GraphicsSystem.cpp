@@ -1,7 +1,7 @@
 #include "pch.hpp"
 #include "global.hpp"
 #include "GraphicsSystem.h"
-#include "Input/InputManager.hpp"
+#include "InputManager.hpp"
 
 
 #ifdef _DEBUG
@@ -68,7 +68,7 @@ namespace EngineFramework
         glfwSwapInterval(1); // Enable vsync
 
         // Initialize GLAD (must happen after window context is created)
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress)) {
             glfwTerminate();
             throw std::runtime_error("Failed to initialize GLAD");
         }
