@@ -175,7 +175,8 @@ foreach(extern_dependency IN LISTS SHARED_LIBRARIES WINDOWS_SHARED_LIBRARIES WIN
     if(NOT (is_imported) AND NOT (target_type STREQUAL "INTERFACE_LIBRARY"))
       target_compile_options(${extern_dependency} PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:/analyze->
-        $<$<CXX_COMPILER_ID:GNU,Clang>:-fno-analyzer>
+        $<$<CXX_COMPILER_ID:GNU>:-fno-analyzer>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-analyzer>
       )
       message("${extern_dependency} analysis off")
     endif()

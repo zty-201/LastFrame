@@ -5,6 +5,8 @@
 #ifndef PRECOMPILED_HEADER_HPP
 #define PRECOMPILED_HEADER_HPP
 
+//Cross-Platform Compatibility
+#include "Platform.h"
 #include <string>
 #include <memory>
 #include <vector>
@@ -17,8 +19,6 @@
 #include "ISystem.hpp"
 #include "CoreEngine.hpp"
 
-//Cross-Platform Compatibility
-#include "Platform.h"
 
 #ifdef PLATFORM_WINDOWS
 #include <glad/glad.h>

@@ -18,7 +18,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include <unordered_map>
 #include "ISystem.hpp"
-#include "GLFW/glfw3.h"
+#ifdef PLATFORM_WINDOWS
+    #include "GLFW/glfw3.h"
+#endif
 namespace EngineFramework
 {
     enum class KeyState
@@ -53,16 +55,18 @@ namespace EngineFramework
 
         // --- Window events ---
         static std::pair<int, int> GetWindowSize();
-
+#ifdef PLATFORM_WINDOWS
         static void RegisterCallbacks(GLFWwindow* window);
-
+#endif
     private:
-        // --- GLFW Callbacks ---
+#ifdef PLATFORM_WINDOWS
+// --- GLFW Callbacks ---
         static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
         static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
         static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
         static void WindowSizeCallback(GLFWwindow* window, int width, int height);
+#endif
         static void ErrorCallback(int error, const char* description);
 
         // --- State storage ---

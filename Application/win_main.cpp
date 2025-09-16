@@ -2,6 +2,8 @@
 	Windows Wrapper for game loop functions
 	Entry point for windows, to call the application functions.
 */
+#include "pch.hpp"
+#ifdef PLATFORM_WINDOWS
 /*
 	Sets the application to not use console if in release mode.
 */
@@ -16,7 +18,6 @@
 
 //#include <WinBase.h>
 #include <windows.h>
-#include "pch.hpp"
 #include "main.hpp"
 #include "GraphicsSystem.h" // Include GraphicsSystem header
 
@@ -53,3 +54,4 @@ int main(int argc, char* argv[])
 		Game_Destroy();
 		return 0;
 }
+#endif

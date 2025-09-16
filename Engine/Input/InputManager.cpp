@@ -35,6 +35,7 @@ namespace EngineFramework
     int InputManager::windowWidth = 0;
     int InputManager::windowHeight = 0;
 
+#ifdef PLATFORM_WINDOWS
     void InputManager::RegisterCallbacks(GLFWwindow* window)
     {
         glfwSetKeyCallback(window, KeyCallback);
@@ -98,7 +99,7 @@ namespace EngineFramework
         windowWidth = width;
         windowHeight = height;
     }
-
+#endif
     void InputManager::ErrorCallback(int error, const char* description)
     {
         (void)error;
