@@ -34,6 +34,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
 #include "Assets/AssetManager.hpp"
+#include "Audio/Audio.hpp"
 
 #ifdef _DEBUG
 #include "System_LevelEditor.hpp"
@@ -104,7 +105,7 @@ int main(int argc, char* argv[])
 		//=Adding Systems
 		core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 1, 1, 100);
 		core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 2, 2, 1);
-
+		core_engine.AddSystem("AudioSystem", std::make_unique<EngineFramework::AudioSystem>(), 3, 3, 2);
 
 		
 		
