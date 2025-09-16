@@ -37,7 +37,10 @@ namespace EngineFramework
     public:
         GraphicsSystem();
         ~GraphicsSystem();
-
+        static GraphicsSystem& GetInstance()
+        {
+            return *this_graphics_ptr;
+        }
         // ISystem implementation
         void Initialize() override;
         void Update(float deltaTime) override;
@@ -51,6 +54,7 @@ namespace EngineFramework
         Scene scene;
         glm::vec2 screen = { WIDTH,HEIGHT };
 		GLFWwindow* window = nullptr;
+        static inline GraphicsSystem* this_graphics_ptr;
 
         // Setup methods
         void SetupGLFW();
