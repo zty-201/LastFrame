@@ -34,6 +34,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
 #include "Assets/AssetManager.hpp"
+#include "UnitTestManager.hpp"
 
 #ifdef _DEBUG
 #include "System_LevelEditor.hpp"
@@ -99,6 +100,8 @@ int main(int argc, char* argv[])
 		*/
 		//Initialize Entt Reflection System by registering all components.
 		EngineFramework::RegisterReflection();
+		// Creates the only instance in the program, and runs all unit tests.
+		UnitTestManager::GetInstance().RunAllTests();
 		EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 
 		//=Adding Systems

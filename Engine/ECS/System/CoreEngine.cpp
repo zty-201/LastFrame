@@ -57,7 +57,7 @@ namespace EngineFramework
 		//Array has already been sorted in update order, in initialize.
 		for (CoreSystem& system : system_arr)
 		{
-			system.system->Update(delta_time);
+			SafeUpdateSystem(system, delta_time);
 		}
 	}
 
@@ -70,7 +70,7 @@ namespace EngineFramework
 		//Array has already been sorted in update order, in initialize.
 		for (CoreSystem& system : system_arr)
 		{
-			system.system->PostUpdate(delta_time);
+			SafePostUpdateSystem(system, delta_time);
 		}
 	}
 
@@ -86,6 +86,39 @@ namespace EngineFramework
 		while (!system_arr.empty())
 		{
 			system_arr.pop_back();
+		}
+	}
+
+	// Functions to safely call Update and PostUpdate with exception handling
+	void CoreEngine::SafeUpdateSystem(CoreSystem& system, float delta_time)
+	{
+		try {
+			system.system->Update(delta_time);
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Exception in Update system [" << system.name
+				<< "]: " << e.what() << std::endl;
+			throw; // rethrow to abort, or use `continue` in caller if you want to skip
+		}
+		catch (...) {
+			std::cerr << "Unknown exception in Update system [" << system.name << "]" << std::endl;
+			throw;
+		}
+	}
+
+	void CoreEngine::SafePostUpdateSystem(CoreSystem& system, float delta_time)
+	{
+		try {
+			system.system->PostUpdate(delta_time);
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Exception in PostUpdate system [" << system.name
+				<< "]: " << e.what() << std::endl;
+			throw;
+		}
+		catch (...) {
+			std::cerr << "Unknown exception in PostUpdate system [" << system.name << "]" << std::endl;
+			throw;
 		}
 	}
 }
