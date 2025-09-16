@@ -1,4 +1,4 @@
-/******************************************************************************/
+﻿/******************************************************************************/
 /*!
 \file		main.cpp
 \author 	Joel Lee Jie
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 		
 		core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 3, 1, 4);
 
-		core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 1, 3);
+		core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 2, 3);
 
 #ifdef _DEBUG
 		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
@@ -157,6 +157,8 @@ int main(int argc, char* argv[])
 		while (graphics_ptr->GetGLFWwindow()) // Replace 'true' with window check
 		{
 			time_before_loop = std::chrono::steady_clock::now();
+
+			glfwPollEvents();
 
 			//TODO: Try-Catch handling in Update/PostUpdate.
 			core_engine.UpdateSystems(delta_time);
