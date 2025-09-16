@@ -1,21 +1,24 @@
 #Libraries.
 #Configure all libraries, and let top-level cmake decide which to link.
+#Put libraries in different folders depending on where they can be used.
+#For example, imgui is only used in windows debug. 
+#glad is used in all platforms and builds, so it is placed under shared even though it has separate versions for each platform/build.
 
 # Shared by all platforms.
 add_subdirectory(Shared/entt)
 add_subdirectory(Shared/glm)
 add_subdirectory(Shared/json)
 add_subdirectory(Shared/fmod)
+add_subdirectory(Shared/glad)
 
 # Windowsx64 Shared
 add_subdirectory(Windows_x64/Shared/glfw)
 
 # Windowsx64 Debug
-add_subdirectory(Windows_x64/Debug/glad_debug)
 add_subdirectory(Windows_x64/Debug/imgui)
 
 # Windowsx64 Release
-add_subdirectory(Windows_x64/Release/glad_release)
+
 
 # Android ARM64
 

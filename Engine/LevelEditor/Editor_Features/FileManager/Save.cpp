@@ -1,9 +1,4 @@
-/*
-		Controls serialization, deserialization, safe deletion of instances.
-		Also controls serialization and deserialization for archtypes.
-
-		Uses Entt as the backbone library.
-*/
+#ifdef _DEBUG
 #include "pch.hpp"
 
 //File management, JSON file parser/writer
@@ -40,7 +35,7 @@ namespace EngineFramework
         //since saving is a one time event, is_enabled should be set to false when done.
         std::cout << "Saved\n";
         is_enabled = false;
-        
+
 
     }
     void Save::Close() {
@@ -48,3 +43,4 @@ namespace EngineFramework
     }
 
 }
+#endif

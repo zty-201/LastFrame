@@ -1,9 +1,4 @@
-/*
-		Controls serialization, deserialization, safe deletion of instances.
-		Also controls serialization and deserialization for archtypes.
-
-		Uses Entt as the backbone library.
-*/
+#ifdef _DEBUG
 #include "pch.hpp"
 
 //File management, JSON file parser/writer
@@ -23,13 +18,16 @@
 
 namespace EngineFramework
 {
+	bool LevelEditorSystem::Get_Enable() {
+		return LevelEditor::Get_Editor_State();
+	}
 
 	LevelEditorSystem::LevelEditorSystem()
 	{
 		this_system = this;
 
 	}
-	
+
 	void LevelEditorSystem::Initialize()
 	{
 		application = std::make_unique<LevelEditor>();
@@ -43,14 +41,17 @@ namespace EngineFramework
 		if (application->To_Close()) {
 			application->Close();
 
-		}else if(application->Get_Editor_State()){
+		}
+		else if (application->Get_Editor_State()) {
 
 			//open is a 1 time thing, it shouldnt be called everyframe
 			//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed			
 			application->Run();
 		}
-		
-		
+
+
 	}
 
 }
+#endif
+

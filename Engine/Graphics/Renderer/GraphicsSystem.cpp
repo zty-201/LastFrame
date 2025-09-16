@@ -1,7 +1,15 @@
 #include "pch.hpp"
 #include "global.hpp"
 #include "GraphicsSystem.h"
-#include "Input/InputManager.hpp"
+#include "InputManager.hpp"
+
+
+#ifdef _DEBUG
+#include "System_LevelEditor.hpp"
+class LevelEditor; //forward declaration
+#endif
+
+
 
 namespace EngineFramework
 {
@@ -62,7 +70,7 @@ namespace EngineFramework
         glfwSwapInterval(1); // Enable vsync
 
         // Initialize GLAD (must happen after window context is created)
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress)) {
             glfwTerminate();
             throw std::runtime_error("Failed to initialize GLAD");
         }
@@ -212,6 +220,14 @@ namespace EngineFramework
             // Later you might want a proper way to signal the CoreEngine
         }
 
+#ifdef _DEBUG
+        if (!LevelEditor::Get_Editor_State()) {
+            InputManager::RegisterCallbacks(window);
+        }
+#else
+        InputManager::RegisterCallbacks(window);
+#endif        
+        
         // Draw scene
         scene.render();
     }

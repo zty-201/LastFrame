@@ -24,8 +24,6 @@ const char* getTypeString(GLenum type)
         return "vec3";
     case GL_FLOAT_VEC4:
         return "vec4";
-    case GL_DOUBLE:
-        return "double";
     case GL_INT:
         return "int";
     case GL_UNSIGNED_INT:

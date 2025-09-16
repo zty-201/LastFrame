@@ -58,9 +58,8 @@ int checkForOpenGLError(const char* file, int line)
     }
     return retCode;
 }
-
 /**
- * \brief OpenGL debug callback function. Logs detailed debug information.
+ * \brief OpenGL ES 3.1 debug callback function.
  *
  * \param source The origin of the message (e.g., API, Shader Compiler, etc.).
  * \param type The type of error (e.g., error, deprecated behavior, etc.).
@@ -73,22 +72,20 @@ int checkForOpenGLError(const char* file, int line)
 void debugCallback(GLenum source, GLenum type, GLuint id,
     GLenum severity, GLsizei length, const GLchar* msg, const void* param)
 {
-	UNREFERENCED_PARAMETER(length);
-	UNREFERENCED_PARAMETER(param);
+    (void)length;
+    (void)param;
+
     // Determine the source of the debug message.
     std::string sourceStr;
     switch (source) {
-    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-        sourceStr = "WindowSys";
-        break;
-    case GL_DEBUG_SOURCE_APPLICATION:
-        sourceStr = "App";
-        break;
     case GL_DEBUG_SOURCE_API:
         sourceStr = "OpenGL";
         break;
     case GL_DEBUG_SOURCE_SHADER_COMPILER:
         sourceStr = "ShaderCompiler";
+        break;
+    case GL_DEBUG_SOURCE_APPLICATION:
+        sourceStr = "App";
         break;
     case GL_DEBUG_SOURCE_THIRD_PARTY:
         sourceStr = "3rdParty";
@@ -117,15 +114,6 @@ void debugCallback(GLenum source, GLenum type, GLuint id,
         break;
     case GL_DEBUG_TYPE_PERFORMANCE:
         typeStr = "Performance";
-        break;
-    case GL_DEBUG_TYPE_MARKER:
-        typeStr = "Marker";
-        break;
-    case GL_DEBUG_TYPE_PUSH_GROUP:
-        typeStr = "PushGrp";
-        break;
-    case GL_DEBUG_TYPE_POP_GROUP:
-        typeStr = "PopGrp";
         break;
     case GL_DEBUG_TYPE_OTHER:
         typeStr = "Other";
@@ -157,6 +145,7 @@ void debugCallback(GLenum source, GLenum type, GLuint id,
     std::cerr << sourceStr << ":" << typeStr << "[" << sevStr << "]"
         << "(" << id << "): " << msg << std::endl;
 }
+
 
 /**
  * \brief Dumps OpenGL context information, such as version, vendor, and extensions.

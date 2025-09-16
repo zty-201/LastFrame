@@ -1,7 +1,4 @@
-/*
-		
-		Uses Entt as the backbone.
-*/
+#ifdef _DEBUG
 #ifndef SAVE_LFEATURE_HPP
 #define SAVE_LFEATURE_HPP
 #include <unordered_map>
@@ -16,12 +13,12 @@
 
 namespace EngineFramework
 {
-	struct iEditorView; //forward declaration
+    struct iEditorView; //forward declaration
 
     class Save : public LFeature
     {
     public:
-        
+
         Save();
         ~Save() override;
 
@@ -39,4 +36,5 @@ namespace EngineFramework
 
 
 
+#endif
 #endif

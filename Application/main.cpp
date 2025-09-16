@@ -35,7 +35,9 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "System_GameObjectSystem.hpp"
 #include "Assets/AssetManager.hpp"
 
+#ifdef _DEBUG
 #include "System_LevelEditor.hpp"
+#endif
 
 
 /*
@@ -126,7 +128,12 @@ int main(int argc, char* argv[])
 
 		core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 2, 3);
 
+#ifdef _DEBUG
 		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
+#endif
+
+
+		
 
 		//=Initialize Systems
 		try
