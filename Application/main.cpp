@@ -22,7 +22,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "System_GameObjectSystem.hpp"
 #include "Assets/AssetManager.hpp"
 
-#ifdef _DEBUG
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "System_LevelEditor.hpp"
 #endif
 

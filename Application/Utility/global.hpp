@@ -25,7 +25,6 @@ written consent of DigiPen Institute of Technology is prohibited.
 
 //Global ecs system.
 extern entt::registry registry;
-namespace EngineFramework { class GraphicsSystem; }//forward declaration
 
 //TODO: replace with config file.
 #define ARCHTYPE_FOLDER_PATH "Extern/Archtypes"
