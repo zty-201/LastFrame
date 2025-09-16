@@ -103,11 +103,34 @@ namespace EngineFramework
             "Extern/Graphics/Shader/BasicVert.vert", // Vertex shader file path
             "Extern/Graphics/Shader/BasicFrag.frag", // Fragment shader file path
             std::initializer_list<Scene::Pass>{         // List of rendering passes
-            // Pass 0: Render Skybox
+            
+            // Pass 0: Render Scene
             Scene::Pass{
                 {FBO::Default, WIDTH, HEIGHT},                                 // Default FBO
                 { 0, 0, WIDTH, HEIGHT },           // Viewport
-                { },        // Clear color
+                {},                                 // Clear color
+                true,                                 // Depth buffer
+                {                                  // Objects
+                    { PLANE, MATERIAL_CHECKERBOARD, glm::translate(glm::scale(glm::mat4(1.0f), {10.0f, 1.0f, 10.0f}), {0.0f, -1.01f, 0.0f}) },
+                    { SPHERE, MATERIAL_PBR_PHONG, glm::translate(glm::mat4(1.0f), {-3.0f, 0.0f, 0.0f}) },
+                    { CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) },
+                    { CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) }
+                },
+                { camera },                        // Cameras
+                { { {0.0f, 5.0f, 2.0f} } },       // Lights
+                {},                                // Textures
+                [this](ShaderProgram& shader) {       // Uniform callback
+                    shader.setUniform("fog.color", fogColor);
+                    shader.setUniform("fog.minDist", fogMinDist);
+                    shader.setUniform("fog.maxDist", fogMaxDist);
+                    shader.setUniform("materialType", shadingModel);
+                }
+            },
+                // Pass 1: Render Skybox
+            Scene::Pass{
+                {FBO::Default, WIDTH, HEIGHT},                                 // Default FBO
+                { 0, 0, WIDTH, HEIGHT },           // Viewport
+                { 0.0f, 0.0f, 0.0f, 1.0f},        // Clear color
                 true,                              // Enable depth buffer
                 {                                  // Objects
                     { SKYBOX }
@@ -116,29 +139,8 @@ namespace EngineFramework
                 {},                                // Lights
                 { texture },                       // Textures
                 nullptr                            // Uniform callback
-            },
-                // Pass 1: Render Scene
-                Scene::Pass{
-                    {FBO::Default, WIDTH, HEIGHT},                                 // Default FBO
-                    { 0, 0, WIDTH, HEIGHT },           // Viewport
-                    {},                                 // Clear color
-                    true,                                 // Depth buffer
-                    {                                  // Objects
-                        { PLANE, MATERIAL_CHECKERBOARD, glm::translate(glm::scale(glm::mat4(1.0f), {10.0f, 1.0f, 10.0f}), {0.0f, -1.01f, 0.0f}) },
-                        { SPHERE, MATERIAL_PBR_PHONG, glm::translate(glm::mat4(1.0f), {-3.0f, 0.0f, 0.0f}) },
-                        { CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) },
-                        { CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) }
-                    },
-                    { camera },                        // Cameras
-                    { { {0.0f, 5.0f, 2.0f} } },       // Lights
-                    {},                                // Textures
-                    [this](ShaderProgram& shader) {       // Uniform callback
-                        shader.setUniform("fog.color", fogColor);
-                        shader.setUniform("fog.minDist", fogMinDist);
-                        shader.setUniform("fog.maxDist", fogMaxDist);
-                        shader.setUniform("materialType", shadingModel);
-                    }
             }
+                
         }
         );
 		

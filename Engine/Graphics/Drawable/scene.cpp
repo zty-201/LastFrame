@@ -251,6 +251,9 @@ void Scene::render()
 
     int i = 0;
 
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     // Iterate through all rendering passes
     for (const Scene::Pass& pass : passes)
     {
@@ -276,11 +279,12 @@ void Scene::render()
             glViewport(pass.viewport[0], pass.viewport[1], pass.viewport[2], pass.viewport[3]);
 
         // Clear the color buffer if a clear color is specified
-        if (pass.clearColor.size() == 4)
-        {
-            glClearColor(pass.clearColor[0], pass.clearColor[1], pass.clearColor[2], pass.clearColor[3]);
-            glClear(GL_COLOR_BUFFER_BIT);
-        }
+        //if (pass.clearColor.size() == 4)
+        //{
+        //    //std::cout << "Clearing class" << std::endl;
+        //    glClearColor(pass.clearColor[0], pass.clearColor[1], pass.clearColor[2], pass.clearColor[3]);
+        //    glClear(GL_COLOR_BUFFER_BIT);
+        //}
 
         // Set and clear the depth buffer
         if (pass.enableDepthBuffer.size() > 0)
