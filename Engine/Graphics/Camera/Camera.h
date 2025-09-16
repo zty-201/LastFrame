@@ -12,7 +12,7 @@ enum CameraType { ORBITING, WALKING };
 //
 class Camera
 {
-    CameraType cameraType; // Stores the type of camera (ORBITING or WALKING)
+    CameraType camType; // Stores the type of camera (ORBITING or WALKING)
     glm::vec3 position; // Current position of the camera in 3D space
     glm::vec3 target;   // Target point that the camera is looking at
     float fieldOfView;  // Field of view angle in degrees
@@ -29,15 +29,15 @@ public:
         glm::vec3 position = { 0.0f, 3.0f, 3.0f },
         glm::vec3 target = { 0.0f, 0.0f, 0.0f },
         float fieldOfView = 45.0f,
-        float nearPlane = 0.5f,
-        float farPlane = 200.0f
+        float n = 0.5f,
+        float f = 200.0f
     ) :
-        cameraType{ cameraType },
+        camType{ cameraType },
         position{ position },
         target{ target },
         fieldOfView{ fieldOfView },
-        nearPlane{ nearPlane },
-        farPlane{ farPlane },
+        nearPlane{ n },
+        farPlane{ f },
         oldx{ -1.0 },
         oldy{ -1.0 }
     {
@@ -48,7 +48,7 @@ public:
         glm::vec3 position = { 0.0f, 3.0f, 3.0f },
         float fieldOfView = 45.0f
     ) :
-        cameraType{ CameraType::ORBITING },
+        camType{ CameraType::ORBITING },
         position{ position },
         target{ 0.0f, 0.0f, 0.0f },
         fieldOfView{ fieldOfView },
@@ -60,10 +60,10 @@ public:
     }
 
     // Sets the camera type and updates the target if it's orbiting
-    void setType(CameraType camType)
+    void setType(CameraType cameraType)
     {
-        this->cameraType = camType;
-        if (camType == CameraType::ORBITING)
+        this->camType = cameraType;
+        if (cameraType == CameraType::ORBITING)
             target = { 0.0f, 0.0f, 0.0f }; // Orbiting cameras always target the origin
     }
 
@@ -78,7 +78,7 @@ public:
     // Returns the view matrix for the camera using the "look at" method
     glm::mat4 getLookAt(glm::vec3 center = { 0.0f, 0.0f, 0.0f }, glm::vec3 up = { 0.0f, 1.0f, 0.0f }) const
     {
-		UNREFERENCED_PARAMETER(center);
+        UNREFERENCED_PARAMETER(center);
         return glm::lookAt(position, target, up);
     }
 
@@ -93,7 +93,7 @@ public:
     {
         const float PI05 = glm::pi<float>() / 2.0f; // Half of pi for clamping
 
-        if (cameraType == CameraType::ORBITING)
+        if (camType == CameraType::ORBITING)
         {
             // Calculate spherical coordinates for orbiting movement
             const float r = glm::sqrt(position.x * position.x +
@@ -120,7 +120,7 @@ public:
             position.y = r * glm::sin(alpha);
             position.z = r * glm::cos(alpha) * glm::cos(betta);
         }
-        else if (cameraType == CameraType::WALKING)
+        else if (camType == CameraType::WALKING)
         {
             // Calculate spherical coordinates for walking movement
             const float r = glm::sqrt(
@@ -157,8 +157,8 @@ public:
     // Handles scroll input to adjust zoom or camera position
     void onScroll(double xoffset, double yoffset, ShaderProgram* pProgram = nullptr)
     {
-		UNREFERENCED_PARAMETER(xoffset);
-        if (cameraType == CameraType::ORBITING)
+        UNREFERENCED_PARAMETER(xoffset);
+        if (camType == CameraType::ORBITING)
         {
             // Calculate the distance from the origin and adjust it based on scroll input
             float r = glm::sqrt(position.x * position.x + position.y * position.y + position.z * position.z);
@@ -173,7 +173,7 @@ public:
             position.y = r * glm::sin(alpha);
             position.z = r * glm::cos(alpha) * glm::cos(betta);
         }
-        else if (cameraType == CameraType::WALKING)
+        else if (camType == CameraType::WALKING)
         {
             // Adjust position and target based on scroll input for walking
             const glm::vec3 velocity = glm::normalize(yoffset > 0.0f ? target - position : position - target);

@@ -45,11 +45,6 @@ namespace EngineFramework
             throw std::runtime_error("Failed to initialize GLFW");
         }
 
-        // Debug context setup for OpenGL if in debug mode
-#if defined( _DEBUG )
-        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-#endif
-
         // Configure OpenGL context properties
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -65,7 +60,7 @@ namespace EngineFramework
         }
 
         glfwMakeContextCurrent(window);
-        glfwSwapInterval(1); // Enable vsync
+        //glfwSwapInterval(1); // Enable vsync
 
         // Initialize GLAD (must happen after window context is created)
         if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress)) {
@@ -91,118 +86,63 @@ namespace EngineFramework
     }
 
     void GraphicsSystem::SetupGraphics()
-    {
+    { 
+        fogColor = { 0.0f, 0.0f, 0.0f }; // Example: gray fog color
+        fogMinDist = 5.0f;
+        fogMaxDist = 15.0f;
+        shadingModel = 0;
+		// Define the scene and its properties
+		Scene::Texture texture = {
+			 { "Extern/night_negx.png", "Extern/night_posx.png",
+			   "Extern/night_posy.png", "Extern/night_negy.png",
+			   "Extern/night_posz.png", "Extern/night_negz.png"  }
+		};
 
-        
-            // Define the scene and its properties
-		    new (&scene) Scene
-            {
-                // Vertex shader
-                {
-                    #include "../Extern/Graphics/Shader/BasicVert.vert"
+		Camera camera = { { 0.0f, 1.0f, 5.0f }, 75.0f };
+        scene = std::make_unique<Scene>(
+            "Extern/Graphics/Shader/BasicVert.vert", // Vertex shader file path
+            "Extern/Graphics/Shader/BasicFrag.frag", // Fragment shader file path
+            std::initializer_list<Scene::Pass>{         // List of rendering passes
+            // Pass 0: Render Skybox
+            Scene::Pass{
+                {FBO::Default, WIDTH, HEIGHT},                                 // Default FBO
+                { 0, 0, WIDTH, HEIGHT },           // Viewport
+                { },        // Clear color
+                true,                              // Enable depth buffer
+                {                                  // Objects
+                    { SKYBOX }
                 },
-
-                // Fragment shader
-                {
-                    #include "../Extern/Graphics/Shader/BasicFrag.frag"
-                },
-
-                // Rendering passes
-                {
-                    // Pass 0
-                    {
-                        // Rendering target
-                        { FBO::Type::Deferred, WIDTH, HEIGHT },
-
-                        // Viewport
-                        { 0, 0, WIDTH, HEIGHT },
-
-                        // Background color
-                        BLACK,
-
-                        // Depth buffer
-                        ENABLE,
-
-                        // Objects
-                        {
-                            {   "Extern/bs_ears.obj",
-                                {
-                                    INSTANCES(-10.0f),
-                                    INSTANCES(-8.0f),
-                                    INSTANCES(-6.0f),
-                                    INSTANCES(-4.0f),
-                                    INSTANCES(-2.0f),
-                                    INSTANCES(0.0f),
-                                    INSTANCES(2.0f),
-                                    INSTANCES(4.0f),
-                                    INSTANCES(6.0f),
-                                    INSTANCES(8.0f),
-                                    INSTANCES(10.0f),
-                                }
-                            }
-                        },
-
-                // The camera
-                {
-                    { {0.0f, 4.0f, 5.0f} }
-                },
-
-                // Lights
-                {
-                    DEFAULT
-                },
-
-                // Textures
-                {
-                    { { "Extern/ogre_diffuse.png" },   GL_TEXTURE3 }, // Channel 3
-                    { { "Extern/ogre_normalmap.png" }, GL_TEXTURE4 }  // Channel 4                         
-                },
-
-                // Setup uniforms in the shader
-                NULL
+                { camera },                        // Cameras
+                {},                                // Lights
+                { texture },                       // Textures
+                nullptr                            // Uniform callback
             },
-
-                // Pass 1
-                {
-                    // Rendering target
-                    DEFAULT,
-
-                    // Viewport
-                    { 0, 0, WIDTH, HEIGHT },
-
-                    // Background color
-                    { },
-
-                    // Depth buffer
-                    DISABLE,
-
-                    // Objects
-                    {
-                        {
-                            QUAD
-                        }
+                // Pass 1: Render Scene
+                Scene::Pass{
+                    {FBO::Default, WIDTH, HEIGHT},                                 // Default FBO
+                    { 0, 0, WIDTH, HEIGHT },           // Viewport
+                    {},                                 // Clear color
+                    true,                                 // Depth buffer
+                    {                                  // Objects
+                        { PLANE, MATERIAL_CHECKERBOARD, glm::translate(glm::scale(glm::mat4(1.0f), {10.0f, 1.0f, 10.0f}), {0.0f, -1.01f, 0.0f}) },
+                        { SPHERE, MATERIAL_PBR_PHONG, glm::translate(glm::mat4(1.0f), {-3.0f, 0.0f, 0.0f}) },
+                        { CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) },
+                        { CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) }
                     },
-
-                // The camera
-                {
-
-                },
-
-                // Lights
-                {
-
-                },
-
-                // Textures
-                {
-
-                },
-
-                // Setup uniforms in the shader
-
-                }
+                    { camera },                        // Cameras
+                    { { {0.0f, 5.0f, 2.0f} } },       // Lights
+                    {},                                // Textures
+                    [this](ShaderProgram& shader) {       // Uniform callback
+                        shader.setUniform("fog.color", fogColor);
+                        shader.setUniform("fog.minDist", fogMinDist);
+                        shader.setUniform("fog.maxDist", fogMaxDist);
+                        shader.setUniform("materialType", shadingModel);
+                    }
             }
-            };
+        }
+        );
+		
+		
 
     }
 
@@ -230,7 +170,7 @@ namespace EngineFramework
 #endif        
         
         // Draw scene
-        scene.render();
+        scene->render();
     }
 
     void GraphicsSystem::PostUpdate(float deltaTime)

@@ -3,9 +3,9 @@
 
 #include "ShaderProgram.h"
 
-    // Predefined material definitions using macros for common materials (Phong and PBR)
+// Predefined material definitions using macros for common materials (Phong and PBR)
 
-    // Blue Phong material with shininess and color properties
+// Blue Phong material with shininess and color properties
 #define PHONG_MATERIAL_BLUE\
         {\
             { "material.shininess", { 100.0f } },\

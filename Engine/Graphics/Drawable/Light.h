@@ -3,15 +3,12 @@
 
 #include "ShaderProgram.h"
 
-#include <glm/glm.hpp> // For mathematical types like vec2, vec3, mat4
-#include <glm/ext.hpp> // For mathematical constants like pi
-#include <sstream>     // For dynamic string generation
-#include <vector>      // For managing multiple light components
+
 
 //
-// The Light struct represents a point light source in 3D space with ambient, 
-// diffuse, and specular intensities.
-//
+    // The Light struct represents a point light source in 3D space with ambient, 
+    // diffuse, and specular intensities.
+    //
 struct Light
 {
     glm::vec3 position;       // The position of the light in 3D space
@@ -103,7 +100,7 @@ struct Light
     // Handles scroll events to zoom the light in/out by adjusting its radial distance.
     void onScroll(double xoffset, double yoffset, ShaderProgram* pProgram = nullptr, int i = 0)
     {
-		UNREFERENCED_PARAMETER(xoffset);
+        UNREFERENCED_PARAMETER(xoffset);
         float r = glm::sqrt(position.x * position.x +
             position.y * position.y +
             position.z * position.z); // Calculate radial distance

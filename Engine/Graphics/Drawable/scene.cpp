@@ -1,9 +1,5 @@
 
 #include "pch.hpp"
-#include <stdexcept>
-#include <sstream>   
-#include <fstream>
-
 #include "Scene.h"
 
 // For loading textures
@@ -12,15 +8,15 @@
 
 
 //
-// This function utilizes the stb_image library for loading image files and OpenGL 
-// for creating and handling the texture.
-// 
-// GLuint: The function returns a GLuint, which is a type used by OpenGL 
-//          to represent an identifier for the texture. This value is used 
-//          later to refer to the texture in rendering operations.
-// const char* filename: This parameter takes a string representing the file path 
-//          of the image from which the texture is to be loaded.
-//
+    // This function utilizes the stb_image library for loading image files and OpenGL 
+    // for creating and handling the texture.
+    // 
+    // GLuint: The function returns a GLuint, which is a type used by OpenGL 
+    //          to represent an identifier for the texture. This value is used 
+    //          later to refer to the texture in rendering operations.
+    // const char* filename: This parameter takes a string representing the file path 
+    //          of the image from which the texture is to be loaded.
+    //
 GLuint loadTexture(const char* filename)
 {
     // Declare variables for the image's width, height, and the number of bytes per pixel

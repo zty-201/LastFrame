@@ -45,13 +45,17 @@ namespace EngineFramework
 
 		// Accessor for the scene
         GLFWwindow* GetGLFWwindow() { return window; }
-		Scene* GetScene() { return &scene; }
     private:
 
-        Scene scene;
-        glm::vec2 screen = { WIDTH,HEIGHT };
+        std::unique_ptr<Scene> scene;
+        
 		GLFWwindow* window = nullptr;
 
+        glm::vec2 screen = { WIDTH,HEIGHT };
+        glm::vec3 fogColor; // Example: gray fog color
+        float fogMinDist;
+        float fogMaxDist;
+        int shadingModel;
         // Setup methods
         void SetupGLFW();
         void SetupImGui();

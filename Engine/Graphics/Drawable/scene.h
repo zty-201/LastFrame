@@ -1,9 +1,5 @@
 #ifndef SCENE_H
 #define SCENE_H
-#include <vector>
-#include <list>
-#include <map>
-#include <string>
 
 #include "ShaderProgram.h"
 #include "FBO.h"
@@ -13,7 +9,7 @@
 #include "Camera.h"
 
 
-    // Color and state definitions
+// Color and state definitions
 #define BLACK           { 0.0f, 0.0f, 0.0f, 0.0f }
 #define GREY            { 0.5f, 0.5f, 0.5f, 0.0f }
 #define WHITE           { 1.0f, 1.0f, 1.0f, 0.0f }
@@ -133,7 +129,9 @@ struct Scene
             void setBuffers(const char* meshName);
         };
 
-        typedef void (*SetUniformCallback)(ShaderProgram& shader); // Callback for setting uniforms
+        using SetUniformCallback = std::function<void(ShaderProgram& shader)>;
+
+        //typedef void (*SetUniformCallback)(ShaderProgram& shader); // Callback for setting uniforms
 
         FBO fbo;                           // Framebuffer Object for the pass
         std::vector<int> viewport;         // Viewport dimensions
@@ -210,8 +208,8 @@ struct Scene
 
     // Constructors for the Scene class
     Scene(
-        const char* sv,
-        const char* sf,
+        const char* sv = "",
+        const char* sf = "",
         const std::initializer_list<Pass>& passes = { }
     )
         :

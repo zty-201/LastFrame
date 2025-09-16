@@ -13,6 +13,9 @@
 #include <fstream>
 #include <sstream>
 #include <random>
+#include <map>
+#include <functional>
+
 #include "global.hpp"
 #include "ISystem.hpp"
 #include "CoreEngine.hpp"
@@ -33,6 +36,7 @@
 //TODO: Replace with centralized math lib.
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/constants.hpp>
 #include <glm/ext.hpp> // For mathematical constants like pi
 #include <glm/gtc/matrix_transform.hpp> // Utility functions for matrix transformations
 
