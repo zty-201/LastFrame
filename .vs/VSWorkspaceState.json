@@ -1,0 +1,24 @@
+{
+  "OutputFoldersPerTargetSystem": {
+    "Local Machine": [
+      "build\\VisualStudio"
+    ]
+  },
+  "ExpandedNodes": [
+    "",
+    "\\Engine",
+    "\\Lib\\Android_ARM64",
+    "\\Lib\\Android_ARM64\\Debug",
+    "\\Lib\\Android_ARM64\\Debug\\FMOD_API",
+    "\\Lib\\Android_ARM64\\Debug\\FMOD_API\\core",
+    "\\Lib\\Android_ARM64\\Debug\\FMOD_API\\core\\examples",
+    "\\Lib\\Android_ARM64\\Debug\\FMOD_API\\core\\examples\\vs2017",
+    "\\Lib\\Android_ARM64\\Release",
+    "\\Lib\\Android_ARM64\\Release\\FMOD_API",
+    "\\Lib\\Android_ARM64\\Release\\FMOD_API\\core",
+    "\\Lib\\Android_ARM64\\Release\\FMOD_API\\core\\examples",
+    "\\Lib\\Android_ARM64\\Release\\FMOD_API\\core\\examples\\vs2019"
+  ],
+  "SelectedNode": "\\Engine",
+  "PreviewInSolutionExplorer": false
+}
