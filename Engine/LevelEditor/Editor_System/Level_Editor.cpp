@@ -1,4 +1,5 @@
-#ifdef _DEBUG
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+
 
 #include "pch.hpp"
 #include "global.hpp"
@@ -271,5 +272,4 @@ namespace EngineFramework
 
 }
 #endif
-
 
