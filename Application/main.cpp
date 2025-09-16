@@ -27,8 +27,6 @@ written consent of DigiPen Institute of Technology is prohibited.
 #endif
 
 
-
-
 void Game_Initialize()
 {
 	/*
@@ -49,7 +47,6 @@ void Game_Initialize()
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 #endif
-
 	/*
 			Process
 			1. Initialize all external libraries that cannot be initialized normally (maybe the initialization order is finicky).

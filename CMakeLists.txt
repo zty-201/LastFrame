@@ -57,7 +57,7 @@ target_compile_options(engine_library PUBLIC
 #Enable VS code analysis for faster checks.
 #Enable clang tidy code analysis for more checks.
 set_target_properties(engine_library PROPERTIES
-    VS_GLOBAL_RunCodeAnalysis true
+    VS_GLOBAL_RunCodeAnalysis ${CODE_ANALYSIS_ON_BUILD}
     # Do not use visual studio core guidelines if clang tidy is enabled.
     VS_GLOBAL_EnableMicrosoftCodeAnalysis true
     # Use clangtidy
@@ -65,7 +65,7 @@ set_target_properties(engine_library PROPERTIES
     VS_GLOBAL_ClangTidyChecks -checks=-*,clang-analyzer-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type
 )
 set_target_properties(application_executable PROPERTIES
-    VS_GLOBAL_RunCodeAnalysis true
+    VS_GLOBAL_RunCodeAnalysis ${CODE_ANALYSIS_ON_BUILD}
     # Do not use visual studio core guidelines if clang tidy is enabled.
     VS_GLOBAL_EnableMicrosoftCodeAnalysis true
     # Use clangtidy

@@ -1,6 +1,5 @@
 #ifndef MAIN_HPP
 #define MAIN_HPP
-
 /*
 	Initialize the game application and all systems
 */
