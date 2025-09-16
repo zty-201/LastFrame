@@ -13,7 +13,6 @@ written consent of DigiPen Institute of Technology is prohibited.
 #ifndef GLOBAL_HPP
 #define GLOBAL_HPP
 #include "entt/entity/registry.hpp"
-#include "entt/meta/meta.hpp"
 
 
 //Used to denote a variable is unused.

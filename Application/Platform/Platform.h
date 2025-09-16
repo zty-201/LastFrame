@@ -6,7 +6,7 @@
 // Platform detection
 #ifdef _WIN32
 #define PLATFORM_WINDOWS
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) && !defined(PLATFORM_ANDROID)
 #define PLATFORM_ANDROID
 #endif
 // Platform-specific includes
