@@ -1,4 +1,4 @@
-#ifdef _DEBUG
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "pch.hpp"
 
 //File management, JSON file parser/writer

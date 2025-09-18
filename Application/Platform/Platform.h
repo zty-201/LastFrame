@@ -6,13 +6,11 @@
 // Platform detection
 #ifdef _WIN32
 #define PLATFORM_WINDOWS
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) && !defined(PLATFORM_ANDROID)
 #define PLATFORM_ANDROID
 #endif
 // Platform-specific includes
 #ifdef PLATFORM_WINDOWS
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <iostream>
 #include <cstring>
 // Windows logging macros
@@ -21,8 +19,6 @@
 #define LOGE(...) printf("[ERROR] " __VA_ARGS__); printf("\n")
 #define LOGD(...) printf("[DEBUG] " __VA_ARGS__); printf("\n")
 #elif defined(PLATFORM_ANDROID)
-#include <EGL/egl.h>
-#include <GLES3/gl31.h>
 #include <android/log.h>
 #include <cstring>
 // Android logging macros (LOG_TAG should be defined in each source file)
