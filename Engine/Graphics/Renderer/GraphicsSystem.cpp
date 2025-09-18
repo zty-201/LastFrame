@@ -17,7 +17,6 @@ namespace EngineFramework
 
     GraphicsSystem::GraphicsSystem()
     {
-        this_graphics_ptr = this;
     }
 
     GraphicsSystem::~GraphicsSystem()

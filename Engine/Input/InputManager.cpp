@@ -91,7 +91,7 @@ namespace EngineFramework
         oldxpos = xpos;
         oldypos = ypos;
 
-        auto& pScene = GraphicsSystem::GetInstance().GetScene();
+        auto& pScene = g_graphics_ptr->GetScene();
         //std::cout << "CursorPosCallback: xoffset = " << xoffset << ", yoffset = " << yoffset << std::endl;
         if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed 
             || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down))
