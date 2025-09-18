@@ -32,7 +32,6 @@ struct Light
     // Sets the light's uniform variables in the given shader program.
     void setUniforms(ShaderProgram* pProgram, int i = 0) const
     {
-        pProgram->use(); // Activate the shader program
 
         std::stringstream s;
 
@@ -68,7 +67,6 @@ struct Light
             pProgram->setUniform(s.str(), L[2]);
         }
 
-        pProgram->disuse(); // Deactivate the shader program
     }
 
     // Handles cursor movement events to adjust the light's position.

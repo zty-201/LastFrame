@@ -16,24 +16,21 @@ uniform int Pass; // Pass number
 
 void main()
 {
+    // Pass 0 is SCENE
     if (Pass == 0) {
-
-        Vec = VertexPosition; 
-        gl_Position = P * vec4(vec3(M * V * vec4(VertexPosition, 0.f)).xyz, 1.f);
-
-    } else {
-        // Scene pass
         TexCoord = VertexTexCoord;
-
         mat4 MV = V * M; 
         mat3 N = mat3(vec3(MV[0]), vec3(MV[1]), vec3(MV[2])); 
-
         Normal = normalize(N * VertexNormal);
-
         vec4 VertexPositionInView = MV * vec4(VertexPosition, 1.0f);
         Position = VertexPositionInView.xyz;
         gl_Position = P * VertexPositionInView; 
+    } 
+    // Pass 1 is SKYBOX
+    else {
+        Vec = VertexPosition;
+        mat4 viewNoTranslation = mat4(mat3(V));
+        vec4 pos = P * viewNoTranslation * vec4(VertexPosition, 1.0);
+        gl_Position = pos.xyzz;
     }
 }
-
-

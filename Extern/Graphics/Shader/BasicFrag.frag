@@ -232,23 +232,7 @@ vec4 checkerboardTexture(vec2 uv, float size) {
         return vec4(1.0, 1.0, 1.0, 1.0); // White
 }
 
-// Skybox pass
-layout(binding=0) uniform samplerCube CubeMapTex;
-
-void pass0() 
-{
-    // Access the cube map texture
-    vec3 color = texture(CubeMapTex, normalize(Vec)).rgb;
-
-    // Gamma correction
-    color = pow(color, vec3(1.0f/2.2f));
-
-    FragColor = vec4(color, 1.0f);
-}
-
-// Scene pass
-
-void pass1() 
+void scenePass() 
 {
     vec3 color;
 
@@ -298,11 +282,21 @@ void pass1()
     FragColor = vec4(color, 1.0f);
 }
 
+layout(binding=0) uniform samplerCube CubeMapTex;
+
+void skyboxPass() 
+{
+    // Access the cube map texture
+    vec3 color = texture(CubeMapTex, normalize(Vec)).rgb;
+
+    // Gamma correction
+    color = pow(color, vec3(1.0f/2.2f));
+
+    FragColor = vec4(color, 1.0f);
+}
 
 void main()
 {
-    if (Pass == 0) pass0();
-    else if (Pass == 1) pass1();
+    if (Pass == 0) scenePass();
+    else if (Pass == 1) skyboxPass();
 }
-
-

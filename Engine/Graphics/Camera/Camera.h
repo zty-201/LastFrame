@@ -70,9 +70,7 @@ public:
     // Updates the shader program with camera position
     void setUniforms(ShaderProgram* pProgram) const
     {
-        pProgram->use();
         pProgram->setUniform("camera.position", position); // Pass camera position to the shader
-        pProgram->disuse();
     }
 
     // Returns the view matrix for the camera using the "look at" method
@@ -89,7 +87,7 @@ public:
     }
 
     // Handles cursor movement to adjust camera orientation
-    void onCursor(double xoffset, double yoffset, ShaderProgram* pProgram = nullptr)
+    void onCursor(double xoffset, double yoffset)
     {
         const float PI05 = glm::pi<float>() / 2.0f; // Half of pi for clamping
 
@@ -149,13 +147,13 @@ public:
             target.y = position.y + r * glm::sin(alpha);
             target.z = position.z + r * glm::cos(alpha) * glm::cos(betta);
         }
-
+		//UNREFERENCED_PARAMETER(pProgram);
         // Update shader program with the new camera settings
-        setUniforms(pProgram);
+        //setUniforms(pProgram);
     }
 
     // Handles scroll input to adjust zoom or camera position
-    void onScroll(double xoffset, double yoffset, ShaderProgram* pProgram = nullptr)
+    void onScroll(double xoffset, double yoffset)
     {
         UNREFERENCED_PARAMETER(xoffset);
         if (camType == CameraType::ORBITING)
@@ -180,9 +178,9 @@ public:
             position += velocity * glm::vec3(1.0f, 0.0f, 1.0f);
             target += velocity * glm::vec3(1.0f, 0.0f, 1.0f);
         }
-
+        //UNREFERENCED_PARAMETER(pProgram);
         // Update shader program with the new camera settings
-        setUniforms(pProgram);
+        //setUniforms(pProgram);
     }
 };
 

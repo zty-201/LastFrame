@@ -1,4 +1,3 @@
-
 #include "pch.hpp"
 #include "Scene.h"
 
@@ -239,133 +238,116 @@ void Scene::Pass::Object::setBuffers(const char* meshName)
     glBindVertexArray(0);
 }
 
-//
-// The function orchestrates the rendering process for a scene by iterating through a series 
-// of rendering passes. This function handles various stages of the rendering pipeline, 
-// including framebuffer setup, shader configuration, texture binding, lighting, 
-// and object rendering, making it versatile for multi-pass rendering in OpenGL.
-//
 void Scene::render()
 {
-    static GLuint currentHandle = 0xFFFFFF;
+    static GLuint currentFboHandle = 0xFFFFFF;
 
-    int i = 0;
-
+    // 1. Clear the default framebuffer once at the start of the frame.
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
 
-    // Iterate through all rendering passes
-    for (const Scene::Pass& pass : passes)
+    int passIndex = 0;
+    for (const auto& pass : passes)
     {
-        // Set the framebuffer object (FBO) as the render target
-
-        // Check if framebuffer is already bound to improve performance 
-        // by avoiding unnecessary bindings
-        if (currentHandle != pass.fbo.handle)
+        // --- 1. SETUP THE PASS RENDER TARGET AND STATE ---
+        if (currentFboHandle != pass.fbo.handle)
         {
             glBindFramebuffer(GL_FRAMEBUFFER, pass.fbo.handle);
-            currentHandle = pass.fbo.handle;
+            currentFboHandle = pass.fbo.handle;
         }
 
-        // Set the pass number and other parameters for rendering if any
-        shader.use();
-        shader.setUniform("Pass", i++);
-        if (pass.setUniformCallback)
-            pass.setUniformCallback(shader);
-        shader.disuse();
-
-        // Configure the viewport if specified
-        if (pass.viewport.size() == 4)
+        if (pass.viewport.size() == 4) {
             glViewport(pass.viewport[0], pass.viewport[1], pass.viewport[2], pass.viewport[3]);
-
-        // Clear the color buffer if a clear color is specified
-        //if (pass.clearColor.size() == 4)
-        //{
-        //    //std::cout << "Clearing class" << std::endl;
-        //    glClearColor(pass.clearColor[0], pass.clearColor[1], pass.clearColor[2], pass.clearColor[3]);
-        //    glClear(GL_COLOR_BUFFER_BIT);
-        //}
-
-        // Set and clear the depth buffer
-        if (pass.enableDepthBuffer.size() > 0)
-        {
-            GLboolean enableDepthTest;
-            glGetBooleanv(GL_DEPTH_TEST, &enableDepthTest);
-
-            // Enable or disable depth testing based on the pass settings
-            if (enableDepthTest)
-                if (pass.enableDepthBuffer[0])
-                    glClear(GL_DEPTH_BUFFER_BIT);
-                else
-                {
-                    glDisable(GL_DEPTH_TEST);
-                    glClear(GL_DEPTH_BUFFER_BIT);
-                }
-            else
-                if (pass.enableDepthBuffer[0])
-                {
-                    glEnable(GL_DEPTH_TEST);
-                    glClear(GL_DEPTH_BUFFER_BIT);
-                }
         }
 
-        // Bind textures for the current pass
-        for (const Texture& info : pass.textures)
-            if (info.id)
-            {
-                glActiveTexture(info.channel);
-                glBindTexture(info.target, info.id);
-            }
+        glDepthFunc(pass.depthMode);
 
-        // Configure lighting for the pass
-        for (int idx = 0; idx < pass.lights.size(); ++idx)
-            pass.lights[idx].setUniforms(&shader, idx);
+        // Set state based on whether this is a scene pass or skybox pass
+        if (pass.depthMode == GL_LEQUAL) // Skybox pass
+        {
+            glDepthMask(GL_FALSE);
+            glDisable(GL_CULL_FACE);
+        }
+        else // Scene pass (GL_LESS)
+        {
+            glDepthMask(GL_TRUE);
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK); // Default to culling back faces
+        }
 
+        // --- 2. ACTIVATE SHADER AND SET UNIFORMS ---
+        shader.use();
+        shader.setUniform("Pass", passIndex);
 
-        glm::mat4 V = glm::mat4(1.0f); // View matrix
-        glm::mat4 P = glm::mat4(1.0f); // Projection matrix
+        if (pass.setUniformCallback) {
+            pass.setUniformCallback(shader);
+        }
 
-        // If a single camera is used, set its uniforms and update matrices
-        if (pass.cameras.size() == 1)
+        // Set camera matrices
+        glm::mat4 V = glm::mat4(1.0f);
+        glm::mat4 P = glm::mat4(1.0f);
+        if (!pass.cameras.empty())
         {
             pass.cameras[0].setUniforms(&shader);
-
-            if (pass.viewport.size() == 4 && pass.viewport[3])
+            if (pass.viewport.size() == 4 && pass.viewport[3] > 0)
             {
                 V = pass.cameras[0].getLookAt();
                 P = pass.cameras[0].getPerspective((float)pass.viewport[2] / pass.viewport[3]);
             }
         }
-
-        // Set the view and projection matrices in the shader
-        shader.use();
         shader.setUniform("V", V);
         shader.setUniform("P", P);
-        shader.disuse();
 
-        // Render objects for the pass
-        for (const Scene::Pass::Object& object : pass.objects)
-            if (object.isVisible && !object.instances.empty())
-            {
-                for (const Scene::Pass::Object::Instance& instance : object.instances)
-                    if (instance.isVisible)
-                    {
-                        // Set material properties for the instance
-                        instance.material.setUniforms(&shader);
+        // Set lighting uniforms (only for scene pass)
+        for (int i = 0; i < pass.lights.size(); ++i) {
+            pass.lights[i].setUniforms(&shader, i);
+        }
 
-                        // Set the model transformation matrix and render the instance
-                        shader.use();
-                        shader.setUniform("M", instance.modeltransform);
-
-                        glBindVertexArray(object.vao);
-                        glDrawElements(GL_TRIANGLES, (GLsizei)object.size, GL_UNSIGNED_INT, 0);
-                        glBindVertexArray(0);
-
-                        shader.disuse();
-                    }
+        // Bind per-pass textures (only for skybox pass)
+        for (const auto& info : pass.textures) {
+            if (info.id) {
+                glActiveTexture(info.channel);
+                glBindTexture(info.target, info.id);
             }
+        }
 
-        // Ensure all OpenGL commands are finished before moving to the next pass
-        glFinish();
+        // --- 3. RENDER ALL OBJECTS IN THE PASS ---
+        for (const auto& object : pass.objects)
+        {
+            if (!object.isVisible) continue;
+
+            glBindVertexArray(object.vao);
+
+            for (const auto& instance : object.instances)
+            {
+                if (!instance.isVisible) continue;
+
+                // *** FIX: Check for the checkerboard material and flip the culling ***
+                bool isCheckerboard = (instance.material.effect == 3.0f);
+                if (isCheckerboard) {
+                    glCullFace(GL_FRONT); // Cull the front face to see the "back"
+                }
+
+                instance.material.setUniforms(&shader);
+                shader.setUniform("M", instance.modeltransform);
+                glDrawElements(GL_TRIANGLES, (GLsizei)object.size, GL_UNSIGNED_INT, 0);
+
+                // *** FIX: Reset culling back to the default for other objects ***
+                if (isCheckerboard) {
+                    glCullFace(GL_BACK);
+                }
+            }
+        }
+
+        glBindVertexArray(0);
+        shader.disuse();
+        passIndex++;
     }
+
+    // --- FINAL CLEANUP ---
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glDepthMask(GL_TRUE);
 }
