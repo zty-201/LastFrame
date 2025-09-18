@@ -76,7 +76,6 @@ namespace EngineFramework
         (void)mods;
 
         if (action == GLFW_PRESS) { 
-            std::cout << "Mouse button pressed: button = " << button << std::endl;
             mouseButtonStates[button] = KeyState::Pressed; }
         else if (action == GLFW_RELEASE) { mouseButtonStates[button] = KeyState::Released; }
     }
@@ -96,7 +95,6 @@ namespace EngineFramework
         if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed 
             || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down))
         {
-			std::cout << "CursorPosCallback: xoffset = " << xoffset << ", yoffset = " << yoffset << std::endl;
             pScene->camerasOnCursor(xoffset, yoffset);
         }
         else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed)

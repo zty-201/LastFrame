@@ -157,7 +157,7 @@ endif()
 add_subdirectory(Lib)
 
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod glad CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad stb_image CACHE INTERNAL "")
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
 set(WINDOWS_DEBUG_LIBRARIES imgui CACHE INTERNAL "")
