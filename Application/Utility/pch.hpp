@@ -36,6 +36,7 @@
 #include <glm/ext.hpp> // For mathematical constants like pi
 #include <glm/gtc/matrix_transform.hpp> // Utility functions for matrix transformations
 
+#include <Jolt/Jolt.h>
 
 //// Windows API headers
 //#ifdef _WIN32
