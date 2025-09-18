@@ -18,9 +18,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include <unordered_map>
 #include "ISystem.hpp"
-#ifdef PLATFORM_WINDOWS
-    #include "GLFW/glfw3.h"
-#endif
+#include "GLFW/glfw3.h"
 namespace EngineFramework
 {
     enum class KeyState
@@ -39,10 +37,6 @@ namespace EngineFramework
         void Update(float deltaTime) override;      // promote transitions
         void PostUpdate(float deltaTime) override;  // finalize states
 
-        InputManager() { this_class = this; }
-        static InputManager& GetInstance() { return *this_class; }
-        static inline InputManager *this_class = nullptr;
-
         // --- Keyboard API ---
         static bool GetKey(int key);       // true while held
         static bool GetKeyDown(int key);   // true on press
@@ -59,22 +53,16 @@ namespace EngineFramework
 
         // --- Window events ---
         static std::pair<int, int> GetWindowSize();
-#ifdef PLATFORM_WINDOWS
-        static void RegisterCallbacks(GLFWwindow* window);
-#endif
 
-        const std::unordered_map<int, KeyState>& GetKeyStates() const { return keyStates; }
-        const std::unordered_map<int, KeyState>& GetMouseButtonStates() const { return mouseButtonStates; }
+        static void RegisterCallbacks(GLFWwindow* window);
 
     private:
-#ifdef PLATFORM_WINDOWS
-// --- GLFW Callbacks ---
+        // --- GLFW Callbacks ---
         static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
         static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
         static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
         static void WindowSizeCallback(GLFWwindow* window, int width, int height);
-#endif
         static void ErrorCallback(int error, const char* description);
 
         // --- State storage ---

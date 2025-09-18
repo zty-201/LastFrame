@@ -1,4 +1,5 @@
-#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+
+#ifdef _DEBUG
 #include "pch.hpp"
 
 #ifndef LEVEL_EDITOR_HPP
@@ -79,4 +80,5 @@ namespace EngineFramework
 
 #endif
 #endif
+
 

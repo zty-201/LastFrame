@@ -1,5 +1,5 @@
 
-#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+#ifdef _DEBUG
 #ifndef SYSTEM_LEVEL_EDITOR_HPP
 #define SYSTEM_LEVEL_EDITOR_HPP
 #include <unordered_map>

@@ -36,7 +36,6 @@ namespace EngineFramework
     int InputManager::windowWidth = 0;
     int InputManager::windowHeight = 0;
 
-#ifdef PLATFORM_WINDOWS
     void InputManager::RegisterCallbacks(GLFWwindow* window)
     {
         glfwSetKeyCallback(window, KeyCallback);
@@ -118,7 +117,7 @@ namespace EngineFramework
         windowWidth = width;
         windowHeight = height;
     }
-#endif
+
     void InputManager::ErrorCallback(int error, const char* description)
     {
         (void)error;
@@ -189,56 +188,53 @@ namespace EngineFramework
     void InputManager::Update(float deltaTime)
     {
         (void)deltaTime;
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
     }
 
     void InputManager::PostUpdate(float deltaTime)
     {
         (void)deltaTime;
-
-        // --- Keyboard ---
-        for (auto& [key, state] : keyStates)
+        // Keys
+        for (auto it = keyStates.begin(); it != keyStates.end(); )
         {
-            switch (state)
+            switch (it->second)
             {
             case KeyState::Pressed:
-                state = KeyState::Down; // Pressed → Down
+                it->second = KeyState::Down;
+                ++it;
                 break;
             case KeyState::Released:
-                state = KeyState::None; // Released → None
+                it->second = KeyState::None;
+                ++it;
                 break;
-            case KeyState::Down:
-                break;
-            case KeyState::None:
-                // Nothing to print
+            default:
+                ++it;
                 break;
             }
         }
 
-        // --- Mouse ---
-        for (auto& [button, state] : mouseButtonStates)
+        // Mouse buttons
+        for (auto it = mouseButtonStates.begin(); it != mouseButtonStates.end(); )
         {
-            switch (state)
+            switch (it->second)
             {
             case KeyState::Pressed:
-                state = KeyState::Down; // Pressed → Down
+                it->second = KeyState::Down;
+                ++it;
                 break;
             case KeyState::Released:
-                state = KeyState::None; // Released → None
+                it->second = KeyState::None;
+                ++it;
                 break;
-            case KeyState::Down:
-                break;
-            case KeyState::None:
+            default:
+                ++it;
                 break;
             }
         }
 
-        // Reset scroll deltas every frame
         scrollX = 0.0;
         scrollY = 0.0;
-
-        // Update last mouse position
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
     }
 
 }

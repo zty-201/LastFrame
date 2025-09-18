@@ -1,5 +1,4 @@
-#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
-
+#ifdef _DEBUG
 
 #include "pch.hpp"
 #include "global.hpp"
@@ -99,12 +98,12 @@ namespace EngineFramework
 			ImGuiWindowFlags_NoBackground;
 
 		// If using GLFW for input, you can still initialize the input handling, but use your custom window
-		if (GraphicsSystem::GetInstance().GetGLFWwindow() == nullptr) {
+		if (g_graphics_ptr->GetGLFWwindow() == nullptr) {
 			std::cout << "level editor app cannot be initialised\n";
 			throw std::runtime_error("Level editor init failed: GraphicsSystem has no valid GLFWwindow.");
 		}
 		else {
-			ImGui_ImplGlfw_InitForOpenGL(GraphicsSystem::GetInstance().GetGLFWwindow(), true);
+			ImGui_ImplGlfw_InitForOpenGL(g_graphics_ptr->GetGLFWwindow(), true);
 			std::cout << "level editor app is initialised\n";
 		}
 
@@ -272,4 +271,5 @@ namespace EngineFramework
 
 }
 #endif
+
 

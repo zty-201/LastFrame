@@ -1,4 +1,4 @@
-#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+#ifdef _DEBUG
 #ifndef OBJECTMANAGER_LFEATURE_HPP
 #define OBJECTMANAGER_LFEATURE_HPP
 #include <unordered_map>

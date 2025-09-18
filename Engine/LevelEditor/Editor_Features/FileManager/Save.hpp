@@ -1,4 +1,4 @@
-#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+#ifdef _DEBUG
 #ifndef SAVE_LFEATURE_HPP
 #define SAVE_LFEATURE_HPP
 #include <unordered_map>
