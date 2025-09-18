@@ -31,3 +31,10 @@ Includes:
 
 Cleaning:
 1. Run the clean .bat file, or delete build/ folder.
+
+
+#TODO:
+1. Cross-Platform input handling, independent of glfw.
+2. Cross-Platform graphics, independent of glfw.
+3. Cross-Platform Asset manager (use AAsset to get assets/)
+Note: Filepath may be different depending on windows vs android (use / for windows and android). 

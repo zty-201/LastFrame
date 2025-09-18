@@ -1,0 +1,5 @@
+#ifndef GRAPHICS_INITIALIZE_HPP
+#define GRAPHICS_INITIALIZE_HPP
+
+
+#endif
