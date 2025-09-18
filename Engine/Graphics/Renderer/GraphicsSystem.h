@@ -43,6 +43,12 @@ namespace EngineFramework
         void Update(float deltaTime) override;
         void PostUpdate(float deltaTime) override;
 
+
+        static GraphicsSystem& GetInstance()
+        {
+            return *this_graphics_ptr;
+        }
+
 		// Accessor for the scene
         GLFWwindow* GetGLFWwindow() { return pWindow; }
 		std::unique_ptr<Scene>& GetScene() { return pScene; }
@@ -55,7 +61,7 @@ namespace EngineFramework
     private:
 
         std::unique_ptr<Scene> pScene;
-        
+		static inline GraphicsSystem* this_graphics_ptr = nullptr;
 		GLFWwindow* pWindow = nullptr;
 
         glm::vec2 screen = { WIDTH,HEIGHT };
