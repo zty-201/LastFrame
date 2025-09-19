@@ -14,6 +14,12 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     // Used to load the 'jnicpp' library on application startup.
     static {
         try {
+            if (BuildConfig.IS_DEBUG_BUILD) {
+                System.loadLibrary("fmodL");  // Debug / Logging version
+            } else {
+                System.loadLibrary("fmod");   // Release / Optimized version
+            }
+
             System.loadLibrary("jnicpp");
             Log.d(TAG, "Native library loaded successfully");
         } catch (UnsatisfiedLinkError e) {
@@ -32,7 +38,8 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
             setContentView(binding.getRoot());
 // Setup GLSurfaceView
             glSurfaceView = binding.glSurfaceView;
-            glSurfaceView.setEGLContextClientVersion(32); // OpenGL ES 3.2
+            glSurfaceView.setEGLContextClientVersion(3); // OpenGL ES 3.X, uses highest version.
+            glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
             glSurfaceView.setRenderer(this);
             glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 // Example of a call to a native method
