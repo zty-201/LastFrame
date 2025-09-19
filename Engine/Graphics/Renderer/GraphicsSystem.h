@@ -50,7 +50,9 @@ namespace EngineFramework
         }
 
 		// Accessor for the scene
+#ifdef PLATFORM_WINDOWS
         GLFWwindow* GetGLFWwindow() { return pWindow; }
+#endif
 		std::unique_ptr<Scene>& GetScene() { return pScene; }
 		bool IsAltDown() const { return alt_down; }
 		bool IsLButtonDown() const { return lbutton_down; }
@@ -62,19 +64,18 @@ namespace EngineFramework
 
         std::unique_ptr<Scene> pScene;
 		static inline GraphicsSystem* this_graphics_ptr = nullptr;
+#ifdef PLATFORM_WINDOWS
 		GLFWwindow* pWindow = nullptr;
-
+#endif
         glm::vec2 screen = { WIDTH,HEIGHT };
         glm::vec3 fogColor; // Example: gray fog color
         float fogMinDist;
         float fogMaxDist;
         int shadingModel;
         // Setup methods
-        void SetupGLFW();
+        void SetupWindow();
         void SetupImGui();
         void SetupGraphics();
-
-       
 
         bool lbutton_down = false;
         bool rbutton_down = false;

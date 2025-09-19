@@ -53,9 +53,9 @@ ShaderProgram::ShaderProgram(const char* sv, const char* sf)
 {
     if (sv && sf && strlen(sv) && strlen(sf)) // Check that shader file paths are valid.
     {
-        LOGI((std::string("Compiling Vertex Shader: ") + sv).c_str());
+        LOGI("Compiling Vertex Shader: %s", sv);
         compileShaderFile(sv, GL_VERTEX_SHADER);  // Compile vertex shader.
-        LOGI((std::string("Compiling Fragment Shader: ") + sf).c_str());
+        LOGI("Compiling Fragment Shader: %s", sf);
         compileShaderFile(sf, GL_FRAGMENT_SHADER);  // Compile fragment shader.
         link();  // Link the shaders into a program.
     }

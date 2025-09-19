@@ -26,7 +26,9 @@ written consent of DigiPen Institute of Technology is prohibited.
 #endif
 
 
-void Game_Initialize()
+//Initialization of game application.
+//android_asset_manager should only be set when building for android.
+void Game_Initialize(void* android_asset_manager)
 {
 	/*
 			Memory fault checks
@@ -46,6 +48,17 @@ void Game_Initialize()
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 #endif
+#ifdef PLATFORM_WINDOWS
+	UNREFERENCED_PARAMETER(android_asset_manager);
+#elif defined(PLATFORM_ANDROID)
+	//Set the asset manager.
+	if (!android_asset_manager)
+	{
+		throw std::runtime_error("No AAsetManager asset manager passed to Game_Initialize() function");
+	}
+	EngineFramework::AssetManagerSystem::SetAndroidAssetManager(android_asset_manager);
+#endif
+
 	/*
 			Process
 			1. Initialize all external libraries that cannot be initialized normally (maybe the initialization order is finicky).
@@ -91,7 +104,7 @@ void Game_Initialize()
 	catch (std::exception& e)
 	{
 		LOGE("Game Aborted due to failure to initialize systems.");
-		LOGE(e.what());
+		LOGE("%s", e.what());
 		std::abort();
 	}
 }

@@ -6,12 +6,19 @@
  * @detail  This file contains only path / filesystem operations. No file I/O for parsing/decoding
  *          assets is performed here.
 */
-#ifndef DISABLE_ASSET_INPUT
 #include "Assets/AssetManager.hpp"
 #include <system_error>
 #include <fstream>
 
 namespace EngineFramework {
+
+#ifdef PLATFORM_ANDROID
+    void AssetManagerSystem::SetAndroidAssetManager(void* asset_manager)
+    {
+        android_asset_manager = static_cast<AAssetManager*>(asset_manager);
+    }
+#endif
+#ifndef DISABLE_ASSET_INPUT
 
     // -------- small helpers --------
     /**
@@ -266,7 +273,6 @@ namespace EngineFramework {
         for (auto& [n, e] : m_byName) out.emplace_back(n, e.relative);
         return out;
     }
-
+#endif
 } // namespace EngineFramework
 
-#endif

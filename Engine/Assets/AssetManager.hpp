@@ -15,7 +15,6 @@
  *  - list all assets.
  *
 */
-#ifndef DISABLE_ASSET_INPUT
 #pragma once
 #ifndef ASSET_MANAGER_HPP
 #define ASSET_MANAGER_HPP
@@ -27,6 +26,11 @@
 #include <vector>
 #include <cstdint>
 #include "ISystem.hpp"
+
+#ifdef PLATFORM_ANDROID
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
+#endif
 
 namespace EngineFramework {
 
@@ -45,6 +49,10 @@ namespace EngineFramework {
          */
         AssetManagerSystem();
         static AssetManagerSystem& GetInstance();
+#ifdef PLATFORM_ANDROID
+        static void SetAndroidAssetManager(void* android_asset_manager);
+#endif
+#ifndef DISABLE_ASSET_INPUT
         void Initialize() override {}
         void Update(float) override {}
         void PostUpdate(float) override {}
@@ -182,10 +190,12 @@ namespace EngineFramework {
         AssetID m_next{ 1 };                                // Next id to hand out.
         std::unordered_map<std::string, Entry> m_byName;    // name to entry
         std::unordered_map<AssetID, std::string>    m_byId; // id to name
-
+#endif
         static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer
+#ifdef PLATFORM_ANDROID
+        static inline AAssetManager* android_asset_manager = nullptr;
+#endif
     };
 
 } // namespace EngineFramework
 #endif // ASSET_MANAGER_HPP
-#endif

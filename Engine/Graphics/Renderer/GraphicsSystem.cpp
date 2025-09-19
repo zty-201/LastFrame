@@ -22,36 +22,33 @@ namespace EngineFramework
 
     GraphicsSystem::~GraphicsSystem()
     {
+#ifdef PLATFORM_WINDOWS
         // Clean up GLFW
         glfwTerminate();
+#endif
     }
 
     void GraphicsSystem::Initialize()
     {
-        SetupGLFW();
+        SetupWindow();
         SetupImGui();
         SetupGraphics();
         //need to have a function for input handling
         //since input handling is part of glfw , at least for the callbacks
     }
 
-    void GraphicsSystem::SetupGLFW()
+    void GraphicsSystem::SetupWindow()
     {
+#ifdef PLATFORM_WINDOWS
         // Initialize GLFW library
         if (!glfwInit()) {
             throw std::runtime_error("Failed to initialize GLFW");
         }
 
-        // Configure OpenGL context properties
-        /*glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);*/
-
         // Configure GLFW for OpenGL ES 3.1 on desktop.
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
         glfwWindowHint(GLFW_DEPTH_BITS, 24);
@@ -73,6 +70,7 @@ namespace EngineFramework
             throw std::runtime_error("Failed to initialize GLAD");
         }
 
+#endif
 
         // Print OpenGL info
         LOGI("OpenGL Version: %s", glGetString(GL_VERSION));
@@ -164,13 +162,16 @@ namespace EngineFramework
     {
         UNREFERENCED_PARAMETER(deltaTime);
 
+#ifdef PLATFORM_WINDOWS
         // Check for window close
         if (pWindow && glfwWindowShouldClose(pWindow))
         {
             // Signal application to close
             // For now, you can just use glfwSetWindowShouldClose
             // Later you might want a proper way to signal the CoreEngine
+            glfwSetWindowShouldClose(pWindow, true);
         }
+#endif
 
         // Draw scene
         pScene->render();
@@ -179,8 +180,10 @@ namespace EngineFramework
     void GraphicsSystem::PostUpdate(float deltaTime)
     {
         UNREFERENCED_PARAMETER(deltaTime);
+#ifdef PLATFORM_WINDOWS
         // Swap buffers
         glfwSwapBuffers(pWindow);
         glfwPollEvents();
+#endif
     }
 }
