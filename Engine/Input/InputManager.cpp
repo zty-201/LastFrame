@@ -13,7 +13,7 @@ Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
 */
 /* *******************************************************************/
-
+#ifndef DISABLE_ASSET_INPUT
 #include "pch.hpp"
 #include "global.hpp"
 #include "InputManager.hpp"
@@ -120,7 +120,7 @@ namespace EngineFramework
     void InputManager::ErrorCallback(int error, const char* description)
     {
         (void)error;
-        fprintf(stderr, "GLFW Error: %s\n", description);
+        LOGE("GLFW Error: %s", description);
     }
 
     bool InputManager::GetKey(int key)
@@ -240,3 +240,4 @@ namespace EngineFramework
     }
 
 }
+#endif

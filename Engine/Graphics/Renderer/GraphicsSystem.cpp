@@ -43,12 +43,19 @@ namespace EngineFramework
         }
 
         // Configure OpenGL context properties
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        /*glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);*/
+
+        // Configure GLFW for OpenGL ES 3.1 on desktop.
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
         glfwWindowHint(GLFW_DEPTH_BITS, 24);
+
 
         pWindow = glfwCreateWindow(WIDTH, HEIGHT, "Framework", NULL, NULL);
 
@@ -68,20 +75,22 @@ namespace EngineFramework
 
 
         // Print OpenGL info
-        printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
-        printf("GLSL Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-        printf("Rendered by: %s\n", glGetString(GL_RENDERER));
+        LOGI("OpenGL Version: %s", glGetString(GL_VERSION));
+        LOGI("GLSL Version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+        LOGI("Rendered by: %s", glGetString(GL_RENDERER));
 
-        std::cout << "Registering InputManager callbacks to GraphicsSystem window.\n";
+        LOGI("Registering InputManager callbacks to GraphicsSystem window.");
+#ifndef DISABLE_ASSET_INPUT
         InputManager::RegisterCallbacks(pWindow);
 #ifdef _DEBUG
         if (!LevelEditor::Get_Editor_State()) {
-            std::cout << "Registering InputManager callbacks to GraphicsSystem window.\n";
+            LOGI("Registering InputManager callbacks to GraphicsSystem window.");
             InputManager::RegisterCallbacks(pWindow);
         }
 #else
         InputManager::RegisterCallbacks(pWindow);
 #endif  
+#endif
     }
 
     void GraphicsSystem::SetupImGui()

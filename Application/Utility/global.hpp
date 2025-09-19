@@ -14,6 +14,9 @@ written consent of DigiPen Institute of Technology is prohibited.
 #define GLOBAL_HPP
 #include "entt/entity/registry.hpp"
 
+//TODO: Temporary definition, TODELETE ALL INSTANCES OF THIS.
+//Used to temporarily disable asset and input management until game can be ported to android with working graphics + audio.
+#define DISABLE_ASSET_INPUT
 
 //Used to denote a variable is unused.
 #define UNREFERENCED_PARAMETER(P) (P)

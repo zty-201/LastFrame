@@ -32,7 +32,7 @@ namespace EngineFramework
 	{
 		application = std::make_unique<LevelEditor>();
 		application->Initialize();
-		std::cout << "level editor system ONLINE!\n";
+		LOGI("level editor system ONLINE!");
 	}
 	void LevelEditorSystem::Update(float delta_time)
 	{

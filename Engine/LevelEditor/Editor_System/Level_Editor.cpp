@@ -37,12 +37,12 @@ namespace EngineFramework
 		variables.selected_modelID = 0; //zero means none selected
 		variables.selected_objectID = 0; //zero means none selected
 
-		std::cout << "LevelEditor() constructor\n";
+		LOGI("LevelEditor() constructor");
 	}
 	LevelEditor::~LevelEditor() {
 
 		ImGui::DestroyContext();
-		std::cout << "~LevelEditor() destructor\n";
+		LOGI("~LevelEditor() destructor");
 	}
 
 	void LevelEditor::addFeature(const std::string& feature_name, std::unique_ptr<LFeature> feature_class, bool enabled) {
@@ -91,7 +91,7 @@ namespace EngineFramework
 		ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
 
 		// Initialize the ImGui backend for your existing OpenGL context
-		ImGui_ImplOpenGL3_Init("#version 450");
+		ImGui_ImplOpenGL3_Init("#version 310 es");
 
 		imgui_flags.DockWindowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
 			ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
@@ -100,12 +100,12 @@ namespace EngineFramework
 
 		// If using GLFW for input, you can still initialize the input handling, but use your custom window
 		if (GraphicsSystem::GetInstance().GetGLFWwindow() == nullptr) {
-			std::cout << "level editor app cannot be initialised\n";
+			LOGI("level editor app cannot be initialised");
 			throw std::runtime_error("Level editor init failed: GraphicsSystem has no valid GLFWwindow.");
 		}
 		else {
 			ImGui_ImplGlfw_InitForOpenGL(GraphicsSystem::GetInstance().GetGLFWwindow(), true);
-			std::cout << "level editor app is initialised\n";
+			LOGI("level editor app is initialised");
 		}
 
 		//FEATURES ===============================================================
@@ -127,7 +127,7 @@ namespace EngineFramework
 	void LevelEditor::Open()
 	{
 		to_open = false; //after open, set this to false.
-		std::cout << "app opened\n"; //okay good check
+		LOGI("app opened"); //okay good check
 	}
 
 	void LevelEditor::docking() {

@@ -6,7 +6,7 @@
  * @detail  This file contains only path / filesystem operations. No file I/O for parsing/decoding
  *          assets is performed here.
 */
-
+#ifndef DISABLE_ASSET_INPUT
 #include "Assets/AssetManager.hpp"
 #include <system_error>
 #include <fstream>
@@ -268,3 +268,5 @@ namespace EngineFramework {
     }
 
 } // namespace EngineFramework
+
+#endif

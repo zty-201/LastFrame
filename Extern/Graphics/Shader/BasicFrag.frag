@@ -1,4 +1,9 @@
-#version 420 core
+#version 310 es
+
+
+//Specify precision for es. use highp for more accurate lighting.
+precision highp float;
+precision highp int;
 
 uniform int materialType;
 
@@ -77,7 +82,7 @@ vec3 schlickFresnel(float lDotH)
     vec3 f0 = vec3(0.04f); // Dielectrics
     if (material.metal == 1.0f)
         f0 = material.color;
-    return f0 + (1.0f - f0) * pow(1.0f - lDotH, 5);
+    return f0 + (1.0f - f0) * pow(1.0f - lDotH, 5.0);
 }
 
 vec3 microfacetModel(vec3 position, vec3 n) 
@@ -90,7 +95,7 @@ vec3 microfacetModel(vec3 position, vec3 n)
     vec3 l = lightPositionInView - position;
     float dist = length(l);
     l = normalize(l);
-    lightI *= 100 / (dist * dist); // Intensity is normalized, so scale up by 100 first
+    lightI *= 100.0 / (dist * dist); // Intensity is normalized, so scale up by 100 first
 
     vec3 v = normalize(-position);
     vec3 h = normalize(v + l);
@@ -107,8 +112,8 @@ vec3 microfacetModel(vec3 position, vec3 n)
 float cartoon(float value)
 {
     const int levels = CARTOON_LEVELS;
-    const float scaleFactor = 1.0f / levels;
-    return floor(value * levels) * scaleFactor;
+    const float scaleFactor = 1.0f / float(levels);
+    return floor(value * float(levels)) * scaleFactor;
 }
 
 vec3 blinnPhongCartoon(vec3 position, vec3 n)
@@ -266,7 +271,7 @@ void scenePass()
     } else if (material.effect == 3.0f) {
 
         // checkerboard texture 
-        vec4 checkerboard = checkerboardTexture(TexCoord, CHECKERBOARD_SIZE);
+        vec4 checkerboard = checkerboardTexture(TexCoord, float(CHECKERBOARD_SIZE));
 
         color = mix(color, checkerboard.rgb, CHECKERBOARD_MIXLEVEL);
 

@@ -15,6 +15,7 @@
  *  - list all assets.
  *
 */
+#ifndef DISABLE_ASSET_INPUT
 #pragma once
 #ifndef ASSET_MANAGER_HPP
 #define ASSET_MANAGER_HPP
@@ -187,3 +188,4 @@ namespace EngineFramework {
 
 } // namespace EngineFramework
 #endif // ASSET_MANAGER_HPP
+#endif

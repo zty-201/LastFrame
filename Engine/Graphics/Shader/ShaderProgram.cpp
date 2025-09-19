@@ -53,7 +53,9 @@ ShaderProgram::ShaderProgram(const char* sv, const char* sf)
 {
     if (sv && sf && strlen(sv) && strlen(sf)) // Check that shader file paths are valid.
     {
+        LOGI((std::string("Compiling Vertex Shader: ") + sv).c_str());
         compileShaderFile(sv, GL_VERTEX_SHADER);  // Compile vertex shader.
+        LOGI((std::string("Compiling Fragment Shader: ") + sf).c_str());
         compileShaderFile(sf, GL_FRAGMENT_SHADER);  // Compile fragment shader.
         link();  // Link the shaders into a program.
     }
@@ -220,7 +222,7 @@ void ShaderProgram::printActiveUniforms()
 
     GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_BLOCK_INDEX };  // Properties to query for each uniform.
 
-    printf("Active uniforms:\n");
+    LOGI("Active uniforms:");
     for (int i = 0; i < numUniforms; ++i) {
         GLint results[4];
         glGetProgramResourceiv(handle, GL_UNIFORM, i, 4, properties, 4, NULL, results);  // Get uniform properties.
@@ -230,7 +232,7 @@ void ShaderProgram::printActiveUniforms()
         GLint nameBufSize = results[0] + 1;
         char* name = new char[nameBufSize];
         glGetProgramResourceName(handle, GL_UNIFORM, i, nameBufSize, NULL, name);  // Get uniform name.
-        printf("%-5d %s (%s)\n", results[2], name, getTypeString(results[1]));  // Print uniform location and type.
+        LOGI("%-5d %s (%s)", results[2], name, getTypeString(results[1]));  // Print uniform location and type.
         delete[] name;
     }
 }
@@ -253,7 +255,7 @@ void ShaderProgram::printActiveUniformBlocks()
 
         char* blockName = new char[blockInfo[1] + 1];
         glGetProgramResourceName(handle, GL_UNIFORM_BLOCK, block, blockInfo[1] + 1, NULL, blockName);
-        printf("Uniform block \"%s\":\n", blockName);  // Print block name.
+        LOGI("Uniform block \"%s\":", blockName);  // Print block name.
         delete[] blockName;
 
         GLint* unifIndexes = new GLint[numUnis];
@@ -268,7 +270,7 @@ void ShaderProgram::printActiveUniformBlocks()
             GLint nameBufSize = results[0] + 1;
             char* name = new char[nameBufSize];
             glGetProgramResourceName(handle, GL_UNIFORM, uniIndex, nameBufSize, NULL, name);
-            printf("    %s (%s)\n", name, getTypeString(results[1]));  // Print uniform name and type.
+            LOGI("    %s (%s)", name, getTypeString(results[1]));  // Print uniform name and type.
             delete[] name;
         }
 
@@ -285,7 +287,7 @@ void ShaderProgram::printActiveAttribs()
 
     GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };  // Properties to query for each attribute.
 
-    printf("Active attributes:\n");
+    LOGI("Active attributes:");
     for (int i = 0; i < numAttribs; ++i) {
         GLint results[3];
         glGetProgramResourceiv(handle, GL_PROGRAM_INPUT, i, 3, properties, 3, NULL, results);  // Get attribute properties.
@@ -293,7 +295,7 @@ void ShaderProgram::printActiveAttribs()
         GLint nameBufSize = results[0] + 1;
         char* name = new char[nameBufSize];
         glGetProgramResourceName(handle, GL_PROGRAM_INPUT, i, nameBufSize, NULL, name);  // Get attribute name.
-        printf("%-5d %s (%s)\n", results[2], name, getTypeString(results[1]));  // Print attribute location and type.
+        LOGI("%-5d %s (%s)", results[2], name, getTypeString(results[1]));  // Print attribute location and type.
         delete[] name;
     }
 }

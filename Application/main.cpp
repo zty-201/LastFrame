@@ -66,7 +66,6 @@ void Game_Initialize()
 	EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 
 	//=Adding Systems
-	core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 1, 1, 100);
 	core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 2, 2, 1);
 	// Add the GraphicsSystem to the CoreEngine
 	core_engine.AddSystem(
@@ -76,8 +75,10 @@ void Game_Initialize()
 		1,                          // Update order (low = update first)
 		3                         // Destruct order (high = destroy last)
 	);
+#ifndef DISABLE_ASSET_INPUT
 	core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 3, 1, 4);
 	core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 2, 3);
+#endif
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 	core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
 #endif
@@ -89,8 +90,8 @@ void Game_Initialize()
 	}
 	catch (std::exception& e)
 	{
-		std::cout << "Game Aborted due to failure to initialize systems.\n"
-			<< e.what() << std::endl;
+		LOGE("Game Aborted due to failure to initialize systems.");
+		LOGE(e.what());
 		std::abort();
 	}
 }
