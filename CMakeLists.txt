@@ -57,7 +57,7 @@ target_compile_options(engine_library PUBLIC
 #Enable VS code analysis for faster checks.
 #Enable clang tidy code analysis for more checks.
 set_target_properties(engine_library PROPERTIES
-    VS_GLOBAL_RunCodeAnalysis true
+    VS_GLOBAL_RunCodeAnalysis ${CODE_ANALYSIS_ON_BUILD}
     # Do not use visual studio core guidelines if clang tidy is enabled.
     VS_GLOBAL_EnableMicrosoftCodeAnalysis true
     # Use clangtidy
@@ -65,7 +65,7 @@ set_target_properties(engine_library PROPERTIES
     VS_GLOBAL_ClangTidyChecks -checks=-*,clang-analyzer-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type
 )
 set_target_properties(application_executable PROPERTIES
-    VS_GLOBAL_RunCodeAnalysis true
+    VS_GLOBAL_RunCodeAnalysis ${CODE_ANALYSIS_ON_BUILD}
     # Do not use visual studio core guidelines if clang tidy is enabled.
     VS_GLOBAL_EnableMicrosoftCodeAnalysis true
     # Use clangtidy
@@ -157,7 +157,7 @@ endif()
 add_subdirectory(Lib)
 
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod glad CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad stb_image CACHE INTERNAL "")
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
 set(WINDOWS_DEBUG_LIBRARIES imgui CACHE INTERNAL "")
@@ -175,7 +175,8 @@ foreach(extern_dependency IN LISTS SHARED_LIBRARIES WINDOWS_SHARED_LIBRARIES WIN
     if(NOT (is_imported) AND NOT (target_type STREQUAL "INTERFACE_LIBRARY"))
       target_compile_options(${extern_dependency} PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:/analyze->
-        $<$<CXX_COMPILER_ID:GNU,Clang>:-fno-analyzer>
+        $<$<CXX_COMPILER_ID:GNU>:-fno-analyzer>
+        $<$<CXX_COMPILER_ID:Clang>:-Wno-analyzer>
       )
       message("${extern_dependency} analysis off")
     endif()

@@ -17,6 +17,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "pch.hpp"
 #include "global.hpp"
 #include "InputManager.hpp"
+#include "GraphicsSystem.h"
 
 namespace EngineFramework
 {
@@ -35,6 +36,7 @@ namespace EngineFramework
     int InputManager::windowWidth = 0;
     int InputManager::windowHeight = 0;
 
+#ifdef PLATFORM_WINDOWS
     void InputManager::RegisterCallbacks(GLFWwindow* window)
     {
         glfwSetKeyCallback(window, KeyCallback);
@@ -71,20 +73,34 @@ namespace EngineFramework
     void InputManager::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
         (void)window;
-        (void)button;
         (void)mods;
 
-        if (action == GLFW_PRESS) mouseButtonStates[button] = KeyState::Pressed;
-        else if (action == GLFW_RELEASE) mouseButtonStates[button] = KeyState::Released;
+        if (action == GLFW_PRESS) { 
+            mouseButtonStates[button] = KeyState::Pressed; }
+        else if (action == GLFW_RELEASE) { mouseButtonStates[button] = KeyState::Released; }
     }
 
     void InputManager::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     {
-        (void)window;
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
-        mouseX = xpos;
-        mouseY = ypos;
+		UNREFERENCED_PARAMETER(window);
+        static double oldxpos = xpos;
+        static double oldypos = ypos;
+        double xoffset = xpos - oldxpos;
+        double yoffset = ypos - oldypos;
+        oldxpos = xpos;
+        oldypos = ypos;
+
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
+        //std::cout << "CursorPosCallback: xoffset = " << xoffset << ", yoffset = " << yoffset << std::endl;
+        if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed 
+            || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down))
+        {
+            pScene->camerasOnCursor(xoffset, yoffset);
+        }
+        else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed)
+        {
+            pScene->lightsOnCursor(xoffset, yoffset);
+        }
     }
 
     void InputManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
@@ -100,7 +116,7 @@ namespace EngineFramework
         windowWidth = width;
         windowHeight = height;
     }
-
+#endif
     void InputManager::ErrorCallback(int error, const char* description)
     {
         (void)error;

@@ -10,6 +10,7 @@ add_subdirectory(Shared/glm)
 add_subdirectory(Shared/json)
 add_subdirectory(Shared/fmod)
 add_subdirectory(Shared/glad)
+add_subdirectory(Shared/stb_image)
 
 # Windowsx64 Shared
 add_subdirectory(Windows_x64/Shared/glfw)

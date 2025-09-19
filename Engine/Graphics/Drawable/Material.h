@@ -2,164 +2,43 @@
 #define MATERIAL_H
 
 #include "ShaderProgram.h"
+#include <glm/glm.hpp>
 
-    // Predefined material definitions using macros for common materials (Phong and PBR)
-
-    // Blue Phong material with shininess and color properties
-#define PHONG_MATERIAL_BLUE\
-        {\
-            { "material.shininess", { 100.0f } },\
-            { "material.Ka", { 0.3f, 0.5f, 0.9f } },\
-            { "material.Kd", { 0.3f, 0.5f, 0.9f } },\
-            { "material.Ks", { 0.8f, 0.8f, 0.8f } },\
-            { "material.effect", { 0.0f } }\
-        }
-
-    // Orange Phong material with shininess and color properties
-#define PHONG_MATERIAL_ORANGE\
-        {\
-            { "material.shininess", { 100.0f } },\
-            { "material.Ka", { 0.9f, 0.5f, 0.3f } },\
-            { "material.Kd", { 0.9f, 0.5f, 0.3f } },\
-            { "material.Ks", { 0.8f, 0.8f, 0.8f } },\
-            { "material.effect", { 0.0f } }\
-        }
-
-    // White Phong material with shininess and color properties
-#define PHONG_MATERIAL_WHITE\
-        {\
-            { "material.shininess", { 100.0f } },\
-            { "material.Ka", { 1.0f, 1.0f, 1.0f } },\
-            { "material.Kd", { 1.0f, 1.0f, 1.0f } },\
-            { "material.Ks", { 1.0f, 1.0f, 1.0f } },\
-            { "material.effect", { 0.0f } }\
-        }
-
-    // Reflective and refractive material with color and reflection factor
-#define MATERIAL_REFLECT_REFRACT\
-        {\
-            { "material.color", { 0.5f, 0.5f, 0.5f } },\
-            { "material.reflectionFactor", { 0.9f } },\
-            { "material.eta", { 0.94f } },\
-            { "material.effect", { 0.0f } }\
-        }
-
-    // PBR (Physically-Based Rendering) material properties for different colors
-#define MATERIAL_PROPERTIES_PBR_RED\
-            { "material.rough", { 0.3f } },\
-            { "material.metal", { 0.0f } },\
-            { "material.color", { 1.0f, 0.0f, 0.0f } }
-
-#define MATERIAL_PROPERTIES_PBR_GREEN\
-            { "material.rough", { 0.3f } },\
-            { "material.metal", { 0.0f } },\
-            { "material.color", { 0.0f, 1.0f, 0.0f } }
-
-#define MATERIAL_PROPERTIES_PBR_BLUE\
-            { "material.rough", { 0.3f } },\
-            { "material.metal", { 0.0f } },\
-            { "material.color", { 0.0f, 0.0f, 1.0f } }
-
-#define MATERIAL_PROPERTIES_PBR_GREY\
-            { "material.rough", { 0.3f } },\
-            { "material.metal", { 0.0f } },\
-            { "material.color", { 0.3f, 0.3f, 0.3f } }
-
-    // Phong material properties for different colors
-#define MATERIAL_PROPERTIES_PHONG_RED\
-            { "material.shininess", { 100.0f } },\
-            { "material.Ka", { 0.0f, 0.0f, 0.0f } },\
-            { "material.Kd", { 1.0f, 0.0f, 0.0f } },\
-            { "material.Ks", { 1.0f, 0.0f, 0.0f } }   
-
-#define MATERIAL_PROPERTIES_PHONG_GREEN\
-            { "material.shininess", { 100.0f } },\
-            { "material.Ka", { 0.0f, 0.0f, 0.0f } },\
-            { "material.Kd", { 0.0f, 1.0f, 0.0f } },\
-            { "material.Ks", { 0.0f, 1.0f, 0.0f } } 
-
-#define MATERIAL_PROPERTIES_PHONG_BLUE\
-            { "material.shininess", { 100.0f } },\
-            { "material.Ka", { 0.0f, 0.0f, 0.0f } },\
-            { "material.Kd", { 0.0f, 0.0f, 1.0f } },\
-            { "material.Ks", { 0.0f, 0.0f, 1.0f } } 
-
-#define MATERIAL_PROPERTIES_PHONG_GREY\
-            { "material.shininess", { 100.0f } },\
-            { "material.Ka", { 0.0f, 0.0f, 0.0f } },\
-            { "material.Kd", { 0.3f, 0.3f, 0.3f } },\
-            { "material.Ks", { 0.3f, 0.3f, 0.3f } } 
-
-    // Final predefined materials, combining PBR and Phong with some effects
-#define MATERIAL_PBR\
-            {\
-                MATERIAL_PROPERTIES_PBR_RED,\
-                { "material.effect", { 0.0f } }\
-            }
-
-#define MATERIAL_PBR_PHONG\
-            {\
-                MATERIAL_PROPERTIES_PBR_RED,\
-                MATERIAL_PROPERTIES_PHONG_RED,\
-                { "material.effect", { 0.0f } }\
-            }
-
-#define MATERIAL_DISCARD  \
-            {\
-                MATERIAL_PROPERTIES_PBR_GREEN,\
-                MATERIAL_PROPERTIES_PHONG_GREEN,\
-                { "material.effect", { 1.0f } }\
-            }
-
-#define MATERIAL_CARTOON  \
-            {\
-                MATERIAL_PROPERTIES_PBR_BLUE,\
-                MATERIAL_PROPERTIES_PHONG_BLUE,\
-                { "material.effect", { 2.0f } }\
-            }
-
-#define MATERIAL_CHECKERBOARD  \
-            {\
-                MATERIAL_PROPERTIES_PBR_GREY,\
-                MATERIAL_PROPERTIES_PHONG_GREY,\
-                { "material.effect", { 3.0f } }\
-            }
-
-    // Material for a plane using the blue Phong material
-#define MATERIAL_PLANE  PHONG_MATERIAL_BLUE
-
-// Material for an object using the orange Phong material
-#define MATERIAL_OBJECT PHONG_MATERIAL_ORANGE
-
-//
-// Material base class for defining materials with parameters for rendering. 
-// This class and the macros simplify the creation and usage of materials 
-// in a graphics framework, allowing for easy management of material
-// properties and their application in shaders.
-//
 struct Material
 {
-    // A map of parameter names (strings) to values (vectors of floats)
-    std::map<std::string, std::vector<float>> params;
+    float rough;
+    float metal;
+    glm::vec3 color;
+    glm::vec3 Ka;
+    glm::vec3 Kd;
+    glm::vec3 Ks;
+    float shininess;
+    float effect; // *** ADD THIS LINE ***
 
-    // Constructor initializes the material parameters using an initializer list
-    Material(const std::initializer_list< std::pair<std::string, std::initializer_list<float>> >& params)
-        : params{ }
-    {
-        // Copy parameters into the internal map
-        for (const std::pair < std::string, std::initializer_list<float>>& p : params)
-            this->params.insert(p);
+    // Default constructor
+    Material(float rough = 0.5f, float metal = 0.0f, glm::vec3 color = { 1.0f, 1.0f, 1.0f },
+        glm::vec3 Ka = { 0.1f, 0.1f, 0.1f }, glm::vec3 Kd = { 0.7f, 0.7f, 0.7f }, glm::vec3 Ks = { 1.0f, 1.0f, 1.0f },
+        float shininess = 32.0f, float effect = 0.0f) // Add effect to constructor
+        : rough(rough), metal(metal), color(color), Ka(Ka), Kd(Kd), Ks(Ks), shininess(shininess), effect(effect) {
     }
 
-    // Set the material uniforms in a shader program
-    void setUniforms(ShaderProgram* pProgram) const
+    void setUniforms(ShaderProgram* shader) const
     {
-        pProgram->use(); // Activate the shader program
-        // Loop over each parameter and set it in the shader program
-        for (const std::pair <std::string, std::vector<float>>& p : params)
-            pProgram->setUniform(p.first, p.second); // Set uniform by name and value
-        pProgram->disuse(); // Deactivate the shader program
+        shader->setUniform("material.rough", rough);
+        shader->setUniform("material.metal", metal);
+        shader->setUniform("material.color", color);
+        shader->setUniform("material.Ka", Ka);
+        shader->setUniform("material.Kd", Kd);
+        shader->setUniform("material.Ks", Ks);
+        shader->setUniform("material.shininess", shininess);
+        shader->setUniform("material.effect", effect); // *** ADD THIS LINE ***
     }
 };
 
-#endif // !MATERIAL_H
+// Define some default materials using the new structure
+const Material MATERIAL_PBR_PHONG({ 0.8f, 0.2f, {1.0f, 0.8f, 0.2f}, {0.1f, 0.1f, 0.1f}, {0.7f, 0.7f, 0.7f}, {1.0f, 1.0f, 1.0f}, 128.0f, 0.0f });
+const Material MATERIAL_DISCARD({ 0.5f, 0.0f, {0.2f, 0.8f, 0.2f}, {0.1f, 0.1f, 0.1f}, {0.7f, 0.7f, 0.7f}, {1.0f, 1.0f, 1.0f}, 32.0f, 1.0f });
+const Material MATERIAL_CARTOON({ 0.5f, 0.0f, {0.8f, 0.2f, 0.8f}, {0.1f, 0.1f, 0.1f}, {0.7f, 0.7f, 0.7f}, {1.0f, 1.0f, 1.0f}, 32.0f, 2.0f });
+const Material MATERIAL_CHECKERBOARD({ 0.9f, 0.0f, {1.0f, 1.0f, 1.0f}, {0.1f, 0.1f, 0.1f}, {0.7f, 0.7f, 0.7f}, {1.0f, 1.0f, 1.0f}, 32.0f, 3.0f });
+
+#endif // MATERIAL_H
