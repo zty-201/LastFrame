@@ -5,20 +5,22 @@
 #ifndef PRECOMPILED_HEADER_HPP
 #define PRECOMPILED_HEADER_HPP
 
+//Cross-Platform Compatibility
+#include "Platform.h"
 #include <string>
 #include <memory>
 #include <vector>
 #include <algorithm>
-#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <random>
+#include <map>
+#include <functional>
+
 #include "global.hpp"
 #include "ISystem.hpp"
 #include "CoreEngine.hpp"
 
-//Cross-Platform Compatibility
-#include "Platform.h"
 
 #ifdef PLATFORM_WINDOWS
 #include <glad/glad.h>
@@ -33,6 +35,7 @@
 //TODO: Replace with centralized math lib.
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/constants.hpp>
 #include <glm/ext.hpp> // For mathematical constants like pi
 #include <glm/gtc/matrix_transform.hpp> // Utility functions for matrix transformations
 
