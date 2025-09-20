@@ -147,10 +147,22 @@ namespace EngineFramework
 
 		//MAIN MENU SHOULD CONTAIN THE SUB MENUS
 
-		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
-		ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_Once);  // Width: 300,500
+		ImGuiIO& io = ImGui::GetIO();
 
-		if (ImGui::Begin("Main Window", nullptr, ImGuiWindowFlags_MenuBar)) {
+		// Window flags to make it fixed at the top
+		ImGuiWindowFlags mainWindowFlags =
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_MenuBar |
+			ImGuiWindowFlags_NoCollapse;
+
+		// Set the window at the top of the screen, full width, small height
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, 30), ImGuiCond_Always); // 30 px height for header
+
+
+		if (ImGui::Begin("Main Window", nullptr, mainWindowFlags)) {
 
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
 
@@ -193,16 +205,12 @@ namespace EngineFramework
 					ImGui::PopStyleColor();  // Pop the white text color for "File" menu
 					ImGui::EndMenu();
 				}
-
 				ImGui::EndMenuBar();
-
 			}
-
-			ImGui::PopStyleColor();
-
 		}
 
 		ImGui::PopStyleColor();
+
 		ImGui::End();
 
 
