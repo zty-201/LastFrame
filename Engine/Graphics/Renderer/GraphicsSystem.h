@@ -52,6 +52,7 @@ namespace EngineFramework
 		// Accessor for the scene
         GLFWwindow* GetGLFWwindow() { return pWindow; }
 		std::unique_ptr<Scene>& GetScene() { return pScene; }
+		GLuint GetSceneTextureID() const { return sceneTextureID; }
 		bool IsAltDown() const { return alt_down; }
 		bool IsLButtonDown() const { return lbutton_down; }
 		bool IsRButtonDown() const { return rbutton_down; }
@@ -63,6 +64,7 @@ namespace EngineFramework
         std::unique_ptr<Scene> pScene;
 		static inline GraphicsSystem* this_graphics_ptr = nullptr;
 		GLFWwindow* pWindow = nullptr;
+        GLuint sceneTextureID;
 
         glm::vec2 screen = { WIDTH,HEIGHT };
         glm::vec3 fogColor; // Example: gray fog color
