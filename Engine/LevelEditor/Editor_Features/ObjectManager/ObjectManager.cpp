@@ -52,7 +52,7 @@ namespace EngineFramework
 
     }
     void ObjectManager::Close() {
-
+        std::cout << "object manager closed\n";
     }
 
 }
