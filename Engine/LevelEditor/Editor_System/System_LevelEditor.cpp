@@ -15,7 +15,7 @@
 
 //Casting meta data to type.
 #include "ReflectionRegister.hpp"
-
+#include "InputManager.hpp"
 namespace EngineFramework
 {
 	bool LevelEditorSystem::Get_Enable() {
@@ -38,16 +38,32 @@ namespace EngineFramework
 	{
 		UNREFERENCED_PARAMETER(delta_time);
 
-		if (application->To_Close()) {
-			application->Close();
+		//only check for this if the editor state is not true
+		if (!application->Get_Editor_State()) {
+			//std::cout << "yo\n";
+			if (InputManager::GetInstance().GetKeyDown(GLFW_KEY_1)) {
 
+				application->Open();
+				//std::cout << "2222222222222222222222222222222222222\n";
+			}
 		}
-		else if (application->Get_Editor_State()) {
+		else {
 
-			//open is a 1 time thing, it shouldnt be called everyframe
-			//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed			
-			application->Run();
+			if (application->To_Close()) {
+				application->Close();
+
+			}
+			else if (application->Get_Editor_State()) {
+
+				//open is a 1 time thing, it shouldnt be called everyframe
+				//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed			
+				application->Run();
+			}
 		}
+
+		
+
+		
 
 
 	}

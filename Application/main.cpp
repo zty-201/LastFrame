@@ -79,7 +79,7 @@ void Game_Initialize()
 	core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 3, 1, 4);
 	core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 2, 3);
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-	core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
+	core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 2, 2, 1);
 #endif
 
 	//=Initialize Systems

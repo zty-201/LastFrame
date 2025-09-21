@@ -29,9 +29,9 @@ namespace EngineFramework
 	LevelEditor::LevelEditor()
 	{
 		this_system = this;
-		is_enabled = true; //by default it should be set to false
+		is_enabled = false; //by default it should be set to false
 
-		to_open = false;
+		//to_open = false;
 		to_close = false;
 
 		variables.selected_modelID = 0; //zero means none selected
@@ -126,7 +126,7 @@ namespace EngineFramework
 
 	void LevelEditor::Open()
 	{
-		to_open = false; //after open, set this to false.
+		is_enabled = true;
 		std::cout << "app opened\n"; //okay good check
 	}
 
@@ -203,6 +203,31 @@ namespace EngineFramework
 
 		}
 
+		ImVec2 available_size = ImGui::GetContentRegionAvail();
+		static ImVec2 available_size_old = available_size;
+		static bool first_init = true;
+
+		if (first_init) {
+
+			GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
+			first_init = false;
+		}
+
+		//only do this when needed.
+		if (available_size.x != available_size_old.x || available_size.y != available_size_old.y)
+		{
+			//resize when the screen size changes		
+			std::cout << "x: " << available_size.x << "y: " << available_size.y << std::endl;
+			GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
+		}
+		
+
+		available_size_old = available_size;
+
+		ImGui::Image((ImTextureID)(intptr_t)0,
+			available_size,
+			ImVec2(0, 1),ImVec2(1,0));
+
 		ImGui::PopStyleColor();
 		ImGui::End();
 
@@ -244,9 +269,11 @@ namespace EngineFramework
 
 	void LevelEditor::Close()
 	{
-		ImGui_ImplOpenGL3_Shutdown();  // OpenGL backend
-		ImGui_ImplGlfw_Shutdown();     // GLFW backend
-		ImGui::DestroyContext();
+		//for item such as pointer or stack should be released, no point for editor to be holding it
+		for (auto& [name, feature] : featureMap) {	
+			feature->Close();		
+		}
+		
 		to_close = false; //after closing, set this to false.
 		is_enabled = false;
 	}
@@ -254,21 +281,12 @@ namespace EngineFramework
 	void LevelEditor::Clean() {
 
 		//when the game is exited, we should clean this up to prevent mem leak
+		ImGui_ImplOpenGL3_Shutdown();  // OpenGL backend
+		ImGui_ImplGlfw_Shutdown();     // GLFW backend
+		ImGui::DestroyContext();
 	}
 
-	void LevelEditor::Toggle() {
-
-		if (is_enabled) {
-			//if is_enabled = true, then we toggle, so we are closing now
-			to_close = true;
-		}
-		else {
-			//if is_enabled = false, then we toggle, so we are opening now
-			to_open = true;
-		}
-
-		is_enabled = !is_enabled;
-	}
+	
 
 }
 #endif
