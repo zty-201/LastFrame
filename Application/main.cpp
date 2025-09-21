@@ -101,6 +101,7 @@ int main(int argc, char* argv[])
 		EngineFramework::RegisterReflection();
 		EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 
+<<<<<<< Updated upstream
 		//=Adding Systems
 		core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 1, 1, 100);
 		core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 2, 2, 1);
@@ -130,6 +131,22 @@ int main(int argc, char* argv[])
 
 #ifdef _DEBUG
 		core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 1, 1, 1);
+=======
+	//=Adding Systems
+	core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 2, 2, 1);
+	// Add the GraphicsSystem to the CoreEngine
+	core_engine.AddSystem(
+		"GraphicsSystem",            // Name
+		std::make_unique<EngineFramework::GraphicsSystem>(),  // Transfer ownership to CoreEngine
+		1,                          // Init order (low = init first)
+		1,                          // Update order (low = update first)
+		3                         // Destruct order (high = destroy last)
+	);
+	core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 3, 1, 4);
+	core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 3, 3, 3);
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+	core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 2, 2, 1);
+>>>>>>> Stashed changes
 #endif
 
 

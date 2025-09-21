@@ -6,6 +6,7 @@
 #include "pch.hpp"
 #include <algorithm>
 #include "CoreEngine.hpp"
+#include "System_LevelEditor.hpp"
 namespace EngineFramework
 {
 	//Singleton pattern: Everyone shares the only instance of the core engine.
@@ -67,7 +68,8 @@ namespace EngineFramework
 	*/
 	void CoreEngine::PostUpdateSystems(float delta_time)
 	{
-		//Array has already been sorted in update order, in initialize.
+		//Array has already been sorted in update order, in initialize.	WA4COM =
+		 
 		for (CoreSystem& system : system_arr)
 		{
 			system.system->PostUpdate(delta_time);

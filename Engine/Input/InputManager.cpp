@@ -50,7 +50,7 @@ namespace EngineFramework
         (void)window;
         (void)scancode;
         (void)mods;
-
+        std::cout << "KeyCallback: key=" << key << ", action=" << action << "\n";
         switch (action)
         {
         case GLFW_PRESS:
@@ -180,6 +180,7 @@ namespace EngineFramework
         // --- Keyboard ---
         for (auto& [key, state] : keyStates)
         {
+            KeyState oldState = state; // Store the old state for debugging
             switch (state)
             {
             case KeyState::Pressed:
@@ -193,6 +194,9 @@ namespace EngineFramework
             case KeyState::None:
                 // Nothing to print
                 break;
+            }
+            if (oldState != state) {
+                std::cout << "Key State Advanced: key=" << key << " " << (int)oldState << " -> " << (int)state << "\n";
             }
         }
 

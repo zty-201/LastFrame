@@ -62,7 +62,7 @@ namespace EngineFramework
 
         const std::unordered_map<int, KeyState>& GetKeyStates() const { return keyStates; }
         const std::unordered_map<int, KeyState>& GetMouseButtonStates() const { return mouseButtonStates; }
-
+static std::unordered_map<int, KeyState> keyStates;
     private:
         // --- GLFW Callbacks ---
         static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -73,7 +73,7 @@ namespace EngineFramework
         static void ErrorCallback(int error, const char* description);
 
         // --- State storage ---
-        static std::unordered_map<int, KeyState> keyStates;
+        
         static std::unordered_map<int, KeyState> mouseButtonStates;
 
         static double mouseX, mouseY;

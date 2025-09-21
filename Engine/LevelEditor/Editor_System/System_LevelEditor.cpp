@@ -38,9 +38,30 @@ namespace EngineFramework
 	{
 		UNREFERENCED_PARAMETER(delta_time);
 
+<<<<<<< Updated upstream
 		if (application->To_Close()) {
 			application->Close();
 
+=======
+		//only check for this if the editor state is not true
+		if (!application->Get_Editor_State()) {
+			//std::cout << "yo\n";
+			if (InputManager::GetKeyDown(GLFW_KEY_W)) {
+
+				//application->Open();
+				std::cout << "down\n";
+			}
+			if (InputManager::GetKey(GLFW_KEY_W)) {
+
+				//application->Open();
+				std::cout << "hold\n";
+			}
+			if (InputManager::GetKeyUp(GLFW_KEY_W)) {
+
+				//application->Open();
+				std::cout << "up\n";
+			}
+>>>>>>> Stashed changes
 		}
 		else if (application->Get_Editor_State()) {
 
