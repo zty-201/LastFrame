@@ -33,12 +33,9 @@ namespace EngineFramework
 	void LevelEditorSystem::Initialize()
 	{
 		application = std::make_unique<LevelEditor>();
-<<<<<<< HEAD
-		
-=======
-		application->Initialize();
+
+		//application->Initialize();
 		//application->Open();
->>>>>>> ce5c0241df6dfa7f008ed945c0d49ae3be11f2e4
 		std::cout << "level editor system ONLINE!\n";
 	}
 	void LevelEditorSystem::Update(float delta_time)

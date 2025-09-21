@@ -213,36 +213,7 @@ namespace EngineFramework
 
 		}
 
-<<<<<<< HEAD
-=======
-		ImVec2 available_size = ImGui::GetContentRegionAvail();
-		static ImVec2 available_size_old = available_size;
-		static bool first_init = true;
 
-		if (available_size.x > 0 && available_size.y > 0)
-		{
-			if (first_init) {
-				GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
-				first_init = false;
-			}
-
-			//only do this when needed.
-			if (available_size.x != available_size_old.x || available_size.y != available_size_old.y)
-			{
-				//resize when the screen size changes		
-				std::cout << "x: " << available_size.x << "y: " << available_size.y << std::endl;
-				GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
-			}
-		}
-		
-
-		available_size_old = available_size;
-
-		ImGui::Image((void*)(intptr_t)GraphicsSystem::GetInstance().GetSceneTextureID(),
-			available_size,
-			ImVec2(0, 1),ImVec2(1,0));
-
->>>>>>> ce5c0241df6dfa7f008ed945c0d49ae3be11f2e4
 		ImGui::PopStyleColor();
 		ImGui::End();
 

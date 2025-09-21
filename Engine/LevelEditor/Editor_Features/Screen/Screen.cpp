@@ -73,36 +73,37 @@ namespace EngineFramework
             GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
         }
 
-
-        available_size_old = available_size;
-
-        ImGui::Image((ImTextureID)(intptr_t)0/*GraphicsSystem::GetInstance().GetSceneTextureID()*/,
+        ImGui::Image((void*)(intptr_t)GraphicsSystem::GetInstance().GetSceneTextureID(),
             available_size,
             ImVec2(0, 1), ImVec2(1, 0));
+
+        available_size_old = available_size;
 
     }
 
     void Screen::camera_controls_outside_screen() {
 
+        float speed = 0.05f;
+
         if (ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
             //up vector
-            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0.001f, 0));
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, speed, 0));
             //std::cout << "UP !" << std::endl;
         }
         if (ImGui::IsKeyDown(ImGuiKey_DownArrow)) {
             //down vector
             //std::cout << "DOWN !" << std::endl;
-            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, -0.001f, 0));
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, -speed, 0));
         }
         if (ImGui::IsKeyDown(ImGuiKey_LeftArrow)) {
             //left vector
             //std::cout << "LEFT !" << std::endl;
-            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(-0.001f, 0, 0));
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(-speed, 0, 0));
         }
         if (ImGui::IsKeyDown(ImGuiKey_RightArrow)) {
             //right vector
             //std::cout << "RIGHT !" << std::endl;
-            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0.001f, 0, 0));
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(speed, 0, 0));
         }
 
     }
