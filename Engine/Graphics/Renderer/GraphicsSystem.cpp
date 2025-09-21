@@ -113,7 +113,7 @@ namespace EngineFramework
 
             // Pass 0: Render Scene
             Scene::Pass{
-                {FBO::Texture, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
+                {FBO::Default, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
                 { 0, 0, WIDTH, HEIGHT },            // Viewport
                 GL_LESS,                            // Depth test LESS for the scene
                 {                                   // Objects
@@ -134,7 +134,7 @@ namespace EngineFramework
             },
                 // Pass 1: Render Skybox
                 Scene::Pass{
-                    {FBO::Texture, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
+                    {FBO::Default, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
                     { 0, 0, WIDTH, HEIGHT },            // Viewport
                     GL_LEQUAL,                          // Depth test LEQUAL for the skybox
                     {                                   // Objects
