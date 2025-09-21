@@ -207,24 +207,26 @@ namespace EngineFramework
 		static ImVec2 available_size_old = available_size;
 		static bool first_init = true;
 
-		if (first_init) {
-
-			GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
-			first_init = false;
-		}
-
-		//only do this when needed.
-		if (available_size.x != available_size_old.x || available_size.y != available_size_old.y)
+		if (available_size.x > 0 && available_size.y > 0)
 		{
-			//resize when the screen size changes		
-			std::cout << "x: " << available_size.x << "y: " << available_size.y << std::endl;
-			GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
+			if (first_init) {
+				GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
+				first_init = false;
+			}
+
+			//only do this when needed.
+			if (available_size.x != available_size_old.x || available_size.y != available_size_old.y)
+			{
+				//resize when the screen size changes		
+				std::cout << "x: " << available_size.x << "y: " << available_size.y << std::endl;
+				GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
+			}
 		}
 		
 
 		available_size_old = available_size;
 
-		ImGui::Image((ImTextureID)(intptr_t)0,
+		ImGui::Image((void*)(intptr_t)GraphicsSystem::GetInstance().GetSceneTextureID(),
 			available_size,
 			ImVec2(0, 1),ImVec2(1,0));
 
@@ -244,7 +246,17 @@ namespace EngineFramework
 
 	void LevelEditor::Run()
 	{
-		//std::cout << "yo!\n";
+		// 1. Render the entire 3D scene into our off-screen framebuffer (FBO).
+		GraphicsSystem::GetInstance().GetScene()->render();
+
+		// 2. Now that the FBO is populated, we can prepare to draw the UI.
+		// First, clear the MAIN WINDOW to a background color. This gives ImGui a clean slate to draw on.
+		// We bind framebuffer 0 (the screen) just to be explicit.
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // A dark background for the editor
+		glClear(GL_COLOR_BUFFER_BIT); // We only need to clear the color buffer for the UI
+
+
 		// Start ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();

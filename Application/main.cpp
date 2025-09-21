@@ -66,23 +66,67 @@ void Game_Initialize()
 	EngineFramework::RegisterReflection();
 	EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 
-	//=Adding Systems
-	core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 1, 1, 100);
-	core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 2, 2, 1);
-	core_engine.AddSystem("AudioSystem", std::make_unique<EngineFramework::AudioSystem>(), 4, 4, 3);
-	// Add the GraphicsSystem to the CoreEngine
-	core_engine.AddSystem(
-		"GraphicsSystem",            // Name
-		std::make_unique<EngineFramework::GraphicsSystem>(),  // Transfer ownership to CoreEngine
-		1,                          // Init order (low = init first)
-		1,                          // Update order (low = update first)
-		3                         // Destruct order (high = destroy last)
-	);
-	core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 3, 1, 4);
-	core_engine.AddSystem("InputManager", std::make_unique<EngineFramework::InputManager>(), 2, 2, 3);
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-	core_engine.AddSystem("LevelEditorSystem", std::make_unique<EngineFramework::LevelEditorSystem>(), 2, 2, 1);
-#endif
+	// --- Core Systems (Init First, Destroy Last) ---
+
+	// 1. GraphicsSystem: Initializes the window and graphics context. Must be first.
+		core_engine.AddSystem(
+			"GraphicsSystem",
+			std::make_unique<EngineFramework::GraphicsSystem>(),
+			1,  // Init Order: First
+			5,  // Update Order: After game logic and editor
+			5   // Destruct Order: Last
+		);
+
+		// 2. InputManager: Needs the window from GraphicsSystem to register callbacks.
+		core_engine.AddSystem(
+			"InputManager",
+			std::make_unique<EngineFramework::InputManager>(),
+			2,  // Init Order: After Graphics
+			1,  // Update Order: FIRST in the loop
+			4   // Destruct Order: Before Graphics
+		);
+
+		// 3. AssetManager: Can load assets after core systems are up.
+		core_engine.AddSystem(
+			"AssetManager",
+			std::make_unique<EngineFramework::AssetManagerSystem>(),
+			3,  // Init Order
+			2,  // Update Order: After Input
+			3   // Destruct Order
+		);
+
+		// --- Game Logic and Other Systems ---
+
+		// 4. GameObjectSystem: The main game logic.
+		core_engine.AddSystem(
+			"GameObjectSystem",
+			std::make_unique<EngineFramework::GameObjectSystem>(),
+			4,  // Init Order
+			3,  // Update Order: After Input and Asset Management
+			2   // Destruct Order
+		);
+
+		// 5. AudioSystem: Depends on the game state.
+		core_engine.AddSystem(
+			"AudioSystem",
+			std::make_unique<EngineFramework::AudioSystem>(),
+			5,  // Init Order
+			6,  // Update Order: Last
+			1   // Destruct Order: First
+		);
+
+		// --- Debug/Editor Systems (Conditional) ---
+
+	#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+	// 6. LevelEditorSystem: Controls rendering when active.
+		core_engine.AddSystem(
+			"LevelEditorSystem",
+			std::make_unique<EngineFramework::LevelEditorSystem>(),
+			4,  // Init Order: With other game systems
+			4,  // Update Order: After game logic, before main graphics update
+			1   // Destruct Order: With other game systems
+		);
+	#endif
 
 	//=Initialize Systems
 	try
