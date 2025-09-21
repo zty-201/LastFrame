@@ -27,6 +27,8 @@
 #include <cstdint>
 #include "ISystem.hpp"
 
+namespace EngineFramework { class AudioSystem; }
+
 namespace EngineFramework {
 
     using AssetID = std::uint32_t;
@@ -158,6 +160,10 @@ namespace EngineFramework {
          */
         [[nodiscard]] std::vector<std::pair<std::string, std::filesystem::path>> List() const;
 
+        void SetAudioSystem(AudioSystem* audio);
+
+        bool LoadAudio(const std::string& id, const std::string& nameOrRel, bool loop = false);
+
     private:
         struct Entry {
             AssetID id = 0;                                 // Numeric handle
@@ -183,6 +189,10 @@ namespace EngineFramework {
         std::unordered_map<AssetID, std::string>    m_byId; // id to name
 
         static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer
+
+        AudioSystem* m_audioSystem = nullptr;
+
+        std::string m_audioSubdir = "Audio";
     };
 
 } // namespace EngineFramework

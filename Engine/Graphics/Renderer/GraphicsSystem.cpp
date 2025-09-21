@@ -113,7 +113,7 @@ namespace EngineFramework
 
             // Pass 0: Render Scene
             Scene::Pass{
-                {FBO::Default, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
+                {FBO::Default, WIDTH, HEIGHT},      // Default FBO
                 { 0, 0, WIDTH, HEIGHT },            // Viewport
                 GL_LESS,                            // Depth test LESS for the scene
                 {                                   // Objects
@@ -134,7 +134,7 @@ namespace EngineFramework
             },
                 // Pass 1: Render Skybox
                 Scene::Pass{
-                    {FBO::Default, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
+                    {FBO::Default, WIDTH, HEIGHT},      // Default FBO
                     { 0, 0, WIDTH, HEIGHT },            // Viewport
                     GL_LEQUAL,                          // Depth test LEQUAL for the skybox
                     {                                   // Objects
@@ -159,7 +159,9 @@ namespace EngineFramework
         // Check for window close
         if (pWindow && glfwWindowShouldClose(pWindow))
         {
-			exit(0); // Exit the application
+            // Signal application to close
+            // For now, you can just use glfwSetWindowShouldClose
+            // Later you might want a proper way to signal the CoreEngine
         }
 
         // Draw scene

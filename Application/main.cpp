@@ -20,6 +20,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
 #include "Assets/AssetManager.hpp"
+#include "Audio/Audio.hpp"
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "System_LevelEditor.hpp"
@@ -68,6 +69,7 @@ void Game_Initialize()
 	//=Adding Systems
 	core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 1, 1, 100);
 	core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 2, 2, 1);
+	core_engine.AddSystem("AudioSystem", std::make_unique<EngineFramework::AudioSystem>(), 4, 4, 3);
 	// Add the GraphicsSystem to the CoreEngine
 	core_engine.AddSystem(
 		"GraphicsSystem",            // Name
