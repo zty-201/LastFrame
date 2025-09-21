@@ -113,13 +113,14 @@ namespace EngineFramework
 
             // Pass 0: Render Scene
             Scene::Pass{
-                {FBO::Texture, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
+                {FBO::Default, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
                 { 0, 0, WIDTH, HEIGHT },            // Viewport
                 GL_LESS,                            // Depth test LESS for the scene
                 {                                   // Objects
                     { PLANE, MATERIAL_CHECKERBOARD, glm::translate(glm::scale(glm::mat4(1.0f), {10.0f, 1.0f, 10.0f}), {0.0f, -1.01f, 0.0f}) },
                     { SPHERE, MATERIAL_PBR_PHONG, glm::translate(glm::mat4(1.0f), {-3.0f, 0.0f, 0.0f}) },
-                    { CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) }
+                    { CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) },
+                    { "Extern/tree.obj", MATERIAL_CARTOON, glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f}) }
                 },
                 { camera },                         // Cameras
                 { { {0.0f, 5.0f, 2.0f} } },         // Lights
@@ -133,7 +134,7 @@ namespace EngineFramework
             },
                 // Pass 1: Render Skybox
                 Scene::Pass{
-                    {FBO::Texture, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
+                    {FBO::Default, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
                     { 0, 0, WIDTH, HEIGHT },            // Viewport
                     GL_LEQUAL,                          // Depth test LEQUAL for the skybox
                     {                                   // Objects
