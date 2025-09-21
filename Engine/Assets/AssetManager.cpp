@@ -8,8 +8,10 @@
 */
 
 #include "Assets/AssetManager.hpp"
+#include "Audio.hpp"
 #include <system_error>
 #include <fstream>
+#include <filesystem>
 
 namespace EngineFramework {
 
@@ -265,6 +267,54 @@ namespace EngineFramework {
         out.reserve(m_byName.size());
         for (auto& [n, e] : m_byName) out.emplace_back(n, e.relative);
         return out;
+    }
+
+    void AssetManagerSystem::SetAudioSystem(AudioSystem* audio)
+    {
+        m_audioSystem = audio;
+    }
+
+    bool AssetManagerSystem::LoadAudio(const std::string& id,
+        const std::string& nameOrRel,
+        bool loop)
+    {
+        if (!m_audioSystem)
+        {
+            std::cout << "[AssetManager] No AudioSystem set, unable to load" << id << ".\n";
+            return false;
+        }
+
+        // 1) Resolve a path
+        std::string resolved;
+
+        // CaseA: treat nameOrRel as a registered logical name
+        if (Has(nameOrRel))
+        {
+            AssetID aid = FindId(nameOrRel);
+            const std::filesystem::path abs = GetAbsolutePath(aid);
+            resolved = abs.string();
+        }
+
+        else
+        {
+            // CaseB: treat as a filename under Extern
+            const std::filesystem::path rel = std::filesystem::path(m_audioSubdir) / nameOrRel;
+            const std::filesystem::path abs = full(rel);
+            resolved = abs.string();
+        }
+
+        // 2) Ask AudioSystem to load
+        const bool ok = m_audioSystem->Load(id, resolved, loop);
+        if (ok)
+        {
+            std::cout << "[AssetManager] Loaded Audio " << id << " from " << resolved << "\n";
+        }
+        else
+        {
+            std::cout << "[AssetManager] FAILED to load audio " << id << " from " << resolved << "\n";
+        }
+
+        return ok;
     }
 
 } // namespace EngineFramework

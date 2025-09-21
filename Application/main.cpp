@@ -69,6 +69,7 @@ void Game_Initialize()
 	//=Adding Systems
 	core_engine.AddSystem("AssetManager", std::make_unique<EngineFramework::AssetManagerSystem>(), 1, 1, 100);
 	core_engine.AddSystem("GameObjectSystem", std::make_unique<EngineFramework::GameObjectSystem>(), 2, 2, 1);
+	core_engine.AddSystem("AudioSystem", std::make_unique<EngineFramework::AudioSystem>(), 4, 4, 3);
 	// Add the GraphicsSystem to the CoreEngine
 	core_engine.AddSystem(
 		"GraphicsSystem",            // Name

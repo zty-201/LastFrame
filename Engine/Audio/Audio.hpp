@@ -1,32 +1,36 @@
-#pragma once
-#ifndef AUDIO_HPP
-#define AUDIO_HPP
+/******************************************************************************/
+/*!
+\file       Audio.hpp
+\author     Mohamed Arshad Bin Mohamed Hussain
+\par        mohamedarshad.b\@digipen.edu
+\brief      Declares the Audio System for the Cheerios Engine.
 
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior
+written consent of DigiPen Institute of Technology is prohibited.
+*/
+/******************************************************************************/
+#pragma once
+#ifndef ENGINE_AUDIO_HPP
+#define ENGINE_AUDIO_HPP
+
+// Keep this header small and self-contained
 #include <string>
 #include <unordered_map>
 #include <functional>
 
-// Engine interface
 #include "ISystem.hpp"
 
-// ---------- FMOD includes / fallbacks ----------
-// We still need the types for member pointers even if FMOD is disabled.
-// So when DISABLE_FMOD is set, forward-declare the FMOD classes instead
-// of including the headers.
+// FMOD forward declarations guarded by compile-time flag
 #ifndef DISABLE_FMOD
-#include <fmod.hpp>
-#include <fmod_errors.h>
-#else
-namespace FMOD {
-    class System;
-    class ChannelGroup;
-    class Sound;
-    class Channel;
-}
+#include "fmod.hpp"
+#include "fmod_errors.h"
 #endif
 
 namespace EngineFramework
 {
+
+    // High-level routing buckets for volumes/mutes etc.
     enum class AudioGroup
     {
         Master,
@@ -34,79 +38,128 @@ namespace EngineFramework
         SFX
     };
 
-    // Minimal, cross-platform Audio System (FMOD Core API).
+    /**
+     * AudioSystem
+     * -----------
+     * Minimal, engine-friendly wrapper around FMOD that:
+     * - Initializes FMOD and creates channel groups (Master/Music/SFX)
+     * - Loads sounds (by logical name or path) and plays them
+     * - Lets the engine plug in a "path resolver" so you can map logical IDs -> real paths via AssetManager
+     * - Supports Android asset manager (optional) by copying packed assets to a real file before FMOD loads them
+     *
+     * Notes:
+     * - Linkage guarded by DISABLE_FMOD: you can compile stubs on platforms without FMOD.
+     * - All public methods are stable/simple for gameplay code.
+     */
     class AudioSystem final : public ISystem
     {
     public:
-        AudioSystem();
-        ~AudioSystem();
-
-        // ===== ISystem =====
+        // ---- ISystem lifecycle ----
         void Initialize() override;
         void Update(float delta_time) override;
         void PostUpdate(float delta_time) override;
 
-        // ===== Engine Integration =====
-        // Inject a path resolver from your Asset Manager. Given an id/logical name,
-        // return a platform-ready filesystem path.
+        // ---- Engine integration ----
+        // The engine (or AssetManager) can inject a resolver: logicalId -> absolute path
         void SetPathResolver(std::function<std::string(const std::string&)> resolver);
 
 #ifdef PLATFORM_ANDROID
-        // Provide Android AAssetManager* (as void* to avoid including NDK headers in the public header).
+        // Provide the Android AAssetManager* (pass as void* to avoid android headers in the interface)
         void SetAndroidAssetManager(void* aasset_manager);
 #endif
 
-        // ===== Public API =====
-        bool Load(const std::string& id, const std::string& logicalOrPath, bool loop = false);
+        // Allows quick tests without a resolver; if no resolver is set, logicalOrPath is treated as a literal path.
+        std::string ResolvePath(const std::string& logicalOrPath) const;
+
+        // ---- Public API for gameplay / systems ----
+        // Load a sound (id = how you will refer to it when playing)
+        bool Load(const std::string& id, const std::string& logicalOrPath, bool loop);
+
+        // Unload a previously loaded sound by id
         void Unload(const std::string& id);
 
+        // Play a loaded sound by id; returns false if id not found or not initialized
+        // volume: 0..1   paused: start paused if true   group: routing bucket
         bool Play(const std::string& id,
             float volume = 1.0f,
             bool paused = false,
             AudioGroup group = AudioGroup::SFX);
 
+        // Global controls
         void StopAll();
         void PauseAll(bool paused);
-
         void SetMasterVolume(float volume);
         void SetGroupVolume(AudioGroup group, float volume);
 
+        // Status
         bool IsInitialized() const;
 
-    private:
-        // -------- FMOD state --------
-        FMOD::System* m_system;
-        FMOD::ChannelGroup* m_groupMaster;
-        FMOD::ChannelGroup* m_groupMusic;
-        FMOD::ChannelGroup* m_groupSFX;
+        // ---- Ctor / Dtor ----
+        AudioSystem();
+        ~AudioSystem() override;
 
+    private:
+        // -------- Types / members --------
+#ifndef DISABLE_FMOD
         struct SoundInfo
         {
             FMOD::Sound* sound;
             bool         looped;
         };
+#else
+        struct SoundInfo
+        {
+            void* sound; // stub field when FMOD disabled
+            bool  looped;
+        };
+#endif
+
+        // FMOD system + groups (null when not initialized or DISABLE_FMOD)
+#ifndef DISABLE_FMOD
+        FMOD::System* m_system;
+        FMOD::ChannelGroup* m_groupMaster;
+        FMOD::ChannelGroup* m_groupMusic;
+        FMOD::ChannelGroup* m_groupSFX;
+#else
+        void* m_system;
+        void* m_groupMaster;
+        void* m_groupMusic;
+        void* m_groupSFX;
+#endif
+
+        // Loaded sounds by id
         std::unordered_map<std::string, SoundInfo> m_sounds;
+
+        // Optional: engine-injected mapper logicalId -> path
+        std::function<std::string(const std::string&)> m_pathResolver;
 
         bool m_initialized;
 
-        // -------- Integration hooks --------
-        std::function<std::string(const std::string&)> m_pathResolver;
+#ifdef PLATFORM_ANDROID
+        // Stored as void* to avoid pulling in Android headers into this header
+        void* m_androidAssetMgr;
+#endif
+
+        // -------- Internals --------
+#ifndef DISABLE_FMOD
+    // Log FMOD errors with context label
+        void        logFmodError(FMOD_RESULT result, const char* context);
+        // Choose FMOD mode flags (looped vs one-shot)
+        FMOD_MODE   modeFor(bool looped);
+#endif
+
+        // Pick a channel group pointer (Master/Music/SFX)
+        FMOD::ChannelGroup* pickGroup(AudioGroup group);
+
+        // Release all FMOD::Sound* safely
+        void releaseAllSounds();
 
 #ifdef PLATFORM_ANDROID
-        void* m_androidAssetMgr; // AAssetManager*
+        // Copy an AAsset to a real file path (FMOD requires file paths on some platforms)
         std::string CopyAssetToInternal(const std::string& assetPath) const;
 #endif
-
-        // -------- Helpers --------
-        std::string ResolvePath(const std::string& logicalOrPath) const;
-
-#ifndef DISABLE_FMOD
-        static void      logFmodError(FMOD_RESULT result, const char* context);
-        static FMOD_MODE modeFor(bool looped);
-#endif
-        FMOD::ChannelGroup* pickGroup(AudioGroup group);
-        void                releaseAllSounds();
     };
-}
 
-#endif // AUDIO_HPP
+} // namespace EngineFramework
+
+#endif // ENGINE_AUDIO_HPP

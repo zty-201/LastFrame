@@ -1,5 +1,16 @@
-#include "pch.hpp"
+/******************************************************************************/
+/*!
+\file		Audio.cpp
+\author 	Mohamed Arshad Bin Mohamed Hussain
+\par    	mohamedarshad.b\@digipen.edu
+\brief  	Audio System for the Cheerios Engine
 
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior
+written consent of DigiPen Institute of Technology is prohibited.
+*/
+/******************************************************************************/
+#include "pch.hpp"
 #include "Audio.hpp"
 
 #include <cassert>
@@ -17,9 +28,9 @@
 
 namespace EngineFramework
 {
-    // =======================
+    // ============================================================================
     // Internal helpers (FMOD)
-    // =======================
+    // ============================================================================
 #ifndef DISABLE_FMOD
     void AudioSystem::logFmodError(FMOD_RESULT result, const char* context)
     {
@@ -33,10 +44,11 @@ namespace EngineFramework
 
     FMOD_MODE AudioSystem::modeFor(bool looped)
     {
-        // For SFX we keep fully loaded; for long music consider | FMOD_CREATESTREAM
-        return looped ? (FMOD_DEFAULT | FMOD_LOOP_NORMAL) : (FMOD_DEFAULT | FMOD_LOOP_OFF);
+        // For short SFX we keep fully decoded. For long music you could add FMOD_CREATESTREAM.
+        return looped ? (FMOD_DEFAULT | FMOD_LOOP_NORMAL)
+            : (FMOD_DEFAULT | FMOD_LOOP_OFF);
     }
-#endif
+#endif // !DISABLE_FMOD
 
     FMOD::ChannelGroup* AudioSystem::pickGroup(AudioGroup group)
     {
@@ -49,20 +61,18 @@ namespace EngineFramework
         }
     }
 
-    // =======================
+    // ============================================================================
     // Ctor / Dtor
-    // =======================
+    // ============================================================================
     AudioSystem::AudioSystem()
         : m_system(NULL)
         , m_groupMaster(NULL)
         , m_groupMusic(NULL)
         , m_groupSFX(NULL)
         , m_initialized(false)
-
 #ifdef PLATFORM_ANDROID
         , m_androidAssetMgr(NULL)
 #endif
-
     {
     }
 
@@ -84,9 +94,9 @@ namespace EngineFramework
 #endif
     }
 
-    // =======================
+    // ============================================================================
     // ISystem
-    // =======================
+    // ============================================================================
     void AudioSystem::Initialize()
     {
         if (m_initialized)
@@ -100,12 +110,12 @@ namespace EngineFramework
         logFmodError(r, "System_Create");
         if (r != FMOD_OK || m_system == NULL) return;
 
-        // 2) Init FMOD
+        // 2) Initialize FMOD
         r = m_system->init(64, FMOD_INIT_NORMAL, NULL);
         logFmodError(r, "System::init");
         if (r != FMOD_OK) return;
 
-        // 3) Channel groups
+        // 3) Create channel groups
         r = m_system->createChannelGroup("Master", &m_groupMaster);
         logFmodError(r, "createChannelGroup(Master)"); if (r != FMOD_OK) return;
 
@@ -115,13 +125,15 @@ namespace EngineFramework
         r = m_system->createChannelGroup("SFX", &m_groupSFX);
         logFmodError(r, "createChannelGroup(SFX)");   if (r != FMOD_OK) return;
 
+        // 4) Connect child groups
         if (m_groupMaster && m_groupMusic) m_groupMaster->addGroup(m_groupMusic);
         if (m_groupMaster && m_groupSFX)   m_groupMaster->addGroup(m_groupSFX);
 
+        // 5) Default volumes
         if (m_groupMaster) m_groupMaster->setVolume(1.0f);
         if (m_groupMusic)  m_groupMusic->setVolume(1.0f);
         if (m_groupSFX)    m_groupSFX->setVolume(1.0f);
-#endif
+#endif // !DISABLE_FMOD
 
         m_initialized = true;
         std::cout << "[AudioSystem] Initialization Successful!\n";
@@ -144,9 +156,9 @@ namespace EngineFramework
         (void)delta_time;
     }
 
-    // =======================
+    // ============================================================================
     // Engine Integration
-    // =======================
+    // ============================================================================
     void AudioSystem::SetPathResolver(std::function<std::string(const std::string&)> resolver)
     {
         m_pathResolver = resolver;
@@ -159,22 +171,21 @@ namespace EngineFramework
     }
 #endif
 
-    // Logical to real path
     std::string AudioSystem::ResolvePath(const std::string& logicalOrPath) const
     {
         if (m_pathResolver)
             return m_pathResolver(logicalOrPath);
-        return logicalOrPath; // fallback: treat as literal path (useful for quick tests)
+        return logicalOrPath; // fallback for quick tests
     }
 
 #ifdef PLATFORM_ANDROID
-    // NOTE: Ideally your platform layer provides an app-writable files directory path.
-    // If not, this fallback uses a simple subfolder "audio_cache" within the process's CWD.
+    // If your platform code can pass a proper internal/data path, prefer that.
+    // This fallback creates a subdir next to the executable for copies.
     static std::string GetInternalBaseDirFallback()
     {
-        // You can replace this with a path passed down from your Android app glue.
         std::filesystem::path p = std::filesystem::current_path() / "audio_cache";
-        std::error_code ec; std::filesystem::create_directories(p, ec);
+        std::error_code ec;
+        std::filesystem::create_directories(p, ec);
         return p.string();
     }
 
@@ -222,18 +233,18 @@ namespace EngineFramework
 
         return dst;
     }
-#endif
+#endif // PLATFORM_ANDROID
 
-    // =======================
+    // ============================================================================
     // Public API
-    // =======================
+    // ============================================================================
     bool AudioSystem::Load(const std::string& id, const std::string& logicalOrPath, bool loop)
     {
         if (!m_initialized)
             return false;
 
         if (m_sounds.find(id) != m_sounds.end())
-            return true;
+            return true; // already loaded
 
         const std::string resolved = ResolvePath(logicalOrPath);
 
@@ -242,10 +253,9 @@ namespace EngineFramework
         FMOD_MODE mode = modeFor(loop);
 
 #ifdef PLATFORM_ANDROID
-        // On mobile, large assets often stream better; flip this on per policy if desired.
+        // Example policy: add streaming on mobile for big files if desired
         // mode |= FMOD_CREATESTREAM;
 
-        // If assets are packaged in APK, copy to a real file path first.
         std::string loadPath = resolved;
         if (m_androidAssetMgr != NULL)
         {
@@ -269,9 +279,8 @@ namespace EngineFramework
         return true;
 #else
         (void)resolved; (void)loop;
-        // Stub success when FMOD is disabled
         m_sounds.insert(std::make_pair(id, SoundInfo{ NULL, loop }));
-        return true;
+        return true; // stub success
 #endif
     }
 
@@ -309,20 +318,20 @@ namespace EngineFramework
         if (r != FMOD_OK || channel == NULL)
             return false;
 
-        FMOD::ChannelGroup* grp = pickGroup(group);
-        if (grp) { channel->setChannelGroup(grp); }
+        if (FMOD::ChannelGroup* grp = pickGroup(group))
+            channel->setChannelGroup(grp);
 
         if (volume < 0.0f) volume = 0.0f;
         if (volume > 1.0f) volume = 1.0f;
         channel->setVolume(volume);
 
         channel->setPaused(paused);
-        if (!paused) { channel->setPaused(false); }
+        if (!paused) channel->setPaused(false);
 
         return true;
 #else
         (void)volume; (void)paused; (void)group;
-        return true; // Stub success without FMOD
+        return true; // stub success
 #endif
     }
 
@@ -358,8 +367,8 @@ namespace EngineFramework
         if (volume < 0.0f) volume = 0.0f;
         if (volume > 1.0f) volume = 1.0f;
 #ifndef DISABLE_FMOD
-        FMOD::ChannelGroup* grp = pickGroup(group);
-        if (grp) grp->setVolume(volume);
+        if (FMOD::ChannelGroup* grp = pickGroup(group))
+            grp->setVolume(volume);
 #endif
     }
 
@@ -383,4 +392,5 @@ namespace EngineFramework
         }
         m_sounds.clear();
     }
-}
+
+} // namespace EngineFramework
