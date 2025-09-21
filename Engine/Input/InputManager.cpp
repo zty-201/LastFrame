@@ -53,11 +53,26 @@ namespace EngineFramework
         (void)scancode;
         (void)mods;
 
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
         switch (action)
         {
         case GLFW_PRESS:
             // Transition to Pressed (this frame only)
             keyStates[key] = KeyState::Pressed;
+            if (key == 'W')
+                pScene->camerasSetType(CameraType::WALKING);
+            else if (key == 'O')
+                pScene->camerasSetType(CameraType::ORBITING);
+            else if (key == GLFW_KEY_1)
+            {
+                pScene->shader.use();
+                pScene->shader.setUniform("materialType", 0); // PBR
+            }
+            else if (key == GLFW_KEY_2)
+            {
+                pScene->shader.use();
+				pScene->shader.setUniform("materialType", 1); // Blinn-Phong
+            }
             break;
         case GLFW_RELEASE:
             // Transition to Released (this frame only)
@@ -89,7 +104,6 @@ namespace EngineFramework
         double yoffset = ypos - oldypos;
         oldxpos = xpos;
         oldypos = ypos;
-
         auto& pScene = GraphicsSystem::GetInstance().GetScene();
         //std::cout << "CursorPosCallback: xoffset = " << xoffset << ", yoffset = " << yoffset << std::endl;
         if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed 
@@ -106,15 +120,17 @@ namespace EngineFramework
     void InputManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     {
         (void)window;
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
         scrollX = xoffset;
         scrollY = yoffset;
+        pScene->camerasOnScroll(xoffset, yoffset);
     }
 
     void InputManager::WindowSizeCallback(GLFWwindow* window, int width, int height)
     {
-        (void)window;
-        windowWidth = width;
-        windowHeight = height;
+		UNREFERENCED_PARAMETER(window);
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
+        pScene->resize(width, height);
     }
 #endif
     void InputManager::ErrorCallback(int error, const char* description)
