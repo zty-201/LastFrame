@@ -29,7 +29,6 @@ namespace EngineFramework
     void GraphicsSystem::Initialize()
     {
         SetupGLFW();
-        SetupImGui();
         SetupGraphics();
         //need to have a function for input handling
         //since input handling is part of glfw , at least for the callbacks
@@ -58,7 +57,7 @@ namespace EngineFramework
         }
 
         glfwMakeContextCurrent(pWindow);
-        //glfwSwapInterval(1); // Enable vsync
+        glfwSwapInterval(1); // Enable vsync
 
         // Initialize GLAD (must happen after window context is created)
         if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress)) {
@@ -77,13 +76,6 @@ namespace EngineFramework
 
     }
 
-    void GraphicsSystem::SetupImGui()
-    {
-        //imgui should not be an entity of graphics
-        /*ImGui::CreateContext();
-        ImGui_ImplGlfw_InitForOpenGL(scene.window, true);
-        ImGui_ImplOpenGL3_Init();*/
-    }
 
     void GraphicsSystem::SetupGraphics()
     {
@@ -99,6 +91,7 @@ namespace EngineFramework
         };
 
         Camera camera = { { 0.0f, 1.0f, 5.0f }, 75.0f };
+        FBO sceneFBO(FBO::Texture, WIDTH, HEIGHT, &sceneTextureID);
         pScene = std::make_unique<Scene>(
             "Extern/Graphics/Shader/BasicVert.vert", // Vertex shader file path
             "Extern/Graphics/Shader/BasicFrag.frag", // Fragment shader file path
@@ -106,7 +99,7 @@ namespace EngineFramework
 
             // Pass 0: Render Scene
             Scene::Pass{
-                {FBO::Default, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
+                {sceneFBO},      
                 { 0, 0, WIDTH, HEIGHT },            // Viewport
                 GL_LESS,                            // Depth test LESS for the scene
                 {                                   // Objects
@@ -127,7 +120,7 @@ namespace EngineFramework
             },
                 // Pass 1: Render Skybox
                 Scene::Pass{
-                    {FBO::Default, WIDTH, HEIGHT, &sceneTextureID},      // Default FBO
+                    {sceneFBO},      // Default FBO
                     { 0, 0, WIDTH, HEIGHT },            // Viewport
                     GL_LEQUAL,                          // Depth test LEQUAL for the skybox
                     {                                   // Objects
@@ -154,6 +147,13 @@ namespace EngineFramework
         {
 			exit(0); // Exit the application
         }
+
+#ifdef _DEBUG
+        // If the level editor is active, it will handle rendering the scene.
+        if (LevelEditorSystem::Get_Enable()) {
+            return;
+        }
+#endif
 
         // Draw scene
         pScene->render();

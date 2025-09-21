@@ -33,7 +33,12 @@ namespace EngineFramework
 	void LevelEditorSystem::Initialize()
 	{
 		application = std::make_unique<LevelEditor>();
+<<<<<<< HEAD
 		
+=======
+		application->Initialize();
+		//application->Open();
+>>>>>>> ce5c0241df6dfa7f008ed945c0d49ae3be11f2e4
 		std::cout << "level editor system ONLINE!\n";
 	}
 	void LevelEditorSystem::Update(float delta_time)
@@ -59,18 +64,13 @@ namespace EngineFramework
 
 			}
 			else if (application->Get_Editor_State()) {
-
+				//std::cout << "Imgui running\n";
 				//open is a 1 time thing, it shouldnt be called everyframe
 				//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed			
 				application->Run();
 
 			}
 		}
-
-		
-
-		
-
 
 	}
 
