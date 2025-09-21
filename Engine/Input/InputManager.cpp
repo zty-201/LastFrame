@@ -18,9 +18,14 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "global.hpp"
 #include "InputManager.hpp"
 #include "GraphicsSystem.h"
+//#include "Level_Editor.hpp"
+#include "System_LevelEditor.hpp"
+
 
 namespace EngineFramework
 {
+    
+
     // Static member definitions
     std::unordered_map<int, KeyState> InputManager::keyStates;
     std::unordered_map<int, KeyState> InputManager::mouseButtonStates;
@@ -109,11 +114,17 @@ namespace EngineFramework
         if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed 
             || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down))
         {
-            pScene->camerasOnCursor(xoffset, yoffset);
+            if (!LevelEditorSystem::Get_Enable()) {
+                pScene->camerasOnCursor(xoffset, yoffset);
+            }
+               
         }
         else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed)
         {
-            pScene->lightsOnCursor(xoffset, yoffset);
+            if (!LevelEditorSystem::Get_Enable()) {
+                pScene->lightsOnCursor(xoffset, yoffset);
+            }
+            
         }
     }
 
@@ -123,7 +134,11 @@ namespace EngineFramework
         auto& pScene = GraphicsSystem::GetInstance().GetScene();
         scrollX = xoffset;
         scrollY = yoffset;
-        pScene->camerasOnScroll(xoffset, yoffset);
+        if (!LevelEditorSystem::Get_Enable()) {
+            pScene->camerasOnScroll(xoffset, yoffset);
+            //std::cout << "yoffset: " << yoffset << std::endl;
+        }
+        
     }
 
     void InputManager::WindowSizeCallback(GLFWwindow* window, int width, int height)

@@ -16,6 +16,8 @@
 //Casting meta data to type.
 #include "ReflectionRegister.hpp"
 #include "InputManager.hpp"
+#include "Level_Editor.hpp"
+
 namespace EngineFramework
 {
 	bool LevelEditorSystem::Get_Enable() {
@@ -31,7 +33,7 @@ namespace EngineFramework
 	void LevelEditorSystem::Initialize()
 	{
 		application = std::make_unique<LevelEditor>();
-		application->Initialize();
+		
 		std::cout << "level editor system ONLINE!\n";
 	}
 	void LevelEditorSystem::Update(float delta_time)
@@ -43,6 +45,7 @@ namespace EngineFramework
 			//std::cout << "yo\n";
 			if (InputManager::GetInstance().GetKeyDown(GLFW_KEY_1)) {
 
+				application->Initialize();
 				application->Open();
 				//std::cout << "2222222222222222222222222222222222222\n";
 			}
@@ -50,7 +53,9 @@ namespace EngineFramework
 		else {
 
 			if (application->To_Close()) {
+
 				application->Close();
+				application->Clean();
 
 			}
 			else if (application->Get_Editor_State()) {
@@ -58,6 +63,7 @@ namespace EngineFramework
 				//open is a 1 time thing, it shouldnt be called everyframe
 				//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed			
 				application->Run();
+
 			}
 		}
 

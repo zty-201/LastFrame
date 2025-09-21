@@ -59,6 +59,22 @@ public:
     {
     }
 
+    void Move_Cam_and_Target(glm::vec3 offset) {
+
+        const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
+
+        glm::vec3 front = glm::normalize(target - position);      // view direction
+        glm::vec3 right = glm::normalize(glm::cross(front, worldUp));
+        glm::vec3 up = glm::normalize(glm::cross(right, front));
+
+        // Combine local-axis moves into one world-space translation
+        glm::vec3 t = right * offset.x + up * offset.y + front * offset.z;
+
+        // Apply translation; choose whether to pan (move target too) or not
+        position += t;
+        target += t;
+    }
+
     // Sets the camera type and updates the target if it's orbiting
     void setType(CameraType cameraType)
     {

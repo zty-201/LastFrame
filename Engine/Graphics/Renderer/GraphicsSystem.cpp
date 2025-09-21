@@ -74,14 +74,7 @@ namespace EngineFramework
 
         std::cout << "Registering InputManager callbacks to GraphicsSystem window.\n";
         InputManager::RegisterCallbacks(pWindow);
-#ifdef _DEBUG
-        if (!LevelEditor::Get_Editor_State()) {
-            std::cout << "Registering InputManager callbacks to GraphicsSystem window.\n";
-            InputManager::RegisterCallbacks(pWindow);
-        }
-#else
-        InputManager::RegisterCallbacks(pWindow);
-#endif  
+
     }
 
     void GraphicsSystem::SetupImGui()

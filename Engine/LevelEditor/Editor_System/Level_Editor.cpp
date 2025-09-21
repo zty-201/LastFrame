@@ -21,6 +21,7 @@
 #include "GraphicsSystem.h"
 #include "ObjectManager.hpp"
 #include "Save.hpp"
+#include "Screen.hpp"
 
 namespace EngineFramework
 {
@@ -41,7 +42,10 @@ namespace EngineFramework
 	}
 	LevelEditor::~LevelEditor() {
 
-		ImGui::DestroyContext();
+		//iff the window is closed while level editor is running, rmb to clean
+		if (is_enabled) {
+			Clean();
+		}	
 		std::cout << "~LevelEditor() destructor\n";
 	}
 
@@ -82,6 +86,9 @@ namespace EngineFramework
 		ImGui::GetIO().ConfigDockingTransparentPayload = false;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
+		io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+
 		/*
 		 Check if ImGui needs the keyboard. If so, disable in-game key input.
 		 e.g. Typing into an imgui text field shouldn't move the player.
@@ -113,6 +120,9 @@ namespace EngineFramework
 		/*add the following submenu here*/
 		addFeature("ObjectManager", std::make_unique<ObjectManager>());
 		addFeature("Save", std::make_unique<Save>());
+		addFeature("Screen", std::make_unique<Screen>());
+
+		
 
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {
@@ -167,7 +177,7 @@ namespace EngineFramework
 						ImGui::EndMenu();
 					}
 
-					ImGui::MenuItem("Open Existing", NULL);
+					ImGui::MenuItem("Open Existing", NULL, &featureFlag("Screen"));
 					ImGui::Separator();
 					ImGui::MenuItem("Save", NULL, &featureFlag("Save"));
 					ImGui::MenuItem("Save As ..", NULL);
@@ -202,31 +212,6 @@ namespace EngineFramework
 			ImGui::PopStyleColor();
 
 		}
-
-		ImVec2 available_size = ImGui::GetContentRegionAvail();
-		static ImVec2 available_size_old = available_size;
-		static bool first_init = true;
-
-		if (first_init) {
-
-			GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
-			first_init = false;
-		}
-
-		//only do this when needed.
-		if (available_size.x != available_size_old.x || available_size.y != available_size_old.y)
-		{
-			//resize when the screen size changes		
-			std::cout << "x: " << available_size.x << "y: " << available_size.y << std::endl;
-			GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
-		}
-		
-
-		available_size_old = available_size;
-
-		ImGui::Image((ImTextureID)(intptr_t)0,
-			available_size,
-			ImVec2(0, 1),ImVec2(1,0));
 
 		ImGui::PopStyleColor();
 		ImGui::End();
@@ -284,6 +269,7 @@ namespace EngineFramework
 		ImGui_ImplOpenGL3_Shutdown();  // OpenGL backend
 		ImGui_ImplGlfw_Shutdown();     // GLFW backend
 		ImGui::DestroyContext();
+		std::cout << "cleaned\n";
 	}
 
 	
