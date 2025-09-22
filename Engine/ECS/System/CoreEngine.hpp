@@ -34,6 +34,10 @@ namespace EngineFramework
 			std::unique_ptr<ISystem> system;
 			//Specified orders of initialization, Update, Destruction. These orders aren't necessarily the same.
 			char init_order{}, update_order{}, destruct_order{};
+
+			// FOR PROFILER 
+			std::string label_update; // Precomputed sys::<name>::update
+			std::string label_post; // Precomputed sys::<name>::postupdate
 		};
 
 		//Singleton pattern: Everyone shares the only instance of the core engine.

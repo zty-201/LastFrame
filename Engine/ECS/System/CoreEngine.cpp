@@ -6,6 +6,8 @@
 #include "pch.hpp"
 #include <algorithm>
 #include "CoreEngine.hpp"
+#include "Diagnostics/ProfilerEngine.hpp" // To auto-profile every system from one place
+
 namespace EngineFramework
 {
 	//Singleton pattern: Everyone shares the only instance of the core engine.
@@ -23,6 +25,11 @@ namespace EngineFramework
 	void CoreEngine::AddSystem(std::string name, std::unique_ptr<ISystem> system, char init_order, char update_order, char destruct_order)
 	{
 		system_arr.emplace_back(name, std::move(system), init_order, update_order, destruct_order);
+		
+		// FOR PROFILER - To precompute profiler labels for the system
+		CoreSystem& s = system_arr.back();
+		s.label_update = "Sys::" + s.name + "::Update";
+		s.label_post = "Sys::" + s.name + "::PostUpdate";
 	}
 
 	/*
@@ -57,6 +64,9 @@ namespace EngineFramework
 		//Array has already been sorted in update order, in initialize.
 		for (CoreSystem& system : system_arr)
 		{
+			// PROFILER CODE - To time each system automatically
+			Diagnostics::Scoped scope { system.label_update.c_str() }; // To track per system per frame timing
+
 			system.system->Update(delta_time);
 		}
 	}
@@ -70,6 +80,9 @@ namespace EngineFramework
 		//Array has already been sorted in update order, in initialize.
 		for (CoreSystem& system : system_arr)
 		{
+			// PROFILER CODE
+			Diagnostics::Scoped s{ system.label_post.c_str() };
+
 			system.system->PostUpdate(delta_time);
 		}
 	}

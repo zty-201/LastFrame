@@ -20,6 +20,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
 #include "Assets/AssetManager.hpp"
+#include "Diagnostics/ProfilerEngine.hpp" // For the profiler - engine side
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "System_LevelEditor.hpp"
@@ -97,6 +98,10 @@ void Game_Initialize()
 
 void Game_Update()
 {
+	// TESTING PROFILER 
+	using Diagnostics::Profiler;
+	auto& prof = Profiler::I(); // To get the profiler
+
 	EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 	//Keeps track of the current delta time. Use a small arbitrary value for the first update loop.
 	static float delta_time{ 0.0001f };
@@ -109,10 +114,38 @@ void Game_Update()
 	glfwPollEvents();
 #endif
 
-	//TODO: Try-Catch handling in Update/PostUpdate.
-	core_engine.UpdateSystems(delta_time);
+	// START PROFILER frame timing
+	prof.BeginFrame(); 
+	{
+		Diagnostics::Scoped s{ "Frame::UpdateAll" };
 
-	core_engine.PostUpdateSystems(delta_time);
+
+		//TODO: Try-Catch handling in Update/PostUpdate.
+		core_engine.UpdateSystems(delta_time);
+
+		core_engine.PostUpdateSystems(delta_time);
+	}
+
+	prof.EndFrame(); // END PROFILER frame timing
+
+	// Print profiler summary
+	static double acc_ms = 0.0;
+	static int frames = 0;
+	acc_ms += Profiler::I().FrameMS();
+	frames++;
+	if (acc_ms >= 1000.0) {
+		std::cout << "[Profiler] Frame: " << Profiler::I().FrameMS() << " ms, FPS " << Profiler::I().FPS() << "\n";
+
+		for (const auto& kv : Profiler::I().Sections()) {
+			const auto& name = kv.first;
+			const auto& sec = kv.second;
+			const double per_call = (sec.calls ? sec.ms / sec.calls : 0.0);
+			std::cout << " " << name << " : " << sec.ms << " ms" << " (calls " << sec.calls << ", " << per_call << " ms/call)\n";
+		}
+		std::cout << "--------------------------------------\n";
+		acc_ms = 0.0;
+		frames = 0;
+	}
 
 	time_after_loop = std::chrono::steady_clock::now();
 
