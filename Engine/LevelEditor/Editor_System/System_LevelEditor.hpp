@@ -1,5 +1,5 @@
 
-#ifdef _DEBUG
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #ifndef SYSTEM_LEVEL_EDITOR_HPP
 #define SYSTEM_LEVEL_EDITOR_HPP
 #include <unordered_map>
@@ -11,6 +11,7 @@
 
 namespace EngineFramework
 {
+	
 
 	/*
 

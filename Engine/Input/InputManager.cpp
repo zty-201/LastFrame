@@ -17,9 +17,15 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "pch.hpp"
 #include "global.hpp"
 #include "InputManager.hpp"
+#include "GraphicsSystem.h"
+//#include "Level_Editor.hpp"
+#include "System_LevelEditor.hpp"
+
 
 namespace EngineFramework
 {
+    
+
     // Static member definitions
     std::unordered_map<int, KeyState> InputManager::keyStates;
     std::unordered_map<int, KeyState> InputManager::mouseButtonStates;
@@ -35,6 +41,7 @@ namespace EngineFramework
     int InputManager::windowWidth = 0;
     int InputManager::windowHeight = 0;
 
+#ifdef PLATFORM_WINDOWS
     void InputManager::RegisterCallbacks(GLFWwindow* window)
     {
         glfwSetKeyCallback(window, KeyCallback);
@@ -51,11 +58,26 @@ namespace EngineFramework
         (void)scancode;
         (void)mods;
 
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
         switch (action)
         {
         case GLFW_PRESS:
             // Transition to Pressed (this frame only)
             keyStates[key] = KeyState::Pressed;
+            if (key == 'W')
+                pScene->camerasSetType(CameraType::WALKING);
+            else if (key == 'O')
+                pScene->camerasSetType(CameraType::ORBITING);
+            else if (key == GLFW_KEY_1)
+            {
+                pScene->shader.use();
+                pScene->shader.setUniform("materialType", 0); // PBR
+            }
+            else if (key == GLFW_KEY_2)
+            {
+                pScene->shader.use();
+				pScene->shader.setUniform("materialType", 1); // Blinn-Phong
+            }
             break;
         case GLFW_RELEASE:
             // Transition to Released (this frame only)
@@ -71,34 +93,61 @@ namespace EngineFramework
     void InputManager::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
         (void)window;
-        (void)button;
         (void)mods;
 
-        if (action == GLFW_PRESS) mouseButtonStates[button] = KeyState::Pressed;
-        else if (action == GLFW_RELEASE) mouseButtonStates[button] = KeyState::Released;
+        if (action == GLFW_PRESS) { 
+            mouseButtonStates[button] = KeyState::Pressed; }
+        else if (action == GLFW_RELEASE) { mouseButtonStates[button] = KeyState::Released; }
     }
 
     void InputManager::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     {
-        (void)window;
-        mouseX = xpos;
-        mouseY = ypos;
+		UNREFERENCED_PARAMETER(window);
+        static double oldxpos = xpos;
+        static double oldypos = ypos;
+        double xoffset = xpos - oldxpos;
+        double yoffset = ypos - oldypos;
+        oldxpos = xpos;
+        oldypos = ypos;
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
+        //std::cout << "CursorPosCallback: xoffset = " << xoffset << ", yoffset = " << yoffset << std::endl;
+        if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed 
+            || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down))
+        {
+            if (!LevelEditorSystem::Get_Enable()) {
+                pScene->camerasOnCursor(xoffset, yoffset);
+            }
+               
+        }
+        else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed)
+        {
+            if (!LevelEditorSystem::Get_Enable()) {
+                pScene->lightsOnCursor(xoffset, yoffset);
+            }
+            
+        }
     }
 
     void InputManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     {
         (void)window;
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
         scrollX = xoffset;
         scrollY = yoffset;
+        if (!LevelEditorSystem::Get_Enable()) {
+            pScene->camerasOnScroll(xoffset, yoffset);
+            //std::cout << "yoffset: " << yoffset << std::endl;
+        }
+        
     }
 
     void InputManager::WindowSizeCallback(GLFWwindow* window, int width, int height)
     {
-        (void)window;
-        windowWidth = width;
-        windowHeight = height;
+		UNREFERENCED_PARAMETER(window);
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
+        pScene->resize(width, height);
     }
-
+#endif
     void InputManager::ErrorCallback(int error, const char* description)
     {
         (void)error;
@@ -169,53 +218,56 @@ namespace EngineFramework
     void InputManager::Update(float deltaTime)
     {
         (void)deltaTime;
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
     }
 
     void InputManager::PostUpdate(float deltaTime)
     {
         (void)deltaTime;
-        // Keys
-        for (auto it = keyStates.begin(); it != keyStates.end(); )
+
+        // --- Keyboard ---
+        for (auto& [key, state] : keyStates)
         {
-            switch (it->second)
+            switch (state)
             {
             case KeyState::Pressed:
-                it->second = KeyState::Down;
-                ++it;
+                state = KeyState::Down; // Pressed → Down
                 break;
             case KeyState::Released:
-                it->second = KeyState::None;
-                ++it;
+                state = KeyState::None; // Released → None
                 break;
-            default:
-                ++it;
+            case KeyState::Down:
+                break;
+            case KeyState::None:
+                // Nothing to print
                 break;
             }
         }
 
-        // Mouse buttons
-        for (auto it = mouseButtonStates.begin(); it != mouseButtonStates.end(); )
+        // --- Mouse ---
+        for (auto& [button, state] : mouseButtonStates)
         {
-            switch (it->second)
+            switch (state)
             {
             case KeyState::Pressed:
-                it->second = KeyState::Down;
-                ++it;
+                state = KeyState::Down; // Pressed → Down
                 break;
             case KeyState::Released:
-                it->second = KeyState::None;
-                ++it;
+                state = KeyState::None; // Released → None
                 break;
-            default:
-                ++it;
+            case KeyState::Down:
+                break;
+            case KeyState::None:
                 break;
             }
         }
 
+        // Reset scroll deltas every frame
         scrollX = 0.0;
         scrollY = 0.0;
+
+        // Update last mouse position
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
     }
 
 }

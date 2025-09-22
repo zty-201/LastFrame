@@ -43,22 +43,46 @@ namespace EngineFramework
         void Update(float deltaTime) override;
         void PostUpdate(float deltaTime) override;
 
+
+        static GraphicsSystem& GetInstance()
+        {
+            return *this_graphics_ptr;
+        }
+
 		// Accessor for the scene
-        GLFWwindow* GetGLFWwindow() { return window; }
-		Scene* GetScene() { return &scene; }
+        GLFWwindow* GetGLFWwindow() { return pWindow; }
+		std::unique_ptr<Scene>& GetScene() { return pScene; }
+		GLuint GetSceneTextureID() const { return sceneTextureID; }
+		bool IsAltDown() const { return alt_down; }
+		bool IsLButtonDown() const { return lbutton_down; }
+		bool IsRButtonDown() const { return rbutton_down; }
+		bool IsShiftDown() const { return mode_shift; }
+
+        
     private:
 
-        Scene scene;
-        glm::vec2 screen = { WIDTH,HEIGHT };
-		GLFWwindow* window = nullptr;
+        std::unique_ptr<Scene> pScene;
+		static inline GraphicsSystem* this_graphics_ptr = nullptr;
+		GLFWwindow* pWindow = nullptr;
+        GLuint sceneTextureID;
 
+        glm::vec2 screen = { WIDTH,HEIGHT };
+        glm::vec3 fogColor; // Example: gray fog color
+        float fogMinDist;
+        float fogMaxDist;
+        int shadingModel;
         // Setup methods
         void SetupGLFW();
         void SetupImGui();
         void SetupGraphics();
-        
-        // Callback handling
-        static void ErrorCallback(int error, const char* msg);
+
+       
+
+        bool lbutton_down = false;
+        bool rbutton_down = false;
+        bool mode_shift = false;
+        bool alt_down = false;
+
     };
 }
 
