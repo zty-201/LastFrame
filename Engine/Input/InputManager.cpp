@@ -13,14 +13,18 @@ Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
 */
 /* *******************************************************************/
-#ifndef DISABLE_ASSET_INPUT
 #include "pch.hpp"
 #include "global.hpp"
 #include "InputManager.hpp"
 #include "GraphicsSystem.h"
+//#include "Level_Editor.hpp"
+#include "System_LevelEditor.hpp"
+
 
 namespace EngineFramework
 {
+    
+
     // Static member definitions
     std::unordered_map<int, KeyState> InputManager::keyStates;
     std::unordered_map<int, KeyState> InputManager::mouseButtonStates;
@@ -53,11 +57,26 @@ namespace EngineFramework
         (void)scancode;
         (void)mods;
 
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
         switch (action)
         {
         case GLFW_PRESS:
             // Transition to Pressed (this frame only)
             keyStates[key] = KeyState::Pressed;
+            if (key == 'W')
+                pScene->camerasSetType(CameraType::WALKING);
+            else if (key == 'O')
+                pScene->camerasSetType(CameraType::ORBITING);
+            else if (key == GLFW_KEY_1)
+            {
+                pScene->shader.use();
+                pScene->shader.setUniform("materialType", 0); // PBR
+            }
+            else if (key == GLFW_KEY_2)
+            {
+                pScene->shader.use();
+				pScene->shader.setUniform("materialType", 1); // Blinn-Phong
+            }
             break;
         case GLFW_RELEASE:
             // Transition to Released (this frame only)
@@ -89,32 +108,43 @@ namespace EngineFramework
         double yoffset = ypos - oldypos;
         oldxpos = xpos;
         oldypos = ypos;
-
         auto& pScene = GraphicsSystem::GetInstance().GetScene();
         //std::cout << "CursorPosCallback: xoffset = " << xoffset << ", yoffset = " << yoffset << std::endl;
         if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed 
             || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down))
         {
-            pScene->camerasOnCursor(xoffset, yoffset);
+            if (!LevelEditorSystem::Get_Enable()) {
+                pScene->camerasOnCursor(xoffset, yoffset);
+            }
+               
         }
         else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed)
         {
-            pScene->lightsOnCursor(xoffset, yoffset);
+            if (!LevelEditorSystem::Get_Enable()) {
+                pScene->lightsOnCursor(xoffset, yoffset);
+            }
+            
         }
     }
 
     void InputManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     {
         (void)window;
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
         scrollX = xoffset;
         scrollY = yoffset;
+        if (!LevelEditorSystem::Get_Enable()) {
+            pScene->camerasOnScroll(xoffset, yoffset);
+            //std::cout << "yoffset: " << yoffset << std::endl;
+        }
+        
     }
 
     void InputManager::WindowSizeCallback(GLFWwindow* window, int width, int height)
     {
-        (void)window;
-        windowWidth = width;
-        windowHeight = height;
+		UNREFERENCED_PARAMETER(window);
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
+        pScene->resize(width, height);
     }
 #endif
     void InputManager::ErrorCallback(int error, const char* description)
@@ -240,4 +270,3 @@ namespace EngineFramework
     }
 
 }
-#endif

@@ -36,18 +36,15 @@ namespace EngineFramework
 		static bool Get_Editor_State() {
 			return is_enabled;
 		}
+
 		bool To_Close() const {
 			return to_close;
-		}
-
-		bool To_Open() const {
-			return to_open;
 		}
 
 		iEditorView variables;
 
 		//no point checking state change in every frame, reduce performance, only toggle when needed
-		void Toggle(); //input manager should call this function, remove this when event/messaging system is done
+		
 		void Initialize(); //init imgui/glfw during startup
 		void Open(); //open the app
 		void Run(); //run the app
@@ -59,7 +56,7 @@ namespace EngineFramework
 		static inline LevelEditor* this_system{};
 		static bool is_enabled;
 		bool to_close;
-		bool to_open;
+		//bool to_open;
 		Imgui_const_Flags imgui_flags;
 		std::map<std::string, std::unique_ptr<LFeature>> featureMap;
 

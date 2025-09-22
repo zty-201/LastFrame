@@ -246,22 +246,20 @@ void Scene::Pass::Object::setBuffers(const char* meshName)
 
 void Scene::render()
 {
-    static GLuint currentFboHandle = 0xFFFFFF;
-
-    // 1. Clear the default framebuffer once at the start of the frame.
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
     int passIndex = 0;
     for (const auto& pass : passes)
     {
         // --- 1. SETUP THE PASS RENDER TARGET AND STATE ---
-        if (currentFboHandle != pass.fbo.handle)
+        glBindFramebuffer(GL_FRAMEBUFFER, pass.fbo.handle);
+
+        // Only clear the buffers for the VERY FIRST pass.
+        // Subsequent passes (like the skybox) will draw on top of the existing content.
+        if (passIndex == 0)
         {
-            glBindFramebuffer(GL_FRAMEBUFFER, pass.fbo.handle);
-            currentFboHandle = pass.fbo.handle;
+            glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
         if (pass.viewport.size() == 4) {
@@ -353,7 +351,11 @@ void Scene::render()
     }
 
     // --- FINAL CLEANUP ---
+    // Restore default OpenGL states that ImGui might rely on
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
     glDepthMask(GL_TRUE);
+
+    // Unbind the FBO to allow ImGui to render to the screen
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

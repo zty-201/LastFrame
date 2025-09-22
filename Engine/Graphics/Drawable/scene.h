@@ -241,6 +241,15 @@ struct Scene
                 camera.setType(cameraType);
     }
 
+    void camerasSetPos_andTarget(glm::vec3 offset)
+    {
+        for (Scene::Pass& pass : passes)
+            for (Camera& camera : pass.cameras)
+                camera.Move_Cam_and_Target(offset);
+    }
+
+
+
     // Updates camera orientation based on cursor movement
     void camerasOnCursor(double xoffset, double yoffset)
     {

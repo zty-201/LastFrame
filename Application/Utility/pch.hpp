@@ -40,7 +40,7 @@
 #include <glm/ext.hpp> // For mathematical constants like pi
 #include <glm/gtc/matrix_transform.hpp> // Utility functions for matrix transformations
 
-
+#include "event_structures.hpp"
 //// Windows API headers
 //#ifdef _WIN32
 //#define WIN32_LEAN_AND_MEAN  // Exclude rarely-used stuff from Windows headers

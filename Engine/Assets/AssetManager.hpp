@@ -33,7 +33,7 @@
 #endif
 
 namespace EngineFramework {
-
+    class AudioSystem;
     using AssetID = std::uint32_t;
 
     /**
@@ -58,7 +58,6 @@ namespace EngineFramework {
 #ifdef PLATFORM_ANDROID
         static void SetAndroidAssetManager(void* android_asset_manager);
 #endif
-#ifndef DISABLE_ASSET_INPUT
         void Initialize() override {}
         void Update(float) override {}
         void PostUpdate(float) override {}
@@ -173,6 +172,10 @@ namespace EngineFramework {
          */
         [[nodiscard]] std::vector<std::pair<std::string, std::filesystem::path>> List() const;
 
+        void SetAudioSystem(AudioSystem* audio);
+
+        bool LoadAudio(const std::string& id, const std::string& nameOrRel, bool loop = false);
+
     private:
         struct Entry {
             AssetID id = 0;                                 // Numeric handle
@@ -196,8 +199,11 @@ namespace EngineFramework {
         AssetID m_next{ 1 };                                // Next id to hand out.
         std::unordered_map<std::string, Entry> m_byName;    // name to entry
         std::unordered_map<AssetID, std::string>    m_byId; // id to name
-#endif
         static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer
+
+        AudioSystem* m_audioSystem = nullptr;
+
+        std::string m_audioSubdir = "Audio";
 #ifdef PLATFORM_ANDROID
         static inline AAssetManager* android_asset_manager = nullptr;
 #endif

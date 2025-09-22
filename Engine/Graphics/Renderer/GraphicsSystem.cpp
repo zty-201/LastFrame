@@ -28,14 +28,13 @@ namespace EngineFramework
 
     void GraphicsSystem::Initialize()
     {
-        SetupWindow();
-        SetupImGui();
+        SetupGLFW();
         SetupGraphics();
-        //need to have a function for input handling
-        //since input handling is part of glfw , at least for the callbacks
+     
+
     }
 
-    void GraphicsSystem::SetupWindow()
+    void GraphicsSystem::SetupGLFW()
     {
 #ifdef PLATFORM_WINDOWS
         // Initialize GLFW library
@@ -60,7 +59,7 @@ namespace EngineFramework
         }
 
         glfwMakeContextCurrent(pWindow);
-        //glfwSwapInterval(1); // Enable vsync
+        glfwSwapInterval(1); // Enable vsync
 
         // Initialize GLAD (must happen after window context is created)
         if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress)) {
@@ -76,26 +75,13 @@ namespace EngineFramework
         LOGI("Rendered by: %s", glGetString(GL_RENDERER));
 
         LOGI("Registering InputManager callbacks to GraphicsSystem window.");
-#ifndef DISABLE_ASSET_INPUT
         InputManager::RegisterCallbacks(pWindow);
-#ifdef _DEBUG
-        if (!LevelEditor::Get_Editor_State()) {
-            LOGI("Registering InputManager callbacks to GraphicsSystem window.");
-            InputManager::RegisterCallbacks(pWindow);
-        }
-#else
-        InputManager::RegisterCallbacks(pWindow);
-#endif  
-#endif
+
+
     }
 
-    void GraphicsSystem::SetupImGui()
-    {
-        //imgui should not be an entity of graphics
-        /*ImGui::CreateContext();
-        ImGui_ImplGlfw_InitForOpenGL(scene.window, true);
-        ImGui_ImplOpenGL3_Init();*/
-    }
+    
+
 
     void GraphicsSystem::SetupGraphics()
     {
@@ -111,6 +97,7 @@ namespace EngineFramework
         };
 
         Camera camera = { { 0.0f, 1.0f, 5.0f }, 75.0f };
+        FBO sceneFBO(FBO::Texture, WIDTH, HEIGHT, &sceneTextureID);
         pScene = std::make_unique<Scene>(
             "Extern/Graphics/Shader/BasicVert.vert", // Vertex shader file path
             "Extern/Graphics/Shader/BasicFrag.frag", // Fragment shader file path
@@ -118,13 +105,14 @@ namespace EngineFramework
 
             // Pass 0: Render Scene
             Scene::Pass{
-                {FBO::Default, WIDTH, HEIGHT},      // Default FBO
+                {sceneFBO},      
                 { 0, 0, WIDTH, HEIGHT },            // Viewport
                 GL_LESS,                            // Depth test LESS for the scene
                 {                                   // Objects
                     { PLANE, MATERIAL_CHECKERBOARD, glm::translate(glm::scale(glm::mat4(1.0f), {10.0f, 1.0f, 10.0f}), {0.0f, -1.01f, 0.0f}) },
                     { SPHERE, MATERIAL_PBR_PHONG, glm::translate(glm::mat4(1.0f), {-3.0f, 0.0f, 0.0f}) },
-                    { CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) }
+                    { CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) },
+                    { "Extern/tree.obj", MATERIAL_CARTOON, glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f}) }
                 },
                 { camera },                         // Cameras
                 { { {0.0f, 5.0f, 2.0f} } },         // Lights
@@ -138,7 +126,7 @@ namespace EngineFramework
             },
                 // Pass 1: Render Skybox
                 Scene::Pass{
-                    {FBO::Default, WIDTH, HEIGHT},      // Default FBO
+                    {sceneFBO},      // Default FBO
                     { 0, 0, WIDTH, HEIGHT },            // Viewport
                     GL_LEQUAL,                          // Depth test LEQUAL for the skybox
                     {                                   // Objects
@@ -170,7 +158,12 @@ namespace EngineFramework
             glfwSetWindowShouldClose(pWindow, true);
         }
 #endif
-
+#if defined(_DEBUG) && defined(PLATFORM_WINDOWS)
+        // If the level editor is active, it will handle rendering the scene.
+        if (LevelEditorSystem::Get_Enable()) {
+            return;
+        }
+#endif
         // Draw scene
         pScene->render();
     }

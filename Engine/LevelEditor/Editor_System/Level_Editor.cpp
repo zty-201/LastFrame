@@ -21,6 +21,7 @@
 #include "GraphicsSystem.h"
 #include "ObjectManager.hpp"
 #include "Save.hpp"
+#include "Screen.hpp"
 
 namespace EngineFramework
 {
@@ -29,9 +30,9 @@ namespace EngineFramework
 	LevelEditor::LevelEditor()
 	{
 		this_system = this;
-		is_enabled = true; //by default it should be set to false
+		is_enabled = false; //by default it should be set to false
 
-		to_open = false;
+		//to_open = false;
 		to_close = false;
 
 		variables.selected_modelID = 0; //zero means none selected
@@ -41,7 +42,10 @@ namespace EngineFramework
 	}
 	LevelEditor::~LevelEditor() {
 
-		ImGui::DestroyContext();
+		//iff the window is closed while level editor is running, rmb to clean
+		if (is_enabled) {
+			Clean();
+		}	
 		LOGI("~LevelEditor() destructor");
 	}
 
@@ -82,6 +86,9 @@ namespace EngineFramework
 		ImGui::GetIO().ConfigDockingTransparentPayload = false;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
+		io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+
 		/*
 		 Check if ImGui needs the keyboard. If so, disable in-game key input.
 		 e.g. Typing into an imgui text field shouldn't move the player.
@@ -113,6 +120,9 @@ namespace EngineFramework
 		/*add the following submenu here*/
 		addFeature("ObjectManager", std::make_unique<ObjectManager>());
 		addFeature("Save", std::make_unique<Save>());
+		addFeature("Screen", std::make_unique<Screen>());
+
+		
 
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {
@@ -126,7 +136,7 @@ namespace EngineFramework
 
 	void LevelEditor::Open()
 	{
-		to_open = false; //after open, set this to false.
+		is_enabled = true;
 		LOGI("app opened"); //okay good check
 	}
 
@@ -167,7 +177,7 @@ namespace EngineFramework
 						ImGui::EndMenu();
 					}
 
-					ImGui::MenuItem("Open Existing", NULL);
+					ImGui::MenuItem("Open Existing", NULL, &featureFlag("Screen"));
 					ImGui::Separator();
 					ImGui::MenuItem("Save", NULL, &featureFlag("Save"));
 					ImGui::MenuItem("Save As ..", NULL);
@@ -203,6 +213,7 @@ namespace EngineFramework
 
 		}
 
+
 		ImGui::PopStyleColor();
 		ImGui::End();
 
@@ -219,7 +230,17 @@ namespace EngineFramework
 
 	void LevelEditor::Run()
 	{
-		//std::cout << "yo!\n";
+		// 1. Render the entire 3D scene into our off-screen framebuffer (FBO).
+		GraphicsSystem::GetInstance().GetScene()->render();
+
+		// 2. Now that the FBO is populated, we can prepare to draw the UI.
+		// First, clear the MAIN WINDOW to a background color. This gives ImGui a clean slate to draw on.
+		// We bind framebuffer 0 (the screen) just to be explicit.
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // A dark background for the editor
+		glClear(GL_COLOR_BUFFER_BIT); // We only need to clear the color buffer for the UI
+
+
 		// Start ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -244,9 +265,11 @@ namespace EngineFramework
 
 	void LevelEditor::Close()
 	{
-		ImGui_ImplOpenGL3_Shutdown();  // OpenGL backend
-		ImGui_ImplGlfw_Shutdown();     // GLFW backend
-		ImGui::DestroyContext();
+		//for item such as pointer or stack should be released, no point for editor to be holding it
+		for (auto& [name, feature] : featureMap) {	
+			feature->Close();		
+		}
+		
 		to_close = false; //after closing, set this to false.
 		is_enabled = false;
 	}
@@ -254,21 +277,13 @@ namespace EngineFramework
 	void LevelEditor::Clean() {
 
 		//when the game is exited, we should clean this up to prevent mem leak
+		ImGui_ImplOpenGL3_Shutdown();  // OpenGL backend
+		ImGui_ImplGlfw_Shutdown();     // GLFW backend
+		ImGui::DestroyContext();
+		LOGI("cleaned");
 	}
 
-	void LevelEditor::Toggle() {
-
-		if (is_enabled) {
-			//if is_enabled = true, then we toggle, so we are closing now
-			to_close = true;
-		}
-		else {
-			//if is_enabled = false, then we toggle, so we are opening now
-			to_open = true;
-		}
-
-		is_enabled = !is_enabled;
-	}
+	
 
 }
 #endif

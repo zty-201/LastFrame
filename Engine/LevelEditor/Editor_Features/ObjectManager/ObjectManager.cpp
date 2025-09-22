@@ -52,7 +52,7 @@ namespace EngineFramework
 
     }
     void ObjectManager::Close() {
-
+        LOGI("object manager closed");
     }
 
 }

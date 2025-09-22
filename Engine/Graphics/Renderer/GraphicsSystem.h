@@ -54,6 +54,7 @@ namespace EngineFramework
         GLFWwindow* GetGLFWwindow() { return pWindow; }
 #endif
 		std::unique_ptr<Scene>& GetScene() { return pScene; }
+		GLuint GetSceneTextureID() const { return sceneTextureID; }
 		bool IsAltDown() const { return alt_down; }
 		bool IsLButtonDown() const { return lbutton_down; }
 		bool IsRButtonDown() const { return rbutton_down; }
@@ -67,14 +68,15 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
 		GLFWwindow* pWindow = nullptr;
 #endif
+        GLuint sceneTextureID;
+
         glm::vec2 screen = { WIDTH,HEIGHT };
         glm::vec3 fogColor; // Example: gray fog color
         float fogMinDist;
         float fogMaxDist;
         int shadingModel;
         // Setup methods
-        void SetupWindow();
-        void SetupImGui();
+        void SetupGLFW();
         void SetupGraphics();
 
         bool lbutton_down = false;
