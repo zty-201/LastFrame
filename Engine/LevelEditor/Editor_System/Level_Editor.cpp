@@ -230,9 +230,8 @@ namespace EngineFramework
 
 	void LevelEditor::Run()
 	{
-		// 1. Render the entire 3D scene into our off-screen framebuffer (FBO).
-		GraphicsSystem::GetInstance().GetScene()->render();
-
+		//1. Level Editor Update loop should run after Graphics System Update Loop, to allow the scene to draw to framebuffer.
+		
 		// 2. Now that the FBO is populated, we can prepare to draw the UI.
 		// First, clear the MAIN WINDOW to a background color. This gives ImGui a clean slate to draw on.
 		// We bind framebuffer 0 (the screen) just to be explicit.

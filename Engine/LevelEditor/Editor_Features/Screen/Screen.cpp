@@ -59,9 +59,12 @@ namespace EngineFramework
         static ImVec2 available_size_old = available_size;
         static bool first_init = true;
 
+        //Resize window on first initialization.
         if (first_init) {
-
-            GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
+            Event_Window_Resized window_resize;
+            window_resize.width = static_cast<int>(available_size.x);
+            window_resize.height = static_cast<int>(available_size.y);
+            event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
             first_init = false;
         }
 
@@ -70,7 +73,10 @@ namespace EngineFramework
         {
             //resize when the screen size changes		
             //std::cout << "x: " << available_size.x << "y: " << available_size.y << std::endl;
-            GraphicsSystem::GetInstance().GetScene().get()->resize((int)available_size.x, (int)available_size.y);
+            Event_Window_Resized window_resize;
+            window_resize.width = static_cast<int>(available_size.x);
+            window_resize.height = static_cast<int>(available_size.y);
+            event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
         }
 
         ImGui::Image((void*)(intptr_t)GraphicsSystem::GetInstance().GetSceneTextureID(),
@@ -78,7 +84,6 @@ namespace EngineFramework
             ImVec2(0, 1), ImVec2(1, 0));
 
         available_size_old = available_size;
-
     }
 
     void Screen::camera_controls_outside_screen() {

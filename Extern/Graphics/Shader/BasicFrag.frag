@@ -291,6 +291,7 @@ layout(binding=0) uniform samplerCube CubeMapTex;
 
 void skyboxPass() 
 {
+    //It does not write to the depth buffer, but does use depth testing. Thus, it only writes where there are no fragments with depth set.
     // Access the cube map texture
     vec3 color = texture(CubeMapTex, normalize(Vec)).rgb;
 

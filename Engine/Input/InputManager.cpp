@@ -150,8 +150,10 @@ namespace EngineFramework
     void InputManager::WindowSizeCallback(GLFWwindow* window, int width, int height)
     {
 		UNREFERENCED_PARAMETER(window);
-        auto& pScene = GraphicsSystem::GetInstance().GetScene();
-        pScene->resize(width, height);
+        Event_Window_Resized window_resize;
+        window_resize.width = width;
+        window_resize.height = height;
+        event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
     }
 #endif
     void InputManager::ErrorCallback(int error, const char* description)
