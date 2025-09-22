@@ -18,6 +18,57 @@ namespace EngineFramework {
         android_asset_manager = static_cast<AAssetManager*>(asset_manager);
     }
 #endif
+
+    /*
+            Cross-platform reading of data from file.
+        */
+    std::vector<unsigned char> AssetManagerSystem::GetDataFromFile(const std::filesystem::path& path)
+    {
+#ifdef PLATFORM_ANDROID
+        
+        std::vector<unsigned char> buffer{};
+        if (!android_asset_manager)
+        {
+            throw std::invalid_argument("AAssetManager is not initialized in AssetManager");
+        }
+
+        LOGD("Opening Asset: %s", path.c_str());
+        AAsset* asset = AAssetManager_open(android_asset_manager, path.c_str(), AASSET_MODE_BUFFER);
+        if (!asset)
+        {
+            throw std::runtime_error("Failed to open asset: " + path.string());
+        }
+
+        /*
+            Get Asset struct from AAssetManager, and read it into the buffer.
+        */
+
+        off_t size = AAsset_getLength(asset);
+        buffer.resize(size);
+        
+        int bytesRead = AAsset_read(asset, buffer.data(), size);
+        if (bytesRead != size)
+        {
+            AAsset_close(asset);
+            throw std::runtime_error("Failed to read entire asset: " + path.string());
+        }
+
+        AAsset_close(asset);
+        return buffer;
+#endif
+#ifdef PLATFORM_WINDOWS
+        // open the file:
+        std::ifstream file(path, std::ios::binary);
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Failed to open asset: " + path.string());
+        }
+        // read the data:
+        return std::vector<unsigned char>((std::istreambuf_iterator<char>(file)),
+            std::istreambuf_iterator<char>());
+#endif
+    }
+
 #ifndef DISABLE_ASSET_INPUT
 
     // -------- small helpers --------

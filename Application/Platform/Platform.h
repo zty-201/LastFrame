@@ -3,6 +3,7 @@
 */
 #ifndef PLATFORM_H
 #define PLATFORM_H
+
 // Platform detection
 #ifdef _WIN32
 #define PLATFORM_WINDOWS

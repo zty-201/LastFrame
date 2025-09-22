@@ -4,8 +4,7 @@
 // For loading textures
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
-
+#include "AssetManager.hpp"
 //
     // This function utilizes the stb_image library for loading image files and OpenGL 
     // for creating and handling the texture.
@@ -26,10 +25,14 @@ GLuint loadTexture(const char* filename)
     // while many image formats (like PNG) have their origin at the top-left.
     stbi_set_flip_vertically_on_load(true);
 
-    // Load the image data from the file using stb_image's stbi_load function
+
+    //Load using cross-platform compatible function.
+    std::vector<unsigned char> texture_data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path(filename));
+
+    // Load the image data from the buffer using stb_image's stbi_load function
     // This will fill in the width, height, and bytesPerPix (number of channels)
     // The '4' argument tells stb_image to load the image as RGBA (4 channels).
-    unsigned char* data = stbi_load(filename, &width, &height, &bytesPerPix, 4);
+    unsigned char* data = stbi_load_from_memory(texture_data.data(), static_cast<int>(texture_data.size()), &width, &height, &bytesPerPix, 4);
 
     // If the image fails to load (data is null), throw an exception with the filename
     if (!data)
@@ -92,7 +95,10 @@ GLuint loadHdrCubeMap(const std::initializer_list<const char*> filenames)
         GLint w, h; // Variables to store the width and height of the texture
 
         // Load the HDR image data for the current file
-        float* data = stbi_loadf(filename, &w, &h, NULL, 3);
+        //Load using cross-platform compatible function.
+        std::vector<unsigned char> hdr_data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path(filename));
+
+        float* data = stbi_loadf_from_memory(hdr_data.data(), static_cast<int>(hdr_data.size()), &w, &h, NULL, 3);
 
         if (!data) // Throw an exception if the file cannot be loaded
             throw std::runtime_error(std::string("file ") + filename + " not found.");

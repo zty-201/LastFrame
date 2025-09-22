@@ -9,7 +9,7 @@
 
 #include "pch.hpp"
 #include "ShaderProgram.h"
-
+#include "AssetManager.hpp"
 // Function to convert OpenGL shader data type enums to strings.
 const char* getTypeString(GLenum type)
 {
@@ -88,16 +88,11 @@ void ShaderProgram::detachAndDeleteShaderObjects()
 // Compile a shader from a file.
 void ShaderProgram::compileShaderFile(const char* fileName, GLenum type)
 {
-    std::ifstream inFile(fileName, std::ios::in);  // Open shader file.
-    if (!inFile)  // If file cannot be opened, throw an error.
-        throw std::runtime_error(std::string("Unable to open: ") + fileName);
-
-    // Read file contents into a string stream.
-    std::stringstream code;
-    code << inFile.rdbuf();
-    inFile.close();
-
-    compileShader(code.str().c_str(), type);  // Compile the shader using the code read from the file.
+    //Load using cross-platform compatible function.
+    std::vector<unsigned char> file_data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path(fileName));
+    //A null-terminated string is expected.
+    file_data.push_back('\0');
+    compileShader(reinterpret_cast<char*>(file_data.data()), type);  // Compile the shader using the code read from the file.
 }
 
 // Compile a shader from source code.

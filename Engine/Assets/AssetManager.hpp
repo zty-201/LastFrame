@@ -49,6 +49,12 @@ namespace EngineFramework {
          */
         AssetManagerSystem();
         static AssetManagerSystem& GetInstance();
+
+        /*
+            Cross-platform reading of data from file.
+        */
+        static std::vector<unsigned char> GetDataFromFile(const std::filesystem::path& path);
+
 #ifdef PLATFORM_ANDROID
         static void SetAndroidAssetManager(void* android_asset_manager);
 #endif

@@ -9,8 +9,6 @@
 class LevelEditor; //forward declaration
 #endif
 
-
-
 namespace EngineFramework
 {
 
