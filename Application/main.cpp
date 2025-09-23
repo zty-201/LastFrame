@@ -14,6 +14,12 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "pch.hpp"
 //Measurement of delta time.
 #include <chrono>
+// For the profiler
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <iomanip>
+
 #include "main.hpp"
 #include "GraphicsSystem.h" // Include GraphicsSystem header
 #include "Input/InputManager.hpp"
@@ -192,19 +198,50 @@ void Game_Update()
 	static int frames = 0;
 	acc_ms += Profiler::I().FrameMS();
 	frames++;
-	if (acc_ms >= 1000.0) {
-		std::cout << "[Profiler] Frame: " << Profiler::I().FrameMS() << " ms, FPS " << Profiler::I().FPS() << "\n";
 
-		for (const auto& kv : Profiler::I().Sections()) {
-			const auto& name = kv.first;
-			const auto& sec = kv.second;
-			const double per_call = (sec.calls ? sec.ms / sec.calls : 0.0);
-			std::cout << " " << name << " : " << sec.ms << " ms" << " (calls " << sec.calls << ", " << per_call << " ms/call)\n";
+	if (acc_ms >= 1000.0) {
+		auto& P = Profiler::I();
+		const double frame = std::max(1e-6, P.FrameMS());
+
+		double update_all = frame;
+		if (auto it = P.Sections().find("Frame::UpdateAll"); it != P.Sections().end()) {
+			update_all = std::max(1e-6, it->second.ms);
+		}
+
+		std::cout << std::fixed << std::setprecision(4);
+		std::cout << "[Profiler] Frame: " << P.FrameMS() << " ms, FPS " << std::setprecision(1) << P.FPS() << "\n";
+		std::cout << std::setprecision(4);
+
+		// Copy and sort the sections by time in descending order
+		std::vector<std::pair<std::string, Diagnostics::Section>> rows(P.Sections().begin(), P.Sections().end());
+		std::sort(rows.begin(), rows.begin(), [](auto& a, auto& b) {return a.second.ms > b.second.ms; });
+
+		for (auto& [name, sec] : rows) {
+			const double frame_percent = (sec.ms / frame) * 100.0;
+			const double engine_update_percent = (sec.ms / update_all) * 100.0;
+			const double per_call = sec.calls ? sec.ms / sec.calls : 0.0;
+
+			std::cout << " " << name << " : " << sec.ms << " ms" << " (calls " << sec.calls << ", " << per_call << " ms/call)"
+				<< " [" << std::setprecision(1) << engine_update_percent << "% of UpdateAll, " << frame_percent << "% of Frame]\n" << std::setprecision(4);
 		}
 		std::cout << "--------------------------------------\n";
 		acc_ms = 0.0;
-		frames = 0;
+
 	}
+
+	//if (acc_ms >= 1000.0) {
+	//	std::cout << "[Profiler] Frame: " << Profiler::I().FrameMS() << " ms, FPS " << Profiler::I().FPS() << "\n";
+
+	//	for (const auto& kv : Profiler::I().Sections()) {
+	//		const auto& name = kv.first;
+	//		const auto& sec = kv.second;
+	//		const double per_call = (sec.calls ? sec.ms / sec.calls : 0.0);
+	//		std::cout << " " << name << " : " << sec.ms << " ms" << " (calls " << sec.calls << ", " << per_call << " ms/call)\n";
+	//	}
+	//	std::cout << "--------------------------------------\n";
+	//	acc_ms = 0.0;
+	//	frames = 0;
+	//}
 
 	//Send all queued events in order.
 	event_dispatcher.update();
