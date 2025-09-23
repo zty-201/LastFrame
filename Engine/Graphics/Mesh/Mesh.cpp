@@ -1,20 +1,13 @@
 
 #include "pch.hpp"
-#include <fstream>
-#include <sstream>
-#include <map>
-
-#include <glm/gtc/constants.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 #include "Mesh.h"
 
 //
-// The Vertex struct.
-// This class is useful for parsing vertex data from OBJ files and converting them into 
-// indices suitable for OpenGL-based rendering or other 3D graphics workflows.
-//
+    // The Vertex struct.
+    // This class is useful for parsing vertex data from OBJ files and converting them into 
+    // indices suitable for OpenGL-based rendering or other 3D graphics workflows.
+    //
 struct Vertex
 {
     int pIdx;   // Index for the vertex position in the points array.
@@ -64,6 +57,17 @@ void generateCube(std::vector<GLuint>& indices,       // Output vector to store 
     std::vector<GLfloat>& tangents,                  // Output vector to store tangent vectors for the cube.
     GLfloat size = 1.0f);                            // Optional parameter to specify the edge length of the cube. Default is 1.0f.
 
+// Generates a torus (a 3D doughnut shape) with customizable dimensions and resolution.
+void generateTorus(std::vector<GLuint>& indices,      // Output vector to store vertex indices of the torus.
+    std::vector<GLfloat>& points,                    // Output vector to store vertex positions (x, y, z) of the torus.
+    std::vector<GLfloat>& normals,                   // Output vector to store normal vectors for the torus.
+    std::vector<GLfloat>& texCoords,                 // Output vector to store texture coordinates (u, v) for the torus.
+    std::vector<GLfloat>& tangents,                  // Output vector to store tangent vectors for the torus.
+    GLfloat outerRadius = 0.7f,                      // Radius from the center of the torus to the center of its tube. Default is 0.7f.
+    GLfloat innerRadius = 0.3f,                      // Radius of the tube itself. Default is 0.3f.
+    GLuint nsides = 10,                              // Number of subdivisions along the tube's circular cross-section. Default is 10.
+    GLuint nrings = 10);                             // Number of subdivisions along the torus' ring. Default is 10.
+
 // Generates a sphere with the specified radius and resolution.
 void generateSphere(std::vector<GLuint>& indices,     // Output vector to store vertex indices of the sphere.
     std::vector<GLfloat>& points,                    // Output vector to store vertex positions (x, y, z) of the sphere.
@@ -81,7 +85,6 @@ void generateSkyBox(std::vector<GLuint>& indices,     // Output vector to store 
     std::vector<GLfloat>& texCoords,                 // Output vector to store texture coordinates (u, v) for the skybox.
     std::vector<GLfloat>& tangents,                  // Output vector to store tangent vectors for the skybox.
     GLfloat size = 100.0f);                          // Size of the skybox cube. Default is 100.0f.
-
 
 // Generates a mesh from an external file, typically an OBJ or similar format.
 void generate(const char* fileName,                  // Path to the mesh file.
@@ -103,6 +106,8 @@ TriangleMesh::TriangleMesh(const char* fileName /*= ""*/)
         generatePlane(indices, points, normals, texCoords, tangents);
     else if (!strcmp(fileName, "Cube"))
         generateCube(indices, points, normals, texCoords, tangents);
+    else if (!strcmp(fileName, "Torus"))
+        generateTorus(indices, points, normals, texCoords, tangents);
     else if (!strcmp(fileName, "Sphere"))
         generateSphere(indices, points, normals, texCoords, tangents);
     else if (!strcmp(fileName, "SkyBox"))
@@ -120,14 +125,14 @@ void generateQuad(std::vector<GLuint>& indices,         // Output vector to stor
     std::vector<GLfloat>& tangents,                    // Output vector to store tangent vectors.
     GLfloat side /*= 2.0f*/)                           // Optional parameter specifying the length of each side. Default is 2.0f.
 {
-	UNREFERENCED_PARAMETER(tangents); // Tangents are not calculated in this function.  
+    UNREFERENCED_PARAMETER(tangents);
     const GLfloat side2 = side / 2.0f; // Calculate half the side length for positioning the vertices.
 
     // Define the vertex positions of the quad (counterclockwise order).
     points = {
         -side2, -side2, 0.0f, // Bottom-left vertex
-            side2, -side2, 0.0f, // Bottom-right vertex
-            side2,  side2, 0.0f, // Top-right vertex
+         side2, -side2, 0.0f, // Bottom-right vertex
+         side2,  side2, 0.0f, // Top-right vertex
         -side2,  side2, 0.0f  // Top-left vertex
     };
 
@@ -165,19 +170,19 @@ void generatePlane(std::vector<GLuint>& indices,        // Output vector to stor
     std::vector<GLfloat>& texCoords,    // Output vector to store texture coordinates (u, v).
     std::vector<GLfloat>& tangents)     // Output vector to store tangent vectors.
 {
-    UNREFERENCED_PARAMETER(tangents); // Tangents are not calculated in this function.  
+    UNREFERENCED_PARAMETER(tangents);
     const GLfloat side = 4.0f; // Define the side length of the grid spacing in both X and Z directions.
 
     // Define vertex positions for the plane (3x3 grid of vertices in the XZ plane, with Y=0).
     points = {
-        -side,  0.0f,   -side,  // Bottom-left
-            0,  0.0f,   -side,  // Bottom-center
+       -side,  0.0f,   -side,  // Bottom-left
+           0,  0.0f,   -side,  // Bottom-center
         side,  0.0f,   -side,  // Bottom-right
-        -side,  0.0f,    0.0f,  // Middle-left
-            0,  0.0f,    0.0f,  // Center
+       -side,  0.0f,    0.0f,  // Middle-left
+           0,  0.0f,    0.0f,  // Center
         side,  0.0f,    0.0f,  // Middle-right
-        -side,  0.0f,    side,  // Top-left
-            0,  0.0f,    side,  // Top-center
+       -side,  0.0f,    side,  // Top-left
+           0,  0.0f,    side,  // Top-center
         side,  0.0f,    side   // Top-right
     };
 
@@ -237,40 +242,40 @@ void generateCube(std::vector<GLuint>& indices,       // Output vector for verte
     std::vector<GLfloat>& tangents,    // Output vector for tangent vectors (not calculated here).
     GLfloat side /*= 1.0f*/)           // Length of each side of the cube.
 {
-    UNREFERENCED_PARAMETER(tangents); // Tangents are not calculated in this function.  
+    UNREFERENCED_PARAMETER(tangents);
     // Define vertex positions for each face of the cube.
     // Each face is defined by four vertices in counter-clockwise order.
     points = {
         // Front face
-        -side, -side,  side,   // Bottom-left
+       -side, -side,  side,   // Bottom-left
         side, -side,  side,   // Bottom-right
         side,  side,  side,   // Top-right
-        -side,  side,  side,   // Top-left
-        // Right face
-        side, -side,  side,   // Bottom-left
-        side, -side, -side,   // Bottom-right
-        side,  side, -side,   // Top-right
-        side,  side,  side,   // Top-left
-        // Back face
-        -side, -side, -side,   // Bottom-left
-        -side,  side, -side,   // Top-left
-        side,  side, -side,   // Top-right
-        side, -side, -side,   // Bottom-right
-        // Left face
-        -side, -side,  side,   // Bottom-right
-        -side,  side,  side,   // Top-right
-        -side,  side, -side,   // Top-left
-        -side, -side, -side,   // Bottom-left
-        // Bottom face
-        -side, -side,  side,   // Front-left
-        -side, -side, -side,   // Back-left
-        side, -side, -side,   // Back-right
-        side, -side,  side,   // Front-right
-        // Top face
-        -side,  side,  side,   // Front-left
-        side,  side,  side,   // Front-right
-        side,  side, -side,   // Back-right
-        -side,  side, -side    // Back-left
+       -side,  side,  side,   // Top-left
+       // Right face
+       side, -side,  side,   // Bottom-left
+       side, -side, -side,   // Bottom-right
+       side,  side, -side,   // Top-right
+       side,  side,  side,   // Top-left
+       // Back face
+      -side, -side, -side,   // Bottom-left
+      -side,  side, -side,   // Top-left
+       side,  side, -side,   // Top-right
+       side, -side, -side,   // Bottom-right
+       // Left face
+      -side, -side,  side,   // Bottom-right
+      -side,  side,  side,   // Top-right
+      -side,  side, -side,   // Top-left
+      -side, -side, -side,   // Bottom-left
+      // Bottom face
+     -side, -side,  side,   // Front-left
+     -side, -side, -side,   // Back-left
+      side, -side, -side,   // Back-right
+      side, -side,  side,   // Front-right
+      // Top face
+     -side,  side,  side,   // Front-left
+      side,  side,  side,   // Front-right
+      side,  side, -side,   // Back-right
+     -side,  side, -side    // Back-left
     };
 
     // Define normal vectors for each face of the cube.
@@ -283,11 +288,11 @@ void generateCube(std::vector<GLuint>& indices,       // Output vector for verte
         // Back face
         0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,
         // Left face
-        -1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  0.0f,
-        // Bottom face
-        0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-        // Top face
-        0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f
+       -1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  0.0f,
+       // Bottom face
+       0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+       // Top face
+       0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f
     };
 
     // Define texture coordinates for each face.
@@ -321,6 +326,105 @@ void generateCube(std::vector<GLuint>& indices,       // Output vector for verte
     // Note: Tangents are not calculated here, but the vector is prepared to be populated if needed.
 }
 
+
+// Generates a torus (donut-shaped 3D object) with specified parameters.
+// The torus is constructed as a mesh of triangles.
+void generateTorus(std::vector<GLuint>& indices,        // Output vector for vertex indices.
+    std::vector<GLfloat>& points,       // Output vector for vertex positions (x, y, z).
+    std::vector<GLfloat>& normals,      // Output vector for normal vectors (x, y, z).
+    std::vector<GLfloat>& texCoords,    // Output vector for texture coordinates (u, v).
+    std::vector<GLfloat>& tangents,     // Output vector for tangent vectors (not calculated here).
+    GLfloat outerRadius /*= 0.7f*/,     // Radius of the torus ring (distance from the center to the tube center).
+    GLfloat innerRadius /*= 0.3f*/,     // Radius of the torus tube.
+    GLuint nsides /*= 10*/,             // Number of sides (segments around the tube).
+    GLuint nrings /*= 10*/)             // Number of rings (segments around the torus).
+{
+    UNREFERENCED_PARAMETER(tangents);
+    const int nFaces = nsides * nrings;                // Total number of faces (quads).
+    const int nVerts = nsides * (nrings + 1);          // Total number of vertices (extra ring to duplicate the first ring).
+
+    // Resize output vectors to accommodate the required data.
+    points.resize(3 * nVerts);                         // Each vertex has 3 coordinates (x, y, z).
+    normals.resize(3 * nVerts);                        // Each vertex has 3 normal components (x, y, z).
+    texCoords.resize(2 * nVerts);                      // Each vertex has 2 texture coordinates (u, v).
+    indices.resize(6 * nFaces);                        // Each face (quad) consists of 2 triangles (6 indices).
+
+    // Factors to calculate angles for rings and sides.
+    float ringFactor = glm::two_pi<float>() / nrings;  // Angle increment per ring.
+    float sideFactor = glm::two_pi<float>() / nsides;  // Angle increment per side.
+
+    // Generate the vertex data.
+    int idx = 0;                                       // Index for position and normal data.
+    int tidx = 0;                                      // Index for texture coordinate data.
+    for (GLuint ring = 0; ring <= nrings; ring++)      // Iterate through each ring (include extra ring).
+    {
+        float u = ring * ringFactor;                   // Current angle around the torus ring.
+        float cu = cosf(u);                            // Cosine of the angle for x and z.
+        float su = sinf(u);                            // Sine of the angle for x and z.
+
+        for (GLuint side = 0; side < nsides; side++)   // Iterate through each segment of the torus tube.
+        {
+            float v = side * sideFactor;               // Current angle around the tube.
+            float cv = cosf(v);                        // Cosine for tube radius.
+            float sv = sinf(v);                        // Sine for tube radius.
+            float r = outerRadius + innerRadius * cv;  // Radial position of the vertex.
+
+            // Calculate vertex position.
+            points[idx] = r * cu;                      // x-coordinate.
+            points[idx + 1] = innerRadius * sv;        // y-coordinate.
+            points[idx + 2] = r * su;                  // z-coordinate.
+
+            // Calculate normal vector.
+            normals[idx] = cv * cu * r;                // Normal x-component.
+            normals[idx + 1] = sv * r;                 // Normal y-component.
+            normals[idx + 2] = cv * su * r;            // Normal z-component.
+
+            // Calculate texture coordinates.
+            texCoords[tidx] = u / glm::two_pi<float>(); // Texture u-coordinate (ring).
+            texCoords[tidx + 1] = v / glm::two_pi<float>(); // Texture v-coordinate (side).
+
+            tidx += 2;                                 // Advance texture coordinate index.
+
+            // Normalize the normal vector.
+            float len = sqrtf(normals[idx] * normals[idx] +
+                normals[idx + 1] * normals[idx + 1] +
+                normals[idx + 2] * normals[idx + 2]); // Length of the normal vector.
+            normals[idx] /= len;                       // Normalize x-component.
+            normals[idx + 1] /= len;                   // Normalize y-component.
+            normals[idx + 2] /= len;                   // Normalize z-component.
+
+            idx += 3;                                  // Advance position/normal index.
+        }
+    }
+
+    // Generate the index data for the mesh.
+    idx = 0;
+    for (GLuint ring = 0; ring < nrings; ring++)       // Iterate through each ring.
+    {
+        GLuint ringStart = ring * nsides;              // Starting index of the current ring.
+        GLuint nextRingStart = (ring + 1) * nsides;    // Starting index of the next ring.
+
+        for (GLuint side = 0; side < nsides; side++)   // Iterate through each segment of the tube.
+        {
+            int nextSide = (side + 1) % nsides;        // Wrap around for the last segment.
+
+            // Define the two triangles for the current quad.
+            indices[idx] = ringStart + side;           // First triangle: bottom-left.
+            indices[idx + 1] = nextRingStart + side;   // First triangle: top-left.
+            indices[idx + 2] = nextRingStart + nextSide; // First triangle: top-right.
+
+            indices[idx + 3] = ringStart + side;       // Second triangle: bottom-left.
+            indices[idx + 4] = nextRingStart + nextSide; // Second triangle: top-right.
+            indices[idx + 5] = ringStart + nextSide;   // Second triangle: bottom-right.
+
+            idx += 6;                                  // Advance index count.
+        }
+    }
+
+    // Note: Tangents are not calculated here, but the vector is prepared to be populated if needed.
+}
+
+
 // Generates a sphere mesh with specified parameters.
 // The sphere is constructed as a mesh of triangles.
 void generateSphere(std::vector<GLuint>& indices,        // Output vector for vertex indices.
@@ -332,7 +436,7 @@ void generateSphere(std::vector<GLuint>& indices,        // Output vector for ve
     GLuint nSlices /*= 20*/,           // Number of slices (longitudinal divisions).
     GLuint nStacks /*= 20*/)           // Number of stacks (latitudinal divisions).
 {
-    UNREFERENCED_PARAMETER(tangents); // Tangents are not calculated in this function.  
+    UNREFERENCED_PARAMETER(tangents);
     // Calculate the total number of vertices and faces.
     const int nVerts = (nSlices + 1) * (nStacks + 1);    // Total number of vertices (include duplicate for seamless wrapping).
     const int nFaces = (nSlices * 2 * (nStacks - 1)) * 3; // Total number of face indices (triangles).
@@ -439,8 +543,8 @@ void generateSkyBox(std::vector<GLuint>& indices,        // Output vector for ve
     std::vector<GLfloat>& tangents,     // Output vector for tangent vectors (not calculated here).
     GLfloat side /*= 50.0f*/)           // Length of a side of the cube.
 {
-	UNREFERENCED_PARAMETER(texCoords); // Texture coordinates are not used for a skybox.
-    UNREFERENCED_PARAMETER(tangents); // Tangents are not calculated in this function.  
+    UNREFERENCED_PARAMETER(tangents);
+    UNREFERENCED_PARAMETER(texCoords);
     // Half the length of the side, used to center the cube at the origin.
     const GLfloat side2 = side / 2.0f;
 
@@ -448,40 +552,40 @@ void generateSkyBox(std::vector<GLuint>& indices,        // Output vector for ve
     // Each face is defined as a quad made of 4 vertices.
     points = {
         // Front face
-        -side2, -side2,  side2,   // Bottom-left
+       -side2, -side2,  side2,   // Bottom-left
         side2, -side2,  side2,   // Bottom-right
         side2,  side2,  side2,   // Top-right
-        -side2,  side2,  side2,   // Top-left
+       -side2,  side2,  side2,   // Top-left
 
-        // Right face
-        side2, -side2,  side2,   // Bottom-front
-        side2, -side2, -side2,   // Bottom-back
-        side2,  side2, -side2,   // Top-back
-        side2,  side2,  side2,   // Top-front
+       // Right face
+       side2, -side2,  side2,   // Bottom-front
+       side2, -side2, -side2,   // Bottom-back
+       side2,  side2, -side2,   // Top-back
+       side2,  side2,  side2,   // Top-front
 
-        // Back face
-        -side2, -side2, -side2,   // Bottom-right
-        -side2,  side2, -side2,   // Top-right
-        side2,  side2, -side2,   // Top-left
-        side2, -side2, -side2,   // Bottom-left
+       // Back face
+      -side2, -side2, -side2,   // Bottom-right
+      -side2,  side2, -side2,   // Top-right
+       side2,  side2, -side2,   // Top-left
+       side2, -side2, -side2,   // Bottom-left
 
-        // Left face
-        -side2, -side2,  side2,   // Bottom-front
-        -side2,  side2,  side2,   // Top-front
-        -side2,  side2, -side2,   // Top-back
-        -side2, -side2, -side2,   // Bottom-back
+       // Left face
+      -side2, -side2,  side2,   // Bottom-front
+      -side2,  side2,  side2,   // Top-front
+      -side2,  side2, -side2,   // Top-back
+      -side2, -side2, -side2,   // Bottom-back
 
-        // Bottom face
-        -side2, -side2,  side2,   // Front-left
-        -side2, -side2, -side2,   // Back-left
-        side2, -side2, -side2,   // Back-right
-        side2, -side2,  side2,   // Front-right
+      // Bottom face
+     -side2, -side2,  side2,   // Front-left
+     -side2, -side2, -side2,   // Back-left
+      side2, -side2, -side2,   // Back-right
+      side2, -side2,  side2,   // Front-right
 
-        // Top face
-        -side2,  side2,  side2,   // Front-left
-        side2,  side2,  side2,   // Front-right
-        side2,  side2, -side2,   // Back-right
-        -side2,  side2, -side2    // Back-left
+      // Top face
+     -side2,  side2,  side2,   // Front-left
+      side2,  side2,  side2,   // Front-right
+      side2,  side2, -side2,   // Back-right
+     -side2,  side2, -side2    // Back-left
     };
 
     // Normals are not used for a skybox as it is typically rendered without shading.
@@ -518,7 +622,6 @@ void generateSkyBox(std::vector<GLuint>& indices,        // Output vector for ve
 
     // Note: Texture coordinates and tangents are not calculated here, as skyboxes generally do not require them.
 }
-
 
 void generate(const char* fileName,
     std::vector<GLuint>& indices,
@@ -728,4 +831,3 @@ void generate(const char* fileName,
     }
 
 }
-

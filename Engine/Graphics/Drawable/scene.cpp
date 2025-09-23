@@ -1,26 +1,20 @@
-
 #include "pch.hpp"
-#include <stdexcept>
-#include <sstream>   
-#include <fstream>
-
 #include "Scene.h"
 
 // For loading textures
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
-
+#include "AssetManager.hpp"
 //
-// This function utilizes the stb_image library for loading image files and OpenGL 
-// for creating and handling the texture.
-// 
-// GLuint: The function returns a GLuint, which is a type used by OpenGL 
-//          to represent an identifier for the texture. This value is used 
-//          later to refer to the texture in rendering operations.
-// const char* filename: This parameter takes a string representing the file path 
-//          of the image from which the texture is to be loaded.
-//
+    // This function utilizes the stb_image library for loading image files and OpenGL 
+    // for creating and handling the texture.
+    // 
+    // GLuint: The function returns a GLuint, which is a type used by OpenGL 
+    //          to represent an identifier for the texture. This value is used 
+    //          later to refer to the texture in rendering operations.
+    // const char* filename: This parameter takes a string representing the file path 
+    //          of the image from which the texture is to be loaded.
+    //
 GLuint loadTexture(const char* filename)
 {
     // Declare variables for the image's width, height, and the number of bytes per pixel
@@ -31,10 +25,14 @@ GLuint loadTexture(const char* filename)
     // while many image formats (like PNG) have their origin at the top-left.
     stbi_set_flip_vertically_on_load(true);
 
-    // Load the image data from the file using stb_image's stbi_load function
+
+    //Load using cross-platform compatible function.
+    std::vector<unsigned char> texture_data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path(filename));
+
+    // Load the image data from the buffer using stb_image's stbi_load function
     // This will fill in the width, height, and bytesPerPix (number of channels)
     // The '4' argument tells stb_image to load the image as RGBA (4 channels).
-    unsigned char* data = stbi_load(filename, &width, &height, &bytesPerPix, 4);
+    unsigned char* data = stbi_load_from_memory(texture_data.data(), static_cast<int>(texture_data.size()), &width, &height, &bytesPerPix, 4);
 
     // If the image fails to load (data is null), throw an exception with the filename
     if (!data)
@@ -97,7 +95,10 @@ GLuint loadHdrCubeMap(const std::initializer_list<const char*> filenames)
         GLint w, h; // Variables to store the width and height of the texture
 
         // Load the HDR image data for the current file
-        float* data = stbi_loadf(filename, &w, &h, NULL, 3);
+        //Load using cross-platform compatible function.
+        std::vector<unsigned char> hdr_data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path(filename));
+
+        float* data = stbi_loadf_from_memory(hdr_data.data(), static_cast<int>(hdr_data.size()), &w, &h, NULL, 3);
 
         if (!data) // Throw an exception if the file cannot be loaded
             throw std::runtime_error(std::string("file ") + filename + " not found.");
@@ -243,129 +244,118 @@ void Scene::Pass::Object::setBuffers(const char* meshName)
     glBindVertexArray(0);
 }
 
-//
-// The function orchestrates the rendering process for a scene by iterating through a series 
-// of rendering passes. This function handles various stages of the rendering pipeline, 
-// including framebuffer setup, shader configuration, texture binding, lighting, 
-// and object rendering, making it versatile for multi-pass rendering in OpenGL.
-//
 void Scene::render()
 {
-    static GLuint currentHandle = 0xFFFFFF;
+    glEnable(GL_DEPTH_TEST);
 
-    int i = 0;
-
-    // Iterate through all rendering passes
-    for (const Scene::Pass& pass : passes)
+    int passIndex = 0;
+    for (const auto& pass : passes)
     {
-        // Set the framebuffer object (FBO) as the render target
+        // --- 1. SETUP THE PASS RENDER TARGET AND STATE ---
+        glBindFramebuffer(GL_FRAMEBUFFER, pass.fbo.handle);
 
-        // Check if framebuffer is already bound to improve performance 
-        // by avoiding unnecessary bindings
-        if (currentHandle != pass.fbo.handle)
+        // Only clear the buffers for the VERY FIRST pass.
+        // Subsequent passes (like the skybox) will draw on top of the existing content.
+        if (passIndex == 0)
         {
-            glBindFramebuffer(GL_FRAMEBUFFER, pass.fbo.handle);
-            currentHandle = pass.fbo.handle;
+            glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
-        // Set the pass number and other parameters for rendering if any
-        shader.use();
-        shader.setUniform("Pass", i++);
-        if (pass.setUniformCallback)
-            pass.setUniformCallback(shader);
-        shader.disuse();
-
-        // Configure the viewport if specified
-        if (pass.viewport.size() == 4)
+        if (pass.viewport.size() == 4) {
             glViewport(pass.viewport[0], pass.viewport[1], pass.viewport[2], pass.viewport[3]);
-
-        // Clear the color buffer if a clear color is specified
-        if (pass.clearColor.size() == 4)
-        {
-            glClearColor(pass.clearColor[0], pass.clearColor[1], pass.clearColor[2], pass.clearColor[3]);
-            glClear(GL_COLOR_BUFFER_BIT);
         }
 
-        // Set and clear the depth buffer
-        if (pass.enableDepthBuffer.size() > 0)
-        {
-            GLboolean enableDepthTest;
-            glGetBooleanv(GL_DEPTH_TEST, &enableDepthTest);
+        glDepthFunc(pass.depthMode);
 
-            // Enable or disable depth testing based on the pass settings
-            if (enableDepthTest)
-                if (pass.enableDepthBuffer[0])
-                    glClear(GL_DEPTH_BUFFER_BIT);
-                else
-                {
-                    glDisable(GL_DEPTH_TEST);
-                    glClear(GL_DEPTH_BUFFER_BIT);
-                }
-            else
-                if (pass.enableDepthBuffer[0])
-                {
-                    glEnable(GL_DEPTH_TEST);
-                    glClear(GL_DEPTH_BUFFER_BIT);
-                }
+        // Set state based on whether this is a scene pass or skybox pass
+        if (pass.depthMode == GL_LEQUAL) // Skybox pass
+        {
+            glDepthMask(GL_FALSE);
+            glDisable(GL_CULL_FACE);
+        }
+        else // Scene pass (GL_LESS)
+        {
+            glDepthMask(GL_TRUE);
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK); // Default to culling back faces
         }
 
-        // Bind textures for the current pass
-        for (const Texture& info : pass.textures)
-            if (info.id)
-            {
-                glActiveTexture(info.channel);
-                glBindTexture(info.target, info.id);
-            }
+        // --- 2. ACTIVATE SHADER AND SET UNIFORMS ---
+        shader.use();
+        shader.setUniform("Pass", passIndex);
 
-        // Configure lighting for the pass
-        for (int idx = 0; idx < pass.lights.size(); ++idx)
-            pass.lights[idx].setUniforms(&shader, idx);
+        if (pass.setUniformCallback) {
+            pass.setUniformCallback(shader);
+        }
 
-
-        glm::mat4 V = glm::mat4(1.0f); // View matrix
-        glm::mat4 P = glm::mat4(1.0f); // Projection matrix
-
-        // If a single camera is used, set its uniforms and update matrices
-        if (pass.cameras.size() == 1)
+        // Set camera matrices
+        glm::mat4 V = glm::mat4(1.0f);
+        glm::mat4 P = glm::mat4(1.0f);
+        if (!pass.cameras.empty())
         {
             pass.cameras[0].setUniforms(&shader);
-
-            if (pass.viewport.size() == 4 && pass.viewport[3])
+            if (pass.viewport.size() == 4 && pass.viewport[3] > 0)
             {
                 V = pass.cameras[0].getLookAt();
                 P = pass.cameras[0].getPerspective((float)pass.viewport[2] / pass.viewport[3]);
             }
         }
-
-        // Set the view and projection matrices in the shader
-        shader.use();
         shader.setUniform("V", V);
         shader.setUniform("P", P);
-        shader.disuse();
 
-        // Render objects for the pass
-        for (const Scene::Pass::Object& object : pass.objects)
-            if (object.isVisible && !object.instances.empty())
-            {
-                for (const Scene::Pass::Object::Instance& instance : object.instances)
-                    if (instance.isVisible)
-                    {
-                        // Set material properties for the instance
-                        instance.material.setUniforms(&shader);
+        // Set lighting uniforms (only for scene pass)
+        for (int i = 0; i < pass.lights.size(); ++i) {
+            pass.lights[i].setUniforms(&shader, i);
+        }
 
-                        // Set the model transformation matrix and render the instance
-                        shader.use();
-                        shader.setUniform("M", instance.modeltransform);
-
-                        glBindVertexArray(object.vao);
-                        glDrawElements(GL_TRIANGLES, (GLsizei)object.size, GL_UNSIGNED_INT, 0);
-                        glBindVertexArray(0);
-
-                        shader.disuse();
-                    }
+        // Bind per-pass textures (only for skybox pass)
+        for (const auto& info : pass.textures) {
+            if (info.id) {
+                glActiveTexture(info.channel);
+                glBindTexture(info.target, info.id);
             }
+        }
 
-        // Ensure all OpenGL commands are finished before moving to the next pass
-        glFinish();
+        // --- 3. RENDER ALL OBJECTS IN THE PASS ---
+        for (const auto& object : pass.objects)
+        {
+            if (!object.isVisible) continue;
+
+            glBindVertexArray(object.vao);
+
+            for (const auto& instance : object.instances)
+            {
+                if (!instance.isVisible) continue;
+
+                // *** FIX: Check for the checkerboard material and flip the culling ***
+                bool isCheckerboard = (instance.material.effect == 3.0f);
+                if (isCheckerboard) {
+                    glCullFace(GL_FRONT); // Cull the front face to see the "back"
+                }
+
+                instance.material.setUniforms(&shader);
+                shader.setUniform("M", instance.modeltransform);
+                glDrawElements(GL_TRIANGLES, (GLsizei)object.size, GL_UNSIGNED_INT, 0);
+
+                // *** FIX: Reset culling back to the default for other objects ***
+                if (isCheckerboard) {
+                    glCullFace(GL_BACK);
+                }
+            }
+        }
+
+        glBindVertexArray(0);
+        shader.disuse();
+        passIndex++;
     }
+
+    // --- FINAL CLEANUP ---
+    // Restore default OpenGL states that ImGui might rely on
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glDepthMask(GL_TRUE);
+
+    // Unbind the FBO to allow ImGui to render to the screen
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

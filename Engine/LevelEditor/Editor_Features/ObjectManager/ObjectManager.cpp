@@ -1,4 +1,4 @@
-#ifdef _DEBUG
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "pch.hpp"
 
 //File management, JSON file parser/writer
@@ -22,7 +22,7 @@
 namespace EngineFramework
 {
     ObjectManager::ObjectManager() {
-        std::cout << "Lfeature: ObjectManager CREATED\n";
+        LOGI("Lfeature: ObjectManager CREATED");
     }
     ObjectManager::~ObjectManager() {
 
@@ -45,14 +45,14 @@ namespace EngineFramework
 
         if (ImGui::Button("Click me")) {
             ++click_count;
-            std::cout << "[ImGui] Button clicked: " << click_count << " times\n";
+            LOGI((std::string("[ImGui] Button clicked: ") + std::to_string(click_count).c_str() + " times").c_str());
         }
 
         ImGui::End();
 
     }
     void ObjectManager::Close() {
-
+        LOGI("object manager closed");
     }
 
 }

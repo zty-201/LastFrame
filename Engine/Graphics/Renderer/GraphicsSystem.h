@@ -4,32 +4,6 @@
 #include "ISystem.hpp"
 #include "Scene.h"
 
-#define ANINSTANCE(x, z)\
-         { MATERIAL_OBJECT, glm::translate(glm::mat4(1.0f), {x, 0.0f, z}) }
-
-#define INSTANCES(x)\
-                   ANINSTANCE(x, -20.0f-5.0f),\
-                   ANINSTANCE(x, -18.0f-5.0f),\
-                   ANINSTANCE(x, -16.0f-5.0f),\
-                   ANINSTANCE(x, -14.0f-5.0f),\
-                   ANINSTANCE(x, -12.0f-5.0f),\
-                   ANINSTANCE(x, -10.0f-5.0f),\
-                   ANINSTANCE(x,  -8.0f-5.0f),\
-                   ANINSTANCE(x,  -6.0f-5.0f),\
-                   ANINSTANCE(x,  -4.0f-5.0f),\
-                   ANINSTANCE(x,  -2.0f-5.0f),\
-                   ANINSTANCE(x,   0.0f-5.0f),\
-                   ANINSTANCE(x,   2.0f-5.0f),\
-                   ANINSTANCE(x,   4.0f-5.0f),\
-                   ANINSTANCE(x,   6.0f-5.0f),\
-                   ANINSTANCE(x,   8.0f-5.0f),\
-                   ANINSTANCE(x,  10.0f-5.0f),\
-                   ANINSTANCE(x,  12.0f-5.0f),\
-                   ANINSTANCE(x,  14.0f-5.0f),\
-                   ANINSTANCE(x,  16.0f-5.0f),\
-                   ANINSTANCE(x,  18.0f-5.0f),\
-                   ANINSTANCE(x,  20.0f-5.0f)
-
 namespace EngineFramework
 {
     class GraphicsSystem : public ISystem
@@ -43,22 +17,51 @@ namespace EngineFramework
         void Update(float deltaTime) override;
         void PostUpdate(float deltaTime) override;
 
-		// Accessor for the scene
-        GLFWwindow* GetGLFWwindow() { return window; }
-		Scene* GetScene() { return &scene; }
-    private:
 
-        Scene scene;
+        static GraphicsSystem& GetInstance()
+        {
+            return *this_graphics_ptr;
+        }
+
+		// Accessor for the scene
+#ifdef PLATFORM_WINDOWS
+        GLFWwindow* GetGLFWwindow() { return pWindow; }
+#endif
+		std::unique_ptr<Scene>& GetScene() { return pScene; }
+		GLuint GetSceneTextureID() const { return sceneTextureID; }
+
+
+    private:
+        std::unique_ptr<Scene> pScene;
+#ifdef PLATFORM_WINDOWS
+		GLFWwindow* pWindow = nullptr;
+#endif
+
+        //Scene Framebuffer and Texture.
+        FBO scene_framebuffer;
+        GLuint sceneTextureID;
+
         glm::vec2 screen = { WIDTH,HEIGHT };
-		GLFWwindow* window = nullptr;
+        glm::vec3 fogColor; // Example: gray fog color
+        float fogMinDist;
+        float fogMaxDist;
+        int shadingModel;
+        static inline GraphicsSystem* this_graphics_ptr = nullptr;
 
         // Setup methods
         void SetupGLFW();
-        void SetupImGui();
         void SetupGraphics();
-        
-        // Callback handling
-        static void ErrorCallback(int error, const char* msg);
+
+        //Toggle drawing to framebuffer.
+        void DrawSceneToFramebuffer(bool);
+
+        //==Event Handlers, one for each type of event.
+
+        //When level editor is toggled on/off.
+        void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
+        //When drawing area should be resized.
+        void HANDLE_EVENT_WindowResized(Event_Window_Resized&);
+
     };
 }
 

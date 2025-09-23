@@ -12,6 +12,7 @@ Includes:
 - Moving a file
 - Adding a folder
 - Pulling git (files may have changed)
+
 0. Ensure no folder path has spaces in them.
 - The CMake tries to account for this, but it's not made for it.
 1. Add library to CMake if necessary
@@ -31,3 +32,18 @@ Includes:
 
 Cleaning:
 1. Run the clean .bat file, or delete build/ folder.
+
+Android Build
+- Requires Android Studio
+
+1. Open Android/ in Android Studio
+2. File --> invalidate caches
+3. Build --> Clean Project  or  delete build/ folder in Android/app/build and Android/build
+4. Build --> Assemble App, or Run --> Run app.
+5. Open Logcat to see debug output.
+
+#TODO:
+1. Cross-Platform input handling, independent of glfw.
+2. Cross-Platform graphics, independent of glfw.
+3. Cross-Platform Asset manager (use AAsset to get assets/)
+Note: Filepath may be different depending on windows vs android (use / for windows and android). 

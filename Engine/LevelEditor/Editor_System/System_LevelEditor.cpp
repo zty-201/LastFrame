@@ -1,4 +1,4 @@
-#ifdef _DEBUG
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "pch.hpp"
 
 //File management, JSON file parser/writer
@@ -15,6 +15,8 @@
 
 //Casting meta data to type.
 #include "ReflectionRegister.hpp"
+#include "InputManager.hpp"
+#include "Level_Editor.hpp"
 
 namespace EngineFramework
 {
@@ -31,45 +33,48 @@ namespace EngineFramework
 	void LevelEditorSystem::Initialize()
 	{
 		application = std::make_unique<LevelEditor>();
-		application->Initialize();
-		std::cout << "level editor system ONLINE!\n";
+
+		//application->Initialize();
+		//application->Open();
+		LOGI("level editor system ONLINE!");
 	}
 	void LevelEditorSystem::Update(float delta_time)
 	{
 		UNREFERENCED_PARAMETER(delta_time);
 
-<<<<<<< Updated upstream
-		if (application->To_Close()) {
-			application->Close();
-
-=======
 		//only check for this if the editor state is not true
 		if (!application->Get_Editor_State()) {
 			//std::cout << "yo\n";
-			if (InputManager::GetKeyDown(GLFW_KEY_W)) {
+			if (InputManager::GetInstance().GetKeyDown(GLFW_KEY_1)) {
+				application->Initialize();
+				application->Open();
 
-				//application->Open();
-				std::cout << "down\n";
+				// Send an enabled event.
+				Event_Level_Editor_Toggled editor_toggled{};
+				editor_toggled.is_enabled = true;
+				event_dispatcher.trigger<Event_Level_Editor_Toggled>(std::move(editor_toggled));
 			}
-			if (InputManager::GetKey(GLFW_KEY_W)) {
-
-				//application->Open();
-				std::cout << "hold\n";
-			}
-			if (InputManager::GetKeyUp(GLFW_KEY_W)) {
-
-				//application->Open();
-				std::cout << "up\n";
-			}
->>>>>>> Stashed changes
 		}
-		else if (application->Get_Editor_State()) {
+		else {
 
-			//open is a 1 time thing, it shouldnt be called everyframe
-			//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed			
-			application->Run();
+			if (application->To_Close()) {
+
+				application->Close();
+				application->Clean();
+
+				// Send a disabled event.
+				Event_Level_Editor_Toggled editor_toggled{};
+				editor_toggled.is_enabled = false;
+				event_dispatcher.trigger<Event_Level_Editor_Toggled>(std::move(editor_toggled));
+			}
+			else if (application->Get_Editor_State()) {
+				//std::cout << "Imgui running\n";
+				//open is a 1 time thing, it shouldnt be called everyframe
+				//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed			
+				application->Run();
+
+			}
 		}
-
 
 	}
 

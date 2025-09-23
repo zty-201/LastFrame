@@ -1,12 +1,8 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <unordered_map>
-#include <string>
-#include <map>
-#include <stdexcept>
 //
-    // Shader Program class for managing shader program handle and operations.
+    // Shader ShaderProgram class for managing shader program handle and operations.
     //
 class ShaderProgram
 {
@@ -42,7 +38,7 @@ public:
     ShaderProgram(const ShaderProgram& rhs) = delete;
     ShaderProgram& operator=(const ShaderProgram& rhs) = delete;
 
-    // Convert the Program object to its OpenGL handle for easier use in OpenGL functions
+    // Convert the ShaderProgram object to its OpenGL handle for easier use in OpenGL functions
     operator GLuint()
     {
         return handle;
@@ -61,11 +57,6 @@ public:
     void bindAttribLocation(GLuint location, const char* name) {
         glBindAttribLocation(handle, location, name);
     }
-
-    //// Bind a fragment data location (for output of the fragment shader)
-    //void bindFragDataLocation(GLuint location, const char* name) {
-    //    glBindFragDataLocation(handle, location, name);
-    //}
 
     // Set a uniform variable of type vec3 (float x, y, z)
     void setUniform(const std::string& name, float x, float y, float z) {
