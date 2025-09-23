@@ -2,14 +2,14 @@ A cubemap is a series of 6 textures loaded as faces of a cubemap texture, typica
 As such, files in this directory will not be automatically loaded.
 
 To load a cubemap, place the texture files in this directory.
-Next, edit the Config.txt file and use json to list out in this order: -x, +x, +y, -y, +z, -z.
+Next, edit the Config.json file and use json to list out in this order: -x, +x, +y, -y, +z, -z.
 {
-  "cubemap_name": [
-    "file1.png",
-    "file2.png",
-    "file3.png",
-    "file4.png",
-    "file5.png",
-    "file6.png"
+  "night_skybox": [
+    "Extern/Graphics/CubeMap/night_negx.png",
+    "Extern/Graphics/CubeMap/night_posx.png",
+    "Extern/Graphics/CubeMap/night_posy.png",
+    "Extern/Graphics/CubeMap/night_negy.png",
+    "Extern/Graphics/CubeMap/night_posz.png",
+    "Extern/Graphics/CubeMap/night_negz.png"
   ]
 }

@@ -143,7 +143,7 @@ namespace EngineFramework {
 	{
 		//==Add function loaders for each type==//
 		asset_loader_map["texture"] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadTexture);
-		asset_loader_map["cubemap"] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadTexture);
+		asset_loader_map["cubemap"] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadCubemap);
 		asset_loader_map["mesh"] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadMesh);
 		asset_loader_map["shader"] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadShader);
 
@@ -191,7 +191,7 @@ namespace EngineFramework {
 	//==Asset Loaders==//
 	bool AssetManagerSystem::LoadTexture(const std::filesystem::path& folder_path)
 	{
-		LOGI("Loading Texture");
+		LOGD("Loading Texture");
 		//Used as part of the final assets' guid.
 		xresource::type_guid type_guid{ "texture" };
 		//Acceptable files that can be loaded as a texture.
@@ -200,25 +200,39 @@ namespace EngineFramework {
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, texture_extensions);
 
 		//Iterate through all texture files
-		for (const std::filesystem::path& path: files)
+		for (const std::filesystem::path& path : files)
 		{
 			//Get guid (and update guid_name_map by calling GetFullGuid.
 			std::string name = path.stem().string();
 			xresource::full_guid asset_guid = GetFullGuid(type_guid, name);
 
 			//Allocate resource
-			std::shared_ptr<Scene::Texture> resource(new Scene::Texture({ path.string().c_str() }));
+			std::shared_ptr<Scene::Texture> resource(new Scene::Texture(path.string()));
 
 			AddResource(asset_guid, resource);
 		}
-		
+
 		return true;
 	}
-	bool AssetManagerSystem::LoadCubemap(const std::filesystem::path& folder_path)
+	bool AssetManagerSystem::LoadCubemap(const std::filesystem::path& config_file)
 	{
-		UNREFERENCED_PARAMETER(folder_path);
+		LOGD("Loading Cubemap");
+		//Used as part of the final asset guid.
 		xresource::type_guid type_guid{ "cubemap" };
-		LOGI("Loading Cubemap");
+		//Read the Config File
+		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
+		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
+
+		//The config file should contain <name, filepath_arr> pairs
+		for (auto& [cubemap_name, filepath_arr] : config_json.items())
+		{
+			xresource::full_guid asset_guid = GetFullGuid(type_guid, cubemap_name);
+
+			//Allocate resource
+			std::shared_ptr<Scene::Texture> resource(new Scene::Texture(filepath_arr.get<std::array<std::string, 6>>()));
+			AddResource(asset_guid, resource);
+		}
 		return true;
 	}
 	bool AssetManagerSystem::LoadMesh(const std::filesystem::path& folder_path)

@@ -1,0 +1,10 @@
+{
+  "night_skybox": [
+    "Extern/Graphics/CubeMap/night_negx.png",
+    "Extern/Graphics/CubeMap/night_posx.png",
+    "Extern/Graphics/CubeMap/night_posy.png",
+    "Extern/Graphics/CubeMap/night_negy.png",
+    "Extern/Graphics/CubeMap/night_posz.png",
+    "Extern/Graphics/CubeMap/night_negz.png"
+  ]
+}

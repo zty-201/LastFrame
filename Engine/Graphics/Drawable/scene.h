@@ -39,7 +39,7 @@
 
 // Functions for loading textures
 GLuint loadTexture(const char* filename);
-GLuint loadHdrCubeMap(std::initializer_list<const char*> filenames);
+GLuint loadHdrCubeMap(const std::array<std::string, 6>&);
 
 //
 // The main Scene class encapsulates rendering passes, objects, textures, and cameras
@@ -59,8 +59,11 @@ struct Scene
         {
         }
 
-        // Constructor for creating textures from files (2D or cube maps)
-        Texture(const std::initializer_list<const char*> filenames, GLuint channel = GL_TEXTURE0);
+        // Constructor for creating textures from a file (2D)
+        Texture(const std::string& file, GLuint channel = GL_TEXTURE0);
+
+        // Constructor for creating textures from files (cubemap)
+        Texture(const std::array<std::string, 6>& filenames, GLuint channel = GL_TEXTURE0);
 
         // Destructor to free GPU resources
         ~Texture()

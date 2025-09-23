@@ -1,6 +1,6 @@
 /**
  * @file    AssetManager.hpp
- * @author  Mohamed Arshad Bin Mohamed Hussain (mohamedarshad.b)
+ * @author  Mohamed Arshad Bin Mohamed Hussain (mohamedarshad.b), Joel Lee Jie (joeljie.lee)
  * @brief   As of 14 September 2025, Path-only Asset Manager (no file parsing).
  *
  * This manager keeps a database of asset name to relative path under a
@@ -15,6 +15,55 @@
  *  - list all assets.
  *
 */
+
+/*
+		Asset Manager.
+		Resources are loaded at initialise time, and are each assigned a guid consisting of
+		<name_guid><type_guid>.
+		This guid will stay consistent as long as the type and name of the asset stays constant.
+
+		To load an asset, a loader function bool(const std::filesystem::path&) is added to a <name, func> asset_loader_map in Initialize().
+		This name must match ASSET_CONFIG_FILE defined in global.hpp.
+
+		During Initialization, ASSET_CONFIG_FILE is read which gives <name, folderpath> json pairs. For each pair, the respective function loader is called
+		and passed a folderpath.
+
+		This loader function takes in a folderpath, and loads all assets of <T> inside. It may choose to use a separate config file within the folder, or load all assets as is.
+		It generates a type_guid for all assets of <T> as well as an individual instance_guid for that asset name, before combining them
+		into a full_guid.
+		The loaded assets of type std::shared_ptr<T> is then added to the resource_map via AddResource, together with its full_guid.
+		Upon any failure, it is to return false. Otherwise if all assets are loaded, return true.
+
+		instance_guid --> dependent on asset name
+		type_guid --> dependent on asset type name
+		full_guid --> consists of instance and type guid.
+
+		Usage==
+		0. Renaming Asset
+		- Note: Asset path should stay in the same folder.
+		- If renaming an asset, ensure guid_to_name map is changed. Can use instance_id{"old_name"} to get the key-val pair, then change the name.
+		- This is used for serialization.
+		- Do not rename an asset if
+
+		1. Accessing Asset
+		- For every component, all asset types like texture, shader, mesh, audio file etc. are stored as xresource::full_guid.
+		- Use this guid with GetResource<T> for that respective resource.
+		- Do not store pointers, not even shared_ptrs, in the component.
+
+		2. Serializing
+		- For each asset, find the asset name from the full_guid using guid_to_name[full_guid.m_instance].
+		- Convert the name to instance_guid.
+		- Doing it this roundabout way allows it to consider asset renaming while the program is running.
+		- Store the instance_guid as uint64_t.
+
+		3. Deserializing
+		- Similar to serializing, just read the uint64_t into xresource::instance_guid.
+		- Do not need to "load" the asset into the component, just call GetResource<T> when needed.
+
+
+		Note: I realise calling hashmap everytime the asset is accessed may be slower than caching the pointer in full_guid.m_instance.
+		However, I believe there will be <2500 asset access calls / frame, so it's likely negligible enough for M1 at least.
+		*/
 #pragma once
 #ifndef ASSET_MANAGER_HPP
 #define ASSET_MANAGER_HPP
@@ -40,33 +89,7 @@
 namespace EngineFramework {
 
 
-	/*
-		Asset Manager.
-		Resources are loaded at initialise time, and are each assigned a guid consisting of
-		<name_guid><type_guid>.
-		This guid will stay consistent as long as the type and name of the asset stays constant.
-
-		To load an asset, a loader function bool(const std::filesystem::path&) is added to a <name, func> asset_loader_map in Initialize().
-		This name must match ASSET_CONFIG_FILE defined in global.hpp. 
-
-		During Initialization, ASSET_CONFIG_FILE is read which gives <name, folderpath> json pairs. For each pair, the respective function loader is called
-		and passed a folderpath.
-
-		This loader function takes in a folderpath, and loads all assets of <T> inside. It may choose to use a separate config file within the folder, or load all assets as is.
-		It generates a type_guid for all assets of <T> as well as an individual instance_guid for that asset name, before combining them
-		into a full_guid.
-		The loaded assets of type std::shared_ptr<T> is then added to the resource_map via AddResource, together with its full_guid.
-		Upon any failure, it is to return false. Otherwise if all assets are loaded, return true.
-
-		Usage==
-		1. DeSerialization
-		- An entity can have multiple assets of different types.
-		- Indicate the type using a string like "texture", and indicate the name of the asset using a string like "ogre".
-		- When serializing, call GetResource<T> based on the string type (entt reflection system may be used). Convert the name of the asset to xresource::type_guid{"name"}, and pass as argument.
-		- std::shared_ptr<T> will be returned.
-		- If it's nullptr, the asset does not exist so throw an error (or use a default asset). Otherwise, store in the entity.
-		- Finally, ensure the full_guid of the asset is stored. This allows 
-	*/
+	
 	class AssetManagerSystem : public ISystem
 	{
 	public:

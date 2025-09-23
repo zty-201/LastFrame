@@ -27,5 +27,5 @@ extern entt::registry registry;
 extern entt::dispatcher event_dispatcher;
 
 
-#define ASSET_CONFIG_FILE "Extern/Config.txt"
+#define ASSET_CONFIG_FILE "Extern/Config.json"
 #endif

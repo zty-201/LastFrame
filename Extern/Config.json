@@ -1,0 +1,6 @@
+{
+	"texture": "Extern/Graphics/Texture",
+	"shader": "Extern/Graphics/Shader",
+	"mesh": "Extern/Graphics/Mesh",
+	"cubemap": "Extern/Graphics/CubeMap/Config.json"
+}
