@@ -98,7 +98,7 @@ namespace EngineFramework
 		ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
 
 		// Initialize the ImGui backend for your existing OpenGL context
-		ImGui_ImplOpenGL3_Init("#version 310 es");
+		ImGui_ImplOpenGL3_Init("#version 300 es");
 
 		imgui_flags.DockWindowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
 			ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |

@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include "entt/entity/registry.hpp"
+#define IMGUI_IMPL_OPENGL_ES3
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
