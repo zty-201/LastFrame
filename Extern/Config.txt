@@ -1,1 +1,5 @@
-ShaderPath Extern/Graphics/Shader
+{
+	"texture": "Extern/Graphics/Texture",
+	"shader": "Extern/Graphics/Shader",
+	"mesh": "Extern/Graphics/Mesh"
+}

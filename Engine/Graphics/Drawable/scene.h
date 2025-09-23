@@ -61,6 +61,20 @@ struct Scene
 
         // Constructor for creating textures from files (2D or cube maps)
         Texture(const std::initializer_list<const char*> filenames, GLuint channel = GL_TEXTURE0);
+
+        // Destructor to free GPU resources
+        ~Texture()
+        {
+            if (id != 0)
+            {
+                glDeleteTextures(1, &id);
+                id = 0; // Prevent dangling.
+            }
+        }
+
+        //Rule of 3, ensure it cannot be copied so texture destructor has no issues with double or permature deletion
+        Texture(const Texture& rhs) = delete;
+        Texture& operator=(const Texture& rhs) = delete;
     };
 
     // Structure representing a rendering pass
@@ -137,7 +151,7 @@ struct Scene
         std::vector<Object> objects;       // Objects rendered in this pass
         std::vector<Camera> cameras;       // Cameras used in this pass
         std::vector<Light> lights;         // Lights affecting this pass
-        std::vector<Texture> textures;     // Textures used in this pass
+        std::vector<std::shared_ptr<Texture>> textures;     // Textures used in this pass
         SetUniformCallback setUniformCallback; // Optional callback for setting uniforms
 
         // Constructor for older frameworks (single depth buffer flag)
@@ -148,7 +162,7 @@ struct Scene
             const std::initializer_list<Object>& objects = { },
             const std::initializer_list<Camera>& cameras = { },
             const std::initializer_list<Light>& lights = { },
-            const std::initializer_list<Texture> textures = { },
+            const std::initializer_list<std::shared_ptr<Texture>> textures = { },
             SetUniformCallback setUniformCallback = nullptr
         )
             :

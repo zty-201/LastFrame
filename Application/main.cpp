@@ -19,7 +19,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "Input/InputManager.hpp"
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
-#include "Assets/AssetManager.hpp"
+#include "AssetManager.hpp"
 #include "Audio/Audio.hpp"
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)

@@ -311,9 +311,10 @@ void Scene::render()
 
         // Bind per-pass textures (only for skybox pass)
         for (const auto& info : pass.textures) {
-            if (info.id) {
-                glActiveTexture(info.channel);
-                glBindTexture(info.target, info.id);
+            if (info->id) {
+                glActiveTexture(info->channel);
+                glBindTexture(info->target, info->id);
+                LOGI("Texture Destroyed");
             }
         }
 

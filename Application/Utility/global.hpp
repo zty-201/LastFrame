@@ -26,7 +26,6 @@ written consent of DigiPen Institute of Technology is prohibited.
 extern entt::registry registry;
 extern entt::dispatcher event_dispatcher;
 
-//TODO: replace with config file.
-#define ARCHTYPE_FOLDER_PATH "Extern/Archtypes"
 
+#define ASSET_CONFIG_FILE "Extern/Config.txt"
 #endif
