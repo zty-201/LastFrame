@@ -225,7 +225,7 @@ if(WIN32)
 
 target_link_libraries(engine_library PUBLIC ${EXTERNAL_LIBRARY_DEPENDENCIES})
 target_link_libraries(application_executable PUBLIC engine_library)
-
+target_compile_definitions(engine_library PUBLIC USE_JOLT)
 #Android==============
 elseif(ANDROID)
 	list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES ${ANDROID_LIBRARIES})
