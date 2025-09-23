@@ -36,7 +36,7 @@ namespace EngineFramework
 
 		//application->Initialize();
 		//application->Open();
-		std::cout << "level editor system ONLINE!\n";
+		LOGI("level editor system ONLINE!");
 	}
 	void LevelEditorSystem::Update(float delta_time)
 	{
@@ -46,10 +46,13 @@ namespace EngineFramework
 		if (!application->Get_Editor_State()) {
 			//std::cout << "yo\n";
 			if (InputManager::GetInstance().GetKeyDown(GLFW_KEY_1)) {
-
 				application->Initialize();
 				application->Open();
-				//std::cout << "2222222222222222222222222222222222222\n";
+
+				// Send an enabled event.
+				Event_Level_Editor_Toggled editor_toggled{};
+				editor_toggled.is_enabled = true;
+				event_dispatcher.trigger<Event_Level_Editor_Toggled>(std::move(editor_toggled));
 			}
 		}
 		else {
@@ -59,6 +62,10 @@ namespace EngineFramework
 				application->Close();
 				application->Clean();
 
+				// Send a disabled event.
+				Event_Level_Editor_Toggled editor_toggled{};
+				editor_toggled.is_enabled = false;
+				event_dispatcher.trigger<Event_Level_Editor_Toggled>(std::move(editor_toggled));
 			}
 			else if (application->Get_Editor_State()) {
 				//std::cout << "Imgui running\n";

@@ -115,8 +115,10 @@ target_link_options(application_executable PRIVATE
 
 #==============ANDROID====================
 elseif(ANDROID)
+message("Building for Android")
   #Define global targets
   add_library(jnicpp SHARED ${CMAKE_CURRENT_LIST_DIR}/Android/app/src/main/cpp/NativeTemplate.cpp)
+  
   #Add precompiled headers to speed up compilation times. 
   target_precompile_headers(jnicpp PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
   #Preprocessor Definitions 

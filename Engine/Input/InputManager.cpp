@@ -13,7 +13,6 @@ Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
 */
 /* *******************************************************************/
-
 #include "pch.hpp"
 #include "global.hpp"
 #include "InputManager.hpp"
@@ -107,24 +106,29 @@ namespace EngineFramework
         static double oldypos = ypos;
         double xoffset = xpos - oldxpos;
         double yoffset = ypos - oldypos;
+        UNREFERENCED_PARAMETER(xoffset);
+        UNREFERENCED_PARAMETER(yoffset);
         oldxpos = xpos;
         oldypos = ypos;
         auto& pScene = GraphicsSystem::GetInstance().GetScene();
+        UNREFERENCED_PARAMETER(pScene);
         //std::cout << "CursorPosCallback: xoffset = " << xoffset << ", yoffset = " << yoffset << std::endl;
         if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed 
             || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down))
         {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
             if (!LevelEditorSystem::Get_Enable()) {
                 pScene->camerasOnCursor(xoffset, yoffset);
             }
-               
+#endif
         }
         else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed)
         {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
             if (!LevelEditorSystem::Get_Enable()) {
                 pScene->lightsOnCursor(xoffset, yoffset);
             }
-            
+#endif
         }
     }
 
@@ -132,26 +136,30 @@ namespace EngineFramework
     {
         (void)window;
         auto& pScene = GraphicsSystem::GetInstance().GetScene();
+        UNREFERENCED_PARAMETER(pScene);
         scrollX = xoffset;
         scrollY = yoffset;
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         if (!LevelEditorSystem::Get_Enable()) {
             pScene->camerasOnScroll(xoffset, yoffset);
             //std::cout << "yoffset: " << yoffset << std::endl;
         }
-        
+#endif
     }
 
     void InputManager::WindowSizeCallback(GLFWwindow* window, int width, int height)
     {
 		UNREFERENCED_PARAMETER(window);
-        auto& pScene = GraphicsSystem::GetInstance().GetScene();
-        pScene->resize(width, height);
+        Event_Window_Resized window_resize;
+        window_resize.width = width;
+        window_resize.height = height;
+        event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
     }
 #endif
     void InputManager::ErrorCallback(int error, const char* description)
     {
         (void)error;
-        fprintf(stderr, "GLFW Error: %s\n", description);
+        LOGE("GLFW Error: %s", description);
     }
 
     bool InputManager::GetKey(int key)

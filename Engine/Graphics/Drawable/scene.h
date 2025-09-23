@@ -164,37 +164,18 @@ struct Scene
             //this->enableDepthBuffer.push_back(enableDepthBuffer);
         }
 
-        // Constructor for newer frameworks (multiple depth buffer flags)
-        /*Pass(
-            const FBO& fbo = { },
-            const std::initializer_list<int>& viewport = { },
-            const std::initializer_list<float>& clearColor = { },
-            const std::initializer_list<bool>& enableDepthBuffer = { },
-            const std::initializer_list<Object>& objects = { },
-            const std::initializer_list<Camera>& cameras = { },
-            const std::initializer_list<Light>& lights = { },
-            const std::initializer_list<Texture> textures = { },
-            SetUniformCallback setUniformCallback = nullptr
-        )
-            :
-            fbo{ fbo },
-            viewport{ viewport },
-            clearColor{ clearColor },
-            depthMode{ enableDepthBuffer },
-            objects{ objects },
-            cameras{ cameras },
-            lights{ lights },
-            textures{ textures },
-            setUniformCallback{ setUniformCallback }
-        {
-        }*/
-
         // Resizes the framebuffer and viewport for the pass
         void resize(int width, int height)
         {
             viewport[2] = width;
             viewport[3] = height;
             fbo.resize(width, height);
+        }
+
+        //Changes framebuffer.
+        void SetFBO(const FBO& fbo_to_set = { })
+        {
+            fbo = fbo_to_set;
         }
     };
 

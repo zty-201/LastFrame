@@ -50,77 +50,79 @@ namespace EngineFramework
 		Save gameobject archtypes to files using reflection.
 		Each archtype is saved to their own respective files with their own respective names, in the folder.
 	*/
-	void GameObjectSystem::SerializeAllEntityArchtypes(const std::string& folder_path)
+	std::vector<std::pair<std::string, std::string>> GameObjectSystem::SerializeAllEntityArchtypes()
 	{
-		std::filesystem::path folder_path_string{ folder_path };
-		//Not a folder.
-		if (!std::filesystem::is_directory(folder_path_string))
-		{
-			throw std::invalid_argument(std::string("No such folder path when serializing in GameObjectSystem: ") + folder_path);
-		}
-		
-		//Iterate over every archtype and store their component data in their respective folders.
-		for (std::pair<const std::string, entt::entity>& archtype : archtype_entities)
-		{
-			//Empty json object.
-			nlohmann::json archtype_data;
-			/*
-				Store
-				- Component name, and their data members. Do for all components
-				- entt::entity id (may be useful for remapping and maintaining relationships between parent and child gameobjects.
-				
-				Do not store
-				- Archtype name (it'll be store as their file name)
-			*/
+		//TODO:
+		return{};
+		//std::filesystem::path folder_path_string{ folder_path };
+		////Not a folder.
+		//if (!std::filesystem::is_directory(folder_path_string))
+		//{
+		//	throw std::invalid_argument(std::string("No such folder path when serializing in GameObjectSystem: ") + folder_path);
+		//}
+		//
+		////Iterate over every archtype and store their component data in their respective folders.
+		//for (std::pair<const std::string, entt::entity>& archtype : archtype_entities)
+		//{
+		//	//Empty json object.
+		//	nlohmann::json archtype_data;
+		//	/*
+		//		Store
+		//		- Component name, and their data members. Do for all components
+		//		- entt::entity id (may be useful for remapping and maintaining relationships between parent and child gameobjects.
+		//		
+		//		Do not store
+		//		- Archtype name (it'll be store as their file name)
+		//	*/
 
-			/*
-				Iterate over each component type.
-				For each component type, check if the entity has it.
-				If so, save it.
+		//	/*
+		//		Iterate over each component type.
+		//		For each component type, check if the entity has it.
+		//		If so, save it.
 
-				<type_id, sparse_set> where type_id represents the component type.
+		//		<type_id, sparse_set> where type_id represents the component type.
 
-				Note: Cannot simply iterate over all components for an entity, as components are not 
-				stored in the entity but rather stored in their own pools based on type.
-			*/
-			for (auto&& curr : registry.storage())
-			{
-				//If an entity does not contain this specific component type, continue to the next type.
-				if (!curr.second.contains(archtype.second))
-				{
-					continue;
-				}
-				//Save the component as a json object.
-				nlohmann::json component_data;
-				/*
-					Component name
-					->Name of data member, value
-				*/
-				entt::meta_type component_type = entt::resolve(curr.first);
-				std::string component_name = component_type.name();
-				//==Iterate over each data type in the component.
-				for (auto&& member_data : component_type.data())
-				{
-					//Add the member data (can be most data types) to the component json object, together with the member name. 
-					entt::meta_data& meta_data = member_data.second;
-					std::string meta_name = meta_data.name();
-					CastMetaDataToType(meta_data, [&meta_name, &component_data](auto val) {
-						component_data[meta_name] = val;
-						});
-				}
+		//		Note: Cannot simply iterate over all components for an entity, as components are not 
+		//		stored in the entity but rather stored in their own pools based on type.
+		//	*/
+		//	for (auto&& curr : registry.storage())
+		//	{
+		//		//If an entity does not contain this specific component type, continue to the next type.
+		//		if (!curr.second.contains(archtype.second))
+		//		{
+		//			continue;
+		//		}
+		//		//Save the component as a json object.
+		//		nlohmann::json component_data;
+		//		/*
+		//			Component name
+		//			->Name of data member, value
+		//		*/
+		//		entt::meta_type component_type = entt::resolve(curr.first);
+		//		std::string component_name = component_type.name();
+		//		//==Iterate over each data type in the component.
+		//		for (auto&& member_data : component_type.data())
+		//		{
+		//			//Add the member data (can be most data types) to the component json object, together with the member name. 
+		//			entt::meta_data& meta_data = member_data.second;
+		//			std::string meta_name = meta_data.name();
+		//			CastMetaDataToType(meta_data, [&meta_name, &component_data](auto val) {
+		//				component_data[meta_name] = val;
+		//				});
+		//		}
 
-				//Add the component object as part of the archtype object.
-				archtype_data[component_name] = component_data;
-			}
+		//		//Add the component object as part of the archtype object.
+		//		archtype_data[component_name] = component_data;
+		//	}
 
-			//Create a file path to the archtype.
-			std::filesystem::path file_path = folder_path_string;
-			file_path /= archtype.first.c_str();
+		//	//Create a file path to the archtype.
+		//	std::filesystem::path file_path = folder_path_string;
+		//	file_path /= archtype.first.c_str();
 
 
-			std::ofstream archtype_file(file_path);
-			//TODO: Write the json archtype data to file.
-		}
+		//	std::ofstream archtype_file(file_path);
+		//	//TODO: Write the json archtype data to file.
+		//}
 	}
 
 	/*
@@ -130,25 +132,26 @@ namespace EngineFramework
 
 		Do once at the start of the program.
 	*/
-	void GameObjectSystem::DeserializeAllEntityArchtypes(const std::string& folder_path)
+	void GameObjectSystem::DeserializeAllEntityArchtypes(const std::vector<std::pair<std::string, std::string>>& json_input)
 	{
-		UNREFERENCED_PARAMETER(folder_path);
+		UNREFERENCED_PARAMETER(json_input);
 	}
 
 	/*
 		Save gameobject instances to a specified level file using reflection.
 	*/
-	void GameObjectSystem::SerializeAllEntityInstances(const std::string& level_file_path)
+	std::string GameObjectSystem::SerializeAllEntityInstances()
 	{
-		UNREFERENCED_PARAMETER(level_file_path);
+		//TODO:
+		return {};
 	}
 
 	/*
 		Read gameobject instances from a specified level file using reflection.
 		Before this, all archtypes need to be read.
 	*/
-	void GameObjectSystem::DeSerializeAllEntityInstances(const std::string& level_file_path)
+	void GameObjectSystem::DeSerializeAllEntityInstances(const std::string& json_input)
 	{
-		UNREFERENCED_PARAMETER(level_file_path);
+		UNREFERENCED_PARAMETER(json_input);
 	}
 }

@@ -52,7 +52,7 @@ int checkForOpenGLError(const char* file, int line)
         }
 
         // Log the error with file and line number for easier debugging.
-        printf("glError in file %s @ line %d: %s\n", file, line, message);
+        LOGI("glError in file %s @ line %d: %s", file, line, message);
         retCode = 1;
         glErr = glGetError(); // Check the next error.
     }
@@ -167,22 +167,22 @@ void dumpGLInfo(bool dumpExtensions /* = false*/)
     glGetIntegerv(GL_SAMPLE_BUFFERS, &sampleBuffers);
 
     // Print general OpenGL information.
-    printf("-------------------------------------------------------------\n");
-    printf("GL Vendor    : %s\n", vendor);
-    printf("GL Renderer  : %s\n", renderer);
-    printf("GL Version   : %s\n", version);
-    printf("GL Version   : %d.%d\n", major, minor);
-    printf("GLSL Version : %s\n", glslVersion);
-    printf("MSAA samples : %d\n", samples);
-    printf("MSAA buffers : %d\n", sampleBuffers);
-    printf("-------------------------------------------------------------\n");
+    LOGI("-------------------------------------------------------------");
+    LOGI("GL Vendor    : %s", vendor);
+    LOGI("GL Renderer  : %s", renderer);
+    LOGI("GL Version   : %s", version);
+    LOGI("GL Version   : %d.%d", major, minor);
+    LOGI("GLSL Version : %s", glslVersion);
+    LOGI("MSAA samples : %d", samples);
+    LOGI("MSAA buffers : %d", sampleBuffers);
+    LOGI("-------------------------------------------------------------");
 
     // Optionally dump the list of supported extensions.
     if (dumpExtensions) {
         GLint nExtensions;
         glGetIntegerv(GL_NUM_EXTENSIONS, &nExtensions);
         for (int i = 0; i < nExtensions; i++) {
-            printf("%s\n", glGetStringi(GL_EXTENSIONS, i));
+            LOGI("%s", glGetStringi(GL_EXTENSIONS, i));
         }
     }
 }

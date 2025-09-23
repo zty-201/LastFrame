@@ -88,7 +88,7 @@ struct FBO
         GLuint depthBuf;
         glGenRenderbuffers(1, &depthBuf);
         glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 
         // Attach the depth buffer to the framebuffer
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuf);

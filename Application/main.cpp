@@ -27,7 +27,9 @@ written consent of DigiPen Institute of Technology is prohibited.
 #endif
 
 
-void Game_Initialize()
+//Initialization of game application.
+//android_asset_manager should only be set when building for android.
+void Game_Initialize(void* android_asset_manager)
 {
 	/*
 			Memory fault checks
@@ -47,6 +49,17 @@ void Game_Initialize()
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 #endif
+#ifdef PLATFORM_WINDOWS
+	UNREFERENCED_PARAMETER(android_asset_manager);
+#elif defined(PLATFORM_ANDROID)
+	//Set the asset manager.
+	if (!android_asset_manager)
+	{
+		throw std::runtime_error("No AAsetManager asset manager passed to Game_Initialize() function");
+	}
+	EngineFramework::AssetManagerSystem::SetAndroidAssetManager(android_asset_manager);
+#endif
+
 	/*
 			Process
 			1. Initialize all external libraries that cannot be initialized normally (maybe the initialization order is finicky).
@@ -111,7 +124,7 @@ void Game_Initialize()
 			"AudioSystem",
 			std::make_unique<EngineFramework::AudioSystem>(),
 			5,  // Init Order
-			6,  // Update Order: Last
+			7,  // Update Order: Last
 			1   // Destruct Order: First
 		);
 
@@ -122,8 +135,8 @@ void Game_Initialize()
 		core_engine.AddSystem(
 			"LevelEditorSystem",
 			std::make_unique<EngineFramework::LevelEditorSystem>(),
-			4,  // Init Order: With other game systems
-			4,  // Update Order: After game logic, before main graphics update
+			100,  // Init Order: After all other game systems
+			6,  // Update Order: After game logic and main graphics update
 			1   // Destruct Order: With other game systems
 		);
 	#endif
@@ -135,8 +148,8 @@ void Game_Initialize()
 	}
 	catch (std::exception& e)
 	{
-		std::cout << "Game Aborted due to failure to initialize systems.\n"
-			<< e.what() << std::endl;
+		LOGE("Game Aborted due to failure to initialize systems.");
+		LOGE("%s", e.what());
 		std::abort();
 	}
 }
@@ -159,6 +172,9 @@ void Game_Update()
 	core_engine.UpdateSystems(delta_time);
 
 	core_engine.PostUpdateSystems(delta_time);
+
+	//Send all queued events in order.
+	event_dispatcher.update();
 
 	time_after_loop = std::chrono::steady_clock::now();
 

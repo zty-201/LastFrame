@@ -38,7 +38,7 @@ namespace EngineFramework
 		variables.selected_modelID = 0; //zero means none selected
 		variables.selected_objectID = 0; //zero means none selected
 
-		std::cout << "LevelEditor() constructor\n";
+		LOGI("LevelEditor() constructor");
 	}
 	LevelEditor::~LevelEditor() {
 
@@ -46,7 +46,7 @@ namespace EngineFramework
 		if (is_enabled) {
 			Clean();
 		}	
-		std::cout << "~LevelEditor() destructor\n";
+		LOGI("~LevelEditor() destructor");
 	}
 
 	void LevelEditor::addFeature(const std::string& feature_name, std::unique_ptr<LFeature> feature_class, bool enabled) {
@@ -98,7 +98,7 @@ namespace EngineFramework
 		ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
 
 		// Initialize the ImGui backend for your existing OpenGL context
-		ImGui_ImplOpenGL3_Init("#version 450");
+		ImGui_ImplOpenGL3_Init("#version 310 es");
 
 		imgui_flags.DockWindowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
 			ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
@@ -107,12 +107,12 @@ namespace EngineFramework
 
 		// If using GLFW for input, you can still initialize the input handling, but use your custom window
 		if (GraphicsSystem::GetInstance().GetGLFWwindow() == nullptr) {
-			std::cout << "level editor app cannot be initialised\n";
+			LOGI("level editor app cannot be initialised");
 			throw std::runtime_error("Level editor init failed: GraphicsSystem has no valid GLFWwindow.");
 		}
 		else {
 			ImGui_ImplGlfw_InitForOpenGL(GraphicsSystem::GetInstance().GetGLFWwindow(), true);
-			std::cout << "level editor app is initialised\n";
+			LOGI("level editor app is initialised");
 		}
 
 		//FEATURES ===============================================================
@@ -137,7 +137,7 @@ namespace EngineFramework
 	void LevelEditor::Open()
 	{
 		is_enabled = true;
-		std::cout << "app opened\n"; //okay good check
+		LOGI("app opened"); //okay good check
 	}
 
 	void LevelEditor::docking() {
@@ -230,9 +230,8 @@ namespace EngineFramework
 
 	void LevelEditor::Run()
 	{
-		// 1. Render the entire 3D scene into our off-screen framebuffer (FBO).
-		GraphicsSystem::GetInstance().GetScene()->render();
-
+		//1. Level Editor Update loop should run after Graphics System Update Loop, to allow the scene to draw to framebuffer.
+		
 		// 2. Now that the FBO is populated, we can prepare to draw the UI.
 		// First, clear the MAIN WINDOW to a background color. This gives ImGui a clean slate to draw on.
 		// We bind framebuffer 0 (the screen) just to be explicit.
@@ -280,7 +279,7 @@ namespace EngineFramework
 		ImGui_ImplOpenGL3_Shutdown();  // OpenGL backend
 		ImGui_ImplGlfw_Shutdown();     // GLFW backend
 		ImGui::DestroyContext();
-		std::cout << "cleaned\n";
+		LOGI("cleaned");
 	}
 
 	

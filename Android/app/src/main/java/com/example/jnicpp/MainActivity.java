@@ -1,5 +1,7 @@
 package com.example.jnicpp;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.res.AssetManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +14,12 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     // Used to load the 'jnicpp' library on application startup.
     static {
         try {
+            if (BuildConfig.IS_DEBUG_BUILD) {
+                System.loadLibrary("fmodL");  // Debug / Logging version
+            } else {
+                System.loadLibrary("fmod");   // Release / Optimized version
+            }
+
             System.loadLibrary("jnicpp");
             Log.d(TAG, "Native library loaded successfully");
         } catch (UnsatisfiedLinkError e) {
@@ -30,7 +38,8 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
             setContentView(binding.getRoot());
 // Setup GLSurfaceView
             glSurfaceView = binding.glSurfaceView;
-            glSurfaceView.setEGLContextClientVersion(3); // OpenGL ES 3.0
+            glSurfaceView.setEGLContextClientVersion(3); // OpenGL ES 3.X, uses highest version.
+            glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
             glSurfaceView.setRenderer(this);
             glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 // Example of a call to a native method
@@ -83,14 +92,14 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         Log.d(TAG, "Surface created");
         try {
-// Initialize OpenGL in native code (no longer needs surface parameter)
-            boolean success = initGL();
+            // Initialize OpenGL in native code with AssetManager
+            boolean success = initGL(getAssets());
             if (success) {
                 isInitialized = true;
-                Log.d(TAG, "OpenGL ES 3.0 initialized successfully");
+                Log.d(TAG, "OpenGL ES 3.2 initialized successfully");
             } else {
-                Log.e(TAG, "Failed to initialize OpenGL ES 3.0");
-                showToast("Failed to initialize OpenGL ES 3.0");
+                Log.e(TAG, "Failed to initialize OpenGL ES 3.2");
+                showToast("Failed to initialize OpenGL ES 3.2");
             }
         } catch (Exception e) {
             Log.e(TAG, "Error in onSurfaceCreated", e);
@@ -120,7 +129,7 @@ public native String stringFromJNI();
     /**
      * Initialize OpenGL ES 3.0 renderer
      */
-    public native boolean initGL();
+    public native boolean initGL(AssetManager assets);
     /**
      * Render a frame
      */
