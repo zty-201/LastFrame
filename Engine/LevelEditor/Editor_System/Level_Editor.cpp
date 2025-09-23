@@ -142,9 +142,11 @@ namespace EngineFramework
 
 	void LevelEditor::docking() {
 
+		ImGuiIO& io = ImGui::GetIO();
+		float headerHeight = 30.f;
 		// Create a full-screen root dockspace window for all other windows (custom docking)
-		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize, ImGuiCond_Always);
+		ImGui::SetNextWindowPos(ImVec2(0, headerHeight), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y - headerHeight), ImGuiCond_Always);
 
 		if (ImGui::Begin("Main Dockspace", nullptr, imgui_flags.DockWindowFlags)) {
 			// Create a central dockspace

@@ -26,6 +26,7 @@ namespace EngineFramework
         void Run() override;
         void Close() override;
 
+        static bool feature_enabled;
     };
 
 }
