@@ -22,7 +22,7 @@
 namespace EngineFramework
 {
     Save::Save() {
-        std::cout << "Lfeature: Save CREATED\n";
+        LOGI("Lfeature: Save CREATED");
     }
     Save::~Save() {
 
@@ -33,7 +33,7 @@ namespace EngineFramework
     void Save::Run() {
 
         //since saving is a one time event, is_enabled should be set to false when done.
-        std::cout << "Saved\n";
+        LOGI("Saved");
         is_enabled = false;
 
 

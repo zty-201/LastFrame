@@ -4,174 +4,217 @@
 #include "InputManager.hpp"
 
 
-#ifdef _DEBUG
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
 class LevelEditor; //forward declaration
 #endif
-
-
 
 namespace EngineFramework
 {
 
 
-    GraphicsSystem::GraphicsSystem()
-    {
-        this_graphics_ptr = this;
-    }
+	GraphicsSystem::GraphicsSystem()
+	{
+		this_graphics_ptr = this;
+	}
 
-    GraphicsSystem::~GraphicsSystem()
-    {
-        // Clean up GLFW
-        glfwTerminate();
-    }
+	GraphicsSystem::~GraphicsSystem()
+	{
+#ifdef PLATFORM_WINDOWS
+		// Clean up GLFW
+		glfwTerminate();
+#endif
+	}
 
-    void GraphicsSystem::Initialize()
-    {
-        SetupGLFW();
-        SetupImGui();
-        SetupGraphics();
-        //need to have a function for input handling
-        //since input handling is part of glfw , at least for the callbacks
-    }
+	void GraphicsSystem::Initialize()
+	{
+		SetupGLFW();
+		SetupGraphics();
 
-    void GraphicsSystem::SetupGLFW()
-    {
-        // Initialize GLFW library
-        if (!glfwInit()) {
-            throw std::runtime_error("Failed to initialize GLFW");
-        }
+		//Listen for events
+		event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&GraphicsSystem::HANDLE_EVENT_LevelEditorToggled>(this);
+		event_dispatcher.sink<Event_Window_Resized>().connect<&GraphicsSystem::HANDLE_EVENT_WindowResized>(this);
+	}
 
-        // Configure OpenGL context properties
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-        glfwWindowHint(GLFW_DEPTH_BITS, 24);
+	void GraphicsSystem::SetupGLFW()
+	{
+#ifdef PLATFORM_WINDOWS
+		// Initialize GLFW library
+		if (!glfwInit()) {
+			throw std::runtime_error("Failed to initialize GLFW");
+		}
 
-        pWindow = glfwCreateWindow(WIDTH, HEIGHT, "Framework", NULL, NULL);
-
-        if (!pWindow) {
-            glfwTerminate();
-            throw std::runtime_error("Failed to create GLFW window");
-        }
-
-        glfwMakeContextCurrent(pWindow);
-        //glfwSwapInterval(1); // Enable vsync
-
-        // Initialize GLAD (must happen after window context is created)
-        if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress)) {
-            glfwTerminate();
-            throw std::runtime_error("Failed to initialize GLAD");
-        }
+		// Configure GLFW for OpenGL ES 3.1 on desktop.
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+		glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
 
-        // Print OpenGL info
-        printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
-        printf("GLSL Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-        printf("Rendered by: %s\n", glGetString(GL_RENDERER));
+		pWindow = glfwCreateWindow(WIDTH, HEIGHT, "Framework", NULL, NULL);
 
-        std::cout << "Registering InputManager callbacks to GraphicsSystem window.\n";
-        InputManager::RegisterCallbacks(pWindow);
-#ifdef _DEBUG
-        if (!LevelEditor::Get_Editor_State()) {
-            std::cout << "Registering InputManager callbacks to GraphicsSystem window.\n";
-            InputManager::RegisterCallbacks(pWindow);
-        }
-#else
-        InputManager::RegisterCallbacks(pWindow);
-#endif  
-    }
+		if (!pWindow) {
+			glfwTerminate();
+			throw std::runtime_error("Failed to create GLFW window");
+		}
 
-    void GraphicsSystem::SetupImGui()
-    {
-        //imgui should not be an entity of graphics
-        /*ImGui::CreateContext();
-        ImGui_ImplGlfw_InitForOpenGL(scene.window, true);
-        ImGui_ImplOpenGL3_Init();*/
-    }
+		glfwMakeContextCurrent(pWindow);
+		glfwSwapInterval(1); // Enable vsync
 
-    void GraphicsSystem::SetupGraphics()
-    {
-        fogColor = { 0.0f, 0.0f, 0.0f }; // Example: gray fog color
-        fogMinDist = 5.0f;
-        fogMaxDist = 15.0f;
-        shadingModel = 0;
-        // Define the scene and its properties
-        Scene::Texture texture = {
-             { "Extern/night_negx.png", "Extern/night_posx.png",
-               "Extern/night_posy.png", "Extern/night_negy.png",
-               "Extern/night_posz.png", "Extern/night_negz.png"  }
-        };
+		// Initialize GLAD (must happen after window context is created)
+		if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress)) {
+			glfwTerminate();
+			throw std::runtime_error("Failed to initialize GLAD");
+		}
 
-        Camera camera = { { 0.0f, 1.0f, 5.0f }, 75.0f };
-        pScene = std::make_unique<Scene>(
-            "Extern/Graphics/Shader/BasicVert.vert", // Vertex shader file path
-            "Extern/Graphics/Shader/BasicFrag.frag", // Fragment shader file path
-            std::initializer_list<Scene::Pass>{         // List of rendering passes
+		InputManager::RegisterCallbacks(pWindow);
+#endif
 
-            // Pass 0: Render Scene
-            Scene::Pass{
-                {FBO::Default, WIDTH, HEIGHT},      // Default FBO
-                { 0, 0, WIDTH, HEIGHT },            // Viewport
-                GL_LESS,                            // Depth test LESS for the scene
-                {                                   // Objects
-                    { PLANE, MATERIAL_CHECKERBOARD, glm::translate(glm::scale(glm::mat4(1.0f), {10.0f, 1.0f, 10.0f}), {0.0f, -1.01f, 0.0f}) },
-                    { SPHERE, MATERIAL_PBR_PHONG, glm::translate(glm::mat4(1.0f), {-3.0f, 0.0f, 0.0f}) },
-                    { CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) }
-                },
-                { camera },                         // Cameras
-                { { {0.0f, 5.0f, 2.0f} } },         // Lights
-                {},                                 // Textures
-                [this](ShaderProgram& shader) {     // Uniform callback
-                    shader.setUniform("fog.color", fogColor);
-                    shader.setUniform("fog.minDist", fogMinDist);
-                    shader.setUniform("fog.maxDist", fogMaxDist);
-                    shader.setUniform("materialType", shadingModel);
-                }
-            },
-                // Pass 1: Render Skybox
-                Scene::Pass{
-                    {FBO::Default, WIDTH, HEIGHT},      // Default FBO
-                    { 0, 0, WIDTH, HEIGHT },            // Viewport
-                    GL_LEQUAL,                          // Depth test LEQUAL for the skybox
-                    {                                   // Objects
-                        { SKYBOX }
-                    },
-                    { camera },                         // Cameras
-                    {},                                 // Lights
-                    { texture },                        // Textures
-                    nullptr                             // Uniform callback
-            }
-        }
-        );
+		// Print OpenGL info
+		LOGI("OpenGL Version: %s", glGetString(GL_VERSION));
+		LOGI("GLSL Version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+		LOGI("Rendered by: %s", glGetString(GL_RENDERER));
+
+		LOGI("Registering InputManager callbacks to GraphicsSystem window.");
+	}
 
 
 
-    }
 
-    void GraphicsSystem::Update(float deltaTime)
-    {
-        UNREFERENCED_PARAMETER(deltaTime);
+	void GraphicsSystem::SetupGraphics()
+	{
+		fogColor = { 0.0f, 0.0f, 0.0f }; // Example: gray fog color
+		fogMinDist = 5.0f;
+		fogMaxDist = 15.0f;
+		shadingModel = 0;
+		// Define the scene and its properties
+		Scene::Texture texture = {
+			 { "Extern/night_negx.png", "Extern/night_posx.png",
+			   "Extern/night_posy.png", "Extern/night_negy.png",
+			   "Extern/night_posz.png", "Extern/night_negz.png"  }
+		};
 
-        // Check for window close
-        if (pWindow && glfwWindowShouldClose(pWindow))
-        {
-            // Signal application to close
-            // For now, you can just use glfwSetWindowShouldClose
-            // Later you might want a proper way to signal the CoreEngine
-        }
+		Camera camera = { { 0.0f, 1.0f, 5.0f }, 75.0f };
 
-        // Draw scene
-        pScene->render();
-    }
+		//Create a framebuffer for the scene to be drawn on, and read texture handle for the texturebuffer attached.
+		FBO sceneFBO(FBO::Texture, WIDTH, HEIGHT, &sceneTextureID);
+		//Do not use sceneFBO anymore, its contents have been written to the member variable.
+		scene_framebuffer = std::move(sceneFBO);
+		pScene = std::make_unique<Scene>(
+			"Extern/Graphics/Shader/BasicVert.vert", // Vertex shader file path
+			"Extern/Graphics/Shader/BasicFrag.frag", // Fragment shader file path
+			std::initializer_list<Scene::Pass>{         // List of rendering passes
+			// Pass 0: Render Scene
+			Scene::Pass{
+				DEFAULT,
+				{ 0, 0, WIDTH, HEIGHT },            // Viewport
+				GL_LESS,                            // Depth test LESS for the scene
+				{                                   // Objects
+					{ PLANE, MATERIAL_CHECKERBOARD, glm::translate(glm::scale(glm::mat4(1.0f), {10.0f, 1.0f, 10.0f}), {0.0f, -1.01f, 0.0f}) },
+					{ SPHERE, MATERIAL_PBR_PHONG, glm::translate(glm::mat4(1.0f), {-3.0f, 0.0f, 0.0f}) },
+					{ CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) },
+					{ "Extern/tree.obj", MATERIAL_CARTOON, glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f}) }
+				},
+				{ camera },                         // Cameras
+				{ { {0.0f, 5.0f, 2.0f} } },         // Lights
+				{},                                 // Textures
+				[this](ShaderProgram& shader) {     // Uniform callback
+					shader.setUniform("fog.color", fogColor);
+					shader.setUniform("fog.minDist", fogMinDist);
+					shader.setUniform("fog.maxDist", fogMaxDist);
+					shader.setUniform("materialType", shadingModel);
+				}
+			},
+			// Pass 1: Render Skybox
+			Scene::Pass{
+				DEFAULT,      // Default FBO
+				{ 0, 0, WIDTH, HEIGHT },            // Viewport
+				GL_LEQUAL,                          // Depth test LEQUAL for the skybox
+				{                                   // Objects
+					{ SKYBOX }
+				},
+				{ camera },                         // Cameras
+				{},                                 // Lights
+				{ texture },                        // Textures
+				nullptr                             // Uniform callback
+			}
+			}
+		);
+	}
 
-    void GraphicsSystem::PostUpdate(float deltaTime)
-    {
-        UNREFERENCED_PARAMETER(deltaTime);
-        // Swap buffers
-        glfwSwapBuffers(pWindow);
-        glfwPollEvents();
-    }
+	void GraphicsSystem::Update(float deltaTime)
+	{
+		UNREFERENCED_PARAMETER(deltaTime);
+		// Draw scene
+		pScene->render();
+	}
+
+	void GraphicsSystem::PostUpdate(float deltaTime)
+	{
+		UNREFERENCED_PARAMETER(deltaTime);
+#ifdef PLATFORM_WINDOWS
+		// Swap buffers
+		glfwSwapBuffers(pWindow);
+#endif
+	}
+
+
+	//Toggle drawing to framebuffer.
+	void GraphicsSystem::DrawSceneToFramebuffer(bool is_draw_to_framebuffer)
+	{
+		/*
+			TODO:
+			As of 22/09/2025, the rendering process is as follows
+			pScene->render() --> renders each pass sequentially.
+			Pass0: Renders objects to screen.
+			Pass1: Renders skybox to screen where there are no fragments with depth set.
+
+			Pass 1 does not use Pass0 texture, and thus both passes need to be binded to the framebuffer.
+
+			If there is a case where subsequent passes carries over framebuffer texture from previous passes, then only bind the last pass to the framebuffer.
+		*/
+		//Get the last stage of the drawing process.
+		std::vector<Scene::Pass>& passes = pScene->passes;
+		//If set, the scene will draw to the framebuffer.
+		if (is_draw_to_framebuffer)
+		{
+			for (Scene::Pass& pass : passes)
+			{
+				pass.SetFBO(scene_framebuffer);
+			}
+		}
+		else
+		{
+			for (Scene::Pass& pass : passes)
+			{
+				//If no param passed in, the scene will not draw to a framebuffer but rather to the window.
+				pass.SetFBO();
+			}
+		}
+	}
+
+	//==Event Handlers==//
+
+	//When level editor is toggled on/off.
+	void GraphicsSystem::HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled& editor_toggled)
+	{
+		//Only draw the scene to the framebuffer if in level editor.
+		if (editor_toggled.is_enabled)
+		{
+			DrawSceneToFramebuffer(true);
+		}
+		else
+		{
+			DrawSceneToFramebuffer(false);
+		}
+	}
+
+	//When drawing area should be resized.
+	void GraphicsSystem::HANDLE_EVENT_WindowResized(Event_Window_Resized& window_resize)
+	{
+		pScene->resize(window_resize.width, window_resize.height);
+	}
+
 }

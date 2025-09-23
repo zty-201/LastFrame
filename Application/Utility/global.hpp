@@ -13,7 +13,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #ifndef GLOBAL_HPP
 #define GLOBAL_HPP
 #include "entt/entity/registry.hpp"
-
+#include "entt/signal/dispatcher.hpp"
 
 //Used to denote a variable is unused.
 #define UNREFERENCED_PARAMETER(P) (P)
@@ -22,8 +22,9 @@ written consent of DigiPen Institute of Technology is prohibited.
 #define PI 3.14159265358979323846f
 
 
-//Global ecs system.
+//Global ecs and event handler system.
 extern entt::registry registry;
+extern entt::dispatcher event_dispatcher;
 
 //TODO: replace with config file.
 #define ARCHTYPE_FOLDER_PATH "Extern/Archtypes"

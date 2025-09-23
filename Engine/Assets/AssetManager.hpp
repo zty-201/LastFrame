@@ -27,8 +27,13 @@
 #include <cstdint>
 #include "ISystem.hpp"
 
-namespace EngineFramework {
+#ifdef PLATFORM_ANDROID
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
+#endif
 
+namespace EngineFramework {
+    class AudioSystem;
     using AssetID = std::uint32_t;
 
     /**
@@ -44,6 +49,15 @@ namespace EngineFramework {
          */
         AssetManagerSystem();
         static AssetManagerSystem& GetInstance();
+
+        /*
+            Cross-platform reading of data from file.
+        */
+        static std::vector<unsigned char> GetDataFromFile(const std::filesystem::path& path);
+
+#ifdef PLATFORM_ANDROID
+        static void SetAndroidAssetManager(void* android_asset_manager);
+#endif
         void Initialize() override {}
         void Update(float) override {}
         void PostUpdate(float) override {}
@@ -158,6 +172,10 @@ namespace EngineFramework {
          */
         [[nodiscard]] std::vector<std::pair<std::string, std::filesystem::path>> List() const;
 
+        void SetAudioSystem(AudioSystem* audio);
+
+        bool LoadAudio(const std::string& id, const std::string& nameOrRel, bool loop = false);
+
     private:
         struct Entry {
             AssetID id = 0;                                 // Numeric handle
@@ -181,8 +199,14 @@ namespace EngineFramework {
         AssetID m_next{ 1 };                                // Next id to hand out.
         std::unordered_map<std::string, Entry> m_byName;    // name to entry
         std::unordered_map<AssetID, std::string>    m_byId; // id to name
-
         static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer
+
+        AudioSystem* m_audioSystem = nullptr;
+
+        std::string m_audioSubdir = "Audio";
+#ifdef PLATFORM_ANDROID
+        static inline AAssetManager* android_asset_manager = nullptr;
+#endif
     };
 
 } // namespace EngineFramework
