@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 		Game_Initialize();
 		// Use the stored GraphicsSystem pointer to check window state
 		//This is windows specific
-		while (EngineFramework::GraphicsSystem::GetInstance().GetGLFWwindow()) // Replace 'true' with window check
+		while (!glfwWindowShouldClose(EngineFramework::GraphicsSystem::GetInstance().GetGLFWwindow())) // Replace 'true' with window check
 		{
 			Game_Update();
 		}

@@ -1,4 +1,8 @@
-#version 420 core
+#version 310 es
+
+//Specify precision for es. Use highp for more accuracy in 3D.
+precision highp float;
+precision highp int;
 
 layout(location=0) in vec3 VertexPosition;
 layout(location=1) in vec3 VertexNormal;

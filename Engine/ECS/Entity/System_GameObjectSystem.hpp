@@ -49,30 +49,36 @@ namespace EngineFramework
 		void Update(float delta_time) override;
 
 		/*
-			Save gameobject archtypes to files using reflection.
-			Each archtype is saved to their own respective files with their own respective names, in the folder.
+		 	Write to json strings using reflection.
+			Returns an array of <archetype name, json string> where each pair represents the archetype name and the json string to save to
+			their file. Use the archetype name as the file name when saving.
 		*/
-		void SerializeAllEntityArchtypes(const std::string& folder_path);
+		std::vector<std::pair<std::string, std::string>> SerializeAllEntityArchtypes();
 
 		/*
-			Read gameobject archtypes from files using reflection.
-			Each archtype is read from their own respective files with their own respective names, in the folder.
-			After construction, each entity id is stored together with its name inside the archtype entities map.
+			Read gameobject archtypes from json strings using reflection.
+			Each archtype is read as a pair of <archetype name, json string> stored in the archetype array passed to this function.
+			Ensure the archetype name is completely read (from the file name) and accounts for spaces.
+			After construction, each entity id (representing an archetype) is stored together with its name inside the archtype entities map.
 
 			Do once at the start of the program. 
 		*/
-		void DeserializeAllEntityArchtypes(const std::string& folder_path);
+		void DeserializeAllEntityArchtypes(const std::vector<std::pair<std::string, std::string>>& json_input);
 
 		/*
-			Save gameobject instances to a specified level file using reflection.
+			Write gameobject instances to a json string using reflection.
+			Returns a json string that can be written to a scene file.
 		*/
-		void SerializeAllEntityInstances(const std::string& level_file_path);
+		std::string SerializeAllEntityInstances();
 
 		/*
-			Read gameobject instances from a specified level file using reflection.
-			Before this, all archtypes need to be read.
+			Read gameobject instances from json string using reflection.
+			The json string represents a json string read from a scene file.
+			After construction, entities are stored inside entt::registry.
+
+			Ensure all archetypes are deserialized before calling this.
 		*/
-		void DeSerializeAllEntityInstances(const std::string& level_file_path);
+		void DeSerializeAllEntityInstances(const std::string& json_input);
 		
 		//Keeps track of the one and only instance of this system, created by core engine.
 		static inline GameObjectSystem* this_system{};

@@ -88,7 +88,7 @@ struct FBO
         GLuint depthBuf;
         glGenRenderbuffers(1, &depthBuf);
         glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 
         // Attach the depth buffer to the framebuffer
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuf);
@@ -100,7 +100,7 @@ struct FBO
         if (handle)
             glDeleteFramebuffers(1, &handle);
 
-        if (pTexture)
+        if (pTexture && *pTexture) // Add check if pointer is valid before deleting
             glDeleteTextures(1, pTexture);
 
         // Create and bind the framebuffer
@@ -117,15 +117,20 @@ struct FBO
         GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
         glDrawBuffers(1, drawBuffers);
 
-        // Unbind the framebuffer, and revert to default framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        // Check for errors
+        // *** FIX: Check the status of OUR FBO (handle) before unbinding it ***
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (result != GL_FRAMEBUFFER_COMPLETE)
+        {
+            // Unbind before throwing to avoid leaving our broken FBO bound.
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             throw std::runtime_error(std::string("Error ") +
                 std::to_string(result) +
                 ": Framebuffer is not complete.\n");
+        }
+
+        // *** FIX: Unbind only after a successful check ***
+        // Revert to the default framebuffer.
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     void resetTextureDepthAsTarget(int width, int height)
@@ -135,7 +140,7 @@ struct FBO
         if (handle)
             glDeleteFramebuffers(1, &handle);
 
-        if (pTexture)
+        if (pTexture && *pTexture) // Add check if pointer is valid before deleting
             glDeleteTextures(1, pTexture);
 
         GLfloat border[] = { 1.0f, 0.0f,0.0f,0.0f };
@@ -164,15 +169,18 @@ struct FBO
         GLenum drawBuffers[] = { GL_NONE };
         glDrawBuffers(1, drawBuffers);
 
-        // Unbind the framebuffer, and revert to default framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        // Check for errors
+        // *** FIX: Check status before unbinding ***
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (result != GL_FRAMEBUFFER_COMPLETE)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             throw std::runtime_error(std::string("Error ") +
                 std::to_string(result) +
                 ": Framebuffer is not complete.\n");
+        }
+
+        // *** FIX: Unbind after successful check ***
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     // Configures the FBO for deferred rendering
@@ -199,15 +207,18 @@ struct FBO
                                 GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
         glDrawBuffers(4, drawBuffers);
 
-        // Unbind the framebuffer, and revert to default framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        // Check for errors
+        // *** FIX: Check status before unbinding ***
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (result != GL_FRAMEBUFFER_COMPLETE)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             throw std::runtime_error(std::string("Error ") +
                 std::to_string(result) +
                 ": Framebuffer is not complete.\n");
+        }
+
+        // *** FIX: Unbind after successful check ***
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 };
 

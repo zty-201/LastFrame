@@ -1,6 +1,8 @@
 #include <jni.h>
 #include <string>
 #include <android/log.h>
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
 // Ensure JNI macros are available
 #ifndef JNIEXPORT
 #define JNIEXPORT
@@ -29,27 +31,28 @@ Java_com_example_jnicpp_MainActivity_stringFromJNI(
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_example_jnicpp_MainActivity_initGL(
         JNIEnv* env,
-        jobject /* this */) {
-    LOGI("initGL called");
-//// Create renderer if not exists
-//    if (g_renderer == nullptr) {
-//        LOGI("Creating new GLRenderer instance");
-//        g_renderer = new GLRenderer();
-//        if (g_renderer == nullptr) {
-//            LOGE("Failed to create GLRenderer instance");
-//            return JNI_FALSE;
-//        }
-//    }
-//// Initialize OpenGL renderer (no longer needs surface parameter)
-//    bool success = g_renderer->initialize();
-//    if (success) {
-//        LOGI("OpenGL initialization successful");
-//    } else {
-//        LOGE("OpenGL initialization failed");
-//    }
-    Game_Initialize();
+        jobject /* this */,
+        jobject assetManager) {
+
+    LOGI("initGL called with AssetManager");
+    //Ensure garbage collector does not free the reference up.
+    env->NewGlobalRef(assetManager);
+    // Get AssetManager from Java object
+    AAssetManager* nativeAssetManager = nullptr;
+    if (assetManager != nullptr) {
+        nativeAssetManager = AAssetManager_fromJava(env, assetManager);
+        if (nativeAssetManager == nullptr) {
+            LOGE("Failed to get native AssetManager");
+            return JNI_FALSE;
+        }
+        LOGI("AssetManager obtained successfully");
+    } else {
+        LOGE("AssetManager is null");
+        return JNI_FALSE;
+    }
+    //Pass the asset manager to c++ code.
+    Game_Initialize((void*)nativeAssetManager);
     return JNI_TRUE;
-    //return success ? JNI_TRUE : JNI_FALSE;
 }
 extern "C" JNIEXPORT void JNICALL
 Java_com_example_jnicpp_MainActivity_renderFrame(
