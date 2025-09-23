@@ -151,6 +151,8 @@ namespace EngineFramework
     {
 		UNREFERENCED_PARAMETER(window);
         Event_Window_Resized window_resize;
+        windowWidth = width;
+        windowHeight = height;
         window_resize.width = width;
         window_resize.height = height;
         event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
@@ -220,7 +222,8 @@ namespace EngineFramework
 
     void InputManager::Initialize()
     {
-        //Do nothing
+        windowWidth = GraphicsSystem::GetInstance().GetWindowSize().first;
+        windowHeight = GraphicsSystem::GetInstance().GetWindowSize().second;
     }
 
     void InputManager::Update(float deltaTime)

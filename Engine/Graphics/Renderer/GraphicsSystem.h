@@ -29,7 +29,7 @@ namespace EngineFramework
 #endif
 		std::unique_ptr<Scene>& GetScene() { return pScene; }
 		GLuint GetSceneTextureID() const { return sceneTextureID; }
-
+        std::pair<int, int> GetWindowSize() const { return std::pair<int, int>(static_cast<int>(screen.x), static_cast<int>(screen.y)); }
 
     private:
         std::unique_ptr<Scene> pScene;
