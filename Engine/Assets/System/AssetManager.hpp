@@ -134,7 +134,7 @@ namespace EngineFramework {
 				auto requested_type = entt::resolve<std::shared_ptr<T> >().info();
 				if (actual_type == requested_type)
 				{
-					return &it->second.cast<std::shared_ptr<T> >();
+					return it->second.cast<std::shared_ptr<T> >();
 				}
 			}
 			return nullptr;
@@ -167,6 +167,16 @@ namespace EngineFramework {
 
 			return return_val;
 		}
+
+		/*
+			String names for each asset type, so they are consistent across the entire program.
+		*/
+		static inline constexpr const char TEXTURE[]{ "texture" };
+		static inline constexpr const char MESH[]{ "mesh" };
+		static inline constexpr const char SHADER[]{ "shader" };
+		static inline constexpr const char CUBEMAP[]{ "cubemap" };
+		static inline constexpr const char AUDIO[]{ "audio" };
+
 	private:
 		//Delete a resource from the map, calling its destructor.
 		static void RemoveResource(const xresource::full_guid& guid)

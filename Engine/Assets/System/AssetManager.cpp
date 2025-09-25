@@ -11,7 +11,10 @@
 #include <system_error>
 #include <fstream>
 #include <filesystem>
+
+//Asset structs
 #include "scene.h"
+#include "ShaderProgram.h"
 namespace EngineFramework {
 
 	// -------- lifecycle --------
@@ -142,10 +145,10 @@ namespace EngineFramework {
 	void AssetManagerSystem::Initialize()
 	{
 		//==Add function loaders for each type==//
-		asset_loader_map["texture"] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadTexture);
-		asset_loader_map["cubemap"] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadCubemap);
-		asset_loader_map["mesh"] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadMesh);
-		asset_loader_map["shader"] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadShader);
+		asset_loader_map[TEXTURE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadTexture);
+		asset_loader_map[CUBEMAP] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadCubemap);
+		asset_loader_map[MESH] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadMesh);
+		asset_loader_map[SHADER] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadShader);
 
 
 		/*
@@ -161,6 +164,8 @@ namespace EngineFramework {
 			For each asset, load using the respective loader (use resource_type to access the loader) and create a full_guid.
 
 			Modify <guid, name> map for serialization.
+
+			//TODO: Multithreading for asset loading here. Ensure no race conditions(like writing to the resource map) and multi-threaded safety within the function loaders too. (e.g. accessing the same file, writing to the same resource map).
 		*/
 		for (auto& [resource_type, folderpath_string] : config_json.items())
 		{
@@ -193,7 +198,7 @@ namespace EngineFramework {
 	{
 		LOGD("Loading Texture");
 		//Used as part of the final assets' guid.
-		xresource::type_guid type_guid{ "texture" };
+		xresource::type_guid type_guid{ TEXTURE };
 		//Acceptable files that can be loaded as a texture.
 		std::vector<std::string> texture_extensions{ ".png" };
 
@@ -218,7 +223,7 @@ namespace EngineFramework {
 	{
 		LOGD("Loading Cubemap");
 		//Used as part of the final asset guid.
-		xresource::type_guid type_guid{ "cubemap" };
+		xresource::type_guid type_guid{ CUBEMAP };
 		//Read the Config File
 		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
 		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
@@ -238,15 +243,40 @@ namespace EngineFramework {
 	bool AssetManagerSystem::LoadMesh(const std::filesystem::path& folder_path)
 	{
 		UNREFERENCED_PARAMETER(folder_path);
-		xresource::type_guid type_guid{ "mesh" };
-		LOGI("Loading Mesh");
+		xresource::type_guid type_guid{ MESH };
+		LOGI("Mesh Loader not yet implemented.");
 		return true;
 	}
-	bool AssetManagerSystem::LoadShader(const std::filesystem::path& folder_path)
+	bool AssetManagerSystem::LoadShader(const std::filesystem::path& config_file)
 	{
-		UNREFERENCED_PARAMETER(folder_path);
-		xresource::type_guid type_guid{ "shader" };
+		xresource::type_guid type_guid{ SHADER };
 		LOGI("Loading Shader");
+
+		//Read the Config File
+		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
+		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
+
+		//The config file should contain <name, shader_filepaths> pairs
+		for (auto& [shader_name, shader_filepaths] : config_json.items())
+		{
+			xresource::full_guid asset_guid = GetFullGuid(type_guid, shader_name);
+			//Read vertex and fragment shader filepaths.
+			//Always throw an error if not present, as these are critical for a shader program (unlike geometry or tesselation).
+			if (!shader_filepaths.contains("vertex"))
+			{
+				throw std::invalid_argument((std::string("No vertex filepath in config file for shader program ") + shader_name +", did you mispell it?").c_str());
+			}
+			if (!shader_filepaths.contains("fragment"))
+			{
+				throw std::invalid_argument((std::string("No fragment filepath in config file for shader program ") + shader_name + ", did you mispell it?").c_str());
+			}
+			std::string vertex_shader = shader_filepaths["vertex"];
+			std::string fragment_shader = shader_filepaths["fragment"];
+			//Allocate resource
+			std::shared_ptr<ShaderProgram> resource(new ShaderProgram(vertex_shader.c_str(), fragment_shader.c_str()));
+			AddResource(asset_guid, resource);
+		}
 		return true;
 	}
 
