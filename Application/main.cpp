@@ -21,11 +21,31 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "System_GameObjectSystem.hpp"
 #include "Assets/AssetManager.hpp"
 #include "Audio/Audio.hpp"
+#include "Scripting/Script.hpp"   // testing scripting (?)
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "System_LevelEditor.hpp"
 #endif
 
+// --- Native script smoke test -----------------------------------------------
+struct Spinner : Engine::ScriptableEntity {
+	float t = 0.0f;
+	void OnCreate() override {
+		LOGI("[Spinner] OnCreate");
+	}
+	void OnUpdate(float dt) override {
+		t += dt;
+		if (t >= 0.5f) {
+			LOGI("[Spinner] tick");
+			t = 0.0f;
+		}
+	}
+	void OnDestroy() override {
+		LOGI("[Spinner] OnDestroy");
+	}
+};
+// -----------------------------------------------------------------------------
+// End of Jerron's Scripting testing
 
 //Initialization of game application.
 //android_asset_manager should only be set when building for android.
@@ -145,6 +165,23 @@ void Game_Initialize(void* android_asset_manager)
 	try
 	{
 		core_engine.InitializeSystems();
+		//Jerron's playground
+		// --- Start scripting runtime ---
+		Engine::ScriptSystem::Init();
+
+		// IMPORTANT: use your global/global-accessible registry here.
+		// If you have a global entt::registry named `registry`, use it.
+		// If your GameObjectSystem owns the registry, expose and use it instead.
+		extern entt::registry registry;                 // <-- comment out if not using a global
+		Engine::ScriptSystem::OnRuntimeStart(registry); // start script runtime
+
+		// Create a test entity with a native script
+		{
+			auto e = registry.create();
+			auto& nsc = registry.emplace<Engine::NativeScriptComponent>(e);
+			nsc.Bind<Spinner>(); // instantiates lazily on first update
+		}
+		//End of Playground
 	}
 	catch (std::exception& e)
 	{
@@ -171,6 +208,12 @@ void Game_Update()
 	//TODO: Try-Catch handling in Update/PostUpdate.
 	core_engine.UpdateSystems(delta_time);
 
+	// tick scripting by jerron
+	extern entt::registry registry;                       // or EngineFramework::GetRegistry()
+	Engine::ScriptSystem::OnUpdate(registry, delta_time);
+
+	// --- Jerrons scripting playground ---
+
 	core_engine.PostUpdateSystems(delta_time);
 
 	//Send all queued events in order.
@@ -186,5 +229,8 @@ void Game_Update()
 
 void Game_Destroy()
 {
-
+	// stop script runtime and shutdown
+	extern entt::registry registry;                   // or EngineFramework::GetRegistry()
+	Engine::ScriptSystem::OnRuntimeStop(registry);
+	Engine::ScriptSystem::Shutdown();
 }
