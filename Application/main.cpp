@@ -27,12 +27,6 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <iostream>
 #endif
 
-struct Transform {
-	float x, y, z;
-};
-
-entt::entity myEntity, myMyEntity, ent2;
-
 //Initialization of game application.
 //android_asset_manager should only be set when building for android.
 void Game_Initialize(void* android_asset_manager)
@@ -151,17 +145,6 @@ void Game_Initialize(void* android_asset_manager)
 	try
 	{
 		core_engine.InitializeSystems();
-
-		myEntity = registry.create();
-		registry.emplace<Transform>(myEntity, 0.f, 0.f, 0.f);
-
-		myMyEntity = registry.create();
-		registry.emplace<Transform>(myMyEntity, 0.f, 0.f, 0.f);
-
-		ent2 = registry.create();
-		registry.emplace<Transform>(ent2, 0.f, 0.f, 0.f);
-
-		if(registry.valid(myEntity) && registry.valid(myMyEntity) && registry.valid(ent2)) std::cout << "Entities created!\n";
 	}
 	catch (std::exception& e)
 	{
@@ -203,6 +186,4 @@ void Game_Update()
 
 void Game_Destroy()
 {
-	registry.destroy(myEntity);
-	registry.destroy(myMyEntity);
 }
