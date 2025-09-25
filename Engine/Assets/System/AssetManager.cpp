@@ -150,7 +150,23 @@ namespace EngineFramework {
 		asset_loader_map[MESH] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadMesh);
 		asset_loader_map[SHADER] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadShader);
 
+		LoadAllResources();
+	}
+	void AssetManagerSystem::Update(float)
+	{
 
+	}
+	void AssetManagerSystem::PostUpdate(float)
+	{
+
+	}
+
+	/*
+		Reads the config file located at ASSET_CONFIG_FILE, and calls the respective asset function loaders for each folder/config path.
+		Will write into the resource maps.
+	*/
+	void AssetManagerSystem::LoadAllResources()
+	{
 		/*
 			Access each folder specified in the json file.
 		*/
@@ -182,14 +198,6 @@ namespace EngineFramework {
 				throw std::exception((std::string("Unable to load asset of type: ") + resource_type).c_str());
 			}
 		}
-	}
-	void AssetManagerSystem::Update(float)
-	{
-
-	}
-	void AssetManagerSystem::PostUpdate(float)
-	{
-
 	}
 
 
@@ -265,7 +273,7 @@ namespace EngineFramework {
 			//Always throw an error if not present, as these are critical for a shader program (unlike geometry or tesselation).
 			if (!shader_filepaths.contains("vertex"))
 			{
-				throw std::invalid_argument((std::string("No vertex filepath in config file for shader program ") + shader_name +", did you mispell it?").c_str());
+				throw std::invalid_argument((std::string("No vertex filepath in config file for shader program ") + shader_name + ", did you mispell it?").c_str());
 			}
 			if (!shader_filepaths.contains("fragment"))
 			{
@@ -278,6 +286,34 @@ namespace EngineFramework {
 			AddResource(asset_guid, resource);
 		}
 		return true;
+	}
+	bool AssetManagerSystem::LoadAudio(const std::filesystem::path& folder_path)
+	{
+		xresource::type_guid type_guid{ AUDIO };
+		LOGI("Loading Audio");
+
+		//Acceptable files that can be loaded as an audio asset.
+		std::vector<std::string> audio_extensions{ ".mp3" };
+
+		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, audio_extensions);
+
+		//Iterate through all audio files
+		for (const std::filesystem::path& path : files)
+		{
+			//Get guid (and update guid_name_map by calling GetFullGuid).
+			std::string name = path.stem().string();
+			xresource::full_guid asset_guid = GetFullGuid(type_guid, name);
+
+			//TODO: Allocate resource
+			
+
+			//AddResource(asset_guid, resource);
+		}
+
+
+		//NOTE: RETURNING FALSE AS NOT COMPLETE.
+
+		return false;
 	}
 
 	//// -------- small helpers --------

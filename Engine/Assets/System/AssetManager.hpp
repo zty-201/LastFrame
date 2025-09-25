@@ -114,6 +114,7 @@ namespace EngineFramework {
 		void Initialize() override;
 		void Update(float) override;
 		void PostUpdate(float) override;
+		
 
 		// Add a resource to the resource map (store shared_ptr of the resource as meta_any)
 		template<typename T>
@@ -178,6 +179,13 @@ namespace EngineFramework {
 		static inline constexpr const char AUDIO[]{ "audio" };
 
 	private:
+		
+		/*
+			Reads the config file located at ASSET_CONFIG_FILE, and calls the respective asset function loaders for each folder/config path.
+			Will write into the resource maps.
+		*/
+		static void LoadAllResources();
+
 		//Delete a resource from the map, calling its destructor.
 		static void RemoveResource(const xresource::full_guid& guid)
 		{
@@ -203,15 +211,18 @@ namespace EngineFramework {
 		static bool LoadCubemap(const std::filesystem::path&);
 		static bool LoadMesh(const std::filesystem::path&);
 		static bool LoadShader(const std::filesystem::path&);
+		static bool LoadAudio(const std::filesystem::path&);
+
 
 		static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer
 #ifdef PLATFORM_ANDROID
 		static inline AAssetManager* android_asset_manager = nullptr;
 #endif
-		// <guid, name> map for serialization purposes. Can also be used when renaming assets.
-		static inline std::unordered_map<xresource::instance_guid, std::string> guid_name_map{};
 		// <resource_type, func> that maps a resource type to a function. The function loads all assets within the directory, and sets guid_name_map as well.
 		static inline std::unordered_map<std::string, std::function<bool(const std::filesystem::path&)>> asset_loader_map{};
+		// <guid, name> map. Before serialization, asset instance_guid handles are converted to name, then the name is hashed back to instance_guid. 
+		// This accounts for name changes during run-time (any asset name changes just update this map).
+		static inline std::unordered_map<xresource::instance_guid, std::string> guid_name_map{};
 		// <full_guid, resource_type> that maps a guid to a resource.
 		static inline std::unordered_map<xresource::full_guid, entt::meta_any> resource_map{};
 
