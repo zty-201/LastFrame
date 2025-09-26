@@ -46,6 +46,7 @@ GLuint loadHdrCubeMap(std::initializer_list<const char*> filenames);
 //
 struct Scene
 {
+    float aspect;
     // Structure to represent a texture used in the scene
     struct Texture
     {
