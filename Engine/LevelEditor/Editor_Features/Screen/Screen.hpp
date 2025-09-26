@@ -25,10 +25,15 @@ namespace EngineFramework
         void Initialize() override;
         void Run() override;
         void Close() override;
+
+        static bool control_open;
+        static bool simulator_running;
     private:
         void display_screen();
         void camera_controls_outside_screen();
         void camera_controls_in_screen_only();
+        void control_window();
+         
     };
 
 }

@@ -17,10 +17,14 @@
 #include "ReflectionRegister.hpp"
 #include "GraphicsSystem.h"
 #include "Screen.hpp"
-
-
+#include "ImGuizmo.h"
+//#include <iostream>
 namespace EngineFramework
 {
+    bool Screen::control_open = false;
+    bool Screen::simulator_running = false;
+
+
     Screen::Screen() {
         LOGI("Lfeature: Screen CREATED");
     }
@@ -33,20 +37,45 @@ namespace EngineFramework
     }
     void Screen::Run() {
 
-        
-        ImGui::SetNextWindowSize(ImVec2(420, 260), ImGuiCond_FirstUseEver);
+        ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
+        ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500
 
-        ImGui::Begin("level loaded: <name>", &is_enabled);
-              
-        display_screen();
+        if (ImGui::Begin("level loaded: <name>", &is_enabled, ImGuiWindowFlags_MenuBar)) {
 
-        if (bool hovered = ImGui::IsItemHovered()) {
-            camera_controls_in_screen_only();
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
+            if (ImGui::BeginMenuBar()) {
+
+                if (ImGui::MenuItem("Run Simulator", NULL, &simulator_running)) {
+                    //std::cout << "Run Simulator\n";                   
+                }
+
+                ImGui::SameLine(0, 50.0f); // The second argument controls the spacing in pixels
+
+
+                if (ImGui::MenuItem("Interface Controls", NULL, &control_open)) {
+                    //std::cout << "Controls\n";                   
+                }
+
+                ImGui::EndMenuBar();
+
+            }
+
+            ImGui::PopStyleColor();
+
+
+            display_screen();
+            control_window();
+
+            if (bool hovered = ImGui::IsItemHovered()) {               
+                camera_controls_in_screen_only();
+            }
+            camera_controls_outside_screen();
+
         }
-        camera_controls_outside_screen();
 
+        ImGui::PopStyleColor();
         ImGui::End();
-
+      
     }
     void Screen::Close() {
         LOGI("Screen closed");
@@ -131,6 +160,121 @@ namespace EngineFramework
             //std::cout << "scroll: " << Mouse_Scroll << std::endl;
             GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, Mouse_Scroll));
         }
+
+    }
+
+    void Screen::control_window() {
+
+        if (!control_open) return; //if it is not enabled, return
+
+
+        ImGui::SetNextWindowSize(ImVec2(620, 260), ImGuiCond_FirstUseEver);
+
+        // No flags that block move/resize
+        ImGui::Begin("Control Panel", &is_enabled);
+
+
+
+        if (ImGui::BeginTabBar("Types of Controls", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_FittingPolicyResizeDown)) {
+
+            // -------- Gizmos tab --------
+            if (ImGui::BeginTabItem("Transformation (Gizmos)")) {
+
+                static ImGuizmo::OPERATION operation = ImGuizmo::TRANSLATE;
+                static ImGuizmo::MODE mode = ImGuizmo::LOCAL;
+
+                
+                ImGui::Dummy(ImVec2(0.0f, 20.f));
+                ImGui::SeparatorText("Gizmos");
+                ImGui::Dummy(ImVec2(0.0f, 20.f));
+
+                ImGui::TextUnformatted("Type: ");
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Translate", operation == ImGuizmo::TRANSLATE)) operation = ImGuizmo::TRANSLATE;
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Rotate", operation == ImGuizmo::ROTATE))    operation = ImGuizmo::ROTATE;
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Scale", operation == ImGuizmo::SCALE))     operation = ImGuizmo::SCALE;
+                ImGui::Dummy(ImVec2(0.0f, 20.f));
+                
+                ImGui::TextUnformatted("Coord Space: ");
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Local", mode == ImGuizmo::LOCAL))  mode = ImGuizmo::LOCAL;
+                ImGui::SameLine();
+                if (ImGui::RadioButton("World", mode == ImGuizmo::WORLD))  mode = ImGuizmo::WORLD;
+                ImGui::Dummy(ImVec2(0.0f, 200.f));
+
+                
+
+                //if any object is being selected
+                if (true) {
+
+                    ImGui::SeparatorText("Object's Transformation");
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    ImGui::TextUnformatted("Object Selected (ID): ");
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    
+                    
+                    ImGui::Separator();
+
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    ImGui::TextUnformatted("#Translation: ");
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+
+      
+                    ImGui::Separator();
+
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    ImGui::TextUnformatted("#Scale: ");
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+
+                    
+                    ImGui::Separator();
+
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    ImGui::TextUnformatted("#Rotation: ");
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+
+                    
+                    ImGui::Separator();
+
+                }
+                
+                ImGui::EndTabItem();
+            }
+
+            // -------- Lighting tab --------
+            if (ImGui::BeginTabItem("Lighting")) {
+                
+                ImGui::TextUnformatted("see how");
+                
+
+                ImGui::EndTabItem();
+            }
+
+            if (ImGui::BeginTabItem("Camera Navigation")) {
+                ImGui::Spacing();
+                ImGui::TextUnformatted("Up Arrrow        or    Q_key   :   Move Up");
+                ImGui::Separator();
+                ImGui::TextUnformatted("Down Arrrow      or    E_key   :   Move Down");
+                ImGui::Separator();
+                ImGui::TextUnformatted("Left Arrrow      or    A_key   :   Move Left");
+                ImGui::Separator();
+                ImGui::TextUnformatted("Right Arrrow     or    D_key   :   Move Right");
+                ImGui::Separator();
+                ImGui::TextUnformatted("Scoll Backward   or    S_key   :   Move Backwards");
+                ImGui::Separator();
+                ImGui::TextUnformatted("Scoll Forward    or    W_key   :   Move Forwards");
+                ImGui::Separator();
+                ImGui::TextUnformatted("Mouse Right Dragged            :   Look around");
+                ImGui::EndTabItem();
+            }
+
+
+            ImGui::EndTabBar();
+        }
+
+        ImGui::End();
 
     }
 
