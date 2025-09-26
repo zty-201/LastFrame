@@ -51,6 +51,8 @@ namespace EngineFramework
     }
     void Screen::Run() {
 
+        GraphicsSystem::GetInstance().GetScene().get()->camerasSetType(WALKING);
+
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
         ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500
 

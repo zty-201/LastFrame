@@ -142,7 +142,7 @@ public:
             const float yaw_sens = 0.005f;
             const float pitch_sens = 0.003f;
             betta -= (float)xoffset * yaw_sens;    // flip to "-xoffset" if you prefer the opposite
-            alpha += (float) - yoffset * pitch_sens;  // minus makes up = up
+            alpha -= (float) - yoffset * pitch_sens;  // minus makes up = up
 
             // Clamp vertical angle
             alpha = glm::clamp(alpha, -PI05 + 0.01f, PI05 - 0.01f);
