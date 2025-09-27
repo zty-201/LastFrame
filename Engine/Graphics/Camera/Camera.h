@@ -11,12 +11,17 @@ enum CameraType { ORBITING, WALKING };
 //
 class Camera
 {
+
+public:
     CameraType camType; // Stores the type of camera (ORBITING or WALKING)
     glm::vec3 position; // Current position of the camera in 3D space
     glm::vec3 target;   // Target point that the camera is looking at
     float fieldOfView;  // Field of view angle in degrees
     float nearPlane;         // Near clipping plane
     float farPlane;          // Far clipping plane
+
+    glm::mat4 view_vector;
+    glm::mat4 proj_matrix;
 
     double oldx; // Previous x-coordinate for cursor handling
     double oldy; // Previous y-coordinate for cursor handling
@@ -82,23 +87,32 @@ public:
             target = { 0.0f, 0.0f, 0.0f }; // Orbiting cameras always target the origin
     }
 
+    void set_Cam_Pos(glm::vec3 pos) {
+        position = pos;
+    }
+
+    void set_Target_Pos(glm::vec3 pos) {
+        target = pos;
+    }
+
     // Updates the shader program with camera position
     void setUniforms(ShaderProgram* pProgram) const
     {
         pProgram->setUniform("camera.position", position); // Pass camera position to the shader
     }
-
     // Returns the view matrix for the camera using the "look at" method
-    glm::mat4 getLookAt(glm::vec3 center = { 0.0f, 0.0f, 0.0f }, glm::vec3 up = { 0.0f, 1.0f, 0.0f }) const
+    glm::mat4 getLookAt(glm::vec3 center = { 0.0f, 0.0f, 0.0f }, glm::vec3 up = { 0.0f, 1.0f, 0.0f })
     {
         UNREFERENCED_PARAMETER(center);
-        return glm::lookAt(position, target, up);
+        view_vector = glm::lookAt(position, target, up);
+        return view_vector;
     }
 
     // Returns the perspective projection matrix based on the field of view and aspect ratio
-    glm::mat4 getPerspective(float aspect = 1) const
+    glm::mat4 getPerspective(float aspect = 1)
     {
-        return glm::perspective(glm::radians(fieldOfView), aspect, nearPlane, farPlane);
+        proj_matrix = glm::perspective(glm::radians(fieldOfView), aspect, nearPlane, farPlane);
+        return proj_matrix;
     }
 
     // Handles cursor movement to adjust camera orientation
@@ -115,7 +129,7 @@ public:
             float betta = std::atan2f(position.x, position.z); // Horizontal angle
 
             // Adjust angles based on cursor offset
-            if (yoffset < 0.0)
+            /*if (yoffset < 0.0)
                 alpha += -0.02f;
             else if (yoffset > 0.0)
                 alpha += 0.02f;
@@ -123,7 +137,12 @@ public:
             if (xoffset < 0.0)
                 betta += 0.05f;
             else if (xoffset > 0.0)
-                betta += -0.05f;
+                betta += -0.05f;*/
+
+            const float yaw_sens = 0.005f;
+            const float pitch_sens = 0.003f;
+            betta -= (float)xoffset * yaw_sens;    // flip to "-xoffset" if you prefer the opposite
+            alpha -= (float) - yoffset * pitch_sens;  // minus makes up = up
 
             // Clamp vertical angle
             alpha = glm::clamp(alpha, -PI05 + 0.01f, PI05 - 0.01f);
@@ -144,7 +163,7 @@ public:
             float betta = std::atan2f((target.x - position.x), (target.z - position.z));
 
             // Adjust angles based on cursor offset
-            if (yoffset < 0.0)
+            /*if (yoffset < 0.0)
                 alpha += -0.02f;
             else if (yoffset > 0.0)
                 alpha += 0.02f;
@@ -152,7 +171,12 @@ public:
             if (xoffset < 0.0)
                 betta += -0.05f;
             else if (xoffset > 0.0)
-                betta += 0.05f;
+                betta += 0.05f;*/
+
+            const float yaw_sens = 0.005f;
+            const float pitch_sens = 0.003f;
+            betta -= (float)xoffset * yaw_sens;    // flip to "-xoffset" if you prefer the opposite
+            alpha += (float) - yoffset * pitch_sens;  // minus makes up = up
 
             // Clamp vertical angle
             alpha = glm::clamp(alpha, -PI05 + 0.01f, PI05 - 0.01f);
