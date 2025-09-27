@@ -21,9 +21,23 @@
 //#include <iostream>
 namespace EngineFramework
 {
-    bool Screen::control_open = false;
-    bool Screen::simulator_running = false;
+    bool Screen::is_control_open = false;
+    bool Screen::is_simulator_running = false;
+    bool Screen::gizmos_IS_hovering = false;
+    bool Screen::gizmos_IS_dragged = false;
 
+    //set these to default first
+    static ImGuizmo::OPERATION operation = ImGuizmo::TRANSLATE;
+    static ImGuizmo::MODE mode = ImGuizmo::WORLD;
+    static ImVec2 available_size{};
+    static ImVec2 screen_pos{};
+    static float camDistance = 8.f;
+
+    static const float identityMatrix[16] =
+    { 1.f, 0.f, 0.f, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f };
 
     Screen::Screen() {
         LOGI("Lfeature: Screen CREATED");
@@ -37,6 +51,8 @@ namespace EngineFramework
     }
     void Screen::Run() {
 
+        GraphicsSystem::GetInstance().GetScene().get()->camerasSetType(WALKING);
+
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
         ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500
 
@@ -45,14 +61,25 @@ namespace EngineFramework
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
             if (ImGui::BeginMenuBar()) {
 
-                if (ImGui::MenuItem("Run Simulator", NULL, &simulator_running)) {
-                    //std::cout << "Run Simulator\n";                   
+                if (ImGui::MenuItem("Run Simulator", NULL, &is_simulator_running)) {
+                    //std::cout << "Run Simulator\n";
+
+                    int size = (int)GraphicsSystem::GetInstance().GetScene().get()->passes[0].objects.size();
+
+                    //std::cout<< "pass 0 object size: "<<GraphicsSystem::GetInstance().GetScene().get()->passes[0].objects.size() <<std::endl;
+
+                    for (int i = 0; i < size; i++) {
+
+                        //std::cout << "object " << i << " | size = " << GraphicsSystem::GetInstance().GetScene().get()->passes[0].objects[i].instances.size() << std::endl;
+
+                    }
+
                 }
 
                 ImGui::SameLine(0, 50.0f); // The second argument controls the spacing in pixels
 
 
-                if (ImGui::MenuItem("Interface Controls", NULL, &control_open)) {
+                if (ImGui::MenuItem("Interface Controls", NULL, &is_control_open)) {
                     //std::cout << "Controls\n";                   
                 }
 
@@ -64,6 +91,7 @@ namespace EngineFramework
 
 
             display_screen();
+            gizmos();
             control_window();
 
             if (bool hovered = ImGui::IsItemHovered()) {               
@@ -83,8 +111,8 @@ namespace EngineFramework
 
     void Screen::display_screen() {
 
-        //ImVec2 imagepos = ImGui::GetCursorScreenPos();
-        ImVec2 available_size = ImGui::GetContentRegionAvail();
+        screen_pos = ImGui::GetCursorScreenPos();
+        available_size = ImGui::GetContentRegionAvail();
         static ImVec2 available_size_old = available_size;
         static bool first_init = true;
 
@@ -119,22 +147,33 @@ namespace EngineFramework
 
         float speed = 0.05f;
 
-        if (ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
+        if (ImGui::IsKeyDown(ImGuiKey_W)) {
+
+            //GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, Mouse_Scroll));
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, speed));
+        }
+
+        if (ImGui::IsKeyDown(ImGuiKey_S)) {
+
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, -speed));
+        }
+
+        if (ImGui::IsKeyDown(ImGuiKey_Q) || ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
             //up vector
             GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, speed, 0));
             //std::cout << "UP !" << std::endl;
         }
-        if (ImGui::IsKeyDown(ImGuiKey_DownArrow)) {
+        if (ImGui::IsKeyDown(ImGuiKey_E) || ImGui::IsKeyDown(ImGuiKey_DownArrow)) {
             //down vector
             //std::cout << "DOWN !" << std::endl;
             GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, -speed, 0));
         }
-        if (ImGui::IsKeyDown(ImGuiKey_LeftArrow)) {
+        if (ImGui::IsKeyDown(ImGuiKey_A) || ImGui::IsKeyDown(ImGuiKey_LeftArrow)) {
             //left vector
             //std::cout << "LEFT !" << std::endl;
             GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(-speed, 0, 0));
         }
-        if (ImGui::IsKeyDown(ImGuiKey_RightArrow)) {
+        if (ImGui::IsKeyDown(ImGuiKey_D) || ImGui::IsKeyDown(ImGuiKey_RightArrow)) {
             //right vector
             //std::cout << "RIGHT !" << std::endl;
             GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(speed, 0, 0));
@@ -165,7 +204,7 @@ namespace EngineFramework
 
     void Screen::control_window() {
 
-        if (!control_open) return; //if it is not enabled, return
+        if (!is_control_open) return; //if it is not enabled, return
 
 
         ImGui::SetNextWindowSize(ImVec2(620, 260), ImGuiCond_FirstUseEver);
@@ -180,10 +219,6 @@ namespace EngineFramework
             // -------- Gizmos tab --------
             if (ImGui::BeginTabItem("Transformation (Gizmos)")) {
 
-                static ImGuizmo::OPERATION operation = ImGuizmo::TRANSLATE;
-                static ImGuizmo::MODE mode = ImGuizmo::LOCAL;
-
-                
                 ImGui::Dummy(ImVec2(0.0f, 20.f));
                 ImGui::SeparatorText("Gizmos");
                 ImGui::Dummy(ImVec2(0.0f, 20.f));
@@ -209,34 +244,62 @@ namespace EngineFramework
                 //if any object is being selected
                 if (true) {
 
+                    static bool transformation_changed = false;
+
                     ImGui::SeparatorText("Object's Transformation");
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
                     ImGui::TextUnformatted("Object Selected (ID): ");
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    
-                    
+
+                    auto* scene = GraphicsSystem::GetInstance().GetScene().get();
+                    if (!scene) return;
+                    glm::mat4& model = scene->passes[0].objects[2].instances[0].modeltransform;
+
+                    float T[3], R[3], S[3];
+                    ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), T, R, S);
+                  
                     ImGui::Separator();
 
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    ImGui::TextUnformatted("#Translation: ");
+                    //ImGui::TextUnformatted("#Translation: ");
+                    transformation_changed |= ImGui::InputFloat3("Translation", T, "%.3f");
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
 
       
                     ImGui::Separator();
 
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    ImGui::TextUnformatted("#Scale: ");
+                    //ImGui::TextUnformatted("#Scale: ");
+                    transformation_changed |= ImGui::InputFloat3("Scale", S, "%.3f");
+                    
+                    
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
 
                     
                     ImGui::Separator();
 
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    ImGui::TextUnformatted("#Rotation: ");
+                    //ImGui::TextUnformatted("#Rotation: ");
+                    transformation_changed |= ImGui::InputFloat3("Rotation (deg)", R, "%.3f");
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
 
                     
                     ImGui::Separator();
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    
+                    if (ImGui::Button("Reset", ImVec2(120, 0))) {                    
+                        R[0] = R[1] = R[2] = 0.0f;
+                        S[0] = S[1] = S[2] = 1.0f;                        
+                        ImGuizmo::RecomposeMatrixFromComponents(T, R, S, glm::value_ptr(model));
+                    }
+                    ImGui::SameLine();
+                    ImGui::Text(" *only affects scale and rotation");
+
+
+                    if (transformation_changed) {                       
+                        //for (int i = 0; i < 3; ++i) if (fabsf(S[i]) < 1e-6f) S[i] = (S[i] >= 0 ? 1e-6f : -1e-6f);                       
+                        ImGuizmo::RecomposeMatrixFromComponents(T, R, S, glm::value_ptr(model));
+                    }
 
                 }
                 
@@ -275,6 +338,59 @@ namespace EngineFramework
         }
 
         ImGui::End();
+
+    }
+
+    //return true if theres a difference
+    bool Check_Mat4_Diff(const glm::mat4& a, const glm::mat4& b, float epsilon = 1e-5f) {
+        
+        const float* pa = glm::value_ptr(a);
+        const float* pb = glm::value_ptr(b);
+        for (int i = 0; i < 16; ++i) {
+            float aa = pa[i];
+            float bb = pb[i];
+            float tol = epsilon * std::max(1.0f, std::max(std::abs(aa), std::abs(bb)));
+            if (std::abs(aa - bb) > tol) return true;
+        }
+        return false;
+    }
+
+    void Screen::gizmos() {
+
+        ImGuizmo::BeginFrame(); 
+        ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+        gizmos_IS_hovering = ImGuizmo::IsOver();
+        gizmos_IS_dragged = ImGuizmo::IsUsing();
+     
+        auto* scene = GraphicsSystem::GetInstance().GetScene().get();
+        auto &cam = scene->passes[0].cameras[0];
+        glm::mat4 view = cam.getLookAt();
+        glm::mat4 proj = cam.getPerspective(scene->aspect);
+        glm::mat4 &obj = scene->passes[0].objects[2].instances[0].modeltransform;
+        ImGuizmo::SetOrthographic(false); //because we have perspective
+        
+        //set this for gizmos
+        ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
+
+        //imviewgizmo adapted from imguizmo sample demo       
+        float viewManipulateRight = screen_pos.x + available_size.x;
+        float viewManipulateTop = screen_pos.y;
+        glm::mat4 view_before = view;
+
+        ImGuizmo::DrawCubes(glm::value_ptr(view), glm::value_ptr(proj), glm::value_ptr(obj), 1);
+        ImGuizmo::ViewManipulate(glm::value_ptr(view), camDistance, ImVec2(viewManipulateRight - 128, viewManipulateTop), ImVec2(128, 128), 0x10101010);
+        
+        //whenever we clicked on the cube, view will be return with a new value
+        //ONLY if its a new value, set new cam and target position (not every frame)      
+        if (Check_Mat4_Diff(view, view_before)) {
+            //graphics system is always updating the camera view and proj based on camera pos and target pos
+            glm::vec3 new_CamPos = glm::vec3(glm::inverse(view)[3]);
+            glm::vec3 new_TargetPos = glm::vec3(obj[3]);
+            cam.set_Cam_Pos(new_CamPos);
+            cam.set_Target_Pos(new_TargetPos);
+        }
+        
+        ImGuizmo::Manipulate(glm::value_ptr(view),glm::value_ptr(proj),operation,mode, glm::value_ptr(obj));
 
     }
 
