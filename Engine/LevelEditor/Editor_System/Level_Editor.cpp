@@ -22,6 +22,7 @@
 #include "ObjectManager.hpp"
 #include "Save.hpp"
 #include "Screen.hpp"
+#include "SceneManager.hpp"
 
 namespace EngineFramework
 {
@@ -121,6 +122,7 @@ namespace EngineFramework
 		addFeature("ObjectManager", std::make_unique<ObjectManager>());
 		addFeature("Save", std::make_unique<Save>());
 		addFeature("Screen", std::make_unique<Screen>());
+		addFeature("SceneManager", std::make_unique<SceneManager>());
 
 		
 
@@ -193,9 +195,34 @@ namespace EngineFramework
 
 					ImGui::MenuItem("Open Existing", NULL, &featureFlag("Screen"));
 					ImGui::Separator();
+					if (ImGui::BeginMenu("Open Scene")) {
+						//for (const auto& sceneName : sceneList) {
+						//	if (ImGui::MenuItem(sceneName.c_str())) {
+						//		featureFlag("SceneManager") = true;
+						//		// Pass selected sceneName to SceneManager
+						//	}
+						//}
+						// Example: hardcoded scene list
+						if (ImGui::MenuItem("Scene 1")) {
+							// Load Scene 1
+							featureFlag("SceneManager") = true;
+							// SceneManager could internally track "Scene 1" as the selected scene
+						}
+
+						if (ImGui::MenuItem("Scene 2")) {
+							featureFlag("SceneManager") = true;
+							// Trigger loading Scene 2
+						}
+
+						if (ImGui::MenuItem("Scene 3")) {
+							featureFlag("SceneManager") = true;
+							// Trigger loading Scene 3
+						}
+						ImGui::EndMenu();
+					}
 					ImGui::MenuItem("Save", NULL, &featureFlag("Save"));
 					ImGui::MenuItem("Save As ..", NULL);
-					ImGui::Separator();
+					ImGui::Separator(); 
 					ImGui::MenuItem("Save & Quit", NULL);
 					ImGui::MenuItem("Quit", NULL, &to_close);
 					ImGui::PopStyleColor();  // Pop the white text color for "File" menu
