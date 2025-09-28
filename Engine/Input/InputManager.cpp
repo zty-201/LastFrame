@@ -18,13 +18,16 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "InputManager.hpp"
 #include "GraphicsSystem.h"
 //#include "Level_Editor.hpp"
+
+#if defined(DEBUG)
 #include "System_LevelEditor.hpp"
+#endif
+
 
 
 namespace EngineFramework
 {
     
-
     // Static member definitions
     std::unordered_map<int, KeyState> InputManager::keyStates;
     std::unordered_map<int, KeyState> InputManager::mouseButtonStates;
@@ -120,6 +123,8 @@ namespace EngineFramework
             if (!LevelEditorSystem::Get_Enable()) {
                 pScene->camerasOnCursor(xoffset, yoffset);
             }
+#else
+            pScene->camerasOnCursor(xoffset, yoffset);
 #endif
         }
         else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed)
@@ -128,6 +133,8 @@ namespace EngineFramework
             if (!LevelEditorSystem::Get_Enable()) {
                 pScene->lightsOnCursor(xoffset, yoffset);
             }
+#else
+            pScene->lightsOnCursor(xoffset, yoffset);
 #endif
         }
     }
@@ -144,6 +151,8 @@ namespace EngineFramework
             pScene->camerasOnScroll(xoffset, yoffset);
             //std::cout << "yoffset: " << yoffset << std::endl;
         }
+#else
+        pScene->camerasOnScroll(xoffset, yoffset);
 #endif
     }
 
