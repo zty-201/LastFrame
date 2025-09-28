@@ -99,12 +99,21 @@ void Game_Initialize(void* android_asset_manager)
 			4   // Destruct Order: Before Graphics
 		);
 
-		// 3. AssetManager: Can load assets after core systems are up.
+		// 5. AudioSystem: Depends on the game state.
+		core_engine.AddSystem(
+			"AudioSystem",
+			std::make_unique<EngineFramework::AudioSystem>(),
+			3,  // Init Order
+			7,  // Update Order: Last
+			1   // Destruct Order: First
+		);
+
+		// 3. AssetManager: Can load assets after graphics and audio systems are up.
 		core_engine.AddSystem(
 			"AssetManager",
 			std::make_unique<EngineFramework::AssetManagerSystem>(),
-			3,  // Init Order
-			2,  // Update Order: After Input
+			4,  // Init Order
+			2,  // Update Order
 			3   // Destruct Order
 		);
 
@@ -114,18 +123,9 @@ void Game_Initialize(void* android_asset_manager)
 		core_engine.AddSystem(
 			"GameObjectSystem",
 			std::make_unique<EngineFramework::GameObjectSystem>(),
-			4,  // Init Order
+			5,  // Init Order
 			3,  // Update Order: After Input and Asset Management
 			2   // Destruct Order
-		);
-
-		// 5. AudioSystem: Depends on the game state.
-		core_engine.AddSystem(
-			"AudioSystem",
-			std::make_unique<EngineFramework::AudioSystem>(),
-			5,  // Init Order
-			7,  // Update Order: Last
-			1   // Destruct Order: First
 		);
 
 		// --- Debug/Editor Systems (Conditional) ---

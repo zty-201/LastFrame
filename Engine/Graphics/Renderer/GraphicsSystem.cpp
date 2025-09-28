@@ -11,8 +11,7 @@ class LevelEditor; //forward declaration
 
 namespace EngineFramework
 {
-
-
+	
 	GraphicsSystem::GraphicsSystem()
 	{
 		this_graphics_ptr = this;
@@ -98,7 +97,6 @@ namespace EngineFramework
 		};*/
 
 		Camera camera = { { 0.0f, 1.0f, 5.0f }, 75.0f };
-
 		//Create a framebuffer for the scene to be drawn on, and read texture handle for the texturebuffer attached.
 		FBO sceneFBO(FBO::Texture, WIDTH, HEIGHT, &sceneTextureID);
 		//Do not use sceneFBO anymore, its contents have been written to the member variable.

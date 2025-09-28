@@ -86,6 +86,7 @@
 #include <android/asset_manager_jni.h>
 #endif
 
+
 namespace EngineFramework {
 
 
@@ -140,6 +141,7 @@ namespace EngineFramework {
 			}
 			return nullptr;
 		}
+
 
 
 

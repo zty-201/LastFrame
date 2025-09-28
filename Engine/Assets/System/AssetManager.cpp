@@ -15,6 +15,8 @@
 //Asset structs
 #include "scene.h"
 #include "ShaderProgram.h"
+#include "Audio.hpp"
+#include "SoundAsset.hpp"
 namespace EngineFramework {
 
 	// -------- lifecycle --------
@@ -149,6 +151,12 @@ namespace EngineFramework {
 		asset_loader_map[CUBEMAP] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadCubemap);
 		asset_loader_map[MESH] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadMesh);
 		asset_loader_map[SHADER] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadShader);
+		asset_loader_map[AUDIO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAudio);
+
+		//Set AAsetManager for android, in audio system.
+#ifdef PLATFORM_ANDROID
+		AudioSystem::GetInstance().SetAndroidAssetManager(static_cast<void*>(android_asset_manager));
+#endif
 
 		LoadAllResources();
 	}
@@ -217,12 +225,18 @@ namespace EngineFramework {
 		{
 			//Get guid (and update guid_name_map by calling GetFullGuid.
 			std::string name = path.stem().string();
-			xresource::full_guid asset_guid = GetFullGuid(type_guid, name);
 
 			//Allocate resource
-			std::shared_ptr<Scene::Texture> resource(new Scene::Texture(path.string()));
-
-			AddResource(asset_guid, resource);
+			try
+			{
+				std::shared_ptr<Scene::Texture> resource(new Scene::Texture(path.string()));
+				xresource::full_guid asset_guid = GetFullGuid(type_guid, name); //Only if resource is successfully loaded.
+				AddResource(asset_guid, resource);
+			}
+			catch (std::exception& e)
+			{
+				LOGE("%s %s %s", "Unable to Load Texture", name.c_str(), e.what());
+			}
 		}
 
 		return true;
@@ -240,11 +254,17 @@ namespace EngineFramework {
 		//The config file should contain <name, filepath_arr> pairs
 		for (auto& [cubemap_name, filepath_arr] : config_json.items())
 		{
-			xresource::full_guid asset_guid = GetFullGuid(type_guid, cubemap_name);
-
-			//Allocate resource
-			std::shared_ptr<Scene::Texture> resource(new Scene::Texture(filepath_arr.get<std::array<std::string, 6>>()));
-			AddResource(asset_guid, resource);
+			try
+			{
+				//Allocate resource
+				std::shared_ptr<Scene::Texture> resource(new Scene::Texture(filepath_arr.get<std::array<std::string, 6>>()));
+				xresource::full_guid asset_guid = GetFullGuid(type_guid, cubemap_name); //Only if resource is successfully loaded.
+				AddResource(asset_guid, resource);
+			}
+			catch (std::exception& e)
+			{
+				LOGE("%s %s %s", "Unable to Load Cubemap", cubemap_name.c_str(), e.what());
+			}
 		}
 		return true;
 	}
@@ -268,52 +288,113 @@ namespace EngineFramework {
 		//The config file should contain <name, shader_filepaths> pairs
 		for (auto& [shader_name, shader_filepaths] : config_json.items())
 		{
-			xresource::full_guid asset_guid = GetFullGuid(type_guid, shader_name);
 			//Read vertex and fragment shader filepaths.
 			//Always throw an error if not present, as these are critical for a shader program (unlike geometry or tesselation).
 			if (!shader_filepaths.contains("vertex"))
 			{
-				throw std::invalid_argument((std::string("No vertex filepath in config file for shader program ") + shader_name + ", did you mispell it?").c_str());
+				LOGE("%s %s %s", "No vertex filepath in config file for shader program", shader_name.c_str(), ", did you mispell it ?");
+				continue;
 			}
 			if (!shader_filepaths.contains("fragment"))
 			{
-				throw std::invalid_argument((std::string("No fragment filepath in config file for shader program ") + shader_name + ", did you mispell it?").c_str());
+				LOGE("%s %s %s", "No fragment filepath in config file for shader program", shader_name.c_str(), ", did you mispell it ?");
+				continue;
 			}
 			std::string vertex_shader = shader_filepaths["vertex"];
 			std::string fragment_shader = shader_filepaths["fragment"];
-			//Allocate resource
-			std::shared_ptr<ShaderProgram> resource(new ShaderProgram(vertex_shader.c_str(), fragment_shader.c_str()));
-			AddResource(asset_guid, resource);
+			try
+			{
+				//Allocate resource
+				std::shared_ptr<ShaderProgram> resource(new ShaderProgram(vertex_shader.c_str(), fragment_shader.c_str()));
+				xresource::full_guid asset_guid = GetFullGuid(type_guid, shader_name);
+				AddResource(asset_guid, resource);
+			}
+			catch (std::exception& e)
+			{
+				LOGE("%s %s %s", "Unable to Load Shader", shader_name.c_str(), e.what());
+			}
 		}
 		return true;
 	}
-	bool AssetManagerSystem::LoadAudio(const std::filesystem::path& folder_path)
+	bool AssetManagerSystem::LoadAudio(const std::filesystem::path& config_file)
 	{
 		xresource::type_guid type_guid{ AUDIO };
 		LOGI("Loading Audio");
 
+		/*
+			There are two ways to load audio
+			1. Specified in Config File: Allows audio to be loaded in loop or non-loop modes. 
+			2. Not Specified in Config File: Loads audio not in config file as non-looped.
+		*/
+
+		//Read the Config File
+		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
+		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
+
+		//Reading all filepaths for audio files in the current directory.
+		std::filesystem::path folder_path = config_file.parent_path();
 		//Acceptable files that can be loaded as an audio asset.
 		std::vector<std::string> audio_extensions{ ".mp3" };
-
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, audio_extensions);
 
-		//Iterate through all audio files
-		for (const std::filesystem::path& path : files)
+		//Iterate through all audio files in config file.
+		for (auto& [audio_name, config] : config_json.items())
 		{
-			//Get guid (and update guid_name_map by calling GetFullGuid).
-			std::string name = path.stem().string();
-			xresource::full_guid asset_guid = GetFullGuid(type_guid, name);
+			if (!config.contains("filepath"))
+			{
+				LOGE("%s %s %s", "No filepath in config file for audio file", audio_name.c_str(), ", did you mispell it ?");
+				continue;
+			}
+			if (!config.contains("isLoop"))
+			{
+				LOGE("%s %s %s", "No loop variable set in config file for audio file", audio_name.c_str(), ", did you mispell it ?");
+				continue;
+			}
 
-			//TODO: Allocate resource
-			
-
-			//AddResource(asset_guid, resource);
+			try
+			{
+				//Allocate resource
+				std::shared_ptr<SoundAsset> resource = AudioSystem::GetInstance().Load(config["filepath"], config["isLoop"]);
+				xresource::full_guid asset_guid = GetFullGuid(type_guid, audio_name);
+				AddResource(asset_guid, resource);
+				//if resource was loaded, then remove it from the array so it doesn't get duplicate loaded later on.
+				for (auto it = files.begin(); it != files.end(); it++)
+				{
+					if (std::filesystem::equivalent(*it, std::filesystem::path(config["filepath"].get<std::string>())))
+					{
+						files.erase(it);
+						break;
+					}
+				}
+			}
+			catch (std::exception& e)
+			{
+				LOGE("%s %s %s", "Unable to Load Audio File listed in Config file", audio_name.c_str(), e.what());
+			}
+		}
+		/*
+				All audio files listed in config file has been loaded.
+				Load the rest not specified in config file.
+			*/
+		for (const std::filesystem::path& audio_path : files)
+		{
+			//Get guid (and update guid_name_map by calling GetFullGuid.
+			std::string audio_name = audio_path.stem().string();
+			try
+			{
+				//Allocate resource
+				std::shared_ptr<SoundAsset> resource = AudioSystem::GetInstance().Load(audio_path.string(), false);
+				xresource::full_guid asset_guid = GetFullGuid(type_guid, audio_name);
+				AddResource(asset_guid, resource);
+			}
+			catch (std::exception& e)
+			{
+				LOGE("%s %s %s", "Unable to Load Audio File", audio_name.c_str(), e.what());
+			}
 		}
 
-
-		//NOTE: RETURNING FALSE AS NOT COMPLETE.
-
-		return false;
+		return true;
 	}
 
 	//// -------- small helpers --------
