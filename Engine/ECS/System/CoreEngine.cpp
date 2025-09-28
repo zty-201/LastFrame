@@ -92,33 +92,41 @@ namespace EngineFramework
 	// Functions to safely call Update and PostUpdate with exception handling
 	void CoreEngine::SafeUpdateSystem(CoreSystem& system, float delta_time)
 	{
+		static std::ofstream logFile("engine.log", std::ios::app); // log file created once
+
 		try {
 			system.system->Update(delta_time);
 		}
 		catch (const std::exception& e) {
-			std::cerr << "Exception in Update system [" << system.name
+			logFile << "Exception in Update system [" << system.name
 				<< "]: " << e.what() << std::endl;
-			throw; // rethrow to abort, or use `continue` in caller if you want to skip
+			throw;
 		}
 		catch (...) {
-			std::cerr << "Unknown exception in Update system [" << system.name << "]" << std::endl;
+			logFile << "Unknown exception in Update system ["
+				<< system.name << "]" << std::endl;
 			throw;
 		}
 	}
 
+
 	void CoreEngine::SafePostUpdateSystem(CoreSystem& system, float delta_time)
 	{
+		static std::ofstream logFile("engine.log", std::ios::app); // same file as SafeUpdateSystem
+
 		try {
 			system.system->PostUpdate(delta_time);
 		}
 		catch (const std::exception& e) {
-			std::cerr << "Exception in PostUpdate system [" << system.name
+			logFile << "Exception in PostUpdate system [" << system.name
 				<< "]: " << e.what() << std::endl;
 			throw;
 		}
 		catch (...) {
-			std::cerr << "Unknown exception in PostUpdate system [" << system.name << "]" << std::endl;
+			logFile << "Unknown exception in PostUpdate system ["
+				<< system.name << "]" << std::endl;
 			throw;
 		}
 	}
+
 }

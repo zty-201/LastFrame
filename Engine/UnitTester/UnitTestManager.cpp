@@ -13,27 +13,30 @@ void UnitTestManager::AddTest(const std::string& name, TestFunc func) {
 
 // Runs all test does not matter if it fails or pass first, it runs all, and then if there is more than 2 fail test, at the end of this function it will throw exception and tell you whats the function that is broken
 void UnitTestManager::RunAllTests() {
-    std::cout << "Running " << tests.size() << " unit tests...\n";
+    static std::ofstream logFile("unittests.log", std::ios::app); // open once, append mode
+    logFile << "Running " << tests.size() << " unit tests..." << std::endl;
+
     bool allPassed = true;
 
     for (auto& [name, func] : tests) {
         try {
             if (!func()) {
-                std::cerr << "Test failed: " << name << "\n";
+                logFile << "Test failed: " << name << std::endl;
                 allPassed = false;
             }
             else {
-                std::cout << "Test passed: " << name << "\n";
+                logFile << "Test passed: " << name << std::endl;
             }
         }
         catch (const std::exception& e) {
-            std::cerr << "Exception in test " << name << ": " << e.what() << "\n";
+            logFile << "Exception in test " << name << ": " << e.what() << std::endl;
             allPassed = false;
         }
     }
 
     if (!allPassed) {
-        throw std::runtime_error("One or more unit tests failed. Check logs.");
+        throw std::runtime_error("One or more unit tests failed. Check unittests.log.");
     }
 }
+
 
