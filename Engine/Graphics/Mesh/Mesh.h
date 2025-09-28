@@ -2,13 +2,13 @@
 #define MESH_H
 
 //
-//  Represents a 3D triangle mesh for rendering and scene definitions.
-// 
-//  The TriangleMesh structure encapsulates the geometry data required to define
-//  and render a triangle mesh in a 3D scene, including vertices, normals, texture
-//  coordinates, and tangents. This data is typically used in rendering pipelines
-//  with OpenGL.
-//
+    //  Represents a 3D triangle mesh for rendering and scene definitions.
+    // 
+    //  The TriangleMesh structure encapsulates the geometry data required to define
+    //  and render a triangle mesh in a 3D scene, including vertices, normals, texture
+    //  coordinates, and tangents. This data is typically used in rendering pipelines
+    //  with OpenGL.
+    //
 struct TriangleMesh
 {
     // Indices defining the connectivity of the mesh. Each group of three indices

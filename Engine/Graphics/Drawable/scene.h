@@ -1,9 +1,5 @@
 #ifndef SCENE_H
 #define SCENE_H
-#include <vector>
-#include <list>
-#include <map>
-#include <string>
 
 #include "ShaderProgram.h"
 #include "FBO.h"
@@ -13,7 +9,7 @@
 #include "Camera.h"
 
 
-    // Color and state definitions
+// Color and state definitions
 #define BLACK           { 0.0f, 0.0f, 0.0f, 0.0f }
 #define GREY            { 0.5f, 0.5f, 0.5f, 0.0f }
 #define WHITE           { 1.0f, 1.0f, 1.0f, 0.0f }
@@ -50,6 +46,7 @@ GLuint loadHdrCubeMap(std::initializer_list<const char*> filenames);
 //
 struct Scene
 {
+    float aspect;
     // Structure to represent a texture used in the scene
     struct Texture
     {
@@ -77,7 +74,7 @@ struct Scene
             struct Instance
             {
                 Material material;             // Material properties of the instance
-                const glm::mat4& modeltransform; // Model transformation matrix
+                glm::mat4 modeltransform;      // **FIX: Changed from const glm::mat4& to glm::mat4**
                 bool isVisible;                // Visibility flag
 
                 // Constructor for initializing an instance
@@ -133,12 +130,11 @@ struct Scene
             void setBuffers(const char* meshName);
         };
 
-        typedef void (*SetUniformCallback)(ShaderProgram& shader); // Callback for setting uniforms
+        using SetUniformCallback = std::function<void(ShaderProgram& shader)>;
 
         FBO fbo;                           // Framebuffer Object for the pass
         std::vector<int> viewport;         // Viewport dimensions
-        std::vector<float> clearColor;     // Clear color for the pass
-        std::vector<bool> enableDepthBuffer; // Depth buffer enable/disable flags
+        GLenum depthMode;                  // Depth function mode flags
         std::vector<Object> objects;       // Objects rendered in this pass
         std::vector<Camera> cameras;       // Cameras used in this pass
         std::vector<Light> lights;         // Lights affecting this pass
@@ -149,8 +145,7 @@ struct Scene
         Pass(
             const FBO& fbo = { },
             const std::initializer_list<int>& viewport = { },
-            const std::initializer_list<float>& clearColor = { },
-            bool enableDepthBuffer = true,
+            GLenum depthFunction = GL_LESS,
             const std::initializer_list<Object>& objects = { },
             const std::initializer_list<Camera>& cameras = { },
             const std::initializer_list<Light>& lights = { },
@@ -160,8 +155,7 @@ struct Scene
             :
             fbo{ fbo },
             viewport{ viewport },
-            clearColor{ clearColor },
-            enableDepthBuffer{ enableDepthBuffer },
+            depthMode{ depthFunction },
             objects{ objects },
             cameras{ cameras },
             lights{ lights },
@@ -171,37 +165,18 @@ struct Scene
             //this->enableDepthBuffer.push_back(enableDepthBuffer);
         }
 
-        // Constructor for newer frameworks (multiple depth buffer flags)
-        Pass(
-            const FBO& fbo = { },
-            const std::initializer_list<int>& viewport = { },
-            const std::initializer_list<float>& clearColor = { },
-            const std::initializer_list<bool>& enableDepthBuffer = { },
-            const std::initializer_list<Object>& objects = { },
-            const std::initializer_list<Camera>& cameras = { },
-            const std::initializer_list<Light>& lights = { },
-            const std::initializer_list<Texture> textures = { },
-            SetUniformCallback setUniformCallback = nullptr
-        )
-            :
-            fbo{ fbo },
-            viewport{ viewport },
-            clearColor{ clearColor },
-            enableDepthBuffer{ enableDepthBuffer },
-            objects{ objects },
-            cameras{ cameras },
-            lights{ lights },
-            textures{ textures },
-            setUniformCallback{ setUniformCallback }
-        {
-        }
-
         // Resizes the framebuffer and viewport for the pass
         void resize(int width, int height)
         {
             viewport[2] = width;
             viewport[3] = height;
             fbo.resize(width, height);
+        }
+
+        //Changes framebuffer.
+        void SetFBO(const FBO& fbo_to_set = { })
+        {
+            fbo = fbo_to_set;
         }
     };
 
@@ -210,8 +185,8 @@ struct Scene
 
     // Constructors for the Scene class
     Scene(
-        const char* sv,
-        const char* sf,
+        const char* sv = "",
+        const char* sf = "",
         const std::initializer_list<Pass>& passes = { }
     )
         :
@@ -248,12 +223,21 @@ struct Scene
                 camera.setType(cameraType);
     }
 
-    // Updates camera orientation based on cursor movement
-    void camerasOnCursor(double xoffset, double yoffset, ShaderProgram* pProgram = nullptr)
+    void camerasSetPos_andTarget(glm::vec3 offset)
     {
         for (Scene::Pass& pass : passes)
             for (Camera& camera : pass.cameras)
-                camera.onCursor(xoffset, yoffset, pProgram);
+                camera.Move_Cam_and_Target(offset);
+    }
+
+
+
+    // Updates camera orientation based on cursor movement
+    void camerasOnCursor(double xoffset, double yoffset)
+    {
+        for (Scene::Pass& pass : passes)
+            for (Camera& camera : pass.cameras)
+                camera.onCursor(xoffset, yoffset);
     }
 
     // Updates light positions based on cursor movement
@@ -266,11 +250,11 @@ struct Scene
     }
 
     // Updates camera zoom based on scroll input
-    void camerasOnScroll(double xoffset, double yoffset, ShaderProgram* pProgram = nullptr)
+    void camerasOnScroll(double xoffset, double yoffset)
     {
         for (Scene::Pass& pass : passes)
             for (Camera& camera : pass.cameras)
-                camera.onScroll(xoffset, yoffset, pProgram);
+                camera.onScroll(xoffset, yoffset);
     }
 
     // Updates light properties based on scroll input
