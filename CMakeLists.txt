@@ -30,19 +30,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #For Android, both Engine and Application (including main.cpp) are loaded into a single shared library which is linked with the external dependencies used.
 #==============WINDOWS==================
 if(WIN32)
-  # Define global targets
+#Define global targets
   add_executable(application_executable)
   add_library(engine_library STATIC)
-
-  # Precompiled headers 
+  #Add precompiled headers to speed up compilation times. 
   target_precompile_headers(engine_library PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
-  target_precompile_headers(application_executable REUSE_FROM engine_library) 
-
-  # Use the same pch as engine_library 
-  # Preprocessor Definitions 
+  target_precompile_headers(application_executable REUSE_FROM engine_library) #Use the same pch as engine_library 
+  #Preprocessor Definitions 
   target_compile_definitions(engine_library PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG> )
 
-   #Compiler Flags, use a high warning level and treat warnings as errors.
+
+  #Compiler Flags, use a high warning level and treat warnings as errors.
 #Note: In Debug mode, ASAN and UBSAN can incur alot of performance slowdown. Only toggle in debug mode.
 #Note: To enable mem leak checks, temporarily disable (remb to enable back) /fsanitize=address for both targets.
 target_compile_options(engine_library PUBLIC 
@@ -175,15 +173,8 @@ endif()
 set(OVERRIDE_CXX_FLAGS OFF CACHE BOOL "" FORCE)   # stop Jolt from rewriting CXX flags
 set(JPH_USE_STATIC_VCRT OFF CACHE BOOL "" FORCE)  # OFF => /MD(/MDd), ON => /MT(/MTd)
 
-if (MSVC)
-  add_compile_definitions(_ITERATOR_DEBUG_LEVEL=0 _HAS_ITERATOR_DEBUGGING=0)
-endif()
-
 #Build external dependencies ( Jolt lives here )
 add_subdirectory(Lib)
-if (TARGET Jolt)
-  target_sources(Jolt PRIVATE ${CMAKE_SOURCE_DIR}/Lib/jolt_iter_probe.cpp)
-endif()
 
 # ---- (optional) sanity print + last-resort enforcement
 if (TARGET Jolt)
@@ -240,6 +231,7 @@ elseif(ANDROID)
 	list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES ${ANDROID_LIBRARIES})
   target_link_libraries(jnicpp PUBLIC ${EXTERNAL_LIBRARY_DEPENDENCIES})
 endif()
+
 
 #=====Building of Engine Library and Executable, or Android Shared library======#
 
