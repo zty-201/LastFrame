@@ -36,7 +36,7 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
 		GLFWwindow* pWindow = nullptr;
 #endif
-
+        CameraComponent camera;
         //Scene Framebuffer and Texture.
         FBO scene_framebuffer;
         GLuint sceneTextureID;

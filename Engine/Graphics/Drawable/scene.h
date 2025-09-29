@@ -3,11 +3,10 @@
 
 #include "ShaderProgram.h"
 #include "FBO.h"
-#include "Mesh.h"
-#include "Material.h"
 #include "Light.h"
 #include "Camera.h"
-
+#include "Mesh.h"
+#include "Components.h"
 
 // Color and state definitions
 #define BLACK           { 0.0f, 0.0f, 0.0f, 0.0f }
@@ -90,12 +89,12 @@ struct Scene
             // Represents an instance of an object with its material and transform
             struct Instance
             {
-                Material material;             // Material properties of the instance
+                MaterialComponent material;             // Material properties of the instance
                 glm::mat4 modeltransform;      // **FIX: Changed from const glm::mat4& to glm::mat4**
                 bool isVisible;                // Visibility flag
 
                 // Constructor for initializing an instance
-                Instance(const Material& material = { },
+                Instance(const MaterialComponent& material = { },
                     const glm::mat4& modeltransform = NOTRANSFORM,
                     bool isVisible = VISIBLE)
                     :
@@ -114,7 +113,7 @@ struct Scene
 
             // Constructor for creating an object with a single instance
             Object(const char* meshName,
-                const Material& material = { },
+                const MaterialComponent& material = { },
                 const glm::mat4& modeltransform = NOTRANSFORM,
                 bool isVisible = VISIBLE)
                 :
@@ -153,7 +152,7 @@ struct Scene
         std::vector<int> viewport;         // Viewport dimensions
         GLenum depthMode;                  // Depth function mode flags
         std::vector<Object> objects;       // Objects rendered in this pass
-        std::vector<Camera> cameras;       // Cameras used in this pass
+        std::vector<CameraComponent> cameras;       // Cameras used in this pass
         std::vector<Light> lights;         // Lights affecting this pass
         std::vector<xresource::full_guid> texture_guids{};     // Textures used in this pass
         SetUniformCallback setUniformCallback; // Optional callback for setting uniforms
@@ -164,7 +163,7 @@ struct Scene
             const std::initializer_list<int>& viewport = { },
             GLenum depthFunction = GL_LESS,
             const std::initializer_list<Object>& objects = { },
-            const std::initializer_list<Camera>& cameras = { },
+            const std::initializer_list<CameraComponent>& cameras = { },
             const std::initializer_list<Light>& lights = { },
             const std::initializer_list<xresource::full_guid> textures = { },
             SetUniformCallback setUniformCallback = nullptr
@@ -219,18 +218,18 @@ struct Scene
     }
 
     // Updates camera types for all passes
-    void camerasSetType(CameraType cameraType)
+    void camerasSetType(CameraComponent::CameraType cameraType)
     {
         for (Scene::Pass& pass : passes)
-            for (Camera& camera : pass.cameras)
-                camera.setType(cameraType);
+            for (CameraComponent& camera : pass.cameras)
+                Camera::setType(camera, cameraType);
     }
 
     void camerasSetPos_andTarget(glm::vec3 offset)
     {
         for (Scene::Pass& pass : passes)
-            for (Camera& camera : pass.cameras)
-                camera.Move_Cam_and_Target(offset);
+            for (CameraComponent& camera : pass.cameras)
+                Camera::Move_Cam_and_Target(camera, offset);
     }
 
 
@@ -239,8 +238,8 @@ struct Scene
     void camerasOnCursor(double xoffset, double yoffset)
     {
         for (Scene::Pass& pass : passes)
-            for (Camera& camera : pass.cameras)
-                camera.onCursor(xoffset, yoffset);
+            for (CameraComponent& camera : pass.cameras)
+                Camera::onCursor(camera, xoffset, yoffset);
     }
 
     // Updates light positions based on cursor movement
@@ -256,8 +255,8 @@ struct Scene
     void camerasOnScroll(double xoffset, double yoffset)
     {
         for (Scene::Pass& pass : passes)
-            for (Camera& camera : pass.cameras)
-                camera.onScroll(xoffset, yoffset);
+            for (CameraComponent& camera : pass.cameras)
+                Camera::onScroll(camera, xoffset, yoffset);
     }
 
     // Updates light properties based on scroll input

@@ -47,11 +47,11 @@ namespace EngineFramework
     }
     void Screen::Initialize() {
 
-        GraphicsSystem::GetInstance().GetScene().get()->camerasSetType(WALKING);
+        GraphicsSystem::GetInstance().GetScene().get()->camerasSetType(CameraComponent::WALKING);
     }
     void Screen::Run() {
 
-        GraphicsSystem::GetInstance().GetScene().get()->camerasSetType(WALKING);
+        GraphicsSystem::GetInstance().GetScene().get()->camerasSetType(CameraComponent::WALKING);
 
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
         ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500
@@ -364,8 +364,8 @@ namespace EngineFramework
      
         auto* scene = GraphicsSystem::GetInstance().GetScene().get();
         auto &cam = scene->passes[0].cameras[0];
-        glm::mat4 view = cam.getLookAt();
-        glm::mat4 proj = cam.getPerspective(scene->aspect);
+        glm::mat4 view = Camera::getLookAt(cam);
+        glm::mat4 proj = Camera::getPerspective(cam, scene->aspect);
         glm::mat4 &obj = scene->passes[0].objects[2].instances[0].modeltransform;
         ImGuizmo::SetOrthographic(false); //because we have perspective
         
@@ -386,8 +386,8 @@ namespace EngineFramework
             //graphics system is always updating the camera view and proj based on camera pos and target pos
             glm::vec3 new_CamPos = glm::vec3(glm::inverse(view)[3]);
             glm::vec3 new_TargetPos = glm::vec3(obj[3]);
-            cam.set_Cam_Pos(new_CamPos);
-            cam.set_Target_Pos(new_TargetPos);
+            Camera::set_Cam_Pos(cam, new_CamPos);
+            Camera::set_Target_Pos(cam, new_TargetPos);
         }
         
         ImGuizmo::Manipulate(glm::value_ptr(view),glm::value_ptr(proj),operation,mode, glm::value_ptr(obj));

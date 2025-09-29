@@ -98,7 +98,8 @@ namespace EngineFramework
 		fogMinDist = 5.0f;
 		fogMaxDist = 15.0f;
 		shadingModel = 0;
-		Camera camera = { { 0.0f, 1.0f, 5.0f }, 75.0f };
+		camera = CameraComponent{ CameraComponent::ORBITING, {0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, 75.0f, 0.1f, 100.0f };
+
 		pScene = std::make_unique<Scene>(
 			AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Basic"), 
 			std::initializer_list<Scene::Pass>{         // List of rendering passes

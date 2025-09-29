@@ -1,6 +1,5 @@
 #include "pch.hpp"
 #include "Scene.h"
-
 // For loading textures
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -155,11 +154,27 @@ Scene::Texture::Texture(const std::array<std::string, 6>& filenames, GLuint chan
 void Scene::Pass::Object::setBuffers(const char* meshName)
 {
 	// Load the mesh data (vertices, indices, normals, etc.) from the given mesh file
-	TriangleMesh mesh(meshName);
+	MeshComponent mesh;
+
+	if (!strcmp(meshName, "Quad"))
+		Mesh::generateQuad(mesh);
+	else if (!strcmp(meshName, "Plane"))
+		Mesh::generatePlane(mesh);
+	else if (!strcmp(meshName, "Cube"))
+		Mesh::generateCube(mesh);
+	else if (!strcmp(meshName, "Sphere"))
+		Mesh::generateSphere(mesh);
+	else if (!strcmp(meshName, "SkyBox"))
+		Mesh::generateSkyBox(mesh);
+	else if (meshName)
+		throw std::runtime_error(std::string("No such Object"));
+
 
 	// Check if the mesh has valid data for indices, points (vertices), and normals.
-	if (mesh.indices.empty() || mesh.points.empty() || mesh.normals.empty())
+	if (mesh.indices.empty() || mesh.points.empty() || mesh.normals.empty()) {
 		return;
+	}
+		
 
 	// Store the number of indices.
 	size = mesh.indices.size();
@@ -296,12 +311,12 @@ void Scene::render()
 		glm::mat4 P = glm::mat4(1.0f);
 		if (!pass.cameras.empty())
 		{
-			pass.cameras[0].setUniforms(shader);
+			Camera::setUniforms(pass.cameras[0], shader);
 			if (pass.viewport.size() == 4 && pass.viewport[3] > 0)
 			{
-				V = pass.cameras[0].getLookAt();
+				V = Camera::getLookAt(pass.cameras[0]);
 				aspect = (float)pass.viewport[2] / pass.viewport[3];
-				P = pass.cameras[0].getPerspective(aspect);
+				P = Camera::getPerspective(pass.cameras[0], aspect);
 			}
 		}
 		shader->setUniform("V", V);
@@ -342,7 +357,7 @@ void Scene::render()
 					glCullFace(GL_FRONT); // Cull the front face to see the "back"
 				}
 
-				instance.material.setUniforms(shader);
+				shader->setMaterialUniforms(instance.material);
 				shader->setUniform("M", instance.modeltransform);
 				glDrawElements(GL_TRIANGLES, (GLsizei)object.size, GL_UNSIGNED_INT, 0);
 

@@ -69,9 +69,9 @@ namespace EngineFramework
             // Transition to Pressed (this frame only)
             keyStates[key] = KeyState::Pressed;
             if (key == 'W')
-                pScene->camerasSetType(CameraType::WALKING);
+                pScene->camerasSetType(CameraComponent::CameraType::WALKING);
             else if (key == 'O')
-                pScene->camerasSetType(CameraType::ORBITING);
+                pScene->camerasSetType(CameraComponent::CameraType::ORBITING);
             else if (key == GLFW_KEY_1)
             {
                 shader->use();
