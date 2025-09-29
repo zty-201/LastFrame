@@ -1,8 +1,6 @@
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #ifndef SCENEMANAGER_LFEATURE_HPP
 #define SCENEMANAGER_LFEATURE_HPP
-
-#include <unordered_map>
 #include <string>
 #include <sstream>
 #include "ISystem.hpp"
