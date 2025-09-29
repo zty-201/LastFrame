@@ -11,8 +11,10 @@ add_subdirectory(Shared/json)
 add_subdirectory(Shared/fmod)
 add_subdirectory(Shared/glad)
 add_subdirectory(Shared/stb_image)
+add_subdirectory(Shared/xresource)
 add_subdirectory(Shared/lua)
 add_subdirectory(Shared/sol)
+
 
 # Windowsx64 Shared
 add_subdirectory(Windows_x64/Shared/glfw)

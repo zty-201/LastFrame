@@ -25,6 +25,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #ifndef DISABLE_FMOD
 #include "fmod.hpp"
 #include "fmod_errors.h"
+#include "SoundAsset.hpp"
 #endif
 
 namespace EngineFramework
@@ -59,6 +60,8 @@ namespace EngineFramework
         void Update(float delta_time) override;
         void PostUpdate(float delta_time) override;
 
+        static AudioSystem& GetInstance() { return *this_system; }
+
         // ---- Engine integration ----
         // The engine (or AssetManager) can inject a resolver: logicalId -> absolute path
         void SetPathResolver(std::function<std::string(const std::string&)> resolver);
@@ -72,15 +75,16 @@ namespace EngineFramework
         std::string ResolvePath(const std::string& logicalOrPath) const;
 
         // ---- Public API for gameplay / systems ----
-        // Load a sound (id = how you will refer to it when playing)
-        bool Load(const std::string& id, const std::string& logicalOrPath, bool loop);
+        
+        //Load a sound from filepath.
+        std::shared_ptr<SoundAsset> Load(const std::string& logicalOrPath, bool loop);
 
-        // Unload a previously loaded sound by id
-        void Unload(const std::string& id);
+        // Unload a previously loaded sound.
+        void Unload(const std::shared_ptr<SoundAsset>& sound);
 
-        // Play a loaded sound by id; returns false if id not found or not initialized
+        // Play a loaded sound; returns false if id not found or not initialized
         // volume: 0..1   paused: start paused if true   group: routing bucket
-        bool Play(const std::string& id,
+        bool Play(const std::shared_ptr<SoundAsset>& sound,
             float volume = 1.0f,
             bool paused = false,
             AudioGroup group = AudioGroup::SFX);
@@ -100,19 +104,6 @@ namespace EngineFramework
 
     private:
         // -------- Types / members --------
-#ifndef DISABLE_FMOD
-        struct SoundInfo
-        {
-            FMOD::Sound* sound;
-            bool         looped;
-        };
-#else
-        struct SoundInfo
-        {
-            void* sound; // stub field when FMOD disabled
-            bool  looped;
-        };
-#endif
 
         // FMOD system + groups (null when not initialized or DISABLE_FMOD)
 #ifndef DISABLE_FMOD
@@ -126,9 +117,6 @@ namespace EngineFramework
         void* m_groupMusic;
         void* m_groupSFX;
 #endif
-
-        // Loaded sounds by id
-        std::unordered_map<std::string, SoundInfo> m_sounds;
 
         // Optional: engine-injected mapper logicalId -> path
         std::function<std::string(const std::string&)> m_pathResolver;
@@ -151,13 +139,12 @@ namespace EngineFramework
         // Pick a channel group pointer (Master/Music/SFX)
         FMOD::ChannelGroup* pickGroup(AudioGroup group);
 
-        // Release all FMOD::Sound* safely
-        void releaseAllSounds();
-
 #ifdef PLATFORM_ANDROID
         // Copy an AAsset to a real file path (FMOD requires file paths on some platforms)
         std::string CopyAssetToInternal(const std::string& assetPath) const;
 #endif
+
+        static inline AudioSystem* this_system{};
     };
 
 } // namespace EngineFramework

@@ -44,10 +44,17 @@ namespace EngineFramework
 
 		//Return reference to the one and only instance of this system, created by core engine.
 		static GameObjectSystem& GetInstance();
+
+		//Quick Call function to load scene
+		void LoadScene(const std::string& json_input);
+		
 	private:
 		void Initialize() override;
 		void Update(float delta_time) override;
-
+		
+		//Clears all entities in the scene
+		void ClearAllEntities();
+		
 		/*
 		 	Write to json strings using reflection.
 			Returns an array of <archetype name, json string> where each pair represents the archetype name and the json string to save to

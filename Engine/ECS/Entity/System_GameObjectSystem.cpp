@@ -34,6 +34,17 @@ namespace EngineFramework
 		return *this_system;
 	}
 
+	void GameObjectSystem::LoadScene(const std::string& json_input)
+	{
+		ClearAllEntities();
+		DeSerializeAllEntityInstances(json_input);
+	}
+
+	void GameObjectSystem::ClearAllEntities()
+	{
+		registry.clear();
+	}
+
 	void GameObjectSystem::Initialize()
 	{
 

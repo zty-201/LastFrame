@@ -44,6 +44,8 @@ namespace EngineFramework
 
 		iEditorView variables;
 
+		static LevelEditor& GetInstance() { return *this_system; }
+
 		//no point checking state change in every frame, reduce performance, only toggle when needed
 		
 		void Initialize(); //init imgui/glfw during startup
