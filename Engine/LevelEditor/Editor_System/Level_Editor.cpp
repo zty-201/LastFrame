@@ -3,6 +3,7 @@
 
 #include "pch.hpp"
 #include "global.hpp"
+#include "LFeature.hpp"
 //File management, JSON file parser/writer
 #include <filesystem>
 #include <fstream>
@@ -22,6 +23,9 @@
 #include "ObjectManager.hpp"
 #include "Save.hpp"
 #include "Screen.hpp"
+
+// Profiler/Debug
+#include "Profiler.hpp"
 
 namespace EngineFramework
 {
@@ -121,7 +125,7 @@ namespace EngineFramework
 		addFeature("ObjectManager", std::make_unique<ObjectManager>());
 		addFeature("Save", std::make_unique<Save>());
 		addFeature("Screen", std::make_unique<Screen>());
-
+		addFeature("Profiler", std::make_unique<LFeature_DebugProfiler>()); // Add profiler feature (testing purpose)
 		
 
 		/*initialise all the features*/
@@ -202,6 +206,25 @@ namespace EngineFramework
 					ImGui::Separator();
 					ImGui::MenuItem("Property Manager", NULL);
 					ImGui::PopStyleColor();  // Pop the white text color for "File" menu
+					ImGui::EndMenu();
+				}
+
+				ImGui::SameLine(0, 50.0f); // The second argument controls the spacing in pixels
+
+				// Debug menu
+				if (ImGui::BeginMenu("Debug")) {
+					// Single toggle that controls the profiler window visibility
+					if (auto it = featureMap.find("Profiler"); it != featureMap.end()) {
+						auto* prof = static_cast<LFeature_DebugProfiler*>(it->second.get());
+						bool on = prof->is_enabled; // Panel visibility flag
+						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+						if (ImGui::MenuItem("Profiler", nullptr, &on)) {
+							prof->is_enabled = on; // Show/hide panel
+							it->second->is_enabled = true; // Keep feature running
+						}
+						ImGui::PopStyleColor();
+					}
+
 					ImGui::EndMenu();
 				}
 

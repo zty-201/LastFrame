@@ -131,7 +131,7 @@ void Game_Initialize(void* android_asset_manager)
 			"AudioSystem",
 			std::make_unique<EngineFramework::AudioSystem>(),
 			5,  // Init Order
-			7,  // Update Order: Last
+			6,  // Update Order: Last
 			1   // Destruct Order: First
 		);
 
@@ -143,7 +143,7 @@ void Game_Initialize(void* android_asset_manager)
 			"LevelEditorSystem",
 			std::make_unique<EngineFramework::LevelEditorSystem>(),
 			100,  // Init Order: After all other game systems
-			6,  // Update Order: After game logic and main graphics update
+			7,  // Update Order: After game logic and main graphics update
 			1   // Destruct Order: With other game systems
 		);
 	#endif
@@ -214,7 +214,7 @@ void Game_Update()
 
 		// Copy and sort the sections by time in descending order
 		std::vector<std::pair<std::string, Diagnostics::Section>> rows(P.Sections().begin(), P.Sections().end());
-		std::sort(rows.begin(), rows.begin(), [](auto& a, auto& b) {return a.second.ms > b.second.ms; });
+		//std::sort(rows.begin(), rows.begin(), [](auto& a, auto& b) {return a.second.ms > b.second.ms; });
 
 		for (auto& [name, sec] : rows) {
 			const double frame_percent = (sec.ms / frame) * 100.0;
