@@ -83,7 +83,7 @@ public:
     }
 
     // Updates the shader program with camera position
-    void setUniforms(ShaderProgram* pProgram) const
+    void setUniforms(std::shared_ptr<ShaderProgram> pProgram) const
     {
         pProgram->setUniform("camera.position", position); // Pass camera position to the shader
     }

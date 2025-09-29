@@ -213,8 +213,6 @@ namespace EngineFramework {
 	bool AssetManagerSystem::LoadTexture(const std::filesystem::path& folder_path)
 	{
 		LOGD("Loading Texture");
-		//Used as part of the final assets' guid.
-		xresource::type_guid type_guid{ TEXTURE };
 		//Acceptable files that can be loaded as a texture.
 		std::vector<std::string> texture_extensions{ ".png" };
 
@@ -230,7 +228,7 @@ namespace EngineFramework {
 			try
 			{
 				std::shared_ptr<Scene::Texture> resource(new Scene::Texture(path.string()));
-				xresource::full_guid asset_guid = GetFullGuid(type_guid, name); //Only if resource is successfully loaded.
+				xresource::full_guid asset_guid = GetFullGuid(TEXTURE_GUID, name); //Only if resource is successfully loaded.
 				AddResource(asset_guid, resource);
 			}
 			catch (std::exception& e)
@@ -244,8 +242,6 @@ namespace EngineFramework {
 	bool AssetManagerSystem::LoadCubemap(const std::filesystem::path& config_file)
 	{
 		LOGD("Loading Cubemap");
-		//Used as part of the final asset guid.
-		xresource::type_guid type_guid{ CUBEMAP };
 		//Read the Config File
 		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
 		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
@@ -258,7 +254,7 @@ namespace EngineFramework {
 			{
 				//Allocate resource
 				std::shared_ptr<Scene::Texture> resource(new Scene::Texture(filepath_arr.get<std::array<std::string, 6>>()));
-				xresource::full_guid asset_guid = GetFullGuid(type_guid, cubemap_name); //Only if resource is successfully loaded.
+				xresource::full_guid asset_guid = GetFullGuid(CUBEMAP_GUID, cubemap_name); //Only if resource is successfully loaded.
 				AddResource(asset_guid, resource);
 			}
 			catch (std::exception& e)
@@ -271,13 +267,11 @@ namespace EngineFramework {
 	bool AssetManagerSystem::LoadMesh(const std::filesystem::path& folder_path)
 	{
 		UNREFERENCED_PARAMETER(folder_path);
-		xresource::type_guid type_guid{ MESH };
 		LOGI("Mesh Loader not yet implemented.");
 		return true;
 	}
 	bool AssetManagerSystem::LoadShader(const std::filesystem::path& config_file)
 	{
-		xresource::type_guid type_guid{ SHADER };
 		LOGI("Loading Shader");
 
 		//Read the Config File
@@ -306,7 +300,7 @@ namespace EngineFramework {
 			{
 				//Allocate resource
 				std::shared_ptr<ShaderProgram> resource(new ShaderProgram(vertex_shader.c_str(), fragment_shader.c_str()));
-				xresource::full_guid asset_guid = GetFullGuid(type_guid, shader_name);
+				xresource::full_guid asset_guid = GetFullGuid(SHADER_GUID, shader_name);
 				AddResource(asset_guid, resource);
 			}
 			catch (std::exception& e)
@@ -318,7 +312,6 @@ namespace EngineFramework {
 	}
 	bool AssetManagerSystem::LoadAudio(const std::filesystem::path& config_file)
 	{
-		xresource::type_guid type_guid{ AUDIO };
 		LOGI("Loading Audio");
 
 		/*
@@ -356,7 +349,7 @@ namespace EngineFramework {
 			{
 				//Allocate resource
 				std::shared_ptr<SoundAsset> resource = AudioSystem::GetInstance().Load(config["filepath"], config["isLoop"]);
-				xresource::full_guid asset_guid = GetFullGuid(type_guid, audio_name);
+				xresource::full_guid asset_guid = GetFullGuid(AUDIO_GUID, audio_name);
 				AddResource(asset_guid, resource);
 				//if resource was loaded, then remove it from the array so it doesn't get duplicate loaded later on.
 				for (auto it = files.begin(); it != files.end(); it++)
@@ -385,7 +378,7 @@ namespace EngineFramework {
 			{
 				//Allocate resource
 				std::shared_ptr<SoundAsset> resource = AudioSystem::GetInstance().Load(audio_path.string(), false);
-				xresource::full_guid asset_guid = GetFullGuid(type_guid, audio_name);
+				xresource::full_guid asset_guid = GetFullGuid(AUDIO_GUID, audio_name);
 				AddResource(asset_guid, resource);
 			}
 			catch (std::exception& e)

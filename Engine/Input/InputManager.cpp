@@ -19,6 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "GraphicsSystem.h"
 //#include "Level_Editor.hpp"
 #include "System_LevelEditor.hpp"
+#include "AssetManager.hpp"
 
 
 namespace EngineFramework
@@ -58,6 +59,7 @@ namespace EngineFramework
         (void)mods;
 
         auto& pScene = GraphicsSystem::GetInstance().GetScene();
+        std::shared_ptr<ShaderProgram> shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(pScene->shader_guid);
         switch (action)
         {
         case GLFW_PRESS:
@@ -69,13 +71,13 @@ namespace EngineFramework
                 pScene->camerasSetType(CameraType::ORBITING);
             else if (key == GLFW_KEY_1)
             {
-                pScene->shader.use();
-                pScene->shader.setUniform("materialType", 0); // PBR
+                shader->use();
+                shader->setUniform("materialType", 0); // PBR
             }
             else if (key == GLFW_KEY_2)
             {
-                pScene->shader.use();
-				pScene->shader.setUniform("materialType", 1); // Blinn-Phong
+                shader->use();
+                shader->setUniform("materialType", 1); // Blinn-Phong
             }
             break;
         case GLFW_RELEASE:

@@ -154,7 +154,7 @@ struct Scene
         std::vector<Object> objects;       // Objects rendered in this pass
         std::vector<Camera> cameras;       // Cameras used in this pass
         std::vector<Light> lights;         // Lights affecting this pass
-        std::vector<std::shared_ptr<Texture>> textures;     // Textures used in this pass
+        std::vector<xresource::full_guid> texture_guids{};     // Textures used in this pass
         SetUniformCallback setUniformCallback; // Optional callback for setting uniforms
 
         // Constructor for older frameworks (single depth buffer flag)
@@ -165,7 +165,7 @@ struct Scene
             const std::initializer_list<Object>& objects = { },
             const std::initializer_list<Camera>& cameras = { },
             const std::initializer_list<Light>& lights = { },
-            const std::initializer_list<std::shared_ptr<Texture>> textures = { },
+            const std::initializer_list<xresource::full_guid> textures = { },
             SetUniformCallback setUniformCallback = nullptr
         )
             :
@@ -175,7 +175,7 @@ struct Scene
             objects{ objects },
             cameras{ cameras },
             lights{ lights },
-            textures{ textures },
+            texture_guids{ textures },
             setUniformCallback{ setUniformCallback }
         {
             //this->enableDepthBuffer.push_back(enableDepthBuffer);
@@ -196,29 +196,15 @@ struct Scene
         }
     };
 
-    ShaderProgram shader;          // Shader program for the scene
+    xresource::full_guid shader_guid{};          // Shader program for the scene
     std::vector<Pass> passes; // Rendering passes in the scene
 
     // Constructors for the Scene class
     Scene(
-        const char* sv = "",
-        const char* sf = "",
+        xresource::full_guid shader_guid,
         const std::initializer_list<Pass>& passes = { }
-    )
-        :
-        shader(sv, sf),
-        passes{ passes }
-    {
-    }
-
-    Scene(
-        GLuint shaderHandle = 0,
-        const std::initializer_list<Pass>& passes = { }
-    )
-        :
-        shader(shaderHandle),
-        passes{ passes }
-    {
+    ) : shader_guid{ shader_guid }, passes {passes}
+    {   
     }
 
     // Main render function for the scene
@@ -257,7 +243,7 @@ struct Scene
     }
 
     // Updates light positions based on cursor movement
-    void lightsOnCursor(double xoffset, double yoffset, ShaderProgram* pProgram = nullptr)
+    void lightsOnCursor(double xoffset, double yoffset, std::shared_ptr<ShaderProgram> pProgram = nullptr)
     {
         int i = 0;
         for (Scene::Pass& pass : passes)
@@ -274,7 +260,7 @@ struct Scene
     }
 
     // Updates light properties based on scroll input
-    void lightsOnScroll(double xoffset, double yoffset, ShaderProgram* pProgram = nullptr)
+    void lightsOnScroll(double xoffset, double yoffset, std::shared_ptr<ShaderProgram> pProgram = nullptr)
     {
         int i = 0;
         for (Scene::Pass& pass : passes)

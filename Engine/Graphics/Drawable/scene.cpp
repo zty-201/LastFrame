@@ -276,13 +276,19 @@ void Scene::render()
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK); // Default to culling back faces
 		}
-
 		// --- 2. ACTIVATE SHADER AND SET UNIFORMS ---
-		shader.use();
-		shader.setUniform("Pass", passIndex);
+		//Temporary shader ptr, caching the ptr for use.
+		std::shared_ptr<ShaderProgram> shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(shader_guid);
+		//Ensure shader is valid. If not, nothing can be drawn.
+		if (!shader)
+		{
+			throw std::runtime_error("[Graphic System] Shader Program not loaded or Shader guid is invalid for current scene");
+		}
+		shader->use();
+		shader->setUniform("Pass", passIndex);
 
 		if (pass.setUniformCallback) {
-			pass.setUniformCallback(shader);
+			pass.setUniformCallback(*shader);
 		}
 
 		// Set camera matrices
@@ -290,27 +296,31 @@ void Scene::render()
 		glm::mat4 P = glm::mat4(1.0f);
 		if (!pass.cameras.empty())
 		{
-			pass.cameras[0].setUniforms(&shader);
+			pass.cameras[0].setUniforms(shader);
 			if (pass.viewport.size() == 4 && pass.viewport[3] > 0)
 			{
 				V = pass.cameras[0].getLookAt();
 				P = pass.cameras[0].getPerspective((float)pass.viewport[2] / pass.viewport[3]);
 			}
 		}
-		shader.setUniform("V", V);
-		shader.setUniform("P", P);
+		shader->setUniform("V", V);
+		shader->setUniform("P", P);
 
 		// Set lighting uniforms (only for scene pass)
 		for (int i = 0; i < pass.lights.size(); ++i) {
-			pass.lights[i].setUniforms(&shader, i);
+			pass.lights[i].setUniforms(shader, i);
 		}
 
 		// Bind per-pass textures (only for skybox pass)
-		for (const auto& info : pass.textures) {
-			if (info->id) {
-				glActiveTexture(info->channel);
-				glBindTexture(info->target, info->id);
-				LOGI("Texture Destroyed");
+		for (const xresource::full_guid& texture_guid : pass.texture_guids) {
+			//Ensure texture is valid.
+			if (texture_guid.empty()) continue;
+			std::shared_ptr<Texture> texture = EngineFramework::AssetManagerSystem::GetResource<Texture>(texture_guid);
+			if (!texture) continue;
+
+			if (texture->id) {
+				glActiveTexture(texture->channel);
+				glBindTexture(texture->target, texture->id);
 			}
 		}
 
@@ -331,8 +341,8 @@ void Scene::render()
 					glCullFace(GL_FRONT); // Cull the front face to see the "back"
 				}
 
-				instance.material.setUniforms(&shader);
-				shader.setUniform("M", instance.modeltransform);
+				instance.material.setUniforms(shader);
+				shader->setUniform("M", instance.modeltransform);
 				glDrawElements(GL_TRIANGLES, (GLsizei)object.size, GL_UNSIGNED_INT, 0);
 
 				// *** FIX: Reset culling back to the default for other objects ***
@@ -343,7 +353,7 @@ void Scene::render()
 		}
 
 		glBindVertexArray(0);
-		shader.disuse();
+		shader->disuse();
 		passIndex++;
 	}
 

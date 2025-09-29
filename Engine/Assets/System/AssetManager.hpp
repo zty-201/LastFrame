@@ -180,6 +180,14 @@ namespace EngineFramework {
 		static inline constexpr const char CUBEMAP[]{ "cubemap" };
 		static inline constexpr const char AUDIO[]{ "audio" };
 
+		/*
+			Precomputed type guids.
+		*/
+		static inline constexpr xresource::type_guid TEXTURE_GUID{ TEXTURE };
+		static inline constexpr xresource::type_guid MESH_GUID{ MESH };
+		static inline constexpr xresource::type_guid SHADER_GUID{ SHADER };
+		static inline constexpr xresource::type_guid CUBEMAP_GUID{ CUBEMAP };
+		static inline constexpr xresource::type_guid AUDIO_GUID{ AUDIO };
 	private:
 		
 		/*

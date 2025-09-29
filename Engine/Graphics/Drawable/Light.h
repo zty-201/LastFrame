@@ -30,7 +30,7 @@ struct Light
     }
 
     // Sets the light's uniform variables in the given shader program.
-    void setUniforms(ShaderProgram* pProgram, int i = 0) const
+    void setUniforms(std::shared_ptr<ShaderProgram> pProgram, int i = 0) const
     {
 
         std::stringstream s;
@@ -70,7 +70,7 @@ struct Light
     }
 
     // Handles cursor movement events to adjust the light's position.
-    void onCursor(double xoffset, double yoffset, ShaderProgram* pProgram = nullptr, int i = 0)
+    void onCursor(double xoffset, double yoffset, std::shared_ptr<ShaderProgram> pProgram = nullptr, int i = 0)
     {
         const float PI05 = glm::pi<float>() / 2.0f;
         const float r = glm::sqrt(position.x * position.x +
@@ -96,7 +96,7 @@ struct Light
     }
 
     // Handles scroll events to zoom the light in/out by adjusting its radial distance.
-    void onScroll(double xoffset, double yoffset, ShaderProgram* pProgram = nullptr, int i = 0)
+    void onScroll(double xoffset, double yoffset, std::shared_ptr<ShaderProgram> pProgram = nullptr, int i = 0)
     {
         UNREFERENCED_PARAMETER(xoffset);
         float r = glm::sqrt(position.x * position.x +

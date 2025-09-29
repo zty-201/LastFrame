@@ -2,7 +2,7 @@
 #include "global.hpp"
 #include "GraphicsSystem.h"
 #include "InputManager.hpp"
-
+#include "AssetManager.hpp"
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
@@ -84,62 +84,59 @@ namespace EngineFramework
 
 	void GraphicsSystem::SetupGraphics()
 	{
+		using AssetMgr = EngineFramework::AssetManagerSystem;
+		//Creation of framebuffer for scene, used for level editor (or others).
+		//Create a framebuffer for the scene to be drawn on, and read texture handle for the texturebuffer attached.
+		FBO tempFBO(FBO::Texture, WIDTH, HEIGHT, &sceneTextureID);
+		//Do not use sceneFBO anymore, its contents have been written to the member variable.
+		scene_framebuffer = std::move(tempFBO);
+
+		//TODO: ==Hardcoded scene, for demo only.==
+
+		//Scene Properties
 		fogColor = { 0.0f, 0.0f, 0.0f }; // Example: gray fog color
 		fogMinDist = 5.0f;
 		fogMaxDist = 15.0f;
 		shadingModel = 0;
-		//TODO: Uncomment.
-		// Define the scene and its properties
-		/*Scene::Texture texture = {
-			 { "Extern/night_negx.png", "Extern/night_posx.png",
-			   "Extern/night_posy.png", "Extern/night_negy.png",
-			   "Extern/night_posz.png", "Extern/night_negz.png"  }
-		};*/
-
 		Camera camera = { { 0.0f, 1.0f, 5.0f }, 75.0f };
-		//Create a framebuffer for the scene to be drawn on, and read texture handle for the texturebuffer attached.
-		FBO sceneFBO(FBO::Texture, WIDTH, HEIGHT, &sceneTextureID);
-		//Do not use sceneFBO anymore, its contents have been written to the member variable.
-		scene_framebuffer = std::move(sceneFBO);
-		pScene = std::make_unique<Scene>( "", "", std::initializer_list<Scene::Pass>{}
-			//"Extern/Graphics/Shader/BasicVert.vert", // Vertex shader file path
-			//"Extern/Graphics/Shader/BasicFrag.frag", // Fragment shader file path
-			//std::initializer_list<Scene::Pass>{         // List of rendering passes
-			//// Pass 0: Render Scene
-			//Scene::Pass{
-			//	DEFAULT,
-			//	{ 0, 0, WIDTH, HEIGHT },            // Viewport
-			//	GL_LESS,                            // Depth test LESS for the scene
-			//	{                                   // Objects
-			//		{ PLANE, MATERIAL_CHECKERBOARD, glm::translate(glm::scale(glm::mat4(1.0f), {10.0f, 1.0f, 10.0f}), {0.0f, -1.01f, 0.0f}) },
-			//		{ SPHERE, MATERIAL_PBR_PHONG, glm::translate(glm::mat4(1.0f), {-3.0f, 0.0f, 0.0f}) },
-			//		{ CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) },
-			//		{ "Extern/tree.obj", MATERIAL_CARTOON, glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f}) }
-			//	},
-			//	{ camera },                         // Cameras
-			//	{ { {0.0f, 5.0f, 2.0f} } },         // Lights
-			//	{},                                 // Textures
-			//	[this](ShaderProgram& shader) {     // Uniform callback
-			//		shader.setUniform("fog.color", fogColor);
-			//		shader.setUniform("fog.minDist", fogMinDist);
-			//		shader.setUniform("fog.maxDist", fogMaxDist);
-			//		shader.setUniform("materialType", shadingModel);
-			//	}
-			//},
-			//// Pass 1: Render Skybox
-			//Scene::Pass{
-			//	DEFAULT,      // Default FBO
-			//	{ 0, 0, WIDTH, HEIGHT },            // Viewport
-			//	GL_LEQUAL,                          // Depth test LEQUAL for the skybox
-			//	{                                   // Objects
-			//		{ SKYBOX }
-			//	},
-			//	{ camera },                         // Cameras
-			//	{},                                 // Lights
-			//	{ texture },                        // Textures
-			//	nullptr                             // Uniform callback
-			//}
-			//}
+		pScene = std::make_unique<Scene>(
+			AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Basic"), 
+			std::initializer_list<Scene::Pass>{         // List of rendering passes
+			// Pass 0: Render Scene
+			Scene::Pass{
+				DEFAULT,
+				{ 0, 0, WIDTH, HEIGHT },            // Viewport
+				GL_LESS,                            // Depth test LESS for the scene
+				{                                   // Objects
+					{ PLANE, MATERIAL_CHECKERBOARD, glm::translate(glm::scale(glm::mat4(1.0f), {10.0f, 1.0f, 10.0f}), {0.0f, -1.01f, 0.0f}) },
+					{ SPHERE, MATERIAL_PBR_PHONG, glm::translate(glm::mat4(1.0f), {-3.0f, 0.0f, 0.0f}) },
+					{ CUBE, MATERIAL_DISCARD, glm::translate(glm::mat4(1.0f), {3.0f, 0.0f, 0.0f}) },
+					//{ "Extern/tree.obj", MATERIAL_CARTOON, glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f}) }
+				},
+				{ camera },                         // Cameras
+				{ { {0.0f, 5.0f, 2.0f} } },         // Lights
+				{},                                 // Textures
+				[this](ShaderProgram& shader) {     // Uniform callback
+					shader.setUniform("fog.color", fogColor);
+					shader.setUniform("fog.minDist", fogMinDist);
+					shader.setUniform("fog.maxDist", fogMaxDist);
+					shader.setUniform("materialType", shadingModel);
+				}
+			},
+			// Pass 1: Render Skybox
+			Scene::Pass{
+				DEFAULT,      // Default FBO
+				{ 0, 0, WIDTH, HEIGHT },            // Viewport
+				GL_LEQUAL,                          // Depth test LEQUAL for the skybox
+				{                                   // Objects
+					{ SKYBOX }
+				},
+				{ camera },                         // Cameras
+				{},                                 // Lights
+				{ AssetMgr::GetFullGuid(AssetMgr::CUBEMAP_GUID, "night_skybox")},                        // Textures
+				nullptr                             // Uniform callback
+			}
+			}
 		);
 	}
 
