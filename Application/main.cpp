@@ -28,22 +28,22 @@ written consent of DigiPen Institute of Technology is prohibited.
 #endif
 
 // --- Native script smoke test -----------------------------------------------
-struct Spinner : Engine::ScriptableEntity {
-	float t = 0.0f;
-	void OnCreate() override {
-		LOGI("[Spinner] OnCreate");
-	}
-	void OnUpdate(float dt) override {
-		t += dt;
-		if (t >= 0.5f) {
-			LOGI("[Spinner] tick");
-			t = 0.0f;
-		}
-	}
-	void OnDestroy() override {
-		LOGI("[Spinner] OnDestroy");
-	}
-};
+//struct Spinner : Engine::ScriptableEntity {
+//	float t = 0.0f;
+//	void OnCreate() override {
+//		LOGI("[Spinner] OnCreate");
+//	}
+//	void OnUpdate(float dt) override {
+//		t += dt;
+//		if (t >= 0.5f) {
+//			LOGI("[Spinner] tick");
+//			t = 0.0f;
+//		}
+//	}
+//	void OnDestroy() override {
+//		LOGI("[Spinner] OnDestroy");
+//	}
+//};
 // -----------------------------------------------------------------------------
 // End of Jerron's Scripting testing
 
@@ -176,12 +176,31 @@ void Game_Initialize(void* android_asset_manager)
 		Engine::ScriptSystem::OnRuntimeStart(registry); // start script runtime
 
 		// Create a test entity with a native script
+		//{
+		//	auto e = registry.create();
+		//	auto& nsc = registry.emplace<Engine::NativeScriptComponent>(e);
+		//	nsc.Bind<Spinner>(); // instantiates lazily on first update
+		//}
+		// Add this code in Game_Initialize() after Engine::ScriptSystem::OnRuntimeStart(registry);
+
+#if defined(ENGINE_ENABLE_LUA)
+// Test Lua script loading
 		{
-			auto e = registry.create();
-			auto& nsc = registry.emplace<Engine::NativeScriptComponent>(e);
-			nsc.Bind<Spinner>(); // instantiates lazily on first update
+			auto testEntity = registry.create();
+			auto& luaScript = registry.emplace<Engine::LuaScriptComponent>(testEntity);
+
+			// Set the path to your Lua script
+			luaScript.ScriptPath = "Scripts/hello.lua";
+			luaScript.Enabled = true;
+
+			// The script will be loaded automatically on the first update cycle
+			LOGI("Created test entity with Lua script: Scripts/hello.lua");
 		}
-		//End of Playground
+#else
+		LOGI("Lua scripting is disabled - cannot test hello.lua");
+#endif
+
+		//End of Playground (jerron's)
 	}
 	catch (std::exception& e)
 	{
