@@ -20,6 +20,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
 #include "Assets/AssetManager.hpp"
+#include "UnitTestManager.hpp"
 #include "Audio/Audio.hpp"
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
@@ -76,8 +77,10 @@ void Game_Initialize(void* android_asset_manager)
 			- Note: Sometimes this step must be done before deallocation of external libraries. If so, CoreEngine should not be deallocated via RAII but rather via a manual function call before the previous step.
 		*/
 		//Initialize Entt Reflection System by registering all components.
-	EngineFramework::RegisterReflection();
-	EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
+		EngineFramework::RegisterReflection();
+		// Creates the only instance in the program, and runs all unit tests.
+		UnitTestManager::GetInstance().RunAllTests();
+		EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 
 	// --- Core Systems (Init First, Destroy Last) ---
 
