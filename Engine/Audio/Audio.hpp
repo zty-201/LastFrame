@@ -107,33 +107,33 @@ namespace EngineFramework
 
         // ===== 3D Functions =====
         // 3D Configuration
-        void Set3DSettings(float dopplerScale = 1.0f,
-            float distanceFactorMeters = 1.0f,
-            float rolloffScale = 1.0f);
+        //void Set3DSettings(float dopplerScale = 1.0f,
+        //    float distanceFactorMeters = 1.0f,
+        //    float rolloffScale = 1.0f);
 
-        // Call this during Update() to follow player/camera
-        void SetListenerTransform(const Vec3& pos,
-            const Vec3& forward,
-            const Vec3& up,
-            const Vec3& velocity = Vec3(0, 0, 0),
-            int listenerIndex = 0);
+        //// Call this during Update() to follow player/camera
+        //void SetListenerTransform(const Vec3& pos,
+        //    const Vec3& forward,
+        //    const Vec3& up,
+        //    const Vec3& velocity = Vec3(0, 0, 0),
+        //    int listenerIndex = 0);
 
-        // Specifically to load 3D audio
-        bool Load3D(const std::string& id,
-            const std::string& logicalOrPath,
-            bool loop = false,
-            AudioRolloff rolloff = AudioRolloff::Linear);
+        //// Specifically to load 3D audio
+        //bool Load3D(const std::string& id,
+        //    const std::string& logicalOrPath,
+        //    bool loop = false,
+        //    AudioRolloff rolloff = AudioRolloff::Linear);
 
-        bool Play3D(const std::string& id,
-            const Vec3& pos,
-            const Vec3& vel = Vec3(0, 0, 0),
-            float minDist = 1.0f,
-            float maxDist = 50.0f,
-            float volume = 1.0f,
-            bool paused = false,
-            AudioGroup group = AudioGroup::SFX);
+        //bool Play3D(const std::string& id,
+        //    const Vec3& pos,
+        //    const Vec3& vel = Vec3(0, 0, 0),
+        //    float minDist = 1.0f,
+        //    float maxDist = 50.0f,
+        //    float volume = 1.0f,
+        //    bool paused = false,
+        //    AudioGroup group = AudioGroup::SFX);
 
-        void SetDefault3DMinMax(float minDist, float maxDist);
+        //void SetDefault3DMinMax(float minDist, float maxDist);
 
         // Global controls
         void StopAll();
@@ -144,6 +144,7 @@ namespace EngineFramework
         // Request Status
         bool IsInitialized() const;
 
+        //void DebugPlayOnKey(int key, const std::shared_ptr<SoundAsset>& sound);
 
         // Constructor / Destructor
         AudioSystem();
@@ -201,6 +202,9 @@ namespace EngineFramework
         FMOD_MODE   modeFor(bool looped, bool is3D, AudioRolloff rolloff) const;
         // Pick a channel group pointer (Master/Music/SFX)
         FMOD::ChannelGroup* pickGroup(AudioGroup group);
+
+        // Testing purpose
+        void DebugPlayTestSound();
 #endif
 
 #ifdef PLATFORM_ANDROID

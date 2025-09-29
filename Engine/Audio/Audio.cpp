@@ -12,6 +12,8 @@ written consent of DigiPen Institute of Technology is prohibited.
 /******************************************************************************/
 #include "pch.hpp"
 #include "Audio.hpp"
+#include "InputManager.hpp"
+#include "SoundAsset.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -42,8 +44,11 @@ namespace EngineFramework
 		}
 	}
 
-	FMOD_MODE AudioSystem::modeFor(bool looped)
+	FMOD_MODE AudioSystem::modeFor(bool looped, bool is3D, AudioRolloff rolloff) const
 	{
+		(void)is3D;
+		(void)rolloff;
+
 		// For short SFX we keep fully decoded. For long music you could add FMOD_CREATESTREAM.
 		return looped ? (FMOD_DEFAULT | FMOD_LOOP_NORMAL)
 			: (FMOD_DEFAULT | FMOD_LOOP_OFF);
@@ -147,6 +152,10 @@ namespace EngineFramework
 
 		FMOD_RESULT r = m_system->update();
 		logFmodError(r, "System::update");
+
+		
+		
+		DebugPlayTestSound();
 #endif
 	}
 
@@ -246,7 +255,7 @@ namespace EngineFramework
 
 #ifndef DISABLE_FMOD
 		FMOD::Sound* snd = NULL;
-		FMOD_MODE mode = modeFor(loop);
+		FMOD_MODE mode = modeFor(loop, false, AudioRolloff::Linear);
 
 #ifdef PLATFORM_ANDROID
 		// Example policy: add streaming on mobile for big files if desired
@@ -358,4 +367,25 @@ namespace EngineFramework
 	{
 		return m_initialized;
 	}
+
+	// TESTING PURPOSE
+	void AudioSystem::DebugPlayTestSound()
+	{
+		static std::shared_ptr<SoundAsset> testSound = nullptr;
+
+		if (testSound == nullptr)
+		{
+			testSound = Load("Extern/Audio/lizard.mp3", false);
+		}
+
+		if (m_initialized && testSound && testSound->sound)
+		{
+			if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_G))
+			{
+				LOGI("[AudioSystem] G pressed, playing Lizard.mp3");
+				Play(testSound, 1.0f, false, AudioGroup::SFX);
+			}
+		}
+	}
+
 } // namespace EngineFramework
