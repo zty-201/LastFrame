@@ -124,7 +124,7 @@ namespace EngineFramework
 		addFeature("Screen", std::make_unique<Screen>());
 		addFeature("SceneManager", std::make_unique<SceneManager>());
 
-		
+		SceneManager::GetInstance().ScanScenes("Extern/Scenes");
 
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {
@@ -196,27 +196,10 @@ namespace EngineFramework
 					ImGui::MenuItem("Open Existing", NULL, &featureFlag("Screen"));
 					ImGui::Separator();
 					if (ImGui::BeginMenu("Open Scene")) {
-						//for (const auto& sceneName : sceneList) {
-						//	if (ImGui::MenuItem(sceneName.c_str())) {
-						//		featureFlag("SceneManager") = true;
-						//		// Pass selected sceneName to SceneManager
-						//	}
-						//}
-						// Example: hardcoded scene list
-						if (ImGui::MenuItem("Scene 1")) {
-							// Load Scene 1
-							featureFlag("SceneManager") = true;
-							// SceneManager could internally track "Scene 1" as the selected scene
-						}
-
-						if (ImGui::MenuItem("Scene 2")) {
-							featureFlag("SceneManager") = true;
-							// Trigger loading Scene 2
-						}
-
-						if (ImGui::MenuItem("Scene 3")) {
-							featureFlag("SceneManager") = true;
-							// Trigger loading Scene 3
+						for (const auto& sceneName : SceneManager::GetInstance().GetSceneList()) {
+							if (ImGui::MenuItem(sceneName.c_str())) {
+								SceneManager::GetInstance().LoadScene(sceneName);
+							}
 						}
 						ImGui::EndMenu();
 					}
@@ -245,6 +228,13 @@ namespace EngineFramework
 					ImGui::PopStyleColor();  // Pop the white text color for "File" menu
 					ImGui::EndMenu();
 				}
+
+				ImGui::SameLine(0, 50.f);
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+				const std::string& currScene = SceneManager::GetInstance().GetCurrentScene();
+				ImGui::Text("| Current Scene: %s", currScene.empty() ? "None" : currScene.c_str());
+				ImGui::PopStyleColor();
+
 				ImGui::EndMenuBar();
 			}
 		}

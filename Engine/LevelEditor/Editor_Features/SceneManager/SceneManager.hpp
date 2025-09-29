@@ -25,7 +25,19 @@ namespace EngineFramework
         void Run() override;
         void Close() override;
 
+        static SceneManager& GetInstance();
+
         static bool feature_enabled;
+
+        const std::vector<std::string>& GetSceneList() const;
+        void ScanScenes(const std::string& dir);
+        void LoadScene(const std::string& scenePath);
+        const std::string& GetCurrentScene() const;
+
+    private:
+        static inline SceneManager* this_system{};
+        std::vector<std::string> sceneList;
+        std::string currentScene;
     };
 }
 
