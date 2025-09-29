@@ -44,7 +44,7 @@ namespace EngineFramework
 			throw std::runtime_error("Failed to initialize GLFW");
 		}
 
-		// Configure GLFW for OpenGL ES 3.1 on desktop.
+		// Configure GLFW for OpenGL ES 3.2 on desktop.
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);

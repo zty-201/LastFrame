@@ -249,7 +249,7 @@ void Scene::render()
     glEnable(GL_DEPTH_TEST);
 
     int passIndex = 0;
-    for (const auto& pass : passes)
+    for (auto& pass : passes)
     {
         // --- 1. SETUP THE PASS RENDER TARGET AND STATE ---
         glBindFramebuffer(GL_FRAMEBUFFER, pass.fbo.handle);
@@ -298,7 +298,8 @@ void Scene::render()
             if (pass.viewport.size() == 4 && pass.viewport[3] > 0)
             {
                 V = pass.cameras[0].getLookAt();
-                P = pass.cameras[0].getPerspective((float)pass.viewport[2] / pass.viewport[3]);
+                aspect = (float)pass.viewport[2] / pass.viewport[3];
+                P = pass.cameras[0].getPerspective(aspect);
             }
         }
         shader.setUniform("V", V);

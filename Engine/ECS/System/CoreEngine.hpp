@@ -77,6 +77,11 @@ namespace EngineFramework
 
 		//Array containing all systems. Sorted based on order of init/update/destruct according to current needs.
 		std::vector<CoreSystem> system_arr;
+
+		// Helper functions to safely call system methods with try-catch and error logging.
+		void SafeUpdateSystem(CoreSystem& system, float delta_time);
+
+		void SafePostUpdateSystem(CoreSystem& system, float delta_time);
 	};
 }
 
