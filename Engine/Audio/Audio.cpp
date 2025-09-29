@@ -12,6 +12,8 @@ written consent of DigiPen Institute of Technology is prohibited.
 /******************************************************************************/
 #include "pch.hpp"
 #include "Audio.hpp"
+#include "InputManager.hpp"
+#include "SoundAsset.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -42,8 +44,11 @@ namespace EngineFramework
 		}
 	}
 
-	FMOD_MODE AudioSystem::modeFor(bool looped)
+	FMOD_MODE AudioSystem::modeFor(bool looped, bool is3D, AudioRolloff rolloff) const
 	{
+		(void)is3D;
+		(void)rolloff;
+
 		// For short SFX we keep fully decoded. For long music you could add FMOD_CREATESTREAM.
 		return looped ? (FMOD_DEFAULT | FMOD_LOOP_NORMAL)
 			: (FMOD_DEFAULT | FMOD_LOOP_OFF);
@@ -147,6 +152,10 @@ namespace EngineFramework
 
 		FMOD_RESULT r = m_system->update();
 		logFmodError(r, "System::update");
+		
+		//DebugPlayTestSound();
+		DebugMainMenuAutoPlay();
+		DebugMainMenuHandleKeys();
 #endif
 	}
 
@@ -246,7 +255,7 @@ namespace EngineFramework
 
 #ifndef DISABLE_FMOD
 		FMOD::Sound* snd = NULL;
-		FMOD_MODE mode = modeFor(loop);
+		FMOD_MODE mode = modeFor(loop, false, AudioRolloff::Linear);
 
 #ifdef PLATFORM_ANDROID
 		// Example policy: add streaming on mobile for big files if desired
@@ -358,4 +367,156 @@ namespace EngineFramework
 	{
 		return m_initialized;
 	}
+
+	// ============== TESTING PURPOSE ==============
+	/*void AudioSystem::DebugPlayTestSound()
+	{
+		static std::shared_ptr<SoundAsset> testSound = nullptr;
+
+		if (testSound == nullptr)
+		{
+			testSound = Load("Extern/Audio/lizard.mp3", false);
+		}
+
+		if (m_initialized && testSound && testSound->sound)
+		{
+			if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_G))
+			{
+				LOGI("[AudioSystem] G pressed, playing Lizard.mp3");
+				Play(testSound, 1.0f, false, AudioGroup::SFX);
+			}
+		}
+	}*/
+
+	void AudioSystem::DebugMainMenuAutoPlay()
+	{
+		if (!m_initialized || m_debugMainMenuStarted) return;
+
+		static std::shared_ptr<SoundAsset> s_MainMenu = nullptr;
+
+		if (!s_MainMenu)
+		{
+			s_MainMenu = Load("Extern/Audio/mainmenu_loop.wav", true);
+			if (!s_MainMenu || !s_MainMenu->sound)
+			{
+				LOGI("[AudioSystem] Failed to load Main Menu audio");
+				return;
+			}
+		}
+
+		const bool ok = Play(s_MainMenu, 1.0f, false, AudioGroup::Music);
+		if (ok)
+		{
+			if (m_groupMusic) m_groupMusic->setVolume(0.5f);
+			m_debugMainMenuStarted = true;
+			LOGI("[AudioSystem] Main Menu music is playing.");
+		}
+		else
+		{
+			LOGI("[AudioSystem] Failed to play Main Menu music.");
+		}
+	}
+
+	void AudioSystem::DebugMainMenuHandleKeys()
+	{
+		if (!m_initialized || !m_groupMusic) return;
+
+		// --------------------------
+		// Pause / Resume toggle (F)
+		// --------------------------
+		if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_F))
+		{
+			bool paused = false;
+			m_groupMusic->getPaused(&paused);
+			m_groupMusic->setPaused(!paused);
+			LOGI(paused ? "[AudioSystem] Music Status: Resuming."
+						: "[AudioSystem] Music Status: Pausing.");
+		}
+
+		// ---------------------------------------
+		// Play / Resume (G) — Avoids double-play
+		// ---------------------------------------
+		if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_G))
+		{
+			// If group is paused, just unpause
+			bool paused = false;
+			m_groupMusic->getPaused(&paused);
+			if (paused)
+			{
+				m_groupMusic->setPaused(false);
+				LOGI("[AudioSystem] Music Status: Resuming (unpaused).");
+			}
+			else
+			{
+				// Check if any channel in the Music group is already playing
+				int numCh = 0;
+				m_groupMusic->getNumChannels(&numCh);
+
+				bool anyPlaying = false;
+				for (int i = 0; i < numCh; ++i)
+				{
+					FMOD::Channel* ch = nullptr;
+					if (m_groupMusic->getChannel(i, &ch) == FMOD_OK && ch)
+					{
+						bool isPlaying = false;
+						if (ch->isPlaying(&isPlaying) == FMOD_OK && isPlaying)
+						{
+							anyPlaying = true;
+							break;
+						}
+					}
+				}
+
+				if (!anyPlaying)
+				{
+					static std::shared_ptr<SoundAsset> s_MainMenu = nullptr;
+					if (!s_MainMenu) s_MainMenu = Load("Extern/Audio/mainmenu_loop.wav", /*loop=*/true);
+
+					if (s_MainMenu && s_MainMenu->sound)
+					{
+						// Start playback on the Music bus
+						Play(s_MainMenu, /*volume=*/1.0f, /*paused=*/false, AudioGroup::Music);
+						LOGI("[AudioSystem] Music Status: Playing.");
+						m_debugMainMenuStarted = true;
+					}
+					else
+					{
+						LOGI("[AudioSystem] Music: Failed to play (audio file missing?).");
+					}
+				}
+				else
+				{
+					LOGI("[AudioSystem] Music Status: Already playing; not starting another instance.");
+				}
+			}
+		}
+
+		// --------------------------------
+		// Volume Up (Y) / Down (H)
+		// --------------------------------
+		float vol = 1.0f;
+		m_groupMusic->getVolume(&vol);
+
+		const float step = 0.05f;
+		bool changed = false;
+
+		if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_Y))
+		{
+			vol += step;
+			if (vol > 1.0f) vol = 1.0f; changed = true;
+		}
+
+		if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_H))
+		{
+			vol -= step;
+			if (vol < 0.0f) vol = 0.0f; changed = true;
+		}
+
+		if (changed)
+		{
+			m_groupMusic->setVolume(vol);
+			LOGI("[AudioSystem] Music Volume: %f", vol);
+		}
+	}
+
 } // namespace EngineFramework
