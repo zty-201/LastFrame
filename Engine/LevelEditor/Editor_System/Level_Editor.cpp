@@ -195,14 +195,8 @@ namespace EngineFramework
 
 					ImGui::MenuItem("Open Existing", NULL, &featureFlag("Screen"));
 					ImGui::Separator();
-					if (ImGui::BeginMenu("Open Scene")) {
-						for (const auto& sceneName : SceneManager::GetInstance().GetSceneList()) {
-							if (ImGui::MenuItem(sceneName.c_str())) {
-								SceneManager::GetInstance().LoadScene(sceneName);
-							}
-						}
-						ImGui::EndMenu();
-					}
+					ImGui::MenuItem("Open Scene", NULL, &featureFlag("SceneManager"));
+					ImGui::Separator();
 					ImGui::MenuItem("Save", NULL, &featureFlag("Save"));
 					ImGui::MenuItem("Save As ..", NULL);
 					ImGui::Separator(); 
