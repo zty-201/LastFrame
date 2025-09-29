@@ -28,24 +28,37 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "System_LevelEditor.hpp"
 #endif
 
-// --- Native script smoke test -----------------------------------------------
-//struct Spinner : Engine::ScriptableEntity {
-//	float t = 0.0f;
-//	void OnCreate() override {
-//		LOGI("[Spinner] OnCreate");
-//	}
-//	void OnUpdate(float dt) override {
-//		t += dt;
-//		if (t >= 0.5f) {
-//			LOGI("[Spinner] tick");
-//			t = 0.0f;
-//		}
-//	}
-//	void OnDestroy() override {
-//		LOGI("[Spinner] OnDestroy");
-//	}
-//};
-// -----------------------------------------------------------------------------
+#if defined(ENGINE_ENABLE_LUA)
+void TestLuaFunctions() {
+	LOGI("=== Testing Lua standalone functions ===");
+
+	try {
+		sol::state& lua = Engine::ScriptSystem::GetLuaState();
+
+		// Load the test script into global space (not in a component)
+		lua.script_file("Extern/Scripts/test.lua");
+
+		// Call the greet function
+		sol::function greet = lua["greet"];
+		if (greet.valid()) {
+			std::string result = greet("C++ Engine");
+			LOGI("Greet returned: %s", result.c_str());
+		}
+
+		// Call the add function
+		sol::function add = lua["add"];
+		if (add.valid()) {
+			int sum = add(15, 27);
+			LOGI("Add returned: %d", sum);
+		}
+
+		LOGI("=== Lua function test complete ===");
+	}
+	catch (const sol::error& e) {
+		LOGE("Lua test error: %s", e.what());
+	}
+}
+#endif
 // End of Jerron's Scripting testing
 
 //Initialization of game application.
@@ -178,29 +191,22 @@ void Game_Initialize(void* android_asset_manager)
 		extern entt::registry registry;                 // <-- comment out if not using a global
 		Engine::ScriptSystem::OnRuntimeStart(registry); // start script runtime
 
-		// Create a test entity with a native script
-		//{
-		//	auto e = registry.create();
-		//	auto& nsc = registry.emplace<Engine::NativeScriptComponent>(e);
-		//	nsc.Bind<Spinner>(); // instantiates lazily on first update
-		//}
-		// Add this code in Game_Initialize() after Engine::ScriptSystem::OnRuntimeStart(registry);
-
 #if defined(ENGINE_ENABLE_LUA)
-// Test Lua script loading
+	// Test Lua script loading
 		{
 			auto testEntity = registry.create();
 			auto& luaScript = registry.emplace<Engine::LuaScriptComponent>(testEntity);
 
-			// Set the path to your Lua script
-			luaScript.ScriptPath = "Scripts/hello.lua";
+			// Set the path to your test script
+			luaScript.ScriptPath = "Extern/Scripts/test.lua";
 			luaScript.Enabled = true;
+			TestLuaFunctions();
 
-			// The script will be loaded automatically on the first update cycle
-			LOGI("Created test entity with Lua script: Scripts/hello.lua");
+			LOGI("Created test entity with Lua script: Scripts/test.lua");
+			//LOGI("Watch console for Lua print statements during update loop");
 		}
 #else
-		LOGI("Lua scripting is disabled - cannot test hello.lua");
+		LOGI("Lua scripting is disabled - ENGINE_ENABLE_LUA not defined");
 #endif
 
 		//End of Playground (jerron's)

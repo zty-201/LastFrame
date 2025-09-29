@@ -105,9 +105,15 @@ namespace Engine {
     void ScriptSystem::LoadLuaFor(entt::registry& reg,
         entt::entity /*e*/,
         LuaScriptComponent& lsc) {
+		(void)reg; // Unused
         UnloadLuaFor(lsc, /*callOnDestroy*/false);
 
         if (lsc.ScriptPath.empty()) { lsc.Loaded = false; return; }
+
+        // DEBUG: Print the full path being attempted
+        std::filesystem::path fullPath = std::filesystem::absolute(lsc.ScriptPath);
+        std::cerr << "[Lua] Attempting to read: " << fullPath.string() << "\n";
+        std::cerr << "[Lua] File exists: " << std::filesystem::exists(lsc.ScriptPath) << "\n";
 
         const std::string code = ReadTextFile(lsc.ScriptPath);
         if (code.empty()) {
@@ -116,20 +122,14 @@ namespace Engine {
         }
 
         try {
+            // Create environment for this script
             lsc.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
-            sol::load_result chunk = s_Lua.load(code);
-            if (!chunk.valid()) {
-                sol::error err = chunk;
-                std::cerr << "[Lua] Load error in " << lsc.ScriptPath.string()
-                    << " : " << err.what() << "\n";
-                lsc.Loaded = false; return;
-            }
 
-            sol::protected_function pf = chunk;
-            pf.set_environment(lsc.Env);
-            sol::protected_function_result execRes = pf();
-            if (!execRes.valid()) {
-                sol::error err = execRes;
+            // Load the script with the environment
+            auto result = s_Lua.script(code, lsc.Env);
+
+            if (!result.valid()) {
+                sol::error err = result;
                 std::cerr << "[Lua] Exec error in " << lsc.ScriptPath.string()
                     << " : " << err.what() << "\n";
                 lsc.Loaded = false; return;

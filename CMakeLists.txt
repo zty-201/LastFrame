@@ -37,7 +37,7 @@ if(WIN32)
   target_precompile_headers(engine_library PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
   target_precompile_headers(application_executable REUSE_FROM engine_library) #Use the same pch as engine_library 
   #Preprocessor Definitions 
-  target_compile_definitions(engine_library PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG> )
+  target_compile_definitions(engine_library PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG> ENGINE_ENABLE_LUA )  # <--- ADD THIS LINE 
 
 
   #Compiler Flags, use a high warning level and treat warnings as errors.
@@ -159,7 +159,7 @@ endif()
 add_subdirectory(Lib)
 
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod glad stb_image CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad stb_image lua sol CACHE INTERNAL "")
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
 set(WINDOWS_DEBUG_LIBRARIES imgui CACHE INTERNAL "")
@@ -279,5 +279,28 @@ if(WIN32)
             $<TARGET_FILE:fmod>
             $<TARGET_FILE_DIR:application_executable>
     COMMENT "Copying fmod dll to executable directory"
+  )
+endif()
+
+#Copying of dlls
+#Copies fmod dll to executable path
+if(WIN32)
+  add_custom_command(
+    TARGET application_executable
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            $<TARGET_FILE:fmod>
+            $<TARGET_FILE_DIR:application_executable>
+    COMMENT "Copying fmod dll to executable directory"
+  )
+  
+# Copy Lua DLL
+  add_custom_command(
+    TARGET application_executable
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${LUA_DLL}
+            $<TARGET_FILE_DIR:application_executable>
+    COMMENT "Copying lua54.dll to executable directory"
   )
 endif()
