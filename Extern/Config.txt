@@ -1,1 +1,0 @@
-ShaderPath Extern/Graphics/Shader
