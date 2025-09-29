@@ -23,6 +23,7 @@
 #include "Save.hpp"
 #include "Screen.hpp"
 #include "SceneManager.hpp"
+#include "AssetWindow.hpp"
 
 namespace EngineFramework
 {
@@ -123,6 +124,7 @@ namespace EngineFramework
 		addFeature("Save", std::make_unique<Save>());
 		addFeature("Screen", std::make_unique<Screen>());
 		addFeature("SceneManager", std::make_unique<SceneManager>());
+		addFeature("AssetWindow", std::make_unique<AssetWindow>());
 
 		SceneManager::GetInstance().ScanScenes("Extern/Scenes");
 
@@ -179,7 +181,7 @@ namespace EngineFramework
 
 		if (ImGui::Begin("Main Window", nullptr, mainWindowFlags)) {
 
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));      // Black text
 
 			if (ImGui::BeginMenuBar()) {
 
@@ -195,14 +197,8 @@ namespace EngineFramework
 
 					ImGui::MenuItem("Open Existing", NULL, &featureFlag("Screen"));
 					ImGui::Separator();
-					if (ImGui::BeginMenu("Open Scene")) {
-						for (const auto& sceneName : SceneManager::GetInstance().GetSceneList()) {
-							if (ImGui::MenuItem(sceneName.c_str())) {
-								SceneManager::GetInstance().LoadScene(sceneName);
-							}
-						}
-						ImGui::EndMenu();
-					}
+					ImGui::MenuItem("Open Scene", NULL, &featureFlag("SceneManager"));
+					ImGui::Separator();
 					ImGui::MenuItem("Save", NULL, &featureFlag("Save"));
 					ImGui::MenuItem("Save As ..", NULL);
 					ImGui::Separator(); 
@@ -225,6 +221,8 @@ namespace EngineFramework
 					ImGui::MenuItem("Object Manager", NULL, &featureFlag("ObjectManager"));
 					ImGui::Separator();
 					ImGui::MenuItem("Property Manager", NULL);
+					ImGui::Separator();
+					ImGui::MenuItem("Asset Browser", NULL, &featureFlag("AssetWindow"));
 					ImGui::PopStyleColor();  // Pop the white text color for "File" menu
 					ImGui::EndMenu();
 				}
