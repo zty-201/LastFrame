@@ -40,14 +40,14 @@ void TestLuaFunctions() {
 
 		// Call the greet function
 		sol::function greet = lua["greet"];
-		if (greet.valid()) {
+		if (greet.valid()) { //Continues if greet function is added correctly
 			std::string result = greet("C++ Engine");
 			LOGI("Greet returned: %s", result.c_str());
 		}
 
 		// Call the add function
 		sol::function add = lua["add"];
-		if (add.valid()) {
+		if (add.valid()) { //Continue if add function is added correctly
 			int sum = add(15, 27);
 			LOGI("Add returned: %d", sum);
 		}
