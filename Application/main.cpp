@@ -77,8 +77,6 @@ void Game_Initialize(void* android_asset_manager)
 		*/
 		//Initialize Entt Reflection System by registering all components.
 		EngineFramework::RegisterReflection();
-		// Creates the only instance in the program, and runs all unit tests.
-		UnitTestManager::GetInstance().RunAllTests();
 		EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 
 	// --- Core Systems (Init First, Destroy Last) ---
@@ -147,6 +145,10 @@ void Game_Initialize(void* android_asset_manager)
 	try
 	{
 		core_engine.InitializeSystems();
+#ifdef DEBUG
+		// Creates the only instance in the program, and runs all unit tests.
+		UnitTestManager::GetInstance().RunAllTests();
+#endif
 	}
 	catch (std::exception& e)
 	{
