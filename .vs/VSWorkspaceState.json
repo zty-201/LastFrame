@@ -5,7 +5,11 @@
     ]
   },
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Engine",
+    "\\Engine\\Physics",
+    "\\Engine\\Physics\\System"
   ],
+  "SelectedNode": "\\.gitattributes",
   "PreviewInSolutionExplorer": false
 }
