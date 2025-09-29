@@ -1,3 +1,4 @@
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "SceneManager.hpp"
 #include "System_GameObjectSystem.hpp"
 #include <filesystem>
@@ -68,3 +69,4 @@ namespace EngineFramework
 		LOGI("Scene manager closed");
 	}
 }
+#endif
