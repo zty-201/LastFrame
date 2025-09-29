@@ -17,11 +17,16 @@
 #include <map>
 #include <functional>
 
+//Asset Management via guids
+#include "xresource_guid.h"
+
+//Core Systems and Global Definitions
 #include "global.hpp"
 #include "ISystem.hpp"
 #include "CoreEngine.hpp"
 
 
+//Opengl Rendering
 #ifdef PLATFORM_WINDOWS
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -40,6 +45,7 @@
 #include <glm/ext.hpp> // For mathematical constants like pi
 #include <glm/gtc/matrix_transform.hpp> // Utility functions for matrix transformations
 
+//Event system
 #include "event_structures.hpp"
 //// Windows API headers
 //#ifdef _WIN32
