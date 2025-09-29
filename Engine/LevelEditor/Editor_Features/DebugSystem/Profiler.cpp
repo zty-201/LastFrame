@@ -181,7 +181,7 @@ namespace EngineFramework {
             }
         }
 
-        // Header / legend
+        // Header of the profiler
         ImGui::Text("Frame: %.3f ms  (FPS %.1f)   UpdateAll (smoothed): %.3f ms", s_ema_frame_ms, fps, s_ema_updateAll);
         ImGui::TextDisabled("Bars = smoothed %% of UpdateAll; label shows current ms.");
         ImGui::Checkbox("Freeze order", &s_freeze_order);
@@ -212,11 +212,6 @@ namespace EngineFramework {
             const double smoothed = s_ema_ms[name];
             const double pctUpd = (smoothed / s_ema_updateAll) * 100.0;
             const double pctFrame = (smoothed / s_ema_frame_ms) * 100.0;
-            //const double per_call = sec.calls ? sec.ms / sec.calls : 0.0;
-
-            //// hide trivial noise unless hovered
-            //if (pctUpd < 0.5 && sec.ms < 0.02 && !ImGui::IsWindowHovered())
-            //    continue;
 
             float frac = (float)(smoothed / s_ema_updateAll);
             if (frac > 1.f) frac = 1.f;
@@ -226,7 +221,7 @@ namespace EngineFramework {
             snprintf(label, sizeof(label), "%s  %d%%  %.*f ms", name.c_str(), (int)pctUpd, MS_PRECISION, smoothed);
             ImGui::ProgressBar(frac, ImVec2(-1, 0), label);
 
-            // sparkline: instantaneous % history
+            // Instantaneous % history
             auto& ring = section_hist[name].data;
             if (!ring.empty()) {
                 ImGui::PlotLines(("##hist_" + name).c_str(),
@@ -271,10 +266,6 @@ namespace EngineFramework {
             frame_hist.clear();
             section_hist.clear();
             s_ema_ms.clear();
-            // keep s_order/s_index so names stay in the same human order after reset,
-            // but if you want a hard reset, uncomment the two lines below:
-            // s_order.clear();
-            // s_index.clear();
             s_ema_updateAll = 0.0;
             s_ema_frame_ms = 0.0;
             s_last_sort_time = 0.0;
