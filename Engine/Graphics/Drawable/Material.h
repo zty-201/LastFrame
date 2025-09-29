@@ -22,7 +22,7 @@ struct Material
         : rough(rough), metal(metal), color(color), Ka(Ka), Kd(Kd), Ks(Ks), shininess(shininess), effect(effect) {
     }
 
-    void setUniforms(ShaderProgram* shader) const
+    void setUniforms(std::shared_ptr<ShaderProgram> shader) const
     {
         shader->setUniform("material.rough", rough);
         shader->setUniform("material.metal", metal);
