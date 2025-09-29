@@ -23,6 +23,7 @@
 #include "ObjectManager.hpp"
 #include "Save.hpp"
 #include "Screen.hpp"
+#include "SceneManager.hpp"
 
 // Profiler/Debug
 #include "Profiler.hpp"
@@ -127,6 +128,9 @@ namespace EngineFramework
 		addFeature("Screen", std::make_unique<Screen>());
 		addFeature("Profiler", std::make_unique<LFeature_DebugProfiler>()); // Add profiler feature (testing purpose)
 		
+		addFeature("SceneManager", std::make_unique<SceneManager>());
+
+		SceneManager::GetInstance().ScanScenes("Extern/Scenes");
 
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {
@@ -146,9 +150,11 @@ namespace EngineFramework
 
 	void LevelEditor::docking() {
 
+		ImGuiIO& io = ImGui::GetIO();
+		float headerHeight = 30.f;
 		// Create a full-screen root dockspace window for all other windows (custom docking)
-		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize, ImGuiCond_Always);
+		ImGui::SetNextWindowPos(ImVec2(0, headerHeight), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y - headerHeight), ImGuiCond_Always);
 
 		if (ImGui::Begin("Main Dockspace", nullptr, imgui_flags.DockWindowFlags)) {
 			// Create a central dockspace
@@ -162,10 +168,22 @@ namespace EngineFramework
 
 		//MAIN MENU SHOULD CONTAIN THE SUB MENUS
 
-		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
-		ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_Once);  // Width: 300,500
+		ImGuiIO& io = ImGui::GetIO();
 
-		if (ImGui::Begin("Main Window", nullptr, ImGuiWindowFlags_MenuBar)) {
+		// Window flags to make it fixed at the top
+		ImGuiWindowFlags mainWindowFlags =
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_MenuBar |
+			ImGuiWindowFlags_NoCollapse;
+
+		// Set the window at the top of the screen, full width, small height
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, 30), ImGuiCond_Always); // 30 px height for header
+
+
+		if (ImGui::Begin("Main Window", nullptr, mainWindowFlags)) {
 
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
 
@@ -183,9 +201,17 @@ namespace EngineFramework
 
 					ImGui::MenuItem("Open Existing", NULL, &featureFlag("Screen"));
 					ImGui::Separator();
+					if (ImGui::BeginMenu("Open Scene")) {
+						for (const auto& sceneName : SceneManager::GetInstance().GetSceneList()) {
+							if (ImGui::MenuItem(sceneName.c_str())) {
+								SceneManager::GetInstance().LoadScene(sceneName);
+							}
+						}
+						ImGui::EndMenu();
+					}
 					ImGui::MenuItem("Save", NULL, &featureFlag("Save"));
 					ImGui::MenuItem("Save As ..", NULL);
-					ImGui::Separator();
+					ImGui::Separator(); 
 					ImGui::MenuItem("Save & Quit", NULL);
 					ImGui::MenuItem("Quit", NULL, &to_close);
 					ImGui::PopStyleColor();  // Pop the white text color for "File" menu
@@ -227,17 +253,19 @@ namespace EngineFramework
 
 					ImGui::EndMenu();
 				}
+				ImGui::SameLine(0, 50.f);
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+				const std::string& currScene = SceneManager::GetInstance().GetCurrentScene();
+				ImGui::Text("| Current Scene: %s", currScene.empty() ? "None" : currScene.c_str());
+				ImGui::PopStyleColor();
 
 				ImGui::EndMenuBar();
-
 			}
-
-			ImGui::PopStyleColor();
-
 		}
 
 
 		ImGui::PopStyleColor();
+
 		ImGui::End();
 
 

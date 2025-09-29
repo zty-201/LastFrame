@@ -6,7 +6,6 @@
 #include <sstream>
 #include "ISystem.hpp"
 #include "entt/entity/registry.hpp"
-
 #include "System_LevelEditor.hpp"
 #include "LFeature.hpp"
 
@@ -26,12 +25,9 @@ namespace EngineFramework
         void Run() override;
         void Close() override;
 
+        static bool feature_enabled;
     };
-
 }
-
-
-
 
 #endif
 #endif

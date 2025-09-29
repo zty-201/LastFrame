@@ -68,6 +68,7 @@ namespace EngineFramework
 			Diagnostics::Scoped scope { system.label_update.c_str() }; // To track per system per frame timing
 
 			system.system->Update(delta_time);
+			SafeUpdateSystem(system, delta_time);
 		}
 	}
 
@@ -84,6 +85,7 @@ namespace EngineFramework
 			Diagnostics::Scoped s{ system.label_post.c_str() };
 
 			system.system->PostUpdate(delta_time);
+			SafePostUpdateSystem(system, delta_time);
 		}
 	}
 
@@ -101,4 +103,45 @@ namespace EngineFramework
 			system_arr.pop_back();
 		}
 	}
+
+	// Functions to safely call Update and PostUpdate with exception handling
+	void CoreEngine::SafeUpdateSystem(CoreSystem& system, float delta_time)
+	{
+		static std::ofstream logFile("engine.log", std::ios::app); // log file created once
+
+		try {
+			system.system->Update(delta_time);
+		}
+		catch (const std::exception& e) {
+			logFile << "Exception in Update system [" << system.name
+				<< "]: " << e.what() << std::endl;
+			throw;
+		}
+		catch (...) {
+			logFile << "Unknown exception in Update system ["
+				<< system.name << "]" << std::endl;
+			throw;
+		}
+	}
+
+
+	void CoreEngine::SafePostUpdateSystem(CoreSystem& system, float delta_time)
+	{
+		static std::ofstream logFile("engine.log", std::ios::app); // same file as SafeUpdateSystem
+
+		try {
+			system.system->PostUpdate(delta_time);
+		}
+		catch (const std::exception& e) {
+			logFile << "Exception in PostUpdate system [" << system.name
+				<< "]: " << e.what() << std::endl;
+			throw;
+		}
+		catch (...) {
+			logFile << "Unknown exception in PostUpdate system ["
+				<< system.name << "]" << std::endl;
+			throw;
+		}
+	}
+
 }
