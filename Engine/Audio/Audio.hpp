@@ -204,7 +204,11 @@ namespace EngineFramework
         FMOD::ChannelGroup* pickGroup(AudioGroup group);
 
         // Testing purpose
-        void DebugPlayTestSound();
+        //void DebugPlayTestSound();
+
+        void DebugMainMenuAutoPlay();
+        void DebugMainMenuHandleKeys();
+        bool m_debugMainMenuStarted = false;
 #endif
 
 #ifdef PLATFORM_ANDROID
