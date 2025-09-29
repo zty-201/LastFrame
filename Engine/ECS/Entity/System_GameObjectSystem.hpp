@@ -11,7 +11,7 @@
 #include <sstream>
 #include "ISystem.hpp"
 #include "entt/entity/registry.hpp"
-
+#include "Archtype.hpp"
 
 namespace EngineFramework
 {

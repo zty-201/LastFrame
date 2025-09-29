@@ -20,6 +20,7 @@
 
 //Casting meta data to type.
 #include "ReflectionRegister.hpp"
+#include "AssetManager.hpp" //TODO: remove include.
 
 namespace EngineFramework
 {
@@ -44,10 +45,15 @@ namespace EngineFramework
 	{
 		registry.clear();
 	}
-
 	void GameObjectSystem::Initialize()
 	{
-
+		//TODO: remove
+		LOGD("%s", "Testing deserialization of archetype");
+		std::vector<unsigned char> data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path("Extern/Archtypes/testclass.json"));
+		std::string test_string{ data.begin(), data.end() };
+		Archtype a{ test_string };
+		a.Instantiate();
+		a.Instantiate();
 	}
 	void GameObjectSystem::Update(float delta_time)
 	{

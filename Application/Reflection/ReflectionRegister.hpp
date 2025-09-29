@@ -10,6 +10,8 @@
 	When registering members like variables and functions under a specific type, a name can be assigned to it.
 
 
+	When looking up a name, ensure it's hashed if it was registered as hashed (_hs).
+
 	// direct access to a reflected type
 	auto by_type = entt::resolve<my_type>();
 	// look up a reflected type by identifier
@@ -43,113 +45,123 @@
 #define REFLECTION_REGISTER_HPP
 #include "entt/meta/meta.hpp"
 #include "entt/meta/resolve.hpp"
+#include "nlohmann/json.hpp"
 #include <variant>
 namespace EngineFramework
 {
-
+	inline entt::id_type GetID(std::string type_name)
+	{
+		return entt::hashed_string{ type_name.c_str()}.value();
+	}
 	/*
 		Called during program startup: Will register all components into Entt reflection system.
 	*/
 	void RegisterReflection();
 
+	//Helper function to cast json to the correct data type, and set comp_data.
+	void SetMetaAnyWithJson(entt::meta_any& comp_data, const entt::meta_data& data_type, nlohmann::json& data);
+
 	//Helper function to cast any meta type.
 	template <typename Func>
-	void CastMetaDataToType(entt::meta_data data, Func callable)
+	void CastMetaDataToType(const entt::meta_data &data_type, nlohmann::json& data, Func callable)
 	{
-		entt::meta_type type = data.type();
-
+		entt::meta_type type = data_type.type();
 		if (type.is_integral())
 		{
 			if (type.is_signed())
 			{
 				if (type == entt::resolve<int>()) {
-					callable(data.get({}).cast<int>());
+					callable(data.get<int>());
 					return;
 				}
 				else if (type == entt::resolve<signed char>()) {
-					callable(data.get({}).cast<signed char>());
+					callable(data.get<signed char>());
 					return;
 				}
 				else if (type == entt::resolve<short>()) {
-					callable(data.get({}).cast<short>());
+					callable(data.get<short>());
 					return;
 				}
 				else if (type == entt::resolve<long>()) {
-					callable(data.get({}).cast<long>());
+					callable(data.get<long>());
 					return;
 				}
 				else if (type == entt::resolve<long long>()) {
-					callable(data.get({}).cast<long long>());
+					callable(data.get<long long>());
 					return;
 				}
 			}
 			else
 			{
 				if (type == entt::resolve<bool>()) {
-					callable(data.get({}).cast<bool>());
+					callable(data.get<bool>());
 					return;
 				}
 				else if (type == entt::resolve<unsigned char>()) {
-					callable(data.get({}).cast<unsigned char>());
+					callable(data.get<unsigned char>());
 					return;
 				}
 				else if (type == entt::resolve<unsigned short>()) {
-					callable(data.get({}).cast<unsigned short>());
+					callable(data.get<unsigned short>());
 					return;
 				}
 
 				else if (type == entt::resolve<unsigned int>()) {
-					callable(data.get({}).cast<unsigned int>());
+					callable(data.get<unsigned int>());
 					return;
 				}
 				else if (type == entt::resolve<unsigned long>()) {
-					callable(data.get({}).cast<unsigned long>());
+					callable(data.get<unsigned long>());
 					return;
 				}
 				else if (type == entt::resolve<unsigned long long>()) {
-					callable(data.get({}).cast<unsigned long long>());
+					callable(data.get<unsigned long long>());
 					return;
 				}
 			}
 			if (type == entt::resolve<char>()) {
-				callable(data.get({}).cast<char>());
+				callable(data.get<char>());
 				return;
 			}
 			else if (type == entt::resolve<wchar_t>()) {
-				callable(data.get({}).cast<wchar_t>());
+				callable(data.get<wchar_t>());
 				return;
 			}
 		}
 		else
 		{
 			if (type == entt::resolve<float>()) {
-				callable(data.get({}).cast<float>());
+				callable(data.get<float>());
+				return;
+			}
+			else if (type == entt::resolve<std::string>()) {
+				callable(data.get<std::string>());
 				return;
 			}
 			else if (type == entt::resolve<double>()) {
-				callable(data.get({}).cast<double>());
+				callable(data.get<double>());
 				return;
 			}
 			else if (type == entt::resolve<long double>()) {
-				callable(data.get({}).cast<long double>());
+				callable(data.get<long double>());
 				return;
 			}
 			else if (type == entt::resolve<std::nullptr_t>()) {
-				callable(data.get({}).cast<std::nullptr_t>());
+				callable(data.get<nullptr_t>());
 				return;
 			}
 		}
 		//Not treated as integrals before c++ 20, but is afterwards. Put outside both checks.
 		if (type == entt::resolve<char8_t>()) {
-			callable(data.get({}).cast<char8_t>());
+			callable(data.get<char8_t>());
 			return;
 		}
 		else if (type == entt::resolve<char16_t>()) {
-			callable(data.get({}).cast<char16_t>());
+			callable(data.get<char16_t>());
 			return;
 		}
 		else if (type == entt::resolve<char32_t>()) {
-			callable(data.get({}).cast<char32_t>());
+			callable(data.get<char32_t>());
 			return;
 		}
 		//not supported by nlohmann json library.

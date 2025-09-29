@@ -42,7 +42,19 @@ if(WIN32)
 
   #Compiler Flags, use a high warning level and treat warnings as errors.
 #Note: In Debug mode, ASAN and UBSAN can incur alot of performance slowdown. Only toggle in debug mode.
-#Note: To enable mem leak checks, temporarily disable (remb to enable back) /fsanitize=address for both targets.
+#Note: To enable mem leak checks, temporarily disable (remb to enable back) /fsanitize=address for the bottom target (after else())
+
+if(NOT CODE_ANALYSIS_ON_BUILD)
+target_compile_options(engine_library PUBLIC 
+    # MSVC (Windows) specific warnings
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+    $<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/Zi>>
+    # GCC/Clang specific warnings
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+    $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
+)
+message("ASAN is off")
+else() 
 target_compile_options(engine_library PUBLIC 
     # MSVC (Windows) specific warnings
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
@@ -52,6 +64,7 @@ target_compile_options(engine_library PUBLIC
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
     $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
 )
+endif()
 
 #Code analysis for Visual Studio
 #Enable VS code analysis for faster checks.
