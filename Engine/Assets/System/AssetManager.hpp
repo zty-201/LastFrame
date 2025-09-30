@@ -174,11 +174,11 @@ namespace EngineFramework {
 		/*
 			String names for each asset type, so they are consistent across the entire program.
 		*/
-		static inline constexpr const char TEXTURE[]{ "texture" };
-		static inline constexpr const char MESH[]{ "mesh" };
-		static inline constexpr const char SHADER[]{ "shader" };
-		static inline constexpr const char CUBEMAP[]{ "cubemap" };
-		static inline constexpr const char AUDIO[]{ "audio" };
+		static inline constexpr const char TEXTURE[8]{ "texture" };
+		static inline constexpr const char MESH[5]{ "mesh" };
+		static inline constexpr const char SHADER[7]{ "shader" };
+		static inline constexpr const char CUBEMAP[8]{ "cubemap" };
+		static inline constexpr const char AUDIO[6]{ "audio" };
 
 		/*
 			Precomputed type guids.
