@@ -155,11 +155,39 @@ endif()
 #NOTE: importDependencies is failing and I don't know how to debug it, so Vendoring will be used instead.
 #importDependencies()
 
-#Build external dependencies.
+# Make CMAKE_MSVC_RUNTIME_LIBRARY effective everywhere (CMake >= 3.15)
+cmake_policy(SET CMP0091 NEW)
+
+if(MSVC)
+  # Pick ONE runtime for all targets. Recommended: DLL CRT (/MD, /MDd)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+  # If you truly want static CRT instead, use:
+  # set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
+# ---- MSVC: force /MD (Release) and /MDd (Debug) for everything
+cmake_policy(SET CMP0091 NEW)
+if (MSVC)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
+
+# ---- Jolt: do not override flags; do not use static CRT
+set(OVERRIDE_CXX_FLAGS OFF CACHE BOOL "" FORCE)   # stop Jolt from rewriting CXX flags
+set(JPH_USE_STATIC_VCRT OFF CACHE BOOL "" FORCE)  # OFF => /MD(/MDd), ON => /MT(/MTd)
+
+#Build external dependencies ( Jolt lives here )
 add_subdirectory(Lib)
 
+# ---- (optional) sanity print + last-resort enforcement
+if (TARGET Jolt)
+  get_target_property(_rt Jolt MSVC_RUNTIME_LIBRARY)
+  message(STATUS "✅ Jolt present. Runtime = ${_rt}")
+  # Usually unnecessary, but safe if cache was sticky:
+  set_property(TARGET Jolt PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
+
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod glad stb_image xresource CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource CACHE INTERNAL "")
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
 set(WINDOWS_DEBUG_LIBRARIES imgui CACHE INTERNAL "")
@@ -200,7 +228,7 @@ if(WIN32)
 
 target_link_libraries(engine_library PUBLIC ${EXTERNAL_LIBRARY_DEPENDENCIES})
 target_link_libraries(application_executable PUBLIC engine_library)
-
+target_compile_definitions(engine_library PUBLIC USE_JOLT)
 #Android==============
 elseif(ANDROID)
 	list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES ${ANDROID_LIBRARIES})

@@ -1,0 +1,15 @@
+{
+  "OutputFoldersPerTargetSystem": {
+    "Local Machine": [
+      "build\\VisualStudio"
+    ]
+  },
+  "ExpandedNodes": [
+    "",
+    "\\Engine",
+    "\\Engine\\Physics",
+    "\\Engine\\Physics\\System"
+  ],
+  "SelectedNode": "\\.gitattributes",
+  "PreviewInSolutionExplorer": false
+}
