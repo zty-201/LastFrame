@@ -35,12 +35,10 @@ namespace EngineFramework
 		void Run() override;
 		void Close() override;
 
-		static AssetWindow& GetInstance();
-
 		static bool feature_enabled;
 
 	private:
-		static inline AssetWindow* this_system{};
+		void DrawDirectoryRecursive(const std::filesystem::path& dir);
 	};
 }
 
