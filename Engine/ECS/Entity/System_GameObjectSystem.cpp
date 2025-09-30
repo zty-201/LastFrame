@@ -76,8 +76,45 @@ namespace EngineFramework
 	*/
 	std::vector<std::pair<std::string, std::string>> GameObjectSystem::SerializeAllEntityArchtypes()
 	{
-		//TODO:
-		return{};
+		//Each pair represents <archtype_name, archtype_json_data>
+		std::vector<std::pair<std::string, std::string>> save_data{};
+		/*
+			Iterate over all archtypes, save their component data and registered members to json.
+
+			json format (archtype name is the file name).
+			{
+				"component_name1":
+				{
+					"data_name1" : "value",
+					"data_name2" : value,
+					"data_name3" : [
+						2, 3, 4
+					]
+				},
+				"component_name2"
+				{
+					...
+				}
+			}
+		*/
+		for (const std::pair<std::string, Archtype>& archtype_pair : archtype_arr)
+		{
+			std::string archtype_name = archtype_pair.first;
+			const Archtype& archtype_data = archtype_pair.second;
+			nlohmann::json archtype_json_data{};
+			/*
+				Iterate over all component types and add each member
+			*/
+			for (const entt::meta_any& comp : archtype_data.component_arr)
+			{
+				//Store data members of the component, then add the component json under archtype_data.
+				nlohmann::json component_json_data{};
+				//Iterate over all data members.
+				for
+			}
+		}
+
+
 		//std::filesystem::path folder_path_string{ folder_path };
 		////Not a folder.
 		//if (!std::filesystem::is_directory(folder_path_string))
@@ -158,7 +195,16 @@ namespace EngineFramework
 	*/
 	void GameObjectSystem::DeserializeAllEntityArchtypes(const std::vector<std::pair<std::string, std::string>>& json_input)
 	{
-		UNREFERENCED_PARAMETER(json_input);
+		for (const std::pair<std::string, std::string>& name_json_pair : json_input)
+		{
+			//There should not already be an archtype of the same name inside.
+			if (archtype_arr.find(name_json_pair.first) != archtype_arr.end())
+			{
+				LOGE("%s %s", "Archtype already present in array, duplicate deserialize detected: ", name_json_pair.first.c_str());
+				continue;
+			}
+			archtype_arr.emplace(name_json_pair.first, name_json_pair.second);
+		}
 	}
 
 	/*
@@ -192,6 +238,6 @@ namespace EngineFramework
 		}
 		//Create instance from archtype component data.
 		Archtype& archtype = archtype_it->second;
-		return archtype.Instantiate();
+		return archtype.Instantiate(); //Modifies global registry
 	}
 }
