@@ -18,15 +18,22 @@
 using namespace entt::literals;
 namespace EngineFramework
 {
-	//TODO: Test struct, to delete.
-	struct TODELETE
-	{
-		int a{};
-		float b{};
-		std::string c{};
-		float not_serializable{};
-	};
+	
 
+	
+	//Templated class, to provide different function overloads for each type that all do the same thing.
+	template <typename T>
+	class Emplacer
+	{
+	public:
+		//Taking in entt::meta_any*, as references do not work.
+		static void EmplaceComponent(entt::entity entity, entt::meta_any* data)
+		{
+			//Make a copy using the ptr provided
+			registry.emplace<T>(entity, data->cast<T>());
+		}
+	};
+	
 	/*
 		Called during program startup: Will register all components into Entt reflection system.
 	*/
@@ -52,9 +59,9 @@ namespace EngineFramework
 			If a variable/function is registered under my_type, they'll be treated as members of my_type (even for global variables/functions).
 		
 			Every type needs an emplace function for that type.
-			.func< [](entt::entity entity, entt::meta_any& data) {
-			registry.emplace< EngineFramework::TODELETE>(entity, data.cast< EngineFramework::TODELETE>());
-			} >("emplace"_hs)
+			.func<&Emplacer<TODELETE>::EmplaceComponent>("emplace"_hs);
+
+			NOTE: Taking in references may not work for functions registered.
 		*/
 
 		entt::meta_factory<EngineFramework::TODELETE>()
@@ -62,12 +69,8 @@ namespace EngineFramework
 			.data<&TODELETE::a>("player_health"_hs)
 			.data<&TODELETE::b>("b"_hs)
 			.data<&TODELETE::c>("c"_hs)
-			.func< [](entt::entity entity, entt::meta_any& data) {
-			LOGD("%s", "TESTER");
-			registry.emplace< EngineFramework::TODELETE>(entity, data.cast< EngineFramework::TODELETE>());
-			} >("emplace"_hs);
+			.func<&Emplacer<TODELETE>::EmplaceComponent>("emplace"_hs);
 
-		
 	}
 
 

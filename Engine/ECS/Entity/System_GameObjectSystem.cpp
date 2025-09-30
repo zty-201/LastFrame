@@ -20,7 +20,7 @@
 
 //Casting meta data to type.
 #include "ReflectionRegister.hpp"
-#include "AssetManager.hpp" //TODO: remove include.
+#include "Archtype.hpp"
 
 namespace EngineFramework
 {
@@ -37,23 +37,30 @@ namespace EngineFramework
 
 	void GameObjectSystem::LoadScene(const std::string& json_input)
 	{
-		ClearAllEntities();
+		ClearAllInstances();
 		DeSerializeAllEntityInstances(json_input);
 	}
 
-	void GameObjectSystem::ClearAllEntities()
+	void GameObjectSystem::ClearAllInstances()
 	{
 		registry.clear();
 	}
 	void GameObjectSystem::Initialize()
 	{
-		//TODO: remove
-		LOGD("%s", "Testing deserialization of archetype");
-		std::vector<unsigned char> data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path("Extern/Archtypes/testclass.json"));
-		std::string test_string{ data.begin(), data.end() };
-		Archtype a{ test_string };
-		a.Instantiate();
-		a.Instantiate();
+		////TODO: remove
+		//LOGD("%s", "Testing deserialization of archetype");
+		//std::vector<unsigned char> data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path("Extern/Archtypes/testclass.json"));
+		//std::string test_string{ data.begin(), data.end() };
+		//Archtype a{ test_string };
+		//a.Instantiate();
+		//a.Instantiate();
+
+		//auto view = registry.view<EngineFramework::TODELETE>();
+		//for (auto entity : view) {
+		//	TODELETE& comp = view.get<EngineFramework::TODELETE>(entity);
+		//	LOGI("%s", comp.c.c_str());
+		//}
+
 	}
 	void GameObjectSystem::Update(float delta_time)
 	{
@@ -170,5 +177,21 @@ namespace EngineFramework
 	void GameObjectSystem::DeSerializeAllEntityInstances(const std::string& json_input)
 	{
 		UNREFERENCED_PARAMETER(json_input);
+	}
+
+	/*
+			Creates a single entity with the same component data (copied) from archtype
+		*/
+	entt::entity GameObjectSystem::CreateInstance(std::string archtype_str)
+	{
+		//Get archtype
+		auto archtype_it = archtype_arr.find(archtype_str);
+		if (archtype_it == archtype_arr.end())
+		{
+			throw std::runtime_error((std::string("Archtype used for instantiating instance is not valid: ") + archtype_str).c_str());
+		}
+		//Create instance from archtype component data.
+		Archtype& archtype = archtype_it->second;
+		return archtype.Instantiate();
 	}
 }

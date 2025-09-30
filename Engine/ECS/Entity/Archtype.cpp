@@ -61,8 +61,6 @@ namespace EngineFramework
 	entt::entity Archtype::Instantiate()
 	{
 		entt::entity entity = registry.create();
-		entt::entity entity2 = registry.create();
-		UNREFERENCED_PARAMETER(entity2);
 		//Emplace all components inside the entity.
 		//Each component must have an "emplace" lambda/function registered.
 		for (entt::meta_any& comp : component_arr)
@@ -72,8 +70,10 @@ namespace EngineFramework
 			{
 				throw std::exception("Emplace function not registered for this component");
 			}
-			func.invoke({}, entity2, comp);
+			func.invoke({}, entity, &comp);
 		}
+
+
 		return entity;
 	}
 

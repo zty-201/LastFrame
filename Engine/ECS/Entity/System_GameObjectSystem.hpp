@@ -45,7 +45,7 @@ namespace EngineFramework
 		//Return reference to the one and only instance of this system, created by core engine.
 		static GameObjectSystem& GetInstance();
 
-		//Quick Call function to load scene
+		//Quick Call function to load scene and destroy current scene.
 		void LoadScene(const std::string& json_input);
 		
 	private:
@@ -53,7 +53,7 @@ namespace EngineFramework
 		void Update(float delta_time) override;
 		
 		//Clears all entities in the scene
-		void ClearAllEntities();
+		void ClearAllInstances();
 		
 		/*
 		 	Write to json strings using reflection.
@@ -87,11 +87,17 @@ namespace EngineFramework
 		*/
 		void DeSerializeAllEntityInstances(const std::string& json_input);
 		
+	
+		/*
+			Creates a single entity with the same component data (copied) from archtype
+		*/
+		entt::entity CreateInstance(std::string archtype);
+
+		//The archetypes used for instantiating entity instances
+		std::unordered_map<std::string, Archtype> archtype_arr;
+
 		//Keeps track of the one and only instance of this system, created by core engine.
 		static inline GameObjectSystem* this_system{};
-
-		//The archetype entities used for instantiating instances. 
-		std::unordered_map<std::string, entt::entity> archtype_entities;
 	};
 
 	

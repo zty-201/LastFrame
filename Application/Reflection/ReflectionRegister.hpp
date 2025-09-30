@@ -172,6 +172,15 @@ namespace EngineFramework
 		assert(false && "Type is not supported by this function. Please add it here.");
 
 	}
+
+	//TODO: Test struct, to delete.
+	struct TODELETE
+	{
+		int a{};
+		float b{};
+		std::string c{};
+		float not_serializable{};
+	};
 }
 
 
