@@ -19,8 +19,12 @@
 #include "System_GameObjectSystem.hpp"
 
 //Casting meta data to type.
-#include "ReflectionRegister.hpp"
 #include "Archtype.hpp"
+#include "ReflectionRegister.hpp"
+
+//TODO: Remove
+#include "AssetManager.hpp"
+
 
 namespace EngineFramework
 {
@@ -47,20 +51,7 @@ namespace EngineFramework
 	}
 	void GameObjectSystem::Initialize()
 	{
-		////TODO: remove
-		//LOGD("%s", "Testing deserialization of archetype");
-		//std::vector<unsigned char> data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path("Extern/Archtypes/testclass.json"));
-		//std::string test_string{ data.begin(), data.end() };
-		//Archtype a{ test_string };
-		//a.Instantiate();
-		//a.Instantiate();
-
-		//auto view = registry.view<EngineFramework::TODELETE>();
-		//for (auto entity : view) {
-		//	TODELETE& comp = view.get<EngineFramework::TODELETE>(entity);
-		//	LOGI("%s", comp.c.c_str());
-		//}
-
+		
 	}
 	void GameObjectSystem::Update(float delta_time)
 	{
@@ -68,7 +59,7 @@ namespace EngineFramework
 
 	}
 
-	
+
 
 	/*
 		Save gameobject archtypes to files using reflection.
@@ -78,43 +69,49 @@ namespace EngineFramework
 	{
 		//Each pair represents <archtype_name, archtype_json_data>
 		std::vector<std::pair<std::string, std::string>> save_data{};
-		/*
-			Iterate over all archtypes, save their component data and registered members to json.
+		//	Iterate over all archtypes, save their component data and registered members to json.
 
-			json format (archtype name is the file name).
-			{
-				"component_name1":
-				{
-					"data_name1" : "value",
-					"data_name2" : value,
-					"data_name3" : [
-						2, 3, 4
-					]
-				},
-				"component_name2"
-				{
-					...
-				}
-			}
-		*/
 		for (const std::pair<std::string, Archtype>& archtype_pair : archtype_arr)
 		{
-			std::string archtype_name = archtype_pair.first;
-			const Archtype& archtype_data = archtype_pair.second;
-			nlohmann::json archtype_json_data{};
-			/*
-				Iterate over all component types and add each member
-			*/
-			for (const entt::meta_any& comp : archtype_data.component_arr)
-			{
-				//Store data members of the component, then add the component json under archtype_data.
-				nlohmann::json component_json_data{};
-				//Iterate over all data members.
-				for
-			}
+			//Add this archtype to the array.
+			//<archtype name, archtype_json_string> pair.
+			save_data.emplace_back(std::make_pair(archtype_pair.first, archtype_pair.second.Deserialize()));
 		}
 
+		return save_data;
+	}
 
+	/*
+		Read gameobject archtypes from files using reflection.
+		Each archtype is read from their own respective files with their own respective names, in the folder.
+		After construction, each entity id is stored together with its name inside the archtype entities map.
+
+		Do once at the start of the program.
+	*/
+	void GameObjectSystem::DeserializeAllEntityArchtypes(const std::vector<std::pair<std::string, std::string>>& json_input)
+	{
+		for (const std::pair<std::string, std::string>& name_json_pair : json_input)
+		{
+			//There should not already be an archtype of the same name inside.
+			if (archtype_arr.find(name_json_pair.first) != archtype_arr.end())
+			{
+				LOGE("%s %s", "Archtype already present in array, duplicate deserialize detected: ", name_json_pair.first.c_str());
+				continue;
+			}
+			//This passes the json string to each Archtype constructor to initialize themselves.
+			archtype_arr.emplace(name_json_pair.first, name_json_pair.second);
+		}
+	}
+
+	/*
+		Save gameobject instances to a specified level file using reflection.
+	*/
+	std::string GameObjectSystem::SerializeAllEntityInstances()
+	{
+		//TODO: May want to keep a map<entityid, archtype_name_string> to map instances back to their archtype when serializing. this can be easily changeable. 
+		//Each instance has the archtype name (can be left empty if not based on archtype), and other component data.
+
+		//TODO:
 		//std::filesystem::path folder_path_string{ folder_path };
 		////Not a folder.
 		//if (!std::filesystem::is_directory(folder_path_string))
@@ -184,35 +181,6 @@ namespace EngineFramework
 		//	std::ofstream archtype_file(file_path);
 		//	//TODO: Write the json archtype data to file.
 		//}
-	}
-
-	/*
-		Read gameobject archtypes from files using reflection.
-		Each archtype is read from their own respective files with their own respective names, in the folder.
-		After construction, each entity id is stored together with its name inside the archtype entities map.
-
-		Do once at the start of the program.
-	*/
-	void GameObjectSystem::DeserializeAllEntityArchtypes(const std::vector<std::pair<std::string, std::string>>& json_input)
-	{
-		for (const std::pair<std::string, std::string>& name_json_pair : json_input)
-		{
-			//There should not already be an archtype of the same name inside.
-			if (archtype_arr.find(name_json_pair.first) != archtype_arr.end())
-			{
-				LOGE("%s %s", "Archtype already present in array, duplicate deserialize detected: ", name_json_pair.first.c_str());
-				continue;
-			}
-			archtype_arr.emplace(name_json_pair.first, name_json_pair.second);
-		}
-	}
-
-	/*
-		Save gameobject instances to a specified level file using reflection.
-	*/
-	std::string GameObjectSystem::SerializeAllEntityInstances()
-	{
-		//TODO:
 		return {};
 	}
 

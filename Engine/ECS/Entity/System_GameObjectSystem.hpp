@@ -20,14 +20,10 @@ namespace EngineFramework
 		Controls serialization, deserialization, safe deletion of instances.
 		Also controls serialization and deserialization for archtypes.
 
-		Note: The way archtypes are stored/read are different from the way instances are stored/read.
-		Under the hood this can be ignored, but it can lead to slow archtype serialization.
-
 		Archtype:
 		- Stored individually in each file with their own name.
-		- All components of an archtype are iterated over and serialized before going to the next archtype
-		--> As different component types are stored in separate pools, to get all components of an archtype all pools have to be iterated over and checked for that entity id.
-		--> Thus, this can lead to slower run times with growing number of component types + growing number of archtypes.
+		- Not part of the game (not in registry), only job is to hold component data and create entt::entity instances copying the stored component data.
+		- component data will not have any allocated data, it will only have data that can be deserialized from file. ensure component destructors account for this. 
 
 		Instance:
 		- Stored together in a single level file.
@@ -35,7 +31,45 @@ namespace EngineFramework
 		- Next, all components of a specific type are iterated over and stored. They may belong to different entities.
 		- This repeats for all component types.
 
-		If archtype serialization performance is a critical issue, store all archtypes in a single file and use the "instance" method (but use names instead of entity id)
+
+		==Example Deserialization/Serialization of Archtypes==
+		//==Testing of deserialization + serialization of one archtype
+		/*LOGD("%s", "Testing deserialization of archetype");
+		std::vector<unsigned char> data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path("Extern/Archtypes/testclass.json"));
+		std::string test_string{ data.begin(), data.end() };
+		std::vector<std::pair<std::string, std::string>> test_arr{ std::make_pair(std::string("testclass"), test_string) };
+		DeserializeAllEntityArchtypes(test_arr);
+		archtype_arr.find("testclass")->second.Instantiate();
+		archtype_arr.find("testclass")->second.Instantiate();
+		for (auto entity : registry.view<TODELETE>())
+		{
+			TODELETE& pos = registry.view<TODELETE>().get<TODELETE>(entity);
+			LOGD("%s", pos.c.c_str());
+		}
+		auto archtype_json_arr = SerializeAllEntityArchtypes();
+		LOGD("%s", "testing");
+		
+		Serialization
+		- string is read from archtype files, and each <file_name_string, json_string> is added to a vector   
+		- Read file_name using std::filsystem::path directory_iterator, to include whitespaces in the name. (note that file_name is stem(), i.e. without slashes and without extension)(note that file_name is stem(), i.e. without slashes and without extension)
+		- DO NOT USE IFSTREAM. Call AssetManagerSystem::GetDataFromFile instead, and convert vector<unsigned char> to std::string.
+		- vector of archtype jsons is passed to SerializeAllEntityArchtypes.
+
+		Deserialization
+		- When called, archtypes in archtype_arr will write their json string to <archtype_name_string, json_string>.
+		- the strings from all archtypes are added to a vector and returned by DeserializeAllEntityArchtypes
+		- Just iterate over each pair <archtype_name_string, json_string> in the vector, and write to separate files using archtype_name as the file name.
+
+
+		Instantiation
+		- Use CreateInstance("archtype_name") where the archtype name is the file name.
+		- Note: doing archtype_arr["name"] will throw an error, as [] is both a find() and a constructor. Constructing however is not allowed if no parameter is passed in. use .find() instead.
+
+		Changing Archtype Name
+		- Access archtype_map using .find()
+		- Copy archtype, then delete pair from map
+		- Reinsert archtype into map with new name.
+		- May also need to change map<entityid, archtype_name_string> to the changed archtype_name_string for serialization.
 	*/
 	class GameObjectSystem : public ISystem
 	{

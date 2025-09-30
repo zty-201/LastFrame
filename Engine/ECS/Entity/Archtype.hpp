@@ -18,7 +18,9 @@ namespace EngineFramework
 	{
 	public:
 		Archtype(const std::string& json_data);
-		entt::entity Instantiate();
+		entt::entity Instantiate() const;
+		//Returns a json string representing components and their data.
+		std::string Deserialize() const;
 		std::vector<entt::meta_any> component_arr;
 	};
 }

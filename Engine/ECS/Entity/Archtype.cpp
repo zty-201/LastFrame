@@ -58,12 +58,12 @@ namespace EngineFramework
 			component_arr.emplace_back(comp_data);
 		}
 	}
-	entt::entity Archtype::Instantiate()
+	entt::entity Archtype::Instantiate() const
 	{
 		entt::entity entity = registry.create();
 		//Emplace all components inside the entity.
 		//Each component must have an "emplace" lambda/function registered.
-		for (entt::meta_any& comp : component_arr)
+		for (const entt::meta_any& comp : component_arr)
 		{
 			auto func = comp.type().func("emplace"_hs);
 			if (!func)
@@ -77,4 +77,44 @@ namespace EngineFramework
 		return entity;
 	}
 
+	std::string Archtype::Deserialize() const
+	{
+		//	json format (archtype name is the file name).
+		//	{
+		//		"component_name1":
+		//		{
+		//			"data_name1" : "value",
+		//			"data_name2" : value,
+		//			"data_name3" : [
+		//				2, 3, 4
+		//			]
+		//		},
+		//		"component_name2"
+		//		{
+		//			...
+		//		}
+		//	}
+		//*/
+		nlohmann::json archtype_json_data{};
+		/*
+				Iterate over all component types and add each member
+			*/
+		for (const entt::meta_any& comp : component_arr)
+		{
+			//Store data members of the component, then add the component json under archtype_data (nested json).
+			nlohmann::json component_json_data{};
+			entt::meta_type comp_type = comp.type();
+			//Iterate over all data members in the component, forming <name, value> pair for each.
+			for (const auto& data_member : comp_type.data())
+			{
+				entt::meta_any member_data = comp.get(data_member.first);
+				//Set Json with member_data, by casting it to the type determined by data_member.second
+				SetJsonWithMetaAny(component_json_data, data_member.second, member_data);
+			}
+			//Add component json to archtype json.
+			archtype_json_data[comp.type().name()] = component_json_data;
+		}
+		//Dump in a prettified/readable format (using 1 tab for indentation).
+		return archtype_json_data.dump(1, '\t');
+	}
 }

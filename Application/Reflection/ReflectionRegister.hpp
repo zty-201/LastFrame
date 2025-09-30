@@ -10,7 +10,8 @@
 	When registering members like variables and functions under a specific type, a name can be assigned to it.
 
 
-	When looking up a name, ensure it's hashed if it was registered as hashed (_hs).
+	When looking up a name, ensure it's hashed if it was registered as hashed (_hs). For non-hashed registration, it can be looked up via hash too.
+	for entt::id_type, use entt::hashed_string{"string"} to get the hashed string. 
 
 	// direct access to a reflected type
 	auto by_type = entt::resolve<my_type>();
@@ -41,6 +42,19 @@
 
 */
 
+/*
+	Type resolving.
+	SetJsonWithMetaAny() and SetMetaAnyWithJson() is used to convert meta_any into a concrete type, or json into a concrete type.
+	They are used during serialization and deserialization respectively, so any new data types to account for needs to be placed into both.
+
+	CastMetaDataToType is optional, but it may be used. if used, the new data types need to be placed in this function too.
+
+	When setting new data types, sometimes json doesn't have implicit support for these types. e.g. glm::vec3, std::vector<T>. 
+	In these cases, instead of doing data.cast<T> the data may need to be written to json or read from json in a different way. e.g. reading/writing glm::vec3 as an array of 3 floats.
+	Try to keep code reusable, e.g. std::vector<T> read/write to json can be placed into a template function so it can be reused for different types like std::vector<int>, std::vector<float>.
+	Also ensure data types are registered before using entt::resolve<new type>(). e.g. register glm::vec3.
+*/
+
 #ifndef REFLECTION_REGISTER_HPP
 #define REFLECTION_REGISTER_HPP
 #include "entt/meta/meta.hpp"
@@ -59,7 +73,9 @@ namespace EngineFramework
 	void RegisterReflection();
 
 	//Helper function to cast json to the correct data type, and set comp_data.
-	void SetMetaAnyWithJson(entt::meta_any& comp_data, const entt::meta_data& data_type, nlohmann::json& data);
+	void SetMetaAnyWithJson(entt::meta_any& comp_data, const entt::meta_data& data_type, const nlohmann::json& data);
+	//Helper function to cast meta_any to correct data type, and set comp_json.
+	void SetJsonWithMetaAny(nlohmann::json& comp_json, const entt::meta_data& data_type, const entt::meta_any& data);
 
 	//Helper function to cast any meta type.
 	template <typename Func>
@@ -169,7 +185,7 @@ namespace EngineFramework
 			callable(data.get({}).cast<void*>());
 		}*/
 
-		assert(false && "Type is not supported by this function. Please add it here.");
+		assert(false && "Type is not supported by CastMetaDataToType function. Please add it here.");
 
 	}
 
