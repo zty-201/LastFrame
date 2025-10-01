@@ -404,7 +404,7 @@ namespace EngineFramework
             // Accept path payload (null-terminated string)
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Models"))
             {                
-                const char* path = (const char*)payload->Data;
+                //const char* path = (const char*)payload->Data;
 
                 //std::cout << "Drop successful: " << path << std::endl;
             }
