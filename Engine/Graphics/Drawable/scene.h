@@ -2,11 +2,15 @@
 #define SCENE_H
 
 #include "ShaderProgram.h"
+#include "CameraComponent.h"
+#include "LightComponent.h"
+#include "MaterialComponent.h"
+#include "MeshComponent.h"
+#include "TransformComponent.h"
 #include "FBO.h"
 #include "Light.h"
 #include "Camera.h"
 #include "Mesh.h"
-#include "Components.h"
 
 // Color and state definitions
 #define BLACK           { 0.0f, 0.0f, 0.0f, 0.0f }
@@ -153,7 +157,7 @@ struct Scene
         GLenum depthMode;                  // Depth function mode flags
         std::vector<Object> objects;       // Objects rendered in this pass
         std::vector<CameraComponent> cameras;       // Cameras used in this pass
-        std::vector<Light> lights;         // Lights affecting this pass
+        std::vector<LightComponent> lights;         // Lights affecting this pass
         std::vector<xresource::full_guid> texture_guids{};     // Textures used in this pass
         SetUniformCallback setUniformCallback; // Optional callback for setting uniforms
 
@@ -164,7 +168,7 @@ struct Scene
             GLenum depthFunction = GL_LESS,
             const std::initializer_list<Object>& objects = { },
             const std::initializer_list<CameraComponent>& cameras = { },
-            const std::initializer_list<Light>& lights = { },
+            const std::initializer_list<LightComponent>& lights = { },
             const std::initializer_list<xresource::full_guid> textures = { },
             SetUniformCallback setUniformCallback = nullptr
         )
@@ -247,8 +251,8 @@ struct Scene
     {
         int i = 0;
         for (Scene::Pass& pass : passes)
-            for (Light& light : pass.lights)
-                light.onCursor(xoffset, yoffset, pProgram, i++);
+            for (LightComponent& light : pass.lights)
+                Light::onCursor(light, xoffset, yoffset, pProgram, i++);
     }
 
     // Updates camera zoom based on scroll input
@@ -264,8 +268,8 @@ struct Scene
     {
         int i = 0;
         for (Scene::Pass& pass : passes)
-            for (Light& light : pass.lights)
-                light.onScroll(xoffset, yoffset, pProgram, i++);
+            for (LightComponent& light : pass.lights)
+                Light::onScroll(light, xoffset, yoffset, pProgram, i++);
     }
 };
 

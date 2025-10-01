@@ -1,7 +1,11 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "Components.h"
+#include "CameraComponent.h"
+#include "LightComponent.h"
+#include "MaterialComponent.h"
+#include "MeshComponent.h"
+#include "TransformComponent.h"
 //
     // Shader ShaderProgram class for managing shader program handle and operations.
     //

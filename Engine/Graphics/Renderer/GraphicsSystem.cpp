@@ -99,7 +99,11 @@ namespace EngineFramework
 		fogMaxDist = 15.0f;
 		shadingModel = 0;
 		camera = CameraComponent{ CameraComponent::ORBITING, {0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, 75.0f, 0.1f, 100.0f };
-
+		light = LightComponent{ {0.0f, 5.0f, 2.0f}, {
+					{ 0.4f, 0.4f, 0.4f },  // Ambient light intensity (La)
+					{ 1.0f, 1.0f, 1.0f },  // Diffuse light intensity (Ld)
+					{ 1.0f, 1.0f, 1.0f }   // Specular light intensity (Ls)
+				} };
 		pScene = std::make_unique<Scene>(
 			AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Basic"), 
 			std::initializer_list<Scene::Pass>{         // List of rendering passes
@@ -115,7 +119,7 @@ namespace EngineFramework
 					//{ "Extern/tree.obj", MATERIAL_CARTOON, glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f}) }
 				},
 				{ camera },                         // Cameras
-				{ { {0.0f, 5.0f, 2.0f} } },         // Lights
+				{ { light } },         // Lights
 				{},                                 // Textures
 				[this](ShaderProgram& shader) {     // Uniform callback
 					shader.setUniform("fog.color", fogColor);

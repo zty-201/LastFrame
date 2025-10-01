@@ -324,7 +324,8 @@ void Scene::render()
 
 		// Set lighting uniforms (only for scene pass)
 		for (int i = 0; i < pass.lights.size(); ++i) {
-			pass.lights[i].setUniforms(shader, i);
+			
+			Light::setUniforms(pass.lights[i], shader, i);
 		}
 
 		// Bind per-pass textures (only for skybox pass)
