@@ -17,6 +17,7 @@
 #include "ShaderProgram.h"
 #include "Audio.hpp"
 #include "SoundAsset.hpp"
+#include "Archtype.hpp"
 namespace EngineFramework {
 
 	// -------- lifecycle --------
@@ -152,6 +153,7 @@ namespace EngineFramework {
 		asset_loader_map[MESH] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadMesh);
 		asset_loader_map[SHADER] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadShader);
 		asset_loader_map[AUDIO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAudio);
+		asset_loader_map[ARCHTYPE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadArchtype);
 
 		//Set AAsetManager for android, in audio system.
 #ifdef PLATFORM_ANDROID
@@ -384,6 +386,38 @@ namespace EngineFramework {
 			catch (std::exception& e)
 			{
 				LOGE("%s %s %s", "Unable to Load Audio File", audio_name.c_str(), e.what());
+			}
+		}
+
+		return true;
+	}
+
+	bool AssetManagerSystem::LoadArchtype(const std::filesystem::path& folder_path)
+	{
+		LOGI("Loading Archtype");
+		//Acceptable files that can be loaded as a texture.
+		std::vector<std::string> archtype_extensions{ ".json" };
+
+		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, archtype_extensions);
+
+		//Iterate through all archtype files
+		for (const std::filesystem::path& path : files)
+		{
+			//Get guid (and update guid_name_map by calling GetFullGuid).
+			std::string name = path.stem().string();
+
+			//Allocate resource
+			try
+			{
+				std::vector<unsigned char> temp = GetDataFromFile(path);
+				std::string json_string{ temp.begin(), temp.end() };
+				std::shared_ptr<Archtype> resource(new Archtype(json_string));
+				xresource::full_guid asset_guid = GetFullGuid(ARCHTYPE_GUID, name); //Only if resource is successfully loaded.
+				AddResource(asset_guid, resource);
+			}
+			catch (std::exception& e)
+			{
+				LOGE("%s %s %s", "Unable to Load Archtype file", name.c_str(), e.what());
 			}
 		}
 

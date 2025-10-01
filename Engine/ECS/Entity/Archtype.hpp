@@ -5,22 +5,21 @@
 namespace EngineFramework
 {
 	/*
-		Archtype class used to instantiate entity instances in the global entt::registry with copied component data.
+		Archtype class used to contain component data. Not stored in the entity system.
 
 		Note:
 		1. Ensure the component has a valid copy operator/ctor as it'll be copied from archtype into entity.
 		2. The component destructor will be called when this archtype is freed
 		- Only data types (not pointers) will be set by the archtype.
-
-		Call Instantiate to automatically emplace entity into registry and set its components.
 	*/
 	class Archtype
 	{
 	public:
 		Archtype(const std::string& json_data);
-		entt::entity Instantiate() const;
 		//Returns a json string representing components and their data.
-		std::string Deserialize() const;
+		std::string Serialize() const;
+
+		//Component data
 		std::vector<entt::meta_any> component_arr;
 	};
 }

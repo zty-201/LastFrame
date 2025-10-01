@@ -58,26 +58,9 @@ namespace EngineFramework
 			component_arr.emplace_back(comp_data);
 		}
 	}
-	entt::entity Archtype::Instantiate() const
-	{
-		entt::entity entity = registry.create();
-		//Emplace all components inside the entity.
-		//Each component must have an "emplace" lambda/function registered.
-		for (const entt::meta_any& comp : component_arr)
-		{
-			auto func = comp.type().func("emplace"_hs);
-			if (!func)
-			{
-				throw std::exception("Emplace function not registered for this component");
-			}
-			func.invoke({}, entity, &comp);
-		}
+	
 
-
-		return entity;
-	}
-
-	std::string Archtype::Deserialize() const
+	std::string Archtype::Serialize() const
 	{
 		//	json format (archtype name is the file name).
 		//	{

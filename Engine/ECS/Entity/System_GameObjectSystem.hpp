@@ -18,36 +18,24 @@ namespace EngineFramework
 
 	/*
 		Controls serialization, deserialization, safe deletion of instances.
-		Also controls serialization and deserialization for archtypes.
+		Also controls serialization for archtypes.
 
 		Archtype:
 		- Stored individually in each file with their own name.
-		- Not part of the game (not in registry), only job is to hold component data and create entt::entity instances copying the stored component data.
-		- component data will not have any allocated data, it will only have data that can be deserialized from file. ensure component destructors account for this. 
+		- Not part of the game (not in registry), only job is to hold component data that can be used to create entities by copying the component data stored.
+		- component data will not have any allocated data, it will only have data that can be deserialized from file. ensure component destructors account for this.
+		- Once deserialized, will be stored in assetmanager. Can be accessed indirectly via CreateInstance() 
 
 		Instance:
 		- Stored together in a single level file.
-		- First, all instance entity IDs are stored.
+		- First, all instances are stored with incremental ids. These ids (currently) do not represent entity id, they're just used for differentiating instances in the json file.
+		- Each instance can have an optional "archtype" : "archtype_name" that it can be based off.
 		- Next, all components of a specific type are iterated over and stored. They may belong to different entities.
 		- This repeats for all component types.
 
-
-		==Example Deserialization/Serialization of Archtypes==
-		//==Testing of deserialization + serialization of one archtype
-		/*LOGD("%s", "Testing deserialization of archetype");
-		std::vector<unsigned char> data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path("Extern/Archtypes/testclass.json"));
-		std::string test_string{ data.begin(), data.end() };
-		std::vector<std::pair<std::string, std::string>> test_arr{ std::make_pair(std::string("testclass"), test_string) };
-		DeserializeAllEntityArchtypes(test_arr);
-		archtype_arr.find("testclass")->second.Instantiate();
-		archtype_arr.find("testclass")->second.Instantiate();
-		for (auto entity : registry.view<TODELETE>())
-		{
-			TODELETE& pos = registry.view<TODELETE>().get<TODELETE>(entity);
-			LOGD("%s", pos.c.c_str());
-		}
-		auto archtype_json_arr = SerializeAllEntityArchtypes();
-		LOGD("%s", "testing");
+		Renaming of Archtypes:
+		- Similar to renaming of assets in assetmanager (since an archtype is also an asset). 
+		- Ensure the guid_to_name map in assetmanager is changed appropriately.
 		
 		Serialization
 		- string is read from archtype files, and each <file_name_string, json_string> is added to a vector   
@@ -60,16 +48,8 @@ namespace EngineFramework
 		- the strings from all archtypes are added to a vector and returned by DeserializeAllEntityArchtypes
 		- Just iterate over each pair <archtype_name_string, json_string> in the vector, and write to separate files using archtype_name as the file name.
 
-
 		Instantiation
 		- Use CreateInstance("archtype_name") where the archtype name is the file name.
-		- Note: doing archtype_arr["name"] will throw an error, as [] is both a find() and a constructor. Constructing however is not allowed if no parameter is passed in. use .find() instead.
-
-		Changing Archtype Name
-		- Access archtype_map using .find()
-		- Copy archtype, then delete pair from map
-		- Reinsert archtype into map with new name.
-		- May also need to change map<entityid, archtype_name_string> to the changed archtype_name_string for serialization.
 	*/
 	class GameObjectSystem : public ISystem
 	{
@@ -82,6 +62,10 @@ namespace EngineFramework
 		//Quick Call function to load scene and destroy current scene.
 		void LoadScene(const std::string& json_input);
 		
+		/*
+			Creates a single entity with the same component data (copied) from archtype
+		*/
+		entt::entity CreateInstance(std::string archtype);
 	private:
 		void Initialize() override;
 		void Update(float delta_time) override;
@@ -95,16 +79,6 @@ namespace EngineFramework
 			their file. Use the archetype name as the file name when saving.
 		*/
 		std::vector<std::pair<std::string, std::string>> SerializeAllEntityArchtypes();
-
-		/*
-			Read gameobject archtypes from json strings using reflection.
-			Each archtype is read as a pair of <archetype name, json string> stored in the archetype array passed to this function.
-			Ensure the archetype name is completely read (from the file name) and accounts for spaces.
-			After construction, each entity id (representing an archetype) is stored together with its name inside the archtype entities map.
-
-			Do once at the start of the program. 
-		*/
-		void DeserializeAllEntityArchtypes(const std::vector<std::pair<std::string, std::string>>& json_input);
 
 		/*
 			Write gameobject instances to a json string using reflection.
@@ -121,14 +95,7 @@ namespace EngineFramework
 		*/
 		void DeSerializeAllEntityInstances(const std::string& json_input);
 		
-	
-		/*
-			Creates a single entity with the same component data (copied) from archtype
-		*/
-		entt::entity CreateInstance(std::string archtype);
-
-		//The archetypes used for instantiating entity instances
-		std::unordered_map<std::string, Archtype> archtype_arr;
+		entt::entity Instantiate(std::shared_ptr<Archtype> archtype);
 
 		//Keeps track of the one and only instance of this system, created by core engine.
 		static inline GameObjectSystem* this_system{};
