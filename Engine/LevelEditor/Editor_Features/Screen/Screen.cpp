@@ -212,7 +212,7 @@ namespace EngineFramework
         ImGui::SetNextWindowSize(ImVec2(620, 260), ImGuiCond_FirstUseEver);
 
         // No flags that block move/resize
-        ImGui::Begin("Control Panel", &is_enabled);
+        ImGui::Begin("Control Panel", &is_control_open);
 
 
 
