@@ -25,7 +25,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "Input/InputManager.hpp"
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
-#include "Assets/AssetManager.hpp"
+#include "AssetManager.hpp"
 #include "Diagnostics/ProfilerEngine.hpp" // For the profiler - engine side
 #include "UnitTestManager.hpp"
 #include "AssetManager.hpp"

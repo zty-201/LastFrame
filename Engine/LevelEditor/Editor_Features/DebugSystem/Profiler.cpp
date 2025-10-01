@@ -37,6 +37,7 @@ static bool s_sort_once = false; // To trigger a one shot re sort from UI
 
 constexpr int MS_PRECISION = 6; // Precision value for the ms to be shown in profiler
 
+
 // Ensure label exists in s_order at a deterministic spot (alphabetical if new)
 static void EnsureLabelInOrder(const std::string& name) {
     if (s_index.count(name)) return;
@@ -63,6 +64,8 @@ namespace EngineFramework {
     }
 
     void LFeature_DebugProfiler::DrawWindow() {
+
+
         auto& P = Diagnostics::Profiler::I();
 
         constexpr const char* kProfilerWin = "Profiler##LevelEditor";
@@ -96,7 +99,7 @@ namespace EngineFramework {
             EnsureLabelInOrder(kv.first);
         }
 
-        // Choose denominator (prefer Frame::UpdateAll, but be consistent)
+        // Choose denominator (prefer Frame::UpdateAll, but have to be consistent)
         double denominator = frame_ms;
         if (auto iterator = secs.find("Frame::UpdateAll"); iterator != secs.end() && iterator->second.ms > 0.001) {
             denominator = iterator->second.ms;
@@ -114,7 +117,7 @@ namespace EngineFramework {
             const std::string& name = kv.first;
             const auto& sec = kv.second;
 
-            // sparkline history uses instantaneous % of smoothed denom for consistency
+            // Sparkline history uses instantaneous % of smoothed denom for consistency
             float percent_update = (float)((sec.ms / s_ema_updateAll) * 100.0);
             auto& ring = section_hist[name];
             ring.max = frame_hist.max;

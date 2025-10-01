@@ -17,24 +17,23 @@ namespace EngineFramework {
 
         //bool is_visible = true;
 
-        // Match your LFeature base EXACTLY. If your base methods are noexcept, add noexcept here too.
         void Initialize() override;
-        void Run() override;             // draw window each editor frame (when enabled)
+        void Run() override; // Draw window each editor frame (when enabled)
         void Close() override;
 
     private:
-        // simple rolling buffers
+        // Simple rolling buffers
         struct Ring {
             std::deque<float> data;
-            int max = 300;               // ~5s @60 fps
+            int max = 300; // ~5s @60 fps
             void push(float v) { data.push_back(v); if ((int)data.size() > max) data.pop_front(); }
             void clear() { data.clear(); }
         };
 
         void DrawWindow();
 
-        bool open_window = true;         // panel visibility
-        Ring frame_hist;                 // frame-ms history
+        bool open_window = true; // Panel visibility
+        Ring frame_hist; // Frame-ms history
         std::unordered_map<std::string, Ring> section_hist; // % of UpdateAll per label
     };
 

@@ -244,13 +244,14 @@ namespace EngineFramework
 						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 						if (ImGui::MenuItem("Profiler", nullptr, &on)) {
 							prof->is_enabled = on; // Show/hide panel
-							it->second->is_enabled = true; // Keep feature running
+							//it->second->is_enabled = true; // Keep feature running
 						}
 						ImGui::PopStyleColor();
 					}
 
 					ImGui::EndMenu();
 				}
+
 				ImGui::SameLine(0, 50.f);
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 				const std::string& currScene = SceneManager::GetInstance().GetCurrentScene();
