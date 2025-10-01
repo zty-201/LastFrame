@@ -198,6 +198,7 @@ struct Scene
     };
 
     xresource::full_guid shader_guid{};          // Shader program for the scene
+    std::string shader_name{}; //temp
     std::vector<Pass> passes; // Rendering passes in the scene
 
     // Constructors for the Scene class
@@ -206,6 +207,14 @@ struct Scene
         const std::initializer_list<Pass>& passes = { }
     ) : shader_guid{ shader_guid }, passes {passes}
     {   
+    }
+
+    // Constructors for the Scene class
+    Scene(
+        std::string shader_name,
+        const std::initializer_list<Pass>& passes = { }
+    ) : shader_name{ shader_name }, passes{ passes }
+    {
     }
 
     // Main render function for the scene

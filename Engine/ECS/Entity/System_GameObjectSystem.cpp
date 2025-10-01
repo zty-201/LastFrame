@@ -56,9 +56,7 @@ namespace EngineFramework
 	}
 	void GameObjectSystem::Update(float delta_time)
 	{
-		SerializeAllEntityArchtypes();
 		UNREFERENCED_PARAMETER(delta_time);
-
 	}
 
 

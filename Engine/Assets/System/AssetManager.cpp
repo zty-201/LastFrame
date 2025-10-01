@@ -11,6 +11,11 @@
 #include <system_error>
 #include <fstream>
 #include <filesystem>
+//For guid metadata file reading.
+#ifdef PLATFORM_WINDOWS
+#include <fstream>
+#include <iomanip>
+#endif
 
 //Asset structs
 #include "scene.h"
@@ -145,6 +150,111 @@ namespace EngineFramework {
 		return file_list;
 	}
 
+
+	/*
+			Reads name->guid mapping from the metadata file in the folder provided.
+			If no such mapping exists, it creates a new guid and writes the mapping to the file (windows only.)
+			For android platform, ensure all metadata files are set (i.e. game loads all assets and thus sets the mapping).
+
+			Returns guids in the same order as the names passed in.
+		*/
+	std::vector<xresource::instance_guid> AssetManagerSystem::GetGuidMapping(const std::vector<std::string>& names, const std::filesystem::path& folder_path)
+	{
+		//Decide if the json file needs to be modified.
+		bool isNewMapping = false;
+		std::vector<xresource::instance_guid> guid_arr{};
+		std::vector<unsigned char> guid_meta_string;
+		std::filesystem::path metadata_file = folder_path / "guid.meta";
+
+		/*
+			1. Read metadata file, if it doesn't exist then throw an error.
+
+			Note: If it doesn't exist, simply create a file "guid.meta" in the asset folder that has { } written in it.
+		*/
+		try
+		{
+			guid_meta_string = GetDataFromFile(metadata_file);
+		}
+		catch (std::exception&)
+		{
+			throw std::exception((std::string("[AssetManager] Unable to find guid.meta in: ") + folder_path.string()).c_str());
+		}
+		std::string temp{ guid_meta_string.begin(), guid_meta_string.end() };
+		nlohmann::json guid_meta_json = nlohmann::json::parse(temp);
+
+		/*
+			Find name mappings.
+		*/
+		for (const std::string& name : names)
+		{
+			//Add name mapping to array.
+			if (guid_meta_json.contains(name))
+			{
+				guid_arr.emplace_back(guid_meta_json[name].get<std::uint64_t>());
+				continue;
+			}
+			//Name mapping doesn't exist in metadata file, so add it in.
+			//This should not occur in android, as all asset and metadata files must be set beforehand (i.e. run game on desktop first).
+#ifdef PLATFORM_WINDOWS
+			xresource::instance_guid generated_guid = xresource::instance_guid::GenerateGUIDCopy();
+			guid_meta_json[name] = generated_guid.m_Value;
+			guid_arr.emplace_back(generated_guid);
+			isNewMapping = true;
+#else
+			throw std::runtime_error("Metadata file has not been fully configured, please load all assets on desktop to set metadata before compiling android");
+#endif
+		}
+
+		/*
+			Write back to file if necessary (e.g. new mappings generated).
+			Only done for windows, should be unnecessary for android.
+		*/
+#ifdef PLATFORM_WINDOWS
+		if (isNewMapping)
+		{
+			std::ofstream metadata_out{ metadata_file , std::ios::trunc };
+			metadata_out << std::setw(4) << guid_meta_json << std::endl;
+			metadata_out.close();
+		}
+#endif
+
+		return guid_arr;
+	}
+
+	/*
+			Sets the <guid, resource> <guid, name> <name, guid> maps.
+			Requires asset folder path.
+		*/
+	template <typename T>
+	void AssetManagerSystem::SetMappings(const xresource::type_guid& type_guid, const std::vector<std::string>& name_arr, const std::vector<std::shared_ptr<T>>& resource_arr, const std::filesystem::path& folder_path)
+	{
+		if (name_arr.size() != resource_arr.size())
+		{
+			throw std::logic_error("[AssetManager] Number of resource names should match number of loaded resources, was there any unloaded resources whose names were added?");
+		}
+
+		/*
+			First, get the guids mapped from name.
+		*/
+		std::vector<xresource::instance_guid> guid_mapping = GetGuidMapping(name_arr, folder_path);
+		if (guid_mapping.size() != resource_arr.size())
+		{
+			throw std::logic_error("[AssetManager] Number of guids should match number of loaded resources");
+		}
+		for (int i = 0; i < resource_arr.size(); i++)
+		{
+			xresource::instance_guid &instance_guid = guid_mapping[i];
+			const std::string &name = name_arr[i];
+
+			//	Add resource to the resource map.
+			AddResource(xresource::full_guid(instance_guid, type_guid), resource_arr[i]);
+
+			//Add <guid, name> and <name, guid> mapping.
+			guid_name_map[instance_guid] = name;
+			name_guid_map[type_guid][name] = instance_guid;
+		}
+	}
+
 	void AssetManagerSystem::Initialize()
 	{
 		//==Add function loaders for each type==//
@@ -217,21 +327,24 @@ namespace EngineFramework {
 		LOGD("Loading Texture");
 		//Acceptable files that can be loaded as a texture.
 		std::vector<std::string> texture_extensions{ ".png" };
-
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, texture_extensions);
+
+		/*
+			Asset names used for mapping to guid.
+			Resources are kept in an array until guid mappings are read.
+		*/
+		std::vector<std::string> asset_names{};
+		std::vector< std::shared_ptr<Scene::Texture>> loaded_resources{};
 
 		//Iterate through all texture files
 		for (const std::filesystem::path& path : files)
 		{
-			//Get guid (and update guid_name_map by calling GetFullGuid.
 			std::string name = path.stem().string();
-
 			//Allocate resource
 			try
 			{
-				std::shared_ptr<Scene::Texture> resource(new Scene::Texture(path.string()));
-				xresource::full_guid asset_guid = GetFullGuid(TEXTURE_GUID, name); //Only if resource is successfully loaded.
-				AddResource(asset_guid, resource);
+				loaded_resources.emplace_back(new Scene::Texture(path.string()));
+				asset_names.emplace_back(name); //Done if resource loading is a success.
 			}
 			catch (std::exception& e)
 			{
@@ -239,11 +352,21 @@ namespace EngineFramework {
 			}
 		}
 
+		SetMappings(TEXTURE_GUID, asset_names, loaded_resources, folder_path);
+
 		return true;
 	}
 	bool AssetManagerSystem::LoadCubemap(const std::filesystem::path& config_file)
 	{
 		LOGD("Loading Cubemap");
+
+		/*
+			Asset names used for mapping to guid.
+			Resources are kept in an array until guid mappings are read.
+		*/
+		std::vector<std::string> asset_names{};
+		std::vector< std::shared_ptr<Scene::Texture>> loaded_resources{};
+
 		//Read the Config File
 		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
 		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
@@ -254,27 +377,37 @@ namespace EngineFramework {
 		{
 			try
 			{
-				//Allocate resource
-				std::shared_ptr<Scene::Texture> resource(new Scene::Texture(filepath_arr.get<std::array<std::string, 6>>()));
-				xresource::full_guid asset_guid = GetFullGuid(CUBEMAP_GUID, cubemap_name); //Only if resource is successfully loaded.
-				AddResource(asset_guid, resource);
+				loaded_resources.emplace_back(new Scene::Texture(filepath_arr.get<std::array<std::string, 6>>()));
+				asset_names.emplace_back(cubemap_name); //Done if resource loading is a success.
 			}
 			catch (std::exception& e)
 			{
 				LOGE("%s %s %s", "Unable to Load Cubemap", cubemap_name.c_str(), e.what());
 			}
 		}
+
+		SetMappings(CUBEMAP_GUID, asset_names, loaded_resources, config_file.parent_path());
+
+
 		return true;
 	}
 	bool AssetManagerSystem::LoadMesh(const std::filesystem::path& folder_path)
 	{
 		UNREFERENCED_PARAMETER(folder_path);
 		LOGI("Mesh Loader not yet implemented.");
+
+
 		return true;
 	}
 	bool AssetManagerSystem::LoadShader(const std::filesystem::path& config_file)
 	{
 		LOGI("Loading Shader");
+		/*
+			Asset names used for mapping to guid.
+			Resources are kept in an array until guid mappings are read.
+		*/
+		std::vector<std::string> asset_names{};
+		std::vector< std::shared_ptr<ShaderProgram>> loaded_resources{};
 
 		//Read the Config File
 		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
@@ -300,22 +433,28 @@ namespace EngineFramework {
 			std::string fragment_shader = shader_filepaths["fragment"];
 			try
 			{
-				//Allocate resource
-				std::shared_ptr<ShaderProgram> resource(new ShaderProgram(vertex_shader.c_str(), fragment_shader.c_str()));
-				xresource::full_guid asset_guid = GetFullGuid(SHADER_GUID, shader_name);
-				AddResource(asset_guid, resource);
+				loaded_resources.emplace_back(new ShaderProgram(vertex_shader.c_str(), fragment_shader.c_str()));
+				asset_names.emplace_back(shader_name); //Done if resource loading is a success.
 			}
 			catch (std::exception& e)
 			{
 				LOGE("%s %s %s", "Unable to Load Shader", shader_name.c_str(), e.what());
 			}
 		}
+
+		SetMappings(SHADER_GUID, asset_names, loaded_resources, config_file.parent_path());
+
 		return true;
 	}
 	bool AssetManagerSystem::LoadAudio(const std::filesystem::path& config_file)
 	{
 		LOGI("Loading Audio");
-
+		/*
+			Asset names used for mapping to guid.
+			Resources are kept in an array until guid mappings are read.
+		*/
+		std::vector<std::string> asset_names{};
+		std::vector< std::shared_ptr<SoundAsset>> loaded_resources{};
 		/*
 			There are two ways to load audio
 			1. Specified in Config File: Allows audio to be loaded in loop or non-loop modes. 
@@ -349,10 +488,8 @@ namespace EngineFramework {
 
 			try
 			{
-				//Allocate resource
-				std::shared_ptr<SoundAsset> resource = AudioSystem::GetInstance().Load(config["filepath"], config["isLoop"]);
-				xresource::full_guid asset_guid = GetFullGuid(AUDIO_GUID, audio_name);
-				AddResource(asset_guid, resource);
+				loaded_resources.emplace_back(AudioSystem::GetInstance().Load(config["filepath"], config["isLoop"]));
+				asset_names.emplace_back(audio_name); //Done if resource loading is a success.
 				//if resource was loaded, then remove it from the array so it doesn't get duplicate loaded later on.
 				for (auto it = files.begin(); it != files.end(); it++)
 				{
@@ -378,10 +515,8 @@ namespace EngineFramework {
 			std::string audio_name = audio_path.stem().string();
 			try
 			{
-				//Allocate resource
-				std::shared_ptr<SoundAsset> resource = AudioSystem::GetInstance().Load(audio_path.string(), false);
-				xresource::full_guid asset_guid = GetFullGuid(AUDIO_GUID, audio_name);
-				AddResource(asset_guid, resource);
+				loaded_resources.emplace_back(AudioSystem::GetInstance().Load(audio_path.string(), false));
+				asset_names.emplace_back(audio_name); //Done if resource loading is a success.
 			}
 			catch (std::exception& e)
 			{
@@ -389,12 +524,20 @@ namespace EngineFramework {
 			}
 		}
 
+		SetMappings(AUDIO_GUID, asset_names, loaded_resources, folder_path);
+
 		return true;
 	}
 
 	bool AssetManagerSystem::LoadArchtype(const std::filesystem::path& folder_path)
 	{
 		LOGI("Loading Archtype");
+		/*
+			Asset names used for mapping to guid.
+			Resources are kept in an array until guid mappings are read.
+		*/
+		std::vector<std::string> asset_names{};
+		std::vector< std::shared_ptr<Archtype>> loaded_resources{};
 		//Acceptable files that can be loaded as a texture.
 		std::vector<std::string> archtype_extensions{ ".json" };
 
@@ -411,9 +554,8 @@ namespace EngineFramework {
 			{
 				std::vector<unsigned char> temp = GetDataFromFile(path);
 				std::string json_string{ temp.begin(), temp.end() };
-				std::shared_ptr<Archtype> resource(new Archtype(json_string));
-				xresource::full_guid asset_guid = GetFullGuid(ARCHTYPE_GUID, name); //Only if resource is successfully loaded.
-				AddResource(asset_guid, resource);
+				loaded_resources.emplace_back(new Archtype(json_string));
+				asset_names.emplace_back(name); //Done if resource loading is a success.
 			}
 			catch (std::exception& e)
 			{
@@ -421,308 +563,11 @@ namespace EngineFramework {
 			}
 		}
 
+		SetMappings(ARCHTYPE_GUID, asset_names, loaded_resources, folder_path);
+
 		return true;
 	}
 
-	//// -------- small helpers --------
-	///**
-	// * @brief Safely canonicalize a path (ignores errors).
-	// * @param p Input path.
-	// * @return Canonical/normalized path; may equal @p p if normalization failed.
-	// */
-	//static std::filesystem::path CanonicalSafe(const std::filesystem::path& p) {
-	//	std::error_code ec;
-	//	return std::filesystem::weakly_canonical(p, ec);
-	//}
-
-	///**
-	// * @brief Check if path @p a starts with @p prefix (element-wise).
-	// * @details Used to ensure a destination stays inside the root directory.
-	// */
-	//static bool StartsWithPath(const std::filesystem::path& a, const std::filesystem::path& prefix) {
-	//	auto ca = CanonicalSafe(a);
-	//	auto cp = CanonicalSafe(prefix);
-	//	auto ait = ca.begin(), aend = ca.end();
-	//	auto pit = cp.begin(), pend = cp.end();
-	//	for (; pit != pend && ait != aend; ++pit, ++ait) if (*pit != *ait) return false;
-	//	return pit == pend; // every element of prefix matched
-	//}
-
-	///**
-	// * @brief Lowercase utility for extensions and case-insensitive compares.
-	// */
-	//std::string AssetManagerSystem::toLower(std::string s) {
-	//	for (auto& c : s) c = static_cast<char>(::tolower(static_cast<unsigned char>(c)));
-	//	return s;
-	//}
-
-
-
-	//void AssetManagerSystem::SetRoot(const std::filesystem::path& root) {
-	//	m_root = root;
-	//	std::error_code ec;
-	//	std::filesystem::create_directories(m_root, ec); // best-effort
-	//}
-
-	//std::filesystem::path AssetManagerSystem::full(const std::filesystem::path& rel) const {
-	//	return rel.is_absolute() ? rel : (m_root / rel).lexically_normal();
-	//}
-	//bool AssetManagerSystem::insideRoot(const std::filesystem::path& abs) const {
-	//	return StartsWithPath(abs, m_root);
-	//}
-
-	//// -------- registration --------
-	//AssetID AssetManagerSystem::Register(const std::string& name,
-	//	const std::filesystem::path& relativePath,
-	//	bool verifyExists)
-	//{
-	//	Entry e;
-	//	e.id = m_next++;
-	//	e.name = name;
-	//	e.relative = relativePath.lexically_normal();
-
-	//	if (verifyExists) {
-	//		std::error_code ec;
-	//		if (!std::filesystem::exists(full(e.relative), ec)) {
-	//			// still register, but mark lastWrite default (not required)
-	//		}
-	//		else {
-	//			e.lastWrite = std::filesystem::last_write_time(full(e.relative), ec);
-	//		}
-	//	}
-
-	//	m_byName[name] = e;
-	//	m_byId[e.id] = name;
-
-	//	return e.id;
-	//}
-
-	//void AssetManagerSystem::Unregister(const std::string& name) {
-	//	auto it = m_byName.find(name);
-	//	if (it == m_byName.end()) return;
-	//	AssetID id = it->second.id;
-	//	m_byName.erase(it);
-	//	m_byId.erase(id);
-	//}
-
-	//bool AssetManagerSystem::Has(const std::string& name) const {
-	//	return m_byName.find(name) != m_byName.end();
-	//}
-
-	//AssetID AssetManagerSystem::FindId(const std::string& name) const {
-	//	auto it = m_byName.find(name);
-	//	return (it == m_byName.end()) ? 0 : it->second.id;
-	//}
-
-	//// -------- queries --------
-	//std::filesystem::path AssetManagerSystem::GetRelativePath(AssetID id) const {
-	//	auto idIt = m_byId.find(id);
-	//	if (idIt == m_byId.end()) return {};
-
-	//	auto nmIt = m_byName.find(idIt->second);
-	//	if (nmIt == m_byName.end()) return{};
-
-	//	return nmIt->second.relative;
-	//}
-	//std::filesystem::path AssetManagerSystem::GetAbsolutePath(AssetID id) const {
-	//	auto idIt = m_byId.find(id);
-	//	if (idIt == m_byId.end()) return{};
-
-	//	auto nmIt = m_byName.find(idIt->second);
-	//	if (nmIt == m_byName.end()) return{};
-
-	//	return full(nmIt->second.relative);
-	//}
-	//bool AssetManagerSystem::ExistsOnDisk(AssetID id) const {
-	//	auto idIt = m_byId.find(id);
-	//	if (idIt == m_byId.end()) return false;
-
-	//	auto nmIt = m_byName.find(idIt->second);
-	//	if (nmIt == m_byName.end()) return false;
-
-	//	std::error_code ec;
-	//	return std::filesystem::exists(full(nmIt->second.relative), ec);
-	//}
-	//bool AssetManagerSystem::ExistsOnDiskByName(const std::string& name) const {
-	//	auto it = m_byName.find(name);
-	//	if (it == m_byName.end()) return false;
-
-	//	std::error_code ec;
-	//	return std::filesystem::exists(full(it->second.relative), ec);
-	//}
-
-	//// -------- relocation / rename --------
-	//bool AssetManagerSystem::RelocateByName(const std::string& name,
-	//	const std::filesystem::path& newRelativePath,
-	//	MovePolicy policy,
-	//	bool allowOverwrite)
-	//{
-	//	auto it = m_byName.find(name);
-	//	if (it == m_byName.end()) return false;
-
-	//	Entry& e = it->second;
-
-	//	const auto oldAbs = full(e.relative);
-	//	const auto newRel = newRelativePath.lexically_normal();
-	//	const auto newAbs = full(newRel);
-
-	//	// keep everything inside root
-	//	if (!insideRoot(newAbs)) return false;
-
-	//	std::error_code ec;
-
-	//	if (policy != MovePolicy::UpdateRecordOnly) {
-	//		// make sure destination dir exists
-	//		std::filesystem::create_directories(newAbs.parent_path(), ec);
-
-	//		const bool destExists = std::filesystem::exists(newAbs, ec);
-	//		if (destExists && !allowOverwrite) return false;
-
-	//		if (policy == MovePolicy::MoveOnDisk) {
-	//			// try fast rename; if cross-device, fall back to copy+remove
-	//			std::filesystem::rename(oldAbs, newAbs, ec);
-	//			if (ec) {
-	//				ec.clear();
-	//				if (!std::filesystem::copy_file(
-	//					oldAbs, newAbs,
-	//					allowOverwrite ? std::filesystem::copy_options::overwrite_existing
-	//					: std::filesystem::copy_options::none,
-	//					ec))
-	//					return false;
-	//				std::filesystem::remove(oldAbs, ec);
-	//			}
-	//		}
-	//		else { // CopyOnDisk
-	//			if (!std::filesystem::copy_file(
-	//				oldAbs, newAbs,
-	//				allowOverwrite ? std::filesystem::copy_options::overwrite_existing
-	//				: std::filesystem::copy_options::none,
-	//				ec))
-	//				return false;
-	//		}
-	//	}
-
-	//	// update the record
-	//	e.relative = newRel;
-	//	e.lastWrite = std::filesystem::last_write_time(newAbs, ec);
-	//	return true;
-	//}
-
-
-	//bool AssetManagerSystem::RenameName(const std::string& oldName, const std::string& newName) {
-	//	if (m_byName.find(newName) != m_byName.end()) return false; // avoid collision
-	//	auto it = m_byName.find(oldName);
-	//	if (it == m_byName.end()) return false;
-
-	//	Entry e = it->second;
-	//	m_byName.erase(it);
-	//	e.name = newName;
-	//	m_byName[newName] = e;
-	//	m_byId[e.id] = newName;
-	//	return true;
-	//}
-
-	//// -------- discovery --------
-	//std::size_t AssetManagerSystem::ImportFolder(const std::filesystem::path& relativeDir,
-	//	const std::vector<std::string>& extensions,
-	//	bool recursive)
-	//{
-	//	std::size_t count = 0;
-	//	std::vector<std::string> extsLower;
-	//	extsLower.reserve(extensions.size());
-	//	for (auto s : extensions) extsLower.push_back(toLower(std::move(s)));
-
-	//	auto mode = recursive ? std::filesystem::directory_options::follow_directory_symlink
-	//		: std::filesystem::directory_options::none;
-
-	//	std::error_code ec;
-	//	const auto baseAbs = full(relativeDir);
-	//	if (!std::filesystem::exists(baseAbs, ec)) return 0;
-
-	//	auto matchExt = [&](const std::filesystem::path& p) {
-	//		auto ext = toLower(p.extension().string());
-	//		for (auto& e : extsLower) if (ext == e) return true;
-	//		return extsLower.empty(); // if you pass {}, accept all
-	//		};
-
-	//	if (recursive) {
-	//		for (auto& de : std::filesystem::recursive_directory_iterator(baseAbs, mode, ec)) {
-	//			if (!de.is_regular_file(ec)) continue;
-	//			const auto abs = de.path();
-	//			if (!matchExt(abs)) continue;
-	//			auto rel = std::filesystem::relative(abs, m_root, ec).lexically_normal();
-	//			auto name = abs.stem().string(); // basic name; collisions possible
-	//			if (!Has(name)) { Register(name, rel, /*verify=*/false); ++count; }
-	//		}
-	//	}
-	//	else {
-	//		for (auto& de : std::filesystem::directory_iterator(baseAbs, ec)) {
-	//			if (!de.is_regular_file(ec)) continue;
-	//			const auto abs = de.path();
-	//			if (!matchExt(abs)) continue;
-	//			auto rel = std::filesystem::relative(abs, m_root, ec).lexically_normal();
-	//			auto name = abs.stem().string();
-	//			if (!Has(name)) { Register(name, rel, /*verify=*/false); ++count; }
-	//		}
-	//	}
-	//	return count;
-	//}
-
-	//std::vector<std::pair<std::string, std::filesystem::path>>
-	//	AssetManagerSystem::List() const {
-	//	std::vector<std::pair<std::string, std::filesystem::path>> out;
-	//	out.reserve(m_byName.size());
-	//	for (auto& [n, e] : m_byName) out.emplace_back(n, e.relative);
-	//	return out;
-	//}
-
-	//void AssetManagerSystem::SetAudioSystem(AudioSystem* audio)
-	//{
-	//	m_audioSystem = audio;
-	//}
-
-	//bool AssetManagerSystem::LoadAudio(const std::string& id,
-	//	const std::string& nameOrRel,
-	//	bool loop)
-	//{
-	//	if (!m_audioSystem)
-	//	{
-	//		LOGI("%s %s", "[AssetManager] No AudioSystem set, unable to load", id.c_str());
-	//		return false;
-	//	}
-
-	//	// 1) Resolve a path
-	//	std::string resolved;
-
-	//	// CaseA: treat nameOrRel as a registered logical name
-	//	if (Has(nameOrRel))
-	//	{
-	//		AssetID aid = FindId(nameOrRel);
-	//		const std::filesystem::path abs = GetAbsolutePath(aid);
-	//		resolved = abs.string();
-	//	}
-
-	//	else
-	//	{
-	//		// CaseB: treat as a filename under Extern
-	//		const std::filesystem::path rel = std::filesystem::path(m_audioSubdir) / nameOrRel;
-	//		const std::filesystem::path abs = full(rel);
-	//		resolved = abs.string();
-	//	}
-
-	//	// 2) Ask AudioSystem to load
-	//	const bool ok = m_audioSystem->Load(id, resolved, loop);
-	//	if (ok)
-	//	{
-	//		LOGI("%s %s %s %s", "[AssetManager] Loaded Audio ", id.c_str(), " from ", resolved.c_str());
-	//	}
-	//	else
-	//	{
-	//		LOGI("%s %s %s %s", "[AssetManager] FAILED to load audio ", id.c_str(), " from ", resolved.c_str());
-	//	}
-
-	//	return ok;
-	//}
-
+	
 } // namespace EngineFramework
 

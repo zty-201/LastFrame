@@ -92,14 +92,18 @@ namespace EngineFramework
 	// Functions to safely call Update and PostUpdate with exception handling
 	void CoreEngine::SafeUpdateSystem(CoreSystem& system, float delta_time)
 	{
+#ifdef PLATFORM_WINDOWS
 		static std::ofstream logFile("engine.log", std::ios::app); // log file created once
-
+#endif
 		try {
 			system.system->Update(delta_time);
 		}
 		catch (const std::exception& e) {
+#ifdef PLATFORM_WINDOWS
 			logFile << "Exception in Update system [" << system.name
 				<< "]: " << e.what() << std::endl;
+#endif
+			LOGE("Exception in Update system [%s]: %s", system.name.c_str(), e.what());
 			throw;
 		}
 		catch (...) {

@@ -18,9 +18,8 @@
 
 /*
 		Asset Manager.
-		Resources are loaded at initialise time, and are each assigned a guid consisting of
-		<name_guid><type_guid>.
-		This guid will stay consistent as long as the type and name of the asset stays constant.
+		Resources are loaded at initialise time, and are assigned a name->guid mapping in the guid.meta file located within the asset folder, for the first ever load.
+		This guid will stay constant no matter what.
 
 		To load an asset, a loader function bool(const std::filesystem::path&) is added to a <name, func> asset_loader_map in Initialize().
 		This name must match the name given in ASSET_CONFIG_FILE defined in global.hpp.
@@ -29,12 +28,12 @@
 		and passed a folderpath.
 
 		This loader function takes in a folderpath, and loads all assets of <T> inside. It may choose to use a separate config file within the folder, or load all assets as is.
-		It generates a type_guid for all assets of <T> as well as an individual instance_guid for that asset name, before combining them
+		It generates a type_guid for all assets of <T> as well gets the corresponding instance_guid from guid.meta file mapping based on the asset name (not asset filepath)
 		into a full_guid.
 		The loaded assets of type std::shared_ptr<T> is then added to the resource_map via AddResource, together with its full_guid.
 		Upon any failure, it is to return false. Otherwise if all assets are loaded, return true.
 
-		instance_guid --> dependent on asset name
+		instance_guid --> generated randomly upon first load of an asset, and kept constant. name->guid mapping is written in guid.meta file.
 		type_guid --> dependent on asset type name
 		full_guid --> consists of instance and type guid.
 
@@ -44,9 +43,10 @@
 
 		0. Renaming Asset
 		- Note: Asset path should stay in the same folder.
-		- If renaming an asset, ensure guid_to_name map is changed. Can use instance_id{"old_name"} to get the key-val pair, then change the name.
-		- Afterwards, serialize all instances (or, change the scene files directly) such that the asset guids are now using the new name for hashing.
-		- This is used for serialization.
+		- After renaming the asset file itself, parse guid.meta file and look for the old asset name.
+		- change that old name to the new name. e.g. "old_name" -> guid becomes "new_name" -> guid.
+		- Finally, change guid_to_name mapping (for level editor display of guids as readable names). 
+		- Unless accounted for in code, name_to_guid mapping should not change. otherwise for example a graphic system using "Basic" shader will not be able to find it any longer.
 
 		1. Accessing Asset
 		- For every component, all asset types like texture, shader, mesh, audio file etc. are stored as xresource::full_guid.
@@ -54,15 +54,12 @@
 		- Do not store pointers, not even shared_ptrs, in the component.
 
 		2. Serializing
-		- For each asset, find the asset name from the full_guid using guid_to_name[full_guid.m_instance].
-		- Convert the name to instance_guid.
-		- Doing it this roundabout way allows it to consider asset renaming while the program is running.
-		- Store the instance_guid as uint64_t.
+		- Store instance_guid as uint64_t.
+		- Do not need to store type_guid.
 
 		3. Deserializing
 		- Similar to serializing, just read the uint64_t into xresource::instance_guid.
 		- Do not need to "load" the asset into the component, just call GetResource<T> when needed.
-
 
 		Note: I realise calling hashmap everytime the asset is accessed may be slower than caching the pointer in full_guid.m_instance.
 		However, I believe there will be <2500 asset access calls / frame, so it's likely negligible enough for M1 at least.
@@ -180,18 +177,14 @@ namespace EngineFramework {
 		*/
 		static xresource::full_guid GetFullGuid(const xresource::type_guid& type_guid, std::string asset_name)
 		{
-			xresource::full_guid return_val;
-			//Hash the asset name into a guid.
-			return_val.m_Instance = xresource::instance_guid::GenerateGUIDCopy(asset_name.c_str());
-			return_val.m_Type = type_guid;
-
-			//If guid, name pair is not in map then add it in.
-			if (guid_name_map.find(return_val.m_Instance) == guid_name_map.end())
+			auto it = name_guid_map[type_guid].find(asset_name);
+			//Name guid map is set during loading of the respective asset.
+			if (it == name_guid_map[type_guid].end())
 			{
-				guid_name_map[return_val.m_Instance] = asset_name;
+				LOGE("%s %s", "[AssetManager] No Asset with this name found in name_guid_map", asset_name.c_str());
+				return {};
 			}
-
-			return return_val;
+			return xresource::full_guid{ it->second, type_guid };
 		}
 
 		/*
@@ -255,6 +248,23 @@ namespace EngineFramework {
 		*/
 		static std::vector<std::filesystem::path> ListFilesInDirectory(const std::filesystem::path& folder_path, const std::vector<std::string>& accepted_extensions = {});
 
+
+		/*
+			Reads name->guid mapping from the metadata file in the folder provided.
+			If no such mapping exists, it creates a new guid and writes the mapping to the file (windows only.)
+			For android platform, ensure all metadata files are set (i.e. game loads all assets and thus sets the mapping).
+
+			Returns guids in the same order as the names passed in.
+		*/
+		static std::vector<xresource::instance_guid> GetGuidMapping(const std::vector<std::string>& names, const std::filesystem::path& folder_path);
+
+		/*
+			Sets the <guid, resource> <guid, name> <name, guid> maps.
+			Requires asset folder path.
+		*/
+		template <typename T>
+		static void SetMappings(const xresource::type_guid& type_guid, const std::vector<std::string>& name_arr, const std::vector<std::shared_ptr<T>>& resource_arr, const std::filesystem::path& folder_path);
+
 		//==Asset Loaders==//
 		static bool LoadTexture(const std::filesystem::path&);
 		static bool LoadCubemap(const std::filesystem::path&);
@@ -268,26 +278,19 @@ namespace EngineFramework {
 #ifdef PLATFORM_ANDROID
 		static inline AAssetManager* android_asset_manager = nullptr;
 #endif
-		// <resource_type, func> that maps a resource type to a function. The function loads all assets within the directory, and sets guid_name_map as well.
+		// <resource_type, func> that maps a resource type to a function.
 		static inline std::unordered_map<std::string, std::function<bool(const std::filesystem::path&)>> asset_loader_map{};
-		// <guid, name> map. Before serialization, asset instance_guid handles are converted to name, then the name is hashed back to instance_guid. 
-		// This accounts for name changes during run-time (any asset name changes just update this map).
-		static inline std::unordered_map<xresource::instance_guid, std::string> guid_name_map{};
+
 		// <full_guid, resource_type> that maps a guid to a resource.
 		static inline std::unordered_map<xresource::full_guid, entt::meta_any> resource_map{};
+		// This is used to get human-readable names from instance_guid, like for level editor usage.
+		static inline std::unordered_map<xresource::instance_guid, std::string> guid_name_map{};
+		// This is used to get guids from human-readable names, like for anything "hardcoded", e.g. using a "Basic" shader. 
+		// Note that type_guid is requested jic there are different asset types with the same name.
+		// uint64_t is used for type_guid to allow hashing for unordered_map.
+		// <type, <string, guid>>
+		static inline std::unordered_map<xresource::type_guid, std::unordered_map<std::string, xresource::instance_guid>> name_guid_map{};
 
-
-		/*
-			During initialization,
-			1. Assets are loaded via their respective folders into their data structures (stored in asset manager).
-			2. Each type has its own 64bit guid.
-			3. Each asset has their guid, based on <name 64bit guid><64bit type guid> --> create a <guid, name> map for serialization.
-			4. During deserialization, components reference assets using <name><type>, which can be hashed into a guid.
-			5. During run-time, assets are accessed from the asset manager via the guid.
-			6. During serialization, guid is converted back into name.
-
-			7. For renaming of assets, simply change the name in <guid, name> map. When serializing back, the guid will convert back to this name.
-		*/
 	};
 
 } // namespace EngineFramework
