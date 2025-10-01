@@ -24,7 +24,7 @@
 #include "Screen.hpp"
 #include "SceneManager.hpp"
 #include "AssetWindow.hpp"
-
+#include "ModelManager.hpp"
 
 namespace EngineFramework
 {
@@ -134,6 +134,9 @@ namespace EngineFramework
 		addFeature("Screen", std::make_unique<Screen>());
 		addFeature("SceneManager", std::make_unique<SceneManager>()); //
 		addFeature("AssetWindow", std::make_unique<AssetWindow>());//
+		addFeature("ModelManager", std::make_unique<ModelManager>());//
+
+		
 
 		SceneManager::GetInstance().ScanScenes("Extern/Scenes");//
 
@@ -222,7 +225,7 @@ namespace EngineFramework
 
 					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));      // White text
 
-					ImGui::MenuItem("Model Manager", NULL);
+					ImGui::MenuItem("Model Manager", NULL, &featureFlag("ModelManager"));
 					ImGui::Separator();
 					ImGui::MenuItem("Object Manager", NULL, &featureFlag("ObjectManager"));
 					ImGui::Separator();
