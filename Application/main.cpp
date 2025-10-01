@@ -184,6 +184,7 @@ void Game_Initialize(void* android_asset_manager)
 	try
 	{
 		core_engine.InitializeSystems();
+
 		//Jerron's playground
 		// --- Start scripting runtime ---
 		Engine::ScriptSystem::Init();
@@ -194,6 +195,7 @@ void Game_Initialize(void* android_asset_manager)
 		extern entt::registry registry;                 // <-- comment out if not using a global
 		Engine::ScriptSystem::OnRuntimeStart(registry); // start script runtime
 
+		//This section below is only active in DEBUG mode (hopefully)
 #if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
 		Engine::ScriptDebug::Initialize();
 #endif

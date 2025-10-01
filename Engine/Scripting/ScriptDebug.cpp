@@ -13,49 +13,70 @@ Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
 */
 /* *******************************************************************/
-
 #include "ScriptDebug.hpp"
-
 #if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
 #include "Script.hpp"
 #include "InputManager.hpp"
 #include <sol/sol.hpp>
-
 namespace Engine {
-
     static bool s_TestInitialized = false;
+    static sol::function s_GreetFunc;
+    static sol::function s_AddFunc;
 
     void ScriptDebug::Initialize() {
-        LOGI("[ScriptDebug] Lua script testing enabled. Press L to run test script.");
-        s_TestInitialized = true;
+        LOGI("[ScriptDebug] Lua script testing enabled. Press K/L to run test script.");
+
+        try {
+            sol::state& lua = ScriptSystem::GetLuaState();
+
+            // Load the test script once during initialization
+            lua.script_file("Extern/Scripts/test.lua");
+
+            // Cache function references
+            s_GreetFunc = lua["greet"];
+            s_AddFunc = lua["add"];
+
+            if (!s_GreetFunc.valid() || !s_AddFunc.valid()) {
+                LOGE("[ScriptDebug] Failed to load test functions from test.lua");
+                return;
+            }
+
+            s_TestInitialized = true;
+            LOGI("[ScriptDebug] Test script loaded successfully");
+        }
+        catch (const sol::error& e) {
+            LOGE("[ScriptDebug] Failed to load test script: %s", e.what());
+        }
     }
 
     void ScriptDebug::Update(float dt) {
         (void)dt;
-
         if (!s_TestInitialized) return;
 
+        // Press K to test Lua functions
+        if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_K)) {
+            LOGI("[ScriptDebug] K pressed - Testing Lua functions");
+
+            try {
+                // Test greet function
+                if (s_GreetFunc.valid()) {
+                    std::string result = s_GreetFunc("Developer");
+                    LOGI("[ScriptDebug] Greet returned: %s", result.c_str());
+                }
+                LOGI("[ScriptDebug] Test complete");
+            }
+            catch (const sol::error& e) {
+                LOGE("[ScriptDebug] Lua error: %s", e.what());
+            }
+        }
         // Press L to test Lua functions
         if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_L)) {
             LOGI("[ScriptDebug] L pressed - Testing Lua functions");
 
             try {
-                sol::state& lua = ScriptSystem::GetLuaState();
-
-                // Load the test script
-                lua.script_file("Extern/Scripts/test.lua");
-
-                // Test greet function
-                sol::function greet = lua["greet"];
-                if (greet.valid()) {
-                    std::string result = greet("Developer");
-                    LOGI("[ScriptDebug] Greet returned: %s", result.c_str());
-                }
-
                 // Test add function
-                sol::function add = lua["add"];
-                if (add.valid()) {
-                    int sum = add(42, 13);
+                if (s_AddFunc.valid()) {
+                    int sum = s_AddFunc(35, 32);
                     LOGI("[ScriptDebug] Add returned: %d", sum);
                 }
 
@@ -68,8 +89,9 @@ namespace Engine {
     }
 
     void ScriptDebug::Shutdown() {
+        s_GreetFunc = sol::nil;
+        s_AddFunc = sol::nil;
         s_TestInitialized = false;
     }
 }
-
 #endif // ENGINE_ENABLE_LUA && DEBUG
