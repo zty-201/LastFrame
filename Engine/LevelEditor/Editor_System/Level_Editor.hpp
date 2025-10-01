@@ -19,6 +19,7 @@ namespace EngineFramework
 	struct Imgui_const_Flags {
 
 		ImGuiWindowFlags DockWindowFlags;
+		ImGuiWindowFlags mainWindowFlags;
 	};
 
 	//limiting the accessable variables for Lfeature, only able to change certain variables
