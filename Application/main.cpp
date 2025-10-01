@@ -23,43 +23,46 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetManager.hpp"
 #include "Audio/Audio.hpp"
 #include "Scripting/Script.hpp"   // testing scripting (?)
+#if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
+#include "Scripting/ScriptDebug.hpp" //For testing Lua scripts in DEBUG mode
+#endif
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "System_LevelEditor.hpp"
 #endif
 
-#if defined(ENGINE_ENABLE_LUA)
-void TestLuaFunctions() {
-	LOGI("=== Testing Lua standalone functions ===");
-
-	try {
-		sol::state& lua = Engine::ScriptSystem::GetLuaState();
-
-		// Load the test script into global space (not in a component)
-		lua.script_file("Extern/Scripts/test.lua");
-
-		// Call the greet function
-		sol::function greet = lua["greet"];
-		if (greet.valid()) { //Continues if greet function is added correctly
-			std::string result = greet("C++ Engine");
-			LOGI("Greet returned: %s", result.c_str());
-		}
-
-		// Call the add function
-		sol::function add = lua["add"];
-		if (add.valid()) { //Continue if add function is added correctly
-			int sum = add(15, 27);
-			LOGI("Add returned: %d", sum);
-		}
-
-		LOGI("=== Lua function test complete ===");
-	}
-	catch (const sol::error& e) {
-		LOGE("Lua test error: %s", e.what());
-	}
-}
-#endif
-// End of Jerron's Scripting testing
+//#if defined(ENGINE_ENABLE_LUA)
+//void TestLuaFunctions() {
+//	LOGI("=== Testing Lua standalone functions ===");
+//
+//	try {
+//		sol::state& lua = Engine::ScriptSystem::GetLuaState();
+//
+//		// Load the test script into global space (not in a component)
+//		lua.script_file("Extern/Scripts/test.lua");
+//
+//		// Call the greet function
+//		sol::function greet = lua["greet"];
+//		if (greet.valid()) { //Continues if greet function is added correctly
+//			std::string result = greet("C++ Engine");
+//			LOGI("Greet returned: %s", result.c_str());
+//		}
+//
+//		// Call the add function
+//		sol::function add = lua["add"];
+//		if (add.valid()) { //Continue if add function is added correctly
+//			int sum = add(15, 27);
+//			LOGI("Add returned: %d", sum);
+//		}
+//
+//		LOGI("=== Lua function test complete ===");
+//	}
+//	catch (const sol::error& e) {
+//		LOGE("Lua test error: %s", e.what());
+//	}
+//}
+//#endif
+//// End of Jerron's Scripting testing
 
 //Initialization of game application.
 //android_asset_manager should only be set when building for android.
@@ -191,20 +194,24 @@ void Game_Initialize(void* android_asset_manager)
 		extern entt::registry registry;                 // <-- comment out if not using a global
 		Engine::ScriptSystem::OnRuntimeStart(registry); // start script runtime
 
+#if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
+		Engine::ScriptDebug::Initialize();
+#endif
+
 #if defined(ENGINE_ENABLE_LUA)
 	// Test Lua script loading
-		{
-			auto testEntity = registry.create();
-			auto& luaScript = registry.emplace<Engine::LuaScriptComponent>(testEntity);
+		//{
+		//	auto testEntity = registry.create();
+		//	auto& luaScript = registry.emplace<Engine::LuaScriptComponent>(testEntity);
 
-			// Set the path to your test script
-			luaScript.ScriptPath = "Extern/Scripts/test.lua";
-			luaScript.Enabled = true;
-			TestLuaFunctions();
+		//	// Set the path to your test script
+		//	luaScript.ScriptPath = "Extern/Scripts/test.lua";
+		//	luaScript.Enabled = true;
+		//	TestLuaFunctions();
 
-			LOGI("Created test entity with Lua script: Scripts/test.lua");
-			//LOGI("Watch console for Lua print statements during update loop");
-		}
+		//	LOGI("Created test entity with Lua script: Scripts/test.lua");
+		//	//LOGI("Watch console for Lua print statements during update loop");
+		//}
 #else
 		LOGI("Lua scripting is disabled - ENGINE_ENABLE_LUA not defined");
 #endif
@@ -240,6 +247,10 @@ void Game_Update()
 	extern entt::registry registry;                       // or EngineFramework::GetRegistry()
 	Engine::ScriptSystem::OnUpdate(registry, delta_time);
 
+#if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
+	Engine::ScriptDebug::Update(delta_time);
+#endif
+
 	// --- Jerrons scripting playground ---
 
 	core_engine.PostUpdateSystems(delta_time);
@@ -261,4 +272,8 @@ void Game_Destroy()
 	extern entt::registry registry;                   // or EngineFramework::GetRegistry()
 	Engine::ScriptSystem::OnRuntimeStop(registry);
 	Engine::ScriptSystem::Shutdown();
+
+#if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
+	Engine::ScriptDebug::Shutdown();
+#endif
 }
