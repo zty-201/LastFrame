@@ -25,6 +25,7 @@
 #include "SceneManager.hpp"
 #include "AssetWindow.hpp"
 
+
 namespace EngineFramework
 {
 	bool LevelEditor::is_enabled = true;
@@ -201,8 +202,11 @@ namespace EngineFramework
 					ImGui::Separator();
 					ImGui::MenuItem("Open Scene", NULL, &featureFlag("SceneManager"));
 					ImGui::Separator();
-					ImGui::MenuItem("Save", NULL, &featureFlag("Save"));
-					ImGui::MenuItem("Save As ..", NULL);
+					if (ImGui::MenuItem("Save", NULL)) {
+						Save::GetInstance().SAVEFILE("test315.txt");
+					}
+
+					ImGui::MenuItem("Save As ..", NULL, &featureFlag("Save"));
 					ImGui::Separator(); 
 					ImGui::MenuItem("Save & Quit", NULL);
 					ImGui::MenuItem("Quit", NULL, &to_close);

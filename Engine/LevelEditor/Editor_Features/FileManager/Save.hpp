@@ -26,6 +26,15 @@ namespace EngineFramework
         void Run() override;
         void Close() override;
 
+        bool SAVEFILE(std::string filename);
+
+
+        static Save& GetInstance()
+        {
+            return *this_ptr;
+        }
+
+        static inline Save* this_ptr = nullptr;
 
     };
 
