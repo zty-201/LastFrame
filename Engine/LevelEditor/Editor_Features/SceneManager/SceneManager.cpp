@@ -1,3 +1,18 @@
+/*
+*****************************************************************/
+/*!
+\file   SceneManager.cpp
+\author Tang Yeun, Dean
+\par    y.tang\@digipen.edu
+\date   September 2025
+\brief
+This file allows the user to change scenes / levels
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/* *******************************************************************/
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "SceneManager.hpp"
 #include "System_GameObjectSystem.hpp"
 #include <filesystem>
@@ -10,7 +25,11 @@ namespace EngineFramework
 		LOGI("Lfeature: SceneManager CREATED");
 	}
 	SceneManager::~SceneManager() {}
-	void SceneManager::Initialize() {}
+
+	void SceneManager::Initialize()
+	{
+		ScanScenes("Extern/Scenes/");
+	}
 
 	SceneManager& SceneManager::GetInstance()
 	{
@@ -51,9 +70,11 @@ namespace EngineFramework
 
 	void SceneManager::Run()
 	{
+		if (!is_enabled) return; // only open if toggled
+
 		if (ImGui::Begin("Scene Manager", &is_enabled)) {
 			ImGui::Text("Available Scenes:");
-
+			ImGui::Separator();
 			for (const auto& scene : GetSceneList()) {
 				if (ImGui::Selectable(scene.c_str())) {
 					LoadScene(scene);
@@ -68,3 +89,4 @@ namespace EngineFramework
 		LOGI("Scene manager closed");
 	}
 }
+#endif

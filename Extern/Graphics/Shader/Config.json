@@ -1,0 +1,6 @@
+{
+  "Basic" : {
+    "vertex":   "Extern/Graphics/Shader/Basic.vert",
+    "fragment": "Extern/Graphics/Shader/Basic.frag"
+  }
+}
