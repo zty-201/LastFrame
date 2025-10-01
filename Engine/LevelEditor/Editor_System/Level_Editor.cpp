@@ -187,7 +187,7 @@ namespace EngineFramework
 
 		if (ImGui::Begin("Main Window", nullptr, mainWindowFlags)) {
 
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));      // Black text
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
 
 			if (ImGui::BeginMenuBar()) {
 
@@ -262,7 +262,7 @@ namespace EngineFramework
 		}
 
 
-		//ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
 
 		ImGui::End();
 
