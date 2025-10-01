@@ -89,10 +89,8 @@ namespace EngineFramework
 
             ImGui::PopStyleColor();
 
-
             display_screen();
             gizmos();
-            control_window();
 
             if (bool hovered = ImGui::IsItemHovered()) {               
                 camera_controls_in_screen_only();
@@ -103,6 +101,10 @@ namespace EngineFramework
 
         ImGui::PopStyleColor();
         ImGui::End();
+
+        
+        
+        control_window();
       
     }
     void Screen::Close() {
@@ -210,7 +212,7 @@ namespace EngineFramework
         ImGui::SetNextWindowSize(ImVec2(620, 260), ImGuiCond_FirstUseEver);
 
         // No flags that block move/resize
-        ImGui::Begin("Control Panel", &is_enabled);
+        ImGui::Begin("Control Panel", &is_control_open);
 
 
 
