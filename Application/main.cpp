@@ -15,9 +15,8 @@ written consent of DigiPen Institute of Technology is prohibited.
 //Measurement of delta time.
 #include <chrono>
 // For the profiler
-#include <iostream>
 #include <vector>
-#include <algorithm>
+#include <iostream>
 #include <iomanip>
 
 #include "main.hpp"
@@ -205,6 +204,7 @@ void Game_Update()
 	frames++;
 
 	if (acc_ms >= 1000.0) {
+		std::stringstream out_stream{};
 		auto& P = Profiler::I();
 		const double frame = std::max(1e-6, P.FrameMS());
 
@@ -213,9 +213,9 @@ void Game_Update()
 			update_all = std::max(1e-6, it->second.ms);
 		}
 
-		std::cout << std::fixed << std::setprecision(4);
-		std::cout << "[Profiler] Frame: " << P.FrameMS() << " ms, FPS " << std::setprecision(1) << P.FPS() << "\n";
-		std::cout << std::setprecision(4);
+		out_stream << std::fixed << std::setprecision(4);
+		out_stream << "[Profiler] Frame: " << P.FrameMS() << " ms, FPS " << std::setprecision(1) << P.FPS() << "\n";
+		out_stream << std::setprecision(4);
 
 		// Copy and sort the sections by time in descending order
 		std::vector<std::pair<std::string, Diagnostics::Section>> rows(P.Sections().begin(), P.Sections().end());
@@ -226,12 +226,12 @@ void Game_Update()
 			const double engine_update_percent = (sec.ms / update_all) * 100.0;
 			const double per_call = sec.calls ? sec.ms / sec.calls : 0.0;
 
-			std::cout << " " << name << " : " << sec.ms << " ms" << " (calls " << sec.calls << ", " << per_call << " ms/call)"
+			out_stream << " " << name << " : " << sec.ms << " ms" << " (calls " << sec.calls << ", " << per_call << " ms/call)"
 				<< " [" << std::setprecision(1) << engine_update_percent << "% of UpdateAll, " << frame_percent << "% of Frame]\n" << std::setprecision(4);
 		}
-		std::cout << "--------------------------------------\n";
+		out_stream << "--------------------------------------\n";
 		acc_ms = 0.0;
-
+		LOGD("%s", out_stream.str().c_str());
 	}
 
 	//if (acc_ms >= 1000.0) {

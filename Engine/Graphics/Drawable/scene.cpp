@@ -286,7 +286,8 @@ void Scene::render()
 		else
 		{
 			using E_AM = EngineFramework::AssetManagerSystem;
-			shader = E_AM::GetResource<ShaderProgram>(E_AM::GetFullGuid(E_AM::SHADER_GUID, shader_name));
+			shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, shader_name);
+			shader = E_AM::GetResource<ShaderProgram>(shader_guid);
 		}
 		//Ensure shader is valid. If not, nothing can be drawn.
 		if (!shader)

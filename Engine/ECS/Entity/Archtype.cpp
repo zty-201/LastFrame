@@ -1,7 +1,5 @@
+#include "pch.hpp"
 #include "Archtype.hpp"
-#include "entt/meta/resolve.hpp"
-#include "entt/core/hashed_string.hpp"
-#include "nlohmann/json.hpp"
 #include "ReflectionRegister.hpp"
 
 namespace EngineFramework
