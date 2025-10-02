@@ -78,27 +78,27 @@ set_target_properties(application_executable PROPERTIES OUTPUT_NAME LastFrame)
 set_target_properties(engine_library PROPERTIES OUTPUT_NAME EngineLibrary)
 
 
-#Copies assets to build directory, every build (to refresh assets)
-#This is necessary when run from visual studio (instead of running the executable)
-add_custom_command(
-  TARGET application_executable
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_SOURCE_DIR}/Extern
-          ${CMAKE_BINARY_DIR}/Extern
-  COMMENT "Copying Extern/ to build directory ${CMAKE_BINARY_DIR}/"
-)
+# #Copies assets to build directory, every build (to refresh assets)
+# #This is necessary when run from visual studio (instead of running the executable)
+# add_custom_command(
+#   TARGET application_executable
+#   POST_BUILD
+#   COMMAND ${CMAKE_COMMAND} -E copy_directory
+#           ${CMAKE_SOURCE_DIR}/Extern
+#           ${CMAKE_BINARY_DIR}/Extern
+#   COMMENT "Copying Extern/ to build directory ${CMAKE_BINARY_DIR}/"
+# )
 
-#Copies assets to executable directory.
-#This is necessary for executable to find it.
-add_custom_command(
-  TARGET application_executable
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_SOURCE_DIR}/Extern
-          $<TARGET_FILE_DIR:application_executable>/Extern
-  COMMENT "Copying Extern/ to executable directory"
-)
+# #Copies assets to executable directory.
+# #This is necessary for executable to find it.
+# add_custom_command(
+#   TARGET application_executable
+#   POST_BUILD
+#   COMMAND ${CMAKE_COMMAND} -E copy_directory
+#           ${CMAKE_SOURCE_DIR}/Extern
+#           $<TARGET_FILE_DIR:application_executable>/Extern
+#   COMMENT "Copying Extern/ to executable directory"
+# )
 
 #Sets the default startup project for visual studio to application_executable, other IDEs will ignore this.
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT application_executable)

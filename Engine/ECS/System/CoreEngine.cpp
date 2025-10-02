@@ -112,19 +112,28 @@ namespace EngineFramework
 	// Functions to safely call Update and PostUpdate with exception handling
 	void CoreEngine::SafeUpdateSystem(CoreSystem& system, float delta_time)
 	{
+#ifdef PLATFORM_WINDOWS
 		static std::ofstream logFile("engine.log", std::ios::app); // log file created once
-
+#endif
 		try {
 			system.system->Update(delta_time);
 		}
 		catch (const std::exception& e) {
+#ifdef PLATFORM_WINDOWS
 			logFile << "Exception in Update system [" << system.name
 				<< "]: " << e.what() << std::endl;
+#else
+			LOGD("Exception in Update system[%s]: %s", system.name.c_str(), e.what());
+#endif
 			throw;
 		}
 		catch (...) {
+#ifdef PLATFORM_WINDOWS
 			logFile << "Unknown exception in Update system ["
 				<< system.name << "]" << std::endl;
+#else
+			LOGD("Unknown exception in Update system[%s]: %s", system.name.c_str(), e.what());
+#endif
 			throw;
 		}
 	}
@@ -132,19 +141,29 @@ namespace EngineFramework
 
 	void CoreEngine::SafePostUpdateSystem(CoreSystem& system, float delta_time)
 	{
+#ifdef PLATFORM_WINDOWS
 		static std::ofstream logFile("engine.log", std::ios::app); // same file as SafeUpdateSystem
-
+#endif
 		try {
 			system.system->PostUpdate(delta_time);
 		}
 		catch (const std::exception& e) {
+#ifdef PLATFORM_WINDOWS
 			logFile << "Exception in PostUpdate system [" << system.name
 				<< "]: " << e.what() << std::endl;
+#else
+			LOGD("Exception in PostUpdate system[%s]: %s", system.name.c_str(), e.what());
+#endif
+
 			throw;
 		}
 		catch (...) {
+#ifdef PLATFORM_WINDOWS
 			logFile << "Unknown exception in PostUpdate system ["
 				<< system.name << "]" << std::endl;
+#else
+			LOGD("Unknown exception in PostUpdate system[%s]: %s", system.name.c_str(), e.what());
+#endif
 			throw;
 		}
 	}

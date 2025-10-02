@@ -9,7 +9,6 @@
 #include "AssetManager.hpp"
 #include "Audio.hpp"
 #include <system_error>
-#include <fstream>
 #include <filesystem>
 
 //Asset structs
@@ -20,7 +19,30 @@
 namespace EngineFramework {
 
 	// -------- lifecycle --------
-	AssetManagerSystem::AssetManagerSystem() { s_instance = this; }
+	AssetManagerSystem::AssetManagerSystem() { 
+		s_instance = this; 
+		/*
+			Check for location of asset folder, prioritising the top-level folder first.
+			This is because running from VS uses the current VS build folder, executable uses the current executable folder.
+			writing to asset folder requires top-level asset folder whilst packaging executable requires it to use its current folder.
+			Thus, always try to find a viable asset folder starting from the top level.
+			Only windows needs to do this, android can use current folder as assets are stored in a fixed folder for apk.
+		*/
+#ifdef PLATFORM_WINDOWS
+		std::filesystem::path arr[4]{ "../../../", "../../", "../", "" };
+		for (const std::filesystem::path& prefix : arr)
+		{
+			//Look for extern folder
+			std::filesystem::path asset_folder = prefix / "Extern";
+			if (std::filesystem::is_directory(asset_folder))
+			{
+				extern_folder_prefix = prefix;
+				LOGD("Using %s as Extern folder", asset_folder.string().c_str());
+				break;
+			}
+		}
+#endif
+	}
 	AssetManagerSystem::~AssetManagerSystem() { RemoveAllResources(); } //Call destructors on all resources.
 	AssetManagerSystem& AssetManagerSystem::GetInstance() { return *s_instance; }
 
@@ -70,10 +92,10 @@ namespace EngineFramework {
 #endif
 #ifdef PLATFORM_WINDOWS
 		// open the file:
-		std::ifstream file(path, std::ios::binary);
+		std::ifstream file(extern_folder_prefix / path, std::ios::binary);
 		if (!file.is_open())
 		{
-			throw std::runtime_error("Failed to open asset: " + path.string());
+			throw std::runtime_error("Failed to open asset: " + (extern_folder_prefix / path).string());
 		}
 		// read the data:
 		return std::vector<unsigned char>((std::istreambuf_iterator<char>(file)),

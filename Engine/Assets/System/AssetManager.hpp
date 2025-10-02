@@ -112,6 +112,9 @@ namespace EngineFramework {
 #ifdef PLATFORM_ANDROID
 		static void SetAndroidAssetManager(void* android_asset_manager);
 #endif
+#ifdef PLATFORM_WINDOWS
+		std::filesystem::path GetAssetFolderPrefix() { return extern_folder_prefix; }
+#endif
 		void Initialize() override;
 		void Update(float) override;
 		void PostUpdate(float) override;
@@ -228,6 +231,12 @@ namespace EngineFramework {
 #ifdef PLATFORM_ANDROID
 		static inline AAssetManager* android_asset_manager = nullptr;
 #endif
+
+		//Prefix only needs to be found on windows. on android, use the current folder.
+#ifdef PLATFORM_WINDOWS
+		static inline std::filesystem::path extern_folder_prefix{};
+#endif
+
 		// <resource_type, func> that maps a resource type to a function. The function loads all assets within the directory, and sets guid_name_map as well.
 		static inline std::unordered_map<std::string, std::function<bool(const std::filesystem::path&)>> asset_loader_map{};
 		// <guid, name> map. Before serialization, asset instance_guid handles are converted to name, then the name is hashed back to instance_guid. 

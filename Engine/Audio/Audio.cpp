@@ -27,6 +27,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #endif
+#include "AssetManager.hpp"
 
 namespace EngineFramework
 {
@@ -271,7 +272,12 @@ namespace EngineFramework
 
 		FMOD_RESULT r = m_system->createSound(loadPath.c_str(), mode, NULL, &snd);
 #else
-		FMOD_RESULT r = m_system->createSound(resolved.c_str(), mode, NULL, &snd);
+		std::vector<unsigned char> file_data = AssetManagerSystem::GetDataFromFile(resolved);
+
+		FMOD_CREATESOUNDEXINFO exinfo = {};
+		exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+		exinfo.length = static_cast<unsigned int>(file_data.size());
+		FMOD_RESULT r = m_system->createSound(reinterpret_cast<const char*>(file_data.data()), mode | FMOD_OPENMEMORY, &exinfo, &snd);
 #endif
 		logFmodError(r, "System::createSound");
 		if (r != FMOD_OK || snd == NULL)
