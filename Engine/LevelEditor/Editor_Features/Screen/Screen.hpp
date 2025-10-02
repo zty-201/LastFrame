@@ -37,7 +37,7 @@ namespace EngineFramework
         void camera_controls_outside_screen();
         void camera_controls_in_screen_only();
         void control_window();
-
+        void drop_target();
         
          
     };

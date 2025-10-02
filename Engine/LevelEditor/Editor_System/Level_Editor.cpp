@@ -25,6 +25,7 @@
 #include "Screen.hpp"
 #include "SceneManager.hpp"
 #include "AssetWindow.hpp"
+#include "ModelManager.hpp"
 
 // Profiler/Debug
 #include "Profiler.hpp"
@@ -137,8 +138,11 @@ namespace EngineFramework
 		addFeature("Screen", std::make_unique<Screen>());
 		addFeature("Profiler", std::make_unique<LFeature_DebugProfiler>()); // Add profiler feature (testing purpose)
 		
-		addFeature("SceneManager", std::make_unique<SceneManager>());
-		addFeature("AssetWindow", std::make_unique<AssetWindow>());
+		addFeature("SceneManager", std::make_unique<SceneManager>()); //
+		addFeature("AssetWindow", std::make_unique<AssetWindow>());//
+		addFeature("ModelManager", std::make_unique<ModelManager>());//
+
+		
 
 		SceneManager::GetInstance().ScanScenes("Extern/Scenes");//
 
@@ -207,8 +211,11 @@ namespace EngineFramework
 					ImGui::Separator();
 					ImGui::MenuItem("Open Scene", NULL, &featureFlag("SceneManager"));
 					ImGui::Separator();
-					ImGui::MenuItem("Save", NULL, &featureFlag("Save"));
-					ImGui::MenuItem("Save As ..", NULL);
+					if (ImGui::MenuItem("Save", NULL)) {
+						Save::GetInstance().SAVEFILE("test315.txt");
+					}
+
+					ImGui::MenuItem("Save As ..", NULL, &featureFlag("Save"));
 					ImGui::Separator(); 
 					ImGui::MenuItem("Save & Quit", NULL);
 					ImGui::MenuItem("Quit", NULL, &to_close);
@@ -224,7 +231,7 @@ namespace EngineFramework
 
 					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));      // White text
 
-					ImGui::MenuItem("Model Manager", NULL);
+					ImGui::MenuItem("Model Manager", NULL, &featureFlag("ModelManager"));
 					ImGui::Separator();
 					ImGui::MenuItem("Object Manager", NULL, &featureFlag("ObjectManager"));
 					ImGui::Separator();
