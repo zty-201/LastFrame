@@ -68,10 +68,6 @@ namespace EngineFramework
 			Diagnostics::Scoped scope{ system.label_update.c_str() }; // To track per system per frame timing
 
 			SafeUpdateSystem(system, delta_time);
-
-
-
-			//system.system->Update(delta_time);
 		}
 	}
 
