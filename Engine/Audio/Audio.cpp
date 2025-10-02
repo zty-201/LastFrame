@@ -423,7 +423,7 @@ namespace EngineFramework
 		}
 
 		// ---------------------------------------
-		// Play / Resume (G) ?Avoids double-play
+		// Play / Resume (G) — Avoids double-play
 		// ---------------------------------------
 		if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_G))
 		{

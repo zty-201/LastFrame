@@ -46,15 +46,12 @@ namespace EngineFramework
 
     }
     void Screen::Initialize() {
-        auto camera_view = registry.view<CameraComponent>();
-        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-		Camera::setType(camera, CameraComponent::WALKING);
+
+        GraphicsSystem::GetInstance().GetScene().get()->camerasSetType(WALKING);
     }
     void Screen::Run() {
 
-        auto camera_view = registry.view<CameraComponent>();
-        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-        Camera::setType(camera, CameraComponent::WALKING);
+        GraphicsSystem::GetInstance().GetScene().get()->camerasSetType(WALKING);
 
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
         ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500
@@ -66,8 +63,8 @@ namespace EngineFramework
 
                 if (ImGui::MenuItem("Run Simulator", NULL, &is_simulator_running)) {
                     //std::cout << "Run Simulator\n";
-                    auto entity_view = registry.view<SceneRenderPass>();
-                    int size = (int)entity_view.size();
+
+                    int size = (int)GraphicsSystem::GetInstance().GetScene().get()->passes[0].objects.size();
 
                     //std::cout<< "pass 0 object size: "<<GraphicsSystem::GetInstance().GetScene().get()->passes[0].objects.size() <<std::endl;
 
@@ -152,38 +149,37 @@ namespace EngineFramework
     void Screen::camera_controls_outside_screen() {
 
         float speed = 0.05f;
-        
+
         if (ImGui::IsKeyDown(ImGuiKey_W)) {
-            auto camera_view = registry.view<CameraComponent>();
-            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-			Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, speed));
+
+            //GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, Mouse_Scroll));
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, speed));
         }
 
         if (ImGui::IsKeyDown(ImGuiKey_S)) {
-            auto camera_view = registry.view<CameraComponent>();
-            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-			Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, -speed));
+
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, -speed));
         }
 
         if (ImGui::IsKeyDown(ImGuiKey_Q) || ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
-            auto camera_view = registry.view<CameraComponent>();
-            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-			Camera::Move_Cam_and_Target(camera, glm::vec3(0, speed, 0));
+            //up vector
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, speed, 0));
+            //std::cout << "UP !" << std::endl;
         }
         if (ImGui::IsKeyDown(ImGuiKey_E) || ImGui::IsKeyDown(ImGuiKey_DownArrow)) {
-            auto camera_view = registry.view<CameraComponent>();
-            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-            Camera::Move_Cam_and_Target(camera, glm::vec3(0, -speed, 0));
+            //down vector
+            //std::cout << "DOWN !" << std::endl;
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, -speed, 0));
         }
         if (ImGui::IsKeyDown(ImGuiKey_A) || ImGui::IsKeyDown(ImGuiKey_LeftArrow)) {
-            auto camera_view = registry.view<CameraComponent>();
-            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-            Camera::Move_Cam_and_Target(camera, glm::vec3(-speed, 0, 0));
+            //left vector
+            //std::cout << "LEFT !" << std::endl;
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(-speed, 0, 0));
         }
         if (ImGui::IsKeyDown(ImGuiKey_D) || ImGui::IsKeyDown(ImGuiKey_RightArrow)) {
-            auto camera_view = registry.view<CameraComponent>();
-            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-            Camera::Move_Cam_and_Target(camera, glm::vec3(speed, 0, 0));
+            //right vector
+            //std::cout << "RIGHT !" << std::endl;
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(speed, 0, 0));
         }
 
     }
@@ -193,18 +189,18 @@ namespace EngineFramework
         ImVec2 Mouse_delta = io.MouseDelta;
         float Mouse_Scroll = io.MouseWheel;
 
+        auto& pScene = GraphicsSystem::GetInstance().GetScene();
+
         //right mouse is down means = i am dragging the screen
         if (io.MouseDown[1]) {
-            auto camera_view = registry.view<CameraComponent>();
-            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-			Camera::onCursor(camera, Mouse_delta.x, Mouse_delta.y);
+            pScene->camerasOnCursor(Mouse_delta.x, Mouse_delta.y);
+            //std::cout << "Mouse_delta x: " << Mouse_delta.x << " y: " << Mouse_delta.y << std::endl;
         }
 
         //moving forward/backwards
         if (Mouse_Scroll != 0.f) {
-            auto camera_view = registry.view<CameraComponent>();
-            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-			Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, Mouse_Scroll));
+            //std::cout << "scroll: " << Mouse_Scroll << std::endl;
+            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, Mouse_Scroll));
         }
 
     }
@@ -249,7 +245,8 @@ namespace EngineFramework
                 
 
                 //if any object is being selected
-                if (true) { // if any object is being selected
+                if (true) {
+
                     static bool transformation_changed = false;
 
                     ImGui::SeparatorText("Object's Transformation");
@@ -259,53 +256,54 @@ namespace EngineFramework
 
                     auto* scene = GraphicsSystem::GetInstance().GetScene().get();
                     if (!scene) return;
-                    auto objects = registry.view<TransformComponent>();
-                    auto& first_obj = objects.get<TransformComponent>(objects.front());
+                    glm::mat4& model = scene->passes[0].objects[2].instances[0].modeltransform;
 
-                    // Work directly with the component values instead of the matrix
-                    float T[3] = { first_obj.position.x, first_obj.position.y, first_obj.position.z };
-                    float R[3] = { first_obj.rotation.x, first_obj.rotation.y, first_obj.rotation.z };
-                    float S[3] = { first_obj.scale.x, first_obj.scale.y, first_obj.scale.z };
-
+                    float T[3], R[3], S[3];
+                    ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), T, R, S);
+                  
                     ImGui::Separator();
 
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    //ImGui::TextUnformatted("#Translation: ");
                     transformation_changed |= ImGui::InputFloat3("Translation", T, "%.3f");
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
 
+      
                     ImGui::Separator();
 
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    //ImGui::TextUnformatted("#Scale: ");
                     transformation_changed |= ImGui::InputFloat3("Scale", S, "%.3f");
-
+                    
+                    
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
 
+                    
                     ImGui::Separator();
 
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    //ImGui::TextUnformatted("#Rotation: ");
                     transformation_changed |= ImGui::InputFloat3("Rotation (deg)", R, "%.3f");
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
 
+                    
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
-
-                    if (ImGui::Button("Reset", ImVec2(120, 0))) {
+                    
+                    if (ImGui::Button("Reset", ImVec2(120, 0))) {                    
                         R[0] = R[1] = R[2] = 0.0f;
-                        S[0] = S[1] = S[2] = 1.0f;
-                        transformation_changed = true;
+                        S[0] = S[1] = S[2] = 1.0f;                        
+                        ImGuizmo::RecomposeMatrixFromComponents(T, R, S, glm::value_ptr(model));
                     }
                     ImGui::SameLine();
                     ImGui::Text(" *only affects scale and rotation");
 
-                    // Apply changes directly to the transform component
-                    if (transformation_changed) {
-                        first_obj.position = glm::vec3(T[0], T[1], T[2]);
-                        first_obj.rotation = glm::vec3(R[0], R[1], R[2]);
-                        first_obj.scale = glm::vec3(S[0], S[1], S[2]);
 
-                        // Reset the flag after applying changes
-                        transformation_changed = false;
+                    if (transformation_changed) {                       
+                        //for (int i = 0; i < 3; ++i) if (fabsf(S[i]) < 1e-6f) S[i] = (S[i] >= 0 ? 1e-6f : -1e-6f);                       
+                        ImGuizmo::RecomposeMatrixFromComponents(T, R, S, glm::value_ptr(model));
                     }
+
                 }
                 
                 ImGui::EndTabItem();
@@ -367,17 +365,11 @@ namespace EngineFramework
         gizmos_IS_hovering = ImGuizmo::IsOver();
         gizmos_IS_dragged = ImGuizmo::IsUsing();
      
-        auto camera_view = registry.view<CameraComponent>();
-        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-        float aspect = (GraphicsSystem::GetInstance().GetWindowSize().second > 0) ? 
-            (float)GraphicsSystem::GetInstance().GetWindowSize().first / GraphicsSystem::GetInstance().GetWindowSize().second : 1.0f;
-        glm::mat4 view = Camera::getLookAt(camera);
-        glm::mat4 proj = Camera::getPerspective(camera, aspect);
-        auto objects = registry.view<TransformComponent>();
-        auto& first_obj = objects.get<TransformComponent>(objects.front());
-
-        // Create a copy of the model matrix to work with
-        glm::mat4 model = first_obj.modelMatrix;
+        auto* scene = GraphicsSystem::GetInstance().GetScene().get();
+        auto &cam = scene->passes[0].cameras[0];
+        glm::mat4 view = cam.getLookAt();
+        glm::mat4 proj = cam.getPerspective(scene->aspect);
+        glm::mat4 &obj = scene->passes[0].objects[2].instances[0].modeltransform;
         ImGuizmo::SetOrthographic(false); //because we have perspective
         
         //set this for gizmos
@@ -388,7 +380,7 @@ namespace EngineFramework
         float viewManipulateTop = screen_pos.y;
         glm::mat4 view_before = view;
 
-        ImGuizmo::DrawCubes(glm::value_ptr(view), glm::value_ptr(proj), glm::value_ptr(model), 1);
+        ImGuizmo::DrawCubes(glm::value_ptr(view), glm::value_ptr(proj), glm::value_ptr(obj), 1);
         ImGuizmo::ViewManipulate(glm::value_ptr(view), camDistance, ImVec2(viewManipulateRight - 128, viewManipulateTop), ImVec2(128, 128), 0x10101010);
         
         //whenever we clicked on the cube, view will be return with a new value
@@ -396,31 +388,12 @@ namespace EngineFramework
         if (Check_Mat4_Diff(view, view_before)) {
             //graphics system is always updating the camera view and proj based on camera pos and target pos
             glm::vec3 new_CamPos = glm::vec3(glm::inverse(view)[3]);
-            glm::vec3 new_TargetPos = glm::vec3(model[3]);
-            Camera::set_Cam_Pos(camera, new_CamPos);
-            Camera::set_Target_Pos(camera, new_TargetPos);
+            glm::vec3 new_TargetPos = glm::vec3(obj[3]);
+            cam.set_Cam_Pos(new_CamPos);
+            cam.set_Target_Pos(new_TargetPos);
         }
         
-        // Store the matrix before manipulation
-        glm::mat4 model_before = model;
-
-        // Manipulate the model matrix
-        ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(proj), operation, mode, glm::value_ptr(model));
-
-        // Check if the model matrix was changed
-        if (Check_Mat4_Diff(model, model_before)) {
-            // Extract position, rotation, and scale from the new model matrix
-            float translation[3], rotation[3], scale[3];
-            ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), translation, rotation, scale);
-
-            // Update the TransformComponent values
-            first_obj.position = glm::vec3(translation[0], translation[1], translation[2]);
-            first_obj.rotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
-            first_obj.scale = glm::vec3(scale[0], scale[1], scale[2]);
-
-            // No need to manually update the modelMatrix as it will be recalculated next frame
-            // based on the updated position, rotation, and scale values
-        }
+        ImGuizmo::Manipulate(glm::value_ptr(view),glm::value_ptr(proj),operation,mode, glm::value_ptr(obj));
 
     }
 

@@ -21,9 +21,11 @@ written consent of DigiPen Institute of Technology is prohibited.
 #define MAX_DELTA_TIME 0.1f
 #define PI 3.14159265358979323846f
 
+
 //Global ecs and event handler system.
 extern entt::registry registry;
 extern entt::dispatcher event_dispatcher;
+
 
 #define ASSET_CONFIG_FILE "Extern/Config.json"
 #endif

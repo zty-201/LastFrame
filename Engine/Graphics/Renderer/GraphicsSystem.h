@@ -17,8 +17,6 @@ namespace EngineFramework
         void Update(float deltaTime) override;
         void PostUpdate(float deltaTime) override;
 
-        void RenderScene(); 
-        void LoadAndCacheMesh(const std::string& meshName);
 
         static GraphicsSystem& GetInstance()
         {
@@ -31,26 +29,31 @@ namespace EngineFramework
 #endif
 		std::unique_ptr<Scene>& GetScene() { return pScene; }
 		GLuint GetSceneTextureID() const { return sceneTextureID; }
-        std::pair<int, int> GetWindowSize() const { return std::pair<int, int>(static_cast<int>(screen.x), static_cast<int>(screen.y)); }
+
 
     private:
-#ifdef PLATFORM_WINDOWS
-        GLFWwindow* pWindow = nullptr;
-#endif
-        // A map to cache loaded mesh data (VAO, index count)
-        xresource::full_guid shader_guid;
-        std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCache;
         std::unique_ptr<Scene> pScene;
+#ifdef PLATFORM_WINDOWS
+		GLFWwindow* pWindow = nullptr;
+#endif
+
+        //Scene Framebuffer and Texture.
         FBO scene_framebuffer;
         GLuint sceneTextureID;
+
         glm::vec2 screen = { WIDTH,HEIGHT };
-        bool m_isRenderingToFBO = false;
+        glm::vec3 fogColor; // Example: gray fog color
+        float fogMinDist;
+        float fogMaxDist;
+        int shadingModel;
         static inline GraphicsSystem* this_graphics_ptr = nullptr;
 
         // Setup methods
         void SetupGLFW();
         void SetupGraphics();
-		void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
+
+        //Toggle drawing to framebuffer.
+        void DrawSceneToFramebuffer(bool);
 
         //==Event Handlers, one for each type of event.
 
