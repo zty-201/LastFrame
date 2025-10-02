@@ -6,10 +6,11 @@
  * @detail  This file contains only path / filesystem operations. No file I/O for parsing/decoding
  *          assets is performed here.
 */
+#include "pch.hpp"
 #include "AssetManager.hpp"
 #include "Audio.hpp"
 #include <system_error>
-#include <filesystem>
+
 //For guid metadata file reading.
 #ifdef PLATFORM_WINDOWS
 #include <fstream>

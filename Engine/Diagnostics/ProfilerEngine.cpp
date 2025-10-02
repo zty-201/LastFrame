@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include "ProfilerEngine.hpp"
 
 namespace Diagnostics {

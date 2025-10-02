@@ -118,6 +118,7 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
 			logFile << "Exception in Update system [" << system.name
 				<< "]: " << e.what() << std::endl;
+			LOGD("Exception in Update system[%s]: %s", system.name.c_str(), e.what());
 #else
 			LOGD("Exception in Update system[%s]: %s", system.name.c_str(), e.what());
 #endif
@@ -127,8 +128,9 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
 			logFile << "Unknown exception in Update system ["
 				<< system.name << "]" << std::endl;
+			LOGD("Unknown exception in Update system[%s]", system.name.c_str());
 #else
-			LOGD("Unknown exception in Update system[%s]: %s", system.name.c_str(), e.what());
+			LOGD("Unknown exception in Update system[%s]", system.name.c_str());
 #endif
 			throw;
 		}

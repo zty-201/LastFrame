@@ -127,9 +127,23 @@ namespace EngineFramework
 		UNREFERENCED_PARAMETER(delta_time);
 
 		//TODO: Testing, to delete.
-		//std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
-		//std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
-		//DeSerializeAllEntityInstances(test_scene);
+		/*std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
+		std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
+		DeSerializeAllEntityInstances(test_scene);
+		auto view = registry.view<TODELETE>();
+		auto view2 = registry.view<TODELETE2>();
+		for (entt::entity entity_id : view)
+		{
+			TODELETE& comp = view.get<TODELETE>(entity_id);
+			LOGD("%s", comp.c.c_str());
+			UNREFERENCED_PARAMETER(comp);
+		}
+		for (entt::entity entity_id : view2)
+		{
+			TODELETE2& comp = view2.get<TODELETE2>(entity_id);
+			LOGD("%s", comp.c.c_str());
+			UNREFERENCED_PARAMETER(comp);
+		}*/
 	}
 
 
@@ -163,9 +177,30 @@ namespace EngineFramework
 	*/
 	std::string GameObjectSystem::SerializeAllEntityInstances()
 	{
-		
-
-
+		/*
+		{
+			"1": {
+				"archtype": 8960202118185140225,
+					"TestClass2" : {
+					"player_damage": 12,
+						"e" : 15.0,
+						"c" : "testclass2.1"
+				}
+			},
+				"2": {
+				"TestClass": {
+					"player_health": 123,
+						"b" : 1234.15,
+						"c" : "testclass1.2"
+				},
+					"TestClass2" : {
+					"player_damage": 15,
+						"e" : 16.0,
+						"c" : "testclass2.2"
+				}
+			}
+		}
+		*/
 		//TODO: May want to keep a map<entityid, archtype_name_string> to map instances back to their archtype when serializing. this can be easily changeable. 
 		//Each instance has the archtype name (can be left empty if not based on archtype), and other component data.
 
@@ -308,7 +343,7 @@ namespace EngineFramework
 				{
 					throw std::exception((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp_data.type().name()).c_str());
 				}
-				entt::meta_any success = func.invoke({}, entity_id, &comp_data);
+				entt::meta_any success = func.invoke({}, entity_id, static_cast<const void*>(&comp_data));
 				//Duplicate component already present inside.
 				if (!success.cast<bool>())
 				{
@@ -332,7 +367,7 @@ namespace EngineFramework
 			{
 				throw std::exception((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp.type().name()).c_str());
 			}
-			entt::meta_any success = func.invoke({}, entity, &comp);
+			entt::meta_any success = func.invoke({}, entity, static_cast<const void*>(&comp));
 			//Duplicate component already present inside.
 			if (!success.cast<bool>())
 			{
