@@ -54,8 +54,6 @@ namespace EngineFramework
 	{
 		ClearAllInstances();
 		DeSerializeAllEntityInstances(json_input);
-
-		
 	}
 
 	void GameObjectSystem::ClearAllInstances()
@@ -128,24 +126,26 @@ namespace EngineFramework
 	{
 		UNREFERENCED_PARAMETER(delta_time);
 
-		////TODO: Testing, to delete.
-		//std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
-		//std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
-		//DeSerializeAllEntityInstances(test_scene);
-		//auto view = registry.view<TODELETE>();
-		//auto view2 = registry.view<TODELETE2>();
-		//for (entt::entity entity_id : view)
-		//{
-		//	TODELETE& comp = view.get<TODELETE>(entity_id);
-		//	LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-		//	UNREFERENCED_PARAMETER(comp);
-		//}
-		//for (entt::entity entity_id : view2)
-		//{
-		//	TODELETE2& comp = view2.get<TODELETE2>(entity_id);
-		//	LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-		//	UNREFERENCED_PARAMETER(comp);
-		//}
+		//TODO: Testing, to delete.
+		std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
+		std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
+		DeSerializeAllEntityInstances(test_scene);
+		auto view = registry.view<TODELETE>();
+		auto view2 = registry.view<TODELETE2>();
+		for (entt::entity entity_id : view)
+		{
+			TODELETE& comp = view.get<TODELETE>(entity_id);
+			LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+			UNREFERENCED_PARAMETER(comp);
+		}
+		for (entt::entity entity_id : view2)
+		{
+			TODELETE2& comp = view2.get<TODELETE2>(entity_id);
+			LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+			UNREFERENCED_PARAMETER(comp);
+		}
+		std::string test_save_data = SerializeAllEntityInstances();
+		LOGD("Testing Serialization: %s", test_save_data.c_str());
 	}
 
 
@@ -203,112 +203,63 @@ namespace EngineFramework
 			}
 		}
 		*/
+		/*
+			Entities
+			-> Archtype (optional)
+			-> Component
+			--> Component data
+		*/
+		nlohmann::json save_data{};
+		int id{}; //Basic id to prevent duplicate keys in json. Does not represent entity id.
+		// Iterate over all entities
+		for (auto entity : registry.view<entt::entity>()) {
+			nlohmann::json entity_save_data{};
+			//Store the associated archtype if available.
+			if (entity_archtype_map.contains(entity))
+			{
+				entity_save_data[AssetManagerSystem::ARCHTYPE] = entity_archtype_map[entity].m_Value;
+			}
 
-		//nlohmann::json save_data;
-		//int id{}; //Basic id to prevent duplicate keys in json. Does not represent entity id.
-		//// Iterate over all entities
-		//for (auto entity : registry.view<entt::entity>()) {
-		//	
+			/*
+			* 	Iterate over all components that this entity has.
+				To do so, iterate over all possible component types and see which does the entity have.
 
-		//	id++;
-		//}
+				<type_id, sparse_set> where type_id represents the component type.
 
-		//registry.each([&](entt::entity entity) {
-		//	nlohmann::json entity_json;
-		//	entity_json["id"] = (uint32_t)entity;
+				Note: Cannot simply iterate over all components for an entity, as components are not
+				stored in the entity but rather stored in their own pools based on type.
+			*/
+			for (auto&& [comp_type_id, component_type] : entt::resolve())
+			{
+				//If an entity does not contain this specific component type, continue to the next type.
+				if (!registry.storage(comp_type_id)->contains(entity))
+				{
+					continue;
+				}
+				
+				//Save the component as a json object.
+				nlohmann::json component_save_data{};
+				/*
+					Component name
+					->Name of data member, value
+				*/
+				entt::meta_any component_data = component_type.func("get"_hs).invoke({}, entity);
+				//==Iterate over each data type in the component. Only store data, not functions or ptrs.
+				for (auto&& member : component_type.data())
+				{
+					//Get the data value as meta_any.
+					SetJsonWithMetaAny(component_save_data, member.second, component_data.get(member.first));
+				}
 
-		//	// Iterate all component types that are registered with meta
-		//	entt::meta_registry::iterate([&](entt::meta_type type) {
-		//		if (type.is_valid() && registry.all_of(type.id(), entity)) {
-		//			auto comp = registry.try_get(type.id(), entity);
-		//			if (comp) {
-		//				// Use meta_any for reflection serialization
-		//				entt::meta_any any = *static_cast<entt::meta_any*>(comp);
-		//				// Suppose each component has a to_json function or similar
-		//				entity_json[type.info().name()] = /* convert any to JSON */;
-		//			}
-		//		}
-		//		});
+				//Add the component object as part of the entity json object.
+				entity_save_data[component_type.name()] = component_save_data;
+			}
+			//Add the entity object as part of the final json object.
+			save_data[id++] = entity_save_data;
+		}
 
-		//	j.push_back(entity_json);
-		//	});
-
-		//return j;
-
-		//TODO: May want to keep a map<entityid, archtype_name_string> to map instances back to their archtype when serializing. this can be easily changeable. 
-		//Each instance has the archtype name (can be left empty if not based on archtype), and other component data.
-
-		//TODO:
-		//std::filesystem::path folder_path_string{ folder_path };
-		////Not a folder.
-		//if (!std::filesystem::is_directory(folder_path_string))
-		//{
-		//	throw std::invalid_argument(std::string("No such folder path when serializing in GameObjectSystem: ") + folder_path);
-		//}
-		//
-		////Iterate over every archtype and store their component data in their respective folders.
-		//for (std::pair<const std::string, entt::entity>& archtype : archtype_entities)
-		//{
-		//	//Empty json object.
-		//	nlohmann::json archtype_data;
-		//	/*
-		//		Store
-		//		- Component name, and their data members. Do for all components
-		//		- entt::entity id (may be useful for remapping and maintaining relationships between parent and child gameobjects.
-		//		
-		//		Do not store
-		//		- Archtype name (it'll be store as their file name)
-		//	*/
-
-		//	/*
-		//		Iterate over each component type.
-		//		For each component type, check if the entity has it.
-		//		If so, save it.
-
-		//		<type_id, sparse_set> where type_id represents the component type.
-
-		//		Note: Cannot simply iterate over all components for an entity, as components are not 
-		//		stored in the entity but rather stored in their own pools based on type.
-		//	*/
-		//	for (auto&& curr : registry.storage())
-		//	{
-		//		//If an entity does not contain this specific component type, continue to the next type.
-		//		if (!curr.second.contains(archtype.second))
-		//		{
-		//			continue;
-		//		}
-		//		//Save the component as a json object.
-		//		nlohmann::json component_data;
-		//		/*
-		//			Component name
-		//			->Name of data member, value
-		//		*/
-		//		entt::meta_type component_type = entt::resolve(curr.first);
-		//		std::string component_name = component_type.name();
-		//		//==Iterate over each data type in the component.
-		//		for (auto&& member_data : component_type.data())
-		//		{
-		//			//Add the member data (can be most data types) to the component json object, together with the member name. 
-		//			entt::meta_data& meta_data = member_data.second;
-		//			std::string meta_name = meta_data.name();
-		//			CastMetaDataToType(meta_data, [&meta_name, &component_data](auto val) {
-		//				component_data[meta_name] = val;
-		//				});
-		//		}
-
-		//		//Add the component object as part of the archtype object.
-		//		archtype_data[component_name] = component_data;
-		//	}
-
-		//	//Create a file path to the archtype.
-		//	std::filesystem::path file_path = folder_path_string;
-		//	file_path /= archtype.first.c_str();
-
-
-		//	std::ofstream archtype_file(file_path);
-		//	//TODO: Write the json archtype data to file.
-		//}
-		return {};
+		//Return json as a string object, but prettified.
+		return save_data.dump(1, '\t');
 	}
 
 	/*
@@ -370,7 +321,7 @@ namespace EngineFramework
 					//Set the data member.
 					SetMetaAnyWithJson(comp_data, data_type, data_val_json);
 				}
-				
+
 				//==Emplace component data into map, by calling the "emplace" function registered with this type. All components must have emplace function.
 				auto func = comp_data.type().func("emplace"_hs);
 				if (!func)
