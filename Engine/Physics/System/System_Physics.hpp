@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.hpp"
 #include "ISystem.hpp"
 #include <entt/entity/registry.hpp>
 #include <iostream>
@@ -44,16 +45,18 @@ namespace EngineFramework {
         va_end(list);
 
         // Print to the TTY
-        std::cout << buffer << std::endl;
+        std::stringstream out{};
+        out << buffer;
+        LOGE("[PhysicsSystem] %s", out.str().c_str());
     }
 
 #ifdef JPH_ENABLE_ASSERTS
     // Callback for asserts, connect this to your own assert handler if you have one
     static bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, unsigned int inLine)
     {
-        // Print to the TTY
-        std::cout << inFile << ":" << inLine << ": (" << inExpression << ") " << (inMessage != nullptr ? inMessage : "") << std::endl;
-
+        std::stringstream out{};
+        out << inFile << ":" << inLine << ": (" << inExpression << ") " << (inMessage != nullptr ? inMessage : "") << std::endl;
+        LOGE("[PhysicsSystem] %s", out.str().c_str());
         // Breakpoint
         return true;
     };

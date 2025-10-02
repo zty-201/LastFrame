@@ -15,7 +15,7 @@
 
 //Casting meta data to type.
 #include "ReflectionRegister.hpp"
-
+#include "AssetManager.hpp"
 #include "Save.hpp"
 //#include <iostream>
 
@@ -102,7 +102,7 @@ namespace EngineFramework
             return false;
         }
 
-        std::string path = "Extern/Scenes/" + filename;
+        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scenes/" + filename;
         std::ofstream Out_File(path);
 
         if (!Out_File.is_open()) return false;

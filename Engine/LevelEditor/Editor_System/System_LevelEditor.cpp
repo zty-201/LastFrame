@@ -17,7 +17,7 @@
 #include "ReflectionRegister.hpp"
 #include "InputManager.hpp"
 #include "Level_Editor.hpp"
-
+#include "AssetManager.hpp"
 namespace EngineFramework
 {
 	bool LevelEditorSystem::Get_Enable() {
@@ -45,7 +45,10 @@ namespace EngineFramework
 		//only check for this if the editor state is not true
 		if (!application->Get_Editor_State()) {
 			//std::cout << "yo\n";
-			if (InputManager::GetInstance().GetKeyDown(GLFW_KEY_1)) {
+			if (InputManager::GetInstance().GetKeyDown(GLFW_KEY_9)) {
+
+
+
 				application->Initialize();
 				application->Open();
 

@@ -42,16 +42,28 @@ if(WIN32)
 
   #Compiler Flags, use a high warning level and treat warnings as errors.
 #Note: In Debug mode, ASAN and UBSAN can incur alot of performance slowdown. Only toggle in debug mode.
-#Note: To enable mem leak checks, temporarily disable (remb to enable back) /fsanitize=address for both targets.
+#Note: To enable mem leak checks, temporarily disable (remb to enable back) /fsanitize=address for the bottom target (after else())
+
+if(NOT CODE_ANALYSIS_ON_BUILD)
 target_compile_options(engine_library PUBLIC 
     # MSVC (Windows) specific warnings
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-    # /fsanitize=address is enabled for ASAN. /Zi generates a pdb for debugging purposes.
-    $<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address /Zi>>
     # GCC/Clang specific warnings
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
     $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
 )
+message("ASAN is off")
+else() 
+target_compile_options(engine_library PUBLIC 
+    # MSVC (Windows) specific warnings
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+    # /fsanitize=address is enabled for ASAN. 
+    $<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address>>
+    # GCC/Clang specific warnings
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+    $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
+)
+endif()
 
 #Code analysis for Visual Studio
 #Enable VS code analysis for faster checks.
@@ -78,27 +90,27 @@ set_target_properties(application_executable PROPERTIES OUTPUT_NAME LastFrame)
 set_target_properties(engine_library PROPERTIES OUTPUT_NAME EngineLibrary)
 
 
-#Copies assets to build directory, every build (to refresh assets)
-#This is necessary when run from visual studio (instead of running the executable)
-add_custom_command(
-  TARGET application_executable
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_SOURCE_DIR}/Extern
-          ${CMAKE_BINARY_DIR}/Extern
-  COMMENT "Copying Extern/ to build directory ${CMAKE_BINARY_DIR}/"
-)
+# #Copies assets to build directory, every build (to refresh assets)
+# #This is necessary when run from visual studio (instead of running the executable)
+# add_custom_command(
+#   TARGET application_executable
+#   POST_BUILD
+#   COMMAND ${CMAKE_COMMAND} -E copy_directory
+#           ${CMAKE_SOURCE_DIR}/Extern
+#           ${CMAKE_BINARY_DIR}/Extern
+#   COMMENT "Copying Extern/ to build directory ${CMAKE_BINARY_DIR}/"
+# )
 
-#Copies assets to executable directory.
-#This is necessary for executable to find it.
-add_custom_command(
-  TARGET application_executable
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_SOURCE_DIR}/Extern
-          $<TARGET_FILE_DIR:application_executable>/Extern
-  COMMENT "Copying Extern/ to executable directory"
-)
+# #Copies assets to executable directory.
+# #This is necessary for executable to find it.
+# add_custom_command(
+#   TARGET application_executable
+#   POST_BUILD
+#   COMMAND ${CMAKE_COMMAND} -E copy_directory
+#           ${CMAKE_SOURCE_DIR}/Extern
+#           $<TARGET_FILE_DIR:application_executable>/Extern
+#   COMMENT "Copying Extern/ to executable directory"
+# )
 
 #Sets the default startup project for visual studio to application_executable, other IDEs will ignore this.
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT application_executable)
@@ -284,8 +296,8 @@ endforeach()
 
 #Adding include directories and sources
 if(WIN32)
-  target_sources(engine_library PUBLIC ${ENGINE_SOURCE})
-  target_sources(application_executable PUBLIC ${APPLICATION_SOURCE})
+  target_sources(engine_library PRIVATE ${ENGINE_SOURCE})
+  target_sources(application_executable PRIVATE ${APPLICATION_SOURCE})
   #TODO: By right, the engine shouldn't need to include application headers? Need to research more on this.
   target_include_directories(engine_library PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
   target_include_directories(application_executable PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})

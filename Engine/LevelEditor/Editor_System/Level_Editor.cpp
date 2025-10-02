@@ -3,6 +3,7 @@
 
 #include "pch.hpp"
 #include "global.hpp"
+#include "LFeature.hpp"
 //File management, JSON file parser/writer
 #include <filesystem>
 #include <fstream>
@@ -25,6 +26,9 @@
 #include "SceneManager.hpp"
 #include "AssetWindow.hpp"
 #include "ModelManager.hpp"
+#include "AssetManager.hpp"
+// Profiler/Debug
+#include "Profiler.hpp"
 
 namespace EngineFramework
 {
@@ -132,13 +136,15 @@ namespace EngineFramework
 		addFeature("ObjectManager", std::make_unique<ObjectManager>());
 		addFeature("Save", std::make_unique<Save>());
 		addFeature("Screen", std::make_unique<Screen>());
+		addFeature("Profiler", std::make_unique<LFeature_DebugProfiler>()); // Add profiler feature (testing purpose)
+		
 		addFeature("SceneManager", std::make_unique<SceneManager>()); //
 		addFeature("AssetWindow", std::make_unique<AssetWindow>());//
 		addFeature("ModelManager", std::make_unique<ModelManager>());//
 
 		
 
-		SceneManager::GetInstance().ScanScenes("Extern/Scenes");//
+		SceneManager::GetInstance().ScanScenes(AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scenes");//
 
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {
@@ -233,6 +239,25 @@ namespace EngineFramework
 					ImGui::Separator();
 					ImGui::MenuItem("Asset Browser", NULL, &featureFlag("AssetWindow"));
 					ImGui::PopStyleColor();  // Pop the white text color for "File" menu
+					ImGui::EndMenu();
+				}
+
+				ImGui::SameLine(0, 50.0f); // The second argument controls the spacing in pixels
+
+				// Debug menu
+				if (ImGui::BeginMenu("Debug")) {
+					// Single toggle that controls the profiler window visibility
+					if (auto it = featureMap.find("Profiler"); it != featureMap.end()) {
+						auto* prof = static_cast<LFeature_DebugProfiler*>(it->second.get());
+						bool on = prof->is_enabled; // Panel visibility flag
+						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+						if (ImGui::MenuItem("Profiler", nullptr, &on)) {
+							prof->is_enabled = on; // Show/hide panel
+							//it->second->is_enabled = true; // Keep feature running
+						}
+						ImGui::PopStyleColor();
+					}
+
 					ImGui::EndMenu();
 				}
 

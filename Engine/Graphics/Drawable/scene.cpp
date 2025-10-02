@@ -278,7 +278,17 @@ void Scene::render()
 		}
 		// --- 2. ACTIVATE SHADER AND SET UNIFORMS ---
 		//Temporary shader ptr, caching the ptr for use.
-		std::shared_ptr<ShaderProgram> shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(shader_guid);
+		std::shared_ptr<ShaderProgram> shader{};
+		if (shader_guid != xresource::full_guid{}) //Check if full_guid has been set.
+		{
+			shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(shader_guid);
+		}
+		else
+		{
+			using E_AM = EngineFramework::AssetManagerSystem;
+			shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, shader_name);
+			shader = E_AM::GetResource<ShaderProgram>(shader_guid);
+		}
 		//Ensure shader is valid. If not, nothing can be drawn.
 		if (!shader)
 		{

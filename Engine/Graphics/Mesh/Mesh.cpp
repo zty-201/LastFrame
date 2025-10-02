@@ -2,7 +2,7 @@
 #include "pch.hpp"
 
 #include "Mesh.h"
-
+#include "AssetManager.hpp"
 //
     // The Vertex struct.
     // This class is useful for parsing vertex data from OBJ files and converting them into 
@@ -641,10 +641,13 @@ void generate(const char* fileName,
     } meshData;
 
     // Load data
-    std::ifstream objStream(fileName, std::ios::in);
+    std::vector<unsigned char> temp = EngineFramework::AssetManagerSystem::GetDataFromFile(fileName);
+    /*if (!objStream)    exception thrown by GetData already.
+        throw std::runtime_error(std::string("file ") + fileName + " not found.");*/
+    std::string file_string{ temp.begin(), temp.end() };
+    std::stringstream objStream(file_string);
 
-    if (!objStream)
-        throw std::runtime_error(std::string("file ") + fileName + " not found.");
+   
 
     std::string line, token;
     getline(objStream, line);
@@ -706,7 +709,6 @@ void generate(const char* fileName,
         }
         getline(objStream, line);
     }
-    objStream.close();
 
     // Generate normals if needed
     if (meshData.normals.size() == 0)

@@ -18,32 +18,35 @@
 
 /*
 		Asset Manager.
-		Resources are loaded at initialise time, and are each assigned a guid consisting of
-		<name_guid><type_guid>.
-		This guid will stay consistent as long as the type and name of the asset stays constant.
+		Resources are loaded at initialise time, and are assigned a name->guid mapping in the guid.meta file located within the asset folder, for the first ever load.
+		This guid will and should stay constant no matter what afterwards.
 
 		To load an asset, a loader function bool(const std::filesystem::path&) is added to a <name, func> asset_loader_map in Initialize().
-		This name must match ASSET_CONFIG_FILE defined in global.hpp.
+		This name must match the name given in ASSET_CONFIG_FILE defined in global.hpp.
 
 		During Initialization, ASSET_CONFIG_FILE is read which gives <name, folderpath> json pairs. For each pair, the respective function loader is called
 		and passed a folderpath.
 
 		This loader function takes in a folderpath, and loads all assets of <T> inside. It may choose to use a separate config file within the folder, or load all assets as is.
-		It generates a type_guid for all assets of <T> as well as an individual instance_guid for that asset name, before combining them
+		It generates a type_guid for all assets of <T> as well gets the corresponding instance_guid from guid.meta file mapping based on the asset name (not asset filepath)
 		into a full_guid.
 		The loaded assets of type std::shared_ptr<T> is then added to the resource_map via AddResource, together with its full_guid.
 		Upon any failure, it is to return false. Otherwise if all assets are loaded, return true.
 
-		instance_guid --> dependent on asset name
+		instance_guid --> generated randomly upon first load of an asset, and kept constant. name->guid mapping is written in guid.meta file.
 		type_guid --> dependent on asset type name
 		full_guid --> consists of instance and type guid.
 
 		Usage==
+		0. Replacing asset (same name)
+		- Simply reload the asset of X type, then all instances will simply used that new asset.
+
 		0. Renaming Asset
 		- Note: Asset path should stay in the same folder.
-		- If renaming an asset, ensure guid_to_name map is changed. Can use instance_id{"old_name"} to get the key-val pair, then change the name.
-		- This is used for serialization.
-		- Do not rename an asset if
+		- After renaming the asset file itself, parse guid.meta file and look for the old asset name.
+		- change that old name to the new name. e.g. "old_name" -> guid becomes "new_name" -> guid.
+		- Finally, change guid_to_name mapping (for level editor display of guids as readable names). 
+		- Unless accounted for in code, name_to_guid mapping should not change. otherwise for example a graphic system using "Basic" shader will not be able to find it any longer.
 
 		1. Accessing Asset
 		- For every component, all asset types like texture, shader, mesh, audio file etc. are stored as xresource::full_guid.
@@ -51,15 +54,12 @@
 		- Do not store pointers, not even shared_ptrs, in the component.
 
 		2. Serializing
-		- For each asset, find the asset name from the full_guid using guid_to_name[full_guid.m_instance].
-		- Convert the name to instance_guid.
-		- Doing it this roundabout way allows it to consider asset renaming while the program is running.
-		- Store the instance_guid as uint64_t.
+		- Store instance_guid as uint64_t.
+		- Do not need to store type_guid.
 
 		3. Deserializing
 		- Similar to serializing, just read the uint64_t into xresource::instance_guid.
 		- Do not need to "load" the asset into the component, just call GetResource<T> when needed.
-
 
 		Note: I realise calling hashmap everytime the asset is accessed may be slower than caching the pointer in full_guid.m_instance.
 		However, I believe there will be <2500 asset access calls / frame, so it's likely negligible enough for M1 at least.
@@ -112,6 +112,13 @@ namespace EngineFramework {
 #ifdef PLATFORM_ANDROID
 		static void SetAndroidAssetManager(void* android_asset_manager);
 #endif
+		static std::filesystem::path GetAssetFolderPrefix() { 
+#ifdef PLATFORM_WINDOWS
+			return extern_folder_prefix; 
+#else
+			return "";
+#endif
+		}
 		void Initialize() override;
 		void Update(float) override;
 		void PostUpdate(float) override;
@@ -142,7 +149,27 @@ namespace EngineFramework {
 			return nullptr;
 		}
 
-
+		//Gets a vector of shared_ptr to the resource types. Each asset is accompanied with its instance guid.
+		template<typename T>
+		static std::vector<std::pair<xresource::instance_guid, std::shared_ptr<T>>> GetAllResourceOfType(const xresource::type_guid& guid)
+		{
+			std::vector<std::pair<xresource::instance_guid, std::shared_ptr<T>>> asset_vector{};
+			//Iterate over all resources
+			for (auto it = resource_map.begin(); it != resource_map.end(); it++)
+			{
+				//Get all resource matching the type.
+				if (it->first.m_Type != guid) continue;
+				//Ensure the requested type is the actual type of the data, otherwise it can cause undefined behaviour.
+				entt::type_info actual_type = it->second.type().info();
+				entt::type_info requested_type = entt::resolve<std::shared_ptr<T> >().info();
+				if (actual_type == requested_type)
+				{
+					asset_vector.emplace_back(it->first.m_Instance, it->second.cast<std::shared_ptr<T> >());
+				}
+			}
+			
+			return asset_vector;
+		}
 
 
 		//Return if the resource_map contains the resource.
@@ -157,18 +184,28 @@ namespace EngineFramework {
 		*/
 		static xresource::full_guid GetFullGuid(const xresource::type_guid& type_guid, std::string asset_name)
 		{
-			xresource::full_guid return_val;
-			//Hash the asset name into a guid.
-			return_val.m_Instance = xresource::instance_guid::GenerateGUIDCopy(asset_name.c_str());
-			return_val.m_Type = type_guid;
-
-			//If guid, name pair is not in map then add it in.
-			if (guid_name_map.find(return_val.m_Instance) == guid_name_map.end())
+			auto it = name_guid_map[type_guid].find(asset_name);
+			//Name guid map is set during loading of the respective asset.
+			if (it == name_guid_map[type_guid].end())
 			{
-				guid_name_map[return_val.m_Instance] = asset_name;
+				LOGE("%s %s", "[AssetManager] No Asset with this name found in name_guid_map", asset_name.c_str());
+				return {};
 			}
+			return xresource::full_guid{ it->second, type_guid };
+		}
 
-			return return_val;
+		/*
+			Returns the name of an asset given its instance_guid.
+			Returns nothing if it can't be found.
+		*/
+		static std::string GetName(xresource::instance_guid instance_guid)
+		{
+			auto it = guid_name_map.find(instance_guid);
+			if (it != guid_name_map.end())
+			{
+				return it->second;
+			}
+			return {};
 		}
 
 		/*
@@ -179,6 +216,7 @@ namespace EngineFramework {
 		static inline constexpr const char SHADER[7]{ "shader" };
 		static inline constexpr const char CUBEMAP[8]{ "cubemap" };
 		static inline constexpr const char AUDIO[6]{ "audio" };
+		static inline constexpr const char ARCHTYPE[9]{ "archtype" };
 
 		/*
 			Precomputed type guids.
@@ -188,6 +226,7 @@ namespace EngineFramework {
 		static inline constexpr xresource::type_guid SHADER_GUID{ SHADER };
 		static inline constexpr xresource::type_guid CUBEMAP_GUID{ CUBEMAP };
 		static inline constexpr xresource::type_guid AUDIO_GUID{ AUDIO };
+		static inline constexpr xresource::type_guid ARCHTYPE_GUID{ ARCHTYPE };
 	private:
 		
 		/*
@@ -216,216 +255,56 @@ namespace EngineFramework {
 		*/
 		static std::vector<std::filesystem::path> ListFilesInDirectory(const std::filesystem::path& folder_path, const std::vector<std::string>& accepted_extensions = {});
 
+
+		/*
+			Reads name->guid mapping from the metadata file in the folder provided.
+			If no such mapping exists, it creates a new guid and writes the mapping to the file (windows only.)
+			For android platform, ensure all metadata files are set (i.e. game loads all assets and thus sets the mapping).
+
+			Returns guids in the same order as the names passed in.
+		*/
+		static std::vector<xresource::instance_guid> GetGuidMapping(const std::vector<std::string>& names, const std::filesystem::path& folder_path);
+
+		/*
+			Sets the <guid, resource> <guid, name> <name, guid> maps.
+			Requires asset folder path.
+		*/
+		template <typename T>
+		static void SetMappings(const xresource::type_guid& type_guid, const std::vector<std::string>& name_arr, const std::vector<std::shared_ptr<T>>& resource_arr, const std::filesystem::path& folder_path);
+
 		//==Asset Loaders==//
 		static bool LoadTexture(const std::filesystem::path&);
 		static bool LoadCubemap(const std::filesystem::path&);
 		static bool LoadMesh(const std::filesystem::path&);
 		static bool LoadShader(const std::filesystem::path&);
 		static bool LoadAudio(const std::filesystem::path&);
+		static bool LoadArchtype(const std::filesystem::path&);
 
 
 		static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer
 #ifdef PLATFORM_ANDROID
 		static inline AAssetManager* android_asset_manager = nullptr;
 #endif
-		// <resource_type, func> that maps a resource type to a function. The function loads all assets within the directory, and sets guid_name_map as well.
+
+		//Prefix only needs to be found on windows. on android, use the current folder.
+#ifdef PLATFORM_WINDOWS
+		static inline std::filesystem::path extern_folder_prefix{};
+#endif
+
+		// <resource_type, func> that maps a resource type to a function. The function loads all assets within the directory, and sets guid_name_map and name_guid_map as well.
 		static inline std::unordered_map<std::string, std::function<bool(const std::filesystem::path&)>> asset_loader_map{};
-		// <guid, name> map. Before serialization, asset instance_guid handles are converted to name, then the name is hashed back to instance_guid. 
-		// This accounts for name changes during run-time (any asset name changes just update this map).
-		static inline std::unordered_map<xresource::instance_guid, std::string> guid_name_map{};
+
 		// <full_guid, resource_type> that maps a guid to a resource.
 		static inline std::unordered_map<xresource::full_guid, entt::meta_any> resource_map{};
+		// This is used to get human-readable names from instance_guid, like for level editor usage.
+		static inline std::unordered_map<xresource::instance_guid, std::string> guid_name_map{};
+		// This is used to get guids from human-readable names, like for anything "hardcoded", e.g. using a "Basic" shader. 
+		// Note that type_guid is requested jic there are different asset types with the same name.
+		// uint64_t is used for type_guid to allow hashing for unordered_map.
+		// <type, <string, guid>>
+		static inline std::unordered_map<xresource::type_guid, std::unordered_map<std::string, xresource::instance_guid>> name_guid_map{};
 
-
-		/*
-			During initialization,
-			1. Assets are loaded via their respective folders into their data structures (stored in asset manager).
-			2. Each type has its own 64bit guid.
-			3. Each asset has their guid, based on <name 64bit guid><64bit type guid> --> create a <guid, name> map for serialization.
-			4. During deserialization, components reference assets using <name><type>, which can be hashed into a guid.
-			5. During run-time, assets are accessed from the asset manager via the guid.
-			6. During serialization, guid is converted back into name.
-
-			7. For renaming of assets, simply change the name in <guid, name> map. When serializing back, the guid will convert back to this name.
-		*/
 	};
-
-
-
-	//    class AudioSystem;
-	//    using AssetID = std::uint32_t;
-	//
-	//    /**
-	//     * @brief Main path-only asset manager system.
-	//     * @details Works as an engine system (ISystem) but its update hooks are no-ops.
-	//     */
-	//    class AssetManagerSystem : public ISystem {
-	//    public:
-	//        // ---- lifecycle ----
-	//        /**
-	//         * @brief Construct and set the global singleton pointer.
-	//         * @post  GetInstance() returns this object.
-	//         */
-	//        AssetManagerSystem();
-	//        static AssetManagerSystem& GetInstance();
-	//
-	//        /*
-	//            Cross-platform reading of data from file.
-	//        */
-	//        static std::vector<unsigned char> GetDataFromFile(const std::filesystem::path& path);
-	//
-	//#ifdef PLATFORM_ANDROID
-	//        static void SetAndroidAssetManager(void* android_asset_manager);
-	//#endif
-	//        void Initialize() override {}
-	//        void Update(float) override {}
-	//        void PostUpdate(float) override {}
-	//
-	//        // ---- configuration ----
-	//        /**
-	//         * @brief Set the root directory under which all asset paths live.
-	//         * @param root Example: "Extern" or "Assets".
-	//         * @note The directory is created if it does not exist.
-	//         */
-	//        void SetRoot(const std::filesystem::path& root);
-	//
-	//        // @brief Get the current root directory.
-	//        [[nodiscard]] const std::filesystem::path& GetRoot() const { return m_root; }
-	//
-	//        // ---- registration ----
-	//        /**
-	//         * @brief Register a new asset by name and relative path.
-	//         * @param name          Unique key you will use in code/editor.
-	//         * @param relativePath  Path relative to the root directory.
-	//         * @param verifyExists  If true, checks the file exists (non-blocking).
-	//         * @return A new @ref AssetID handle.
-	//         * @note Registration succeeds even if the file is missing (useful before import).
-	//         */
-	//        AssetID Register(const std::string& name,
-	//                        const std::filesystem::path& relativePath,
-	//                        bool verifyExists = true);
-	//
-	//        /**
-	//         * @brief Remove an asset record by name (does not delete the file).
-	//         */
-	//        void    Unregister(const std::string& name);
-	//
-	//        /**
-	//         * @brief Check whether an asset name is already registered.
-	//         */
-	//        bool    Has(const std::string& name) const;
-	//
-	//        /**
-	//         * @brief Find the numeric id for a name.
-	//         * @return The id or 0 if not found.
-	//         */
-	//        [[nodiscard]] AssetID FindId(const std::string& name) const;
-	//
-	//        // ---- path queries ----
-	//        /**
-	//         * @brief Get the stored relative path for an id.
-	//         * @return Empty path if id is unknown.
-	//         */
-	//        [[nodiscard]] std::filesystem::path GetRelativePath(AssetID id) const;
-	//
-	//        /**
-	//         * @brief Get the absolute path on disk for an id.
-	//         * @return Empty path if id is unknown.
-	//         */
-	//        [[nodiscard]] std::filesystem::path GetAbsolutePath(AssetID id) const;
-	//
-	//        /**
-	//         * @brief Check if the file currently exists on disk (by id).
-	//         */
-	//        [[nodiscard]] bool ExistsOnDisk(AssetID id) const;
-	//
-	//        /**
-	//         * @brief Check if the file currently exists on disk (by name).
-	//         */
-	//        [[nodiscard]] bool ExistsOnDiskByName(const std::string& name) const;
-	//
-	//        // ---- relocation / renaming ----
-	//        /**
-	//         * @brief How to handle the file when changing the recorded path.
-	//         */
-	//        enum class MovePolicy {
-	//            UpdateRecordOnly,   // Only change the stored path; do not touch the file.
-	//            MoveOnDisk,         // Physically move/rename the file inside the root.
-	//            CopyOnDisk          // Copy the file to the new location inside the root.
-	//        };
-	//
-	//        /**
-	//         * @brief Change the path of an asset.
-	//         * @param name            Asset name to modify.
-	//         * @param newRelativePath New path (relative to root).
-	//         * @param policy          Choose whether to move/copy the file or only update the record.
-	//         * @param allowOverwrite  If true, overwrites an existing destination file.
-	//         * @return True on success.
-	//         * @warning The destination must stay inside the root folder.
-	//         */
-	//        bool RelocateByName(const std::string& name,
-	//                            const std::filesystem::path& newRelativePath,
-	//                            MovePolicy policy = MovePolicy::MoveOnDisk,
-	//                            bool allowOverwrite = false);
-	//
-	//        /**
-	//         * @brief Rename the asset's *name* (does not change the file).
-	//         * @return False if the new name already exists.
-	//         */
-	//        bool RenameName(const std::string& oldName, const std::string& newName);
-	//
-	//        // ---- discovery ----
-	//        /**
-	//         * @brief Import files from a folder by extension.
-	//         * @param relativeDir Directory under root to scan.
-	//         * @param extensions  Extensions to accept (e.g., {".png",".obj"}). Empty = all files.
-	//         * @param recursive   If true, scans subfolders.
-	//         * @return Number of new assets registered.
-	//         */
-	//        std::size_t ImportFolder(const std::filesystem::path& relativeDir,
-	//                                const std::vector<std::string>& extensions,
-	//                                bool recursive = true);
-	//
-	//        /**
-	//         * @brief Get a vector of all (name, relativePath) pairs.
-	//         */
-	//        [[nodiscard]] std::vector<std::pair<std::string, std::filesystem::path>> List() const;
-	//
-	//        void SetAudioSystem(AudioSystem* audio);
-	//
-	//        bool LoadAudio(const std::string& id, const std::string& nameOrRel, bool loop = false);
-	//
-	//    private:
-	//        struct Entry {
-	//            AssetID id = 0;                                 // Numeric handle
-	//            std::string name;                               // Asset name key
-	//            std::filesystem::path relative;                 // Path relative to root
-	//            std::filesystem::file_time_type lastWrite{};    // Last write (optional)
-	//        };
-	//
-	//        // helpers
-	//        // Build an absolute path from the stored relative path.
-	//        [[nodiscard]] std::filesystem::path full(const std::filesystem::path& rel) const;
-	//
-	//        // Check that an absolute path stays inside the root.
-	//        [[nodiscard]] bool insideRoot(const std::filesystem::path& abs) const;
-	//
-	//        // Convert string to lowercase (helper for extensions).
-	//        [[nodiscard]] static std::string toLower(std::string s);
-	//
-	//        // data
-	//        std::filesystem::path m_root{ "." };                // Root directory.
-	//        AssetID m_next{ 1 };                                // Next id to hand out.
-	//        std::unordered_map<std::string, Entry> m_byName;    // name to entry
-	//        std::unordered_map<AssetID, std::string>    m_byId; // id to name
-	//        static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer
-	//
-	//        AudioSystem* m_audioSystem = nullptr;
-	//
-	//        std::string m_audioSubdir = "Audio";
-	//#ifdef PLATFORM_ANDROID
-	//        static inline AAssetManager* android_asset_manager = nullptr;
-	//#endif
 
 } // namespace EngineFramework
 #endif // ASSET_MANAGER_HPP

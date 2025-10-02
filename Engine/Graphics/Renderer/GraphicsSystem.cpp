@@ -100,7 +100,7 @@ namespace EngineFramework
 		shadingModel = 0;
 		Camera camera = { { 0.0f, 1.0f, 5.0f }, 75.0f };
 		pScene = std::make_unique<Scene>(
-			AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Basic"), 
+			"Basic",
 			std::initializer_list<Scene::Pass>{         // List of rendering passes
 			// Pass 0: Render Scene
 			Scene::Pass{
