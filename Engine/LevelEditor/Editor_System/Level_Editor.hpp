@@ -1,11 +1,13 @@
-#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "pch.hpp"
-
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #ifndef LEVEL_EDITOR_HPP
 #define LEVEL_EDITOR_HPP
+
 #include <unordered_map>
 #include <string>
 #include <sstream>
+#include <map>
+#include <memory>
 #include "entt/entity/registry.hpp"
 #define IMGUI_IMPL_OPENGL_ES3
 #include "imgui.h"
@@ -15,10 +17,14 @@
 
 namespace EngineFramework
 {
+	// Forward declaration to be used in unique pointer (Testing for imgui profiler)
+	class LFeature;
+
 	//for 1 time init to be used in run()
 	struct Imgui_const_Flags {
 
 		ImGuiWindowFlags DockWindowFlags;
+		ImGuiWindowFlags mainWindowFlags;
 	};
 
 	//limiting the accessable variables for Lfeature, only able to change certain variables
@@ -31,6 +37,7 @@ namespace EngineFramework
 	class LevelEditor
 	{
 	public:
+
 		LevelEditor();
 		~LevelEditor();
 

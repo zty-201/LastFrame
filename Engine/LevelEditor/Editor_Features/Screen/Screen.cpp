@@ -89,10 +89,9 @@ namespace EngineFramework
 
             ImGui::PopStyleColor();
 
-
             display_screen();
             gizmos();
-            control_window();
+            drop_target();
 
             if (bool hovered = ImGui::IsItemHovered()) {               
                 camera_controls_in_screen_only();
@@ -103,6 +102,10 @@ namespace EngineFramework
 
         ImGui::PopStyleColor();
         ImGui::End();
+
+        
+        
+        control_window();
       
     }
     void Screen::Close() {
@@ -210,7 +213,7 @@ namespace EngineFramework
         ImGui::SetNextWindowSize(ImVec2(620, 260), ImGuiCond_FirstUseEver);
 
         // No flags that block move/resize
-        ImGui::Begin("Control Panel", &is_enabled);
+        ImGui::Begin("Control Panel", &is_control_open);
 
 
 
@@ -391,6 +394,24 @@ namespace EngineFramework
         }
         
         ImGuizmo::Manipulate(glm::value_ptr(view),glm::value_ptr(proj),operation,mode, glm::value_ptr(obj));
+
+    }
+
+    void Screen::drop_target() {
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            // Accept path payload (null-terminated string)
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Models"))
+            {                
+                //const char* path = (const char*)payload->Data;
+
+                //std::cout << "Drop successful: " << path << std::endl;
+            }
+
+            ImGui::EndDragDropTarget();
+        }
+
 
     }
 

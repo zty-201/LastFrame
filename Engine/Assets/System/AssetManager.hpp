@@ -112,6 +112,13 @@ namespace EngineFramework {
 #ifdef PLATFORM_ANDROID
 		static void SetAndroidAssetManager(void* android_asset_manager);
 #endif
+		std::filesystem::path GetAssetFolderPrefix() { 
+#ifdef PLATFORM_WINDOWS
+			return extern_folder_prefix; 
+#else
+			return "";
+#endif
+		}
 		void Initialize() override;
 		void Update(float) override;
 		void PostUpdate(float) override;
@@ -204,11 +211,11 @@ namespace EngineFramework {
 		/*
 			String names for each asset type, so they are consistent across the entire program.
 		*/
-		static inline constexpr const char TEXTURE[]{ "texture" };
-		static inline constexpr const char MESH[]{ "mesh" };
-		static inline constexpr const char SHADER[]{ "shader" };
-		static inline constexpr const char CUBEMAP[]{ "cubemap" };
-		static inline constexpr const char AUDIO[]{ "audio" };
+		static inline constexpr const char TEXTURE[8]{ "texture" };
+		static inline constexpr const char MESH[5]{ "mesh" };
+		static inline constexpr const char SHADER[7]{ "shader" };
+		static inline constexpr const char CUBEMAP[8]{ "cubemap" };
+		static inline constexpr const char AUDIO[6]{ "audio" };
 		static inline constexpr const char ARCHTYPE[9]{ "archtype" };
 
 		/*
@@ -278,7 +285,13 @@ namespace EngineFramework {
 #ifdef PLATFORM_ANDROID
 		static inline AAssetManager* android_asset_manager = nullptr;
 #endif
-		// <resource_type, func> that maps a resource type to a function.
+
+		//Prefix only needs to be found on windows. on android, use the current folder.
+#ifdef PLATFORM_WINDOWS
+		static inline std::filesystem::path extern_folder_prefix{};
+#endif
+
+		// <resource_type, func> that maps a resource type to a function. The function loads all assets within the directory, and sets guid_name_map and name_guid_map as well.
 		static inline std::unordered_map<std::string, std::function<bool(const std::filesystem::path&)>> asset_loader_map{};
 
 		// <full_guid, resource_type> that maps a guid to a resource.
