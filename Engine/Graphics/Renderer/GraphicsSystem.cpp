@@ -87,8 +87,9 @@ namespace EngineFramework
 		//Create a framebuffer for the scene to be drawn on, and read texture handle for the texturebuffer attached.
 		FBO tempFBO(FBO::Texture, WIDTH, HEIGHT, &sceneTextureID);
 		scene_framebuffer = std::move(tempFBO);
-
-		pScene = std::make_unique<Scene>(AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Basic"));
+		xresource::full_guid shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Basic");
+		pScene = std::make_unique<Scene>();
+		pScene->shader_guid = shader_guid;
 		// Scene-wide properties (can also be a component on a scene settings entity)
 		pScene->fogColor = { 0.0f, 0.0f, 0.0f };
 		pScene->fogMinDist = 5.0f;
@@ -127,7 +128,7 @@ namespace EngineFramework
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// --- 2. ACTIVATE SHADER AND SET GLOBAL UNIFORMS ---
-		std::shared_ptr<ShaderProgram> shader = AssetManagerSystem::GetResource<ShaderProgram>(pScene->shader_guid);
+		shader = AssetManagerSystem::GetResource<ShaderProgram>(pScene->shader_guid);
 		if (!shader) {
 			throw std::runtime_error("[GraphicsSystem] Shader Program not loaded or Shader guid is invalid.");
 		}
