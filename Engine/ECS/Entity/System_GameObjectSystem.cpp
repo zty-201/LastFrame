@@ -53,6 +53,8 @@ namespace EngineFramework
 	void GameObjectSystem::ClearAllInstances()
 	{
 		registry.clear();
+		//Clear map as there's no longer any point to saving instance --> archtype mapping if the instances are gone.
+		entity_archtype_map.clear();
 	}
 	void GameObjectSystem::Initialize()
 	{
@@ -62,24 +64,24 @@ namespace EngineFramework
 	{
 		UNREFERENCED_PARAMETER(delta_time);
 
-		//TODO: Testing, to delete.
-		/*std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
-		std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
-		DeSerializeAllEntityInstances(test_scene);
-		auto view = registry.view<TODELETE>();
-		auto view2 = registry.view<TODELETE2>();
-		for (entt::entity entity_id : view)
-		{
-			TODELETE& comp = view.get<TODELETE>(entity_id);
-			LOGD("%s", comp.c.c_str());
-			UNREFERENCED_PARAMETER(comp);
-		}
-		for (entt::entity entity_id : view2)
-		{
-			TODELETE2& comp = view2.get<TODELETE2>(entity_id);
-			LOGD("%s", comp.c.c_str());
-			UNREFERENCED_PARAMETER(comp);
-		}*/
+		////TODO: Testing, to delete.
+		//std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
+		//std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
+		//DeSerializeAllEntityInstances(test_scene);
+		//auto view = registry.view<TODELETE>();
+		//auto view2 = registry.view<TODELETE2>();
+		//for (entt::entity entity_id : view)
+		//{
+		//	TODELETE& comp = view.get<TODELETE>(entity_id);
+		//	LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+		//	UNREFERENCED_PARAMETER(comp);
+		//}
+		//for (entt::entity entity_id : view2)
+		//{
+		//	TODELETE2& comp = view2.get<TODELETE2>(entity_id);
+		//	LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+		//	UNREFERENCED_PARAMETER(comp);
+		//}
 	}
 
 
@@ -137,6 +139,38 @@ namespace EngineFramework
 			}
 		}
 		*/
+
+		//nlohmann::json save_data;
+		//int id{}; //Basic id to prevent duplicate keys in json. Does not represent entity id.
+		//// Iterate over all entities
+		//for (auto entity : registry.view<entt::entity>()) {
+		//	
+
+		//	id++;
+		//}
+
+		//registry.each([&](entt::entity entity) {
+		//	nlohmann::json entity_json;
+		//	entity_json["id"] = (uint32_t)entity;
+
+		//	// Iterate all component types that are registered with meta
+		//	entt::meta_registry::iterate([&](entt::meta_type type) {
+		//		if (type.is_valid() && registry.all_of(type.id(), entity)) {
+		//			auto comp = registry.try_get(type.id(), entity);
+		//			if (comp) {
+		//				// Use meta_any for reflection serialization
+		//				entt::meta_any any = *static_cast<entt::meta_any*>(comp);
+		//				// Suppose each component has a to_json function or similar
+		//				entity_json[type.info().name()] = /* convert any to JSON */;
+		//			}
+		//		}
+		//		});
+
+		//	j.push_back(entity_json);
+		//	});
+
+		//return j;
+
 		//TODO: May want to keep a map<entityid, archtype_name_string> to map instances back to their archtype when serializing. this can be easily changeable. 
 		//Each instance has the archtype name (can be left empty if not based on archtype), and other component data.
 
@@ -240,7 +274,7 @@ namespace EngineFramework
 				if (archtype)
 				{
 					is_instantiated = true;
-					entity_id = GameObjectSystem::Instantiate(archtype);
+					entity_id = GameObjectSystem::Instantiate(archtype, archtype_guid);
 				}
 				else
 				{
@@ -291,7 +325,7 @@ namespace EngineFramework
 		}
 	}
 
-	entt::entity GameObjectSystem::Instantiate(std::shared_ptr<Archtype> archtype)
+	entt::entity GameObjectSystem::Instantiate(std::shared_ptr<Archtype> archtype, const xresource::instance_guid& archtype_instance_guid)
 	{
 		entt::entity entity = registry.create();
 		//Emplace all components inside the entity.
@@ -311,7 +345,7 @@ namespace EngineFramework
 				LOGE("[GameObjectSystem] Duplicate component %s already present in Archtype, will be ignored", comp.type().name());
 			}
 		}
-
+		entity_archtype_map.emplace(entity, archtype_instance_guid);
 
 		return entity;
 	}
@@ -322,7 +356,8 @@ namespace EngineFramework
 	entt::entity GameObjectSystem::CreateInstance(std::string archtype_str)
 	{
 		//Get archtype
-		std::shared_ptr<Archtype> archtype = AssetManagerSystem::GetResource<Archtype>(AssetManagerSystem::GetFullGuid(AssetManagerSystem::ARCHTYPE_GUID, archtype_str));
+		xresource::full_guid archtype_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::ARCHTYPE_GUID, archtype_str);
+		std::shared_ptr<Archtype> archtype = AssetManagerSystem::GetResource<Archtype>(archtype_guid);
 		if (!archtype)
 		{
 			//Fail silently, in the case where archtype is not loaded and/or is deleted. Instance is loaded without the archtype.
@@ -330,6 +365,6 @@ namespace EngineFramework
 			return registry.create(); //Create and return empty entity object.
 		}
 		//Create instance from archtype component data.
-		return Instantiate(archtype);
+		return Instantiate(archtype, archtype_guid.m_Instance);
 	}
 }
