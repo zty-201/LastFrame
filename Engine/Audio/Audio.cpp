@@ -27,6 +27,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #endif
+#include "AssetManager.hpp"
 
 namespace EngineFramework
 {
@@ -271,7 +272,8 @@ namespace EngineFramework
 
 		FMOD_RESULT r = m_system->createSound(loadPath.c_str(), mode, NULL, &snd);
 #else
-		FMOD_RESULT r = m_system->createSound(resolved.c_str(), mode, NULL, &snd);
+		//Accesses the file directly, can be done cause it's windows mode.
+		FMOD_RESULT r = m_system->createSound(resolved.c_str(), mode, nullptr, &snd);
 #endif
 		logFmodError(r, "System::createSound");
 		if (r != FMOD_OK || snd == NULL)
@@ -391,25 +393,20 @@ namespace EngineFramework
 	void AudioSystem::DebugMainMenuAutoPlay()
 	{
 		if (!m_initialized || m_debugMainMenuStarted) return;
-
-		static std::shared_ptr<SoundAsset> s_MainMenu = nullptr;
-
-		if (!s_MainMenu)
+		using EF_AM = AssetManagerSystem;
+		//Don't use static, call getresource every frame just in case the asset updates.
+		std::shared_ptr<SoundAsset> main_menu_bgm = EF_AM::GetResource<SoundAsset>(EF_AM::GetFullGuid(EF_AM::AUDIO_GUID, "mainmenu_loop"));
+		if (!main_menu_bgm)
 		{
-			s_MainMenu = Load("Extern/Audio/mainmenu_loop.wav", true);
-			if (!s_MainMenu || !s_MainMenu->sound)
-			{
-				LOGI("[AudioSystem] Failed to load Main Menu audio");
-				return;
-			}
+			throw std::exception("mainmenu_loop audio asset has not been loaded and can't be played.");
 		}
-
-		const bool ok = Play(s_MainMenu, 1.0f, false, AudioGroup::Music);
+		const bool ok = Play(main_menu_bgm, 1.0f, false, AudioGroup::Music);
 		if (ok)
 		{
 			if (m_groupMusic) m_groupMusic->setVolume(0.5f);
 			m_debugMainMenuStarted = true;
-			LOGI("[AudioSystem] Main Menu music is playing.");
+			//Only output once to avoid clogging up console.
+			static bool doOnce = []() {LOGI("[AudioSystem] Main Menu music is playing."); return true;}();
 		}
 		else
 		{
@@ -469,13 +466,14 @@ namespace EngineFramework
 
 				if (!anyPlaying)
 				{
-					static std::shared_ptr<SoundAsset> s_MainMenu = nullptr;
-					if (!s_MainMenu) s_MainMenu = Load("Extern/Audio/mainmenu_loop.wav", /*loop=*/true);
+					using EF_AM = AssetManagerSystem;
+					//Don't use static, call getresource every frame just in case the asset updates.
+					std::shared_ptr<SoundAsset> main_menu_bgm = EF_AM::GetResource<SoundAsset>(EF_AM::GetFullGuid(EF_AM::AUDIO_GUID, "mainmenu_loop"));
 
-					if (s_MainMenu && s_MainMenu->sound)
+					if (main_menu_bgm && main_menu_bgm->sound)
 					{
 						// Start playback on the Music bus
-						Play(s_MainMenu, /*volume=*/1.0f, /*paused=*/false, AudioGroup::Music);
+						Play(main_menu_bgm, /*volume=*/1.0f, /*paused=*/false, AudioGroup::Music);
 						LOGI("[AudioSystem] Music Status: Playing.");
 						m_debugMainMenuStarted = true;
 					}

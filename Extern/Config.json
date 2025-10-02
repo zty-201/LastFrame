@@ -3,5 +3,6 @@
 	"shader": "Extern/Graphics/Shader/Config.json",
 	"mesh": "Extern/Graphics/Mesh",
 	"cubemap": "Extern/Graphics/CubeMap/Config.json",
-	"audio": "Extern/Audio/Config.json"
+	"audio": "Extern/Audio/Config.json",
+	"archtype": "Extern/Archtypes"
 }

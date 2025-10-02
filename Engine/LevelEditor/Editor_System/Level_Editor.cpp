@@ -3,6 +3,7 @@
 
 #include "pch.hpp"
 #include "global.hpp"
+#include "LFeature.hpp"
 //File management, JSON file parser/writer
 #include <filesystem>
 #include <fstream>
@@ -24,6 +25,10 @@
 #include "Screen.hpp"
 #include "SceneManager.hpp"
 #include "AssetWindow.hpp"
+#include "ModelManager.hpp"
+#include "AssetManager.hpp"
+// Profiler/Debug
+#include "Profiler.hpp"
 
 namespace EngineFramework
 {
@@ -107,6 +112,14 @@ namespace EngineFramework
 			ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
 			ImGuiWindowFlags_NoBackground;
 
+		imgui_flags.mainWindowFlags =
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_MenuBar |
+			ImGuiWindowFlags_NoCollapse |
+			ImGuiWindowFlags_NoDocking;   // <- prevents docking
+
 		// If using GLFW for input, you can still initialize the input handling, but use your custom window
 		if (GraphicsSystem::GetInstance().GetGLFWwindow() == nullptr) {
 			LOGI("level editor app cannot be initialised");
@@ -123,10 +136,15 @@ namespace EngineFramework
 		addFeature("ObjectManager", std::make_unique<ObjectManager>());
 		addFeature("Save", std::make_unique<Save>());
 		addFeature("Screen", std::make_unique<Screen>());
-		addFeature("SceneManager", std::make_unique<SceneManager>());
-		addFeature("AssetWindow", std::make_unique<AssetWindow>());
+		addFeature("Profiler", std::make_unique<LFeature_DebugProfiler>()); // Add profiler feature (testing purpose)
+		
+		addFeature("SceneManager", std::make_unique<SceneManager>()); //
+		addFeature("AssetWindow", std::make_unique<AssetWindow>());//
+		addFeature("ModelManager", std::make_unique<ModelManager>());//
 
-		SceneManager::GetInstance().ScanScenes("Extern/Scenes");
+		
+
+		SceneManager::GetInstance().ScanScenes(AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scenes");//
 
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {
@@ -166,28 +184,22 @@ namespace EngineFramework
 
 		ImGuiIO& io = ImGui::GetIO();
 
-		// Window flags to make it fixed at the top
-		ImGuiWindowFlags mainWindowFlags =
-			ImGuiWindowFlags_NoTitleBar |
-			ImGuiWindowFlags_NoResize |
-			ImGuiWindowFlags_NoMove |
-			ImGuiWindowFlags_MenuBar |
-			ImGuiWindowFlags_NoCollapse;
+		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
 
 		// Set the window at the top of the screen, full width, small height
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, 30), ImGuiCond_Always); // 30 px height for header
 
+		
+		if (ImGui::Begin("Main Window", nullptr, imgui_flags.mainWindowFlags)) {
 
-		if (ImGui::Begin("Main Window", nullptr, mainWindowFlags)) {
-
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));      // Black text
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
 
 			if (ImGui::BeginMenuBar()) {
 
 				if (ImGui::BeginMenu("File")) {
 
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White text for "File"
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));      // Black text
 					//std::cout << "File clicked\n";
 
 					if (ImGui::BeginMenu("Create New")) {
@@ -199,8 +211,11 @@ namespace EngineFramework
 					ImGui::Separator();
 					ImGui::MenuItem("Open Scene", NULL, &featureFlag("SceneManager"));
 					ImGui::Separator();
-					ImGui::MenuItem("Save", NULL, &featureFlag("Save"));
-					ImGui::MenuItem("Save As ..", NULL);
+					if (ImGui::MenuItem("Save", NULL)) {
+						Save::GetInstance().SAVEFILE("test315.txt");
+					}
+
+					ImGui::MenuItem("Save As ..", NULL, &featureFlag("Save"));
 					ImGui::Separator(); 
 					ImGui::MenuItem("Save & Quit", NULL);
 					ImGui::MenuItem("Quit", NULL, &to_close);
@@ -216,7 +231,7 @@ namespace EngineFramework
 
 					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));      // White text
 
-					ImGui::MenuItem("Model Manager", NULL);
+					ImGui::MenuItem("Model Manager", NULL, &featureFlag("ModelManager"));
 					ImGui::Separator();
 					ImGui::MenuItem("Object Manager", NULL, &featureFlag("ObjectManager"));
 					ImGui::Separator();
@@ -227,14 +242,35 @@ namespace EngineFramework
 					ImGui::EndMenu();
 				}
 
+				ImGui::SameLine(0, 50.0f); // The second argument controls the spacing in pixels
+
+				// Debug menu
+				if (ImGui::BeginMenu("Debug")) {
+					// Single toggle that controls the profiler window visibility
+					if (auto it = featureMap.find("Profiler"); it != featureMap.end()) {
+						auto* prof = static_cast<LFeature_DebugProfiler*>(it->second.get());
+						bool on = prof->is_enabled; // Panel visibility flag
+						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+						if (ImGui::MenuItem("Profiler", nullptr, &on)) {
+							prof->is_enabled = on; // Show/hide panel
+							//it->second->is_enabled = true; // Keep feature running
+						}
+						ImGui::PopStyleColor();
+					}
+
+					ImGui::EndMenu();
+				}
+
 				ImGui::SameLine(0, 50.f);
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
 				const std::string& currScene = SceneManager::GetInstance().GetCurrentScene();
 				ImGui::Text("| Current Scene: %s", currScene.empty() ? "None" : currScene.c_str());
 				ImGui::PopStyleColor();
 
 				ImGui::EndMenuBar();
 			}
+
+			ImGui::PopStyleColor();
 		}
 
 
