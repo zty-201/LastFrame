@@ -84,9 +84,6 @@ struct Scene
         Texture& operator=(const Texture& rhs) = delete;
     };
 
-   
-
-    xresource::full_guid shader_guid{};          // Shader program for the scene
     glm::vec3 fogColor;
     float fogMinDist;
     float fogMaxDist;

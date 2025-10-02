@@ -37,8 +37,8 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* pWindow = nullptr;
 #endif
-        std::shared_ptr<ShaderProgram> shader;
         // A map to cache loaded mesh data (VAO, index count)
+        xresource::full_guid shader_guid;
         std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCache;
         std::unique_ptr<Scene> pScene;
         FBO scene_framebuffer;
