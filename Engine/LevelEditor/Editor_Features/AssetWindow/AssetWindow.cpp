@@ -23,7 +23,7 @@ namespace EngineFramework
 {
 	AssetWindow::AssetWindow()
 	{
-		currentDirectory = "Extern"; // Start at project asset root
+		currentDirectory = AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern"; // Start at project asset root
 	}
 
 	AssetWindow::~AssetWindow()

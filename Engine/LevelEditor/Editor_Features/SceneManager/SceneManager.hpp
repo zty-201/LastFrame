@@ -43,7 +43,6 @@ namespace EngineFramework
 
         const std::vector<std::string>& GetSceneList() const;
         void ScanScenes(const std::string& dir);
-        void LoadScene(const std::string& scenePath);
         const std::string& GetCurrentScene() const;
 
     private:
