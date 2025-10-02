@@ -17,6 +17,8 @@ namespace EngineFramework
         void Update(float deltaTime) override;
         void PostUpdate(float deltaTime) override;
 
+        void RenderScene(); 
+        void LoadAndCacheMesh(const std::string& meshName);
 
         static GraphicsSystem& GetInstance()
         {
@@ -32,29 +34,23 @@ namespace EngineFramework
         std::pair<int, int> GetWindowSize() const { return std::pair<int, int>(static_cast<int>(screen.x), static_cast<int>(screen.y)); }
 
     private:
-        std::unique_ptr<Scene> pScene;
 #ifdef PLATFORM_WINDOWS
-		GLFWwindow* pWindow = nullptr;
+        GLFWwindow* pWindow = nullptr;
 #endif
-        CameraComponent camera;
-        LightComponent light;
-        //Scene Framebuffer and Texture.
+
+        // A map to cache loaded mesh data (VAO, index count)
+        std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCache;
+        std::unique_ptr<Scene> pScene;
         FBO scene_framebuffer;
         GLuint sceneTextureID;
-
         glm::vec2 screen = { WIDTH,HEIGHT };
-        glm::vec3 fogColor; // Example: gray fog color
-        float fogMinDist;
-        float fogMaxDist;
-        int shadingModel;
+        bool m_isRenderingToFBO = false;
         static inline GraphicsSystem* this_graphics_ptr = nullptr;
 
         // Setup methods
         void SetupGLFW();
         void SetupGraphics();
-
-        //Toggle drawing to framebuffer.
-        void DrawSceneToFramebuffer(bool);
+		void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
 
         //==Event Handlers, one for each type of event.
 

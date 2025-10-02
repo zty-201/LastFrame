@@ -3,6 +3,13 @@
 #define MESH_H
 
 namespace Mesh {
+    struct MeshData {
+        std::vector<GLfloat> points;     // Vertex positions (x, y, z)
+        std::vector<GLfloat> normals;    // Vertex normals (x, y, z)
+        std::vector<GLfloat> texCoords;  // Texture coordinates (u, v)
+        std::vector<GLfloat> tangents;   // Tangent vectors (x, y, z)
+		std::vector<GLuint> indices;     // Indices for indexed drawing
+    };
     //
     // The Vertex struct.
     // This class is useful for parsing vertex data from OBJ files and converting them into 
@@ -36,7 +43,7 @@ namespace Mesh {
 
     // Generates a single quad (square plane) centered at the origin.
     // The quad lies in the XY plane with a normal pointing along the positive Z-axis.
-    inline void generateQuad(MeshComponent& mesh, GLfloat side = 2.0f)                           // Optional parameter specifying the length of each side. Default is 2.0f.
+    inline void generateQuad(MeshData& mesh, GLfloat side = 2.0f)                           // Optional parameter specifying the length of each side. Default is 2.0f.
     {
         const GLfloat side2 = side / 2.0f; // Calculate half the side length for positioning the vertices.
 
@@ -75,7 +82,7 @@ namespace Mesh {
 
     // Generates a plane composed of 9 vertices arranged in a 3x3 grid.
     // The plane lies in the XZ plane with its normal pointing along the positive Y-axis.
-    inline void generatePlane(MeshComponent& mesh)     // Output vector to store tangent vectors.
+    inline void generatePlane(MeshData& mesh)     // Output vector to store tangent vectors.
     {
         const GLfloat side = 4.0f; // Define the side length of the grid spacing in both X and Z directions.
 
@@ -140,7 +147,7 @@ namespace Mesh {
     // Generates a cube with specified side length.
     // The cube is centered at the origin, with each face consisting of 2 triangles.
     // Each face has unique normals and texture coordinates.
-    inline void generateCube(MeshComponent& mesh, GLfloat side = 1.0f)           // Length of each side of the cube.
+    inline void generateCube(MeshData& mesh, GLfloat side = 1.0f)           // Length of each side of the cube.
     {
         // Define vertex positions for each face of the cube.
         // Each face is defined by four vertices in counter-clockwise order.
@@ -227,7 +234,7 @@ namespace Mesh {
 
     // Generates a sphere mesh with specified parameters.
     // The sphere is constructed as a mesh of triangles.
-    inline void generateSphere(MeshComponent& mesh,     // Output mesh.
+    inline void generateSphere(MeshData& mesh,     // Output mesh.
         float radius = 1.0f,           // Radius of the sphere.
         GLuint nSlices = 20,           // Number of slices (longitudinal divisions).
         GLuint nStacks = 20)           // Number of stacks (latitudinal divisions).
@@ -331,7 +338,7 @@ namespace Mesh {
 
     // Generates a cube-shaped skybox with specified side length.
     // The skybox is constructed as a set of 6 faces (quads) and rendered using triangles.
-    inline void generateSkyBox(MeshComponent& mesh,     // Output mesh
+    inline void generateSkyBox(MeshData& mesh,     // Output mesh
         GLfloat side = 50.0f)           // Length of a side of the cube.
     {
         // Half the length of the side, used to center the cube at the origin.
