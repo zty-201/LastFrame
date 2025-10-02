@@ -97,11 +97,20 @@ namespace EngineFramework {
 		return buffer;
 #endif
 #ifdef PLATFORM_WINDOWS
+		//Check if path already has folder prefix.
+		std::string prefix = GetAssetFolderPrefix().string();
+		std::string path_string = path.string();
+		//Not present, so append it.
+		if (path_string.find(prefix) != 0)
+		{
+			path_string = prefix + path_string;
+		}
+		std::filesystem::path filepath{ path_string };
 		// open the file:
-		std::ifstream file(extern_folder_prefix / path, std::ios::binary);
+		std::ifstream file(filepath, std::ios::binary);
 		if (!file.is_open())
 		{
-			throw std::runtime_error("Failed to open asset: " + (extern_folder_prefix / path).string());
+			throw std::runtime_error("Failed to open asset: " + filepath.string());
 		}
 		// read the data:
 		return std::vector<unsigned char>((std::istreambuf_iterator<char>(file)),
@@ -154,9 +163,10 @@ namespace EngineFramework {
 		AAssetDir_close(assetDir);
 
 #else
+		std::filesystem::path asset_folder_path = GetAssetFolderPrefix() / folder_path;
 		// Use std::filesystem on Windows / Linux
-		if (std::filesystem::exists(folder_path) && std::filesystem::is_directory(folder_path)) {
-			for (auto& entry : std::filesystem::directory_iterator(folder_path)) {
+		if (std::filesystem::exists(asset_folder_path) && std::filesystem::is_directory(asset_folder_path)) {
+			for (auto& entry : std::filesystem::directory_iterator(asset_folder_path)) {
 				//Only check for files
 				if (!entry.is_regular_file()) continue;
 				auto ext = entry.path().extension().string();
@@ -491,7 +501,7 @@ namespace EngineFramework {
 		//Reading all filepaths for audio files in the current directory.
 		std::filesystem::path folder_path = config_file.parent_path();
 		//Acceptable files that can be loaded as an audio asset.
-		std::vector<std::string> audio_extensions{ ".mp3" };
+		std::vector<std::string> audio_extensions{ ".mp3", ".wav"};
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, audio_extensions);
 
 		//Iterate through all audio files in config file.
@@ -510,12 +520,14 @@ namespace EngineFramework {
 
 			try
 			{
-				loaded_resources.emplace_back(AudioSystem::GetInstance().Load(config["filepath"], config["isLoop"]));
+				loaded_resources.emplace_back(AudioSystem::GetInstance().Load((GetAssetFolderPrefix().string() + config["filepath"].get<std::string>()).c_str(), config["isLoop"]));
 				asset_names.emplace_back(audio_name); //Done if resource loading is a success.
 				//if resource was loaded, then remove it from the array so it doesn't get duplicate loaded later on.
 				for (auto it = files.begin(); it != files.end(); it++)
 				{
-					if (std::filesystem::equivalent(*it, std::filesystem::path(config["filepath"].get<std::string>())))
+					//Stem both filepaths, in order to do a filename comparison (and not a filename to json_name comparison).
+					//Use this instead of equivalent, to prevent it trying to read a path (that is not there on android).
+					if (it->stem() == std::filesystem::path(config["filepath"].get<std::string>()).stem())
 					{
 						files.erase(it);
 						break;

@@ -272,12 +272,8 @@ namespace EngineFramework
 
 		FMOD_RESULT r = m_system->createSound(loadPath.c_str(), mode, NULL, &snd);
 #else
-		std::vector<unsigned char> file_data = AssetManagerSystem::GetDataFromFile(resolved);
-
-		FMOD_CREATESOUNDEXINFO exinfo = {};
-		exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-		exinfo.length = static_cast<unsigned int>(file_data.size());
-		FMOD_RESULT r = m_system->createSound(reinterpret_cast<const char*>(file_data.data()), mode | FMOD_OPENMEMORY, &exinfo, &snd);
+		//Accesses the file directly, can be done cause it's windows mode.
+		FMOD_RESULT r = m_system->createSound(resolved.c_str(), mode, nullptr, &snd);
 #endif
 		logFmodError(r, "System::createSound");
 		if (r != FMOD_OK || snd == NULL)
