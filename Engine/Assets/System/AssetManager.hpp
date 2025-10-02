@@ -19,7 +19,7 @@
 /*
 		Asset Manager.
 		Resources are loaded at initialise time, and are assigned a name->guid mapping in the guid.meta file located within the asset folder, for the first ever load.
-		This guid will stay constant no matter what.
+		This guid will and should stay constant no matter what afterwards.
 
 		To load an asset, a loader function bool(const std::filesystem::path&) is added to a <name, func> asset_loader_map in Initialize().
 		This name must match the name given in ASSET_CONFIG_FILE defined in global.hpp.

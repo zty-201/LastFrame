@@ -27,7 +27,7 @@ namespace EngineFramework
 	{
 	public:
 		//Taking in entt::meta_any*, as references do not work.
-		static void EmplaceComponent(entt::entity entity, const entt::meta_any* data)
+		static bool EmplaceComponent(entt::entity entity, const entt::meta_any* data)
 		{
 			//Make a copy using the ptr provided
 			registry.emplace<T>(entity, data->cast<T>());
@@ -64,8 +64,8 @@ namespace EngineFramework
 
 			If a variable/function is registered under my_type, they'll be treated as members of my_type (even for global variables/functions).
 		
-			Every type needs an emplace function for that type.
-			.func<&Emplacer<TODELETE>::EmplaceComponent>("emplace"_hs);
+			Every component needs an emplace function for that type.
+			.func<&Emplacer<My_Component>::EmplaceComponent>("emplace"_hs);
 
 			NOTE: Taking in references may not work for functions registered.
 		*/
@@ -76,6 +76,13 @@ namespace EngineFramework
 			.data<&TODELETE::b>("b")
 			.data<&TODELETE::c>("c")
 			.func<&Emplacer<TODELETE>::EmplaceComponent>("emplace");
+
+		entt::meta_factory<EngineFramework::TODELETE2>()
+			.type("TestClass2")
+			.data<&TODELETE2::d>("player_damage")
+			.data<&TODELETE2::e>("e")
+			.data<&TODELETE2::c>("c")
+			.func<&Emplacer<TODELETE2>::EmplaceComponent>("emplace");
 
 	}
 

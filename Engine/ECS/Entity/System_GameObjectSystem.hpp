@@ -95,7 +95,7 @@ namespace EngineFramework
 		*/
 		void DeSerializeAllEntityInstances(const std::string& json_input);
 		
-		entt::entity Instantiate(std::shared_ptr<Archtype> archtype);
+		static entt::entity Instantiate(std::shared_ptr<Archtype> archtype);
 
 		//Keeps track of the one and only instance of this system, created by core engine.
 		static inline GameObjectSystem* this_system{};

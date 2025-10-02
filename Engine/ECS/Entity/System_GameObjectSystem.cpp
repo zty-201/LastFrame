@@ -25,6 +25,10 @@
 
 #include "AssetManager.hpp"
 
+//For printing instance/type_guids in error messages
+#include <inttypes.h>
+
+
 
 namespace EngineFramework
 {
@@ -57,6 +61,11 @@ namespace EngineFramework
 	void GameObjectSystem::Update(float delta_time)
 	{
 		UNREFERENCED_PARAMETER(delta_time);
+
+		//TODO: Testing, to delete.
+		std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
+		std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
+		DeSerializeAllEntityInstances(test_scene);
 	}
 
 
@@ -175,14 +184,76 @@ namespace EngineFramework
 	*/
 	void GameObjectSystem::DeSerializeAllEntityInstances(const std::string& json_input)
 	{
-		UNREFERENCED_PARAMETER(json_input);
+		nlohmann::json json_scene = nlohmann::json::parse(json_input);
 		/*
 			Deserialization process is similar to archtype.
 			- It is instantiated from an archtype (if none, then an entity is simply created)
 			- Additional component data can be read, where they are first read into a meta_any object
 			before its registered emplace function is called.
 		*/
+		for (auto& [key, entity_json] : json_scene.items())
+		{
+			/*
+				1. Instantiate from archtype, or from scratch otherwise.
+			*/
+			bool is_instantiated = false;
+			entt::entity entity_id{};
+			if (entity_json.contains("archtype"))
+			{
+				xresource::instance_guid archtype_guid{ entity_json["archtype"].get<uint64_t>() };
+				std::shared_ptr<Archtype> archtype = AssetManagerSystem::GetResource<Archtype>({ archtype_guid, AssetManagerSystem::ARCHTYPE_GUID });
+				if (archtype)
+				{
+					is_instantiated = true;
+					entity_id = GameObjectSystem::Instantiate(archtype);
+				}
+				else
+				{
+					//Fail silently, in the case where archtype is not loaded and/or is deleted. Instance is loaded without the archtype.
+					LOGE("[GameObjectSystem] Deserialization: No archtype loaded for %" PRIu64 "guid, instance cannot be instantiated from it", archtype_guid.m_Value);
+				}
+			}
+			//If not created from archtype, then simply create an empty entity.
+			if (!is_instantiated)
+			{
+				entity_id = registry.create();
+			}
+			//Iterate over additional components for that entity and emplace them into the entity (registry).
+			for (auto& [comp_name, comp_data_json] : entity_json.items())
+			{
+				//Already read the archtype. it's not a component to emplace.
+				if (comp_name == "archtype") continue;
+				//Creation of component.
+				entt::meta_type comp_type = entt::resolve(GetID(comp_name));
+				entt::meta_any comp_data = comp_type.construct();
 
+				//Iterate over component data members and set values. If empty it does nothing.
+				for (auto& [data_name, data_val_json] : comp_data_json.items())
+				{
+					entt::id_type data_type_id = GetID(data_name);
+					entt::meta_data data_type = comp_type.data(data_type_id);
+					//Ensure it is a data member. It could be a function for example.
+					if (!data_type) continue;
+					//Set the data member.
+					SetMetaAnyWithJson(comp_data, data_type, data_val_json);
+				}
+				
+				//==Emplace component data into map, by calling the "emplace" function registered with this type. All components must have emplace function.
+				auto func = comp_data.type().func("emplace"_hs);
+				if (!func)
+				{
+					throw std::exception((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp_data.type().name()).c_str());
+				}
+				entt::meta_any success = func.invoke({}, entity_id, &comp_data);
+				//Duplicate component already present inside.
+				if (!success.cast<bool>())
+				{
+					//Silently give an error. 
+					LOGE("[GameObjectSystem] Duplicate component %s already present in Instance, will be ignored", comp_data.type().name());
+				}
+			}
+
+		}
 	}
 
 	entt::entity GameObjectSystem::Instantiate(std::shared_ptr<Archtype> archtype)
@@ -195,9 +266,15 @@ namespace EngineFramework
 			auto func = comp.type().func("emplace"_hs);
 			if (!func)
 			{
-				throw std::exception("[GameObjectSystem] Emplace function not registered for this component");
+				throw std::exception((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp.type().name()).c_str());
 			}
-			func.invoke({}, entity, &comp);
+			entt::meta_any success = func.invoke({}, entity, &comp);
+			//Duplicate component already present inside.
+			if (!success.cast<bool>())
+			{
+				//Silently give an error. 
+				LOGE("[GameObjectSystem] Duplicate component %s already present in Archtype, will be ignored", comp.type().name());
+			}
 		}
 
 
@@ -213,7 +290,9 @@ namespace EngineFramework
 		std::shared_ptr<Archtype> archtype = AssetManagerSystem::GetResource<Archtype>(AssetManagerSystem::GetFullGuid(AssetManagerSystem::ARCHTYPE_GUID, archtype_str));
 		if (!archtype)
 		{
-			throw std::runtime_error((std::string("Archtype used for instantiating instance is not valid: ") + archtype_str).c_str());
+			//Fail silently, in the case where archtype is not loaded and/or is deleted. Instance is loaded without the archtype.
+			LOGE("[GameObjectSystem] Deserialization: No archtype loaded for %s, instance cannot be instantiated from it", archtype_str.c_str());
+			return registry.create(); //Create and return empty entity object.
 		}
 		//Create instance from archtype component data.
 		return Instantiate(archtype);

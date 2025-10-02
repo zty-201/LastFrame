@@ -197,6 +197,14 @@ namespace EngineFramework
 		std::string c{};
 		float not_serializable{};
 	};
+	//TODO: Test struct, to delete.
+	struct TODELETE2
+	{
+		int d{};
+		float e{};
+		std::string c{};
+		float not_serializable{};
+	};
 }
 
 
