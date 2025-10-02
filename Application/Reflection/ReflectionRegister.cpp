@@ -29,8 +29,14 @@ namespace EngineFramework
 		//Taking in entt::meta_any*, as references do not work.
 		static bool EmplaceComponent(entt::entity entity, const entt::meta_any* data)
 		{
+			//Don't emplace duplicate components, so check if it exists in entity first.
+			if (registry.all_of<T>(entity))
+			{
+				return false;
+			}
 			//Make a copy using the ptr provided
 			registry.emplace<T>(entity, data->cast<T>());
+			return true;
 		}
 	};
 	

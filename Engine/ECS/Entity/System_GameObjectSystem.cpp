@@ -63,9 +63,9 @@ namespace EngineFramework
 		UNREFERENCED_PARAMETER(delta_time);
 
 		//TODO: Testing, to delete.
-		std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
+		/*std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
 		std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
-		DeSerializeAllEntityInstances(test_scene);
+		DeSerializeAllEntityInstances(test_scene);*/
 	}
 
 
