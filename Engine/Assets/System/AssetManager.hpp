@@ -112,7 +112,7 @@ namespace EngineFramework {
 #ifdef PLATFORM_ANDROID
 		static void SetAndroidAssetManager(void* android_asset_manager);
 #endif
-		std::filesystem::path GetAssetFolderPrefix() { 
+		static std::filesystem::path GetAssetFolderPrefix() { 
 #ifdef PLATFORM_WINDOWS
 			return extern_folder_prefix; 
 #else

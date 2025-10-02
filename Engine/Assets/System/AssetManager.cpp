@@ -234,7 +234,7 @@ namespace EngineFramework {
 #ifdef PLATFORM_WINDOWS
 		if (isNewMapping)
 		{
-			std::ofstream metadata_out{ metadata_file , std::ios::trunc };
+			std::ofstream metadata_out{ GetAssetFolderPrefix() / metadata_file , std::ios::trunc };
 			metadata_out << std::setw(4) << guid_meta_json << std::endl;
 			metadata_out.close();
 		}
