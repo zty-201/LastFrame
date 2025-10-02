@@ -14,7 +14,7 @@ Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
 */
 /* *******************************************************************/
-
+#include "pch.hpp"
 #include "Math.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

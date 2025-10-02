@@ -15,14 +15,6 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "InputManager.hpp"
 #include "SoundAsset.hpp"
 
-#include <cassert>
-#include <iostream>
-#include <string>
-#include <unordered_map>
-#include <functional>
-#include <filesystem>
-#include <cstdio>
-
 #ifdef PLATFORM_ANDROID
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>

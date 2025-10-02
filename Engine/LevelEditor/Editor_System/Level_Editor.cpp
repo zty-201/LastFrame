@@ -26,6 +26,7 @@
 #include "SceneManager.hpp"
 #include "AssetWindow.hpp"
 #include "ModelManager.hpp"
+#include "AssetManager.hpp"
 
 // Profiler/Debug
 #include "Profiler.hpp"
@@ -144,7 +145,7 @@ namespace EngineFramework
 
 		
 
-		SceneManager::GetInstance().ScanScenes("Extern/Scenes");//
+		SceneManager::GetInstance().ScanScenes(AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scenes");//
 
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {

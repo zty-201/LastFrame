@@ -13,6 +13,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 */
 /* *******************************************************************/
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+#include "pch.hpp"
 #include "SceneManager.hpp"
 #include "System_GameObjectSystem.hpp"
 #include <filesystem>

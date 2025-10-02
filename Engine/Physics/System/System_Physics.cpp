@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.hpp"
 #include "ISystem.hpp"
 #include <entt/entity/registry.hpp>
 #include <iostream>
@@ -36,13 +37,17 @@ namespace EngineFramework {
         char buffer[1024];
         vsnprintf(buffer, sizeof(buffer), inFMT, list);
         va_end(list);
-        std::cout << buffer << std::endl;
+        std::stringstream out{};
+        out << buffer;
+        LOGE("[PhysicsSystem] %s", out.str().c_str());
     }
 
 #ifdef JPH_ENABLE_ASSERTS
     inline bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, unsigned int inLine)
     {
-        std::cout << inFile << ":" << inLine << ": (" << inExpression << ") " << (inMessage != nullptr ? inMessage : "") << std::endl;
+        std::stringstream out{};
+        out << inFile << ":" << inLine << ": (" << inExpression << ") " << (inMessage != nullptr ? inMessage : "") << std::endl;
+        LOGE("[PhysicsSystem] %s", out.str().c_str());
         return true;
     };
 #endif

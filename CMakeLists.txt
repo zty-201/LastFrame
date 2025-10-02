@@ -48,7 +48,6 @@ if(NOT CODE_ANALYSIS_ON_BUILD)
 target_compile_options(engine_library PUBLIC 
     # MSVC (Windows) specific warnings
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-    $<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/Zi>>
     # GCC/Clang specific warnings
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
     $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
@@ -58,8 +57,8 @@ else()
 target_compile_options(engine_library PUBLIC 
     # MSVC (Windows) specific warnings
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-    # /fsanitize=address is enabled for ASAN. /Zi generates a pdb for debugging purposes.
-    $<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address /Zi>>
+    # /fsanitize=address is enabled for ASAN. 
+    $<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address>>
     # GCC/Clang specific warnings
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
     $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>

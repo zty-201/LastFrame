@@ -4,14 +4,8 @@
 */
 
 #include "pch.hpp"
-#include <cassert>
-#include <functional>
 #include "ReflectionRegister.hpp"
-//==For reflection system.
-#include "entt/meta/factory.hpp" 
-#include "entt/meta/meta.hpp"
-#include <entt/meta/resolve.hpp>
-#include <entt/entity/registry.hpp>
+
 //==Components for registering==//
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 
@@ -27,7 +21,7 @@ namespace EngineFramework
 	{
 	public:
 		//Taking in entt::meta_any*, as references do not work.
-		static bool EmplaceComponent(entt::entity entity, const entt::meta_any* data)
+		static bool EmplaceComponent(entt::entity entity, const void* data)
 		{
 			//Don't emplace duplicate components, so check if it exists in entity first.
 			if (registry.all_of<T>(entity))
@@ -35,7 +29,7 @@ namespace EngineFramework
 				return false;
 			}
 			//Make a copy using the ptr provided
-			registry.emplace<T>(entity, data->cast<T>());
+			registry.emplace<T>(entity, static_cast<const entt::meta_any*>(data)->cast<T>());
 			return true;
 		}
 	};

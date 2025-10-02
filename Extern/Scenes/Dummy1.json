@@ -1,0 +1,27 @@
+{
+    "1": {
+        "archtype": 8960202118185140225,
+        "TestClass": {
+            "player_health": 23,
+            "b": 132,
+            "c": "duplicate testclass1.1"
+        },
+        "TestClass2": {
+            "player_damage": 12,
+            "e": 15.0,
+            "c": "testclass2.1"
+        }
+    },
+    "2": {
+        "TestClass": {
+            "player_health": 123,
+            "b": 1234.15,
+            "c": "testclass1.2"
+        },
+        "TestClass2": {
+            "player_damage": 15,
+            "e": 16.0,
+            "c": "testclass2.2"
+        }
+    }
+}
