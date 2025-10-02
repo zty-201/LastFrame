@@ -64,13 +64,14 @@ namespace EngineFramework
 		//Array has already been sorted in update order, in initialize.
 		for (CoreSystem& system : system_arr)
 		{
-
-			SafeUpdateSystem(system, delta_time);
-
 			// PROFILER CODE - To time each system automatically
 			Diagnostics::Scoped scope{ system.label_update.c_str() }; // To track per system per frame timing
 
-			system.system->Update(delta_time);
+			SafeUpdateSystem(system, delta_time);
+
+
+
+			//system.system->Update(delta_time);
 		}
 	}
 
@@ -84,12 +85,12 @@ namespace EngineFramework
 		for (CoreSystem& system : system_arr)
 		{
 
-
-			system.system->PostUpdate(delta_time);
-			SafePostUpdateSystem(system, delta_time);
-
 			// PROFILER CODE
 			Diagnostics::Scoped s{ system.label_post.c_str() };
+
+			//system.system->PostUpdate(delta_time);
+			SafePostUpdateSystem(system, delta_time);
+
 		}
 	}
 
