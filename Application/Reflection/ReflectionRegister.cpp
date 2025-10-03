@@ -222,10 +222,9 @@ namespace EngineFramework
 		{
 			if constexpr (std::is_empty_v<T>)
 			{
-				//Empty struct, just return a default instance.
 				return T{};
 			}
-			return registry.get<T>(entity);
+			else return registry.get<T>(entity);
 		}
 	};
 
