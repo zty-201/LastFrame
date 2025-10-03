@@ -1,3 +1,18 @@
+/*
+*****************************************************************/
+/*!
+\file   Level_Editor.cpp
+\author Tan Yee Tong
+\par    yeetong.t\@digipen.edu
+\date   September 2025
+\brief
+This file contains the main loop of level editor
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/* *******************************************************************/
+
 #include "pch.hpp"
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #ifndef LEVEL_EDITOR_HPP
@@ -30,8 +45,8 @@ namespace EngineFramework
 	//limiting the accessable variables for Lfeature, only able to change certain variables
 	struct iEditorView {
 
-		int selected_objectID;
-		int selected_modelID;
+		entt::entity selected_objectID;
+		entt::entity selected_modelID;
 	};
 
 	class LevelEditor

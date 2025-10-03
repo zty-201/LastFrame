@@ -94,7 +94,7 @@ void Game_Initialize(void* android_asset_manager)
 			std::make_unique<EngineFramework::GraphicsSystem>(),
 			1,  // Init Order: First
 			5,  // Update Order: After game logic and editor
-			5   // Destruct Order: Last
+			6   // Destruct Order: Last
 		);
 
 		// 2. InputManager: Needs the window from GraphicsSystem to register callbacks.
@@ -103,7 +103,7 @@ void Game_Initialize(void* android_asset_manager)
 			std::make_unique<EngineFramework::InputManager>(),
 			2,  // Init Order: After Graphics
 			1,  // Update Order: FIRST in the loop
-			4   // Destruct Order: Before Graphics
+			5   // Destruct Order: Before Graphics
 		);
 
 		// 5. AudioSystem: Depends on the game state.
@@ -112,7 +112,7 @@ void Game_Initialize(void* android_asset_manager)
 			std::make_unique<EngineFramework::AudioSystem>(),
 			3,  // Init Order
 			7,  // Update Order: Last
-			1   // Destruct Order: First
+			4   // Destruct Order: First
 		);
 
 		// 3. AssetManager: Can load assets after graphics and audio systems are up.

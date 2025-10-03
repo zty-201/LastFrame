@@ -13,6 +13,21 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 */
 /* *******************************************************************/
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+/*
+*****************************************************************/
+/*!
+\file   ModelManager.hpp
+\author Tan Yee Tong
+\par    yeetong.t\@digipen.edu
+\date   September 2025
+\brief
+This file shows the models currently loaded in the scene of the level editor
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/* *******************************************************************/
+
 #ifndef MODELMANAGER_LFEATURE_HPP
 #define MODELMANAGER_LFEATURE_HPP
 #include <unordered_map>

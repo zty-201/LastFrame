@@ -50,7 +50,7 @@ namespace EngineFramework
         std::vector<entt::entity> entities;
 
         // Iterate through the sparse set (all alive entities)
-        for (auto entity : registry.storage<entt::entity>()) {
+        for (auto entity : registry.view<entt::entity>()) {
             entities.push_back(entity);
         }
 
@@ -77,7 +77,7 @@ namespace EngineFramework
                 // Make the entity a selectable item
                 if (ImGui::Selectable(label.c_str(), is_selected)) {
                     selected_entity = entity;
-                    LevelEditor::GetInstance().variables.selected_modelID = (uint32_t)selected_entity;
+                    LevelEditor::GetInstance().variables.selected_objectID = selected_entity;
                     LOGI(("Selected Entity: " + std::to_string((uint32_t)selected_entity)).c_str());
                 }
 
@@ -87,8 +87,9 @@ namespace EngineFramework
                 }
 
             }
-            ImGui::End();
+            
         }
+        ImGui::End();
     }
     void ObjectManager::Close() {
         LOGI("object manager closed");

@@ -50,6 +50,13 @@ namespace EngineFramework
 
 		Instantiation
 		- Use CreateInstance("archtype_name") where the archtype name is the file name.
+
+		entt::view for iterating
+		- all entities
+		- all entities with so and so component
+		entt::storage for iterating over all components of a specific type.
+
+
 	*/
 	class GameObjectSystem : public ISystem
 	{
@@ -95,7 +102,14 @@ namespace EngineFramework
 		*/
 		void DeSerializeAllEntityInstances(const std::string& json_input);
 		
-		static entt::entity Instantiate(std::shared_ptr<Archtype> archtype);
+		/*
+			Creates an entt::entity instance with an archtype.
+			entity_id is the id to instantiate with.
+		*/
+		static entt::entity Instantiate(std::shared_ptr<Archtype> archtype, const xresource::instance_guid& archtype_instance_guid);
+
+		//<entity_id, archtype_instance_guid> mapping, used when serializing instances back to scene file.
+		static inline std::unordered_map<entt::entity, xresource::instance_guid> entity_archtype_map{};
 
 		//Keeps track of the one and only instance of this system, created by core engine.
 		static inline GameObjectSystem* this_system{};

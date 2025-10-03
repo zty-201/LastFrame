@@ -1,3 +1,21 @@
+/*
+*****************************************************************/
+/*!
+\file   Level_Editor.hpp
+\author Tan Yee Tong
+\par    yeetong.t\@digipen.edu
+\co-author Tang Yeun, Dean
+\par    y.tang\@digipen.edu
+\date   September 2025
+\brief
+This file contains the main loop of level editor
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/* *******************************************************************/
+
+
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
 
@@ -42,8 +60,8 @@ namespace EngineFramework
 		//to_open = false;
 		to_close = false;
 
-		variables.selected_modelID = 0; //zero means none selected
-		variables.selected_objectID = 0; //zero means none selected
+		variables.selected_modelID = entt::null; //zero means none selected
+		variables.selected_objectID = entt::null; //zero means none selected
 
 		LOGI("LevelEditor() constructor");
 	}
