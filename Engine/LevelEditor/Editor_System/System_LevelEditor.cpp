@@ -69,6 +69,12 @@ namespace EngineFramework
 				Event_Level_Editor_Toggled editor_toggled{};
 				editor_toggled.is_enabled = false;
 				event_dispatcher.trigger<Event_Level_Editor_Toggled>(std::move(editor_toggled));
+
+				// Send an resize event.
+				Event_Window_Resized editor_resize{};
+				editor_resize.width = InputManager::GetInstance().GetWindowSize().first;
+				editor_resize.height = InputManager::GetInstance().GetWindowSize().second;
+				event_dispatcher.trigger<Event_Window_Resized>(std::move(editor_resize));
 			}
 			else if (application->Get_Editor_State()) {
 				//std::cout << "Imgui running\n";

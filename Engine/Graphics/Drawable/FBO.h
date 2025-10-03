@@ -5,10 +5,10 @@
 #include <glm/glm.hpp>
 
 //
-    // This struct that sets up and manages OpenGL Framebuffer Objects (FBOs), allowing 
-    // different rendering techniques(e.g., texture rendering, depth-only
-    // rendering, HDR, deferred rendering) to be used in a graphics application.
-    //
+// This struct that sets up and manages OpenGL Framebuffer Objects (FBOs), allowing 
+// different rendering techniques(e.g., texture rendering, depth-only
+// rendering, HDR, deferred rendering) to be used in a graphics application.
+//
 struct FBO
 {
     // Enum to define different types of framebuffers
@@ -117,7 +117,7 @@ struct FBO
         GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
         glDrawBuffers(1, drawBuffers);
 
-        // *** FIX: Check the status of OUR FBO (handle) before unbinding it ***
+        // Check the status of OUR FBO (handle) before unbinding it
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (result != GL_FRAMEBUFFER_COMPLETE)
         {
@@ -127,8 +127,6 @@ struct FBO
                 std::to_string(result) +
                 ": Framebuffer is not complete.\n");
         }
-
-        // *** FIX: Unbind only after a successful check ***
         // Revert to the default framebuffer.
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -169,7 +167,7 @@ struct FBO
         GLenum drawBuffers[] = { GL_NONE };
         glDrawBuffers(1, drawBuffers);
 
-        // *** FIX: Check status before unbinding ***
+        // Check status before unbinding
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (result != GL_FRAMEBUFFER_COMPLETE)
         {
@@ -179,7 +177,7 @@ struct FBO
                 ": Framebuffer is not complete.\n");
         }
 
-        // *** FIX: Unbind after successful check ***
+        // Unbind after successful check 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
@@ -207,7 +205,7 @@ struct FBO
                                 GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
         glDrawBuffers(4, drawBuffers);
 
-        // *** FIX: Check status before unbinding ***
+        // Check status before unbinding 
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (result != GL_FRAMEBUFFER_COMPLETE)
         {
@@ -217,7 +215,7 @@ struct FBO
                 ": Framebuffer is not complete.\n");
         }
 
-        // *** FIX: Unbind after successful check ***
+        // Unbind after successful check 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 };

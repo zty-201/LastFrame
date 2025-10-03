@@ -1,6 +1,11 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include "CameraComponent.h"
+#include "LightComponent.h"
+#include "MaterialComponent.h"
+#include "MeshComponent.h"
+#include "TransformComponent.h"
 //
     // Shader ShaderProgram class for managing shader program handle and operations.
     //
@@ -122,6 +127,18 @@ public:
 
     void setUniform(const std::string& name, GLsizei count, const GLuint* value) {
         glUniform1uiv(getUniformLocation(name), count, value);
+    }
+
+    void setMaterialUniforms(const MaterialComponent& material)
+    {
+        setUniform("material.rough", material.rough);
+        setUniform("material.metal", material.metal);
+        setUniform("material.color", material.color);
+        setUniform("material.Ka", material.Ka);
+        setUniform("material.Kd", material.Kd);
+        setUniform("material.Ks", material.Ks);
+        setUniform("material.shininess", material.shininess);
+        setUniform("material.effect", material.effect); // *** ADD THIS LINE ***
     }
 
     // Implemented in .cpp file
