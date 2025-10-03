@@ -135,17 +135,17 @@ namespace EngineFramework
 		for (entt::entity entity_id : view)
 		{
 			TODELETE& comp = view.get<TODELETE>(entity_id);
-			LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+			//LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
 			UNREFERENCED_PARAMETER(comp);
 		}
 		for (entt::entity entity_id : view2)
 		{
 			TODELETE2& comp = view2.get<TODELETE2>(entity_id);
-			LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+			//LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
 			UNREFERENCED_PARAMETER(comp);
 		}
-		std::string test_save_data = SerializeAllEntityInstances();
-		LOGD("Testing Serialization: %s", test_save_data.c_str());
+		//std::string test_save_data = SerializeAllEntityInstances();
+		//LOGD("Testing Serialization: %s", test_save_data.c_str());
 	}
 
 
