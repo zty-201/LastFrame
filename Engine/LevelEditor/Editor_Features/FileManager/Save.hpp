@@ -51,6 +51,10 @@ namespace EngineFramework
         }
 
         static inline Save* this_ptr = nullptr;
+    private:
+
+        bool save_Archtypes();
+        bool save_Instances(std::string filename);
 
     };
 
