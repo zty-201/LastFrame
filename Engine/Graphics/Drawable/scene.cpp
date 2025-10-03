@@ -14,70 +14,51 @@
 	// const char* filename: This parameter takes a string representing the file path 
 	//          of the image from which the texture is to be loaded.
 	//
-GLuint loadTexture(const char* filename)
+GLuint setupTexture(const char* filename)
 {
-	// Declare variables for the image's width, height, and the number of bytes per pixel
 	int width, height, bytesPerPix;
-
-	// Set the stb_image library to flip images vertically upon loading
-	// This is because OpenGL has its texture origin at the bottom-left, 
-	// while many image formats (like PNG) have their origin at the top-left.
 	stbi_set_flip_vertically_on_load(true);
-
 
 	//Load using cross-platform compatible function.
 	std::vector<unsigned char> texture_data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path(filename));
+	unsigned char* data = stbi_load_from_memory(
+		texture_data.data(),
+		static_cast<int>(texture_data.size()),
+		&width, &height, &bytesPerPix, 4
+	);
 
-	// Load the image data from the buffer using stb_image's stbi_load function
-	// This will fill in the width, height, and bytesPerPix (number of channels)
-	// The '4' argument tells stb_image to load the image as RGBA (4 channels).
-	unsigned char* data = stbi_load_from_memory(texture_data.data(), static_cast<int>(texture_data.size()), &width, &height, &bytesPerPix, 4);
-
-	// If the image fails to load (data is null), throw an exception with the filename
 	if (!data)
-		throw std::runtime_error(std::string("file ") + filename + " not found.");
+		throw std::runtime_error(std::string("Failed to load texture: ") + filename);
 
-	GLuint tex = 0; // The texture ID
+	GLuint texID = 0;
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_2D, texID);  // Bind temporarily for setup
 
-	// Generate a new texture ID using OpenGL
-	glGenTextures(1, &tex);
-
-	// Bind the generated texture ID to the GL_TEXTURE_2D target
-	// This makes the texture the current active texture for subsequent texture operations
-	glBindTexture(GL_TEXTURE_2D, tex);
-
-	// Allocate storage for the texture (no data uploaded yet)
-	// Internal format is RGBA8 (8 bits per channel, 4 channels: Red, Green, Blue, Alpha)
-	// The texture dimensions are specified by 'width' and 'height'
+	// Allocate storage
 	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
 
-	// Upload the image data to the GPU as the content for the texture
-	// The image data is in RGBA format, and each pixel is represented as an unsigned byte
+	// Upload data
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-	// Set texture parameters:
-	// GL_TEXTURE_MAG_FILTER: Controls how textures are sampled when they are magnified (scaled up)
-	// GL_LINEAR: Linear interpolation (smooth, blending between texels)
+	// Set parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// GL_TEXTURE_MIN_FILTER: Controls how textures are sampled when they are minified (scaled down)
-	// GL_NEAREST: Set the minification filter to use linear filtering with mipmaps
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-	// Generate mipmaps for the texture
+	// Generate mipmaps
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	// Free the memory allocated by stb_image for the image data
-	// The data is now on the GPU, so it is no longer needed in CPU memory
+	// Unbind after creation
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	stbi_image_free(data);
 
-	// Return the texture ID to the caller for future reference in rendering operations
-	return tex;
+	return texID;  // Return unbound texture ID
+
 }
 
 //
 // The loadHdrCubeMap function generates and configures a cube map texture using HDR image files.
-GLuint loadHdrCubeMap(const std::array<std::string, 6>& filenames)
+GLuint setupHdrCubeMap(const std::array<std::string, 6>& filenames)
 {
 	GLuint texID;
 
@@ -118,6 +99,8 @@ GLuint loadHdrCubeMap(const std::array<std::string, 6>& filenames)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
 	// Return the ID of the generated cube map texture
 	return texID;
 }
@@ -128,7 +111,7 @@ GLuint loadHdrCubeMap(const std::array<std::string, 6>& filenames)
 Scene::Texture::Texture(const std::string& file, GLuint channel)
 	: id{ 0 }, channel{ channel }, target{ 0 }
 {
-	id = loadTexture(file.c_str());
+	id = setupTexture(file.c_str());
 	target = GL_TEXTURE_2D;
 }
 
@@ -138,6 +121,6 @@ Scene::Texture::Texture(const std::string& file, GLuint channel)
 Scene::Texture::Texture(const std::array<std::string, 6>& filenames, GLuint channel)
 	: id{ 0 }, channel{ channel }, target{ 0 }
 {
-	id = loadHdrCubeMap(filenames);
+	id = setupHdrCubeMap(filenames);
 	target = GL_TEXTURE_CUBE_MAP;
 }

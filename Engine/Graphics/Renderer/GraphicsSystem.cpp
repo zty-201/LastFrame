@@ -122,13 +122,12 @@ namespace EngineFramework
 		glBindFramebuffer(GL_FRAMEBUFFER, targetFBO);
 		glViewport(0, 0, static_cast<GLsizei>(screen.x), static_cast<GLsizei>(screen.y));
 
-		// Only clear once at the beginning
 		glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// --- 2. ACTIVATE SHADER AND SET GLOBAL UNIFORMS ---
 		std::shared_ptr<ShaderProgram> shader{};
-		if (shader_guid != xresource::full_guid{}) //Check if full_guid has been set.
+		if (shader_guid != xresource::full_guid{})
 		{
 			shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(shader_guid);
 		}
@@ -143,10 +142,7 @@ namespace EngineFramework
 		}
 		shader->use();
 
-		// Set Pass to 0 for scene rendering
 		shader->setUniform("Pass", 0);
-
-		// Set global uniforms like fog
 		shader->setUniform("fog.color", pScene->fogColor);
 		shader->setUniform("fog.minDist", pScene->fogMinDist);
 		shader->setUniform("fog.maxDist", pScene->fogMaxDist);
@@ -156,7 +152,7 @@ namespace EngineFramework
 		auto camera_view = registry.view<CameraComponent>();
 		if (camera_view.empty()) {
 			LOGI("No cameras in registry yet, skipping render");
-			shader->disuse(); 
+			shader->disuse();
 			return;
 		}
 		CameraComponent* active_camera = nullptr;
@@ -201,6 +197,25 @@ namespace EngineFramework
 				glCullFace(GL_FRONT);
 			}
 
+			// **NEW: Check for texture and bind it**
+			bool hasTexture = false;
+			if (registry.all_of<TextureComponent>(entity))
+			{
+				auto& texComp = registry.get<TextureComponent>(entity);
+				auto texture = AssetManagerSystem::GetResource<Scene::Texture>(texComp.texture_guid);
+
+				if (texture && texture->id != 0)
+				{
+					glActiveTexture(texture->channel); // Usually GL_TEXTURE0
+					glBindTexture(texture->target, texture->id);
+					shader->setUniform("DiffuseTex", 0); // Bind to texture unit 0
+					hasTexture = true;
+				}
+			}
+
+			// **NEW: Set UseTexture uniform**
+			shader->setUniform("UseTexture", hasTexture);
+
 			shader->setMaterialUniforms(material);
 			CalculateModelMatrix(transform, transform.modelMatrix);
 			shader->setUniform("M", transform.modelMatrix);
@@ -217,16 +232,28 @@ namespace EngineFramework
 		glDepthMask(GL_FALSE);
 		glDisable(GL_CULL_FACE);
 
-		// **FIX: Set Pass to 1 for skybox rendering**
 		shader->setUniform("Pass", 1);
 
-		auto skybox_view = registry.view<MeshComponent, SkyboxRenderPass>();
-		for (auto [entity, mesh] : skybox_view.each())
+		auto skybox_view = registry.view<MeshComponent, TextureComponent, SkyboxRenderPass>();
+		for (auto [entity, mesh, texture] : skybox_view.each())
 		{
+
 			if (meshCache.find(mesh.meshName) == meshCache.end()) {
 				LoadAndCacheMesh(mesh.meshName);
 			}
 			auto& [vao, indexCount] = meshCache[mesh.meshName];
+
+			if (!texture.texture_guid.empty())
+			{
+				auto texid = AssetManagerSystem::GetResource<Scene::Texture>(texture.texture_guid);
+
+				if (texid && texid->id != 0)
+				{
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_CUBE_MAP, texid->id);
+					// CubeMapTex is already using binding=0, so no need to set uniform
+				}
+			}
 
 			glBindVertexArray(vao);
 			glDrawElements(GL_TRIANGLES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
@@ -234,7 +261,7 @@ namespace EngineFramework
 
 		// --- FINAL CLEANUP ---
 		glBindVertexArray(0);
-		shader->disuse(); 
+		shader->disuse();
 		glDepthFunc(GL_LESS);
 		glEnable(GL_CULL_FACE);
 		glDepthMask(GL_TRUE);

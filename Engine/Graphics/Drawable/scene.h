@@ -7,6 +7,8 @@
 #include "MaterialComponent.h"
 #include "MeshComponent.h"
 #include "TransformComponent.h"
+#include "TextureComponent.h"
+
 #include "FBO.h"
 #include "Light.h"
 #include "Camera.h"
@@ -41,8 +43,8 @@
 #define DISABLE     false
 
 // Functions for loading textures
-GLuint loadTexture(const char* filename);
-GLuint loadHdrCubeMap(const std::array<std::string, 6>&);
+GLuint setupTexture(const char* filename);
+GLuint setupHdrCubeMap(const std::array<std::string, 6>&);
 
 //
 // The main Scene class encapsulates rendering passes, objects, textures, and cameras
