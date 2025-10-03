@@ -6,6 +6,12 @@
 #include "pch.hpp"
 #include "ReflectionRegister.hpp"
 //==Components for registering==//
+#include "CameraComponent.h"
+#include "LightComponent.h"
+#include "MaterialComponent.h"
+#include "MeshComponent.h"
+#include "TransformComponent.h"
+#include "TextureComponent.h"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 
 /*
@@ -66,6 +72,35 @@ struct adl_serializer<xresource::full_guid> {
 		guid.m_Type = j[1].get<uint64_t>();
 	}
 };
+
+template<>
+struct adl_serializer<CameraComponent::CameraType> {
+	static void to_json(json& j, const CameraComponent::CameraType& type) {
+		j = static_cast<int>(type);
+	}
+
+	static void from_json(const json& j, CameraComponent::CameraType& type) {
+		type = static_cast<CameraComponent::CameraType>(j.get<int>());
+	}
+};
+
+template<>
+struct adl_serializer<std::vector<glm::vec3>> {
+	static void to_json(json& j, const std::vector<glm::vec3>& vec) {
+		j = json::array();
+		for (const auto& v : vec) {
+			j.push_back(json::array({ v.x, v.y, v.z }));
+		}
+	}
+
+	static void from_json(const json& j, std::vector<glm::vec3>& vec) {
+		vec.clear();
+		for (const auto& item : j) {
+			vec.push_back(glm::vec3{ item[0], item[1], item[2] });
+		}
+	}
+};
+
 NLOHMANN_JSON_NAMESPACE_END
 
 using namespace entt::literals;
@@ -118,7 +153,9 @@ namespace EngineFramework
 		SetMeta(xresource::full_guid),
 		SetMeta(std::vector<int>),
 		SetMeta(std::vector<float>),
-		SetMeta(std::vector<std::string>)
+		SetMeta(std::vector<std::string>),
+		SetMeta(std::vector<glm::vec3>),
+		SetMeta(CameraComponent::CameraType)
 	};
 #define SetJson(T) {entt::resolve<T>().id(), SetJsonWithMetaAny<T>}
 	static std::unordered_map<entt::id_type, std::function<void(nlohmann::json&, const std::string&, const entt::meta_any&)>> set_json_with_meta_map
@@ -149,7 +186,9 @@ namespace EngineFramework
 		SetJson(xresource::full_guid),
 		SetJson(std::vector<int>),
 		SetJson(std::vector<float>),
-		SetJson(std::vector<std::string>)
+		SetJson(std::vector<std::string>),
+		SetJson(std::vector<glm::vec3>),
+		SetJson(CameraComponent::CameraType)
 	};
 
 
@@ -181,6 +220,11 @@ namespace EngineFramework
 		//Taking in entt::meta_any*, as references do not work.
 		static T GetComponent(entt::entity entity)
 		{
+			if constexpr (std::is_empty_v<T>)
+			{
+				//Empty struct, just return a default instance.
+				return T{};
+			}
 			return registry.get<T>(entity);
 		}
 	};
@@ -238,6 +282,85 @@ namespace EngineFramework
 		//Register the non-component arbitrary types used.
 		REGISTER_ARBITRARY_TYPE(glm::vec3);
 		REGISTER_ARBITRARY_TYPE(glm::mat4);
+		REGISTER_ARBITRARY_TYPE(xresource::full_guid);
+		REGISTER_ARBITRARY_TYPE(std::vector<glm::vec3>);
+		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
+
+		// === Register TransformComponent ===
+		entt::meta_factory<TransformComponent>()
+			.type("TransformComponent")
+			.data<&TransformComponent::position>("position")
+			.data<&TransformComponent::rotation>("rotation")
+			.data<&TransformComponent::scale>("scale")
+			.data<&TransformComponent::modelMatrix>("modelMatrix")
+			.func<&Emplacer<TransformComponent>::EmplaceComponent>("emplace")
+			.func<&Getter<TransformComponent>::GetComponent>("get");
+
+		// === Register MeshComponent ===
+		entt::meta_factory<MeshComponent>()
+			.type("MeshComponent")
+			.data<&MeshComponent::meshName>("meshName")
+			.data<&MeshComponent::vao>("vao")
+			.data<&MeshComponent::indexCount>("indexCount")
+			.func<&Emplacer<MeshComponent>::EmplaceComponent>("emplace")
+			.func<&Getter<MeshComponent>::GetComponent>("get");
+
+		// === Register MaterialComponent ===
+		entt::meta_factory<MaterialComponent>()
+			.type("MaterialComponent")
+			.data<&MaterialComponent::rough>("rough")
+			.data<&MaterialComponent::metal>("metal")
+			.data<&MaterialComponent::color>("color")
+			.data<&MaterialComponent::Ka>("Ka")
+			.data<&MaterialComponent::Kd>("Kd")
+			.data<&MaterialComponent::Ks>("Ks")
+			.data<&MaterialComponent::shininess>("shininess")
+			.data<&MaterialComponent::effect>("effect")
+			.data<&MaterialComponent::materialName>("materialName")
+			.func<&Emplacer<MaterialComponent>::EmplaceComponent>("emplace")
+			.func<&Getter<MaterialComponent>::GetComponent>("get");
+
+		// === Register LightComponent ===
+		entt::meta_factory<LightComponent>()
+			.type("LightComponent")
+			.data<&LightComponent::position>("position")
+			.data<&LightComponent::L>("L")
+			.func<&Emplacer<LightComponent>::EmplaceComponent>("emplace")
+			.func<&Getter<LightComponent>::GetComponent>("get");
+
+		// === Register CameraComponent ===
+		entt::meta_factory<CameraComponent>()
+			.type("CameraComponent")
+			.data<&CameraComponent::camType>("camType")
+			.data<&CameraComponent::position>("position")
+			.data<&CameraComponent::target>("target")
+			.data<&CameraComponent::fieldOfView>("fieldOfView")
+			.data<&CameraComponent::nearPlane>("nearPlane")
+			.data<&CameraComponent::farPlane>("farPlane")
+			.data<&CameraComponent::view_vector>("view_vector")
+			.data<&CameraComponent::proj_matrix>("proj_matrix")
+			.data<&CameraComponent::oldx>("oldx")
+			.data<&CameraComponent::oldy>("oldy")
+			.func<&Emplacer<CameraComponent>::EmplaceComponent>("emplace")
+			.func<&Getter<CameraComponent>::GetComponent>("get");
+
+		// === Register TextureComponent ===
+		entt::meta_factory<TextureComponent>()
+			.type("TextureComponent")
+			.data<&TextureComponent::texture_guid>("texture_guid")
+			.func<&Emplacer<TextureComponent>::EmplaceComponent>("emplace")
+			.func<&Getter<TextureComponent>::GetComponent>("get");
+
+		// Tag components (if you need them for serialization)
+		entt::meta_factory<SceneRenderPass>()
+			.type("SceneRenderPass")
+			.func<&Emplacer<SceneRenderPass>::EmplaceComponent>("emplace")
+			.func<&Getter<SceneRenderPass>::GetComponent>("get");
+
+		entt::meta_factory<SkyboxRenderPass>()
+			.type("SkyboxRenderPass")
+			.func<&Emplacer<SkyboxRenderPass>::EmplaceComponent>("emplace")
+			.func<&Getter<SkyboxRenderPass>::GetComponent>("get");
 
 
 		entt::meta_factory<EngineFramework::TODELETE>()
