@@ -1,3 +1,19 @@
+/*
+*****************************************************************/
+/*!
+\file   Screen.hpp
+\author Tan Yee Tong
+\par    yeetong.t\@digipen.edu
+\date   September 2025
+\brief
+This file enables the screen buffer of the level editor to run. It also
+includes functions that is built in screen such as gizmos
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/* *******************************************************************/
+
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "pch.hpp"
 
@@ -362,65 +378,86 @@ namespace EngineFramework
 
     void Screen::gizmos() {
 
-        ImGuizmo::BeginFrame(); 
-        ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
-        gizmos_IS_hovering = ImGuizmo::IsOver();
-        gizmos_IS_dragged = ImGuizmo::IsUsing();
-     
+        //do not use gizmos if nothing is being selected, because what are you referrring to?
+        if (editor_ptr->selected_objectID == entt::null) {
+            //std::cout << "nothing is selected\n";
+            return;
+        }
+
         auto camera_view = registry.view<CameraComponent>();
         auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-        float aspect = (GraphicsSystem::GetInstance().GetWindowSize().second > 0) ? 
+        float aspect = (GraphicsSystem::GetInstance().GetWindowSize().second > 0) ?
             (float)GraphicsSystem::GetInstance().GetWindowSize().first / GraphicsSystem::GetInstance().GetWindowSize().second : 1.0f;
         glm::mat4 view = Camera::getLookAt(camera);
         glm::mat4 proj = Camera::getPerspective(camera, aspect);
-        auto objects = registry.view<TransformComponent>();
-        auto& first_obj = objects.get<TransformComponent>(objects.front());
 
-        // Create a copy of the model matrix to work with
-        glm::mat4 model = first_obj.modelMatrix;
-        ImGuizmo::SetOrthographic(false); //because we have perspective
-        
-        //set this for gizmos
-        ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
+        /*
+            only usw gizmos if the object have a TransformComponent
+        */
 
-        //imviewgizmo adapted from imguizmo sample demo       
-        float viewManipulateRight = screen_pos.x + available_size.x;
-        float viewManipulateTop = screen_pos.y;
-        glm::mat4 view_before = view;
+        entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+        if (registry.all_of<TransformComponent>(id)) {
 
-        ImGuizmo::DrawCubes(glm::value_ptr(view), glm::value_ptr(proj), glm::value_ptr(model), 1);
-        ImGuizmo::ViewManipulate(glm::value_ptr(view), camDistance, ImVec2(viewManipulateRight - 128, viewManipulateTop), ImVec2(128, 128), 0x10101010);
-        
-        //whenever we clicked on the cube, view will be return with a new value
-        //ONLY if its a new value, set new cam and target position (not every frame)      
-        if (Check_Mat4_Diff(view, view_before)) {
-            //graphics system is always updating the camera view and proj based on camera pos and target pos
-            glm::vec3 new_CamPos = glm::vec3(glm::inverse(view)[3]);
-            glm::vec3 new_TargetPos = glm::vec3(model[3]);
-            Camera::set_Cam_Pos(camera, new_CamPos);
-            Camera::set_Target_Pos(camera, new_TargetPos);
+            auto& object = registry.get<TransformComponent>(id);
+
+            ImGuizmo::BeginFrame();
+            ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+            gizmos_IS_hovering = ImGuizmo::IsOver();
+            gizmos_IS_dragged = ImGuizmo::IsUsing();
+
+
+
+            //auto& first_obj = objects.get<TransformComponent>(objects.front());
+
+            // Create a copy of the model matrix to work with
+            glm::mat4 model = object.modelMatrix;
+            ImGuizmo::SetOrthographic(false); //because we have perspective
+
+            //set this for gizmos
+            ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
+
+            //imviewgizmo adapted from imguizmo sample demo       
+            float viewManipulateRight = screen_pos.x + available_size.x;
+            float viewManipulateTop = screen_pos.y;
+            glm::mat4 view_before = view;
+
+            ImGuizmo::DrawCubes(glm::value_ptr(view), glm::value_ptr(proj), glm::value_ptr(model), 1);
+            ImGuizmo::ViewManipulate(glm::value_ptr(view), camDistance, ImVec2(viewManipulateRight - 128, viewManipulateTop), ImVec2(128, 128), 0x10101010);
+
+            //whenever we clicked on the cube, view will be return with a new value
+            //ONLY if its a new value, set new cam and target position (not every frame)      
+            if (Check_Mat4_Diff(view, view_before)) {
+                //graphics system is always updating the camera view and proj based on camera pos and target pos
+                glm::vec3 new_CamPos = glm::vec3(glm::inverse(view)[3]);
+                glm::vec3 new_TargetPos = glm::vec3(model[3]);
+                Camera::set_Cam_Pos(camera, new_CamPos);
+                Camera::set_Target_Pos(camera, new_TargetPos);
+            }
+
+            // Store the matrix before manipulation
+            glm::mat4 model_before = model;
+
+            // Manipulate the model matrix
+            ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(proj), operation, mode, glm::value_ptr(model));
+
+            // Check if the model matrix was changed
+            if (Check_Mat4_Diff(model, model_before)) {
+                // Extract position, rotation, and scale from the new model matrix
+                float translation[3], rotation[3], scale[3];
+                ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), translation, rotation, scale);
+
+                // Update the TransformComponent values
+                object.position = glm::vec3(translation[0], translation[1], translation[2]);
+                object.rotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
+                object.scale = glm::vec3(scale[0], scale[1], scale[2]);
+
+                // No need to manually update the modelMatrix as it will be recalculated next frame
+                // based on the updated position, rotation, and scale values
+            }
+
+            
         }
         
-        // Store the matrix before manipulation
-        glm::mat4 model_before = model;
-
-        // Manipulate the model matrix
-        ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(proj), operation, mode, glm::value_ptr(model));
-
-        // Check if the model matrix was changed
-        if (Check_Mat4_Diff(model, model_before)) {
-            // Extract position, rotation, and scale from the new model matrix
-            float translation[3], rotation[3], scale[3];
-            ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), translation, rotation, scale);
-
-            // Update the TransformComponent values
-            first_obj.position = glm::vec3(translation[0], translation[1], translation[2]);
-            first_obj.rotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
-            first_obj.scale = glm::vec3(scale[0], scale[1], scale[2]);
-
-            // No need to manually update the modelMatrix as it will be recalculated next frame
-            // based on the updated position, rotation, and scale values
-        }
 
     }
 
