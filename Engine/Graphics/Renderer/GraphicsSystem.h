@@ -19,6 +19,7 @@ namespace EngineFramework
 
         void RenderScene(); 
         void LoadAndCacheMesh(const std::string& meshName);
+        void ApplyPendingResize();
 
         static GraphicsSystem& GetInstance()
         {
@@ -46,6 +47,10 @@ namespace EngineFramework
         glm::vec2 screen = { WIDTH,HEIGHT };
         bool m_isRenderingToFBO = false;
         static inline GraphicsSystem* this_graphics_ptr = nullptr;
+
+        bool m_hasPendingResize = false;
+        int m_pendingWidth = 0;
+        int m_pendingHeight = 0;
 
         // Setup methods
         void SetupGLFW();

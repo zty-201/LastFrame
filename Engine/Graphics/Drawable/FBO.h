@@ -129,6 +129,9 @@ struct FBO
         }
         // Revert to the default framebuffer.
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // Also unbind the texture to avoid state conflicts
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     void resetTextureDepthAsTarget(int width, int height)

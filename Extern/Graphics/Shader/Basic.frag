@@ -46,7 +46,7 @@ uniform int Pass;
 uniform Fog fog;
 
 layout(binding=0) uniform sampler2D DiffuseTex;     // For regular objects
-layout(binding=0) uniform samplerCube CubeMapTex;   // For skybox
+layout(binding=1) uniform samplerCube CubeMapTex;   // For skybox
 
 uniform bool UseTexture;
 

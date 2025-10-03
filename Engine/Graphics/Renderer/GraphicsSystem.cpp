@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "global.hpp"
+#include "Debug.h"
 #include "GraphicsSystem.h"
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
@@ -243,17 +244,16 @@ namespace EngineFramework
 			}
 			auto& [vao, indexCount] = meshCache[mesh.meshName];
 
-			if (!texture.texture_guid.empty())
-			{
-				auto texid = AssetManagerSystem::GetResource<Scene::Texture>(texture.texture_guid);
+			// **NEW: Bind cubemap texture if TextureComponent exists**
+			auto texid = AssetManagerSystem::GetResource<Scene::Texture>(texture.texture_guid);
 
-				if (texid && texid->id != 0)
-				{
-					glActiveTexture(GL_TEXTURE0);
-					glBindTexture(GL_TEXTURE_CUBE_MAP, texid->id);
-					// CubeMapTex is already using binding=0, so no need to set uniform
-				}
+			if (texid && texid->id != 0)
+			{
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, texid->id);
+				shader->setUniform("CubeMapTex", 1);
 			}
+			
 
 			glBindVertexArray(vao);
 			glDrawElements(GL_TRIANGLES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
@@ -360,9 +360,17 @@ namespace EngineFramework
 	//When drawing area should be resized.
 	void GraphicsSystem::HANDLE_EVENT_WindowResized(Event_Window_Resized& window_resize)
 	{
+		// Save current texture bindings
+		GLint prevTexture;
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &prevTexture);
+
+		// Resize framebuffer
 		scene_framebuffer.resize(window_resize.width, window_resize.height);
 		screen.x = static_cast<float>(window_resize.width);
 		screen.y = static_cast<float>(window_resize.height);
+
+		// Restore previous texture bindings
+		glBindTexture(GL_TEXTURE_2D, prevTexture);
 	}
 
 	void GraphicsSystem::CalculateModelMatrix(const TransformComponent& transform, glm::mat4& model)
