@@ -60,8 +60,7 @@ namespace EngineFramework
         (void)window;
         (void)scancode;
         (void)mods;
-        auto camera_view = registry.view<CameraComponent>();
-		auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+        
         //auto& pScene = GraphicsSystem::GetInstance().GetScene();
         //std::shared_ptr<ShaderProgram> shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(pScene->shader_guid);
         switch (action)
@@ -69,10 +68,18 @@ namespace EngineFramework
         case GLFW_PRESS:
             // Transition to Pressed (this frame only)
             keyStates[key] = KeyState::Pressed;
-            if (key == 'W')
-				Camera::setType(camera, CameraComponent::CameraType::WALKING);
-            else if (key == 'O')
-				Camera::setType(camera, CameraComponent::CameraType::ORBITING);
+            if (key == 'W') {
+                auto camera_view = registry.view<CameraComponent>();
+                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+                Camera::setType(camera, CameraComponent::CameraType::WALKING);
+            }
+                
+            else if (key == 'O') {
+                auto camera_view = registry.view<CameraComponent>();
+                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+                Camera::setType(camera, CameraComponent::CameraType::ORBITING);
+            }
+				
             else if (key == GLFW_KEY_1)
             {
                 //shader->use();
@@ -114,29 +121,34 @@ namespace EngineFramework
         double yoffset = ypos - oldypos;
         oldxpos = xpos;
         oldypos = ypos;
-        auto camera_view = registry.view<CameraComponent>();
-        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+        
         if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed 
             || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down))
         {
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
             if (!LevelEditorSystem::Get_Enable()) {
+                auto camera_view = registry.view<CameraComponent>();
+                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
 				Camera::onCursor(camera, xoffset, yoffset);
             }
-#else
+#else   
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
             Camera::onCursor(camera, xoffset, yoffset);
 #endif
         }
         else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed)
         {
-            auto light_view = registry.view<LightComponent>();
-            auto& light = light_view.get<LightComponent>(light_view.front());
+            
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
             if (!LevelEditorSystem::Get_Enable()) {
-
+                auto light_view = registry.view<LightComponent>();
+                auto& light = light_view.get<LightComponent>(light_view.front());
 				Light::onCursor(light, xoffset, yoffset);
             }
 #else
+            auto light_view = registry.view<LightComponent>();
+            auto& light = light_view.get<LightComponent>(light_view.front());
             Light::onCursor(light, xoffset, yoffset);
 #endif
         }
