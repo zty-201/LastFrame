@@ -5,7 +5,6 @@
 
 #include "pch.hpp"
 #include "ReflectionRegister.hpp"
-
 //==Components for registering==//
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 
@@ -78,11 +77,20 @@ namespace EngineFramework
 
 			If a variable/function is registered under my_type, they'll be treated as members of my_type (even for global variables/functions).
 		
-			Every component needs an emplace function for that type.
-			.func<&Emplacer<My_Component>::EmplaceComponent>("emplace"_hs);
+			Every component needs an emplace and getter function for that type.
+			.func<&Emplacer<My_Component>::EmplaceComponent>("emplace"_hs)
+			.func<&Getter<TODELETE>::GetComponent>("get");
+
 
 			NOTE: Taking in references may not work for functions registered.
 		*/
+		
+		//Register the non-component arbitrary types used.
+		entt::meta_factory<glm::vec3>()
+			.traits(REGISTERED_TYPE::NON_COMPONENT);
+		//Register the non-component arbitrary types used.
+		entt::meta_factory<glm::mat4>()
+			.traits(REGISTERED_TYPE::NON_COMPONENT);
 
 		entt::meta_factory<EngineFramework::TODELETE>()
 			.type("TestClass")
@@ -101,6 +109,7 @@ namespace EngineFramework
 			.func<&Emplacer<TODELETE2>::EmplaceComponent>("emplace")
 			.func<&Getter<TODELETE2>::GetComponent>("get");
 
+		
 
 	}
 

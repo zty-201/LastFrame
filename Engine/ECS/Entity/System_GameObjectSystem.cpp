@@ -126,26 +126,26 @@ namespace EngineFramework
 	{
 		UNREFERENCED_PARAMETER(delta_time);
 
-		////TODO: Testing, to delete.
-		//std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
-		//std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
-		//DeSerializeAllEntityInstances(test_scene);
-		//auto view = registry.view<TODELETE>();
-		//auto view2 = registry.view<TODELETE2>();
-		//for (entt::entity entity_id : view)
-		//{
-		//	TODELETE& comp = view.get<TODELETE>(entity_id);
-		//	LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-		//	UNREFERENCED_PARAMETER(comp);
-		//}
-		//for (entt::entity entity_id : view2)
-		//{
-		//	TODELETE2& comp = view2.get<TODELETE2>(entity_id);
-		//	LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-		//	UNREFERENCED_PARAMETER(comp);
-		//}
-		//std::string test_save_data = SerializeAllEntityInstances();
-		//LOGD("Testing Serialization: %s", test_save_data.c_str());
+		//TODO: Testing, to delete.
+		std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
+		std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
+		DeSerializeAllEntityInstances(test_scene);
+		auto view = registry.view<TODELETE>();
+		auto view2 = registry.view<TODELETE2>();
+		for (entt::entity entity_id : view)
+		{
+			TODELETE& comp = view.get<TODELETE>(entity_id);
+			LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+			UNREFERENCED_PARAMETER(comp);
+		}
+		for (entt::entity entity_id : view2)
+		{
+			TODELETE2& comp = view2.get<TODELETE2>(entity_id);
+			LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+			UNREFERENCED_PARAMETER(comp);
+		}
+		std::string test_save_data = SerializeAllEntityInstances();
+		LOGD("Testing Serialization: %s", test_save_data.c_str());
 	}
 
 
@@ -245,6 +245,8 @@ namespace EngineFramework
 			*/
 			for (auto&& [comp_type_id, component_type] : entt::resolve())
 			{
+				//Only serialize components. Registered types which aren't components (like glm::vec3) won't be emplaced in registry anyways.
+				if (component_type.traits<REGISTERED_TYPE>() == REGISTERED_TYPE::NON_COMPONENT) continue;
 				//If an entity does not contain this specific component type, continue to the next type.
 				if (!registry.storage(comp_type_id)->contains(entity))
 				{

@@ -189,6 +189,13 @@ namespace EngineFramework
 
 	}
 
+	//Used to differentiate between the different types.
+	enum struct REGISTERED_TYPE : short
+	{
+		COMPONENT = 0,
+		NON_COMPONENT = 1
+	};
+
 	//TODO: Test struct, to delete.
 	struct TODELETE
 	{
