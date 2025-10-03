@@ -225,8 +225,8 @@ namespace EngineFramework
 						ImGui::EndMenu();
 					}
 
-					/*ImGui::MenuItem("Open Existing", NULL, &featureFlag("Screen"));
-					ImGui::Separator();*/
+					ImGui::MenuItem("Open Existing", NULL, &featureFlag("Screen"));
+					ImGui::Separator();
 					ImGui::MenuItem("Open Scene", NULL, &featureFlag("SceneManager"));
 					ImGui::Separator();
 					if (ImGui::MenuItem("Save", NULL)) {
