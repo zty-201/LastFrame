@@ -15,6 +15,8 @@
 
 namespace EngineFramework
 {
+	class Save; //forward declaration
+	
 
 	/*
 		Controls serialization, deserialization, safe deletion of instances.
@@ -113,6 +115,8 @@ namespace EngineFramework
 
 		//Keeps track of the one and only instance of this system, created by core engine.
 		static inline GameObjectSystem* this_system{};
+
+		friend Save;
 	};
 
 	

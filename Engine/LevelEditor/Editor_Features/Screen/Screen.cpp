@@ -64,7 +64,7 @@ namespace EngineFramework
     void Screen::Initialize() {
         auto camera_view = registry.view<CameraComponent>();
         auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-		Camera::setType(camera, CameraComponent::WALKING);
+        Camera::setType(camera, CameraComponent::WALKING);
     }
     void Screen::Run() {
 
@@ -112,7 +112,7 @@ namespace EngineFramework
             gizmos();
             drop_target();
 
-            if (bool hovered = ImGui::IsItemHovered()) {               
+            if (bool hovered = ImGui::IsItemHovered()) {
                 camera_controls_in_screen_only();
             }
             camera_controls_outside_screen();
@@ -122,10 +122,10 @@ namespace EngineFramework
         ImGui::PopStyleColor();
         ImGui::End();
 
-        
-        
+
+
         control_window();
-      
+
     }
     void Screen::Close() {
         LOGI("Screen closed");
@@ -168,23 +168,23 @@ namespace EngineFramework
     void Screen::camera_controls_outside_screen() {
 
         float speed = 0.05f;
-        
+
         if (ImGui::IsKeyDown(ImGuiKey_W)) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-			Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, speed));
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, speed));
         }
 
         if (ImGui::IsKeyDown(ImGuiKey_S)) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-			Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, -speed));
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, -speed));
         }
 
         if (ImGui::IsKeyDown(ImGuiKey_Q) || ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-			Camera::Move_Cam_and_Target(camera, glm::vec3(0, speed, 0));
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, speed, 0));
         }
         if (ImGui::IsKeyDown(ImGuiKey_E) || ImGui::IsKeyDown(ImGuiKey_DownArrow)) {
             auto camera_view = registry.view<CameraComponent>();
@@ -213,14 +213,14 @@ namespace EngineFramework
         if (io.MouseDown[1]) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-			Camera::onCursor(camera, Mouse_delta.x, Mouse_delta.y);
+            Camera::onCursor(camera, Mouse_delta.x, Mouse_delta.y);
         }
 
         //moving forward/backwards
         if (Mouse_Scroll != 0.f) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-			Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, Mouse_Scroll));
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, Mouse_Scroll));
         }
 
     }
@@ -254,7 +254,7 @@ namespace EngineFramework
                 ImGui::SameLine();
                 if (ImGui::RadioButton("Scale", operation == ImGuizmo::SCALE))     operation = ImGuizmo::SCALE;
                 ImGui::Dummy(ImVec2(0.0f, 20.f));
-                
+
                 ImGui::TextUnformatted("Coord Space: ");
                 ImGui::SameLine();
                 if (ImGui::RadioButton("Local", mode == ImGuizmo::LOCAL))  mode = ImGuizmo::LOCAL;
@@ -262,7 +262,7 @@ namespace EngineFramework
                 if (ImGui::RadioButton("World", mode == ImGuizmo::WORLD))  mode = ImGuizmo::WORLD;
                 ImGui::Dummy(ImVec2(0.0f, 200.f));
 
-                
+
 
                 //if any object is being selected
                 if (true) { // if any object is being selected
@@ -323,15 +323,132 @@ namespace EngineFramework
                         transformation_changed = false;
                     }
                 }
-                
+
                 ImGui::EndTabItem();
             }
 
-            // -------- Lighting tab --------
-            if (ImGui::BeginTabItem("Lighting")) {
-                
-                ImGui::TextUnformatted("see how");
-                
+            // -------- Texture tab --------
+            if (ImGui::BeginTabItem("Texture")) {
+
+                static bool custom_skin = false; //this needs to change depending on the materials
+
+                if (editor_ptr->selected_objectID == entt::null) {
+                    
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));      // Black text
+                    ImGui::TextUnformatted("* no object is being selected");
+                    ImGui::PopStyleColor();
+
+                }
+                else {
+
+                    /*
+                       get the material component of the object
+                   */
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    ImGui::SeparatorText("Material");
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    ImGui::TextUnformatted("Assign a material to the object: ");
+
+                    entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+
+                    if (registry.all_of<MaterialComponent>(id)) {
+
+                        auto& object = registry.get<MaterialComponent>(id);
+
+                        ImGui::SameLine();
+                        static const char* material_type[] = { "Checkerboard", "PBR", "Discard", "Cartoon" };
+                        static int index = 0; // index into items
+
+                        if (object == MATERIAL_CHECKERBOARD) {
+                            index = 0;
+                        }
+                        else if (object == MATERIAL_PBR_PHONG) {
+                            index = 1;
+                        }
+                        else if (object == MATERIAL_DISCARD) {
+                            index = 2;
+                        }
+                        else if (object == MATERIAL_CARTOON) {
+                            index = 3;
+                        }
+
+                        ImGui::SetNextItemWidth(300.f);
+                        if (ImGui::Combo("##material_type", &index, material_type, IM_ARRAYSIZE(material_type))) {
+
+                            if (index == 0) {
+                                object = MATERIAL_CHECKERBOARD;
+                            }
+                            else if (index == 1) {
+                                object = MATERIAL_PBR_PHONG;
+                            }
+                            else if (index == 2) {
+                                object = MATERIAL_DISCARD;
+                            }
+                            else if (index == 3) {
+                                object = MATERIAL_CARTOON;
+                            }
+
+                        }
+
+                    }
+
+                    /*
+                        conditions for the change of custom texture
+                        1. new drag drop into the tab
+                        2. texture is being removed
+
+                        Only these actions will change the static texture_name
+                        workflow will change after graphics team pushes new update
+
+
+                    */
+
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    ImGui::SeparatorText("Custom Texture");
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+
+                    ImGui::TextUnformatted("Texture Loaded: ");
+
+                    if (custom_skin) {
+
+                        ImGui::SameLine();
+                        static std::string texture_name = "DOESNT_EXISTS.png";
+                        ImGui::TextUnformatted(texture_name.c_str());
+
+                        if (ImGui::Button("Remove Custom Texture", ImVec2(300, 0))) {
+
+                            //remove the texturecomponent
+                            custom_skin = false;
+
+                        }
+                    }
+                    else {
+                        ImGui::SameLine();
+                        ImGui::TextUnformatted(" Not chosen");
+                    }
+
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    
+                    ImVec2 size(ImGui::GetContentRegionAvail().x, 160.0f);
+                    ImGui::Button("Drop new Texture from Asset Browser to attach to object", size);
+
+
+                    if (ImGui::BeginDragDropTarget())
+                    {
+                        // Accept path payload (null-terminated string)
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Models"))
+                        {
+                            //const char* path = (const char*)payload->Data;
+
+                            std::cout << "Drop successful in texture tab" << std::endl;
+                            custom_skin = true;
+
+                        }
+                        ImGui::EndDragDropTarget();
+                    }
+
+                }
+
 
                 ImGui::EndTabItem();
             }
@@ -364,7 +481,7 @@ namespace EngineFramework
 
     //return true if theres a difference
     bool Check_Mat4_Diff(const glm::mat4& a, const glm::mat4& b, float epsilon = 1e-5f) {
-        
+
         const float* pa = glm::value_ptr(a);
         const float* pb = glm::value_ptr(b);
         for (int i = 0; i < 16; ++i) {
@@ -455,9 +572,9 @@ namespace EngineFramework
                 // based on the updated position, rotation, and scale values
             }
 
-            
+
         }
-        
+
 
     }
 
@@ -467,7 +584,7 @@ namespace EngineFramework
         {
             // Accept path payload (null-terminated string)
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Models"))
-            {                
+            {
                 //const char* path = (const char*)payload->Data;
 
                 //std::cout << "Drop successful: " << path << std::endl;
