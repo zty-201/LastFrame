@@ -78,8 +78,8 @@ namespace EngineFramework
 		//*/
 		nlohmann::json archtype_json_data{};
 		/*
-				Iterate over all component types and add each member
-			*/
+			Iterate over all component types and add each member
+		*/
 		for (const entt::meta_any& comp : component_arr)
 		{
 			//Store data members of the component, then add the component json under archtype_data (nested json).
