@@ -34,6 +34,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetManager.hpp"
 #include "Save.hpp"
 //#include <iostream>
+#include "System_GameObjectSystem.hpp"
 
 namespace EngineFramework
 {
@@ -118,27 +119,64 @@ namespace EngineFramework
             return false;
         }
 
+        if (!save_Archtypes()) return false;
+        if (!save_Instances(filename)) return false;
+
+        return true;
+
+    }
+
+    bool Save::save_Archtypes() {
+
+        
+        auto pairs = GameObjectSystem::GetInstance().SerializeAllEntityArchtypes();
+        std::string base = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Archtypes/";
+
+        for (auto& [name, json] : pairs)
+        {
+            std::string path = base + name + ".json";
+            std::ofstream Out_File(path, std::ios::binary | std::ios::trunc);
+
+            if (!Out_File.is_open()) return false;
+
+            std::stringstream ss;
+
+            /*
+                Serialise here
+            */
+            ss << json;
+
+            Out_File << ss.str();   // Output the contents of the stringstream
+            Out_File.close();
+        }
+
+        return true;
+
+    }
+
+    bool Save::save_Instances(std::string filename) {
+
         std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scenes/" + filename;
         std::ofstream Out_File(path);
 
         if (!Out_File.is_open()) return false;
-        
-        
-       
+
         std::stringstream ss;
 
         /*
             Seralise here
-            
+
         */
 
-        ss << "Note that seralise is not done yet. This is just a dummy file to demo file saving. Do not data pharse this file\n";
+        std::string json = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances();
+
+        ss << json;
 
         Out_File << ss.str(); // Output the contents of the stringstream
         Out_File.close();
 
         return true;
-       
+
     }
 
 }

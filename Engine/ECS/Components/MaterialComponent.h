@@ -13,6 +13,24 @@ struct MaterialComponent
 	std::string materialName;
 };
 
+inline bool operator==(const MaterialComponent& a, const MaterialComponent& b)
+{
+    return  a.rough == b.rough
+        && a.metal == b.metal
+        && a.shininess == b.shininess
+        && a.effect == b.effect
+        && a.color == b.color
+        && a.Ka == b.Ka
+        && a.Kd == b.Kd
+        && a.Ks == b.Ks;
+}
+
+inline bool operator!=(const MaterialComponent& a, const MaterialComponent& b)
+{
+    return !(a == b);
+}
+
+
 // Define some default materials using the new structure (to be deleted later)
 const MaterialComponent MATERIAL_PBR_PHONG({ 0.8f, 0.2f, {1.0f, 0.8f, 0.2f}, {0.1f, 0.1f, 0.1f}, {0.7f, 0.7f, 0.7f}, {1.0f, 1.0f, 1.0f}, 128.0f, 0.0f, "PBR"});
 const MaterialComponent MATERIAL_DISCARD({ 0.5f, 0.0f, {0.2f, 0.8f, 0.2f}, {0.1f, 0.1f, 0.1f}, {0.7f, 0.7f, 0.7f}, {1.0f, 1.0f, 1.0f}, 32.0f, 1.0f, "Discard"});

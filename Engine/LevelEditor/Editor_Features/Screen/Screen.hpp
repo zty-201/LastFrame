@@ -41,6 +41,8 @@ namespace EngineFramework
         void Run() override;
         void Close() override;
 
+        static Screen& GetInstance();
+
         static bool is_control_open;
         static bool is_simulator_running;
         static bool gizmos_IS_hovering;
@@ -54,7 +56,7 @@ namespace EngineFramework
         void control_window();
         void drop_target();
         
-         
+        static inline Screen* this_instance{};
     };
 
 }

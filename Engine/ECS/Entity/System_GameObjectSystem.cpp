@@ -129,24 +129,24 @@ namespace EngineFramework
 	{
 		UNREFERENCED_PARAMETER(delta_time);
 
-		////TODO: Testing, to delete.
-		//std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
-		//std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
-		//DeSerializeAllEntityInstances(test_scene);
-		//auto view = registry.view<TODELETE>();
-		//auto view2 = registry.view<TODELETE2>();
-		//for (entt::entity entity_id : view)
-		//{
-		//	TODELETE& comp = view.get<TODELETE>(entity_id);
-		//	LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-		//	UNREFERENCED_PARAMETER(comp);
-		//}
-		//for (entt::entity entity_id : view2)
-		//{
-		//	TODELETE2& comp = view2.get<TODELETE2>(entity_id);
-		//	LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-		//	UNREFERENCED_PARAMETER(comp);
-		//}
+		//TODO: Testing, to delete.
+		std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
+		std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
+		DeSerializeAllEntityInstances(test_scene);
+		auto view = registry.view<TODELETE>();
+		auto view2 = registry.view<TODELETE2>();
+		for (entt::entity entity_id : view)
+		{
+			TODELETE& comp = view.get<TODELETE>(entity_id);
+			//LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+			UNREFERENCED_PARAMETER(comp);
+		}
+		for (entt::entity entity_id : view2)
+		{
+			TODELETE2& comp = view2.get<TODELETE2>(entity_id);
+			//LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+			UNREFERENCED_PARAMETER(comp);
+		}
 		//std::string test_save_data = SerializeAllEntityInstances();
 		//LOGD("Testing Serialization: %s", test_save_data.c_str());
 	}
@@ -246,15 +246,19 @@ namespace EngineFramework
 				Note: Cannot simply iterate over all components for an entity, as components are not
 				stored in the entity but rather stored in their own pools based on type.
 			*/
-			for (auto&& [comp_type_id, component_type] : entt::resolve())
+			//for (auto&& [comp_type_id, component_type] : entt::resolve())
+			//Iterate over all types stored in registry.
+			for(auto&& comp_storage : registry.storage())
 			{
-				//Only serialize components. Registered types which aren't components (like glm::vec3) won't be emplaced in registry anyways.
-				if (component_type.traits<REGISTERED_TYPE>() == REGISTERED_TYPE::NON_COMPONENT) continue;
 				//If an entity does not contain this specific component type, continue to the next type.
-				if (!registry.storage(comp_type_id)->contains(entity))
-				{
-					continue;
-				}
+				if (!comp_storage.second.contains(entity)) continue;
+				//Check if it's a registered component
+				entt::meta_type component_type = entt::resolve(comp_storage.second.info());
+				if (!component_type) continue; //Not a valid registered component.
+				//Only serialize components. Registered types which aren't components (like glm::vec3) shouldn't be stored.
+				if (component_type.traits<REGISTERED_TYPE>() == REGISTERED_TYPE::NON_COMPONENT) continue;
+	
+				
 				//If it belongs to the archtype, don't save it.
 				if (std::find(archtype_components.begin(), archtype_components.end(), component_type) != archtype_components.end())
 				{
@@ -368,11 +372,13 @@ namespace EngineFramework
 			}
 
 		}
+		LOGD("Successfully Deserialized %s", json_input.c_str());
 	}
 
 	entt::entity GameObjectSystem::Instantiate(std::shared_ptr<Archtype> archtype, const xresource::instance_guid& archtype_instance_guid)
 	{
 		entt::entity entity = registry.create();
+
 		//Emplace all components inside the entity.
 		//Each component must have an "emplace" lambda/function registered.
 		for (const entt::meta_any& comp : archtype->component_arr)

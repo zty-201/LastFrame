@@ -19,6 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <filesystem>
 #include <iostream>
 #include "AssetManager.hpp"
+#include "Screen.hpp"
 
 namespace EngineFramework
 {
@@ -81,6 +82,8 @@ namespace EngineFramework
 					std::string sceneString{ sceneName.begin(), sceneName.end() };
 					GameObjectSystem::GetInstance().LoadScene(sceneString);
 					currentScene = scene;
+
+					Screen::GetInstance().is_enabled = true;
 				}
 			}
 		}
