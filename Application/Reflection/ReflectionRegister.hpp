@@ -11,7 +11,7 @@
 
 
 	When looking up a name, ensure it's hashed if it was registered as hashed (_hs). For non-hashed registration, it can be looked up via hash too.
-	for entt::id_type, use entt::hashed_string{"string"} to get the hashed string. 
+	for entt::id_type, use entt::hashed_string{"string"} to get the hashed string.
 
 	// direct access to a reflected type
 	auto by_type = entt::resolve<my_type>();
@@ -49,7 +49,7 @@
 
 	CastMetaDataToType is optional, but it may be used. if used, the new data types need to be placed in this function too.
 
-	When setting new data types, sometimes json doesn't have implicit support for these types. e.g. glm::vec3, std::vector<T>. 
+	When setting new data types, sometimes json doesn't have implicit support for these types. e.g. glm::vec3, std::vector<T>.
 	In these cases, instead of doing data.cast<T> the data may need to be written to json or read from json in a different way. e.g. reading/writing glm::vec3 as an array of 3 floats.
 	Try to keep code reusable, e.g. std::vector<T> read/write to json can be placed into a template function so it can be reused for different types like std::vector<int>, std::vector<float>.
 	Also ensure data types are registered before using entt::resolve<new type>(). e.g. register glm::vec3.
@@ -65,7 +65,7 @@ namespace EngineFramework
 {
 	inline entt::id_type GetID(std::string type_name)
 	{
-		return entt::hashed_string{ type_name.c_str()}.value();
+		return entt::hashed_string{ type_name.c_str() }.value();
 	}
 	/*
 		Called during program startup: Will register all components into Entt reflection system.
@@ -77,124 +77,125 @@ namespace EngineFramework
 	//Helper function to cast meta_any to correct data type, and set comp_json.
 	void SetJsonWithMetaAny(nlohmann::json& comp_json, const entt::meta_data& data_type, const entt::meta_any& data);
 
-	//Helper function to cast any meta type.
-	template <typename Func>
-	void CastMetaDataToType(const entt::meta_data &data_type, nlohmann::json& data, Func callable)
-	{
-		entt::meta_type type = data_type.type();
-		if (type.is_integral())
-		{
-			if (type.is_signed())
-			{
-				if (type == entt::resolve<int>()) {
-					callable(data.get<int>());
-					return;
-				}
-				else if (type == entt::resolve<signed char>()) {
-					callable(data.get<signed char>());
-					return;
-				}
-				else if (type == entt::resolve<short>()) {
-					callable(data.get<short>());
-					return;
-				}
-				else if (type == entt::resolve<long>()) {
-					callable(data.get<long>());
-					return;
-				}
-				else if (type == entt::resolve<long long>()) {
-					callable(data.get<long long>());
-					return;
-				}
-			}
-			else
-			{
-				if (type == entt::resolve<bool>()) {
-					callable(data.get<bool>());
-					return;
-				}
-				else if (type == entt::resolve<unsigned char>()) {
-					callable(data.get<unsigned char>());
-					return;
-				}
-				else if (type == entt::resolve<unsigned short>()) {
-					callable(data.get<unsigned short>());
-					return;
-				}
-
-				else if (type == entt::resolve<unsigned int>()) {
-					callable(data.get<unsigned int>());
-					return;
-				}
-				else if (type == entt::resolve<unsigned long>()) {
-					callable(data.get<unsigned long>());
-					return;
-				}
-				else if (type == entt::resolve<unsigned long long>()) {
-					callable(data.get<unsigned long long>());
-					return;
-				}
-			}
-			if (type == entt::resolve<char>()) {
-				callable(data.get<char>());
-				return;
-			}
-			else if (type == entt::resolve<wchar_t>()) {
-				callable(data.get<wchar_t>());
-				return;
-			}
-		}
-		else
-		{
-			if (type == entt::resolve<float>()) {
-				callable(data.get<float>());
-				return;
-			}
-			else if (type == entt::resolve<std::string>()) {
-				callable(data.get<std::string>());
-				return;
-			}
-			else if (type == entt::resolve<double>()) {
-				callable(data.get<double>());
-				return;
-			}
-			else if (type == entt::resolve<long double>()) {
-				callable(data.get<long double>());
-				return;
-			}
-			else if (type == entt::resolve<std::nullptr_t>()) {
-				callable(data.get<nullptr_t>());
-				return;
-			}
-		}
-		//Not treated as integrals before c++ 20, but is afterwards. Put outside both checks.
-		if (type == entt::resolve<char8_t>()) {
-			callable(data.get<char8_t>());
-			return;
-		}
-		else if (type == entt::resolve<char16_t>()) {
-			callable(data.get<char16_t>());
-			return;
-		}
-		else if (type == entt::resolve<char32_t>()) {
-			callable(data.get<char32_t>());
-			return;
-		}
-		//not supported by nlohmann json library.
-		/*else if (type == entt::resolve<void*>()) {
-			callable(data.get({}).cast<void*>());
-		}*/
-
-		assert(false && "Type is not supported by CastMetaDataToType function. Please add it here.");
-
-	}
-
 	//Used to differentiate between the different types.
 	enum struct REGISTERED_TYPE : short
 	{
 		COMPONENT = 0,
 		NON_COMPONENT = 1
 	};
+
+
+	//Helper function to cast any meta type.
+	//template <typename Func>
+	//void CastMetaDataToType(const entt::meta_data &data_type, nlohmann::json& data, Func callable)
+	//{
+	//	entt::meta_type type = data_type.type();
+	//	if (type.is_integral())
+	//	{
+	//		if (type.is_signed())
+	//		{
+	//			if (type == entt::resolve<int>()) {
+	//				callable(data.get<int>());
+	//				return;
+	//			}
+	//			else if (type == entt::resolve<signed char>()) {
+	//				callable(data.get<signed char>());
+	//				return;
+	//			}
+	//			else if (type == entt::resolve<short>()) {
+	//				callable(data.get<short>());
+	//				return;
+	//			}
+	//			else if (type == entt::resolve<long>()) {
+	//				callable(data.get<long>());
+	//				return;
+	//			}
+	//			else if (type == entt::resolve<long long>()) {
+	//				callable(data.get<long long>());
+	//				return;
+	//			}
+	//		}
+	//		else
+	//		{
+	//			if (type == entt::resolve<bool>()) {
+	//				callable(data.get<bool>());
+	//				return;
+	//			}
+	//			else if (type == entt::resolve<unsigned char>()) {
+	//				callable(data.get<unsigned char>());
+	//				return;
+	//			}
+	//			else if (type == entt::resolve<unsigned short>()) {
+	//				callable(data.get<unsigned short>());
+	//				return;
+	//			}
+
+	//			else if (type == entt::resolve<unsigned int>()) {
+	//				callable(data.get<unsigned int>());
+	//				return;
+	//			}
+	//			else if (type == entt::resolve<unsigned long>()) {
+	//				callable(data.get<unsigned long>());
+	//				return;
+	//			}
+	//			else if (type == entt::resolve<unsigned long long>()) {
+	//				callable(data.get<unsigned long long>());
+	//				return;
+	//			}
+	//		}
+	//		if (type == entt::resolve<char>()) {
+	//			callable(data.get<char>());
+	//			return;
+	//		}
+	//		else if (type == entt::resolve<wchar_t>()) {
+	//			callable(data.get<wchar_t>());
+	//			return;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		if (type == entt::resolve<float>()) {
+	//			callable(data.get<float>());
+	//			return;
+	//		}
+	//		else if (type == entt::resolve<std::string>()) {
+	//			callable(data.get<std::string>());
+	//			return;
+	//		}
+	//		else if (type == entt::resolve<double>()) {
+	//			callable(data.get<double>());
+	//			return;
+	//		}
+	//		else if (type == entt::resolve<long double>()) {
+	//			callable(data.get<long double>());
+	//			return;
+	//		}
+	//		else if (type == entt::resolve<std::nullptr_t>()) {
+	//			callable(data.get<nullptr_t>());
+	//			return;
+	//		}
+	//	}
+	//	//Not treated as integrals before c++ 20, but is afterwards. Put outside both checks.
+	//	if (type == entt::resolve<char8_t>()) {
+	//		callable(data.get<char8_t>());
+	//		return;
+	//	}
+	//	else if (type == entt::resolve<char16_t>()) {
+	//		callable(data.get<char16_t>());
+	//		return;
+	//	}
+	//	else if (type == entt::resolve<char32_t>()) {
+	//		callable(data.get<char32_t>());
+	//		return;
+	//	}
+	//	//not supported by nlohmann json library.
+	//	/*else if (type == entt::resolve<void*>()) {
+	//		callable(data.get({}).cast<void*>());
+	//	}*/
+
+	//	assert(false && "Type is not supported by CastMetaDataToType function. Please add it here.");
+
+	//}
 
 	//TODO: Test struct, to delete.
 	struct TODELETE
@@ -212,7 +213,13 @@ namespace EngineFramework
 		std::string c{};
 		float not_serializable{};
 	};
+	//TODO: Test struct, to delete.
+	struct TODELETE3
+	{
+		glm::vec3 pos{};
+	};
 }
+
 
 
 #endif
