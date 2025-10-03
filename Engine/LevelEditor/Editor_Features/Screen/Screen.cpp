@@ -49,6 +49,8 @@ namespace EngineFramework
     static ImVec2 screen_pos{};
     static float camDistance = 8.f;
 
+    static std::string droppedPath;
+
     static const float identityMatrix[16] =
     { 1.f, 0.f, 0.f, 0.f,
         0.f, 1.f, 0.f, 0.f,
@@ -422,7 +424,7 @@ namespace EngineFramework
 
                         ImGui::SameLine();
                         static std::string texture_name = "DOESNT_EXISTS.png";
-                        ImGui::TextUnformatted(texture_name.c_str());
+                        ImGui::TextUnformatted((droppedPath.empty()) ? texture_name.c_str() : droppedPath.c_str());
 
                         if (ImGui::Button("Remove Custom Texture", ImVec2(300, 0))) {
 
@@ -445,10 +447,10 @@ namespace EngineFramework
                     if (ImGui::BeginDragDropTarget())
                     {
                         // Accept path payload (null-terminated string)
-                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Models"))
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Textures"))
                         {
-                            //const char* path = (const char*)payload->Data;
-
+                            droppedPath = (const char*)payload->Data;
+                            
                             std::cout << "Drop successful in texture tab" << std::endl;
                             custom_skin = true;
 

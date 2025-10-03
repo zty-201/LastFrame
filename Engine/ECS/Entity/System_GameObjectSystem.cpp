@@ -369,7 +369,7 @@ namespace EngineFramework
 			}
 
 		}
-		LOGD("Successfully Deserialized %s", json_input.c_str());
+		//LOGD("Successfully Deserialized %s", json_input.c_str());
 	}
 
 	entt::entity GameObjectSystem::Instantiate(std::shared_ptr<Archtype> archtype, const xresource::instance_guid& archtype_instance_guid)
