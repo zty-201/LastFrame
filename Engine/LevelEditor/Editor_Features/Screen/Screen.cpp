@@ -380,7 +380,7 @@ namespace EngineFramework
 
         //do not use gizmos if nothing is being selected, because what are you referrring to?
         if (editor_ptr->selected_objectID == entt::null) {
-            std::cout << "nothing is selected\n";
+            //std::cout << "nothing is selected\n";
             return;
         }
 
