@@ -245,6 +245,8 @@ namespace EngineFramework
 			*/
 			for (auto&& [comp_type_id, component_type] : entt::resolve())
 			{
+				//Only serialize components. Registered types which aren't components (like glm::vec3) won't be emplaced in registry anyways.
+				if (component_type.traits<REGISTERED_TYPE>() == REGISTERED_TYPE::NON_COMPONENT) continue;
 				//If an entity does not contain this specific component type, continue to the next type.
 				if (!registry.storage(comp_type_id)->contains(entity))
 				{
