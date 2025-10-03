@@ -40,17 +40,27 @@ namespace EngineFramework
         0.f, 0.f, 0.f, 1.f };
 
     Screen::Screen() {
+        this_instance = this;
         LOGI("Lfeature: Screen CREATED");
     }
     Screen::~Screen() {
 
     }
+
+    Screen& Screen::GetInstance()
+    {
+        return *this_instance;
+    }
+
     void Screen::Initialize() {
         auto camera_view = registry.view<CameraComponent>();
         auto& camera = camera_view.get<CameraComponent>(camera_view.front());
 		Camera::setType(camera, CameraComponent::WALKING);
     }
     void Screen::Run() {
+
+        if (this_instance->is_enabled)
+            LOGD("Screen Opened");
 
         auto camera_view = registry.view<CameraComponent>();
         auto& camera = camera_view.get<CameraComponent>(camera_view.front());
@@ -59,8 +69,7 @@ namespace EngineFramework
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
         ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500
 
-        if (ImGui::Begin("level loaded: <name>", &is_enabled, ImGuiWindowFlags_MenuBar)) {
-
+        if (ImGui::Begin("level loaded: <name>", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse)) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
             if (ImGui::BeginMenuBar()) {
 
