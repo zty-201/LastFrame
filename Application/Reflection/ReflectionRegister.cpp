@@ -33,6 +33,20 @@ namespace EngineFramework
 			return true;
 		}
 	};
+
+	//Templated class, to provide different function overloads for each type that all do the same thing.
+	template <typename T>
+	class Getter
+	{
+	public:
+		//Taking in entt::meta_any*, as references do not work.
+		static T GetComponent(entt::entity entity)
+		{
+			return registry.get<T>(entity);
+ 		}
+	};
+
+	
 	
 	/*
 		Called during program startup: Will register all components into Entt reflection system.
@@ -75,14 +89,18 @@ namespace EngineFramework
 			.data<&TODELETE::a>("player_health")
 			.data<&TODELETE::b>("b")
 			.data<&TODELETE::c>("c")
-			.func<&Emplacer<TODELETE>::EmplaceComponent>("emplace");
+			.func<&Emplacer<TODELETE>::EmplaceComponent>("emplace")
+			.func<&Getter<TODELETE>::GetComponent>("get");
 
+		//If necessary, may want to add a set method too.
 		entt::meta_factory<EngineFramework::TODELETE2>()
 			.type("TestClass2")
 			.data<&TODELETE2::d>("player_damage")
 			.data<&TODELETE2::e>("e")
 			.data<&TODELETE2::c>("c")
-			.func<&Emplacer<TODELETE2>::EmplaceComponent>("emplace");
+			.func<&Emplacer<TODELETE2>::EmplaceComponent>("emplace")
+			.func<&Getter<TODELETE2>::GetComponent>("get");
+
 
 	}
 
