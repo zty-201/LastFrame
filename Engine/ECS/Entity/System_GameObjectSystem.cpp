@@ -126,26 +126,26 @@ namespace EngineFramework
 	{
 		UNREFERENCED_PARAMETER(delta_time);
 
-		//TODO: Testing, to delete.
-		std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
-		std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
-		DeSerializeAllEntityInstances(test_scene);
-		auto view = registry.view<TODELETE>();
-		auto view2 = registry.view<TODELETE2>();
-		for (entt::entity entity_id : view)
-		{
-			TODELETE& comp = view.get<TODELETE>(entity_id);
-			LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-			UNREFERENCED_PARAMETER(comp);
-		}
-		for (entt::entity entity_id : view2)
-		{
-			TODELETE2& comp = view2.get<TODELETE2>(entity_id);
-			LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-			UNREFERENCED_PARAMETER(comp);
-		}
-		std::string test_save_data = SerializeAllEntityInstances();
-		LOGD("Testing Serialization: %s", test_save_data.c_str());
+		////TODO: Testing, to delete.
+		//std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
+		//std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
+		//DeSerializeAllEntityInstances(test_scene);
+		//auto view = registry.view<TODELETE>();
+		//auto view2 = registry.view<TODELETE2>();
+		//for (entt::entity entity_id : view)
+		//{
+		//	TODELETE& comp = view.get<TODELETE>(entity_id);
+		//	LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+		//	UNREFERENCED_PARAMETER(comp);
+		//}
+		//for (entt::entity entity_id : view2)
+		//{
+		//	TODELETE2& comp = view2.get<TODELETE2>(entity_id);
+		//	LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+		//	UNREFERENCED_PARAMETER(comp);
+		//}
+		//std::string test_save_data = SerializeAllEntityInstances();
+		//LOGD("Testing Serialization: %s", test_save_data.c_str());
 	}
 
 
@@ -214,10 +214,24 @@ namespace EngineFramework
 		// Iterate over all entities
 		for (auto entity : registry.view<entt::entity>()) {
 			nlohmann::json entity_save_data{};
+			static std::vector<entt::meta_type> archtype_components{};
+			archtype_components.clear();
 			//Store the associated archtype if available.
 			if (entity_archtype_map.contains(entity))
 			{
-				entity_save_data[AssetManagerSystem::ARCHTYPE] = entity_archtype_map[entity].m_Value;
+				//Find the archtype components.
+				xresource::instance_guid archtype_guid = entity_archtype_map[entity];
+				std::shared_ptr<Archtype> archtype = AssetManagerSystem::GetResource<Archtype>({ archtype_guid, AssetManagerSystem::ARCHTYPE_GUID });
+				//Only serialize archtype guid if archtype is valid, i.e. hasn't been deleted.
+				if (archtype)
+				{
+					entity_save_data[AssetManagerSystem::ARCHTYPE] = archtype_guid.m_Value;
+					//Record which components belong to the archtype so they don't get duplicate serialized.
+					for (const entt::meta_any& archtype_comp : archtype->component_arr)
+					{
+						archtype_components.emplace_back(archtype_comp.type());
+					}
+				}
 			}
 
 			/*
@@ -236,6 +250,12 @@ namespace EngineFramework
 				{
 					continue;
 				}
+				//If it belongs to the archtype, don't save it.
+				if (std::find(archtype_components.begin(), archtype_components.end(), component_type) != archtype_components.end())
+				{
+					continue;
+				}
+				
 				
 				//Save the component as a json object.
 				nlohmann::json component_save_data{};
@@ -254,8 +274,13 @@ namespace EngineFramework
 				//Add the component object as part of the entity json object.
 				entity_save_data[component_type.name()] = component_save_data;
 			}
+			if (entity_save_data.empty())
+			{
+				LOGD("[GameObjectSystem] No archtypes or components detected for entity, it will not be serialized. Was its components registered?");
+				continue;
+			}
 			//Add the entity object as part of the final json object.
-			save_data[id++] = entity_save_data;
+			save_data[std::to_string(id++)] = entity_save_data;
 		}
 
 		//Return json as a string object, but prettified.
