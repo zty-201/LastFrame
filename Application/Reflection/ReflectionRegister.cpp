@@ -54,6 +54,18 @@ struct adl_serializer<glm::mat4> {
 		}
 	}
 };
+
+template<>
+struct adl_serializer<xresource::full_guid> {
+	static void to_json(json& j, const xresource::full_guid& guid) {
+		j = json::array({ guid.m_Instance.m_Value, guid.m_Type.m_Value });
+	}
+
+	static void from_json(const json& j, xresource::full_guid& guid) {
+		guid.m_Instance = j[0].get<uint64_t>();
+		guid.m_Type = j[1].get<uint64_t>();
+	}
+};
 NLOHMANN_JSON_NAMESPACE_END
 
 using namespace entt::literals;
@@ -103,6 +115,7 @@ namespace EngineFramework
 		SetMeta(char32_t),
 		SetMeta(glm::vec3),
 		SetMeta(glm::mat4),
+		SetMeta(xresource::full_guid),
 		SetMeta(std::vector<int>),
 		SetMeta(std::vector<float>),
 		SetMeta(std::vector<std::string>)
@@ -133,6 +146,7 @@ namespace EngineFramework
 		SetJson(char32_t),
 		SetJson(glm::vec3),
 		SetJson(glm::mat4),
+		SetJson(xresource::full_guid),
 		SetJson(std::vector<int>),
 		SetJson(std::vector<float>),
 		SetJson(std::vector<std::string>)
