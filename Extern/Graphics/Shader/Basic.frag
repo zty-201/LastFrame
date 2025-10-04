@@ -38,6 +38,7 @@ in vec3 Position;
 in vec3 Normal;
 in vec2 TexCoord;
 in vec3 Vec;
+in mat3 TBN;
 
 uniform Light light[1];
 uniform Material material;
@@ -47,8 +48,10 @@ uniform Fog fog;
 
 layout(binding=0) uniform sampler2D DiffuseTex;     // For regular objects
 layout(binding=1) uniform samplerCube CubeMapTex;   // For skybox
+layout(binding=2) uniform sampler2D NormalMap;      // For Normal map
 
 uniform bool UseTexture;
+uniform bool UseNormalMap;
 
 const int CARTOON_LEVELS = 3;
 const int CHECKERBOARD_SIZE = 50;
@@ -237,10 +240,22 @@ void scenePass()
 {
     vec3 color;
 
+    vec3 normal;
+    if (UseNormalMap) {
+        // Sample normal map and transform from [0,1] to [-1,1]
+        vec3 normalMapSample = texture(NormalMap, TexCoord).rgb;
+        normalMapSample = normalMapSample * 2.0 - 1.0;
+        
+        // Transform normal from tangent space to view space
+        normal = normalize(TBN * normalMapSample);
+    } else {
+        normal = normalize(Normal);
+    }
+    
     if (materialType == 0) {
-        color = microfacetModel(Position, normalize(Normal));    
+        color = microfacetModel(Position, normal);    
     } else if (materialType == 1) {
-        color = BlinnPhong(Position, normalize(Normal), light[0], material, V);
+        color = BlinnPhong(Position, normal, light[0], material, V);
     }
 
     if (material.effect == 1.0f) {
@@ -252,7 +267,7 @@ void scenePass()
                 discard;
         }
     } else if (material.effect == 2.0f) {
-        color = blinnPhongCartoon(Position, normalize(Normal));
+        color = blinnPhongCartoon(Position, normal);
     } else if (material.effect == 3.0f) {
         vec4 checkerboard = checkerboardTexture(TexCoord, float(CHECKERBOARD_SIZE));
         color = mix(color, checkerboard.rgb, CHECKERBOARD_MIXLEVEL);

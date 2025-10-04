@@ -1,3 +1,21 @@
+/******************************************************************/
+/*!
+\file   ShaderProgram.h
+\author Zhang TongYan
+\par    tongyan.zhang\@digipen.edu
+\date   October 2025
+\brief
+This file contains the declaration of the ShaderProgram class, which
+manages the compilation, linking, and usage of OpenGL shader programs.
+It also provides utilities for handling shader uniforms, attributes, and
+error logging.
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/******************************************************************/
+
 #ifndef SHADER_H
 #define SHADER_H
 

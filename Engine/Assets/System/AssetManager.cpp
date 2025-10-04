@@ -424,14 +424,45 @@ namespace EngineFramework {
 
 		return true;
 	}
+
 	bool AssetManagerSystem::LoadMesh(const std::filesystem::path& folder_path)
 	{
-		UNREFERENCED_PARAMETER(folder_path);
-		LOGI("Mesh Loader not yet implemented.");
+		/*UNREFERENCED_PARAMETER(folder_path);
+		LOGI("Mesh Loader not yet implemented.");*/
+		LOGI("Loading Mesh");
 
+		// Acceptable files that can be loaded as a mesh.
+		std::vector<std::string> mesh_extensions{ ".obj" };
+		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, mesh_extensions);
+
+		/*
+			Asset names used for mapping to guid.
+			Resources are kept in an array until guid mappings are read.
+		*/
+		std::vector<std::string> asset_names{};
+		std::vector< std::shared_ptr<Mesh::MeshData>> loaded_resources{};
+
+		// Collect the names and loop through all mesh files
+		for (const std::filesystem::path& path : files) {
+			// Obtain the name of the mesh from the file name (without extension)
+			std::string name = path.stem().string();
+
+			// Try catch guard for loading mesh
+			try {
+				loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
+				asset_names.emplace_back(name); // Done if resource loading is a success.
+			}
+			catch (std::exception& e) {
+				LOGE("%s %s %s", "Unable to Load Mesh", name.c_str(), e.what());
+			}
+		}
+
+		// Set Mapping with mesh GUID
+		SetMappings(MESH_GUID, asset_names, loaded_resources, folder_path);
 
 		return true;
 	}
+
 	bool AssetManagerSystem::LoadShader(const std::filesystem::path& config_file)
 	{
 		LOGI("Loading Shader");

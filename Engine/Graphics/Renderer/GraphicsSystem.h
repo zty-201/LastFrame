@@ -1,3 +1,21 @@
+/******************************************************************/
+/*!
+\file   GraphicsSystem.cpp
+\author Zhang TongYan
+\par    tongyan.zhang\@digipen.edu
+\date   October 2025
+\brief
+This file contains the declaration of the GraphicsSystem class, which
+manages the initialization, rendering, and updating of the graphics pipeline.
+It includes functionality for handling OpenGL context setup, rendering scenes,
+managing framebuffers, and responding to window and level editor events.
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/******************************************************************/
+
 #ifndef GRAPHICS_SYSTEM_HPP
 #define GRAPHICS_SYSTEM_HPP
 

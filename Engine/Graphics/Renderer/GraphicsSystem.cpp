@@ -1,10 +1,27 @@
+/******************************************************************/
+/*!
+\file   GraphicsSystem.cpp
+\author Zhang TongYan
+\par    tongyan.zhang\@digipen.edu
+\date   October 2025
+\brief
+This file contains the implementation of the GraphicsSystem class, which
+manages the initialization, rendering, and updating of the graphics pipeline.
+It includes functionality for handling OpenGL context setup, rendering scenes,
+managing framebuffers, and responding to window and level editor events.
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/******************************************************************/
+
 #include "pch.hpp"
 #include "global.hpp"
 #include "Debug.h"
 #include "GraphicsSystem.h"
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
-
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
@@ -102,7 +119,6 @@ namespace EngineFramework
 		UNREFERENCED_PARAMETER(deltaTime);
 		// Draw scene
 		RenderScene();
-		//pScene->render();
 	}
 
 	void GraphicsSystem::PostUpdate(float deltaTime)
@@ -207,15 +223,30 @@ namespace EngineFramework
 
 				if (texture && texture->id != 0)
 				{
-					glActiveTexture(texture->channel); // Usually GL_TEXTURE0
+					glActiveTexture(GL_TEXTURE0); // Diffuse always on unit 0
 					glBindTexture(texture->target, texture->id);
-					shader->setUniform("DiffuseTex", 0); // Bind to texture unit 0
+					shader->setUniform("DiffuseTex", 0);
 					hasTexture = true;
 				}
 			}
-
-			// **NEW: Set UseTexture uniform**
 			shader->setUniform("UseTexture", hasTexture);
+
+			// Bind normal map (separate check)
+			bool hasNormalMap = false;
+			if (registry.all_of<NormalMapComponent>(entity))
+			{
+				auto& normalComp = registry.get<NormalMapComponent>(entity);
+				auto normalMap = AssetManagerSystem::GetResource<Scene::Texture>(normalComp.normalmap_guid);
+
+				if (normalMap && normalMap->id != 0)
+				{
+					glActiveTexture(GL_TEXTURE2); // Normal map on unit 2
+					glBindTexture(GL_TEXTURE_2D, normalMap->id);
+					shader->setUniform("NormalMap", 2);
+					hasNormalMap = true;
+				}
+			}
+			shader->setUniform("UseNormalMap", hasNormalMap);
 
 			shader->setMaterialUniforms(material);
 			CalculateModelMatrix(transform, transform.modelMatrix);
@@ -284,7 +315,16 @@ namespace EngineFramework
 		else {
 			// Here you would load from a file, e.g., using your old Mesh::generate
 			// For now, we'll throw an error for unknown primitives.
-			throw std::runtime_error("Unknown mesh name: " + meshName);
+
+			// Try to see if file is valid
+			try {
+				Mesh::MeshData meshFile(meshName, true);
+				meshData = std::move(meshFile);
+			}
+			// File name is invalid
+			catch (const std::exception& e) {
+				throw std::runtime_error("Failed to load mesh: " + meshName + ". Error: " + e.what());
+			}
 		}
 
 		if (meshData.indices.empty() || meshData.points.empty()) {

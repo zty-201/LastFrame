@@ -30,6 +30,7 @@
 #include "LightComponent.h"
 #include "CameraComponent.h"
 #include "TextureComponent.h"
+#include "NormalMapComponent.h"
 #include "AssetManager.hpp"
 
 //For printing instance/type_guids in error messages
@@ -118,6 +119,7 @@ namespace EngineFramework
 		// 3. Discard-effect Cube
 		auto cubeEntity = registry.create();
 		registry.emplace<MeshComponent>(cubeEntity, "Cube");
+		registry.emplace<NormalMapComponent>(cubeEntity, AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, "normal_map_brick"));
 		registry.emplace<MaterialComponent>(cubeEntity, MATERIAL_DISCARD);
 		registry.emplace<TransformComponent>(cubeEntity,
 			glm::vec3(3.0f, 0.0f, 0.0f) // position
