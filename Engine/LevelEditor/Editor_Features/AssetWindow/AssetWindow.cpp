@@ -63,6 +63,11 @@ namespace EngineFramework
                 }
             }
 
+            if (ImGui::Button("Refresh", ImVec2(buttonWidth, 0))) {
+                AssetManagerSystem::GetInstance().RemoveAllResources();
+                AssetManagerSystem::GetInstance().LoadAllResources();
+            }
+
             ImGui::Separator();
             
 

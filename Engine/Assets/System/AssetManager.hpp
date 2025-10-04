@@ -89,6 +89,7 @@
 
 namespace EngineFramework {
 
+	class AssetWindow;//forward declaration
 
 	
 	class AssetManagerSystem : public ISystem
@@ -228,6 +229,8 @@ namespace EngineFramework {
 		static inline constexpr xresource::type_guid AUDIO_GUID{ AUDIO };
 		static inline constexpr xresource::type_guid ARCHTYPE_GUID{ ARCHTYPE };
 	private:
+
+		friend AssetWindow;
 		
 		/*
 			Reads the config file located at ASSET_CONFIG_FILE, and calls the respective asset function loaders for each folder/config path.
@@ -244,6 +247,8 @@ namespace EngineFramework {
 		static void RemoveAllResources()
 		{
 			resource_map.clear();
+			guid_name_map.clear();//
+			name_guid_map.clear();//
 		}
 
 		/*

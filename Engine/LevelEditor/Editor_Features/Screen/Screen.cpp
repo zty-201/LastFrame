@@ -77,8 +77,8 @@ namespace EngineFramework
     }
     void Screen::Run() {
 
-        if (this_instance->is_enabled)
-            LOGD("Screen Opened");
+       /* if (this_instance->is_enabled)
+            LOGD("Screen Opened");*/
 
         auto camera_view = registry.view<CameraComponent>();
         auto& camera = camera_view.get<CameraComponent>(camera_view.front());

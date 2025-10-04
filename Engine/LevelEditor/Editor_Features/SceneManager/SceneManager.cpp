@@ -80,7 +80,7 @@ namespace EngineFramework
 					LOGD("Selected scene: %s", scene.c_str());
 					std::vector<unsigned char> sceneName = AssetManagerSystem::GetDataFromFile("Extern/Scenes/" + scene);
 					std::string sceneString{ sceneName.begin(), sceneName.end() };
-					//GameObjectSystem::GetInstance().LoadScene(sceneString);
+					GameObjectSystem::GetInstance().LoadScene(sceneString);
 					currentScene = scene;
 
 					Screen::GetInstance().is_enabled = true;

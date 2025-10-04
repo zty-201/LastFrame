@@ -132,7 +132,7 @@ namespace EngineFramework
 		//TODO: Testing, to delete.
 		std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
 		std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
-		DeSerializeAllEntityInstances(test_scene);
+		//DeSerializeAllEntityInstances(test_scene);
 		auto view = registry.view<TODELETE>();
 		auto view2 = registry.view<TODELETE2>();
 		for (entt::entity entity_id : view)
