@@ -12,6 +12,7 @@
 #include "MeshComponent.h"
 #include "TransformComponent.h"
 #include "TextureComponent.h"
+#include "NormalMapComponent.h"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 
 /*
@@ -347,9 +348,15 @@ namespace EngineFramework
 		entt::meta_factory<TextureComponent>()
 			.type("TextureComponent")
 			.data<&TextureComponent::texture_guid>("texture_guid")
-			.data<&TextureComponent::isNormalMap>("isNormalMap")
 			.func<&Emplacer<TextureComponent>::EmplaceComponent>("emplace")
 			.func<&Getter<TextureComponent>::GetComponent>("get");
+
+		// === Register NormalMapComponent ===
+		entt::meta_factory<NormalMapComponent>()
+			.type("NormalMapComponent")
+			.data<&NormalMapComponent::normalmap_guid>("normalmap_guid")
+			.func<&Emplacer<NormalMapComponent>::EmplaceComponent>("emplace")
+			.func<&Getter<NormalMapComponent>::GetComponent>("get");
 
 		// Tag components (if you need them for serialization)
 		entt::meta_factory<SceneRenderPass>()

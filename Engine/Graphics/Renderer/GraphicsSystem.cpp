@@ -223,26 +223,30 @@ namespace EngineFramework
 
 				if (texture && texture->id != 0)
 				{
-					if (texComp.isNormalMap) {
-						glActiveTexture(GL_TEXTURE2);
-						glBindTexture(GL_TEXTURE_2D, texture->id);
-						shader->setUniform("NormalMap", 2);
-						shader->setUniform("UseNormalMap", true);
-					}
-						
-					else {
-						glActiveTexture(texture->channel); // Usually GL_TEXTURE0
-						glBindTexture(texture->target, texture->id);
-						shader->setUniform("DiffuseTex", 0); // Bind to texture unit 0
-						shader->setUniform("UseNormalMap", false);
-						
-					}
+					glActiveTexture(GL_TEXTURE0); // Diffuse always on unit 0
+					glBindTexture(texture->target, texture->id);
+					shader->setUniform("DiffuseTex", 0);
 					hasTexture = true;
 				}
 			}
-
-			// **NEW: Set UseTexture uniform**
 			shader->setUniform("UseTexture", hasTexture);
+
+			// Bind normal map (separate check)
+			bool hasNormalMap = false;
+			if (registry.all_of<NormalMapComponent>(entity))
+			{
+				auto& normalComp = registry.get<NormalMapComponent>(entity);
+				auto normalMap = AssetManagerSystem::GetResource<Scene::Texture>(normalComp.normalmap_guid);
+
+				if (normalMap && normalMap->id != 0)
+				{
+					glActiveTexture(GL_TEXTURE2); // Normal map on unit 2
+					glBindTexture(GL_TEXTURE_2D, normalMap->id);
+					shader->setUniform("NormalMap", 2);
+					hasNormalMap = true;
+				}
+			}
+			shader->setUniform("UseNormalMap", hasNormalMap);
 
 			shader->setMaterialUniforms(material);
 			CalculateModelMatrix(transform, transform.modelMatrix);
