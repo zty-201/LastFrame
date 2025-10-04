@@ -341,8 +341,6 @@ namespace EngineFramework
             // -------- Texture tab --------
             if (ImGui::BeginTabItem("Texture")) {
 
-                static bool custom_skin = false; //this needs to change depending on the materials
-
                 if (editor_ptr->selected_objectID == entt::null) {
                     
                     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));      // Black text
@@ -404,15 +402,8 @@ namespace EngineFramework
                     }
 
                     /*
-                        conditions for the change of custom texture
-                        1. new drag drop into the tab
-                        2. texture is being removed
-
-                        Only these actions will change the static texture_name
-                        workflow will change after graphics team pushes new update
-
-
-                    */
+                       get the texture component of the object
+                   */
 
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
                     ImGui::SeparatorText("Custom Texture");
@@ -420,18 +411,24 @@ namespace EngineFramework
 
                     ImGui::TextUnformatted("Texture Loaded: ");
 
-                    if (custom_skin) {
+                    
+                    if (registry.all_of<TextureComponent>(id)) {
 
+                        auto& object = registry.get<TextureComponent>(id);
+                        std::string name = AssetManagerSystem::GetInstance().GetName(object.texture_guid.m_Instance);             
                         ImGui::SameLine();
-                        static std::string texture_name = "DOESNT_EXISTS.png";
-                        ImGui::TextUnformatted((droppedPath.empty()) ? texture_name.c_str() : droppedPath.c_str());
+                        
+                        ImGui::TextUnformatted(name.c_str());
 
                         if (ImGui::Button("Remove Custom Texture", ImVec2(300, 0))) {
+                            registry.remove<TextureComponent>(id);
+                            if (registry.all_of<MaterialComponent>(id)) {
 
-                            //remove the texturecomponent
-                            custom_skin = false;
-
+                                auto& object_M = registry.get<MaterialComponent>(id);
+                                object_M = MATERIAL_PBR_PHONG;
+                            }
                         }
+
                     }
                     else {
                         ImGui::SameLine();
@@ -450,9 +447,25 @@ namespace EngineFramework
                         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Textures"))
                         {
                             droppedPath = (const char*)payload->Data;
+
+                            //only returning the filename, remove all dir and extension (for asset manager)
+                            std::filesystem::path p = std::filesystem::path(droppedPath).lexically_normal();
+                            droppedPath = p.stem().string();
                             
-                            std::cout << "Drop successful in texture tab" << std::endl;
-                            custom_skin = true;
+                            //std::cout << droppedPath << std::endl;
+
+                            if (registry.all_of<TextureComponent>(id)) {
+
+                                /* if the texture already exists, just swap texture*/
+                                auto& object = registry.get<TextureComponent>(id);
+                                object.texture_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, droppedPath);
+
+                            }
+                            else {                             
+                                /* if the texture do not exists, just init as texture component*/
+                                registry.emplace<TextureComponent>(id, AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, droppedPath));
+                                
+                            }
 
                         }
                         ImGui::EndDragDropTarget();
