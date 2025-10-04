@@ -282,7 +282,16 @@ namespace EngineFramework
 		else {
 			// Here you would load from a file, e.g., using your old Mesh::generate
 			// For now, we'll throw an error for unknown primitives.
-			throw std::runtime_error("Unknown mesh name: " + meshName);
+
+			// Try to see if file is valid
+			try {
+				Mesh::MeshData meshFile(meshName, true);
+				meshData = std::move(meshFile);
+			}
+			// File name is invalid
+			catch (const std::exception& e) {
+				throw std::runtime_error("Failed to load mesh: " + meshName + ". Error: " + e.what());
+			}
 		}
 
 		if (meshData.indices.empty() || meshData.points.empty()) {
