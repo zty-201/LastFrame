@@ -1,11 +1,20 @@
-///////////////////////////////////////////////////////////////////////
-// A slight encapsulation of a shader program. This contains methods
-// to build a shader program from multiples files containing vertex
-// and pixel shader code, and a method to link the result.  When
-// loaded (method "Use"), its vertex shader and pixel shader will be
-// invoked for all geometry passing through the graphics pipeline.
-// When done, unload it with method "Unuse".
-////////////////////////////////////////////////////////////////////////
+/******************************************************************/
+/*!
+\file   ShaderProgram.cpp
+\author Zhang TongYan
+\par    tongyan.zhang\@digipen.edu
+\date   October 2025
+\brief
+This file contains the implementation of the ShaderProgram class, which
+manages the compilation, linking, and usage of OpenGL shader programs.
+It also provides utilities for handling shader uniforms, attributes, and
+error logging.
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/******************************************************************/
 
 #include "pch.hpp"
 #include "ShaderProgram.h"

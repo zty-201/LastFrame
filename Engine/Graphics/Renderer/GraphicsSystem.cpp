@@ -1,10 +1,27 @@
+/******************************************************************/
+/*!
+\file   GraphicsSystem.cpp
+\author Zhang TongYan
+\par    tongyan.zhang\@digipen.edu
+\date   October 2025
+\brief
+This file contains the implementation of the GraphicsSystem class, which
+manages the initialization, rendering, and updating of the graphics pipeline.
+It includes functionality for handling OpenGL context setup, rendering scenes,
+managing framebuffers, and responding to window and level editor events.
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/******************************************************************/
+
 #include "pch.hpp"
 #include "global.hpp"
 #include "Debug.h"
 #include "GraphicsSystem.h"
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
-
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
@@ -102,7 +119,6 @@ namespace EngineFramework
 		UNREFERENCED_PARAMETER(deltaTime);
 		// Draw scene
 		RenderScene();
-		//pScene->render();
 	}
 
 	void GraphicsSystem::PostUpdate(float deltaTime)
@@ -207,9 +223,20 @@ namespace EngineFramework
 
 				if (texture && texture->id != 0)
 				{
-					glActiveTexture(texture->channel); // Usually GL_TEXTURE0
-					glBindTexture(texture->target, texture->id);
-					shader->setUniform("DiffuseTex", 0); // Bind to texture unit 0
+					if (texComp.isNormalMap) {
+						glActiveTexture(GL_TEXTURE2);
+						glBindTexture(GL_TEXTURE_2D, texture->id);
+						shader->setUniform("NormalMap", 2);
+						shader->setUniform("UseNormalMap", true);
+					}
+						
+					else {
+						glActiveTexture(texture->channel); // Usually GL_TEXTURE0
+						glBindTexture(texture->target, texture->id);
+						shader->setUniform("DiffuseTex", 0); // Bind to texture unit 0
+						shader->setUniform("UseNormalMap", false);
+						
+					}
 					hasTexture = true;
 				}
 			}

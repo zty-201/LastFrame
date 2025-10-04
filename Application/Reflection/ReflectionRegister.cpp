@@ -347,6 +347,7 @@ namespace EngineFramework
 		entt::meta_factory<TextureComponent>()
 			.type("TextureComponent")
 			.data<&TextureComponent::texture_guid>("texture_guid")
+			.data<&TextureComponent::isNormalMap>("isNormalMap")
 			.func<&Emplacer<TextureComponent>::EmplaceComponent>("emplace")
 			.func<&Getter<TextureComponent>::GetComponent>("get");
 

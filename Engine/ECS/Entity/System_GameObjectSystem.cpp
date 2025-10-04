@@ -89,7 +89,7 @@ namespace EngineFramework
 		// --- Create Skybox ---
 		auto skyboxEntity = registry.create();
 		registry.emplace<MeshComponent>(skyboxEntity, "SkyBox");
-		registry.emplace<TextureComponent>(skyboxEntity, AssetManagerSystem::GetFullGuid(AssetManagerSystem::CUBEMAP_GUID, "night_skybox"));
+		registry.emplace<TextureComponent>(skyboxEntity, AssetManagerSystem::GetFullGuid(AssetManagerSystem::CUBEMAP_GUID, "night_skybox"), false);
 		registry.emplace<SkyboxRenderPass>(skyboxEntity); // Tag for skybox pass
 
 		// --- Create Renderable Game Objects ---
@@ -108,7 +108,7 @@ namespace EngineFramework
 		// 2. PBR Phong Sphere
 		auto sphereEntity = registry.create();
 		registry.emplace<MeshComponent>(sphereEntity, "Sphere");
-		registry.emplace<TextureComponent>(sphereEntity, AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, "ogre_diffuse"));
+		registry.emplace<TextureComponent>(sphereEntity, AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, "ogre_diffuse"), false);
 		registry.emplace<MaterialComponent>(sphereEntity, MATERIAL_PBR_PHONG);
 		registry.emplace<TransformComponent>(sphereEntity,
 			glm::vec3(-3.0f, 0.0f, 0.0f) // position
@@ -118,6 +118,7 @@ namespace EngineFramework
 		// 3. Discard-effect Cube
 		auto cubeEntity = registry.create();
 		registry.emplace<MeshComponent>(cubeEntity, "Cube");
+		registry.emplace<TextureComponent>(cubeEntity, AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, "normal_map_brick"), true);
 		registry.emplace<MaterialComponent>(cubeEntity, MATERIAL_DISCARD);
 		registry.emplace<TransformComponent>(cubeEntity,
 			glm::vec3(3.0f, 0.0f, 0.0f) // position

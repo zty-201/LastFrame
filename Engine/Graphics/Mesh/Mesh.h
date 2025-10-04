@@ -251,9 +251,86 @@ namespace Mesh {
                     else
                         indices.push_back(it->second);
                 }
-
             }
     };
+
+    inline void calculateTangents(MeshData& mesh)
+    {
+        if (mesh.indices.empty() || mesh.points.empty() ||
+            mesh.normals.empty() || mesh.texCoords.empty())
+            return;
+
+        // Resize tangent array to match vertices
+        size_t vertexCount = mesh.points.size() / 3;
+        mesh.tangents.resize(vertexCount * 4, 0.0f); // vec4 per vertex
+
+        std::vector<glm::vec3> tan1(vertexCount, glm::vec3(0.0f));
+        std::vector<glm::vec3> tan2(vertexCount, glm::vec3(0.0f));
+
+        // Calculate tangent and bitangent for each triangle
+        for (size_t i = 0; i < mesh.indices.size(); i += 3)
+        {
+            GLuint i0 = mesh.indices[i];
+            GLuint i1 = mesh.indices[i + 1];
+            GLuint i2 = mesh.indices[i + 2];
+
+            // Get positions
+            glm::vec3 v0(mesh.points[i0 * 3], mesh.points[i0 * 3 + 1], mesh.points[i0 * 3 + 2]);
+            glm::vec3 v1(mesh.points[i1 * 3], mesh.points[i1 * 3 + 1], mesh.points[i1 * 3 + 2]);
+            glm::vec3 v2(mesh.points[i2 * 3], mesh.points[i2 * 3 + 1], mesh.points[i2 * 3 + 2]);
+
+            // Get texture coordinates
+            glm::vec2 uv0(mesh.texCoords[i0 * 2], mesh.texCoords[i0 * 2 + 1]);
+            glm::vec2 uv1(mesh.texCoords[i1 * 2], mesh.texCoords[i1 * 2 + 1]);
+            glm::vec2 uv2(mesh.texCoords[i2 * 2], mesh.texCoords[i2 * 2 + 1]);
+
+            // Calculate edges
+            glm::vec3 edge1 = v1 - v0;
+            glm::vec3 edge2 = v2 - v0;
+            glm::vec2 deltaUV1 = uv1 - uv0;
+            glm::vec2 deltaUV2 = uv2 - uv0;
+
+            // Calculate tangent
+            float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+            glm::vec3 tangent, bitangent;
+
+            tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+            tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+            tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+
+            bitangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+            bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+            bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+
+            // Accumulate for each vertex
+            tan1[i0] += tangent;
+            tan1[i1] += tangent;
+            tan1[i2] += tangent;
+
+            tan2[i0] += bitangent;
+            tan2[i1] += bitangent;
+            tan2[i2] += bitangent;
+        }
+
+        // Orthogonalize and store tangents
+        for (size_t i = 0; i < vertexCount; ++i)
+        {
+            glm::vec3 n(mesh.normals[i * 3], mesh.normals[i * 3 + 1], mesh.normals[i * 3 + 2]);
+            glm::vec3 t = tan1[i];
+
+            // Gram-Schmidt orthogonalize
+            t = glm::normalize(t - n * glm::dot(n, t));
+
+            // Calculate handedness
+            float handedness = (glm::dot(glm::cross(n, t), tan2[i]) < 0.0f) ? -1.0f : 1.0f;
+
+            // Store as vec4 (xyz = tangent, w = handedness)
+            mesh.tangents[i * 4 + 0] = t.x;
+            mesh.tangents[i * 4 + 1] = t.y;
+            mesh.tangents[i * 4 + 2] = t.z;
+            mesh.tangents[i * 4 + 3] = handedness;
+        }
+    }
 
     // Generates a single quad (square plane) centered at the origin.
     // The quad lies in the XY plane with a normal pointing along the positive Z-axis.
@@ -290,7 +367,7 @@ namespace Mesh {
             0, 1, 2, // First triangle (bottom-left, bottom-right, top-right)
             0, 2, 3  // Second triangle (bottom-left, top-right, top-left)
         };
-
+        calculateTangents(mesh);
     }
 
 
@@ -354,7 +431,7 @@ namespace Mesh {
             7, 4, 5,  // Top-center triangle
             5, 8, 7   // Top-right triangle
         };
-
+        calculateTangents(mesh);
     }
 
 
@@ -442,7 +519,7 @@ namespace Mesh {
             16,17,18, 16,18,19, // Bottom face
             20,21,22, 20,22,23  // Top face
         };
-
+        calculateTangents(mesh);
     }
 
 
@@ -545,8 +622,7 @@ namespace Mesh {
                 }
             }
         }
-
-        // Note: Tangents are not calculated here, but the vector is prepared to be populated if needed.
+        calculateTangents(mesh);
     }
 
 
@@ -629,6 +705,7 @@ namespace Mesh {
             20, 22, 21, // Triangle 1
             20, 23, 22  // Triangle 2
         };
+
     }
 
     //void generate(const char* fileName,
