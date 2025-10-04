@@ -89,7 +89,10 @@
 
 namespace EngineFramework {
 
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+
 	class AssetWindow;//forward declaration
+#endif
 
 	
 	class AssetManagerSystem : public ISystem
@@ -230,7 +233,10 @@ namespace EngineFramework {
 		static inline constexpr xresource::type_guid ARCHTYPE_GUID{ ARCHTYPE };
 	private:
 
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+
 		friend AssetWindow;
+#endif
 		
 		/*
 			Reads the config file located at ASSET_CONFIG_FILE, and calls the respective asset function loaders for each folder/config path.

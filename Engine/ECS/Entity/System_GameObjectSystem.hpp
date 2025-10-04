@@ -15,7 +15,11 @@
 
 namespace EngineFramework
 {
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+
 	class Save; //forward declaration
+#endif
+	
 	
 
 	/*
@@ -115,8 +119,11 @@ namespace EngineFramework
 
 		//Keeps track of the one and only instance of this system, created by core engine.
 		static inline GameObjectSystem* this_system{};
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
 		friend Save;
+#endif
+		
 	};
 
 	
