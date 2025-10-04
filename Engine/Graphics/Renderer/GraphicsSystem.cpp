@@ -235,23 +235,25 @@ namespace EngineFramework
 
 		shader->setUniform("Pass", 1);
 
-		auto skybox_view = registry.view<MeshComponent, TextureComponent, SkyboxRenderPass>();
-		for (auto [entity, mesh, texture] : skybox_view.each())
+		auto skybox_view = registry.view<MeshComponent, SkyboxRenderPass>();
+		for (auto [entity, mesh] : skybox_view.each())
 		{
 
 			if (meshCache.find(mesh.meshName) == meshCache.end()) {
 				LoadAndCacheMesh(mesh.meshName);
 			}
 			auto& [vao, indexCount] = meshCache[mesh.meshName];
-
-			// **NEW: Bind cubemap texture if TextureComponent exists**
-			auto texid = AssetManagerSystem::GetResource<Scene::Texture>(texture.texture_guid);
-
-			if (texid && texid->id != 0)
+			if (registry.all_of<TextureComponent>(entity))
 			{
-				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, texid->id);
-				shader->setUniform("CubeMapTex", 1);
+				auto& texComp = registry.get<TextureComponent>(entity);
+				auto texture = AssetManagerSystem::GetResource<Scene::Texture>(texComp.texture_guid);
+
+				if (texture && texture->id != 0)
+				{
+					glActiveTexture(GL_TEXTURE1);
+					glBindTexture(GL_TEXTURE_CUBE_MAP, texture->id);
+					shader->setUniform("CubeMapTex", 1);
+				}
 			}
 			
 
