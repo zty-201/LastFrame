@@ -1,3 +1,18 @@
+/**
+ * @file Light.h
+ * @brief Provides utility functions for managing light components in a 3D graphics application.
+ *
+ * This file defines a collection of inline functions within the `Light` namespace for manipulating
+ * light components. It includes functionality for setting light uniforms in shader programs,
+ * handling cursor movement to adjust light positions, and handling scroll events to zoom the light.
+ *
+ * The `LightComponent` structure represents a point light source with position and intensity
+ * properties, while the `ShaderProgram` class is used to manage shader operations.
+ *
+ * @author Zhang TongYan
+ * @date Sept, 2025
+ */
+
 #ifndef LIGHT_H
 #define LIGHT_H
 #include "ShaderProgram.h"

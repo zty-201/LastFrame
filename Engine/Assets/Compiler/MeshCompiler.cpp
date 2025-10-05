@@ -1,4 +1,15 @@
-﻿#include "pch.hpp"
+﻿/**
+ * @file MeshCompiler.cpp
+ * @brief Implementation of the MeshCompiler class for asset compilation.
+ *
+ * This file provides the implementation of the `MeshCompiler` class, which
+ * determines if a mesh asset needs compilation and performs the compilation
+ * process. It includes platform-specific logic for handling file operations.
+ *
+ * @author Zhang TongYan
+ * @date October, 2025
+ */
+#include "pch.hpp"
 #include "MeshCompiler.h"
 
 namespace EngineFramework {

@@ -1,3 +1,14 @@
+/**
+ * @file Camera.h
+ * @brief Provides utility functions for managing camera behavior and transformations.
+ *
+ * This file contains a collection of inline functions for manipulating camera components,
+ * including movement, orientation, and projection. It supports both orbiting and walking
+ * camera types and integrates with shader programs for rendering.
+ *
+ * @author Zhang TongYan
+ * @date Sept, 2025
+ */
 #ifndef CAMERA_H
 #define CAMERA_H
 

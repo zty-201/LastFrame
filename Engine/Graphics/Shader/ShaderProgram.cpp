@@ -1,20 +1,20 @@
-/******************************************************************/
-/*!
-\file   ShaderProgram.cpp
-\author Zhang TongYan
-\par    tongyan.zhang\@digipen.edu
-\date   October 2025
-\brief
-This file contains the implementation of the ShaderProgram class, which
-manages the compilation, linking, and usage of OpenGL shader programs.
-It also provides utilities for handling shader uniforms, attributes, and
-error logging.
-
-Copyright (C) 2025 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents without the
-prior written consent of DigiPen Institute of Technology is prohibited.
-*/
-/******************************************************************/
+/**
+ * @file ShaderProgram.cpp
+ * @brief Implementation of the ShaderProgram class for managing OpenGL shader programs.
+ *
+ * This file contains the implementation of the `ShaderProgram` class, which provides
+ * functionality for compiling, linking, and managing OpenGL shader programs. It includes
+ * methods for handling shader source files, managing uniforms, and validating the shader program.
+ *
+ * Key functionalities:
+ * - Compilation and linking of vertex and fragment shaders.
+ * - Management of shader program resources, including uniform locations and attributes.
+ * - Utility functions for debugging, such as printing active uniforms and attributes.
+ * - Integration with the asset manager for loading shader source files.
+ *
+ * @author Zhang TongYan
+ * @date Sept, 2025
+ */
 
 #include "pch.hpp"
 #include "ShaderProgram.h"

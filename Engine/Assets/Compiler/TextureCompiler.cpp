@@ -1,4 +1,15 @@
-﻿#include "pch.hpp"
+﻿/**
+ * @file TextureCompiler.cpp
+ * @brief Implementation of the TextureCompiler class for texture asset compilation.
+ *
+ * This file provides the implementation of the `TextureCompiler` class, which
+ * determines if a texture asset needs compilation and performs the compilation
+ * process. It includes platform-specific logic for handling file operations.
+ *
+ * @author Zhang TongYan
+ * @date October, 2025
+ */
+#include "pch.hpp"
 #include "TextureCompiler.h"
 #include "AssetManager.hpp"
 

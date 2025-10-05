@@ -1,3 +1,20 @@
+/**
+ * @file scene.cpp
+ * @brief Implementation of texture loading and management for 3D scenes.
+ *
+ * This file contains functions and constructors for setting up and managing textures
+ * in a 3D graphics application. It utilizes the stb_image library for loading image files
+ * and OpenGL for creating and handling textures. The file supports both 2D textures and
+ * cube map textures, including HDR textures.
+ *
+ * Key functionalities include:
+ * - Loading textures from files or memory.
+ * - Generating OpenGL texture objects for 2D and cube map textures.
+ * - Configuring texture parameters and mipmaps.
+ *
+ * @author Zhang TongYan
+ * @date Sept, 2025
+ */
 #include "pch.hpp"
 #include "Scene.h"
 // For loading textures
