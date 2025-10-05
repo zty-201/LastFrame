@@ -15,3 +15,4 @@ Made by Team Cheerios as part of our 3rd year project.
 - Asset Browser allow us to browse assets from the asset folder
 - Debug profiler shows the current state of the engine (fps, running time etc.)
 - Move around using wasd or up right left down and hold right mouse to look around
+- Debug -> Show Debug Wireframe will display the mesh edges for debugging
