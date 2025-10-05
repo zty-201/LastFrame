@@ -66,11 +66,6 @@ namespace EngineFramework
 	}
 	void GameObjectSystem::Initialize()
 	{
-		//Load a scene
-		std::vector<unsigned char> start_scene_data = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
-		std::string start_scene{ start_scene_data.begin(), start_scene_data.end() };
-		LoadScene(start_scene);
-
 		// For testing, create a simple scene with a camera, light, skybox, and some objects. To be loaded from JSON later under LoadScene func.
 		// --- Create Camera ---
 		auto cameraEntity = registry.create();
