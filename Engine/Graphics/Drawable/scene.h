@@ -1,3 +1,20 @@
+/**
+ * @file scene.h
+ * @brief Defines the Scene class and related utilities for managing 3D scenes.
+ *
+ * This file contains the `Scene` class, which encapsulates rendering passes, objects,
+ * textures, and cameras for a 3D graphics application. It also includes utility functions
+ * for setting up textures and cube maps, as well as various constants for default colors,
+ * dimensions, and visibility states.
+ *
+ * Key components:
+ * - `Scene::Texture`: A structure for managing OpenGL textures, including 2D and cube maps.
+ * - Utility functions: `setupTexture` and `setupHdrCubeMap` for loading textures.
+ * - Constants: Definitions for default colors, transforms, and common 3D primitives.
+ *
+ * @author Zhang TongYan
+ * @date Sept, 2025
+ */
 #ifndef SCENE_H
 #define SCENE_H
 

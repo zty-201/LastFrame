@@ -66,6 +66,11 @@ namespace EngineFramework
 	}
 	void GameObjectSystem::Initialize()
 	{
+		//Load a scene
+		std::vector<unsigned char> start_scene_data = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
+		std::string start_scene{ start_scene_data.begin(), start_scene_data.end() };
+		LoadScene(start_scene);
+
 		// For testing, create a simple scene with a camera, light, skybox, and some objects. To be loaded from JSON later under LoadScene func.
 		// --- Create Camera ---
 		auto cameraEntity = registry.create();
@@ -131,26 +136,26 @@ namespace EngineFramework
 	{
 		UNREFERENCED_PARAMETER(delta_time);
 
-		//TODO: Testing, to delete.
-		std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
-		std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
-		//DeSerializeAllEntityInstances(test_scene);
-		auto view = registry.view<TODELETE>();
-		auto view2 = registry.view<TODELETE2>();
-		for (entt::entity entity_id : view)
-		{
-			TODELETE& comp = view.get<TODELETE>(entity_id);
-			//LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-			UNREFERENCED_PARAMETER(comp);
-		}
-		for (entt::entity entity_id : view2)
-		{
-			TODELETE2& comp = view2.get<TODELETE2>(entity_id);
-			//LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-			UNREFERENCED_PARAMETER(comp);
-		}
-		//std::string test_save_data = SerializeAllEntityInstances();
-		//LOGD("Testing Serialization: %s", test_save_data.c_str());
+		////TODO: Testing, to delete.
+		//std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
+		//std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
+		////DeSerializeAllEntityInstances(test_scene);
+		//auto view = registry.view<TODELETE>();
+		//auto view2 = registry.view<TODELETE2>();
+		//for (entt::entity entity_id : view)
+		//{
+		//	TODELETE& comp = view.get<TODELETE>(entity_id);
+		//	//LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+		//	UNREFERENCED_PARAMETER(comp);
+		//}
+		//for (entt::entity entity_id : view2)
+		//{
+		//	TODELETE2& comp = view2.get<TODELETE2>(entity_id);
+		//	//LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
+		//	UNREFERENCED_PARAMETER(comp);
+		//}
+		////std::string test_save_data = SerializeAllEntityInstances();
+		////LOGD("Testing Serialization: %s", test_save_data.c_str());
 	}
 
 

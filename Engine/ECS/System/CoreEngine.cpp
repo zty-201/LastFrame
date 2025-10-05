@@ -122,7 +122,7 @@ namespace EngineFramework
 #else
 			LOGD("Exception in Update system[%s]: %s", system.name.c_str(), e.what());
 #endif
-			throw;
+			//throw;
 		}
 		catch (...) {
 #ifdef PLATFORM_WINDOWS
@@ -132,7 +132,7 @@ namespace EngineFramework
 #else
 			LOGD("Unknown exception in Update system[%s]", system.name.c_str());
 #endif
-			throw;
+			//throw;
 		}
 	}
 
@@ -153,7 +153,7 @@ namespace EngineFramework
 			LOGD("Exception in PostUpdate system[%s]: %s", system.name.c_str(), e.what());
 #endif
 
-			throw;
+			//throw;
 		}
 		catch (...) {
 #ifdef PLATFORM_WINDOWS
@@ -162,7 +162,7 @@ namespace EngineFramework
 #else
 			LOGD("Unknown exception in PostUpdate system[%s]: %s", system.name.c_str(), e.what());
 #endif
-			throw;
+			//throw;
 		}
 	}
 

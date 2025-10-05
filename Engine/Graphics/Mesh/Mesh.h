@@ -1,4 +1,20 @@
-
+/**
+ * @file Mesh.h
+ * @brief Provides utilities for generating and managing 3D mesh data.
+ *
+ * This file defines the `Mesh` namespace, which includes structures and functions
+ * for creating, parsing, and manipulating 3D mesh data. It supports loading meshes
+ * from OBJ files, generating common 3D primitives (e.g., quads, planes, cubes, spheres,
+ * and skyboxes), and calculating tangents for advanced rendering techniques.
+ *
+ * Key components:
+ * - `Mesh::Vertex`: Represents a vertex with position, normal, and texture coordinate indices.
+ * - `Mesh::MeshData`: Stores vertex data, normals, texture coordinates, tangents, and indices.
+ * - Utility functions for generating 3D primitives and calculating tangents.
+ *
+ * @author Zhang TongYan
+ * @date October, 2025
+ */
 #ifndef MESH_H
 #define MESH_H
 

@@ -487,9 +487,9 @@ namespace EngineFramework
                 ImGui::Separator();
                 ImGui::TextUnformatted("Right Arrrow     or    D_key   :   Move Right");
                 ImGui::Separator();
-                ImGui::TextUnformatted("Scoll Backward   or    S_key   :   Move Backwards");
+                ImGui::TextUnformatted("Scroll Backward  or    S_key   :   Move Backwards");
                 ImGui::Separator();
-                ImGui::TextUnformatted("Scoll Forward    or    W_key   :   Move Forwards");
+                ImGui::TextUnformatted("Scroll Forward   or    W_key   :   Move Forwards");
                 ImGui::Separator();
                 ImGui::TextUnformatted("Mouse Right Dragged            :   Look around");
                 ImGui::EndTabItem();

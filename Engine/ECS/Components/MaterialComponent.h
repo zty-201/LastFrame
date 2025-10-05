@@ -1,3 +1,18 @@
+/**
+ * @file MaterialComponent.h
+ * @brief Defines the MaterialComponent structure for representing material properties in a 3D scene.
+ *
+ * This file contains the `MaterialComponent` structure, which represents the material properties
+ * of an object in a 3D graphics application. It includes properties for roughness, metallicity,
+ * color, ambient, diffuse, and specular components, as well as shininess and effect parameters.
+ *
+ * Key functionalities:
+ * - Stores material properties such as roughness, metallicity, and color.
+ * - Includes predefined materials for PBR, discard, cartoon, and checkerboard effects.
+ * - Provides comparison operators for equality and inequality.
+ *
+ * @date Sept 2025
+ */
 #ifndef MATERIAL_COMPONENT
 #define MATERIAL_COMPONENT
 struct MaterialComponent

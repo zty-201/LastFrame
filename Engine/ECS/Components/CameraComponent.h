@@ -1,3 +1,18 @@
+/**
+ * @file CameraComponent.h
+ * @brief Defines the CameraComponent structure for managing camera properties in a 3D scene.
+ *
+ * This file contains the `CameraComponent` structure, which represents a camera in a 3D
+ * graphics application. It includes properties for camera type, position, target, field
+ * of view, and clipping planes, as well as matrices for view and projection transformations.
+ *
+ * Key functionalities:
+ * - Supports two camera types: ORBITING and WALKING.
+ * - Stores camera position, target, and field of view.
+ * - Includes matrices for view and projection transformations.
+ *
+ * @date Sept 2025
+ */
 #ifndef CAM_COMPONENT
 #define CAM_COMPONENT
 

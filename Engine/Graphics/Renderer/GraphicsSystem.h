@@ -1,20 +1,21 @@
-/******************************************************************/
-/*!
-\file   GraphicsSystem.cpp
-\author Zhang TongYan
-\par    tongyan.zhang\@digipen.edu
-\date   October 2025
-\brief
-This file contains the declaration of the GraphicsSystem class, which
-manages the initialization, rendering, and updating of the graphics pipeline.
-It includes functionality for handling OpenGL context setup, rendering scenes,
-managing framebuffers, and responding to window and level editor events.
-
-Copyright (C) 2025 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents without the
-prior written consent of DigiPen Institute of Technology is prohibited.
-*/
-/******************************************************************/
+/**
+ * @file GraphicsSystem.h
+ * @brief Declaration of the GraphicsSystem class for managing rendering operations.
+ *
+ * This file defines the `GraphicsSystem` class, which is responsible for initializing
+ * and managing the graphics pipeline in the EngineFramework. It handles window creation,
+ * OpenGL context setup, rendering scenes, and managing framebuffers, shaders, and other
+ * graphics-related resources.
+ *
+ * Key functionalities:
+ * - Initialization of GLFW and OpenGL contexts.
+ * - Management of rendering passes, including scene rendering and skybox rendering.
+ * - Handling of events such as window resizing and toggling the level editor.
+ * - Integration with the asset manager for loading and caching meshes, textures, and shaders.
+ *
+ * @author Zhang TongYan
+ * @date October, 2025
+ */
 
 #ifndef GRAPHICS_SYSTEM_HPP
 #define GRAPHICS_SYSTEM_HPP

@@ -1,3 +1,17 @@
+/**
+ * @file FBO.h
+ * @brief Defines the FBO struct for managing OpenGL Framebuffer Objects.
+ *
+ * This file contains the `FBO` struct, which provides functionality for setting up
+ * and managing OpenGL Framebuffer Objects (FBOs). It supports various rendering
+ * techniques such as texture rendering, depth-only rendering, HDR, and deferred rendering.
+ *
+ * The `FBO` struct includes methods for resizing framebuffers, creating texture and
+ * depth buffers, and configuring framebuffers for specific rendering types.
+ *
+ * @author Zhang TongYan
+ * @date October, 2025
+ */
 #ifndef FBO_H
 #define FBO_H
 
