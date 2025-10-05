@@ -36,6 +36,23 @@ struct adl_serializer<glm::vec3> {
 };
 
 template<>
+struct adl_serializer<std::vector<glm::vec3>> {
+	static void to_json(json& j, const std::vector<glm::vec3>& vec) {
+		j = json::array();
+		for (const auto& v : vec) {
+			j.push_back(json::array({ v.x, v.y, v.z }));
+		}
+	}
+
+	static void from_json(const json& j, std::vector<glm::vec3>& vec) {
+		vec.clear();
+		for (const auto& item : j) {
+			vec.push_back(glm::vec3{ item[0], item[1], item[2] });
+		}
+	}
+};
+
+template<>
 struct adl_serializer<glm::mat4> {
 	static void to_json(json& j, const glm::mat4& m) {
 
@@ -85,22 +102,7 @@ struct adl_serializer<CameraComponent::CameraType> {
 	}
 };
 
-template<>
-struct adl_serializer<std::vector<glm::vec3>> {
-	static void to_json(json& j, const std::vector<glm::vec3>& vec) {
-		j = json::array();
-		for (const auto& v : vec) {
-			j.push_back(json::array({ v.x, v.y, v.z }));
-		}
-	}
 
-	static void from_json(const json& j, std::vector<glm::vec3>& vec) {
-		vec.clear();
-		for (const auto& item : j) {
-			vec.push_back(glm::vec3{ item[0], item[1], item[2] });
-		}
-	}
-};
 
 NLOHMANN_JSON_NAMESPACE_END
 
