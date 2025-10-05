@@ -23,6 +23,8 @@
 #include "Audio.hpp"
 #include "SoundAsset.hpp"
 #include "Archtype.hpp"
+
+
 namespace EngineFramework {
 
 	// -------- lifecycle --------
@@ -297,6 +299,9 @@ namespace EngineFramework {
 		asset_loader_map[SHADER] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadShader);
 		asset_loader_map[AUDIO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAudio);
 		asset_loader_map[ARCHTYPE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadArchtype);
+		//=====================================//
+		compilers["texture"] = std::make_unique<TextureCompiler>();
+		compilers["mesh"] = std::make_unique<MeshCompiler>();
 
 		//Set AAsetManager for android, in audio system.
 #ifdef PLATFORM_ANDROID
@@ -314,6 +319,51 @@ namespace EngineFramework {
 
 	}
 
+	void AssetManagerSystem::CompileIfNeeded(
+		const std::filesystem::path& srcFolder,
+		const std::filesystem::path& outFolder,
+		IAssetCompiler* compiler)
+	{
+#ifdef PLATFORM_WINDOWS
+		std::filesystem::path srcPath = GetAssetFolderPrefix() / srcFolder;
+		std::filesystem::path outPath = GetAssetFolderPrefix() / outFolder;
+
+		if (!std::filesystem::exists(srcPath))
+			return;
+
+		std::filesystem::create_directories(outPath);
+
+		// Copy guid.meta
+		std::filesystem::path srcGuid = srcPath / "guid.meta";
+		std::filesystem::path outGuid = outPath / "guid.meta";
+		if (std::filesystem::exists(srcGuid) && !std::filesystem::exists(outGuid)) {
+			std::filesystem::copy(srcGuid, outGuid);
+		}
+
+		// Compile each file
+		std::string srcExt = compiler->GetSourceExt();
+		for (auto& entry : std::filesystem::directory_iterator(srcPath))
+		{
+			if (!entry.is_regular_file()) continue;
+			if (entry.path().extension() != srcExt) continue;
+
+			std::filesystem::path outFile = outPath /
+				(entry.path().stem().string() + compiler->GetOutputExt());
+
+			if (compiler->NeedsCompilation(entry.path(), outFile))
+			{
+				if (!compiler->Compile(entry.path(), outFile))
+				{
+					LOGE("Failed to compile: %s", entry.path().string().c_str());
+				}
+			}
+		}
+#else
+		UNREFERENCED_PARAMETER(srcFolder);
+		UNREFERENCED_PARAMETER(outFolder);
+		UNREFERENCED_PARAMETER(compiler);
+#endif
+	}
 	/*
 		Reads the config file located at ASSET_CONFIG_FILE, and calls the respective asset function loaders for each folder/config path.
 		Will write into the resource maps.
@@ -338,6 +388,20 @@ namespace EngineFramework {
 		*/
 		for (auto& [resource_type, folderpath_string] : config_json.items())
 		{
+			std::filesystem::path folder_path{ folderpath_string.get<std::string>() };
+			//Compile if needed, then load from compiled folder.
+			if (compilers.find(resource_type) != compilers.end())
+			{
+				std::filesystem::path compiledFolder =
+					folder_path.parent_path() /
+					(folder_path.filename().string() + "_Compiled");
+
+				CompileIfNeeded(folder_path, compiledFolder, compilers[resource_type].get());
+
+				// Load from compiled folder
+				folder_path = compiledFolder;
+			}
+
 			//Unable to find resource type in map, it might not have been added yet.
 			if (asset_loader_map.find(resource_type) == asset_loader_map.end())
 			{
@@ -345,7 +409,6 @@ namespace EngineFramework {
 			}
 
 			//Call the asset loader for that respective asset type, and pass in the folderpath.
-			std::filesystem::path folder_path{ folderpath_string.get<std::string>() };
 			if (!asset_loader_map[resource_type](folder_path))
 			{
 				throw std::exception((std::string("Unable to load asset of type: ") + resource_type).c_str());
@@ -359,7 +422,7 @@ namespace EngineFramework {
 	{
 		LOGD("Loading Texture");
 		//Acceptable files that can be loaded as a texture.
-		std::vector<std::string> texture_extensions{ ".png" };
+		std::vector<std::string> texture_extensions{ ".png", ".compiled" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, texture_extensions);
 
 		/*
@@ -432,7 +495,7 @@ namespace EngineFramework {
 		LOGI("Loading Mesh");
 
 		// Acceptable files that can be loaded as a mesh.
-		std::vector<std::string> mesh_extensions{ ".obj" };
+		std::vector<std::string> mesh_extensions{ ".obj", ".compiled" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, mesh_extensions);
 
 		/*

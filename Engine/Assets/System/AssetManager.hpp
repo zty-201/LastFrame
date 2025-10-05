@@ -81,6 +81,11 @@
 #include "entt/meta/meta.hpp"
 #include "entt/meta/resolve.hpp"
 
+//Asset compilers
+#include "AssetCompiler.h"
+#include "TextureCompiler.h"
+#include "MeshCompiler.h"
+
 #ifdef PLATFORM_ANDROID
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
@@ -315,6 +320,12 @@ namespace EngineFramework {
 		// <type, <string, guid>>
 		static inline std::unordered_map<xresource::type_guid, std::unordered_map<std::string, xresource::instance_guid>> name_guid_map{};
 
+		static inline std::unordered_map<std::string, std::unique_ptr<IAssetCompiler>> compilers;
+
+		static void CompileIfNeeded(
+			const std::filesystem::path& srcFolder,
+			const std::filesystem::path& outFolder,
+			IAssetCompiler* compiler);
 	};
 
 } // namespace EngineFramework
