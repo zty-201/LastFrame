@@ -66,65 +66,10 @@ namespace EngineFramework
 	}
 	void GameObjectSystem::Initialize()
 	{
-		// For testing, create a simple scene with a camera, light, skybox, and some objects. To be loaded from JSON later under LoadScene func.
-		// --- Create Camera ---
-		auto cameraEntity = registry.create();
-		registry.emplace<CameraComponent>(cameraEntity,
-			CameraComponent::ORBITING,
-			glm::vec3(0.0f, 0.0f, 5.0f),  // position
-			glm::vec3(0.0f, 0.0f, 0.0f),  // target
-			75.0f, 0.1f, 100.0f
-		);
-
-		// --- Create Light ---
-		auto lightEntity = registry.create();
-		registry.emplace<LightComponent>(lightEntity,
-			glm::vec3(0.0f, 5.0f, 2.0f), // position
-			std::vector<glm::vec3>{      // L
-				{ 0.4f, 0.4f, 0.4f },      // Ambient
-				{ 1.0f, 1.0f, 1.0f },      // Diffuse
-				{ 1.0f, 1.0f, 1.0f }       // Specular
-		}
-		);
-
-		// --- Create Skybox ---
-		auto skyboxEntity = registry.create();
-		registry.emplace<MeshComponent>(skyboxEntity, "SkyBox");
-		registry.emplace<TextureComponent>(skyboxEntity, AssetManagerSystem::GetFullGuid(AssetManagerSystem::CUBEMAP_GUID, "night_skybox"));
-		registry.emplace<SkyboxRenderPass>(skyboxEntity); // Tag for skybox pass
-
-		// --- Create Renderable Game Objects ---
-
-		// 1. Checkerboard Plane
-		auto planeEntity = registry.create();
-		registry.emplace<MeshComponent>(planeEntity, "Plane");
-		registry.emplace<MaterialComponent>(planeEntity, MATERIAL_CHECKERBOARD);
-		registry.emplace<TransformComponent>(planeEntity,
-			glm::vec3(0.0f, -1.01f, 0.0f), // position
-			glm::vec3(0.0f, 0.0f, 0.0f),   // rotation
-			glm::vec3(10.0f, 1.0f, 10.0f)  // scale
-		);
-		registry.emplace<SceneRenderPass>(planeEntity); // Tag for scene pass
-
-		// 2. PBR Phong Sphere
-		auto sphereEntity = registry.create();
-		registry.emplace<MeshComponent>(sphereEntity, "Sphere");
-		registry.emplace<TextureComponent>(sphereEntity, AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, "ogre_diffuse"));
-		registry.emplace<MaterialComponent>(sphereEntity, MATERIAL_PBR_PHONG);
-		registry.emplace<TransformComponent>(sphereEntity,
-			glm::vec3(-3.0f, 0.0f, 0.0f) // position
-		);
-		registry.emplace<SceneRenderPass>(sphereEntity); // Tag for scene pass
-
-		// 3. Discard-effect Cube
-		auto cubeEntity = registry.create();
-		registry.emplace<MeshComponent>(cubeEntity, "Cube");
-		registry.emplace<NormalMapComponent>(cubeEntity, AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, "normal_map_brick"));
-		registry.emplace<MaterialComponent>(cubeEntity, MATERIAL_DISCARD);
-		registry.emplace<TransformComponent>(cubeEntity,
-			glm::vec3(3.0f, 0.0f, 0.0f) // position
-		);
-		registry.emplace<SceneRenderPass>(cubeEntity); // Tag for scene pass
+		// Load a Scene
+		std::vector<unsigned char> start_scene_data = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
+		std::string start_scene{ start_scene_data.begin(), start_scene_data.end() };
+		LoadScene(start_scene);
 		
 	}
 	void GameObjectSystem::Update(float delta_time)
