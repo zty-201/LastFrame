@@ -125,7 +125,7 @@ namespace EngineFramework
 			glm::vec3(3.0f, 0.0f, 0.0f) // position
 		);
 		registry.emplace<SceneRenderPass>(cubeEntity); // Tag for scene pass
-
+		
 	}
 	void GameObjectSystem::Update(float delta_time)
 	{

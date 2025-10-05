@@ -257,6 +257,42 @@ namespace EngineFramework
 			if (isCheckerboard) {
 				glCullFace(GL_BACK);
 			}
+
+			// --- 3.5. Debug Drawing ---
+			if (show_debugDraw) {
+				// 1) Ensure a wire VAO exists for this mesh
+				auto itWire = meshCacheWire.find(mesh.meshName);
+				if (itWire == meshCacheWire.end()) {
+					// Rebuild cache entries (creates wire VAO/EBO too)
+					LoadAndCacheMesh(mesh.meshName);
+					itWire = meshCacheWire.find(mesh.meshName);
+				}
+				if (itWire == meshCacheWire.end())
+					break; // nothing to draw for this mesh
+
+				const auto& [wireVAO, wireIndexCount] = itWire->second;
+
+				// 2) Save minimal GL state we’re about to touch
+				const GLboolean depthEnabled = glIsEnabled(GL_DEPTH_TEST);
+				const GLboolean cullEnabled = glIsEnabled(GL_CULL_FACE);
+
+				// 3) Overlay: draw lines without depth testing so they’re always visible
+				glDisable(GL_DEPTH_TEST);
+				glDisable(GL_CULL_FACE);
+				glLineWidth(1.0f);                 // ES often clamps to 1.0
+
+				shader->setUniform("Pass", 2);     // flat debug branch in your frag shader
+				shader->setUniform("M", transform.modelMatrix);
+
+				glBindVertexArray(wireVAO);
+				glDrawElements(GL_LINES, (GLsizei)wireIndexCount, GL_UNSIGNED_INT, 0);
+				glBindVertexArray(0);
+
+				// 4) Restore shader + GL state
+				shader->setUniform("Pass", 0);
+				if (cullEnabled)  glEnable(GL_CULL_FACE);  else glDisable(GL_CULL_FACE);
+				if (depthEnabled) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
+			}
 		}
 
 		// --- 4. RENDER SKYBOX ---
@@ -388,6 +424,30 @@ namespace EngineFramework
 
 		// Note: The raw buffer handles (indexBuf, posBuf, etc.) should be stored somewhere
 		// to be deleted when the mesh is unloaded. For simplicity, this is omitted here.
+
+		// Build edges using helper function
+		std::vector<uint32_t> wireIdx = BuildUniqueEdgeIndices(meshData.indices);
+
+		// Create wire VAO and EBO
+		GLuint wireVAO = 0, wireEBO = 0;
+		glGenVertexArrays(1, &wireVAO);
+		glBindVertexArray(wireVAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, posBuf);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glGenBuffers(1, &wireEBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wireEBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+			wireIdx.size() * sizeof(GLuint),
+			wireIdx.data(),
+			GL_STATIC_DRAW);
+
+		glBindVertexArray(0);
+
+		// Store in wire cache
+		meshCacheWire[meshName] = { wireVAO, wireIdx.size() };
 	}
 
 	//==Event Handlers==//

@@ -39,10 +39,16 @@ void main()
         gl_Position = P * VertexPositionInView; 
     } 
     // Pass 1 is SKYBOX
-    else {
+    else if (Pass == 1) {
         Vec = VertexPosition;
         mat4 viewNoTranslation = mat4(mat3(V));
         vec4 pos = P * viewNoTranslation * vec4(VertexPosition, 1.0);
         gl_Position = pos.xyzz;
+    }
+    else {
+        // Other passes
+        vec4 clip = P * V * M * vec4(VertexPosition, 1.0);
+        clip.z -= 1e-3 * clip.w;
+        gl_Position = clip;
     }
 }

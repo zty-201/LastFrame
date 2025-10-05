@@ -7,11 +7,40 @@
 \brief This file has definitions of helper functions for debugging.
 *******************************************************************************/
 #include "pch.hpp"
-#include "debug.h"
+#include "Debug.h"
 
 #include <cstdio>
 #include <string>
 #include <iostream>
+#include <unordered_set>
+
+// Helper function for creating Edges used in debug Drawing
+inline uint64_t EdgeKey(uint32_t a, uint32_t b)
+{
+    if (a > b) std::swap(a, b);
+    return (uint64_t(a) << 32) | uint64_t(b);
+}
+
+std::vector<uint32_t> BuildUniqueEdgeIndices(const std::vector<GLuint>& triIdx)
+{
+    std::vector<uint32_t> edges;
+    edges.reserve(triIdx.size() * 2);
+    std::unordered_set<uint64_t> seen;
+    seen.reserve(triIdx.size());
+
+    for (size_t i = 0; i + 2 < triIdx.size(); i += 3) {
+        uint32_t i0 = triIdx[i + 0], i1 = triIdx[i + 1], i2 = triIdx[i + 2];
+        const uint32_t e[3][2] = { {i0,i1}, {i1,i2}, {i2,i0} };
+        for (int k = 0; k < 3; ++k) {
+            uint32_t a = e[k][0], b = e[k][1];
+            if (seen.insert(EdgeKey(a, b)).second) {
+                edges.push_back(a);
+                edges.push_back(b);
+            }
+        }
+    }
+    return edges;
+}
 
 /**
  * \brief Checks for OpenGL errors and reports them.

@@ -293,4 +293,8 @@ void main()
 {
     if (Pass == 0) scenePass();
     else if (Pass == 1) skyboxPass();
+    else if (Pass == 2) {
+        FragColor = vec4(1.0, 1.0, 0.0, 1.0); // bright yellow
+        return;
+    }
 }

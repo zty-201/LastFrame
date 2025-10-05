@@ -44,6 +44,10 @@ namespace EngineFramework
             return *this_graphics_ptr;
         }
 
+        // Mutator for boolean
+        void SetDebugStatus(bool enable) { show_debugDraw = enable; }
+        bool GetDebugStatus() { return show_debugDraw; }
+
 		// Accessor for the scene
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* GetGLFWwindow() { return pWindow; }
@@ -59,6 +63,9 @@ namespace EngineFramework
         // A map to cache loaded mesh data (VAO, index count)
         xresource::full_guid shader_guid;
         std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCache;
+        // Storage for wireframe debug drawing
+        bool show_debugDraw = false;
+        std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCacheWire;
         std::unique_ptr<Scene> pScene;
         FBO scene_framebuffer;
         GLuint sceneTextureID;

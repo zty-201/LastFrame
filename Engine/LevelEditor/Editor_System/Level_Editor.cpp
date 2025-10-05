@@ -45,7 +45,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetWindow.hpp"
 #include "ModelManager.hpp"
 #include "AssetManager.hpp"
-// Profiler/Debug
+
+// /Debug
 #include "Profiler.hpp"
 
 namespace EngineFramework
@@ -275,6 +276,17 @@ namespace EngineFramework
 						}
 						ImGui::PopStyleColor();
 					}
+
+					auto& gfx = EngineFramework::GraphicsSystem::GetInstance();
+
+					bool draw = gfx.GetDebugStatus();
+
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
+					if (ImGui::Checkbox("Show Debug Wireframe", &draw)) {
+						gfx.SetDebugStatus(draw);
+					}
+
+					ImGui::PopStyleColor();
 
 					ImGui::EndMenu();
 				}

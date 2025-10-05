@@ -8,6 +8,10 @@
 *******************************************************************************/
 #pragma once
 
+// Helper functions to build edge cases
+uint64_t EdgeKey(uint32_t a, uint32_t b);
+std::vector<uint32_t>BuildUniqueEdgeIndices(const std::vector<GLuint>& triIdx);
+
 /**
  * \brief Checks for OpenGL errors and logs them.
  *
