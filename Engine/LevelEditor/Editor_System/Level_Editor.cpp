@@ -230,7 +230,7 @@ namespace EngineFramework
 					ImGui::MenuItem("Open Scene", NULL, &featureFlag("SceneManager"));
 					ImGui::Separator();
 					if (ImGui::MenuItem("Save", NULL)) {
-						Save::GetInstance().SAVEFILE("Dummy1.json");
+						Save::GetInstance().SAVEFILE(SceneManager::GetInstance().GetCurrentScene());
 					}
 
 					ImGui::MenuItem("Save As ..", NULL, &featureFlag("Save"));
