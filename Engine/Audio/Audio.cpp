@@ -258,7 +258,7 @@ namespace EngineFramework
 		if (m_androidAssetMgr != NULL)
 		{
 			std::string copied = CopyAssetToInternal(resolved);
-			if (copied.empty()) return false;
+			if (copied.empty()) return {};
 			loadPath = copied;
 		}
 

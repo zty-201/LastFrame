@@ -40,7 +40,7 @@ void UnitTestManager::RunAllTests() {
 #ifdef PLATFORM_WINDOWS
     logFile << log_string.str();
 #else 
-    LOGD("%s", log_string.c_str());
+    LOGE("%s", log_string.str().c_str());
 #endif
     if (!allPassed) {
         throw std::runtime_error("One or more unit tests failed. Check unittests.log.");
