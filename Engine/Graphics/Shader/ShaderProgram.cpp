@@ -1,11 +1,20 @@
-///////////////////////////////////////////////////////////////////////
-// A slight encapsulation of a shader program. This contains methods
-// to build a shader program from multiples files containing vertex
-// and pixel shader code, and a method to link the result.  When
-// loaded (method "Use"), its vertex shader and pixel shader will be
-// invoked for all geometry passing through the graphics pipeline.
-// When done, unload it with method "Unuse".
-////////////////////////////////////////////////////////////////////////
+/**
+ * @file ShaderProgram.cpp
+ * @brief Implementation of the ShaderProgram class for managing OpenGL shader programs.
+ *
+ * This file contains the implementation of the `ShaderProgram` class, which provides
+ * functionality for compiling, linking, and managing OpenGL shader programs. It includes
+ * methods for handling shader source files, managing uniforms, and validating the shader program.
+ *
+ * Key functionalities:
+ * - Compilation and linking of vertex and fragment shaders.
+ * - Management of shader program resources, including uniform locations and attributes.
+ * - Utility functions for debugging, such as printing active uniforms and attributes.
+ * - Integration with the asset manager for loading shader source files.
+ *
+ * @author Zhang TongYan
+ * @date Sept, 2025
+ */
 
 #include "pch.hpp"
 #include "ShaderProgram.h"

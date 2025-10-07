@@ -2,5 +2,9 @@
     "lizard" : {
         "filepath" : "Extern/Audio/lizard.mp3",
         "isLoop" : false
+    },
+    "mainmenu_loop" : {
+        "filepath" : "Extern/Audio/mainmenu_loop.wav",
+        "isLoop" : true
     }
 }

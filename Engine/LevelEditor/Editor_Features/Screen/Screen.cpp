@@ -1,3 +1,19 @@
+/*
+*****************************************************************/
+/*!
+\file   Screen.hpp
+\author Tan Yee Tong
+\par    yeetong.t\@digipen.edu
+\date   September 2025
+\brief
+This file enables the screen buffer of the level editor to run. It also
+includes functions that is built in screen such as gizmos
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/* *******************************************************************/
+
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "pch.hpp"
 
@@ -33,6 +49,8 @@ namespace EngineFramework
     static ImVec2 screen_pos{};
     static float camDistance = 8.f;
 
+    static std::string droppedPath;
+
     static const float identityMatrix[16] =
     { 1.f, 0.f, 0.f, 0.f,
         0.f, 1.f, 0.f, 0.f,
@@ -40,31 +58,43 @@ namespace EngineFramework
         0.f, 0.f, 0.f, 1.f };
 
     Screen::Screen() {
+        this_instance = this;
         LOGI("Lfeature: Screen CREATED");
     }
     Screen::~Screen() {
 
     }
-    void Screen::Initialize() {
 
-        GraphicsSystem::GetInstance().GetScene().get()->camerasSetType(WALKING);
+    Screen& Screen::GetInstance()
+    {
+        return *this_instance;
+    }
+
+    void Screen::Initialize() {
+        auto camera_view = registry.view<CameraComponent>();
+        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+        Camera::setType(camera, CameraComponent::WALKING);
     }
     void Screen::Run() {
 
-        GraphicsSystem::GetInstance().GetScene().get()->camerasSetType(WALKING);
+       /* if (this_instance->is_enabled)
+            LOGD("Screen Opened");*/
+
+        auto camera_view = registry.view<CameraComponent>();
+        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+        Camera::setType(camera, CameraComponent::WALKING);
 
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
         ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500
 
-        if (ImGui::Begin("level loaded: <name>", &is_enabled, ImGuiWindowFlags_MenuBar)) {
-
+        if (ImGui::Begin("level loaded: <name>", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse)) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
             if (ImGui::BeginMenuBar()) {
 
                 if (ImGui::MenuItem("Run Simulator", NULL, &is_simulator_running)) {
                     //std::cout << "Run Simulator\n";
-
-                    int size = (int)GraphicsSystem::GetInstance().GetScene().get()->passes[0].objects.size();
+                    auto entity_view = registry.view<SceneRenderPass>();
+                    int size = (int)entity_view.size();
 
                     //std::cout<< "pass 0 object size: "<<GraphicsSystem::GetInstance().GetScene().get()->passes[0].objects.size() <<std::endl;
 
@@ -89,12 +119,11 @@ namespace EngineFramework
 
             ImGui::PopStyleColor();
 
-
             display_screen();
             gizmos();
-            control_window();
+            drop_target();
 
-            if (bool hovered = ImGui::IsItemHovered()) {               
+            if (bool hovered = ImGui::IsItemHovered()) {
                 camera_controls_in_screen_only();
             }
             camera_controls_outside_screen();
@@ -103,7 +132,11 @@ namespace EngineFramework
 
         ImGui::PopStyleColor();
         ImGui::End();
-      
+
+
+
+        control_window();
+
     }
     void Screen::Close() {
         LOGI("Screen closed");
@@ -148,35 +181,36 @@ namespace EngineFramework
         float speed = 0.05f;
 
         if (ImGui::IsKeyDown(ImGuiKey_W)) {
-
-            //GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, Mouse_Scroll));
-            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, speed));
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, speed));
         }
 
         if (ImGui::IsKeyDown(ImGuiKey_S)) {
-
-            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, -speed));
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, -speed));
         }
 
         if (ImGui::IsKeyDown(ImGuiKey_Q) || ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
-            //up vector
-            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, speed, 0));
-            //std::cout << "UP !" << std::endl;
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, speed, 0));
         }
         if (ImGui::IsKeyDown(ImGuiKey_E) || ImGui::IsKeyDown(ImGuiKey_DownArrow)) {
-            //down vector
-            //std::cout << "DOWN !" << std::endl;
-            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, -speed, 0));
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, -speed, 0));
         }
         if (ImGui::IsKeyDown(ImGuiKey_A) || ImGui::IsKeyDown(ImGuiKey_LeftArrow)) {
-            //left vector
-            //std::cout << "LEFT !" << std::endl;
-            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(-speed, 0, 0));
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+            Camera::Move_Cam_and_Target(camera, glm::vec3(-speed, 0, 0));
         }
         if (ImGui::IsKeyDown(ImGuiKey_D) || ImGui::IsKeyDown(ImGuiKey_RightArrow)) {
-            //right vector
-            //std::cout << "RIGHT !" << std::endl;
-            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(speed, 0, 0));
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+            Camera::Move_Cam_and_Target(camera, glm::vec3(speed, 0, 0));
         }
 
     }
@@ -186,18 +220,18 @@ namespace EngineFramework
         ImVec2 Mouse_delta = io.MouseDelta;
         float Mouse_Scroll = io.MouseWheel;
 
-        auto& pScene = GraphicsSystem::GetInstance().GetScene();
-
         //right mouse is down means = i am dragging the screen
         if (io.MouseDown[1]) {
-            pScene->camerasOnCursor(Mouse_delta.x, Mouse_delta.y);
-            //std::cout << "Mouse_delta x: " << Mouse_delta.x << " y: " << Mouse_delta.y << std::endl;
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+            Camera::onCursor(camera, Mouse_delta.x, Mouse_delta.y);
         }
 
         //moving forward/backwards
         if (Mouse_Scroll != 0.f) {
-            //std::cout << "scroll: " << Mouse_Scroll << std::endl;
-            GraphicsSystem::GetInstance().GetScene().get()->camerasSetPos_andTarget(glm::vec3(0, 0, Mouse_Scroll));
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, Mouse_Scroll));
         }
 
     }
@@ -210,7 +244,7 @@ namespace EngineFramework
         ImGui::SetNextWindowSize(ImVec2(620, 260), ImGuiCond_FirstUseEver);
 
         // No flags that block move/resize
-        ImGui::Begin("Control Panel", &is_enabled);
+        ImGui::Begin("Control Panel", &is_control_open);
 
 
 
@@ -231,7 +265,7 @@ namespace EngineFramework
                 ImGui::SameLine();
                 if (ImGui::RadioButton("Scale", operation == ImGuizmo::SCALE))     operation = ImGuizmo::SCALE;
                 ImGui::Dummy(ImVec2(0.0f, 20.f));
-                
+
                 ImGui::TextUnformatted("Coord Space: ");
                 ImGui::SameLine();
                 if (ImGui::RadioButton("Local", mode == ImGuizmo::LOCAL))  mode = ImGuizmo::LOCAL;
@@ -239,11 +273,10 @@ namespace EngineFramework
                 if (ImGui::RadioButton("World", mode == ImGuizmo::WORLD))  mode = ImGuizmo::WORLD;
                 ImGui::Dummy(ImVec2(0.0f, 200.f));
 
-                
+
 
                 //if any object is being selected
-                if (true) {
-
+                if (true) { // if any object is being selected
                     static bool transformation_changed = false;
 
                     ImGui::SeparatorText("Object's Transformation");
@@ -253,64 +286,193 @@ namespace EngineFramework
 
                     auto* scene = GraphicsSystem::GetInstance().GetScene().get();
                     if (!scene) return;
-                    glm::mat4& model = scene->passes[0].objects[2].instances[0].modeltransform;
+                    auto objects = registry.view<TransformComponent>();
+                    auto& first_obj = objects.get<TransformComponent>(objects.front());
 
-                    float T[3], R[3], S[3];
-                    ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), T, R, S);
-                  
+                    // Work directly with the component values instead of the matrix
+                    float T[3] = { first_obj.position.x, first_obj.position.y, first_obj.position.z };
+                    float R[3] = { first_obj.rotation.x, first_obj.rotation.y, first_obj.rotation.z };
+                    float S[3] = { first_obj.scale.x, first_obj.scale.y, first_obj.scale.z };
+
                     ImGui::Separator();
 
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    //ImGui::TextUnformatted("#Translation: ");
                     transformation_changed |= ImGui::InputFloat3("Translation", T, "%.3f");
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
 
-      
                     ImGui::Separator();
 
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    //ImGui::TextUnformatted("#Scale: ");
                     transformation_changed |= ImGui::InputFloat3("Scale", S, "%.3f");
-                    
-                    
+
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
 
-                    
                     ImGui::Separator();
 
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    //ImGui::TextUnformatted("#Rotation: ");
                     transformation_changed |= ImGui::InputFloat3("Rotation (deg)", R, "%.3f");
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
 
-                    
                     ImGui::Separator();
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    
-                    if (ImGui::Button("Reset", ImVec2(120, 0))) {                    
+
+                    if (ImGui::Button("Reset", ImVec2(120, 0))) {
                         R[0] = R[1] = R[2] = 0.0f;
-                        S[0] = S[1] = S[2] = 1.0f;                        
-                        ImGuizmo::RecomposeMatrixFromComponents(T, R, S, glm::value_ptr(model));
+                        S[0] = S[1] = S[2] = 1.0f;
+                        transformation_changed = true;
                     }
                     ImGui::SameLine();
                     ImGui::Text(" *only affects scale and rotation");
 
+                    // Apply changes directly to the transform component
+                    if (transformation_changed) {
+                        first_obj.position = glm::vec3(T[0], T[1], T[2]);
+                        first_obj.rotation = glm::vec3(R[0], R[1], R[2]);
+                        first_obj.scale = glm::vec3(S[0], S[1], S[2]);
 
-                    if (transformation_changed) {                       
-                        //for (int i = 0; i < 3; ++i) if (fabsf(S[i]) < 1e-6f) S[i] = (S[i] >= 0 ? 1e-6f : -1e-6f);                       
-                        ImGuizmo::RecomposeMatrixFromComponents(T, R, S, glm::value_ptr(model));
+                        // Reset the flag after applying changes
+                        transformation_changed = false;
                     }
-
                 }
-                
+
                 ImGui::EndTabItem();
             }
 
-            // -------- Lighting tab --------
-            if (ImGui::BeginTabItem("Lighting")) {
-                
-                ImGui::TextUnformatted("see how");
-                
+            // -------- Texture tab --------
+            if (ImGui::BeginTabItem("Texture")) {
+
+                if (editor_ptr->selected_objectID == entt::null) {
+                    
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));      // Black text
+                    ImGui::TextUnformatted("* no object is being selected");
+                    ImGui::PopStyleColor();
+
+                }
+                else {
+
+                    /*
+                       get the material component of the object
+                   */
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    ImGui::SeparatorText("Material");
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    ImGui::TextUnformatted("Assign a material to the object: ");
+
+                    entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+
+                    if (registry.all_of<MaterialComponent>(id)) {
+
+                        auto& object = registry.get<MaterialComponent>(id);
+
+                        ImGui::SameLine();
+                        static const char* material_type[] = { "Checkerboard", "PBR", "Discard", "Cartoon" };
+                        static int index = 0; // index into items
+
+                        if (object == MATERIAL_CHECKERBOARD) {
+                            index = 0;
+                        }
+                        else if (object == MATERIAL_PBR_PHONG) {
+                            index = 1;
+                        }
+                        else if (object == MATERIAL_DISCARD) {
+                            index = 2;
+                        }
+                        else if (object == MATERIAL_CARTOON) {
+                            index = 3;
+                        }
+
+                        ImGui::SetNextItemWidth(300.f);
+                        if (ImGui::Combo("##material_type", &index, material_type, IM_ARRAYSIZE(material_type))) {
+
+                            if (index == 0) {
+                                object = MATERIAL_CHECKERBOARD;
+                            }
+                            else if (index == 1) {
+                                object = MATERIAL_PBR_PHONG;
+                            }
+                            else if (index == 2) {
+                                object = MATERIAL_DISCARD;
+                            }
+                            else if (index == 3) {
+                                object = MATERIAL_CARTOON;
+                            }
+
+                        }
+
+                    }
+
+                    /*
+                       get the texture component of the object
+                   */
+
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    ImGui::SeparatorText("Custom Texture");
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+
+                    ImGui::TextUnformatted("Texture Loaded: ");
+
+                    
+                    if (registry.all_of<TextureComponent>(id)) {
+
+                        auto& object = registry.get<TextureComponent>(id);
+                        std::string name = AssetManagerSystem::GetInstance().GetName(object.texture_guid.m_Instance);             
+                        ImGui::SameLine();
+                        
+                        ImGui::TextUnformatted(name.c_str());
+
+                        if (ImGui::Button("Remove Custom Texture", ImVec2(300, 0))) {
+                            registry.remove<TextureComponent>(id);
+                            if (registry.all_of<MaterialComponent>(id)) {
+
+                                auto& object_M = registry.get<MaterialComponent>(id);
+                                object_M = MATERIAL_PBR_PHONG;
+                            }
+                        }
+
+                    }
+                    else {
+                        ImGui::SameLine();
+                        ImGui::TextUnformatted(" Not chosen");
+                    }
+
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    
+                    ImVec2 size(ImGui::GetContentRegionAvail().x, 160.0f);
+                    ImGui::Button("Drop new Texture from Asset Browser to attach to object", size);
+
+
+                    if (ImGui::BeginDragDropTarget())
+                    {
+                        // Accept path payload (null-terminated string)
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Textures"))
+                        {
+                            droppedPath = (const char*)payload->Data;
+
+                            //only returning the filename, remove all dir and extension (for asset manager)
+                            std::filesystem::path p = std::filesystem::path(droppedPath).lexically_normal();
+                            droppedPath = p.stem().string();
+                            
+                            //std::cout << droppedPath << std::endl;
+
+                            if (registry.all_of<TextureComponent>(id)) {
+
+                                /* if the texture already exists, just swap texture*/
+                                auto& object = registry.get<TextureComponent>(id);
+                                object.texture_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, droppedPath);
+
+                            }
+                            else {                             
+                                /* if the texture do not exists, just init as texture component*/
+                                registry.emplace<TextureComponent>(id, AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, droppedPath));
+                                
+                            }
+
+                        }
+                        ImGui::EndDragDropTarget();
+                    }
+
+                }
+
 
                 ImGui::EndTabItem();
             }
@@ -325,9 +487,9 @@ namespace EngineFramework
                 ImGui::Separator();
                 ImGui::TextUnformatted("Right Arrrow     or    D_key   :   Move Right");
                 ImGui::Separator();
-                ImGui::TextUnformatted("Scoll Backward   or    S_key   :   Move Backwards");
+                ImGui::TextUnformatted("Scroll Backward  or    S_key   :   Move Backwards");
                 ImGui::Separator();
-                ImGui::TextUnformatted("Scoll Forward    or    W_key   :   Move Forwards");
+                ImGui::TextUnformatted("Scroll Forward   or    W_key   :   Move Forwards");
                 ImGui::Separator();
                 ImGui::TextUnformatted("Mouse Right Dragged            :   Look around");
                 ImGui::EndTabItem();
@@ -343,7 +505,7 @@ namespace EngineFramework
 
     //return true if theres a difference
     bool Check_Mat4_Diff(const glm::mat4& a, const glm::mat4& b, float epsilon = 1e-5f) {
-        
+
         const float* pa = glm::value_ptr(a);
         const float* pb = glm::value_ptr(b);
         for (int i = 0; i < 16; ++i) {
@@ -357,40 +519,104 @@ namespace EngineFramework
 
     void Screen::gizmos() {
 
-        ImGuizmo::BeginFrame(); 
-        ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
-        gizmos_IS_hovering = ImGuizmo::IsOver();
-        gizmos_IS_dragged = ImGuizmo::IsUsing();
-     
-        auto* scene = GraphicsSystem::GetInstance().GetScene().get();
-        auto &cam = scene->passes[0].cameras[0];
-        glm::mat4 view = cam.getLookAt();
-        glm::mat4 proj = cam.getPerspective(scene->aspect);
-        glm::mat4 &obj = scene->passes[0].objects[2].instances[0].modeltransform;
-        ImGuizmo::SetOrthographic(false); //because we have perspective
-        
-        //set this for gizmos
-        ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
-
-        //imviewgizmo adapted from imguizmo sample demo       
-        float viewManipulateRight = screen_pos.x + available_size.x;
-        float viewManipulateTop = screen_pos.y;
-        glm::mat4 view_before = view;
-
-        ImGuizmo::DrawCubes(glm::value_ptr(view), glm::value_ptr(proj), glm::value_ptr(obj), 1);
-        ImGuizmo::ViewManipulate(glm::value_ptr(view), camDistance, ImVec2(viewManipulateRight - 128, viewManipulateTop), ImVec2(128, 128), 0x10101010);
-        
-        //whenever we clicked on the cube, view will be return with a new value
-        //ONLY if its a new value, set new cam and target position (not every frame)      
-        if (Check_Mat4_Diff(view, view_before)) {
-            //graphics system is always updating the camera view and proj based on camera pos and target pos
-            glm::vec3 new_CamPos = glm::vec3(glm::inverse(view)[3]);
-            glm::vec3 new_TargetPos = glm::vec3(obj[3]);
-            cam.set_Cam_Pos(new_CamPos);
-            cam.set_Target_Pos(new_TargetPos);
+        //do not use gizmos if nothing is being selected, because what are you referrring to?
+        if (editor_ptr->selected_objectID == entt::null) {
+            //std::cout << "nothing is selected\n";
+            return;
         }
-        
-        ImGuizmo::Manipulate(glm::value_ptr(view),glm::value_ptr(proj),operation,mode, glm::value_ptr(obj));
+
+        auto camera_view = registry.view<CameraComponent>();
+        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+        float aspect = (GraphicsSystem::GetInstance().GetWindowSize().second > 0) ?
+            (float)GraphicsSystem::GetInstance().GetWindowSize().first / GraphicsSystem::GetInstance().GetWindowSize().second : 1.0f;
+        glm::mat4 view = Camera::getLookAt(camera);
+        glm::mat4 proj = Camera::getPerspective(camera, aspect);
+
+        /*
+            only usw gizmos if the object have a TransformComponent
+        */
+
+        entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+        if (registry.all_of<TransformComponent>(id)) {
+
+            auto& object = registry.get<TransformComponent>(id);
+
+            ImGuizmo::BeginFrame();
+            ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+            gizmos_IS_hovering = ImGuizmo::IsOver();
+            gizmos_IS_dragged = ImGuizmo::IsUsing();
+
+
+
+            //auto& first_obj = objects.get<TransformComponent>(objects.front());
+
+            // Create a copy of the model matrix to work with
+            glm::mat4 model = object.modelMatrix;
+            ImGuizmo::SetOrthographic(false); //because we have perspective
+
+            //set this for gizmos
+            ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
+
+            //imviewgizmo adapted from imguizmo sample demo       
+            float viewManipulateRight = screen_pos.x + available_size.x;
+            float viewManipulateTop = screen_pos.y;
+            glm::mat4 view_before = view;
+
+            ImGuizmo::DrawCubes(glm::value_ptr(view), glm::value_ptr(proj), glm::value_ptr(model), 1);
+            ImGuizmo::ViewManipulate(glm::value_ptr(view), camDistance, ImVec2(viewManipulateRight - 128, viewManipulateTop), ImVec2(128, 128), 0x10101010);
+
+            //whenever we clicked on the cube, view will be return with a new value
+            //ONLY if its a new value, set new cam and target position (not every frame)      
+            if (Check_Mat4_Diff(view, view_before)) {
+                //graphics system is always updating the camera view and proj based on camera pos and target pos
+                glm::vec3 new_CamPos = glm::vec3(glm::inverse(view)[3]);
+                glm::vec3 new_TargetPos = glm::vec3(model[3]);
+                Camera::set_Cam_Pos(camera, new_CamPos);
+                Camera::set_Target_Pos(camera, new_TargetPos);
+            }
+
+            // Store the matrix before manipulation
+            glm::mat4 model_before = model;
+
+            // Manipulate the model matrix
+            ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(proj), operation, mode, glm::value_ptr(model));
+
+            // Check if the model matrix was changed
+            if (Check_Mat4_Diff(model, model_before)) {
+                // Extract position, rotation, and scale from the new model matrix
+                float translation[3], rotation[3], scale[3];
+                ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), translation, rotation, scale);
+
+                // Update the TransformComponent values
+                object.position = glm::vec3(translation[0], translation[1], translation[2]);
+                object.rotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
+                object.scale = glm::vec3(scale[0], scale[1], scale[2]);
+
+                // No need to manually update the modelMatrix as it will be recalculated next frame
+                // based on the updated position, rotation, and scale values
+            }
+
+
+        }
+
+
+    }
+
+    void Screen::drop_target() {
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            // Accept path payload (null-terminated string)
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Models"))
+            {
+                //const char* path = (const char*)payload->Data;
+
+                //std::cout << "Drop successful: " << path << std::endl;
+            }
+
+            ImGui::EndDragDropTarget();
+        }
+
 
     }
 

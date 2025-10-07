@@ -1,13 +1,36 @@
+/**
+ * @file scene.h
+ * @brief Defines the Scene class and related utilities for managing 3D scenes.
+ *
+ * This file contains the `Scene` class, which encapsulates rendering passes, objects,
+ * textures, and cameras for a 3D graphics application. It also includes utility functions
+ * for setting up textures and cube maps, as well as various constants for default colors,
+ * dimensions, and visibility states.
+ *
+ * Key components:
+ * - `Scene::Texture`: A structure for managing OpenGL textures, including 2D and cube maps.
+ * - Utility functions: `setupTexture` and `setupHdrCubeMap` for loading textures.
+ * - Constants: Definitions for default colors, transforms, and common 3D primitives.
+ *
+ * @author Zhang TongYan
+ * @date Sept, 2025
+ */
 #ifndef SCENE_H
 #define SCENE_H
 
 #include "ShaderProgram.h"
+#include "CameraComponent.h"
+#include "LightComponent.h"
+#include "MaterialComponent.h"
+#include "MeshComponent.h"
+#include "TransformComponent.h"
+#include "TextureComponent.h"
+#include "NormalMapComponent.h"
+
 #include "FBO.h"
-#include "Mesh.h"
-#include "Material.h"
 #include "Light.h"
 #include "Camera.h"
-
+#include "Mesh.h"
 
 // Color and state definitions
 #define BLACK           { 0.0f, 0.0f, 0.0f, 0.0f }
@@ -38,16 +61,16 @@
 #define DISABLE     false
 
 // Functions for loading textures
-GLuint loadTexture(const char* filename);
-GLuint loadHdrCubeMap(const std::array<std::string, 6>&);
+GLuint setupTexture(const char* filename);
+GLuint setupHdrCubeMap(const std::array<std::string, 6>&);
 
 //
 // The main Scene class encapsulates rendering passes, objects, textures, and cameras
 //
 struct Scene
 {
-    float aspect;
-    // Structure to represent a texture used in the scene
+    //float aspect;
+    //// Structure to represent a texture used in the scene
     struct Texture
     {
         GLuint id;        // Texture ID assigned by OpenGL
@@ -81,193 +104,12 @@ struct Scene
         Texture& operator=(const Texture& rhs) = delete;
     };
 
-    // Structure representing a rendering pass
-    struct Pass
-    {
-        // Structure representing an object in the scene
-        struct Object
-        {
-            // Represents an instance of an object with its material and transform
-            struct Instance
-            {
-                Material material;             // Material properties of the instance
-                glm::mat4 modeltransform;      // **FIX: Changed from const glm::mat4& to glm::mat4**
-                bool isVisible;                // Visibility flag
+    glm::vec3 fogColor;
+    float fogMinDist;
+    float fogMaxDist;
+    int shadingModel;
 
-                // Constructor for initializing an instance
-                Instance(const Material& material = { },
-                    const glm::mat4& modeltransform = NOTRANSFORM,
-                    bool isVisible = VISIBLE)
-                    :
-                    material{ material },
-                    modeltransform{ modeltransform },
-                    isVisible{ isVisible }
-                {
-                }
-            };
-
-            GLuint vao;                     // Vertex Array Object ID for the object
-            std::vector<GLuint> buffers;    // Vertex buffer objects
-            size_t size;                    // Number of indices in the object's index buffer
-            std::vector<Instance> instances; // Instances of the object
-            bool isVisible;                 // Object visibility flag
-
-            // Constructor for creating an object with a single instance
-            Object(const char* meshName,
-                const Material& material = { },
-                const glm::mat4& modeltransform = NOTRANSFORM,
-                bool isVisible = VISIBLE)
-                :
-                instances{ },
-                isVisible{ isVisible },
-                vao{ 0 },
-                buffers{ },
-                size{ 0 }
-            {
-                instances.push_back({ material, modeltransform, VISIBLE });
-                setBuffers(meshName);
-            }
-
-            // Constructor for creating an object with multiple instances
-            Object(const char* meshName,
-                const std::initializer_list<Instance>& instances,
-                bool isVisible = VISIBLE)
-                :
-                instances{ instances },
-                isVisible{ isVisible },
-                vao{ 0 },
-                buffers{ },
-                size{ 0 }
-            {
-                setBuffers(meshName);
-            }
-
-        private:
-            // Sets up OpenGL buffers and VAO for the object's mesh
-            void setBuffers(const char* meshName);
-        };
-
-        using SetUniformCallback = std::function<void(ShaderProgram& shader)>;
-
-        FBO fbo;                           // Framebuffer Object for the pass
-        std::vector<int> viewport;         // Viewport dimensions
-        GLenum depthMode;                  // Depth function mode flags
-        std::vector<Object> objects;       // Objects rendered in this pass
-        std::vector<Camera> cameras;       // Cameras used in this pass
-        std::vector<Light> lights;         // Lights affecting this pass
-        std::vector<xresource::full_guid> texture_guids{};     // Textures used in this pass
-        SetUniformCallback setUniformCallback; // Optional callback for setting uniforms
-
-        // Constructor for older frameworks (single depth buffer flag)
-        Pass(
-            const FBO& fbo = { },
-            const std::initializer_list<int>& viewport = { },
-            GLenum depthFunction = GL_LESS,
-            const std::initializer_list<Object>& objects = { },
-            const std::initializer_list<Camera>& cameras = { },
-            const std::initializer_list<Light>& lights = { },
-            const std::initializer_list<xresource::full_guid> textures = { },
-            SetUniformCallback setUniformCallback = nullptr
-        )
-            :
-            fbo{ fbo },
-            viewport{ viewport },
-            depthMode{ depthFunction },
-            objects{ objects },
-            cameras{ cameras },
-            lights{ lights },
-            texture_guids{ textures },
-            setUniformCallback{ setUniformCallback }
-        {
-            //this->enableDepthBuffer.push_back(enableDepthBuffer);
-        }
-
-        // Resizes the framebuffer and viewport for the pass
-        void resize(int width, int height)
-        {
-            viewport[2] = width;
-            viewport[3] = height;
-            fbo.resize(width, height);
-        }
-
-        //Changes framebuffer.
-        void SetFBO(const FBO& fbo_to_set = { })
-        {
-            fbo = fbo_to_set;
-        }
-    };
-
-    xresource::full_guid shader_guid{};          // Shader program for the scene
-    std::vector<Pass> passes; // Rendering passes in the scene
-
-    // Constructors for the Scene class
-    Scene(
-        xresource::full_guid shader_guid,
-        const std::initializer_list<Pass>& passes = { }
-    ) : shader_guid{ shader_guid }, passes {passes}
-    {   
-    }
-
-    // Main render function for the scene
-    void render();
-
-    // Resizes all passes in the scene
-    void resize(int width, int height)
-    {
-        for (Scene::Pass& pass : passes)
-            pass.resize(width, height);
-    }
-
-    // Updates camera types for all passes
-    void camerasSetType(CameraType cameraType)
-    {
-        for (Scene::Pass& pass : passes)
-            for (Camera& camera : pass.cameras)
-                camera.setType(cameraType);
-    }
-
-    void camerasSetPos_andTarget(glm::vec3 offset)
-    {
-        for (Scene::Pass& pass : passes)
-            for (Camera& camera : pass.cameras)
-                camera.Move_Cam_and_Target(offset);
-    }
-
-
-
-    // Updates camera orientation based on cursor movement
-    void camerasOnCursor(double xoffset, double yoffset)
-    {
-        for (Scene::Pass& pass : passes)
-            for (Camera& camera : pass.cameras)
-                camera.onCursor(xoffset, yoffset);
-    }
-
-    // Updates light positions based on cursor movement
-    void lightsOnCursor(double xoffset, double yoffset, std::shared_ptr<ShaderProgram> pProgram = nullptr)
-    {
-        int i = 0;
-        for (Scene::Pass& pass : passes)
-            for (Light& light : pass.lights)
-                light.onCursor(xoffset, yoffset, pProgram, i++);
-    }
-
-    // Updates camera zoom based on scroll input
-    void camerasOnScroll(double xoffset, double yoffset)
-    {
-        for (Scene::Pass& pass : passes)
-            for (Camera& camera : pass.cameras)
-                camera.onScroll(xoffset, yoffset);
-    }
-
-    // Updates light properties based on scroll input
-    void lightsOnScroll(double xoffset, double yoffset, std::shared_ptr<ShaderProgram> pProgram = nullptr)
-    {
-        int i = 0;
-        for (Scene::Pass& pass : passes)
-            for (Light& light : pass.lights)
-                light.onScroll(xoffset, yoffset, pProgram, i++);
-    }
+   
 };
 
 #endif

@@ -1,6 +1,6 @@
 This folder is used to store audio files.
 All audio files in this folder are loaded automatically at initialize time,
-where they are identified using their file_name (hashed into an xresource::instance_guid integer).
+where they are identified using their file_name (hashed into an xresource::instance_guid integer). By default they are loaded as non-looping.
 Alternatively, add them to the config file.
 
 {

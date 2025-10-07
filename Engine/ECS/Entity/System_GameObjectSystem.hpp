@@ -11,31 +11,58 @@
 #include <sstream>
 #include "ISystem.hpp"
 #include "entt/entity/registry.hpp"
-
+#include "Archtype.hpp"
 
 namespace EngineFramework
 {
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+
+	class Save; //forward declaration
+#endif
+	
+	
 
 	/*
 		Controls serialization, deserialization, safe deletion of instances.
-		Also controls serialization and deserialization for archtypes.
-
-		Note: The way archtypes are stored/read are different from the way instances are stored/read.
-		Under the hood this can be ignored, but it can lead to slow archtype serialization.
+		Also controls serialization for archtypes.
 
 		Archtype:
 		- Stored individually in each file with their own name.
-		- All components of an archtype are iterated over and serialized before going to the next archtype
-		--> As different component types are stored in separate pools, to get all components of an archtype all pools have to be iterated over and checked for that entity id.
-		--> Thus, this can lead to slower run times with growing number of component types + growing number of archtypes.
+		- Not part of the game (not in registry), only job is to hold component data that can be used to create entities by copying the component data stored.
+		- component data will not have any allocated data, it will only have data that can be deserialized from file. ensure component destructors account for this.
+		- Once deserialized, will be stored in assetmanager. Can be accessed indirectly via CreateInstance() 
 
 		Instance:
 		- Stored together in a single level file.
-		- First, all instance entity IDs are stored.
+		- First, all instances are stored with incremental ids. These ids (currently) do not represent entity id, they're just used for differentiating instances in the json file.
+		- Each instance can have an optional "archtype" : "archtype_name" that it can be based off.
 		- Next, all components of a specific type are iterated over and stored. They may belong to different entities.
 		- This repeats for all component types.
 
-		If archtype serialization performance is a critical issue, store all archtypes in a single file and use the "instance" method (but use names instead of entity id)
+		Renaming of Archtypes:
+		- Similar to renaming of assets in assetmanager (since an archtype is also an asset). 
+		- Ensure the guid_to_name map in assetmanager is changed appropriately.
+		
+		Serialization
+		- string is read from archtype files, and each <file_name_string, json_string> is added to a vector   
+		- Read file_name using std::filsystem::path directory_iterator, to include whitespaces in the name. (note that file_name is stem(), i.e. without slashes and without extension)(note that file_name is stem(), i.e. without slashes and without extension)
+		- DO NOT USE IFSTREAM. Call AssetManagerSystem::GetDataFromFile instead, and convert vector<unsigned char> to std::string.
+		- vector of archtype jsons is passed to SerializeAllEntityArchtypes.
+
+		Deserialization
+		- When called, archtypes in archtype_arr will write their json string to <archtype_name_string, json_string>.
+		- the strings from all archtypes are added to a vector and returned by DeserializeAllEntityArchtypes
+		- Just iterate over each pair <archtype_name_string, json_string> in the vector, and write to separate files using archtype_name as the file name.
+
+		Instantiation
+		- Use CreateInstance("archtype_name") where the archtype name is the file name.
+
+		entt::view for iterating
+		- all entities
+		- all entities with so and so component
+		entt::storage for iterating over all components of a specific type.
+
+
 	*/
 	class GameObjectSystem : public ISystem
 	{
@@ -45,15 +72,19 @@ namespace EngineFramework
 		//Return reference to the one and only instance of this system, created by core engine.
 		static GameObjectSystem& GetInstance();
 
-		//Quick Call function to load scene
+		//Quick Call function to load scene and destroy current scene.
 		void LoadScene(const std::string& json_input);
 		
+		/*
+			Creates a single entity with the same component data (copied) from archtype
+		*/
+		entt::entity CreateInstance(std::string archtype);
 	private:
 		void Initialize() override;
 		void Update(float delta_time) override;
 		
 		//Clears all entities in the scene
-		void ClearAllEntities();
+		void ClearAllInstances();
 		
 		/*
 		 	Write to json strings using reflection.
@@ -61,16 +92,6 @@ namespace EngineFramework
 			their file. Use the archetype name as the file name when saving.
 		*/
 		std::vector<std::pair<std::string, std::string>> SerializeAllEntityArchtypes();
-
-		/*
-			Read gameobject archtypes from json strings using reflection.
-			Each archtype is read as a pair of <archetype name, json string> stored in the archetype array passed to this function.
-			Ensure the archetype name is completely read (from the file name) and accounts for spaces.
-			After construction, each entity id (representing an archetype) is stored together with its name inside the archtype entities map.
-
-			Do once at the start of the program. 
-		*/
-		void DeserializeAllEntityArchtypes(const std::vector<std::pair<std::string, std::string>>& json_input);
 
 		/*
 			Write gameobject instances to a json string using reflection.
@@ -87,11 +108,22 @@ namespace EngineFramework
 		*/
 		void DeSerializeAllEntityInstances(const std::string& json_input);
 		
+		/*
+			Creates an entt::entity instance with an archtype.
+			entity_id is the id to instantiate with.
+		*/
+		static entt::entity Instantiate(std::shared_ptr<Archtype> archtype, const xresource::instance_guid& archtype_instance_guid);
+
+		//<entity_id, archtype_instance_guid> mapping, used when serializing instances back to scene file.
+		static inline std::unordered_map<entt::entity, xresource::instance_guid> entity_archtype_map{};
+
 		//Keeps track of the one and only instance of this system, created by core engine.
 		static inline GameObjectSystem* this_system{};
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
-		//The archetype entities used for instantiating instances. 
-		std::unordered_map<std::string, entt::entity> archtype_entities;
+		friend Save;
+#endif
+		
 	};
 
 	

@@ -1,3 +1,17 @@
+/**
+ * @file FBO.h
+ * @brief Defines the FBO struct for managing OpenGL Framebuffer Objects.
+ *
+ * This file contains the `FBO` struct, which provides functionality for setting up
+ * and managing OpenGL Framebuffer Objects (FBOs). It supports various rendering
+ * techniques such as texture rendering, depth-only rendering, HDR, and deferred rendering.
+ *
+ * The `FBO` struct includes methods for resizing framebuffers, creating texture and
+ * depth buffers, and configuring framebuffers for specific rendering types.
+ *
+ * @author Zhang TongYan
+ * @date October, 2025
+ */
 #ifndef FBO_H
 #define FBO_H
 
@@ -5,10 +19,10 @@
 #include <glm/glm.hpp>
 
 //
-    // This struct that sets up and manages OpenGL Framebuffer Objects (FBOs), allowing 
-    // different rendering techniques(e.g., texture rendering, depth-only
-    // rendering, HDR, deferred rendering) to be used in a graphics application.
-    //
+// This struct that sets up and manages OpenGL Framebuffer Objects (FBOs), allowing 
+// different rendering techniques(e.g., texture rendering, depth-only
+// rendering, HDR, deferred rendering) to be used in a graphics application.
+//
 struct FBO
 {
     // Enum to define different types of framebuffers
@@ -117,7 +131,7 @@ struct FBO
         GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
         glDrawBuffers(1, drawBuffers);
 
-        // *** FIX: Check the status of OUR FBO (handle) before unbinding it ***
+        // Check the status of OUR FBO (handle) before unbinding it
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (result != GL_FRAMEBUFFER_COMPLETE)
         {
@@ -127,10 +141,11 @@ struct FBO
                 std::to_string(result) +
                 ": Framebuffer is not complete.\n");
         }
-
-        // *** FIX: Unbind only after a successful check ***
         // Revert to the default framebuffer.
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // Also unbind the texture to avoid state conflicts
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     void resetTextureDepthAsTarget(int width, int height)
@@ -169,7 +184,7 @@ struct FBO
         GLenum drawBuffers[] = { GL_NONE };
         glDrawBuffers(1, drawBuffers);
 
-        // *** FIX: Check status before unbinding ***
+        // Check status before unbinding
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (result != GL_FRAMEBUFFER_COMPLETE)
         {
@@ -179,7 +194,7 @@ struct FBO
                 ": Framebuffer is not complete.\n");
         }
 
-        // *** FIX: Unbind after successful check ***
+        // Unbind after successful check 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
@@ -207,7 +222,7 @@ struct FBO
                                 GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
         glDrawBuffers(4, drawBuffers);
 
-        // *** FIX: Check status before unbinding ***
+        // Check status before unbinding 
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (result != GL_FRAMEBUFFER_COMPLETE)
         {
@@ -217,7 +232,7 @@ struct FBO
                 ": Framebuffer is not complete.\n");
         }
 
-        // *** FIX: Unbind after successful check ***
+        // Unbind after successful check 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 };

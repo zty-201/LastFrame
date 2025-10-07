@@ -111,6 +111,27 @@ macro(import_glad)
     endif()
 endmacro()
 
+# Macro to import Jolt Physics
+macro(import_jolt)
+    if(NOT TARGET Jolt)
+        # Make sure Jolt uses /MD(/MDd) and doesn't override flags
+        set(OVERRIDE_CXX_FLAGS OFF CACHE BOOL "" FORCE)
+        set(JPH_USE_STATIC_VCRT OFF CACHE BOOL "" FORCE)
+
+        # (optional, but nice for MSVC debug)
+        set(GENERATE_DEBUG_SYMBOLS ON CACHE BOOL "" FORCE)
+        set(JPH_DEBUG_SYMBOL_FORMAT "" CACHE STRING "")
+
+        # You can pin a release tag or a commit
+        FetchContent_Declare(
+            Jolt
+            GIT_REPOSITORY https://github.com/jrouwe/JoltPhysics.git
+            GIT_TAG v5.3.1
+        )
+        FetchContent_MakeAvailable(Jolt)  # provides static target "Jolt"
+    endif()
+endmacro()
+
 # Macro to import all dependencies
 macro(importDependencies)
     message(STATUS "Starting to import dependencies...")
@@ -132,5 +153,7 @@ macro(importDependencies)
     message(STATUS "Importing nlohmann/json...")
     import_nlohmann_json()
     message(STATUS "nlohmann/json imported successfully.")
+    import_jolt()
+    message(STATUS "Jolt imported successfully.")
     message(STATUS "All dependencies have been imported successfully.")
 endmacro()

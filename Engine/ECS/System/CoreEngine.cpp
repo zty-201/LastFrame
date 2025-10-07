@@ -6,6 +6,8 @@
 #include "pch.hpp"
 #include <algorithm>
 #include "CoreEngine.hpp"
+#include "Diagnostics/ProfilerEngine.hpp" // To auto-profile every system from one place
+
 namespace EngineFramework
 {
 	//Singleton pattern: Everyone shares the only instance of the core engine.
@@ -23,6 +25,11 @@ namespace EngineFramework
 	void CoreEngine::AddSystem(std::string name, std::unique_ptr<ISystem> system, char init_order, char update_order, char destruct_order)
 	{
 		system_arr.emplace_back(name, std::move(system), init_order, update_order, destruct_order);
+		
+		// FOR PROFILER - To precompute profiler labels for the system
+		CoreSystem& s = system_arr.back();
+		s.label_update = "Sys::" + s.name + "::Update";
+		s.label_post = "Sys::" + s.name + "::PostUpdate";
 	}
 
 	/*
@@ -57,6 +64,9 @@ namespace EngineFramework
 		//Array has already been sorted in update order, in initialize.
 		for (CoreSystem& system : system_arr)
 		{
+			// PROFILER CODE - To time each system automatically
+			Diagnostics::Scoped scope{ system.label_update.c_str() }; // To track per system per frame timing
+
 			SafeUpdateSystem(system, delta_time);
 		}
 	}
@@ -70,7 +80,13 @@ namespace EngineFramework
 		//Array has already been sorted in update order, in initialize.
 		for (CoreSystem& system : system_arr)
 		{
+
+			// PROFILER CODE
+			Diagnostics::Scoped s{ system.label_post.c_str() };
+
+			//system.system->PostUpdate(delta_time);
 			SafePostUpdateSystem(system, delta_time);
+
 		}
 	}
 
@@ -92,40 +108,61 @@ namespace EngineFramework
 	// Functions to safely call Update and PostUpdate with exception handling
 	void CoreEngine::SafeUpdateSystem(CoreSystem& system, float delta_time)
 	{
+#ifdef PLATFORM_WINDOWS
 		static std::ofstream logFile("engine.log", std::ios::app); // log file created once
-
+#endif
 		try {
 			system.system->Update(delta_time);
 		}
 		catch (const std::exception& e) {
+#ifdef PLATFORM_WINDOWS
 			logFile << "Exception in Update system [" << system.name
 				<< "]: " << e.what() << std::endl;
-			throw;
+			LOGD("Exception in Update system[%s]: %s", system.name.c_str(), e.what());
+#else
+			LOGD("Exception in Update system[%s]: %s", system.name.c_str(), e.what());
+#endif
+			//throw;
 		}
 		catch (...) {
+#ifdef PLATFORM_WINDOWS
 			logFile << "Unknown exception in Update system ["
 				<< system.name << "]" << std::endl;
-			throw;
+			LOGD("Unknown exception in Update system[%s]", system.name.c_str());
+#else
+			LOGD("Unknown exception in Update system[%s]", system.name.c_str());
+#endif
+			//throw;
 		}
 	}
 
 
 	void CoreEngine::SafePostUpdateSystem(CoreSystem& system, float delta_time)
 	{
+#ifdef PLATFORM_WINDOWS
 		static std::ofstream logFile("engine.log", std::ios::app); // same file as SafeUpdateSystem
-
+#endif
 		try {
 			system.system->PostUpdate(delta_time);
 		}
 		catch (const std::exception& e) {
+#ifdef PLATFORM_WINDOWS
 			logFile << "Exception in PostUpdate system [" << system.name
 				<< "]: " << e.what() << std::endl;
-			throw;
+#else
+			LOGD("Exception in PostUpdate system[%s]: %s", system.name.c_str(), e.what());
+#endif
+
+			//throw;
 		}
 		catch (...) {
+#ifdef PLATFORM_WINDOWS
 			logFile << "Unknown exception in PostUpdate system ["
 				<< system.name << "]" << std::endl;
-			throw;
+#else
+			LOGD("Unknown exception in PostUpdate system[%s]: %s", system.name.c_str(), e.what());
+#endif
+			//throw;
 		}
 	}
 

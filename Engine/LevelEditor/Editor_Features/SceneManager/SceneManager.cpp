@@ -13,10 +13,13 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 */
 /* *******************************************************************/
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+#include "pch.hpp"
 #include "SceneManager.hpp"
 #include "System_GameObjectSystem.hpp"
 #include <filesystem>
 #include <iostream>
+#include "AssetManager.hpp"
+#include "Screen.hpp"
 
 namespace EngineFramework
 {
@@ -28,7 +31,7 @@ namespace EngineFramework
 
 	void SceneManager::Initialize()
 	{
-		ScanScenes("Extern/Scenes/");
+		ScanScenes(AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern/Scenes/");
 	}
 
 	SceneManager& SceneManager::GetInstance()
@@ -57,12 +60,6 @@ namespace EngineFramework
 		}
 	}
 
-	void SceneManager::LoadScene(const std::string& scenePath)
-	{
-		GameObjectSystem::GetInstance().LoadScene(scenePath);
-		currentScene = scenePath;
-	}
-
 	const std::string& SceneManager::GetCurrentScene() const
 	{
 		return currentScene;
@@ -72,12 +69,21 @@ namespace EngineFramework
 	{
 		if (!is_enabled) return; // only open if toggled
 
-		if (ImGui::Begin("Scene Manager", &is_enabled)) {
+		if (ImGui::Begin("Scene Manager", &is_enabled))
+		{
 			ImGui::Text("Available Scenes:");
 			ImGui::Separator();
-			for (const auto& scene : GetSceneList()) {
-				if (ImGui::Selectable(scene.c_str())) {
-					LoadScene(scene);
+			for (const auto& scene : GetSceneList())
+			{
+				if (ImGui::Selectable(scene.c_str()))
+				{
+					LOGD("Selected scene: %s", scene.c_str());
+					std::vector<unsigned char> sceneName = AssetManagerSystem::GetDataFromFile("Extern/Scenes/" + scene);
+					std::string sceneString{ sceneName.begin(), sceneName.end() };
+					GameObjectSystem::GetInstance().LoadScene(sceneString);
+					currentScene = scene;
+
+					Screen::GetInstance().is_enabled = true;
 				}
 			}
 		}
