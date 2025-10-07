@@ -15,9 +15,14 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
-            abiFilters "arm64-v8a"
+            abiFilters "arm64-v8a", "x86_64"
         }
         buildConfigField "boolean", "IS_DEBUG_BUILD", "true"
+        externalNativeBuild {
+            cmake {
+                cppFlags "-fms-extensions"
+            }
+        }
     }
 
     buildTypes {
