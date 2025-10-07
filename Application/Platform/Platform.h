@@ -30,7 +30,7 @@
 #endif
 #endif // PLATFORM_H
 
-#ifdef DEFINE_GLFW_KEYS
+#ifdef DEFINE_GLFW_KEYS //For android which doesn't have access to glfw.
 #define 	GLFW_KEY_SPACE   32
 #define 	GLFW_KEY_APOSTROPHE   39 /* ' */
 #define 	GLFW_KEY_COMMA   44 /* , */

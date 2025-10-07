@@ -255,14 +255,24 @@ namespace EngineFramework
 		// mode |= FMOD_CREATESTREAM;
 
 		std::string loadPath = resolved;
-		if (m_androidAssetMgr != NULL)
+		/*if (m_androidAssetMgr != NULL)
 		{
 			std::string copied = CopyAssetToInternal(resolved);
-			if (copied.empty()) return {};
+			if (copied.empty()) throw std::runtime_error((std::string("[AudioManager Load] Failed to copy audio file: ") + resolved).c_str());
 			loadPath = copied;
+		}*/
+		
+		std::vector<unsigned char> file_data = AssetManagerSystem::GetDataFromFile(resolved);
+		if (file_data.empty())
+		{
+			throw std::runtime_error((std::string("Unable to read Audio file: ") + resolved ).c_str());
 		}
+		//Load fmod sound using the file data buffer.
+		FMOD_CREATESOUNDEXINFO exinfo = {};
+		exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+		exinfo.length = file_data.size();
 
-		FMOD_RESULT r = m_system->createSound(loadPath.c_str(), mode, NULL, &snd);
+		FMOD_RESULT r = m_system->createSound(reinterpret_cast<const char*>(file_data.data()), mode | FMOD_OPENMEMORY, &exinfo, &snd);
 #else
 		//Accesses the file directly, can be done cause it's windows mode.
 		FMOD_RESULT r = m_system->createSound(resolved.c_str(), mode, nullptr, &snd);
