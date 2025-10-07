@@ -138,7 +138,7 @@ namespace EngineFramework {
 		// Use AAssetManager on Android
 		if (!android_asset_manager)
 		{
-			throw std::exception("Android Asset Manager not set for AssetManagerSystem before calling ListFilesInDirectory()");
+			throw std::runtime_error("Android Asset Manager not set for AssetManagerSystem before calling ListFilesInDirectory()");
 		}
 
 		AAssetDir* assetDir = AAssetManager_openDir(android_asset_manager, folder_path.string().c_str());
@@ -212,7 +212,7 @@ namespace EngineFramework {
 		}
 		catch (std::exception&)
 		{
-			throw std::exception((std::string("[AssetManager] Unable to find guid.meta in: ") + folder_path.string()).c_str());
+			throw std::runtime_error((std::string("[AssetManager] Unable to find guid.meta in: ") + folder_path.string()).c_str());
 		}
 		std::string temp{ guid_meta_string.begin(), guid_meta_string.end() };
 		nlohmann::json guid_meta_json = nlohmann::json::parse(temp);
@@ -405,13 +405,13 @@ namespace EngineFramework {
 			//Unable to find resource type in map, it might not have been added yet.
 			if (asset_loader_map.find(resource_type) == asset_loader_map.end())
 			{
-				throw std::exception((std::string("No Function Loader for resource type: ") + resource_type + ". Ensure it is spelt correctly, and asset loader has been added to asset_loader_map.").c_str());
+				throw std::runtime_error((std::string("No Function Loader for resource type: ") + resource_type + ". Ensure it is spelt correctly, and asset loader has been added to asset_loader_map.").c_str());
 			}
 
 			//Call the asset loader for that respective asset type, and pass in the folderpath.
 			if (!asset_loader_map[resource_type](folder_path))
 			{
-				throw std::exception((std::string("Unable to load asset of type: ") + resource_type).c_str());
+				throw std::runtime_error((std::string("Unable to load asset of type: ") + resource_type).c_str());
 			}
 		}
 	}

@@ -101,7 +101,7 @@ void ShaderProgram::compileShaderFile(const char* fileName, GLenum type)
     std::vector<unsigned char> file_data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path(fileName));
     if (file_data.empty())
     {
-        throw std::exception((std::string("Unable to read filepath: ") + fileName + ", when compiling shader.").c_str());
+        throw std::runtime_error((std::string("Unable to read filepath: ") + fileName + ", when compiling shader.").c_str());
     }
     //A null-terminated string is expected.
     file_data.push_back('\0');
@@ -112,7 +112,7 @@ void ShaderProgram::compileShaderFile(const char* fileName, GLenum type)
     //Rethrow with additional debug info.
     catch (std::runtime_error& e)
     {
-        throw std::exception((std::string("Error in shader file compilation for: ") + fileName + "\n" + e.what()).c_str());
+        throw std::runtime_error((std::string("Error in shader file compilation for: ") + fileName + "\n" + e.what()).c_str());
     }
 }
 

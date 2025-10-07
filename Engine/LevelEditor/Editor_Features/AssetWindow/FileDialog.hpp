@@ -12,6 +12,7 @@ Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
 */
 /* *******************************************************************/
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #pragma once
 #include <string>
 
@@ -24,3 +25,4 @@ namespace EngineFramework
     // Copies a selected file into a destination directory (overwrites if exists)
     bool CopyFileToProject(const std::string& srcFile, const std::string& destDir);
 }
+#endif

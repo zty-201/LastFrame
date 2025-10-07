@@ -242,7 +242,7 @@ namespace EngineFramework
 	std::shared_ptr<SoundAsset> AudioSystem::Load(const std::string& logicalOrPath, bool loop)
 	{
 		if (!m_initialized)
-			throw std::exception("Audio System Not Initialized");
+			throw std::runtime_error("Audio System Not Initialized");
 
 		const std::string resolved = ResolvePath(logicalOrPath);
 
@@ -269,7 +269,7 @@ namespace EngineFramework
 #endif
 		logFmodError(r, "System::createSound");
 		if (r != FMOD_OK || snd == NULL)
-			throw std::exception("Audio Not Loaded");
+			throw std::runtime_error("Audio Not Loaded");
 
 		std::shared_ptr<SoundAsset> info = std::make_shared<SoundAsset>();
 		info->sound = snd;
@@ -390,7 +390,7 @@ namespace EngineFramework
 		std::shared_ptr<SoundAsset> main_menu_bgm = EF_AM::GetResource<SoundAsset>(EF_AM::GetFullGuid(EF_AM::AUDIO_GUID, "mainmenu_loop"));
 		if (!main_menu_bgm)
 		{
-			throw std::exception("mainmenu_loop audio asset has not been loaded and can't be played.");
+			throw std::runtime_error("mainmenu_loop audio asset has not been loaded and can't be played.");
 		}
 		const bool ok = Play(main_menu_bgm, 1.0f, false, AudioGroup::Music);
 		if (ok)
