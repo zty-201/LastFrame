@@ -18,6 +18,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "AssetManager.hpp"
 
 namespace Engine {
 
@@ -96,11 +97,13 @@ namespace Engine {
 
     // ---------------- Helpers: Lua (optional) ----------------
 #if defined(ENGINE_ENABLE_LUA)
-    static std::string ReadTextFile(const std::filesystem::path& p) {
-        std::ifstream ifs(p, std::ios::in | std::ios::binary);
-        if (!ifs) return {};
-        std::ostringstream ss; ss << ifs.rdbuf(); return ss.str();
+    static std::string ReadTextFromAssets(const std::filesystem::path& relPath) {
+        // relPath should be relative to your Assets root, e.g. "Extern/Scripts/hello.lua"
+        auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
+        std::vector<unsigned char> bytes = AM.GetDataFromFile(relPath);
+        return std::string(bytes.begin(), bytes.end());
     }
+
 
     void ScriptSystem::LoadLuaFor(entt::registry& reg,
         entt::entity /*e*/,
@@ -115,7 +118,8 @@ namespace Engine {
         std::cerr << "[Lua] Attempting to read: " << fullPath.string() << "\n";
         std::cerr << "[Lua] File exists: " << std::filesystem::exists(lsc.ScriptPath) << "\n";
 
-        const std::string code = ReadTextFile(lsc.ScriptPath);
+        const std::string code = ReadTextFromAssets(lsc.ScriptPath);
+
         if (code.empty()) {
             std::cerr << "[Lua] Failed to read " << lsc.ScriptPath.string() << "\n";
             lsc.Loaded = false; return;

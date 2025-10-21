@@ -30,7 +30,11 @@ namespace Engine {
             sol::state& lua = ScriptSystem::GetLuaState();
 
             // Load the test script once during initialization
-            lua.script_file("Extern/Scripts/test.lua");
+            auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
+            std::vector<unsigned char> bytes = AM.GetDataFromFile("Extern/Scripts/test.lua");
+            std::string code(bytes.begin(), bytes.end());
+            auto chunk = lua.load(code, "Extern/Scripts/test.lua");
+            chunk(); // execute
 
             // Cache function references
             s_GreetFunc = lua["greet"];
