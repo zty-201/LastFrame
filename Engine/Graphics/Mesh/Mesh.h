@@ -79,10 +79,12 @@ namespace Mesh {
                 } meshData;
 
                 // Load data
-                std::ifstream objStream(fileName, std::ios::in);
-
-                if (!objStream)
+                std::vector<unsigned char> file_data = EngineFramework::AssetManagerSystem::GetDataFromFile(fileName);
+                if (file_data.empty())
                     throw std::runtime_error(std::string("file ") + fileName + " not found.");
+
+                std::stringstream objStream;
+                objStream.write(reinterpret_cast<const char*>(file_data.data()), file_data.size());
 
                 std::string line, token;
                 getline(objStream, line);
@@ -124,7 +126,8 @@ namespace Mesh {
                             meshData.normals.push_back(glm::vec3(x, y, z));
                         }
                         else if (token == "f") {
-                            std::vector<std::string> parts;
+                            static std::vector<std::string> parts;
+                            parts.clear();
                             while (lineStream.good()) {
                                 std::string s;
                                 lineStream >> s;
@@ -144,7 +147,6 @@ namespace Mesh {
                     }
                     getline(objStream, line);
                 }
-                objStream.close();
 
                 // Generate normals if needed
                 if (meshData.normals.size() == 0)

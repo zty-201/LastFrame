@@ -281,41 +281,41 @@ void Game_Update()
 	prof.EndFrame(); // END PROFILER frame timing
 
 	// Print profiler summary
-	static double acc_ms = 0.0;
-	static int frames = 0;
-	acc_ms += Profiler::I().FrameMS();
-	frames++;
+	//static double acc_ms = 0.0;
+	//static int frames = 0;
+	//acc_ms += Profiler::I().FrameMS();
+	//frames++;
 
-	if (acc_ms >= 1000.0) {
-		std::stringstream out_stream{};
-		auto& P = Profiler::I();
-		const double frame = std::max(1e-6, P.FrameMS());
+	//if (acc_ms >= 1000.0) {
+	//	std::stringstream out_stream{};
+	//	auto& P = Profiler::I();
+	//	const double frame = std::max(1e-6, P.FrameMS());
 
-		double update_all = frame;
-		if (auto it = P.Sections().find("Frame::UpdateAll"); it != P.Sections().end()) {
-			update_all = std::max(1e-6, it->second.ms);
-		}
+	//	double update_all = frame;
+	//	if (auto it = P.Sections().find("Frame::UpdateAll"); it != P.Sections().end()) {
+	//		update_all = std::max(1e-6, it->second.ms);
+	//	}
 
-		out_stream << std::fixed << std::setprecision(4);
-		out_stream << "[Profiler] Frame: " << P.FrameMS() << " ms, FPS " << std::setprecision(1) << P.FPS() << "\n";
-		out_stream << std::setprecision(4);
+	//	out_stream << std::fixed << std::setprecision(4);
+	//	out_stream << "[Profiler] Frame: " << P.FrameMS() << " ms, FPS " << std::setprecision(1) << P.FPS() << "\n";
+	//	out_stream << std::setprecision(4);
 
-		// Copy and sort the sections by time in descending order
-		std::vector<std::pair<std::string, Diagnostics::Section>> rows(P.Sections().begin(), P.Sections().end());
-		//std::sort(rows.begin(), rows.begin(), [](auto& a, auto& b) {return a.second.ms > b.second.ms; });
+	//	// Copy and sort the sections by time in descending order
+	//	std::vector<std::pair<std::string, Diagnostics::Section>> rows(P.Sections().begin(), P.Sections().end());
+	//	//std::sort(rows.begin(), rows.begin(), [](auto& a, auto& b) {return a.second.ms > b.second.ms; });
 
-		for (auto& [name, sec] : rows) {
-			const double frame_percent = (sec.ms / frame) * 100.0;
-			const double engine_update_percent = (sec.ms / update_all) * 100.0;
-			const double per_call = sec.calls ? sec.ms / sec.calls : 0.0;
+	//	for (auto& [name, sec] : rows) {
+	//		const double frame_percent = (sec.ms / frame) * 100.0;
+	//		const double engine_update_percent = (sec.ms / update_all) * 100.0;
+	//		const double per_call = sec.calls ? sec.ms / sec.calls : 0.0;
 
-			out_stream << " " << name << " : " << sec.ms << " ms" << " (calls " << sec.calls << ", " << per_call << " ms/call)"
-				<< " [" << std::setprecision(1) << engine_update_percent << "% of UpdateAll, " << frame_percent << "% of Frame]\n" << std::setprecision(4);
-		}
-		out_stream << "--------------------------------------\n";
-		acc_ms = 0.0;
-		LOGD("%s", out_stream.str().c_str());
-	}
+	//		out_stream << " " << name << " : " << sec.ms << " ms" << " (calls " << sec.calls << ", " << per_call << " ms/call)"
+	//			<< " [" << std::setprecision(1) << engine_update_percent << "% of UpdateAll, " << frame_percent << "% of Frame]\n" << std::setprecision(4);
+	//	}
+	//	out_stream << "--------------------------------------\n";
+	//	acc_ms = 0.0;
+	//	LOGD("%s", out_stream.str().c_str());
+	//}
 
 	//if (acc_ms >= 1000.0) {
 	//	std::cout << "[Profiler] Frame: " << Profiler::I().FrameMS() << " ms, FPS " << Profiler::I().FPS() << "\n";

@@ -211,11 +211,6 @@ namespace EngineFramework
         bool m_debugMainMenuStarted = false;
 #endif
 
-#ifdef PLATFORM_ANDROID
-        // Copy an AAsset to a real file path (FMOD requires file paths on some platforms)
-        std::string CopyAssetToInternal(const std::string& assetPath) const;
-#endif
-
         static inline AudioSystem* this_system{};
     };
 

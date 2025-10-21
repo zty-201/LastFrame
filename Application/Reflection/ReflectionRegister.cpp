@@ -66,11 +66,11 @@ struct adl_serializer<glm::mat4> {
 
 	static void from_json(const json& j, glm::mat4& m) {
 		if (!j.is_array() || j.size() != 4)
-			throw std::exception("Array must be size 4x4 for mat4 serialization from json");
+			throw std::runtime_error("Array must be size 4x4 for mat4 serialization from json");
 
 		for (int i = 0; i < 4; ++i) {
 			if (!j[i].is_array() || j[i].size() != 4)
-				throw std::exception("Array must be size 4x4 for mat4 serialization from json");
+				throw std::runtime_error("Array must be size 4x4 for mat4 serialization from json");
 
 			for (int k = 0; k < 4; ++k) {
 				m[i][k] = j[i][k].get<float>();
@@ -424,7 +424,7 @@ namespace EngineFramework
 		std::string name = data_type.name();
 		if (name.empty())
 		{
-			throw std::exception("Meta Data does not have a name, was likely registered with a _hs hashed string instead of a string.");
+			throw std::runtime_error("Meta Data does not have a name, was likely registered with a _hs hashed string instead of a string.");
 		}
 		//Compare types
 		entt::id_type type = data_type.type().id();

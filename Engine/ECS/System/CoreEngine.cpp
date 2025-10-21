@@ -160,7 +160,7 @@ namespace EngineFramework
 			logFile << "Unknown exception in PostUpdate system ["
 				<< system.name << "]" << std::endl;
 #else
-			LOGD("Unknown exception in PostUpdate system[%s]: %s", system.name.c_str(), e.what());
+			LOGD("Unknown exception in PostUpdate system[%s]: %s", system.name.c_str());
 #endif
 			//throw;
 		}

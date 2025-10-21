@@ -15,7 +15,8 @@ static float ImGuiDequeGetter(void* data, int idx) {
 // RAII guard for ImGui window
 struct ImGuiWindowGuard {
     bool open = false;
-    ImGuiWindowGuard(const char* title, bool* p_open = nullptr) { open = ImGui::Begin(title, p_open); }
+    //ImGuiWindowGuard(const char* title, bool* p_open = nullptr) { open = ImGui::Begin(title, p_open); }
+    ImGuiWindowGuard(const char* title, bool* p_open = nullptr, ImGuiWindowFlags flags = 0) { open = ImGui::Begin(title, p_open, flags); }
     ~ImGuiWindowGuard() { ImGui::End(); }
     explicit operator bool() const { return open; }
 };
@@ -69,7 +70,12 @@ namespace EngineFramework {
         auto& P = Diagnostics::Profiler::I();
 
         constexpr const char* kProfilerWin = "Profiler##LevelEditor";
-        ImGuiWindowGuard win(kProfilerWin, &is_enabled);
+        //ImGuiWindowGuard win(kProfilerWin, &is_enabled);
+        // Initial size the first time the profiler window appears
+        ImGui::SetNextWindowSize(ImVec2(900, 480), ImGuiCond_FirstUseEver);
+
+        constexpr ImGuiWindowFlags kProfilerFlags = ImGuiWindowFlags_NoSavedSettings;
+        ImGuiWindowGuard win(kProfilerWin, &is_enabled, kProfilerFlags);
         if (!win) {
             return;
         }

@@ -12,8 +12,8 @@
 
 
 #==========Setup==========
-#Setup cmake and project properties. >= 3.27 for precompiled header targeting
-cmake_minimum_required(VERSION 3.27)
+#Setup cmake and project properties. 
+cmake_minimum_required(VERSION 3.20)
 #Use filters to separate folders.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project("LastFrame" VERSION 1.0 LANGUAGES C CXX)

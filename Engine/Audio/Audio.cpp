@@ -242,7 +242,7 @@ namespace EngineFramework
 	std::shared_ptr<SoundAsset> AudioSystem::Load(const std::string& logicalOrPath, bool loop)
 	{
 		if (!m_initialized)
-			throw std::exception("Audio System Not Initialized");
+			throw std::runtime_error("Audio System Not Initialized");
 
 		const std::string resolved = ResolvePath(logicalOrPath);
 
@@ -255,21 +255,31 @@ namespace EngineFramework
 		// mode |= FMOD_CREATESTREAM;
 
 		std::string loadPath = resolved;
-		if (m_androidAssetMgr != NULL)
+		/*if (m_androidAssetMgr != NULL)
 		{
 			std::string copied = CopyAssetToInternal(resolved);
-			if (copied.empty()) return false;
+			if (copied.empty()) throw std::runtime_error((std::string("[AudioManager Load] Failed to copy audio file: ") + resolved).c_str());
 			loadPath = copied;
+		}*/
+		
+		std::vector<unsigned char> file_data = AssetManagerSystem::GetDataFromFile(resolved);
+		if (file_data.empty())
+		{
+			throw std::runtime_error((std::string("Unable to read Audio file: ") + resolved ).c_str());
 		}
+		//Load fmod sound using the file data buffer.
+		FMOD_CREATESOUNDEXINFO exinfo = {};
+		exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+		exinfo.length = file_data.size();
 
-		FMOD_RESULT r = m_system->createSound(loadPath.c_str(), mode, NULL, &snd);
+		FMOD_RESULT r = m_system->createSound(reinterpret_cast<const char*>(file_data.data()), mode | FMOD_OPENMEMORY, &exinfo, &snd);
 #else
 		//Accesses the file directly, can be done cause it's windows mode.
 		FMOD_RESULT r = m_system->createSound(resolved.c_str(), mode, nullptr, &snd);
 #endif
 		logFmodError(r, "System::createSound");
 		if (r != FMOD_OK || snd == NULL)
-			throw std::exception("Audio Not Loaded");
+			throw std::runtime_error("Audio Not Loaded");
 
 		std::shared_ptr<SoundAsset> info = std::make_shared<SoundAsset>();
 		info->sound = snd;
@@ -390,7 +400,7 @@ namespace EngineFramework
 		std::shared_ptr<SoundAsset> main_menu_bgm = EF_AM::GetResource<SoundAsset>(EF_AM::GetFullGuid(EF_AM::AUDIO_GUID, "mainmenu_loop"));
 		if (!main_menu_bgm)
 		{
-			throw std::exception("mainmenu_loop audio asset has not been loaded and can't be played.");
+			throw std::runtime_error("mainmenu_loop audio asset has not been loaded and can't be played.");
 		}
 		const bool ok = Play(main_menu_bgm, 1.0f, false, AudioGroup::Music);
 		if (ok)

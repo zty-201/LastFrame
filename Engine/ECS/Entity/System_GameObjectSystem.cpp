@@ -307,7 +307,7 @@ namespace EngineFramework
 				auto func = comp_data.type().func("emplace"_hs);
 				if (!func)
 				{
-					throw std::exception((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp_data.type().name()).c_str());
+					throw std::runtime_error((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp_data.type().name()).c_str());
 				}
 				entt::meta_any success = func.invoke({}, entity_id, static_cast<const void*>(&comp_data));
 				//Duplicate component already present inside.
@@ -333,7 +333,7 @@ namespace EngineFramework
 			auto func = comp.type().func("emplace"_hs);
 			if (!func)
 			{
-				throw std::exception((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp.type().name()).c_str());
+				throw std::runtime_error((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp.type().name()).c_str());
 			}
 			entt::meta_any success = func.invoke({}, entity, static_cast<const void*>(&comp));
 			//Duplicate component already present inside.
