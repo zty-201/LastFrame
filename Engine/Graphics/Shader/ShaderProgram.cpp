@@ -1,11 +1,20 @@
-///////////////////////////////////////////////////////////////////////
-// A slight encapsulation of a shader program. This contains methods
-// to build a shader program from multiples files containing vertex
-// and pixel shader code, and a method to link the result.  When
-// loaded (method "Use"), its vertex shader and pixel shader will be
-// invoked for all geometry passing through the graphics pipeline.
-// When done, unload it with method "Unuse".
-////////////////////////////////////////////////////////////////////////
+/**
+ * @file ShaderProgram.cpp
+ * @brief Implementation of the ShaderProgram class for managing OpenGL shader programs.
+ *
+ * This file contains the implementation of the `ShaderProgram` class, which provides
+ * functionality for compiling, linking, and managing OpenGL shader programs. It includes
+ * methods for handling shader source files, managing uniforms, and validating the shader program.
+ *
+ * Key functionalities:
+ * - Compilation and linking of vertex and fragment shaders.
+ * - Management of shader program resources, including uniform locations and attributes.
+ * - Utility functions for debugging, such as printing active uniforms and attributes.
+ * - Integration with the asset manager for loading shader source files.
+ *
+ * @author Zhang TongYan
+ * @date Sept, 2025
+ */
 
 #include "pch.hpp"
 #include "ShaderProgram.h"
@@ -53,9 +62,9 @@ ShaderProgram::ShaderProgram(const char* sv, const char* sf)
 {
     if (sv && sf && strlen(sv) && strlen(sf)) // Check that shader file paths are valid.
     {
-        LOGI("Compiling Vertex Shader: %s", sv);
+        LOGD("Compiling Vertex Shader: %s", sv);
         compileShaderFile(sv, GL_VERTEX_SHADER);  // Compile vertex shader.
-        LOGI("Compiling Fragment Shader: %s", sf);
+        LOGD("Compiling Fragment Shader: %s", sf);
         compileShaderFile(sf, GL_FRAGMENT_SHADER);  // Compile fragment shader.
         link();  // Link the shaders into a program.
     }
@@ -90,9 +99,21 @@ void ShaderProgram::compileShaderFile(const char* fileName, GLenum type)
 {
     //Load using cross-platform compatible function.
     std::vector<unsigned char> file_data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path(fileName));
+    if (file_data.empty())
+    {
+        throw std::runtime_error((std::string("Unable to read filepath: ") + fileName + ", when compiling shader.").c_str());
+    }
     //A null-terminated string is expected.
     file_data.push_back('\0');
-    compileShader(reinterpret_cast<char*>(file_data.data()), type);  // Compile the shader using the code read from the file.
+    try
+    {
+        compileShader(reinterpret_cast<char*>(file_data.data()), type);  // Compile the shader using the code read from the file.
+    }
+    //Rethrow with additional debug info.
+    catch (std::runtime_error& e)
+    {
+        throw std::runtime_error((std::string("Error in shader file compilation for: ") + fileName + "\n" + e.what()).c_str());
+    }
 }
 
 // Compile a shader from source code.

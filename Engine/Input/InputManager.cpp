@@ -18,13 +18,17 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "InputManager.hpp"
 #include "GraphicsSystem.h"
 //#include "Level_Editor.hpp"
+
+#if defined(DEBUG)
 #include "System_LevelEditor.hpp"
+#endif
+#include "AssetManager.hpp"
+
 
 
 namespace EngineFramework
 {
     
-
     // Static member definitions
     std::unordered_map<int, KeyState> InputManager::keyStates;
     std::unordered_map<int, KeyState> InputManager::mouseButtonStates;
@@ -56,29 +60,35 @@ namespace EngineFramework
         (void)window;
         (void)scancode;
         (void)mods;
-
-        auto& pScene = GraphicsSystem::GetInstance().GetScene();
-
-        std::cout << "KeyCallback: key=" << key << ", action=" << action << "\n";
-
+        
+        //auto& pScene = GraphicsSystem::GetInstance().GetScene();
+        //std::shared_ptr<ShaderProgram> shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(pScene->shader_guid);
         switch (action)
         {
         case GLFW_PRESS:
             // Transition to Pressed (this frame only)
             keyStates[key] = KeyState::Pressed;
-            if (key == 'W')
-                pScene->camerasSetType(CameraType::WALKING);
-            else if (key == 'O')
-                pScene->camerasSetType(CameraType::ORBITING);
+            if (key == 'W') {
+                auto camera_view = registry.view<CameraComponent>();
+                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+                Camera::setType(camera, CameraComponent::CameraType::WALKING);
+            }
+                
+            else if (key == 'O') {
+                auto camera_view = registry.view<CameraComponent>();
+                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+                Camera::setType(camera, CameraComponent::CameraType::ORBITING);
+            }
+				
             else if (key == GLFW_KEY_1)
             {
-                pScene->shader.use();
-                pScene->shader.setUniform("materialType", 0); // PBR
+                //shader->use();
+                //shader->setUniform("materialType", 0); // PBR
             }
             else if (key == GLFW_KEY_2)
             {
-                pScene->shader.use();
-				pScene->shader.setUniform("materialType", 1); // Blinn-Phong
+                //shader->use();
+                //shader->setUniform("materialType", 1); // Blinn-Phong
             }
             break;
         case GLFW_RELEASE:
@@ -109,28 +119,37 @@ namespace EngineFramework
         static double oldypos = ypos;
         double xoffset = xpos - oldxpos;
         double yoffset = ypos - oldypos;
-        UNREFERENCED_PARAMETER(xoffset);
-        UNREFERENCED_PARAMETER(yoffset);
         oldxpos = xpos;
         oldypos = ypos;
-        auto& pScene = GraphicsSystem::GetInstance().GetScene();
-        UNREFERENCED_PARAMETER(pScene);
-        //std::cout << "CursorPosCallback: xoffset = " << xoffset << ", yoffset = " << yoffset << std::endl;
+        
         if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed 
             || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down))
         {
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
             if (!LevelEditorSystem::Get_Enable()) {
-                pScene->camerasOnCursor(xoffset, yoffset);
+                auto camera_view = registry.view<CameraComponent>();
+                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+				Camera::onCursor(camera, xoffset, yoffset);
             }
+#else   
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+            Camera::onCursor(camera, xoffset, yoffset);
 #endif
         }
         else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed)
         {
+            
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
             if (!LevelEditorSystem::Get_Enable()) {
-                pScene->lightsOnCursor(xoffset, yoffset);
+                auto light_view = registry.view<LightComponent>();
+                auto& light = light_view.get<LightComponent>(light_view.front());
+				Light::onCursor(light, xoffset, yoffset);
             }
+#else
+            auto light_view = registry.view<LightComponent>();
+            auto& light = light_view.get<LightComponent>(light_view.front());
+            Light::onCursor(light, xoffset, yoffset);
 #endif
         }
     }
@@ -138,15 +157,16 @@ namespace EngineFramework
     void InputManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     {
         (void)window;
-        auto& pScene = GraphicsSystem::GetInstance().GetScene();
-        UNREFERENCED_PARAMETER(pScene);
+        auto camera_view = registry.view<CameraComponent>();
+        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
         scrollX = xoffset;
         scrollY = yoffset;
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         if (!LevelEditorSystem::Get_Enable()) {
-            pScene->camerasOnScroll(xoffset, yoffset);
-            //std::cout << "yoffset: " << yoffset << std::endl;
+			Camera::onScroll(camera, xoffset, yoffset);
         }
+#else
+        Camera::onScroll(camera, xoffset, yoffset);
 #endif
     }
 
@@ -154,6 +174,8 @@ namespace EngineFramework
     {
 		UNREFERENCED_PARAMETER(window);
         Event_Window_Resized window_resize;
+        windowWidth = width;
+        windowHeight = height;
         window_resize.width = width;
         window_resize.height = height;
         event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
@@ -223,7 +245,8 @@ namespace EngineFramework
 
     void InputManager::Initialize()
     {
-        //Do nothing
+        windowWidth = GraphicsSystem::GetInstance().GetWindowSize().first;
+        windowHeight = GraphicsSystem::GetInstance().GetWindowSize().second;
     }
 
     void InputManager::Update(float deltaTime)

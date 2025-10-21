@@ -12,8 +12,8 @@
 
 
 #==========Setup==========
-#Setup cmake and project properties. >= 3.27 for precompiled header targeting
-cmake_minimum_required(VERSION 3.27)
+#Setup cmake and project properties. 
+cmake_minimum_required(VERSION 3.20)
 #Use filters to separate folders.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project("LastFrame" VERSION 1.0 LANGUAGES C CXX)
@@ -42,16 +42,28 @@ if(WIN32)
 
   #Compiler Flags, use a high warning level and treat warnings as errors.
 #Note: In Debug mode, ASAN and UBSAN can incur alot of performance slowdown. Only toggle in debug mode.
-#Note: To enable mem leak checks, temporarily disable (remb to enable back) /fsanitize=address for both targets.
+#Note: To enable mem leak checks, temporarily disable (remb to enable back) /fsanitize=address for the bottom target (after else())
+
+if(NOT CODE_ANALYSIS_ON_BUILD)
 target_compile_options(engine_library PUBLIC 
     # MSVC (Windows) specific warnings
     $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-    # /fsanitize=address is enabled for ASAN. /Zi generates a pdb for debugging purposes.
-    $<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address /Zi>>
     # GCC/Clang specific warnings
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
     $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
 )
+message("ASAN is off")
+else() 
+target_compile_options(engine_library PUBLIC 
+    # MSVC (Windows) specific warnings
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+    # /fsanitize=address is enabled for ASAN. 
+    $<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address>>
+    # GCC/Clang specific warnings
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+    $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
+)
+endif()
 
 #Code analysis for Visual Studio
 #Enable VS code analysis for faster checks.
@@ -78,27 +90,27 @@ set_target_properties(application_executable PROPERTIES OUTPUT_NAME LastFrame)
 set_target_properties(engine_library PROPERTIES OUTPUT_NAME EngineLibrary)
 
 
-#Copies assets to build directory, every build (to refresh assets)
-#This is necessary when run from visual studio (instead of running the executable)
-add_custom_command(
-  TARGET application_executable
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_SOURCE_DIR}/Extern
-          ${CMAKE_BINARY_DIR}/Extern
-  COMMENT "Copying Extern/ to build directory ${CMAKE_BINARY_DIR}/"
-)
+# #Copies assets to build directory, every build (to refresh assets)
+# #This is necessary when run from visual studio (instead of running the executable)
+# add_custom_command(
+#   TARGET application_executable
+#   POST_BUILD
+#   COMMAND ${CMAKE_COMMAND} -E copy_directory
+#           ${CMAKE_SOURCE_DIR}/Extern
+#           ${CMAKE_BINARY_DIR}/Extern
+#   COMMENT "Copying Extern/ to build directory ${CMAKE_BINARY_DIR}/"
+# )
 
-#Copies assets to executable directory.
-#This is necessary for executable to find it.
-add_custom_command(
-  TARGET application_executable
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_SOURCE_DIR}/Extern
-          $<TARGET_FILE_DIR:application_executable>/Extern
-  COMMENT "Copying Extern/ to executable directory"
-)
+# #Copies assets to executable directory.
+# #This is necessary for executable to find it.
+# add_custom_command(
+#   TARGET application_executable
+#   POST_BUILD
+#   COMMAND ${CMAKE_COMMAND} -E copy_directory
+#           ${CMAKE_SOURCE_DIR}/Extern
+#           $<TARGET_FILE_DIR:application_executable>/Extern
+#   COMMENT "Copying Extern/ to executable directory"
+# )
 
 #Sets the default startup project for visual studio to application_executable, other IDEs will ignore this.
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT application_executable)
@@ -155,11 +167,39 @@ endif()
 #NOTE: importDependencies is failing and I don't know how to debug it, so Vendoring will be used instead.
 #importDependencies()
 
-#Build external dependencies.
+# Make CMAKE_MSVC_RUNTIME_LIBRARY effective everywhere (CMake >= 3.15)
+cmake_policy(SET CMP0091 NEW)
+
+if(MSVC)
+  # Pick ONE runtime for all targets. Recommended: DLL CRT (/MD, /MDd)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+  # If you truly want static CRT instead, use:
+  # set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
+# ---- MSVC: force /MD (Release) and /MDd (Debug) for everything
+cmake_policy(SET CMP0091 NEW)
+if (MSVC)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
+
+# ---- Jolt: do not override flags; do not use static CRT
+set(OVERRIDE_CXX_FLAGS OFF CACHE BOOL "" FORCE)   # stop Jolt from rewriting CXX flags
+set(JPH_USE_STATIC_VCRT OFF CACHE BOOL "" FORCE)  # OFF => /MD(/MDd), ON => /MT(/MTd)
+
+#Build external dependencies ( Jolt lives here )
 add_subdirectory(Lib)
 
+# ---- (optional) sanity print + last-resort enforcement
+if (TARGET Jolt)
+  get_target_property(_rt Jolt MSVC_RUNTIME_LIBRARY)
+  message(STATUS "✅ Jolt present. Runtime = ${_rt}")
+  # Usually unnecessary, but safe if cache was sticky:
+  set_property(TARGET Jolt PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
+
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod glad stb_image CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource CACHE INTERNAL "")
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
 set(WINDOWS_DEBUG_LIBRARIES imgui CACHE INTERNAL "")
@@ -200,7 +240,7 @@ if(WIN32)
 
 target_link_libraries(engine_library PUBLIC ${EXTERNAL_LIBRARY_DEPENDENCIES})
 target_link_libraries(application_executable PUBLIC engine_library)
-
+target_compile_definitions(engine_library PUBLIC USE_JOLT)
 #Android==============
 elseif(ANDROID)
 	list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES ${ANDROID_LIBRARIES})
@@ -256,8 +296,8 @@ endforeach()
 
 #Adding include directories and sources
 if(WIN32)
-  target_sources(engine_library PUBLIC ${ENGINE_SOURCE})
-  target_sources(application_executable PUBLIC ${APPLICATION_SOURCE})
+  target_sources(engine_library PRIVATE ${ENGINE_SOURCE})
+  target_sources(application_executable PRIVATE ${APPLICATION_SOURCE})
   #TODO: By right, the engine shouldn't need to include application headers? Need to research more on this.
   target_include_directories(engine_library PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
   target_include_directories(application_executable PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})

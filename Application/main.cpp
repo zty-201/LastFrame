@@ -14,18 +14,25 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "pch.hpp"
 //Measurement of delta time.
 #include <chrono>
+// For the profiler
+#include <vector>
+#include <iostream>
+#include <iomanip>
+
 #include "main.hpp"
 #include "GraphicsSystem.h" // Include GraphicsSystem header
 #include "Input/InputManager.hpp"
 #include "ReflectionRegister.hpp"
 #include "System_GameObjectSystem.hpp"
-#include "Assets/AssetManager.hpp"
+#include "AssetManager.hpp"
+#include "Diagnostics/ProfilerEngine.hpp" // For the profiler - engine side
+#include "UnitTestManager.hpp"
+#include "AssetManager.hpp"
 #include "Audio/Audio.hpp"
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "System_LevelEditor.hpp"
 #endif
-
 
 //Initialization of game application.
 //android_asset_manager should only be set when building for android.
@@ -76,8 +83,8 @@ void Game_Initialize(void* android_asset_manager)
 			- Note: Sometimes this step must be done before deallocation of external libraries. If so, CoreEngine should not be deallocated via RAII but rather via a manual function call before the previous step.
 		*/
 		//Initialize Entt Reflection System by registering all components.
-	EngineFramework::RegisterReflection();
-	EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
+		EngineFramework::RegisterReflection();
+		EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 
 	// --- Core Systems (Init First, Destroy Last) ---
 
@@ -87,7 +94,7 @@ void Game_Initialize(void* android_asset_manager)
 			std::make_unique<EngineFramework::GraphicsSystem>(),
 			1,  // Init Order: First
 			5,  // Update Order: After game logic and editor
-			5   // Destruct Order: Last
+			6   // Destruct Order: Last
 		);
 
 		// 2. InputManager: Needs the window from GraphicsSystem to register callbacks.
@@ -96,15 +103,24 @@ void Game_Initialize(void* android_asset_manager)
 			std::make_unique<EngineFramework::InputManager>(),
 			2,  // Init Order: After Graphics
 			1,  // Update Order: FIRST in the loop
-			4   // Destruct Order: Before Graphics
+			5   // Destruct Order: Before Graphics
 		);
 
-		// 3. AssetManager: Can load assets after core systems are up.
+		// 5. AudioSystem: Depends on the game state.
+		core_engine.AddSystem(
+			"AudioSystem",
+			std::make_unique<EngineFramework::AudioSystem>(),
+			3,  // Init Order
+			7,  // Update Order: Last
+			4   // Destruct Order: First
+		);
+
+		// 3. AssetManager: Can load assets after graphics and audio systems are up.
 		core_engine.AddSystem(
 			"AssetManager",
 			std::make_unique<EngineFramework::AssetManagerSystem>(),
-			3,  // Init Order
-			2,  // Update Order: After Input
+			4,  // Init Order
+			2,  // Update Order
 			3   // Destruct Order
 		);
 
@@ -114,18 +130,9 @@ void Game_Initialize(void* android_asset_manager)
 		core_engine.AddSystem(
 			"GameObjectSystem",
 			std::make_unique<EngineFramework::GameObjectSystem>(),
-			4,  // Init Order
+			5,  // Init Order
 			3,  // Update Order: After Input and Asset Management
 			2   // Destruct Order
-		);
-
-		// 5. AudioSystem: Depends on the game state.
-		core_engine.AddSystem(
-			"AudioSystem",
-			std::make_unique<EngineFramework::AudioSystem>(),
-			5,  // Init Order
-			7,  // Update Order: Last
-			1   // Destruct Order: First
 		);
 
 		// --- Debug/Editor Systems (Conditional) ---
@@ -136,7 +143,7 @@ void Game_Initialize(void* android_asset_manager)
 			"LevelEditorSystem",
 			std::make_unique<EngineFramework::LevelEditorSystem>(),
 			100,  // Init Order: After all other game systems
-			6,  // Update Order: After game logic and main graphics update
+			7,  // Update Order: After game logic and main graphics update
 			1   // Destruct Order: With other game systems
 		);
 	#endif
@@ -145,6 +152,10 @@ void Game_Initialize(void* android_asset_manager)
 	try
 	{
 		core_engine.InitializeSystems();
+#ifdef DEBUG
+		// Creates the only instance in the program, and runs all unit tests.
+		UnitTestManager::GetInstance().RunAllTests();
+#endif
 	}
 	catch (std::exception& e)
 	{
@@ -156,6 +167,10 @@ void Game_Initialize(void* android_asset_manager)
 
 void Game_Update()
 {
+	// TESTING PROFILER 
+	using Diagnostics::Profiler;
+	auto& prof = Profiler::I(); // To get the profiler
+
 	EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 	//Keeps track of the current delta time. Use a small arbitrary value for the first update loop.
 	static float delta_time{ 0.0001f };
@@ -168,10 +183,70 @@ void Game_Update()
 	glfwPollEvents();
 #endif
 
-	//TODO: Try-Catch handling in Update/PostUpdate.
-	core_engine.UpdateSystems(delta_time);
+	// START PROFILER frame timing
+	prof.BeginFrame(); 
+	{
+		Diagnostics::Scoped s{ "Frame::UpdateAll" };
 
-	core_engine.PostUpdateSystems(delta_time);
+
+		//TODO: Try-Catch handling in Update/PostUpdate.
+		core_engine.UpdateSystems(delta_time);
+
+		core_engine.PostUpdateSystems(delta_time);
+	}
+
+	prof.EndFrame(); // END PROFILER frame timing
+
+	// Print profiler summary
+	//static double acc_ms = 0.0;
+	//static int frames = 0;
+	//acc_ms += Profiler::I().FrameMS();
+	//frames++;
+
+	//if (acc_ms >= 1000.0) {
+	//	std::stringstream out_stream{};
+	//	auto& P = Profiler::I();
+	//	const double frame = std::max(1e-6, P.FrameMS());
+
+	//	double update_all = frame;
+	//	if (auto it = P.Sections().find("Frame::UpdateAll"); it != P.Sections().end()) {
+	//		update_all = std::max(1e-6, it->second.ms);
+	//	}
+
+	//	out_stream << std::fixed << std::setprecision(4);
+	//	out_stream << "[Profiler] Frame: " << P.FrameMS() << " ms, FPS " << std::setprecision(1) << P.FPS() << "\n";
+	//	out_stream << std::setprecision(4);
+
+	//	// Copy and sort the sections by time in descending order
+	//	std::vector<std::pair<std::string, Diagnostics::Section>> rows(P.Sections().begin(), P.Sections().end());
+	//	//std::sort(rows.begin(), rows.begin(), [](auto& a, auto& b) {return a.second.ms > b.second.ms; });
+
+	//	for (auto& [name, sec] : rows) {
+	//		const double frame_percent = (sec.ms / frame) * 100.0;
+	//		const double engine_update_percent = (sec.ms / update_all) * 100.0;
+	//		const double per_call = sec.calls ? sec.ms / sec.calls : 0.0;
+
+	//		out_stream << " " << name << " : " << sec.ms << " ms" << " (calls " << sec.calls << ", " << per_call << " ms/call)"
+	//			<< " [" << std::setprecision(1) << engine_update_percent << "% of UpdateAll, " << frame_percent << "% of Frame]\n" << std::setprecision(4);
+	//	}
+	//	out_stream << "--------------------------------------\n";
+	//	acc_ms = 0.0;
+	//	LOGD("%s", out_stream.str().c_str());
+	//}
+
+	//if (acc_ms >= 1000.0) {
+	//	std::cout << "[Profiler] Frame: " << Profiler::I().FrameMS() << " ms, FPS " << Profiler::I().FPS() << "\n";
+
+	//	for (const auto& kv : Profiler::I().Sections()) {
+	//		const auto& name = kv.first;
+	//		const auto& sec = kv.second;
+	//		const double per_call = (sec.calls ? sec.ms / sec.calls : 0.0);
+	//		std::cout << " " << name << " : " << sec.ms << " ms" << " (calls " << sec.calls << ", " << per_call << " ms/call)\n";
+	//	}
+	//	std::cout << "--------------------------------------\n";
+	//	acc_ms = 0.0;
+	//	frames = 0;
+	//}
 
 	//Send all queued events in order.
 	event_dispatcher.update();
@@ -186,5 +261,4 @@ void Game_Update()
 
 void Game_Destroy()
 {
-
 }

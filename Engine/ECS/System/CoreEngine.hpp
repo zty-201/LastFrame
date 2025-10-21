@@ -34,6 +34,10 @@ namespace EngineFramework
 			std::unique_ptr<ISystem> system;
 			//Specified orders of initialization, Update, Destruction. These orders aren't necessarily the same.
 			char init_order{}, update_order{}, destruct_order{};
+
+			// FOR PROFILER 
+			std::string label_update; // Precomputed sys::<name>::update
+			std::string label_post; // Precomputed sys::<name>::postupdate
 		};
 
 		//Singleton pattern: Everyone shares the only instance of the core engine.
@@ -77,6 +81,11 @@ namespace EngineFramework
 
 		//Array containing all systems. Sorted based on order of init/update/destruct according to current needs.
 		std::vector<CoreSystem> system_arr;
+
+		// Helper functions to safely call system methods with try-catch and error logging.
+		void SafeUpdateSystem(CoreSystem& system, float delta_time);
+
+		void SafePostUpdateSystem(CoreSystem& system, float delta_time);
 	};
 }
 
