@@ -3,6 +3,9 @@
 #include <android/log.h>
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
+
+#include "InputManager.hpp"
+
 // Ensure JNI macros are available
 #ifndef JNIEXPORT
 #define JNIEXPORT
@@ -80,4 +83,29 @@ Java_com_example_jnicpp_MainActivity_cleanupGL(
 //        LOGI("GLRenderer was already null");
 //    }
     Game_Destroy();
+}
+
+//JNI function to handle touch motion events (from Java's onTouchEvent)
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jnicpp_MainActivity_handleNativeTouchEvent(
+        JNIEnv* env,
+        jobject /* this */,
+        jint action,
+        jfloat x,
+        jfloat y) {
+
+    //This calls static C++ function in InputManager
+    EngineFramework::InputManager::UpdateTouch(action, x, y);
+}
+
+//JNI function to handle key events (from Java's onKeyDown/Up)
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jnicpp_MainActivity_handleNativeKeyEvent(
+        JNIEnv* env,
+        jobject /* this */,
+        jint keyCode,
+        jboolean isDown) {
+
+    //This calls static C++ function in InputManager
+    EngineFramework::InputManager::UpdateKey(keyCode, isDown);
 }

@@ -5,6 +5,8 @@ import android.content.res.AssetManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.KeyEvent;
 import android.widget.Toast;
 import com.example.jnicpp.databinding.ActivityMainBinding;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -121,6 +123,62 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
             }
         }
     }
+
+    // ------------------------------------------------------------------------
+    // New Input Handling Overrides (Capture events from Android OS)
+    // ------------------------------------------------------------------------
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        //[Touch/Motion]
+        if(isInitialized)
+        {
+            //Pass action type (Up, Down, etc), and primary pointer pos
+            handleNativeTouchEvent(event.getActionMasked(), event.getX(), event.getY());
+            return true;
+        }
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        //[Key down/Pressed]
+        if(isInitialized)
+        {
+            //pass raw android keycode
+            handleNativeKeyEvent(keyCode, true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event)
+    {
+        //[Key up/Released]
+        if(isInitialized)
+        {
+            handleNativeKeyEvent(keyCode, false);
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
+    // --------------------------------------------------------------------------
+    // New Native Declarations for Input (Tell Java compiler about C++ functions)
+    // --------------------------------------------------------------------------
+
+    /**
+     * Handles touch motion events (DOWN, UP, MOVE, etc.)
+     */
+    public native void handleNativeTouchEvent(int action, float x, float y);
+
+    /**
+     * Handles key press events (keyboard or hardware buttons)
+     */
+    public native void handleNativeKeyEvent(int keyCode, boolean isDown);
+
 /**
  * A native method that is implemented by the 'jnicpp' native library,
  * which is packaged with this application.
