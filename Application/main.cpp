@@ -270,8 +270,6 @@ void Game_Update()
 
 	// --- Jerrons scripting playground ---
 
-	core_engine.PostUpdateSystems(delta_time);
-
 		//TODO: Try-Catch handling in Update/PostUpdate.
 		core_engine.UpdateSystems(delta_time);
 
