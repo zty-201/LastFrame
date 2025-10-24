@@ -24,7 +24,14 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #endif
 #include "AssetManager.hpp"
 
-
+// Define constants from Java MotionEvent for direct use in C++
+// These are standard Android MotionEvent action values
+#define ACTION_DOWN         0
+#define ACTION_UP           1
+#define ACTION_MOVE         2
+#define ACTION_CANCEL       3
+#define ACTION_POINTER_DOWN 5
+#define ACTION_POINTER_UP   6
 
 namespace EngineFramework
 {
@@ -181,6 +188,66 @@ namespace EngineFramework
         event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
     }
 #endif
+#ifdef PLATFORM_ANDROID
+    void InputManager::RegisterCallbacks(struct android_app* app)
+    {
+        (void)app;
+    }
+
+    void InputManager::UpdateKey(int keyCode, bool isDown)
+    {
+        //LOGI("Android Key Input: Code=%d, Action=%s", keyCode, isDown ? "DOWN" : "UP");
+        if (isDown)
+        {
+            keyStates[keyCode] = KeyState::Pressed;
+        }
+        else
+        {
+            keyStates[keyCode] = KeyState::Released;
+        }
+    }
+
+    void InputManager::UpdateTouch(int action, float x, float y)
+    {
+        mouseX = (double)x;
+        mouseY = (double)y;
+
+        constexpr int PRIMARY_BUTTON = 0; //Maps to GLFW_MOUSE_BUTTON_LEFT
+
+        //LOGI("Android Touch Input: Action=%d, Pos=(%.1f, %.1f)", action, x, y);
+
+        switch (action)
+        {
+        case ACTION_DOWN:
+        case ACTION_POINTER_DOWN:
+            mouseButtonStates[PRIMARY_BUTTON] = KeyState::Pressed;
+            break;
+
+        case ACTION_UP:
+        case ACTION_POINTER_UP:
+        case ACTION_CANCEL:
+            mouseButtonStates[PRIMARY_BUTTON] = KeyState::Released;
+            break;
+
+        case ACTION_MOVE:
+            if (mouseButtonStates[PRIMARY_BUTTON] == KeyState::Pressed)
+            {
+                mouseButtonStates[PRIMARY_BUTTON] = KeyState::Down;
+            }
+            break;
+        }
+    }
+
+    void InputManager::SetWindowWidth(int width)
+    {
+        windowWidth = width;
+    }
+
+    void InputManager::SetWindowHeight(int height)
+    {
+        windowHeight = height;
+    }
+#endif
     void InputManager::ErrorCallback(int error, const char* description)
     {
         (void)error;
@@ -261,6 +328,7 @@ namespace EngineFramework
         // --- Keyboard ---
         for (auto& [key, state] : keyStates)
         {
+            KeyState oldState = state; // Store the old state for debugging
             switch (state)
             {
             case KeyState::Pressed:
@@ -274,6 +342,9 @@ namespace EngineFramework
             case KeyState::None:
                 // Nothing to print
                 break;
+            }
+            if (oldState != state) {
+                std::cout << "Key State Advanced: key=" << key << " " << (int)oldState << " -> " << (int)state << "\n";
             }
         }
 

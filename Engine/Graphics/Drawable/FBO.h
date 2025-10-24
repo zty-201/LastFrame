@@ -38,6 +38,10 @@ struct FBO
     GLuint* pTexture;     // Pointer to the associated texture
     int framebufferWidth;             // Width of the framebuffer
     int framebufferHeight;            // Height of the framebuffer
+    // Texture handles for deferred rendering
+    GLuint gPosition = 0;
+    GLuint gNormal = 0;
+    GLuint gAlbedoSpec = 0;
 
     // Constructor to initialize the FBO with specific attributes
     FBO(Type type = Default, int width = 0, int height = 0, GLuint* pTexture = nullptr)
@@ -51,6 +55,11 @@ struct FBO
         // Resizes the framebuffer to match the specified dimensions
         resize(width, height);
     }
+
+    // Getters for deferred textures
+    GLuint getPositionTexture() const { return gPosition; }
+    GLuint getNormalTexture() const { return gNormal; }
+    GLuint getAlbedoSpecTexture() const { return gAlbedoSpec; }
 
     // Resizes the framebuffer object based on its type
     void resize(int width, int height)
@@ -82,6 +91,7 @@ struct FBO
 
         // Activate the specified texture unit and generate a texture
         glActiveTexture(texUnit);
+
         glGenTextures(1, &texid);
         glBindTexture(GL_TEXTURE_2D, texid);
         glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
@@ -206,32 +216,47 @@ struct FBO
         if (handle)
             glDeleteFramebuffers(1, &handle);
 
+        // Delete previous textures if they exist
+        if (gPosition) glDeleteTextures(1, &gPosition);
+        if (gNormal) glDeleteTextures(1, &gNormal);
+        if (gAlbedoSpec) glDeleteTextures(1, &gAlbedoSpec);
+
         // Create and bind the framebuffer
         glGenFramebuffers(1, &handle);
         glBindFramebuffer(GL_FRAMEBUFFER, handle);
 
         // Create textures for different deferred rendering passes
-        createTextureBuffer(width, height, GL_TEXTURE0, GL_RGB32F, GL_COLOR_ATTACHMENT0);
-        createTextureBuffer(width, height, GL_TEXTURE1, GL_RGB32F, GL_COLOR_ATTACHMENT1);
-        createTextureBuffer(width, height, GL_TEXTURE2, GL_RGB8, GL_COLOR_ATTACHMENT2);
+        createTextureBuffer(width, height, GL_TEXTURE0, GL_RGB16F, GL_COLOR_ATTACHMENT0, &gPosition);
+        createTextureBuffer(width, height, GL_TEXTURE1, GL_RGB16F, GL_COLOR_ATTACHMENT1, &gNormal);
+        createTextureBuffer(width, height, GL_TEXTURE2, GL_RGBA8, GL_COLOR_ATTACHMENT2, &gAlbedoSpec);
 
         // Create and attach a depth buffer
         createDepthBuffer(width, height);
 
         // Define an array of buffers into which outputs from 
         // the fragment shader data will be written
-        GLenum drawBuffers[] = { GL_NONE, GL_COLOR_ATTACHMENT0,
-                                GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-        glDrawBuffers(4, drawBuffers);
+        GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+        glDrawBuffers(3, drawBuffers);
 
         // Check status before unbinding 
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (result != GL_FRAMEBUFFER_COMPLETE)
         {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            throw std::runtime_error(std::string("Error ") +
-                std::to_string(result) +
-                ": Framebuffer is not complete.\n");
+            std::string errorMsg;
+            switch (result) {
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                errorMsg = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                errorMsg = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT"; break;
+            case GL_FRAMEBUFFER_UNSUPPORTED:
+                errorMsg = "GL_FRAMEBUFFER_UNSUPPORTED"; break;
+                // Add more cases as needed
+            default:
+                errorMsg = "Unknown error"; break;
+            }
+            throw std::runtime_error("Framebuffer incomplete: " + errorMsg + " (" +
+                std::to_string(result) + ")");
         }
 
         // Unbind after successful check 

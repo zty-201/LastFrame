@@ -3,6 +3,9 @@
 #include <android/log.h>
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
+
+#include "InputManager.hpp"
+
 // Ensure JNI macros are available
 #ifndef JNIEXPORT
 #define JNIEXPORT
@@ -65,6 +68,7 @@ Java_com_example_jnicpp_MainActivity_renderFrame(
 //    }
 //TODO: Run GameUpdate once, checking if the window is still valid.
     Game_Update();
+   // EngineFramework::InputManager::GetInstance().PostUpdate(deltaTime);
 }
 extern "C" JNIEXPORT void JNICALL
 Java_com_example_jnicpp_MainActivity_cleanupGL(
@@ -80,4 +84,48 @@ Java_com_example_jnicpp_MainActivity_cleanupGL(
 //        LOGI("GLRenderer was already null");
 //    }
     Game_Destroy();
+}
+
+//JNI function to handle touch motion events (from Java's onTouchEvent)
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jnicpp_MainActivity_handleNativeTouchEvent(
+        JNIEnv* env,
+        jobject /* this */,
+        jint action,
+        jfloat x,
+        jfloat y) {
+
+    //This calls static C++ function in InputManager
+    EngineFramework::InputManager::UpdateTouch(action, x, y);
+}
+
+//JNI function to handle key events (from Java's onKeyDown/Up)
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jnicpp_MainActivity_handleNativeKeyEvent(
+        JNIEnv* env,
+        jobject /* this */,
+        jint keyCode,
+        jboolean isDown) {
+
+    //This calls static C++ function in InputManager
+    EngineFramework::InputManager::UpdateKey(keyCode, isDown);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jnicpp_MainActivity_setDisplaySize(
+        JNIEnv* env,
+        jobject /*this */,
+        jint width,
+        jint height) {
+
+    LOGI("setDisplaySize called: %dx%d", width, height);
+
+    Event_Window_Resized window_resize;
+    window_resize.width = (int)width;
+    window_resize.height = (int)height;
+
+    event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
+
+    EngineFramework::InputManager::SetWindowWidth((int)width);
+    EngineFramework::InputManager::SetWindowHeight((int)height);
 }

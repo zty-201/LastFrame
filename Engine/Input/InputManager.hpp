@@ -21,6 +21,12 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #ifdef PLATFORM_WINDOWS
     #include "GLFW/glfw3.h"
 #endif
+
+#ifdef PLATFORM_ANDROID
+    #include <android/native_activity.h>
+    #include <android/input.h>
+#endif
+
 namespace EngineFramework
 {
     enum class KeyState
@@ -62,10 +68,23 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
         static void RegisterCallbacks(GLFWwindow* window);
 #endif
+#ifdef PLATFORM_ANDROID
+        static void RegisterCallbacks(struct android_app* app);
+#endif
 
         const std::unordered_map<int, KeyState>& GetKeyStates() const { return keyStates; }
         const std::unordered_map<int, KeyState>& GetMouseButtonStates() const { return mouseButtonStates; }
 
+#ifdef PLATFORM_ANDROID
+        static void UpdateKey(int keyCode, bool isDown);
+        static void UpdateTouch(int action, float x, float y);
+
+        //Mutators for JNI
+        static void SetWindowWidth(int width);
+        static void SetWindowHeight(int height);
+#endif
+
+        static std::unordered_map<int, KeyState> keyStates;
     private:
 #ifdef PLATFORM_WINDOWS
 // --- GLFW Callbacks ---
@@ -78,7 +97,7 @@ namespace EngineFramework
         static void ErrorCallback(int error, const char* description);
 
         // --- State storage ---
-        static std::unordered_map<int, KeyState> keyStates;
+        
         static std::unordered_map<int, KeyState> mouseButtonStates;
 
         static double mouseX, mouseY;

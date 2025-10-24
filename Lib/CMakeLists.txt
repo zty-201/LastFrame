@@ -12,6 +12,8 @@ add_subdirectory(Shared/fmod)
 add_subdirectory(Shared/glad)
 add_subdirectory(Shared/stb_image)
 add_subdirectory(Shared/xresource)
+add_subdirectory(Shared/lua)
+add_subdirectory(Shared/sol)
 
 add_subdirectory(Shared/JoltPhysics/Build)
 
@@ -29,3 +31,4 @@ add_subdirectory(Windows_x64/Debug/imgui)
 
 #Settle external interdependencies
 target_link_libraries(imgui PUBLIC glfw3)
+target_link_libraries(sol INTERFACE lua)

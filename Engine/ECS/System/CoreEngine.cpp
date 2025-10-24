@@ -77,7 +77,8 @@ namespace EngineFramework
 	*/
 	void CoreEngine::PostUpdateSystems(float delta_time)
 	{
-		//Array has already been sorted in update order, in initialize.
+		//Array has already been sorted in update order, in initialize.	WA4COM =
+		 
 		for (CoreSystem& system : system_arr)
 		{
 
