@@ -134,7 +134,7 @@ message("Building for Android")
   #Add precompiled headers to speed up compilation times. 
   target_precompile_headers(jnicpp PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
   #Preprocessor Definitions 
-  target_compile_definitions(jnicpp PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG>)
+  target_compile_definitions(jnicpp PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG> ENGINE_ENABLE_LUA)
 
 
 #Copies assets to android apk directory.
