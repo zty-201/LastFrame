@@ -20,6 +20,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "ISystem.hpp"
 #ifdef PLATFORM_WINDOWS
     #include "GLFW/glfw3.h"
+    #include "KeyMapping.hpp"
+    #include "Key_Action.hpp"
 #endif
 
 #ifdef PLATFORM_ANDROID
@@ -54,6 +56,10 @@ namespace EngineFramework
         static bool GetKeyDown(int key);   // true on press
         static bool GetKeyUp(int key);     // true on release
 
+        static bool GetKey(Key_Actions action);       // true while held
+        static bool GetKeyDown(Key_Actions action);   // true on press
+        static bool GetKeyUp(Key_Actions action);     // true on release
+
         // --- Mouse API ---
         static bool GetMouseButton(int button);
         static bool GetMouseButtonDown(int button);
@@ -75,6 +81,7 @@ namespace EngineFramework
         const std::unordered_map<int, KeyState>& GetKeyStates() const { return keyStates; }
         const std::unordered_map<int, KeyState>& GetMouseButtonStates() const { return mouseButtonStates; }
 
+
 #ifdef PLATFORM_ANDROID
         static void UpdateKey(int keyCode, bool isDown);
         static void UpdateTouch(int action, float x, float y);
@@ -85,6 +92,18 @@ namespace EngineFramework
 #endif
 
         static std::unordered_map<int, KeyState> keyStates;
+        static std::map<Key_Actions, int> key_mapping;
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        static std::map <std::string, int> key_mapping_data; //json file data
+        void deseralise(); //this wont be called often
+        void seralise();
+        void key_mapping_code_gen(); //write to initialise_keymapping
+#endif
+        void initialise_keymapping();
+        
+
+
     private:
 #ifdef PLATFORM_WINDOWS
 // --- GLFW Callbacks ---
