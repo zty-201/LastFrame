@@ -43,7 +43,7 @@ namespace EngineFramework
     
     // Static member definitions
     std::unordered_map<int, KeyState> InputManager::keyStates;
-    std::map<Key_Actions, int> InputManager::key_mapping;
+    std::unordered_map<Key_Actions, int> InputManager::key_mapping;
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
     std::map <std::string, int> InputManager::key_mapping_data;
@@ -357,13 +357,7 @@ namespace EngineFramework
     void InputManager::Update(float deltaTime)
     {
         (void)deltaTime;
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-        //testing
-        if (GetKeyDown(Key_Actions::JUMP)) {
-            key_mapping_code_gen();
-        }
-#endif
-        
+      
     }
 
     void InputManager::PostUpdate(float deltaTime)

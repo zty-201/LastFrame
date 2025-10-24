@@ -92,7 +92,7 @@ namespace EngineFramework
 #endif
 
         static std::unordered_map<int, KeyState> keyStates;
-        static std::map<Key_Actions, int> key_mapping;
+        static std::unordered_map<Key_Actions, int> key_mapping;
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         static std::map <std::string, int> key_mapping_data; //json file data

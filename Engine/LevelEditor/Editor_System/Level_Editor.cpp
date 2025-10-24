@@ -45,7 +45,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetWindow.hpp"
 #include "ModelManager.hpp"
 #include "AssetManager.hpp"
-
+#include "GameplayKeyManager.hpp"
 // /Debug
 #include "Profiler.hpp"
 
@@ -160,6 +160,8 @@ namespace EngineFramework
 		addFeature("SceneManager", std::make_unique<SceneManager>()); //
 		addFeature("AssetWindow", std::make_unique<AssetWindow>());//
 		addFeature("ModelManager", std::make_unique<ModelManager>());//
+		addFeature("Gameplay_KeyManager", std::make_unique<Gameplay_KeyManager>());//
+		//GameplayKeyManager
 
 		
 
@@ -255,6 +257,8 @@ namespace EngineFramework
 					ImGui::MenuItem("Object Manager", NULL, &featureFlag("ObjectManager"));
 					ImGui::Separator();
 					ImGui::MenuItem("Property Manager", NULL);
+					ImGui::Separator();
+					ImGui::MenuItem("Input Key Manager", NULL, &featureFlag("Gameplay_KeyManager"));
 					ImGui::Separator();
 					ImGui::MenuItem("Asset Browser", NULL, &featureFlag("AssetWindow"));
 					ImGui::PopStyleColor();  // Pop the white text color for "File" menu
