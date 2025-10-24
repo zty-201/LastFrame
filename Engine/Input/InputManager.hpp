@@ -67,7 +67,8 @@ namespace EngineFramework
         static std::pair<int, int> GetWindowSize();
 #ifdef PLATFORM_WINDOWS
         static void RegisterCallbacks(GLFWwindow* window);
-#elif PLATFORM_ANDROID
+#endif
+#ifdef PLATFORM_ANDROID
         static void RegisterCallbacks(struct android_app* app);
 #endif
 

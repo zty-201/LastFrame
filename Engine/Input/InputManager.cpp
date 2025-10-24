@@ -187,8 +187,8 @@ namespace EngineFramework
         window_resize.height = height;
         event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
     }
-
-#elif PLATFORM_ANDROID
+#endif
+#ifdef PLATFORM_ANDROID
     void InputManager::RegisterCallbacks(struct android_app* app)
     {
         (void)app;
@@ -196,6 +196,7 @@ namespace EngineFramework
 
     void InputManager::UpdateKey(int keyCode, bool isDown)
     {
+        //LOGI("Android Key Input: Code=%d, Action=%s", keyCode, isDown ? "DOWN" : "UP");
         if (isDown)
         {
             keyStates[keyCode] = KeyState::Pressed;
@@ -212,6 +213,8 @@ namespace EngineFramework
         mouseY = (double)y;
 
         constexpr int PRIMARY_BUTTON = 0; //Maps to GLFW_MOUSE_BUTTON_LEFT
+
+        //LOGI("Android Touch Input: Action=%d, Pos=(%.1f, %.1f)", action, x, y);
 
         switch (action)
         {

@@ -68,6 +68,7 @@ Java_com_example_jnicpp_MainActivity_renderFrame(
 //    }
 //TODO: Run GameUpdate once, checking if the window is still valid.
     Game_Update();
+   // EngineFramework::InputManager::GetInstance().PostUpdate(deltaTime);
 }
 extern "C" JNIEXPORT void JNICALL
 Java_com_example_jnicpp_MainActivity_cleanupGL(
