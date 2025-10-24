@@ -13,7 +13,7 @@
 
 #==========Setup==========
 #Setup cmake and project properties. 
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.27)
 #Use filters to separate folders.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project("LastFrame" VERSION 1.0 LANGUAGES C CXX)

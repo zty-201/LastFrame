@@ -111,6 +111,8 @@ struct FBO
     // Configures the FBO for rendering to a color texture with a depth buffer
     void resetTextureAsTarget(int width, int height, GLenum format)
     {
+        //Framebuffer must have a valid size.
+        if (width == 0 || height == 0) return;
         if (handle)
             glDeleteFramebuffers(1, &handle);
 
