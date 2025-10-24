@@ -21,7 +21,7 @@
 #define GRAPHICS_SYSTEM_HPP
 
 #include "ISystem.hpp"
-#include "Scene.h"
+#include "scene.h"
 
 namespace EngineFramework
 {
