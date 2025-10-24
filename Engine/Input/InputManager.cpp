@@ -319,6 +319,25 @@ namespace EngineFramework
     void InputManager::Update(float deltaTime)
     {
         (void)deltaTime;
+
+//#ifdef PLATFORM_ANDROID
+//        // Note: You must ensure your LOGI macro is defined/accessible
+//
+//        // 1. Get current position 
+//        std::pair<double, double> pos = GetMousePosition();
+//
+//        // 2. Get delta
+//        std::pair<double, double> delta = GetMouseDelta();
+//
+//        // Test GetMouseButtonDown (single tap detection)
+//        if (GetMouseButton(0)) {
+//            LOGI("TOUCH_DEBUG: SINGLE TAP DETECTED!");
+//
+//            // Logging the results
+//            LOGI("TOUCH_DEBUG: POS=(X=%.1f, Y=%.1f) | DELTA=(dX=%.1f, dY=%.1f)",
+//                pos.first, pos.second, delta.first, delta.second);
+//        }
+//#endif
     }
 
     void InputManager::PostUpdate(float deltaTime)
