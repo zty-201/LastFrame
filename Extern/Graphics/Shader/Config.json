@@ -1,7 +1,7 @@
 {
-  "Basic" : {
-    "vertex":   "Extern/Graphics/Shader/Basic.vert",
-    "fragment": "Extern/Graphics/Shader/Basic.frag"
+  "Forward" : {
+    "vertex":   "Extern/Graphics/Shader/Forward.vert",
+    "fragment": "Extern/Graphics/Shader/Forward.frag"
   },
   "Geometric" : {
     "vertex":   "Extern/Graphics/Shader/Geometric.vert",

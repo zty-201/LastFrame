@@ -65,7 +65,7 @@ namespace EngineFramework
         // A map to cache loaded mesh data (VAO, index count)
         xresource::full_guid geometric_shader_guid;
         xresource::full_guid lighting_shader_guid;
-		xresource::full_guid shader_guid;
+		xresource::full_guid forward_shader_guid;
 
         // For fullscreen quad in lighting pass
         GLuint fullscreenQuadVAO = 0;

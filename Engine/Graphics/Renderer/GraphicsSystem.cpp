@@ -111,7 +111,7 @@ namespace EngineFramework
 		gBufferFBO = FBO(FBO::Deferred, WIDTH, HEIGHT);
 
 		// Get shader GUIDs
-		shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Basic");
+		forward_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Forward");
 		geometric_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Geometric");
 		lighting_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Lighting");
 
@@ -350,34 +350,34 @@ namespace EngineFramework
 		auto light_view = registry.view<LightComponent>();
 		// Use the forward rendering shader for transparent objects and skybox
 
-		std::shared_ptr<ShaderProgram> basic_shader{};
-		if (shader_guid != xresource::full_guid{})
+		std::shared_ptr<ShaderProgram> forward_shader{};
+		if (forward_shader_guid != xresource::full_guid{})
 		{
-			basic_shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(shader_guid);
+			forward_shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(forward_shader_guid);
 		}
 		else
 		{
 			using E_AM = EngineFramework::AssetManagerSystem;
-			shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Basic");
-			basic_shader = E_AM::GetResource<ShaderProgram>(shader_guid);
+			forward_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Forward");
+			forward_shader = E_AM::GetResource<ShaderProgram>(forward_shader_guid);
 		}
 
-		basic_shader->use();
+		forward_shader->use();
 
 		// Set global uniforms
-		basic_shader->setUniform("Pass", 0);
-		basic_shader->setUniform("fog.color", pScene->fogColor);
-		basic_shader->setUniform("fog.minDist", pScene->fogMinDist);
-		basic_shader->setUniform("fog.maxDist", pScene->fogMaxDist);
-		basic_shader->setUniform("materialType", pScene->shadingModel);
-		basic_shader->setUniform("V", V);
-		basic_shader->setUniform("P", P);
+		forward_shader->setUniform("Pass", 0);
+		forward_shader->setUniform("fog.color", pScene->fogColor);
+		forward_shader->setUniform("fog.minDist", pScene->fogMinDist);
+		forward_shader->setUniform("fog.maxDist", pScene->fogMaxDist);
+		forward_shader->setUniform("materialType", pScene->shadingModel);
+		forward_shader->setUniform("V", V);
+		forward_shader->setUniform("P", P);
 
 		// Set light uniforms
 		int light_index = 0;
 		for (auto entity : light_view) {
 			auto& light = light_view.get<LightComponent>(entity);
-			Light::setUniforms(light, basic_shader, light_index++);
+			Light::setUniforms(light, forward_shader, light_index++);
 		}
 
 		// --- 3. RENDER SCENE OBJECTS ---
@@ -413,11 +413,11 @@ namespace EngineFramework
 				{
 					glActiveTexture(GL_TEXTURE0); // Diffuse always on unit 0
 					glBindTexture(texture->target, texture->id);
-					basic_shader->setUniform("DiffuseTex", 0);
+					forward_shader->setUniform("DiffuseTex", 0);
 					hasTexture = true;
 				}
 			}
-			basic_shader->setUniform("UseTexture", hasTexture);
+			forward_shader->setUniform("UseTexture", hasTexture);
 
 			// Bind normal map (separate check)
 			bool hasNormalMap = false;
@@ -430,15 +430,15 @@ namespace EngineFramework
 				{
 					glActiveTexture(GL_TEXTURE2); // Normal map on unit 2
 					glBindTexture(GL_TEXTURE_2D, normalMap->id);
-					basic_shader->setUniform("NormalMap", 2);
+					forward_shader->setUniform("NormalMap", 2);
 					hasNormalMap = true;
 				}
 			}
-			basic_shader->setUniform("UseNormalMap", hasNormalMap);
+			forward_shader->setUniform("UseNormalMap", hasNormalMap);
 
-			basic_shader->setMaterialUniforms(material);
+			forward_shader->setMaterialUniforms(material);
 			CalculateModelMatrix(transform, transform.modelMatrix);
-			basic_shader->setUniform("M", transform.modelMatrix);
+			forward_shader->setUniform("M", transform.modelMatrix);
 
 			glDrawElements(GL_TRIANGLES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
 
@@ -469,15 +469,15 @@ namespace EngineFramework
 				glDisable(GL_CULL_FACE);
 				glLineWidth(1.0f);                 // ES often clamps to 1.0
 
-				basic_shader->setUniform("Pass", 2);     // flat debug branch in your frag shader
-				basic_shader->setUniform("M", transform.modelMatrix);
+				forward_shader->setUniform("Pass", 2);     // flat debug branch in your frag shader
+				forward_shader->setUniform("M", transform.modelMatrix);
 
 				glBindVertexArray(wireVAO);
 				glDrawElements(GL_LINES, (GLsizei)wireIndexCount, GL_UNSIGNED_INT, 0);
 				glBindVertexArray(0);
 
 				// 4) Restore shader + GL state
-				basic_shader->setUniform("Pass", 0);
+				forward_shader->setUniform("Pass", 0);
 				if (cullEnabled)  glEnable(GL_CULL_FACE);  else glDisable(GL_CULL_FACE);
 				if (depthEnabled) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
 			}
@@ -488,7 +488,7 @@ namespace EngineFramework
 		glDepthMask(GL_FALSE);
 		glDisable(GL_CULL_FACE);
 
-		basic_shader->setUniform("Pass", 1);
+		forward_shader->setUniform("Pass", 1);
 
 		auto skybox_view = registry.view<MeshComponent, SkyboxRenderPass>();
 		for (auto [entity, mesh] : skybox_view.each())
@@ -507,7 +507,7 @@ namespace EngineFramework
 				{
 					glActiveTexture(GL_TEXTURE1);
 					glBindTexture(GL_TEXTURE_CUBE_MAP, texture->id);
-					basic_shader->setUniform("CubeMapTex", 1);
+					forward_shader->setUniform("CubeMapTex", 1);
 				}
 			}
 
@@ -518,7 +518,7 @@ namespace EngineFramework
 
 		// --- FINAL CLEANUP ---
 		glBindVertexArray(0);
-		basic_shader->disuse();
+		forward_shader->disuse();
 		glDepthFunc(GL_LESS);
 		glEnable(GL_CULL_FACE);
 		glDepthMask(GL_TRUE);
