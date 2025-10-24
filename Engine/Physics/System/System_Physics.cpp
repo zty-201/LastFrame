@@ -44,19 +44,24 @@ namespace EngineFramework {
     void PhysicsSystem::Initialize()
     {
 #ifdef USE_JOLT
-        // Initialise Jolt
-        InstallJoltCallbacks();                         // Routing trace
-        JPH::RegisterDefaultAllocator();                // Register allocation hook
-        JPH::Factory::sInstance = new JPH::Factory();   // Create a factory
-        JPH::RegisterTypes();                           // Register all Jolt shapes / constraints
+        // Install callbacks
+        InstallJoltCallbacks();
 
-        // Threading and Memory
-        m_temp_allocator = std::make_unique<JPH::TempAllocatorImpl>(10 * 1024 * 1024); // Create temp allocator
-        m_job_system = std::make_unique<JPH::JobSystemThreadPool>(          // Create job system
-            JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, 
-            std::thread::hardware_concurrency() - 1);
+        // Register allocation hook
+        JPH::RegisterDefaultAllocator();
 
-        // Broadphase / Layering
+        // Create a factory
+        JPH::Factory::sInstance = new JPH::Factory();
+
+        // Register all Jolt physics types
+        JPH::RegisterTypes();
+
+        // Create temp allocator
+        m_temp_allocator = std::make_unique<JPH::TempAllocatorImpl>(10 * 1024 * 1024); // 10 MB
+
+        // Create job system
+        m_job_system = std::make_unique<JPH::JobSystemThreadPool>(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1);
+
         // Create mapping table from object layer to broadphase layer
         m_broad_phase_layer_interface = std::make_unique<BPLayerInterfaceImpl>();
 
@@ -64,7 +69,6 @@ namespace EngineFramework {
         m_object_vs_broadphase_layer_filter = std::make_unique<ObjectVsBroadPhaseLayerFilterImpl>();
         m_object_vs_object_layer_filter = std::make_unique<ObjectLayerPairFilterImpl>();
 
-        // physics system core
         // Create the actual physics system
         m_physics_system = std::make_unique<JPH::PhysicsSystem>();
         m_physics_system->Init(

@@ -1,5 +1,6 @@
 #version 310 es
 
+//Specify precision for es. Use highp for more accuracy in 3D.
 precision highp float;
 precision highp int;
 
@@ -17,11 +18,11 @@ out mat3 TBN;
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
-uniform int Pass;
+uniform int Pass; // Pass number
 
 void main()
 {
-    // Pass 0: Forward rendering for transparent objects and special effects
+    // Pass 0 is SCENE
     if (Pass == 0) {
         TexCoord = VertexTexCoord;
         mat4 MV = V * M; 
@@ -30,22 +31,22 @@ void main()
         Normal = normalize(N * VertexNormal);
 
         vec3 T = normalize(N * VertexTangent.xyz);
-        vec3 B = cross(Normal, T) * VertexTangent.w;
+        vec3 B = cross(Normal, T) * VertexTangent.w; // Use handedness
         TBN = mat3(T, B, Normal);
 
         vec4 VertexPositionInView = MV * vec4(VertexPosition, 1.0f);
         Position = VertexPositionInView.xyz;
         gl_Position = P * VertexPositionInView; 
     } 
-    // Pass 1: Skybox rendering
+    // Pass 1 is SKYBOX
     else if (Pass == 1) {
         Vec = VertexPosition;
         mat4 viewNoTranslation = mat4(mat3(V));
         vec4 pos = P * viewNoTranslation * vec4(VertexPosition, 1.0);
         gl_Position = pos.xyzz;
     }
-    // Pass 2: Debug wireframe rendering
     else {
+        // Other passes
         vec4 clip = P * V * M * vec4(VertexPosition, 1.0);
         clip.z -= 1e-3 * clip.w;
         gl_Position = clip;

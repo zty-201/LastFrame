@@ -2,13 +2,5 @@
   "Basic" : {
     "vertex":   "Extern/Graphics/Shader/Basic.vert",
     "fragment": "Extern/Graphics/Shader/Basic.frag"
-  },
-  "Geometric" : {
-    "vertex":   "Extern/Graphics/Shader/Geometric.vert",
-    "fragment": "Extern/Graphics/Shader/Geometric.frag"
-  },
-  "Lighting" : {
-    "vertex":   "Extern/Graphics/Shader/Lighting.vert",
-    "fragment": "Extern/Graphics/Shader/Lighting.frag"
   }
 }
