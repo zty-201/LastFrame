@@ -1,6 +1,5 @@
 # Sol2 (header-only library)
-cmake_minimum_required(VERSION 3.27)
-project(sol LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.20)
 
 # Sol2 is header-only, so create an INTERFACE library
 add_library(sol INTERFACE)

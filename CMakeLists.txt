@@ -13,7 +13,7 @@
 
 #==========Setup==========
 #Setup cmake and project properties. 
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.20)
 #Use filters to separate folders.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project("LastFrame" VERSION 1.0 LANGUAGES C CXX)
@@ -134,7 +134,7 @@ message("Building for Android")
   #Add precompiled headers to speed up compilation times. 
   target_precompile_headers(jnicpp PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
   #Preprocessor Definitions 
-  target_compile_definitions(jnicpp PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG>)
+  target_compile_definitions(jnicpp PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG> ENGINE_ENABLE_LUA)
 
 
 #Copies assets to android apk directory.
@@ -323,25 +323,4 @@ if(WIN32)
   )
 endif()
 
-#Copying of dlls
-#Copies fmod dll to executable path
-if(WIN32)
-  add_custom_command(
-    TARGET application_executable
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-            $<TARGET_FILE:fmod>
-            $<TARGET_FILE_DIR:application_executable>
-    COMMENT "Copying fmod dll to executable directory"
-  )
-  
-# Copy Lua DLL
-  add_custom_command(
-    TARGET application_executable
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-            ${LUA_DLL}
-            $<TARGET_FILE_DIR:application_executable>
-    COMMENT "Copying lua54.dll to executable directory"
-  )
-endif()
+ 
