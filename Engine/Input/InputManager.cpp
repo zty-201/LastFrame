@@ -237,6 +237,16 @@ namespace EngineFramework
             break;
         }
     }
+
+    void InputManager::SetWindowWidth(int width)
+    {
+        windowWidth = width;
+    }
+
+    void InputManager::SetWindowHeight(int height)
+    {
+        windowHeight = height;
+    }
 #endif
     void InputManager::ErrorCallback(int error, const char* description)
     {

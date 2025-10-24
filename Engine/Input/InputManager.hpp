@@ -78,6 +78,10 @@ namespace EngineFramework
 #ifdef PLATFORM_ANDROID
         static void UpdateKey(int keyCode, bool isDown);
         static void UpdateTouch(int action, float x, float y);
+
+        //Mutators for JNI
+        static void SetWindowWidth(int width);
+        static void SetWindowHeight(int height);
 #endif
 
         static std::unordered_map<int, KeyState> keyStates;

@@ -111,7 +111,10 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         Log.d(TAG, "Surface changed: " + width + "x" + height);
-// Viewport is handled in native code
+
+        if(isInitialized){
+            setDisplaySize(width, height);
+        }
     }
     @Override
     public void onDrawFrame(GL10 gl) {
@@ -196,4 +199,9 @@ public native String stringFromJNI();
      * Cleanup OpenGL resources
      */
     public native void cleanupGL();
+
+    /**
+     * Notify native code of the current display size.
+     */
+    public native void setDisplaySize(int width, int height);
 }

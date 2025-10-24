@@ -15,6 +15,13 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
+
+            android:screenOrientation="Landscape"
+
+            android:configChanges="orientation|screenSize|keyboardHidden"
+
+            android:theme="@style/Theme.Jnicoo.Fullscreen"
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

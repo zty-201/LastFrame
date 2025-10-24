@@ -110,3 +110,22 @@ Java_com_example_jnicpp_MainActivity_handleNativeKeyEvent(
     //This calls static C++ function in InputManager
     EngineFramework::InputManager::UpdateKey(keyCode, isDown);
 }
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jnicpp_MainActivity_setDisplaySize(
+        JNIEnv* env,
+        jobject /*this */,
+        jint width,
+        jint height) {
+
+    LOGI("setDisplaySize called: %dx%d", width, height);
+
+    Event_Window_Resized window_resize;
+    window_resize.width = (int)width;
+    window_resize.height = (int)height;
+
+    event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
+
+    EngineFramework::InputManager::SetWindowWidth((int)width);
+    EngineFramework::InputManager::SetWindowHeight((int)height);
+}
