@@ -84,6 +84,9 @@ Java_com_example_jnicpp_MainActivity_cleanupGL(
 //    } else {
 //        LOGI("GLRenderer was already null");
 //    }
+
+    event_dispatcher.trigger<Event_Window_Should_Close>();
+
     Game_Destroy();
 }
 
