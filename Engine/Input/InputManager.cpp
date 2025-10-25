@@ -511,7 +511,7 @@ namespace EngineFramework
             ss << "\n\t\tkey_mapping[Key_Actions::" << KEYS.first << "] = " << KEYS.second << ";";
             file << ss.str();         
         }
-        file << "\n\t}\n}";
+        file << "\n\t}\n}\n";
 
         file.close();
 
@@ -535,7 +535,7 @@ namespace EngineFramework
             file_2 << ss.str();
         }
         file_2 << "\n\t};\n}";
-        file_2 << "\n#endif";
+        file_2 << "\n#endif\n";
 
         file_2.close();
 
