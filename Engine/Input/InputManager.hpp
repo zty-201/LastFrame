@@ -18,10 +18,14 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include <unordered_map>
 #include "ISystem.hpp"
+#include "Key_Action.hpp"
+
 #ifdef PLATFORM_WINDOWS
     #include "GLFW/glfw3.h"
+#endif
+
+#if defined(DEBUG)
     #include "KeyMapping.hpp"
-    #include "Key_Action.hpp"
 #endif
 
 #ifdef PLATFORM_ANDROID
