@@ -18,9 +18,21 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include <unordered_map>
 #include "ISystem.hpp"
+#include "Key_Action.hpp"
+
 #ifdef PLATFORM_WINDOWS
     #include "GLFW/glfw3.h"
 #endif
+
+#if defined(DEBUG)
+    #include "KeyMapping.hpp"
+#endif
+
+#ifdef PLATFORM_ANDROID
+    #include <android/native_activity.h>
+    #include <android/input.h>
+#endif
+
 namespace EngineFramework
 {
     enum class KeyState
@@ -48,6 +60,10 @@ namespace EngineFramework
         static bool GetKeyDown(int key);   // true on press
         static bool GetKeyUp(int key);     // true on release
 
+        static bool GetKey(Key_Actions action);       // true while held
+        static bool GetKeyDown(Key_Actions action);   // true on press
+        static bool GetKeyUp(Key_Actions action);     // true on release
+
         // --- Mouse API ---
         static bool GetMouseButton(int button);
         static bool GetMouseButtonDown(int button);
@@ -62,9 +78,35 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
         static void RegisterCallbacks(GLFWwindow* window);
 #endif
+#ifdef PLATFORM_ANDROID
+        static void RegisterCallbacks(struct android_app* app);
+#endif
 
         const std::unordered_map<int, KeyState>& GetKeyStates() const { return keyStates; }
         const std::unordered_map<int, KeyState>& GetMouseButtonStates() const { return mouseButtonStates; }
+
+
+#ifdef PLATFORM_ANDROID
+        static void UpdateKey(int keyCode, bool isDown);
+        static void UpdateTouch(int action, float x, float y);
+
+        //Mutators for JNI
+        static void SetWindowWidth(int width);
+        static void SetWindowHeight(int height);
+#endif
+
+        static std::unordered_map<int, KeyState> keyStates;
+        static std::unordered_map<Key_Actions, int> key_mapping;
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        static std::map <std::string, int> key_mapping_data; //json file data
+        void deseralise(); //this wont be called often
+        void seralise();
+        void key_mapping_code_gen(); //write to initialise_keymapping
+#endif
+        void initialise_keymapping();
+        
+
 
     private:
 #ifdef PLATFORM_WINDOWS
@@ -78,7 +120,7 @@ namespace EngineFramework
         static void ErrorCallback(int error, const char* description);
 
         // --- State storage ---
-        static std::unordered_map<int, KeyState> keyStates;
+        
         static std::unordered_map<int, KeyState> mouseButtonStates;
 
         static double mouseX, mouseY;

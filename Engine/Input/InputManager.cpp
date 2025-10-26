@@ -17,20 +17,38 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "global.hpp"
 #include "InputManager.hpp"
 #include "GraphicsSystem.h"
-//#include "Level_Editor.hpp"
 
-#if defined(DEBUG)
-#include "System_LevelEditor.hpp"
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+    #include "System_LevelEditor.hpp"
+    #include <nlohmann/json.hpp>
+    #include <fstream>
+    #include <iostream>
+
 #endif
+
 #include "AssetManager.hpp"
 
-
+// Define constants from Java MotionEvent for direct use in C++
+// These are standard Android MotionEvent action values
+#define ACTION_DOWN         0
+#define ACTION_UP           1
+#define ACTION_MOVE         2
+#define ACTION_CANCEL       3
+#define ACTION_POINTER_DOWN 5
+#define ACTION_POINTER_UP   6
 
 namespace EngineFramework
 {
     
     // Static member definitions
     std::unordered_map<int, KeyState> InputManager::keyStates;
+    std::unordered_map<Key_Actions, int> InputManager::key_mapping;
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+    std::map <std::string, int> InputManager::key_mapping_data;
+#endif   
+
     std::unordered_map<int, KeyState> InputManager::mouseButtonStates;
 
     double InputManager::mouseX = 0.0;
@@ -181,6 +199,66 @@ namespace EngineFramework
         event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
     }
 #endif
+#ifdef PLATFORM_ANDROID
+    void InputManager::RegisterCallbacks(struct android_app* app)
+    {
+        (void)app;
+    }
+
+    void InputManager::UpdateKey(int keyCode, bool isDown)
+    {
+        //LOGI("Android Key Input: Code=%d, Action=%s", keyCode, isDown ? "DOWN" : "UP");
+        if (isDown)
+        {
+            keyStates[keyCode] = KeyState::Pressed;
+        }
+        else
+        {
+            keyStates[keyCode] = KeyState::Released;
+        }
+    }
+
+    void InputManager::UpdateTouch(int action, float x, float y)
+    {
+        mouseX = (double)x;
+        mouseY = (double)y;
+
+        constexpr int PRIMARY_BUTTON = 0; //Maps to GLFW_MOUSE_BUTTON_LEFT
+
+        //LOGI("Android Touch Input: Action=%d, Pos=(%.1f, %.1f)", action, x, y);
+
+        switch (action)
+        {
+        case ACTION_DOWN:
+        case ACTION_POINTER_DOWN:
+            mouseButtonStates[PRIMARY_BUTTON] = KeyState::Pressed;
+            break;
+
+        case ACTION_UP:
+        case ACTION_POINTER_UP:
+        case ACTION_CANCEL:
+            mouseButtonStates[PRIMARY_BUTTON] = KeyState::Released;
+            break;
+
+        case ACTION_MOVE:
+            if (mouseButtonStates[PRIMARY_BUTTON] == KeyState::Pressed)
+            {
+                mouseButtonStates[PRIMARY_BUTTON] = KeyState::Down;
+            }
+            break;
+        }
+    }
+
+    void InputManager::SetWindowWidth(int width)
+    {
+        windowWidth = width;
+    }
+
+    void InputManager::SetWindowHeight(int height)
+    {
+        windowHeight = height;
+    }
+#endif
     void InputManager::ErrorCallback(int error, const char* description)
     {
         (void)error;
@@ -203,6 +281,28 @@ namespace EngineFramework
     {
         auto it = keyStates.find(key);
         return it != keyStates.end() && it->second == KeyState::Released;
+    }
+    /*
+        FOR KEY MAPPING
+    */
+
+    bool InputManager::GetKey(Key_Actions action) {
+
+        auto it = key_mapping.find(action);
+        return it != key_mapping.end() && GetKey(it->second);
+        
+    }
+    bool InputManager::GetKeyDown(Key_Actions action) {
+
+        auto it = key_mapping.find(action);
+        return it != key_mapping.end() && GetKeyDown(it->second);
+
+    }
+    bool InputManager::GetKeyUp(Key_Actions action) {
+
+        auto it = key_mapping.find(action);
+        return it != key_mapping.end() && GetKeyUp(it->second);
+
     }
 
     bool InputManager::GetMouseButton(int button)
@@ -247,11 +347,36 @@ namespace EngineFramework
     {
         windowWidth = GraphicsSystem::GetInstance().GetWindowSize().first;
         windowHeight = GraphicsSystem::GetInstance().GetWindowSize().second;
+        initialise_keymapping();
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        deseralise();
+#endif        
     }
 
     void InputManager::Update(float deltaTime)
     {
         (void)deltaTime;
+
+//#ifdef PLATFORM_ANDROID
+//        // Note: You must ensure your LOGI macro is defined/accessible
+//
+//        // 1. Get current position 
+//        std::pair<double, double> pos = GetMousePosition();
+//
+//        // 2. Get delta
+//        std::pair<double, double> delta = GetMouseDelta();
+//
+//        // Test GetMouseButtonDown (single tap detection)
+//        if (GetMouseButton(0)) {
+//            LOGI("TOUCH_DEBUG: SINGLE TAP DETECTED!");
+//
+//            // Logging the results
+//            LOGI("TOUCH_DEBUG: POS=(X=%.1f, Y=%.1f) | DELTA=(dX=%.1f, dY=%.1f)",
+//                pos.first, pos.second, delta.first, delta.second);
+//        }
+//#endif
+
     }
 
     void InputManager::PostUpdate(float deltaTime)
@@ -261,6 +386,7 @@ namespace EngineFramework
         // --- Keyboard ---
         for (auto& [key, state] : keyStates)
         {
+            KeyState oldState = state; // Store the old state for debugging
             switch (state)
             {
             case KeyState::Pressed:
@@ -274,6 +400,9 @@ namespace EngineFramework
             case KeyState::None:
                 // Nothing to print
                 break;
+            }
+            if (oldState != state) {
+                std::cout << "Key State Advanced: key=" << key << " " << (int)oldState << " -> " << (int)state << "\n";
             }
         }
 
@@ -303,5 +432,137 @@ namespace EngineFramework
         lastMouseX = mouseX;
         lastMouseY = mouseY;
     }
+
+    /*void InputManager::initialise_keymapping() {
+
+        key_mapping[Key_Actions::MOVE_LEFT] = GLFW_KEY_A;
+        key_mapping[Key_Actions::MOVE_RIGHT] = GLFW_KEY_D;
+        key_mapping[Key_Actions::MOVE_FORWARD] = GLFW_KEY_W;
+        key_mapping[Key_Actions::MOVE_BACK] = GLFW_KEY_S;
+        key_mapping[Key_Actions::JUMP] = GLFW_KEY_SPACE;
+        key_mapping[Key_Actions::OPEN_EDITOR] = GLFW_KEY_9;
+
+    }*/
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+    /*ONLY AVAILABLE IN DEBUG WHERE LEVEL EDITOR IS OPENED*/
+
+    void InputManager::deseralise() {
+
+        //STORE DATA FROM JSON FILE TO KEY_MAPPING_DATA
+        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Input/key_mapping_data.json";
+
+        std::ifstream Out_File(path);
+        if (!Out_File.is_open())
+        {
+            LOGE("Failed to open file for reading: %s", path.c_str());
+            return;
+        }
+
+        nlohmann::json data;
+        Out_File >> data;
+
+        // Loop through each player
+        for (const auto& KEYS : data["gameplay_keys"])
+        {
+            std::string name = KEYS["key_action"];
+            int score = KEYS["glfw_key"];
+            key_mapping_data[name] = score; 
+        }
+        
+        /*for (const auto& KEYS : key_mapping_data)
+        {
+            std::cout << "key_action: " << KEYS.first << ", glfw_key: " << KEYS.second << "\n";
+        }*/
+        
+    }
+
+    void InputManager::seralise() {
+        //STORE DATA FROM KEY_MAPPING_DATA TO JSON FILE
+        nlohmann::json data; // root JSON object
+        data["gameplay_keys"] = nlohmann::json::array(); 
+
+        // Loop through your map and build JSON entries
+        for (const auto& [key_action, glfw_key] : key_mapping_data)
+        {
+            nlohmann::json entry;
+            entry["key_action"] = key_action;
+            entry["glfw_key"] = glfw_key;
+
+            data["gameplay_keys"].push_back(entry);
+        }
+
+        // Write to file
+        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Input/key_mapping_data.json";
+
+        std::ofstream file(path);
+        if (!file.is_open())
+        {
+            LOGE("Failed to open file for writing: %s", path.c_str());
+            return;
+        }
+
+        file << data.dump(4);
+        file.close();
+
+    }
+
+    void InputManager::key_mapping_code_gen() {
+
+        //write to initialise_keymapping
+        //write to keyaction.hpp
+
+        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Engine/Input/InputManager_codegen.cpp";
+
+        std::ofstream file(path);
+        if (!file.is_open())
+        {
+            LOGE("Failed to open file for writing: %s", path.c_str());
+            return;
+        }
+        file << "#include \"InputManager.hpp\"";
+        file << "\nnamespace EngineFramework\n{\n\tvoid InputManager::initialise_keymapping() {";
+
+        for (auto const& KEYS : key_mapping_data)
+        {     
+            std::stringstream ss;
+            //key_mapping[Key_Actions::MOVE_LEFT] = GLFW_KEY_A;
+            ss << "\n\t\tkey_mapping[Key_Actions::" << KEYS.first << "] = " << KEYS.second << ";";
+            file << ss.str();         
+        }
+        file << "\n\t}\n}\n";
+
+        file.close();
+
+        
+        path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Engine/Input/Key_Action.hpp";
+
+        std::ofstream file_2(path);
+        if (!file_2.is_open())
+        {
+            LOGE("Failed to open file for writing: %s", path.c_str());
+            return;
+        }
+        file_2 << "\n#ifndef KEY_ACTION_H";
+        file_2 << "\n#define KEY_ACTION_H";
+        file_2 << "\nnamespace EngineFramework\n{\n\tenum class Key_Actions{";
+
+        for (auto const& KEYS : key_mapping_data)
+        {
+            std::stringstream ss;
+            ss << "\n\t\t" << KEYS.first << ",";
+            file_2 << ss.str();
+        }
+        file_2 << "\n\t};\n}";
+        file_2 << "\n#endif\n";
+
+        file_2.close();
+
+    }
+    
+
+#endif
+
+
 
 }
