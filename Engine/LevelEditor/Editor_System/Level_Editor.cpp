@@ -279,7 +279,9 @@ namespace EngineFramework
 
 					ImGui::Separator();
 					ImGui::MenuItem("Asset Browser", nullptr, &featureFlag("AssetWindow"));
-
+					ImGui::Separator();
+					ImGui::MenuItem("Input Key Manager", NULL, &featureFlag("Gameplay_KeyManager"));
+					ImGui::Separator();
 					ImGui::PopStyleColor();
 					ImGui::EndMenu();
 				}
