@@ -231,6 +231,14 @@ namespace EngineFramework
 		}
 	};
 
+	// To return a meta_any that references the component in the registry
+	template <typename T>
+	static entt::meta_any GetRef(entt::entity e) {
+		// Registry used here (same as emplacer/getter)
+		auto& reg = EngineFramework::GameObjectSystem::GetRegistry();
+		//return entt::meta_any{ std::ref(reg.get<T>(e)) };
+		return entt::forward_as_meta(reg.get<T>(e));
+	}
 	/*
 		Called during program startup: Will register all components into Entt reflection system.
 	*/
@@ -287,6 +295,7 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(xresource::full_guid);
 		REGISTER_ARBITRARY_TYPE(std::vector<glm::vec3>);
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
+		// Helper function to return a meta_any wrapping a reference
 
 		// === Register TransformComponent ===
 		entt::meta_factory<TransformComponent>()
@@ -296,7 +305,8 @@ namespace EngineFramework
 			.data<&TransformComponent::scale>("scale")
 			.data<&TransformComponent::modelMatrix>("modelMatrix")
 			.func<&Emplacer<TransformComponent>::EmplaceComponent>("emplace")
-			.func<&Getter<TransformComponent>::GetComponent>("get");
+			.func<&Getter<TransformComponent>::GetComponent>("get")
+			.func<&GetRef<TransformComponent>>("get_ref");
 
 		// === Register MeshComponent ===
 		entt::meta_factory<MeshComponent>()
@@ -305,7 +315,8 @@ namespace EngineFramework
 			.data<&MeshComponent::vao>("vao")
 			.data<&MeshComponent::indexCount>("indexCount")
 			.func<&Emplacer<MeshComponent>::EmplaceComponent>("emplace")
-			.func<&Getter<MeshComponent>::GetComponent>("get");
+			.func<&Getter<MeshComponent>::GetComponent>("get")
+			.func<&GetRef<MeshComponent>>("get_ref");
 
 		// === Register MaterialComponent ===
 		entt::meta_factory<MaterialComponent>()
@@ -320,7 +331,8 @@ namespace EngineFramework
 			.data<&MaterialComponent::effect>("effect")
 			.data<&MaterialComponent::materialName>("materialName")
 			.func<&Emplacer<MaterialComponent>::EmplaceComponent>("emplace")
-			.func<&Getter<MaterialComponent>::GetComponent>("get");
+			.func<&Getter<MaterialComponent>::GetComponent>("get")
+			.func<&GetRef<MaterialComponent>>("get_ref");
 
 		// === Register LightComponent ===
 		entt::meta_factory<LightComponent>()
@@ -328,9 +340,19 @@ namespace EngineFramework
 			.data<&LightComponent::position>("position")
 			.data<&LightComponent::L>("L")
 			.func<&Emplacer<LightComponent>::EmplaceComponent>("emplace")
-			.func<&Getter<LightComponent>::GetComponent>("get");
+			.func<&Getter<LightComponent>::GetComponent>("get")
+			.func<&GetRef<LightComponent>>("get_ref");
+
+		//== Register CameraComponent Enums == //
+		/*entt::meta_factory<CameraComponent::CameraType>()
+			.type("CameraType")
+			.data<CameraComponent::CameraType::ORBITING>("ORBITING")
+			.data<CameraComponent::CameraType::WALKING>("WALKING")
+			.conv<std::underlying_type_t<CameraComponent::CameraType>>();*/
+
 
 		// === Register CameraComponent ===
+		// Commented out certain fields that I do not want it to appear in inspector (can uncomment them out if need to)
 		entt::meta_factory<CameraComponent>()
 			.type("CameraComponent")
 			.data<&CameraComponent::camType>("camType")
@@ -344,21 +366,24 @@ namespace EngineFramework
 			.data<&CameraComponent::oldx>("oldx")
 			.data<&CameraComponent::oldy>("oldy")
 			.func<&Emplacer<CameraComponent>::EmplaceComponent>("emplace")
-			.func<&Getter<CameraComponent>::GetComponent>("get");
+			.func<&Getter<CameraComponent>::GetComponent>("get")
+			.func<&GetRef<CameraComponent>>("get_ref");
 
 		// === Register TextureComponent ===
 		entt::meta_factory<TextureComponent>()
 			.type("TextureComponent")
 			.data<&TextureComponent::texture_guid>("texture_guid")
 			.func<&Emplacer<TextureComponent>::EmplaceComponent>("emplace")
-			.func<&Getter<TextureComponent>::GetComponent>("get");
+			.func<&Getter<TextureComponent>::GetComponent>("get")
+			.func<&GetRef<TextureComponent>>("get_ref");
 
 		// === Register NormalMapComponent ===
 		entt::meta_factory<NormalMapComponent>()
 			.type("NormalMapComponent")
 			.data<&NormalMapComponent::normalmap_guid>("normalmap_guid")
 			.func<&Emplacer<NormalMapComponent>::EmplaceComponent>("emplace")
-			.func<&Getter<NormalMapComponent>::GetComponent>("get");
+			.func<&Getter<NormalMapComponent>::GetComponent>("get")
+			.func<&GetRef<NormalMapComponent>>("get_ref");
 
 		// Tag components (if you need them for serialization)
 		entt::meta_factory<SceneRenderPass>()
@@ -439,6 +464,8 @@ namespace EngineFramework
 		assert(false && "Type is not supported by SetJsonWithMetaAny function. Please add to map.");
 
 	}
+
+
 }
 
 //if (type.is_integral())
