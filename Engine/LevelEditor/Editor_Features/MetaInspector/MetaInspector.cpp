@@ -13,6 +13,7 @@ Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
 */
 /* *******************************************************************/
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
 #include "pch.hpp"
 #include "MetaInspector.hpp"
@@ -318,3 +319,5 @@ namespace EditorFeatures {
 		}
 	}
 }
+
+#endif

@@ -51,6 +51,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 // Property
 #include "PropertyManager.hpp"
+#include "GameplayKeyManager.hpp"
 
 namespace EngineFramework
 {
