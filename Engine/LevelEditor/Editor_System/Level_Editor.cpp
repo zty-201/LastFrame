@@ -51,6 +51,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 // Property
 #include "PropertyManager.hpp"
+#include <GameplayKeyManager.cpp>
 
 namespace EngineFramework
 {
@@ -169,7 +170,7 @@ namespace EngineFramework
 		addFeature("SceneManager", std::make_unique<SceneManager>()); //
 		addFeature("AssetWindow", std::make_unique<AssetWindow>());//
 		addFeature("ModelManager", std::make_unique<ModelManager>());//
-
+		addFeature("Gameplay_KeyManager", std::make_unique<Gameplay_KeyManager>());
 		addFeature("PropertyManager", std::make_unique<LFeature_PropertyManager>());
 		
 
