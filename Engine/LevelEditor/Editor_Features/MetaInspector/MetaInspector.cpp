@@ -1,3 +1,5 @@
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+
 #include "pch.hpp"
 #include "MetaInspector.hpp"
 #include "CameraComponent.h" // Testing purposes of property manager
@@ -302,3 +304,5 @@ namespace EditorFeatures {
 		}
 	}
 }
+
+#endif

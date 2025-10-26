@@ -1,3 +1,5 @@
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+
 #include "pch.hpp"
 #include "PropertyManager.hpp"
 #include "InspectorPanel.hpp"
@@ -118,3 +120,5 @@ namespace EngineFramework {
 //
 //}
 //
+
+#endif

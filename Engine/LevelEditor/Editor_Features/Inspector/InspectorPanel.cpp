@@ -1,3 +1,5 @@
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+
 #include "pch.hpp"
 #include "InspectorPanel.hpp"
 #include "MetaInspector/MetaInspector.hpp"
@@ -99,3 +101,5 @@ namespace EditorFeatures {
 	//	ImGui::End();
 	//}
 }
+
+#endif
