@@ -45,7 +45,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetWindow.hpp"
 #include "ModelManager.hpp"
 #include "AssetManager.hpp"
-
+#include "GameplayKeyManager.hpp"
 // /Debug
 #include "Profiler.hpp"
 
@@ -169,7 +169,7 @@ namespace EngineFramework
 		addFeature("SceneManager", std::make_unique<SceneManager>()); //
 		addFeature("AssetWindow", std::make_unique<AssetWindow>());//
 		addFeature("ModelManager", std::make_unique<ModelManager>());//
-
+		addFeature("Gameplay_KeyManager", std::make_unique<Gameplay_KeyManager>());
 		addFeature("PropertyManager", std::make_unique<LFeature_PropertyManager>());
 		
 
@@ -274,7 +274,7 @@ namespace EngineFramework
 						else {
 							ImGui::TextDisabled("Feature not registered");
 						}
-						ImGui::EndMenu();   // <-- restore balance
+						ImGui::EndMenu(); 
 					}
 
 					ImGui::Separator();
