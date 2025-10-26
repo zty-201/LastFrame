@@ -666,7 +666,7 @@ namespace EngineFramework {
 			Resources are kept in an array until guid mappings are read.
 		*/
 		std::vector<std::string> asset_names{};
-		std::vector< std::shared_ptr<Archtype>> loaded_resources{};
+		std::vector<std::shared_ptr<Archtype>> loaded_resources{};
 		//Acceptable files that can be loaded as a texture.
 		std::vector<std::string> archtype_extensions{ ".json" };
 

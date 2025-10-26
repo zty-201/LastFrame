@@ -32,6 +32,8 @@ namespace EngineFramework
 		nlohmann::json data = nlohmann::json::parse(json_data);
 		for (auto& [comp_name, comp_data_json] : data.items())
 		{
+			//Not a model.
+			if (comp_name == "model_type") continue;
 			//Creation of component.
 			entt::meta_type comp_type = entt::resolve(GetID(comp_name));
 			entt::meta_any comp_data = comp_type.construct();
@@ -55,6 +57,8 @@ namespace EngineFramework
 			//Store component
 			component_arr.emplace_back(comp_data);
 		}
+		//The type of the archtype, like "Characters" or "Background object"
+		if (data.contains("model_type")) model_type = data["model_type"];
 	}
 	
 
@@ -95,6 +99,7 @@ namespace EngineFramework
 			//Add component json to archtype json.
 			archtype_json_data[comp.type().name()] = component_json_data;
 		}
+		archtype_json_data["model_type"] = model_type;
 		//Dump in a prettified/readable format (using 1 tab for indentation).
 		return archtype_json_data.dump(1, '\t');
 	}
