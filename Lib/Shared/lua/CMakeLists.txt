@@ -1,20 +1,10 @@
-# Lua library (using precompiled binaries)
-cmake_minimum_required(VERSION 3.27)
-project(lua C)
+#lua, a static library.
 
-# Create an imported library target
-add_library(lua STATIC IMPORTED GLOBAL)
+#Get all .cpp and .hpp files in the source directory.
+file(GLOB MY_FILES RELATIVE "${CMAKE_CURRENT_LIST_DIR}" "src/*.cpp" "src/*.c" "src/*.h")
 
-# Set the location of the .lib file
-set_target_properties(lua PROPERTIES
-    IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lua54.lib"
+add_library(lua STATIC "${MY_FILES}")
+target_include_directories(lua PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>
+    	$<INSTALL_INTERFACE:include>
 )
-
-# Set include directories (so other targets can find lua headers)
-target_include_directories(lua INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-
-# Copy the DLL to the executable directory (needed at runtime on Windows)
-if(WIN32)
-    # Store the DLL path for later use
-    set(LUA_DLL "${CMAKE_CURRENT_SOURCE_DIR}/lua54.dll" CACHE INTERNAL "")
-endif()

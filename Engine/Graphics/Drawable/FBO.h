@@ -64,6 +64,8 @@ struct FBO
     // Resizes the framebuffer object based on its type
     void resize(int width, int height)
     {
+        //Can't have a zero size framebuffer.
+        if (width == 0 || height == 0) return;
         switch (type)
         {
         case Default:
@@ -121,6 +123,8 @@ struct FBO
     // Configures the FBO for rendering to a color texture with a depth buffer
     void resetTextureAsTarget(int width, int height, GLenum format)
     {
+        //Framebuffer must have a valid size.
+        if (width == 0 || height == 0) return;
         if (handle)
             glDeleteFramebuffers(1, &handle);
 

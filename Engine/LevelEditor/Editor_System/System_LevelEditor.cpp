@@ -61,7 +61,10 @@ namespace EngineFramework
 		//only check for this if the editor state is not true
 		if (!application->Get_Editor_State()) {
 			//std::cout << "yo\n";
-			if (InputManager::GetInstance().GetKeyDown(GLFW_KEY_9)) {
+
+			
+
+			if (InputManager::GetInstance().GetKeyDown(Key_Actions::OPEN_EDITOR)) {
 
 
 

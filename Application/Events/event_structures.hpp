@@ -6,6 +6,11 @@ struct Event_Window_Resized
 	int width{}; int height{};
 };
 
+struct Event_Window_Should_Close
+{
+
+};
+
 struct Event_Level_Editor_Toggled
 {
 	bool is_enabled{};

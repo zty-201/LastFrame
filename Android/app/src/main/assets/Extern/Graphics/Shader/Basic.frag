@@ -1,13 +1,11 @@
 #version 310 es
 
-//Specify precision for es. use highp for more accurate lighting.
 precision highp float;
 precision highp int;
 
 uniform int materialType;
 
-struct Light 
-{
+struct Light {
     vec3 position;
     vec3 L;
     vec3 La;
@@ -15,8 +13,7 @@ struct Light
     vec3 Ls;
 };
 
-struct Material 
-{
+struct Material {
     float rough;
     float metal;
     vec3 color;
@@ -27,8 +24,7 @@ struct Material
     float effect;          
 };
 
-struct Fog 
-{
+struct Fog {
     float minDist;            
     float maxDist;            
     vec3 color;            
@@ -56,65 +52,13 @@ uniform bool UseNormalMap;
 const int CARTOON_LEVELS = 3;
 const int CHECKERBOARD_SIZE = 50;
 const float CHECKERBOARD_MIXLEVEL = 0.5f; 
-const int DISCARD_SCALE = 10;  
 const float DISCARD_RADIUS = 0.2;  
 
 layout(location=0) out vec4 FragColor;
 
 const float PI = 3.14159265358979323846;
 
-float ggxDistribution(float nDotH) 
-{
-    float alpha2 = material.rough * material.rough * material.rough * material.rough;
-    float d = (nDotH * nDotH) * (alpha2 - 1.0f) + 1.0f;
-    return alpha2 / (PI * d * d);
-}
-
-float geomSmith(float nDotL) 
-{
-    float k = (material.rough + 1.0f) * (material.rough + 1.0f) / 8.0f;
-    float denom = nDotL * (1.0f - k) + k;
-    return 1.0f / denom;
-}
-
-vec3 schlickFresnel(float lDotH) 
-{
-    vec3 f0 = vec3(0.04f); // Dielectrics
-    if (material.metal == 1.0f)
-        f0 = material.color;
-    return f0 + (1.0f - f0) * pow(1.0f - lDotH, 5.0);
-}
-
-vec3 microfacetModel(vec3 position, vec3 n) 
-{  
-    vec3 diffuseBrdf = material.color;
-    
-    // Sample texture if enabled
-    if (UseTexture) {
-        vec4 texColor = texture(DiffuseTex, TexCoord);
-        diffuseBrdf *= texColor.rgb;
-    }
-
-    vec3 lightI = light[0].L;
-    vec3 lightPositionInView = (V * vec4(light[0].position, 1.0f)).xyz;
-
-    vec3 l = lightPositionInView - position;
-    float dist = length(l);
-    l = normalize(l);
-    lightI *= 100.0 / (dist * dist);
-
-    vec3 v = normalize(-position);
-    vec3 h = normalize(v + l);
-    float nDotH = dot(n, h);
-    float lDotH = dot(l, h);
-    float nDotL = max(dot(n, l), 0.0f);
-    float nDotV = dot(n, v);
-    vec3 specBrdf = 0.25f * ggxDistribution(nDotH) * schlickFresnel(lDotH) 
-                            * geomSmith(nDotL) * geomSmith(nDotV);
-
-    return (diffuseBrdf + PI * specBrdf) * lightI * nDotL;
-}
-
+// Only keep the cartoon function since it's a special effect
 float cartoon(float value)
 {
     const int levels = CARTOON_LEVELS;
@@ -122,6 +66,7 @@ float cartoon(float value)
     return floor(value * float(levels)) * scaleFactor;
 }
 
+// Keep the cartoon shading for special effects
 vec3 blinnPhongCartoon(vec3 position, vec3 n)
 {
     vec3 lightPosView = vec3(V * vec4(light[0].position, 1.0f));
@@ -152,6 +97,7 @@ vec3 blinnPhongCartoon(vec3 position, vec3 n)
     return ambient + diffuse + specular;
 }
 
+// Keep standard BlinnPhong for transparent objects
 vec3 BlinnPhong(vec3 position, vec3 normal, Light light, Material material, mat4 view)
 {
     vec3 lightPosView = vec3(view * vec4(light.position, 1.0f));
@@ -174,55 +120,10 @@ vec3 BlinnPhong(vec3 position, vec3 normal, Light light, Material material, mat4
     // Sample texture if enabled
     if (UseTexture) {
         vec4 texColor = texture(DiffuseTex, TexCoord);
-        diffuse *= texColor.rgb;
+        diffuse = texColor.rgb;
     }
 
     return ambient + diffuse + specular;
-}
-
-vec2 vec2uv(vec3 v)
-{
-    if (abs(v.y) > max(abs(v.x), abs(v.z)))
-        return vec2(0.0f, 0.0f);
-
-    float absX = abs(v.x);
-    float absZ = abs(v.z);
-    vec2 uv;
-
-    if (absX > absZ) {
-        float t = 1.0f / absX;
-        vec3 P = t * v;
-        if (v.x > 0.0f) {
-            uv = vec2((P.z + 1.0f) * 0.5f, (P.y + 1.0f) * 0.5f);
-        } else {
-            uv = vec2((1.0f - P.z) * 0.5f, (P.y + 1.0f) * 0.5f);
-        }
-    }
-    else if (absZ > absX) {
-        float t = 1.0f / absZ;
-        vec3 P = t * v;
-        if (v.z < 0.0f) {
-            uv = vec2((P.x + 1.0f) * 0.5f, (P.y + 1.0f) * 0.5f);
-        } else {
-            uv = vec2((1.0f - P.x) * 0.5f, (P.y + 1.0f) * 0.5f);
-        }
-    }
-    else {
-        if (v.z < 0.0f) {
-            if (v.x < 0.0f) {
-                uv = vec2((v.x + 1.0f) * 0.5f, (v.y + 1.0f) * 0.5f);
-            } else {
-                uv = vec2((v.z + 1.0f) * 0.5f, (v.y + 1.0f) * 0.5f);
-            }
-        } else {
-            if (v.x >= 0.0f) {
-                uv = vec2((1.0f - v.x) * 0.5f, (v.y + 1.0f) * 0.5f);
-            } else {
-                uv = vec2((v.z + 1.0f) * 0.5f, (v.y + 1.0f) * 0.5f);
-            }
-        }
-    }
-    return uv;
 }
 
 vec4 checkerboardTexture(vec2 uv, float size) {
@@ -236,29 +137,27 @@ vec4 checkerboardTexture(vec2 uv, float size) {
         return vec4(1.0, 1.0, 1.0, 1.0);
 }
 
+// Simplified forward pass - only for transparent objects and special effects
 void scenePass() 
 {
-    vec3 color;
-
     vec3 normal;
     if (UseNormalMap) {
-        // Sample normal map and transform from [0,1] to [-1,1]
         vec3 normalMapSample = texture(NormalMap, TexCoord).rgb;
         normalMapSample = normalMapSample * 2.0 - 1.0;
-        
-        // Transform normal from tangent space to view space
         normal = normalize(TBN * normalMapSample);
     } else {
         normal = normalize(Normal);
     }
     
-    if (materialType == 0) {
-        color = microfacetModel(Position, normal);    
-    } else if (materialType == 1) {
-        color = BlinnPhong(Position, normal, light[0], material, V);
+    // Start with base color from texture or material
+    vec3 color = material.color;
+    if (UseTexture) {
+        color = texture(DiffuseTex, TexCoord).rgb;
     }
-
+    
+    // Handle special effects and transparent objects
     if (material.effect == 1.0f) {
+        // Discard effect (transparent holes)
         vec2 centers[3] = vec2[3](vec2(0.3f, 0.3f), vec2(0.7f, 0.3f), vec2(0.5f, 0.7f));
         float radius = DISCARD_RADIUS;
         for (int i = 0; i < 3; ++i) {
@@ -266,22 +165,35 @@ void scenePass()
             if (dist < radius)
                 discard;
         }
-    } else if (material.effect == 2.0f) {
+        
+        // For transparent objects, calculate lighting in forward pass
+        if (materialType == 0) {
+            // Use simplified lighting for transparent objects
+            color = BlinnPhong(Position, normal, light[0], material, V);
+        }
+    } 
+    else if (material.effect == 2.0f) {
+        // Cartoon effect
         color = blinnPhongCartoon(Position, normal);
-    } else if (material.effect == 3.0f) {
+    } 
+    else if (material.effect == 3.0f) {
+        // Checkerboard effect
         vec4 checkerboard = checkerboardTexture(TexCoord, float(CHECKERBOARD_SIZE));
         color = mix(color, checkerboard.rgb, CHECKERBOARD_MIXLEVEL);
     }
 
+    // Apply fog
     float dist = length(Position);
     float fogFactor = clamp((dist - fog.minDist) / (fog.maxDist - fog.minDist), 0.0f, 1.0f);
     color = mix(color, fog.color, fogFactor);
 
+    // Apply gamma correction
     color = pow(color, vec3(1.0f/2.2f));
 
     FragColor = vec4(color, 1.0f);
 }
 
+// Keep skybox pass unchanged
 void skyboxPass() 
 {
     vec3 color = texture(CubeMapTex, normalize(Vec)).rgb;
@@ -294,7 +206,7 @@ void main()
     if (Pass == 0) scenePass();
     else if (Pass == 1) skyboxPass();
     else if (Pass == 2) {
-        FragColor = vec4(1.0, 1.0, 0.0, 1.0); // bright yellow
+        FragColor = vec4(1.0, 1.0, 0.0, 1.0); // bright yellow for debug
         return;
     }
 }

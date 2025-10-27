@@ -77,6 +77,12 @@
 #include "CoreEngine.hpp"
 #include "AssetManager.hpp"
 
+//Commonly used systems, or Systems that don't change often.
+#include "Audio.hpp"
+#include "InputManager.hpp"
+#include "Math.hpp"
+
+
 //Event system
 #include "event_structures.hpp"
 
