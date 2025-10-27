@@ -22,6 +22,7 @@
 
 #include "ISystem.hpp"
 #include "scene.h"
+#include "InstancingSystem.h"
 
 namespace EngineFramework
 {
@@ -62,6 +63,8 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* pWindow = nullptr;
 #endif
+
+        std::unique_ptr<InstancingSystem> m_instancingSystem;
         // A map to cache loaded mesh data (VAO, index count)
         xresource::full_guid geometric_shader_guid;
         xresource::full_guid lighting_shader_guid;

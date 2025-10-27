@@ -24,6 +24,7 @@
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
 
+
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
 class LevelEditor; //forward declaration
@@ -115,6 +116,10 @@ namespace EngineFramework
 		geometric_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Geometric");
 		lighting_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Lighting");
 
+		// Initialize instancing system
+		m_instancingSystem = std::make_unique<InstancingSystem>();
+		m_instancingSystem->Initialize(10000);
+
 		// Initialize the fullscreen quad for the lighting pass
 		InitializeFullscreenQuad();
 
@@ -153,53 +158,55 @@ namespace EngineFramework
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		std::shared_ptr<ShaderProgram> geometric_shader{};
-		if (geometric_shader_guid != xresource::full_guid{})
-		{
+		if (geometric_shader_guid != xresource::full_guid{}) {
 			geometric_shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(geometric_shader_guid);
 		}
-		else
-		{
+		else {
 			using E_AM = EngineFramework::AssetManagerSystem;
 			geometric_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Geometric");
 			geometric_shader = E_AM::GetResource<ShaderProgram>(geometric_shader_guid);
 		}
 
 		geometric_shader->use();
-
-		// Set camera and view/projection matrices
 		geometric_shader->setUniform("V", V);
 		geometric_shader->setUniform("P", P);
 
-		// Enable depth test and face culling
 		glDepthFunc(GL_LESS);
 		glDepthMask(GL_TRUE);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 
-		// Render all opaque scene objects to G-buffer
-		auto scene_view = registry.view<TransformComponent, MaterialComponent, MeshComponent, SceneRenderPass>();
-		for (auto [entity, transform, material, mesh] : scene_view.each())
-		{
-			// Skip transparent/special effect objects (handle in forward pass)
-			if (material.effect == 1.0f) continue; // Skip objects with discard
+		// ====================================================================
+		// INSTANCED RENDERING - ITERATE THROUGH BATCHES
+		// ====================================================================
 
+		const auto& deferredBatches = m_instancingSystem->GetDeferredBatches();
+
+		for (const auto& [batchKey, batch] : deferredBatches) {
 			// Load mesh if not cached
-			if (meshCache.find(mesh.meshName) == meshCache.end()) {
-				LoadAndCacheMesh(mesh.meshName);
+			if (meshCache.find(batch.meshName) == meshCache.end()) {
+				LoadAndCacheMesh(batch.meshName);
 			}
-			auto& [vao, indexCount] = meshCache[mesh.meshName];
 
+			auto& [vao, indexCount] = meshCache[batch.meshName];
 			glBindVertexArray(vao);
 
-			// Handle textures
-			bool hasTexture = false;
-			if (registry.all_of<TextureComponent>(entity))
-			{
-				auto& texComp = registry.get<TextureComponent>(entity);
-				auto texture = AssetManagerSystem::GetResource<Scene::Texture>(texComp.texture_guid);
+			// Bind instance SSBO to binding point 0
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, batch.instanceSSBO);
 
-				if (texture && texture->id != 0)
-				{
+			geometric_shader->setUniform("material.Ka", batch.batchMaterial.Ka);
+			geometric_shader->setUniform("material.Kd", batch.batchMaterial.Kd);
+			geometric_shader->setUniform("material.Ks", batch.batchMaterial.Ks);
+			geometric_shader->setUniform("material.rough", batch.batchMaterial.rough);
+			geometric_shader->setUniform("material.metal", batch.batchMaterial.metal);
+			geometric_shader->setUniform("material.shininess", batch.batchMaterial.shininess);
+			geometric_shader->setUniform("material.effect", batch.batchMaterial.effect);
+
+			// Bind diffuse texture for this batch
+			bool hasTexture = false;
+			if (!batchKey.textureGUID.empty()) {
+				auto texture = AssetManagerSystem::GetResource<Scene::Texture>(batchKey.textureGUID);
+				if (texture && texture->id != 0) {
 					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(texture->target, texture->id);
 					geometric_shader->setUniform("DiffuseTex", 0);
@@ -208,15 +215,11 @@ namespace EngineFramework
 			}
 			geometric_shader->setUniform("UseTexture", hasTexture);
 
-			// Handle normal maps
+			// Bind normal map for this batch
 			bool hasNormalMap = false;
-			if (registry.all_of<NormalMapComponent>(entity))
-			{
-				auto& normalComp = registry.get<NormalMapComponent>(entity);
-				auto normalMap = AssetManagerSystem::GetResource<Scene::Texture>(normalComp.normalmap_guid);
-
-				if (normalMap && normalMap->id != 0)
-				{
+			if (!batchKey.normalMapGUID.empty()) {
+				auto normalMap = AssetManagerSystem::GetResource<Scene::Texture>(batchKey.normalMapGUID);
+				if (normalMap && normalMap->id != 0) {
 					glActiveTexture(GL_TEXTURE2);
 					glBindTexture(GL_TEXTURE_2D, normalMap->id);
 					geometric_shader->setUniform("NormalMap", 2);
@@ -225,17 +228,16 @@ namespace EngineFramework
 			}
 			geometric_shader->setUniform("UseNormalMap", hasNormalMap);
 
-			// Set material and transformation
-			geometric_shader->setUniform("material.color", material.color);
-			geometric_shader->setUniform("material.metal", material.metal);
-			geometric_shader->setUniform("material.rough", material.rough);
-
-			CalculateModelMatrix(transform, transform.modelMatrix);
-			geometric_shader->setUniform("M", transform.modelMatrix);
-
-			// Draw the mesh
-			glDrawElements(GL_TRIANGLES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
+			// Single draw call for all instances in this batch
+			glDrawElementsInstanced(GL_TRIANGLES,
+				static_cast<GLsizei>(indexCount),
+				GL_UNSIGNED_INT,
+				nullptr,
+				static_cast<GLsizei>(batch.currentInstanceCount));
 		}
+
+		glBindVertexArray(0);
+		geometric_shader->disuse();
 	}
 
 	void GraphicsSystem::LightingPass(glm::mat4& V)
@@ -324,7 +326,8 @@ namespace EngineFramework
 		lighting_shader->setUniform("material.Kd", glm::vec3(0.7f));
 		lighting_shader->setUniform("material.Ks", glm::vec3(1.0f));
 		lighting_shader->setUniform("material.shininess", 32.0f);
-
+		lighting_shader->setUniform("material.rough", 0.5f);  
+		lighting_shader->setUniform("material.metal", 0.0f);
 		// Draw fullscreen quad to apply lighting
 		glDisable(GL_DEPTH_TEST);
 		glBindVertexArray(fullscreenQuadVAO);
@@ -386,32 +389,38 @@ namespace EngineFramework
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 
-		auto scene_view = registry.view<TransformComponent, MaterialComponent, MeshComponent, SceneRenderPass>();
-		for (auto [entity, transform, material, mesh] : scene_view.each())
-		{
-			// Load mesh if not cached
-			if (meshCache.find(mesh.meshName) == meshCache.end()) {
-				LoadAndCacheMesh(mesh.meshName);
-			}
-			auto& [vao, indexCount] = meshCache[mesh.meshName];
+		const auto& forwardBatches = m_instancingSystem->GetForwardBatches();
 
-			glBindVertexArray(vao);
+		for (const auto& [batchKey, batch] : forwardBatches) {
+			if (batchKey.meshName == "SkyBox") continue;
 
-			bool isCheckerboard = (material.effect == 3.0f);
+			bool isCheckerboard = (batch.batchMaterial.effect == 3.0f);
 			if (isCheckerboard) {
 				glCullFace(GL_FRONT);
 			}
+			if (meshCache.find(batch.meshName) == meshCache.end()) {
+				LoadAndCacheMesh(batch.meshName);
+			}
 
-			// **NEW: Check for texture and bind it**
+			auto& [vao, indexCount] = meshCache[batch.meshName];
+			glBindVertexArray(vao);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, batch.instanceSSBO);
+
+			// Set per-batch material uniforms (same as geometry pass)
+			forward_shader->setUniform("material.Ka", batch.batchMaterial.Ka);
+			forward_shader->setUniform("material.Kd", batch.batchMaterial.Kd);
+			forward_shader->setUniform("material.Ks", batch.batchMaterial.Ks);
+			forward_shader->setUniform("material.rough", batch.batchMaterial.rough);
+			forward_shader->setUniform("material.metal", batch.batchMaterial.metal);
+			forward_shader->setUniform("material.shininess", batch.batchMaterial.shininess);
+			forward_shader->setUniform("material.effect", batch.batchMaterial.effect);
+
+			// Bind textures
 			bool hasTexture = false;
-			if (registry.all_of<TextureComponent>(entity))
-			{
-				auto& texComp = registry.get<TextureComponent>(entity);
-				auto texture = AssetManagerSystem::GetResource<Scene::Texture>(texComp.texture_guid);
-
-				if (texture && texture->id != 0)
-				{
-					glActiveTexture(GL_TEXTURE0); // Diffuse always on unit 0
+			if (!batchKey.textureGUID.empty()) {
+				auto texture = AssetManagerSystem::GetResource<Scene::Texture>(batchKey.textureGUID);
+				if (texture && texture->id != 0) {
+					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(texture->target, texture->id);
 					forward_shader->setUniform("DiffuseTex", 0);
 					hasTexture = true;
@@ -419,16 +428,11 @@ namespace EngineFramework
 			}
 			forward_shader->setUniform("UseTexture", hasTexture);
 
-			// Bind normal map (separate check)
 			bool hasNormalMap = false;
-			if (registry.all_of<NormalMapComponent>(entity))
-			{
-				auto& normalComp = registry.get<NormalMapComponent>(entity);
-				auto normalMap = AssetManagerSystem::GetResource<Scene::Texture>(normalComp.normalmap_guid);
-
-				if (normalMap && normalMap->id != 0)
-				{
-					glActiveTexture(GL_TEXTURE2); // Normal map on unit 2
+			if (!batchKey.normalMapGUID.empty()) {
+				auto normalMap = AssetManagerSystem::GetResource<Scene::Texture>(batchKey.normalMapGUID);
+				if (normalMap && normalMap->id != 0) {
+					glActiveTexture(GL_TEXTURE2);
 					glBindTexture(GL_TEXTURE_2D, normalMap->id);
 					forward_shader->setUniform("NormalMap", 2);
 					hasNormalMap = true;
@@ -436,52 +440,109 @@ namespace EngineFramework
 			}
 			forward_shader->setUniform("UseNormalMap", hasNormalMap);
 
-			forward_shader->setMaterialUniforms(material);
-			CalculateModelMatrix(transform, transform.modelMatrix);
-			forward_shader->setUniform("M", transform.modelMatrix);
-
-			glDrawElements(GL_TRIANGLES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
-
-			if (isCheckerboard) {
-				glCullFace(GL_BACK);
-			}
-
-			// --- 3.5. Debug Drawing ---
-			if (show_debugDraw) {
-				// 1) Ensure a wire VAO exists for this mesh
-				auto itWire = meshCacheWire.find(mesh.meshName);
-				if (itWire == meshCacheWire.end()) {
-					// Rebuild cache entries (creates wire VAO/EBO too)
-					LoadAndCacheMesh(mesh.meshName);
-					itWire = meshCacheWire.find(mesh.meshName);
-				}
-				if (itWire == meshCacheWire.end())
-					break; // nothing to draw for this mesh
-
-				const auto& [wireVAO, wireIndexCount] = itWire->second;
-
-				// 2) Save minimal GL state we’re about to touch
-				const GLboolean depthEnabled = glIsEnabled(GL_DEPTH_TEST);
-				const GLboolean cullEnabled = glIsEnabled(GL_CULL_FACE);
-
-				// 3) Overlay: draw lines without depth testing so they’re always visible
-				glDisable(GL_DEPTH_TEST);
-				glDisable(GL_CULL_FACE);
-				glLineWidth(1.0f);                 // ES often clamps to 1.0
-
-				forward_shader->setUniform("Pass", 2);     // flat debug branch in your frag shader
-				forward_shader->setUniform("M", transform.modelMatrix);
-
-				glBindVertexArray(wireVAO);
-				glDrawElements(GL_LINES, (GLsizei)wireIndexCount, GL_UNSIGNED_INT, 0);
-				glBindVertexArray(0);
-
-				// 4) Restore shader + GL state
-				forward_shader->setUniform("Pass", 0);
-				if (cullEnabled)  glEnable(GL_CULL_FACE);  else glDisable(GL_CULL_FACE);
-				if (depthEnabled) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
-			}
+			glDrawElementsInstanced(GL_TRIANGLES,
+				static_cast<GLsizei>(indexCount),
+				GL_UNSIGNED_INT,
+				nullptr,
+				static_cast<GLsizei>(batch.currentInstanceCount));
 		}
+
+		//auto scene_view = registry.view<TransformComponent, MaterialComponent, MeshComponent, SceneRenderPass>();
+		//for (auto [entity, transform, material, mesh] : scene_view.each())
+		//{
+		//	// Load mesh if not cached
+		//	if (meshCache.find(mesh.meshName) == meshCache.end()) {
+		//		LoadAndCacheMesh(mesh.meshName);
+		//	}
+		//	auto& [vao, indexCount] = meshCache[mesh.meshName];
+
+		//	glBindVertexArray(vao);
+
+		//	bool isCheckerboard = (material.effect == 3.0f);
+		//	if (isCheckerboard) {
+		//		glCullFace(GL_FRONT);
+		//	}
+
+		//	// **NEW: Check for texture and bind it**
+		//	bool hasTexture = false;
+		//	if (registry.all_of<TextureComponent>(entity))
+		//	{
+		//		auto& texComp = registry.get<TextureComponent>(entity);
+		//		auto texture = AssetManagerSystem::GetResource<Scene::Texture>(texComp.texture_guid);
+
+		//		if (texture && texture->id != 0)
+		//		{
+		//			glActiveTexture(GL_TEXTURE0); // Diffuse always on unit 0
+		//			glBindTexture(texture->target, texture->id);
+		//			forward_shader->setUniform("DiffuseTex", 0);
+		//			hasTexture = true;
+		//		}
+		//	}
+		//	forward_shader->setUniform("UseTexture", hasTexture);
+
+		//	// Bind normal map (separate check)
+		//	bool hasNormalMap = false;
+		//	if (registry.all_of<NormalMapComponent>(entity))
+		//	{
+		//		auto& normalComp = registry.get<NormalMapComponent>(entity);
+		//		auto normalMap = AssetManagerSystem::GetResource<Scene::Texture>(normalComp.normalmap_guid);
+
+		//		if (normalMap && normalMap->id != 0)
+		//		{
+		//			glActiveTexture(GL_TEXTURE2); // Normal map on unit 2
+		//			glBindTexture(GL_TEXTURE_2D, normalMap->id);
+		//			forward_shader->setUniform("NormalMap", 2);
+		//			hasNormalMap = true;
+		//		}
+		//	}
+		//	forward_shader->setUniform("UseNormalMap", hasNormalMap);
+
+		//	forward_shader->setMaterialUniforms(material);
+		//	CalculateModelMatrix(transform, transform.modelMatrix);
+		//	forward_shader->setUniform("M", transform.modelMatrix);
+
+		//	glDrawElements(GL_TRIANGLES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
+
+		//	if (isCheckerboard) {
+		//		glCullFace(GL_BACK);
+		//	}
+
+		//	// --- 3.5. Debug Drawing ---
+		//	if (show_debugDraw) {
+		//		// 1) Ensure a wire VAO exists for this mesh
+		//		auto itWire = meshCacheWire.find(mesh.meshName);
+		//		if (itWire == meshCacheWire.end()) {
+		//			// Rebuild cache entries (creates wire VAO/EBO too)
+		//			LoadAndCacheMesh(mesh.meshName);
+		//			itWire = meshCacheWire.find(mesh.meshName);
+		//		}
+		//		if (itWire == meshCacheWire.end())
+		//			break; // nothing to draw for this mesh
+
+		//		const auto& [wireVAO, wireIndexCount] = itWire->second;
+
+		//		// 2) Save minimal GL state we’re about to touch
+		//		const GLboolean depthEnabled = glIsEnabled(GL_DEPTH_TEST);
+		//		const GLboolean cullEnabled = glIsEnabled(GL_CULL_FACE);
+
+		//		// 3) Overlay: draw lines without depth testing so they’re always visible
+		//		glDisable(GL_DEPTH_TEST);
+		//		glDisable(GL_CULL_FACE);
+		//		glLineWidth(1.0f);                 // ES often clamps to 1.0
+
+		//		forward_shader->setUniform("Pass", 2);     // flat debug branch in your frag shader
+		//		forward_shader->setUniform("M", transform.modelMatrix);
+
+		//		glBindVertexArray(wireVAO);
+		//		glDrawElements(GL_LINES, (GLsizei)wireIndexCount, GL_UNSIGNED_INT, 0);
+		//		glBindVertexArray(0);
+
+		//		// 4) Restore shader + GL state
+		//		forward_shader->setUniform("Pass", 0);
+		//		if (cullEnabled)  glEnable(GL_CULL_FACE);  else glDisable(GL_CULL_FACE);
+		//		if (depthEnabled) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
+		//	}
+		//}
 
 		// --- 4. RENDER SKYBOX ---
 		glDepthFunc(GL_LEQUAL);
@@ -541,6 +602,9 @@ namespace EngineFramework
 		glm::mat4 V = Camera::getLookAt(*active_camera);
 		float aspect = (screen.y > 0) ? (float)screen.x / screen.y : 1.0f;
 		glm::mat4 P = Camera::getPerspective(*active_camera, aspect);
+
+		m_instancingSystem->PrepareBatches();
+		m_instancingSystem->PrintStatistics();
 
 		// Geometry Pass
 		GeometryPass(V, P);

@@ -7,24 +7,34 @@ in vec3 Position;
 in vec3 Normal;
 in vec2 TexCoord;
 in mat3 TBN;
+in flat uint InstanceIndex;
 
 // G-buffer outputs
 layout(location=0) out vec3 gPosition;
 layout(location=1) out vec3 gNormal;
 layout(location=2) out vec4 gAlbedoSpec; // RGB = albedo, A = specular intensity
 
-struct Material {
-    float rough;
-    float metal;
-    vec3 color;
+struct InstanceData {
+    mat4 modelMatrix;
+    vec4 tintColor;
+    
     vec3 Ka;
+    float roughness;
+    
     vec3 Kd;
+    float metallic;
+    
     vec3 Ks;
     float shininess;
-    float effect;          
+    
+    uint effect;
+    uint padding[3];
 };
 
-uniform Material material;
+layout(std430, binding=0) readonly buffer InstanceBuffer {
+    InstanceData instances[];
+};
+
 uniform bool UseTexture;
 uniform bool UseNormalMap;
 
@@ -32,6 +42,9 @@ layout(binding=0) uniform sampler2D DiffuseTex;
 layout(binding=2) uniform sampler2D NormalMap;
 
 void main() {
+
+    InstanceData instance = instances[InstanceIndex];
+
     // 1. Store position in view space
     gPosition = Position;
     
@@ -47,13 +60,13 @@ void main() {
     gNormal = normal;
     
     // 3. Store albedo & material properties
-    vec3 albedo = material.color;
+    vec3 albedo = instance.tintColor.rgb;
     if (UseTexture) {
         vec4 texColor = texture(DiffuseTex, TexCoord);
         albedo = texColor.rgb;
     }
     
-    float specular = material.metal; // Store metallicity in alpha channel
+    float specular = instance.metallic; // Store metallicity in alpha channel
     gAlbedoSpec = vec4(albedo, specular);
     
     // Note: We can't handle effects like discard and checkerboard here,

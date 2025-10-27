@@ -145,6 +145,12 @@
 			"vao": 0
 		},
 		"SceneRenderPass": null,
+		"TextureComponent": {
+			"texture_guid": [
+				574965809472389121,
+				3711223656383638553
+			]
+		},
 		"TransformComponent": {
 			"modelMatrix": [
 				[
