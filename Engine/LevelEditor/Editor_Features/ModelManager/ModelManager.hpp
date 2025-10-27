@@ -60,7 +60,7 @@ namespace EngineFramework
         //==Represents the top, left and right pane.
         void DrawSelectedTypes();
         void DrawTypeList(const std::unordered_map<std::string, std::vector<int>>& archtype_type_map);
-        void DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::instance_guid, std::shared_ptr<Archtype>>>& archtype_arr);
+        void DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>>& archtype_arr);
 
         //==Popup menus for archtypes that were right clicked in the archtype table. 
         /*    

@@ -107,7 +107,7 @@ namespace EngineFramework
 		\param spacing per_row
 		- The space between elements, number of elements per row of the table.
 	*/
-	void ModelManager::DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::instance_guid, std::shared_ptr<Archtype>>>& archtype_arr)
+	void ModelManager::DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>>& archtype_arr)
 	{
 		//==Display table of archtypes in the right pane
 		const float avail = ImGui::GetContentRegionAvail().x;
@@ -179,7 +179,7 @@ namespace EngineFramework
 
 					//==Accessing archtype name and texture (if available).
 					auto& pair = archtype_arr[archtype_idx];
-					xresource::instance_guid archtype_guid = pair.first;
+					xresource::full_guid archtype_guid = pair.first;
 					std::shared_ptr<Archtype> archtype = pair.second;
 
 					std::string archtype_name = AssetManagerSystem::GetName(archtype_guid);
@@ -255,7 +255,7 @@ namespace EngineFramework
 			//==Array and Map of archtypes.
 			//Note! This is inefficient due to copying every frame, but is the simplest way.
 			//To make a persistent map ensure that it is updated on every change.
-			const std::vector<std::pair<xresource::instance_guid, std::shared_ptr<Archtype>>> archtype_arr = AssetManagerSystem::GetAllResourceOfType<Archtype>(AssetManagerSystem::ARCHTYPE_GUID);
+			const std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>> archtype_arr = AssetManagerSystem::GetAllResourceOfType<Archtype>(AssetManagerSystem::ARCHTYPE_GUID);
 			std::unordered_map<std::string, std::vector<int>> archtype_type_map{};
 			for (int i = 0; i < archtype_arr.size(); i++)
 			{
