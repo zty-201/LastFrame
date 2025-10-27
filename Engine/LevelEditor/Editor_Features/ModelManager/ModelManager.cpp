@@ -135,6 +135,44 @@ namespace EngineFramework
 			it++;
 		}
 	}
+	namespace
+	{
+		//Helper function that draws an archtype image button. 
+		GLuint DrawArchtypeElement(const std::string& archtype_name, const std::shared_ptr<Archtype> archtype, float cell_w, entt::id_type texture_comp_id)
+		{
+			std::vector<entt::meta_any> component_arr = archtype->component_arr;
+			GLuint texture_id{};
+			/*
+				Iterate over all component types and get the texture id if possible.
+				If there's an error, avoid displaying texture but still display the model.
+			*/
+			try
+			{
+				for (const entt::meta_any& comp : component_arr)
+				{
+					if (comp.type().id() != texture_comp_id) continue;
+
+					//Get the texture asset for drawing
+					xresource::full_guid texture_guid = comp.cast<TextureComponent>().texture_guid;
+					std::shared_ptr<Scene::Texture> texture = AssetManagerSystem::GetResource<Scene::Texture>(texture_guid);
+					if (texture) texture_id = texture->id;
+					break;
+				}
+			}
+			catch (std::exception& e)
+			{
+				LOGE("Error in Level Editor ModelManager when getting texture: Archtype %s : %s", archtype_name.c_str(), e.what());
+			}
+
+			//==Drawing of archtype button. Will not draw an image if not available.
+			if (ImGui::ImageButton(archtype_name.c_str(), (ImTextureID)texture_id, ImVec2(cell_w, cell_w), { 0, 1 }, { 1, 0 }))
+			{
+
+			}
+			return texture_id;
+		}
+	}
+	
 
 	/*
 		Draws the table of archtypes in the right pane.
@@ -143,7 +181,7 @@ namespace EngineFramework
 	*/
 	void ModelManager::DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>>& archtype_arr)
 	{
-		//==Display table of archtypes in the right pane
+		//==ImGui formatting
 		const float avail = ImGui::GetContentRegionAvail().x;
 		//Based on current window size, make the right pane 2/3 width by default.
 		CALL_AT_END(imgui_child_right_pane, ImGui::EndChild(););
@@ -165,17 +203,9 @@ namespace EngineFramework
 		If the archtype has a texture, that texture is drawn as part of the image button.
 
 		Display
-		- Model type
+		- Model type header
 		- Name of archtype
 		- Texture image if possible
-
-		Popup Menu (Right click archtype button):
-		- Enable dragdrop into scene (create instance with default transform at where camera is pointing, with option to choose normalized or world pos).
-        - Creation of instance
-		- Copy of existing archtype
-		- Rename of archtype
-		- Switch archtype model_type
-        - Deletion of archtype
 		*/
 		
 		entt::id_type texture_comp_id = entt::resolve<TextureComponent>().id();
@@ -198,11 +228,10 @@ namespace EngineFramework
 				//==Display archtypes belonging to that group.
 				const std::vector<int>& selected_archtype_arr = archtype_type_map[model_type];
 				if (selected_archtype_arr.empty()) continue;
-
-				int i = 0;
-				for (int archtype_idx : selected_archtype_arr)
+				for (int i = 0; i< selected_archtype_arr.size(); i++)
 				{
-					//==Setting of table element
+					int archtype_idx = selected_archtype_arr[i];
+					//==Setting of table element formatting
 					if (i % per_row == 0) ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(i % per_row);
 					ImGui::PushID(id++);
@@ -211,43 +240,28 @@ namespace EngineFramework
 					ImGui::BeginGroup();
 					CALL_AT_END(imgui_endgroup, ImGui::EndGroup(););
 
-					//==Accessing archtype name and texture (if available).
+					//==Accessing archtype name and data (if available).
 					auto& pair = archtype_arr[archtype_idx];
 					xresource::full_guid archtype_guid = pair.first;
 					std::shared_ptr<Archtype> archtype = pair.second;
-
 					std::string archtype_name = AssetManagerSystem::GetName(archtype_guid);
-					std::vector<entt::meta_any> component_arr = archtype->component_arr;
-					GLuint texture_id{};
-					/*
-						Iterate over all component types and get the texture id if possible.
-						If there's an error, avoid displaying texture but still display the model.
-					*/
-					try
-					{
-						for (const entt::meta_any& comp : component_arr)
-						{
-							if (comp.type().id() != texture_comp_id) continue;
 
-							//Get the texture asset for drawing
-							xresource::full_guid texture_guid = comp.cast<TextureComponent>().texture_guid;
-							std::shared_ptr<Scene::Texture> texture = AssetManagerSystem::GetResource<Scene::Texture>(texture_guid);
-							if (texture) texture_id = texture->id;
-							break;
-						}
-					}
-					catch (std::exception& e)
-					{
-						LOGE("Error in Level Editor ModelManager when getting texture: Archtype %s : %s", archtype_name.c_str(), e.what());
-					}
+					//==Draw Archtype element (image button)
+					GLuint archtype_texture = DrawArchtypeElement(archtype_name, archtype, cell_w, texture_comp_id);
 
-					//==Drawing of archtype button. Will not draw an image if not available.
-					if (ImGui::ImageButton(archtype_name.c_str(), (ImTextureID)texture_id, ImVec2(cell_w, cell_w), { 0, 1 }, { 1, 0 }))
+					//==Set drag and drop payload for the archtype, to allow scene to receive selected archtype name for instantiation.
+					if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 					{
+						selected_drag_drop_archtype = archtype_name;
+						ImGui::SetDragDropPayload("SELECTED_MODEL_NAME", &selected_drag_drop_archtype, selected_drag_drop_archtype.size());
 
+						ImGui::TextUnformatted(selected_drag_drop_archtype.c_str());
+						ImGui::Image((ImTextureID)archtype_texture, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
+
+						ImGui::EndDragDropSource();
 					}
+					//Label the archtype element.
 					ImGui::TextWrapped(archtype_name.c_str());
-					i++;
 				}
 			}
 		}
@@ -269,6 +283,8 @@ namespace EngineFramework
 
 			Temporary containers are refreshed every frame.
 			Persistent selected_types will be cleared when the feature is closed.
+
+			Note: Do not persistently store archtype shared ptrs, use GetAllResources instead.
 		*/
 
 		//// Give size once; don't lock it every frame

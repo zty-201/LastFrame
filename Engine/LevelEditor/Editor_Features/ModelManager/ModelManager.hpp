@@ -63,15 +63,24 @@ namespace EngineFramework
         void DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>>& archtype_arr);
 
         //==Popup menus for archtypes that were right clicked in the archtype table==//
-       
-        //==Archtype Modification/Creation==//
-        //Creates archtype, then reloads all archtypes.
-        void CreateArchtype(const std::string& name);
-        //
-        void RenameArchtype(const std::string& old_name, const std::string& new_name)
+        
 
+        //==Archtype Modification/Creation==//
+        //Creates archtype file, then reloads all archtypes.
+        void CreateArchtype(const std::string& name);
+        //Creates archtype file of "name" from existing archtype, then reloads all archtypes.
+        void CopyArchtype(const std::string& name, const std::shared_ptr<Archtype> existing_archtype);
+        //Rename archtype file, modifying guid.meta accordingly.
+        void RenameArchtype(const std::string& old_name, const std::string& new_name);
+        //Deletes archtype file, modifying guid.meta accordingly. Archtypes are then reloaded.
+        void DeleteArchtype(const std::string& name);
+
+        
         //The map of model types selected, allowing the user to pick which model types they want to see from the list.
         std::unordered_map<std::string, bool> selected_types{};
+        
+        //Name of the archtype selected by drag and drop
+        std::string selected_drag_drop_archtype{};
     };
 }
 
