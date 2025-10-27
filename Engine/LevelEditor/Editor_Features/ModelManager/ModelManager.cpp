@@ -43,6 +43,40 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 //#include <iostream>
 namespace EngineFramework
 {
+
+	/*
+	   * TODO:
+		   Popup Menu (Right click archtype button):
+		   - Enable dragdrop into scene (create instance with default transform at where camera is pointing, with option to choose normalized or world pos).
+		   --> First create instance
+		   --> Next do registry.emplace_or_replace.
+		   --> Do this in a function overload for GameObjectSystem::CreateInstance().
+		   - Creation of instance
+		   --> Instead of drag and drop, just create as is without transform component added.
+		   
+		   - Switch archtype model_type
+
+		   - Copy of existing archtype
+		   --> Add archtype file with different name.
+		   --> Serialize existing archtype, and write to that file.
+		   --> Reload archtypes
+		   - Rename of archtype
+		   --> Rename archtype file and in corresponding guid.meta file.
+		   --> Call ModifyNameMappings for assetmanager.
+		   - Deletion of archtype
+		   --> Delete the archtype file and in corresponding guid.meta file.
+		   --> Reload archtypes (so entities won't be saved with said archtype anymore). This also modifies the name_guid and guid_name maps.
+
+		   Others
+		   - Creation of new archtype
+		   --> Add archtype file
+		   --> Reload archtypes
+
+		   When renaming or deleting an archtype, ensure
+		   - guid.meta file is changed
+		   - ModifyNameMappings or ReloadAllResourcesOfType is called, to update resource maps.
+	   */
+
 	ModelManager::ModelManager() {
 		LOGI("Lfeature: Model Manager CREATED");
 	}

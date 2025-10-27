@@ -43,10 +43,8 @@
 
 		0. Renaming Asset
 		- Note: Asset path should stay in the same folder.
-		- After renaming the asset file itself, parse guid.meta file and look for the old asset name.
-		- change that old name to the new name. e.g. "old_name" -> guid becomes "new_name" -> guid.
-		- Finally, change guid_to_name mapping (for level editor display of guids as readable names). 
-		- Unless accounted for in code, name_to_guid mapping should not change. otherwise for example a graphic system using "Basic" shader will not be able to find it any longer.
+		- After renaming the asset file itself, parse guid.meta file within the same folder and look for the old asset name. Change that old name to the new name. e.g. "old_name" -> guid becomes "new_name" -> guid.
+		- Finally, change guid_to_name mapping (for level editor display of guids as readable names) and name_to_guid mapping using ModifyNameMapping().
 
 		1. Accessing Asset
 		- For every component, all asset types like texture, shader, mesh, audio file etc. are stored as xresource::full_guid.
@@ -232,7 +230,7 @@ namespace EngineFramework {
 		friend AssetWindow;
 #endif
 		
-
+		//== Functions that Level Editor can use.
 		//Loads all resources listed in ASSET_CONFIG_FILE.
 		static void LoadAllResources();
 
@@ -245,8 +243,10 @@ namespace EngineFramework {
 		//Delete a resource from all maps, and calls destructors.
 		static void RemoveResource(const xresource::full_guid& guid);
 
+		//Modifies name_to_guid and guid_to_name mappings. If renaming an asset, the actual asset file and associated guid.meta file must be changed as well.
+		static void ModifyNameMappings(xresource::type_guid type, const std::string& old_name, const std::string& new_name);
 
-
+		static std::filesystem::path GetFolderPath(const std::string& type);
 
 		//== Helper Functions
 
@@ -306,6 +306,8 @@ namespace EngineFramework {
 		static inline std::filesystem::path extern_folder_prefix{};
 #endif
 		//==Asset Loading
+		// Stores the folderpaths for each type, modified when LoadAllResource is called. Does not account for AssetFolderPrefix.
+		static inline std::unordered_map<std::string, std::filesystem::path> type_folderpath_map;
 		// <resource_type, func> that maps a resource type to a function. The function loads all assets within the directory, and sets guid_name_map and name_guid_map as well.
 		static inline std::unordered_map<std::string, std::function<bool(const std::filesystem::path&)>> asset_loader_map{};
 		//For precompiling assets
@@ -318,8 +320,6 @@ namespace EngineFramework {
 		static inline std::unordered_map<xresource::full_guid, std::string> guid_name_map{};
 		// This is used to get guids from human-readable names, like for anything "hardcoded", e.g. using a "Basic" shader. 
 		// Note that type_guid is requested jic there are different asset types with the same name.
-		// uint64_t is used for type_guid to allow hashing for unordered_map.
-		// <type, <string, guid>>
 		static inline std::unordered_map<xresource::type_guid, std::unordered_map<std::string, xresource::instance_guid>> name_guid_map{};
 	};
 

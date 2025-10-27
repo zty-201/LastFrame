@@ -425,6 +425,7 @@ namespace EngineFramework {
 		for (auto& [resource_type, folderpath_string] : config_json.items())
 		{
 			std::filesystem::path folder_path{ folderpath_string.get<std::string>() };
+			type_folderpath_map[resource_type] = folder_path;
 			//Compile if needed, then load from compiled folder.
 			if (compilers.find(resource_type) != compilers.end())
 			{
@@ -756,6 +757,27 @@ namespace EngineFramework {
 			break;
 		}
 	}
+
+	void AssetManagerSystem::ModifyNameMappings(xresource::type_guid type, const std::string& old_name, const std::string& new_name)
+	{
+		//Modify name_guid_map and guid_name_map
+		xresource::full_guid asset_guid = GetFullGuid(type, old_name);
+		guid_name_map[asset_guid] = new_name;
+		//Add new entry and delete old entry.
+		name_guid_map[type][new_name] = asset_guid.m_Instance;
+		name_guid_map[type].erase(old_name);
+	}
+
+	std::filesystem::path AssetManagerSystem::GetFolderPath(const std::string& type)
+	{
+		auto result = type_folderpath_map.find(type);
+		if (result != type_folderpath_map.end())
+		{
+			return result->second;
+		}
+		return {};
+	}
+
 
 	//Reloads all resource of a specific type, and calls destructors in the process.
 	void AssetManagerSystem::ReloadAllResourcesOfType(std::string type, xresource::type_guid type_guid)
