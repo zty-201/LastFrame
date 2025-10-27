@@ -7,6 +7,7 @@ layout(location=0) in vec3 VertexPosition;
 layout(location=1) in vec3 VertexNormal;
 layout(location=2) in vec2 VertexTexCoord;
 layout(location=3) in vec4 VertexTangent;
+layout(location=4) in mat4 InstanceModelMatrix;
 
 out vec3 Position;
 out vec3 Normal;
@@ -14,7 +15,7 @@ out vec2 TexCoord;
 out vec3 Vec;
 out mat3 TBN;
 
-uniform mat4 M;
+//uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 uniform int Pass;
