@@ -14,7 +14,7 @@
 #include "TextureComponent.h"
 #include "NormalMapComponent.h"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
-
+#include "MetaInspector.hpp"
 /*
 	This is for third-party types.
 	For your own types, simply put to/from_json in global namespace or in the respective namespace of the type e.g. namespace hello{ to/fromjson}
@@ -297,6 +297,7 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
 		// Helper function to return a meta_any wrapping a reference
 
+		// TODO - Register additional components (script, audio etc) and remember to tag them when registering (refer to TextureComponent)
 		// === Register TransformComponent ===
 		entt::meta_factory<TransformComponent>()
 			.type("TransformComponent")
@@ -352,7 +353,7 @@ namespace EngineFramework
 
 
 		// === Register CameraComponent ===
-		// Commented out certain fields that I do not want it to appear in inspector (can uncomment them out if need to)
+		// Tag assets that need needs a dropdown
 		entt::meta_factory<CameraComponent>()
 			.type("CameraComponent")
 			.data<&CameraComponent::camType>("camType")
@@ -373,6 +374,7 @@ namespace EngineFramework
 		entt::meta_factory<TextureComponent>()
 			.type("TextureComponent")
 			.data<&TextureComponent::texture_guid>("texture_guid")
+			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture }) // Need to add tags like that for certain components
 			.func<&Emplacer<TextureComponent>::EmplaceComponent>("emplace")
 			.func<&Getter<TextureComponent>::GetComponent>("get")
 			.func<&GetRef<TextureComponent>>("get_ref");
