@@ -17,6 +17,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "pch.hpp"
 #include "InspectorPanel.hpp"
 #include "MetaInspector/MetaInspector.hpp"
+#include "System_GameObjectSystem.hpp"
+#include <sstream>
 #include <imgui.h>
 
 namespace EditorFeatures {
@@ -48,6 +50,17 @@ namespace EditorFeatures {
             ImGui::End();
             return;
         }
+
+        std::string entity_name = EngineFramework::GameObjectSystem::GetEntityName(e);
+        if (entity_name.empty()) {
+            std::ostringstream label;
+            label << "Entity 0x" << std::uppercase << std::setw(8) << std::setfill('0') << static_cast<unsigned>(entt::to_integral(e));
+            entity_name = label.str();
+        }
+
+        ImGui::TextUnformatted(entity_name.c_str());
+        ImGui::Separator();
+
 
         // Actual draw
         for (auto&& [type_id, storage] : reg.storage()) {

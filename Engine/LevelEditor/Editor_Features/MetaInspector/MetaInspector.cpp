@@ -46,8 +46,17 @@ namespace EditorFeatures {
 		{"MeshComponent", {"vao", "indexCount"}},
 		{"LightComponent", {"L"}},
 		{"TransformComponent", {"modelMatrix"}},
-		{"MaterialComponent", {"Ka", "Kd", "Ks", "shininess", "effect"}}
+		{"MaterialComponent", {"Ka", "Kd", "Ks", "shininess", "effect", "materialName"}},
+		{"NormalMapComponent", {"normalmap_guid"}} // Hidden for now - testing purposes
 	};
+
+	struct AssetPickerOptions {
+		xresource::type_guid type_guid;
+		std::string_view suffix;
+		std::vector<std::pair<xresource::instance_guid, std::string>> entries;
+	};
+
+	using AssetDisplayFormatter = std::function<std::string(const xresource::full_guid& guid, std::string display_name, std::string_view suffix)>;
 
 	static std::string to_lower(std::string s) {
 		std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
@@ -87,50 +96,93 @@ namespace EditorFeatures {
 		return oss.str();
 	}
 
-	static std::string describe_guid_name(const xresource::full_guid& guid, std::string display)
-	{
-		if (guid.m_Type == EngineFramework::AssetManagerSystem::TEXTURE_GUID) {
-			return display;
-		}
-		if (guid.m_Type == EngineFramework::AssetManagerSystem::CUBEMAP_GUID) {
-			return display + " (Cubemap)";
-		}
-		return display + " (Unknown)";
-	}
-
-	static bool draw_texture_guid_picker(const char* label, xresource::full_guid& guid, const char* none_label = "None")
-	{
+	static bool draw_asset_guid_picker(const char* label, xresource::full_guid& guid, std::string_view none_label, const std::vector<AssetPickerOptions>& sources, AssetDisplayFormatter formatter = {}) {
 		using EngineFramework::AssetManagerSystem;
-		using SceneTexture = Scene::Texture;
 
-		const auto textures = AssetManagerSystem::GetAllResourceOfType<SceneTexture>(AssetManagerSystem::TEXTURE_GUID);
-		const auto cubemaps = AssetManagerSystem::GetAllResourceOfType<SceneTexture>(AssetManagerSystem::CUBEMAP_GUID);
+		std::string curr = guid.empty() ? std::string{ none_label } : AssetManagerSystem::GetName(guid.m_Instance);
 
-		std::string current = guid.empty() ? none_label : AssetManagerSystem::GetName(guid.m_Instance);
-		if (current.empty()) {
-			current = format_guid_hex(guid.m_Instance.m_Value);
+		if (curr.empty() && !guid.empty()) {
+			curr = format_guid_hex(guid.m_Instance.m_Value);
 		}
-		if (!guid.empty()) {
-			current = describe_guid_name(guid, current);
+
+		if (formatter && !guid.empty()) {
+			curr = formatter(guid, std::move(curr), {});
 		}
 
 		bool changed = false;
+
+		for (const auto& source : sources) {
+			for (const auto& [instance, display] : source.entries) {
+				std::string row_label = display.empty() ? format_guid_hex(instance.m_Value) : display;
+				const xresource::full_guid candidate{ instance, source.type_guid };
+
+				if (formatter) {
+					row_label = formatter(candidate, std::move(row_label), source.suffix);
+				}
+				else if (!source.suffix.empty()) {
+					row_label += " ";
+					row_label.append(source.suffix);
+				}
+
+				const bool selected = (!guid.empty() && guid == candidate);
+
+				if (ImGui::Selectable(row_label.c_str(), selected)) {
+					guid = candidate;
+					changed = true;
+				}
+
+				if (selected) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+		}
+		ImGui::EndCombo();
+	}
+
+	static bool draw_asset_guid_picker(
+		const char* label,
+		xresource::full_guid& guid,
+		std::string_view none_label,
+		const std::vector<AssetPickerOptions>& sources,
+		AssetDisplayFormatter formatter = {}
+	) {
+		using EngineFramework::AssetManagerSystem;
+
+		std::string current = guid.empty()
+			? std::string{ none_label }
+		: AssetManagerSystem::GetName(guid.m_Instance);
+		if (current.empty() && !guid.empty()) {
+			current = format_guid_hex(guid.m_Instance.m_Value);
+		}
+		if (formatter && !guid.empty()) {
+			current = formatter(guid, std::move(current), {});
+		}
+
+		bool changed = false;
+
 		if (ImGui::BeginCombo(label, current.c_str())) {
-			if (ImGui::Selectable(none_label, guid.empty())) {
+			if (ImGui::Selectable(none_label.data(), guid.empty())) {
 				guid.clear();
 				changed = true;
 			}
 
-			auto draw_entries = [&](const auto& list, const xresource::type_guid& type, std::string_view suffix) {
-				for (const auto& [instance, _] : list) {
-					std::string name = AssetManagerSystem::GetName(instance);
-					if (name.empty()) {
-						name = format_guid_hex(instance.m_Value);
+			for (const auto& source : sources) {
+				for (const auto& [instance, display] : source.entries) {
+					std::string row_label = display.empty()
+						? format_guid_hex(instance.m_Value)
+						: display;
+					const xresource::full_guid candidate{ instance, source.type_guid };
+
+					if (formatter) {
+						row_label = formatter(candidate, std::move(row_label), source.suffix);
 					}
-					const xresource::full_guid candidate{ instance, type };
-					std::string label_text = suffix.empty() ? name : (name + " " + std::string{ suffix });
+					else if (!source.suffix.empty()) {
+						row_label += " ";
+						row_label.append(source.suffix);
+					}
+
 					const bool selected = (!guid.empty() && guid == candidate);
-					if (ImGui::Selectable(label_text.c_str(), selected)) {
+					if (ImGui::Selectable(row_label.c_str(), selected)) {
 						guid = candidate;
 						changed = true;
 					}
@@ -138,14 +190,114 @@ namespace EditorFeatures {
 						ImGui::SetItemDefaultFocus();
 					}
 				}
-			};
+			}
 
-			draw_entries(textures, AssetManagerSystem::TEXTURE_GUID, {});
-			draw_entries(cubemaps, AssetManagerSystem::CUBEMAP_GUID, "(Cubemap)");
 			ImGui::EndCombo();
 		}
+
 		return changed;
 	}
+
+	static bool draw_texture_guid_picker(const char* label, xresource::full_guid& guid, const char* none_label = "None") {
+		using EngineFramework::AssetManagerSystem;
+		using SceneTexture = Scene::Texture;
+
+		auto build_entries = [](const auto& list) {
+			std::vector<std::pair<xresource::instance_guid, std::string>> out;
+			out.reserve(list.size());
+			for (const auto& [instance, _] : list) {
+				std::string name = AssetManagerSystem::GetName(instance);
+				if (name.empty()) {
+					name = format_guid_hex(instance.m_Value);
+				}
+				out.emplace_back(instance, std::move(name));
+			}
+			return out;
+			};
+
+		std::vector<AssetPickerOptions> sources = {
+			{ AssetManagerSystem::TEXTURE_GUID,
+			  {},
+			  build_entries(AssetManagerSystem::GetAllResourceOfType<SceneTexture>(
+				  AssetManagerSystem::TEXTURE_GUID)) },
+			{ AssetManagerSystem::CUBEMAP_GUID,
+			  "(Cubemap)",
+			  build_entries(AssetManagerSystem::GetAllResourceOfType<SceneTexture>(
+				  AssetManagerSystem::CUBEMAP_GUID)) }
+		};
+
+		auto formatter = [](const xresource::full_guid& candidate,
+			std::string display,
+			std::string_view suffix) {
+				if (!suffix.empty()) {
+					display += " ";
+					display.append(suffix);
+				}
+				return display;
+			};
+
+		return draw_asset_guid_picker(label, guid, none_label, sources, formatter);
+	}
+
+	//static std::string describe_guid_name(const xresource::full_guid& guid, std::string display)
+	//{
+	//	if (guid.m_Type == EngineFramework::AssetManagerSystem::TEXTURE_GUID) {
+	//		return display;
+	//	}
+	//	if (guid.m_Type == EngineFramework::AssetManagerSystem::CUBEMAP_GUID) {
+	//		return display + " (Cubemap)";
+	//	}
+	//	return display + " (Unknown)";
+	//}
+
+	//static bool draw_texture_guid_picker(const char* label, xresource::full_guid& guid, const char* none_label = "None")
+	//{
+	//	using EngineFramework::AssetManagerSystem;
+	//	using SceneTexture = Scene::Texture;
+
+	//	const auto textures = AssetManagerSystem::GetAllResourceOfType<SceneTexture>(AssetManagerSystem::TEXTURE_GUID);
+	//	const auto cubemaps = AssetManagerSystem::GetAllResourceOfType<SceneTexture>(AssetManagerSystem::CUBEMAP_GUID);
+
+	//	std::string current = guid.empty() ? none_label : AssetManagerSystem::GetName(guid.m_Instance);
+	//	if (current.empty()) {
+	//		current = format_guid_hex(guid.m_Instance.m_Value);
+	//	}
+	//	if (!guid.empty()) {
+	//		current = describe_guid_name(guid, current);
+	//	}
+
+	//	bool changed = false;
+	//	if (ImGui::BeginCombo(label, current.c_str())) {
+	//		if (ImGui::Selectable(none_label, guid.empty())) {
+	//			guid.clear();
+	//			changed = true;
+	//		}
+
+	//		auto draw_entries = [&](const auto& list, const xresource::type_guid& type, std::string_view suffix) {
+	//			for (const auto& [instance, _] : list) {
+	//				std::string name = AssetManagerSystem::GetName(instance);
+	//				if (name.empty()) {
+	//					name = format_guid_hex(instance.m_Value);
+	//				}
+	//				const xresource::full_guid candidate{ instance, type };
+	//				std::string label_text = suffix.empty() ? name : (name + " " + std::string{ suffix });
+	//				const bool selected = (!guid.empty() && guid == candidate);
+	//				if (ImGui::Selectable(label_text.c_str(), selected)) {
+	//					guid = candidate;
+	//					changed = true;
+	//				}
+	//				if (selected) {
+	//					ImGui::SetItemDefaultFocus();
+	//				}
+	//			}
+	//		};
+
+	//		draw_entries(textures, AssetManagerSystem::TEXTURE_GUID, {});
+	//		draw_entries(cubemaps, AssetManagerSystem::CUBEMAP_GUID, "(Cubemap)");
+	//		ImGui::EndCombo();
+	//	}
+	//	return changed;
+	//}
 
 	void DrawMetaObject(entt::meta_type& mt, entt::meta_any& obj) {
 		//const char* typeName = mt.name();
