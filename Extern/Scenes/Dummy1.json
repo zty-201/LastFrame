@@ -145,12 +145,6 @@
 			"vao": 0
 		},
 		"SceneRenderPass": null,
-		"TextureComponent": {
-			"texture_guid": [
-				574965809472389121,
-				3711223656383638553
-			]
-		},
 		"TransformComponent": {
 			"modelMatrix": [
 				[
@@ -301,8 +295,8 @@
 				0.800000011920929,
 				0.20000000298023224
 			],
-			"effect": 1.0,
-			"materialName": "Discard",
+			"effect": 0.0,
+			"materialName": "PBR",
 			"metal": 0.0,
 			"rough": 0.5,
 			"shininess": 32.0
