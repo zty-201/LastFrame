@@ -137,10 +137,47 @@ namespace EngineFramework
 	}
 
 	//Handles the popup menu when rightclicking the archtype element
-	void ModelManager::ArchtypePopupMenu()
+	void ModelManager::ArchtypePopupMenu(std::string archtype_name, std::shared_ptr<Archtype> archtype)
 	{
+		//Open a popup menu if right clicking the element.
+		if (!ImGui::BeginPopupContextWindow("Archtype Menu", ImGuiMouseButton_Right)) return;
+		CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
 
-
+		static char buffer[100];
+		buffer[0] = '\0';
+		if (ImGui::MenuItem("Copy Archtype"))
+		{
+			ImGui::Begin("Enter New Archtype Name");
+			CALL_AT_END(imgui_endcopywindow, ImGui::End(););
+			ImGui::InputText("New Name", buffer, 100);
+			if (ImGui::Button("Submit"))
+			{
+				delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::COPY, {}, buffer, archtype);
+				buffer[0] = '\0';
+			}
+		}
+		if (ImGui::MenuItem("Rename Archtype"))
+		{
+			ImGui::Begin("Enter New Archtype Name");
+			CALL_AT_END(imgui_endrenamewindow, ImGui::End(););
+			ImGui::InputText("New Name", buffer, 100);
+			if (ImGui::Button("Submit"))
+			{
+				delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::RENAME, archtype_name, buffer);
+				buffer[0] = '\0';
+			}
+		}
+		if (ImGui::MenuItem("Change ModelType"))
+		{
+			ImGui::Begin("Enter Model Type");
+			CALL_AT_END(imgui_endmodeltypewindow, ImGui::End(););
+			ImGui::InputText("Model Type", buffer, 100);
+			if (ImGui::Button("Submit"))
+			{
+				archtype->model_type = buffer;
+				buffer[0] = '\0';
+			}
+		}
 	}
 
 	namespace
@@ -217,60 +254,62 @@ namespace EngineFramework
 		*/
 
 		entt::id_type texture_comp_id = entt::resolve<TextureComponent>().id();
+		if (!ImGui::BeginTable("model-grid", per_row, ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_NoBordersInBody)) return;
 		CALL_AT_END(imgui_endtable, ImGui::EndTable(););
-		if (ImGui::BeginTable("model-grid", per_row, ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_NoBordersInBody))
+
+		int id = 0; //unique id for imgui item labelling, to prevent name clashes.
+		//Iterate over all archtypes belonging to the selected model types.
+		for (auto& selected_type : selected_types)
 		{
-			int id = 0;
-			//Iterate over all archtypes belonging to the selected model types.
-			for (auto& selected_type : selected_types)
+			//Only display selected types.
+			if (!selected_type.second) continue;
+			std::string model_type = selected_type.first;
+			std::string model_type_label = "[" + model_type + "]";
+			//==At the top of each model type group, print out the model type name
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
+			ImGui::TableHeader(model_type_label.c_str());
+
+			//==Display archtypes belonging to that group.
+			const std::vector<int>& selected_archtype_arr = archtype_type_map[model_type];
+			if (selected_archtype_arr.empty()) continue;
+			for (int i = 0; i < selected_archtype_arr.size(); i++)
 			{
-				//Only display selected types.
-				if (!selected_type.second) continue;
-				std::string model_type = selected_type.first;
-				std::string model_type_label = "[" + model_type + "]";
-				//==At the top of each model type group, print out the model type name
-				ImGui::TableNextRow();
-				ImGui::TableSetColumnIndex(0);
-				ImGui::TableHeader(model_type_label.c_str());
+				int archtype_idx = selected_archtype_arr[i];
+				//==Setting of table element formatting
+				if (i % per_row == 0) ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(i % per_row);
+				ImGui::PushID(id++);
+				CALL_AT_END(imgui_popid, ImGui::PopID(););
 
-				//==Display archtypes belonging to that group.
-				const std::vector<int>& selected_archtype_arr = archtype_type_map[model_type];
-				if (selected_archtype_arr.empty()) continue;
-				for (int i = 0; i < selected_archtype_arr.size(); i++)
+				ImGui::BeginGroup();
+				CALL_AT_END(imgui_endgroup, ImGui::EndGroup(););
+
+				//==Accessing archtype name and data (if available).
+				auto& pair = archtype_arr[archtype_idx];
+				xresource::full_guid archtype_guid = pair.first;
+				std::shared_ptr<Archtype> archtype = pair.second;
+				std::string archtype_name = AssetManagerSystem::GetName(archtype_guid);
+
+				//==Draw Archtype element (image button)
+				GLuint archtype_texture = DrawArchtypeElement(archtype_name, archtype, cell_w, texture_comp_id);
+
+				//==Set drag and drop payload for the archtype, to allow scene to receive selected archtype name for instantiation.
+				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 				{
-					int archtype_idx = selected_archtype_arr[i];
-					//==Setting of table element formatting
-					if (i % per_row == 0) ImGui::TableNextRow();
-					ImGui::TableSetColumnIndex(i % per_row);
-					ImGui::PushID(id++);
-					CALL_AT_END(imgui_popid, ImGui::PopID(););
+					selected_drag_drop_archtype = archtype_name;
+					ImGui::SetDragDropPayload("SELECTED_MODEL_NAME", &selected_drag_drop_archtype, selected_drag_drop_archtype.size());
 
-					ImGui::BeginGroup();
-					CALL_AT_END(imgui_endgroup, ImGui::EndGroup(););
+					ImGui::TextUnformatted(selected_drag_drop_archtype.c_str());
+					ImGui::Image((ImTextureID)archtype_texture, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
 
-					//==Accessing archtype name and data (if available).
-					auto& pair = archtype_arr[archtype_idx];
-					xresource::full_guid archtype_guid = pair.first;
-					std::shared_ptr<Archtype> archtype = pair.second;
-					std::string archtype_name = AssetManagerSystem::GetName(archtype_guid);
-
-					//==Draw Archtype element (image button)
-					GLuint archtype_texture = DrawArchtypeElement(archtype_name, archtype, cell_w, texture_comp_id);
-
-					//==Set drag and drop payload for the archtype, to allow scene to receive selected archtype name for instantiation.
-					if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
-					{
-						selected_drag_drop_archtype = archtype_name;
-						ImGui::SetDragDropPayload("SELECTED_MODEL_NAME", &selected_drag_drop_archtype, selected_drag_drop_archtype.size());
-
-						ImGui::TextUnformatted(selected_drag_drop_archtype.c_str());
-						ImGui::Image((ImTextureID)archtype_texture, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
-
-						ImGui::EndDragDropSource();
-					}
-					//Label the archtype element.
-					ImGui::TextWrapped(archtype_name.c_str());
+					ImGui::EndDragDropSource();
 				}
+				//Label the archtype element.
+				ImGui::TextWrapped(archtype_name.c_str());
+
+				//==Archtype popup menu, enabled when right clicking on the archtype element.
+				ArchtypePopupMenu(archtype_name, archtype);
 			}
 		}
 	}
@@ -354,7 +393,7 @@ namespace EngineFramework
 		std::filesystem::path archtype_folder = AssetManagerSystem::GetAssetFolderPrefix() / AssetManagerSystem::GetFolderPath(AssetManagerSystem::ARCHTYPE);
 		std::string archtype_extension = name + ".json";
 		std::filesystem::path archtype_path = archtype_folder / archtype_extension;
-		
+
 		//Ensure the file doesn't already exist.
 		if (std::filesystem::is_regular_file(archtype_path))
 		{
@@ -387,7 +426,7 @@ namespace EngineFramework
 		{
 			return ModelErrorCode::FILE_ALREADY_EXISTS;
 		}
-		
+
 		//Serialize the archtype into the created file, thereby copying it.
 		std::ofstream archtype_filestream{ archtype_path };
 		archtype_filestream << existing_archtype->Serialize();
@@ -414,12 +453,12 @@ namespace EngineFramework
 		{
 			return ModelErrorCode::FILE_ALREADY_EXISTS;
 		}
-		
+
 		//==Rename File
 		std::error_code result{};
 		std::filesystem::rename(old_archtype_path, new_archtype_path, result);
 		if (result) return ModelErrorCode::UNKNOWN_FAILURE;
-		
+
 		//Modify existing guid <-> name maps.
 		AssetManagerSystem::ModifyNameMappings(AssetManagerSystem::ARCHTYPE_GUID, old_name, new_name);
 
@@ -440,7 +479,7 @@ namespace EngineFramework
 			return ModelErrorCode::CANNOT_MODIFY_GUIDMETA;
 		}
 		nlohmann::json meta_json{ file_string };
-		
+
 		//==Delete old and add new archtype entry.
 		if (!meta_json.contains(old_name)) return ModelErrorCode::SUCCESS; //No need to modify if there's no existing entry.
 		xresource::instance_guid asset_guid = meta_json[old_name].get<uint64_t>();
@@ -472,7 +511,7 @@ namespace EngineFramework
 			2. Delete archtype entry from json
 			3. Write json object back to file.
 		*/
-		std::filesystem::path meta_path = archtype_folder / "guid.meta"; 
+		std::filesystem::path meta_path = archtype_folder / "guid.meta";
 		if (!std::filesystem::is_regular_file(meta_path))
 		{
 			return ModelErrorCode::CANNOT_MODIFY_GUIDMETA;
@@ -482,7 +521,7 @@ namespace EngineFramework
 		{
 			return ModelErrorCode::CANNOT_MODIFY_GUIDMETA;
 		}
-		nlohmann::json meta_json{file_string};
+		nlohmann::json meta_json{ file_string };
 
 		//==Delete entry and write back to file.
 		if (meta_json.erase(name) == 0)
