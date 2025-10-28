@@ -141,7 +141,7 @@ namespace EngineFramework
 	{
 		//Open a popup menu if right clicking the element.
 		//Determine what archtype event occurs.
-		if (!ImGui::BeginPopupContextWindow("Archtype Menu", ImGuiMouseButton_Right)) return;
+		if (!ImGui::BeginPopupContextItem((std::string("Archtype Menu##") + archtype_name).c_str(), ImGuiMouseButton_Right)) return;
 		CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
 
 		//If chosen, only need to give the minimum amt of information necessary for the event to be executed.
@@ -216,6 +216,14 @@ namespace EngineFramework
 		//Based on current window size, make the right pane 2/3 width by default.
 		CALL_AT_END(imgui_child_right_pane, ImGui::EndChild(););
 		ImGui::BeginChild("Child_RightPane", ImVec2(2 * avail / 3.f, 0), true, ImGuiChildFlags_ResizeX);
+		//==Create child button, on top of the table.
+		//==Table Menu, appears when right clicking on the table (instead of archtype element).
+		//Open a popup menu if right clicking the table.
+		if (ImGui::Button("Create Archtype"))
+		{
+			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::CREATE);
+		}
+
 		//==Table formatting
 		const float table_width = ImGui::GetContentRegionAvail().x;
 		const float spacingF = (float)spacing;
@@ -242,7 +250,6 @@ namespace EngineFramework
 		if (!ImGui::BeginTable("model-grid", per_row, ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_NoBordersInBody)) return;
 		CALL_AT_END(imgui_endtable, ImGui::EndTable(););
 
-		int id = 0; //unique id for imgui item labelling, to prevent name clashes.
 		//Iterate over all archtypes belonging to the selected model types.
 		for (auto& selected_type : selected_types)
 		{
@@ -264,17 +271,17 @@ namespace EngineFramework
 				//==Setting of table element formatting
 				if (i % per_row == 0) ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(i % per_row);
-				ImGui::PushID(id++);
-				CALL_AT_END(imgui_popid, ImGui::PopID(););
-
-				ImGui::BeginGroup();
-				CALL_AT_END(imgui_endgroup, ImGui::EndGroup(););
 
 				//==Accessing archtype name and data (if available).
 				auto& pair = archtype_arr[archtype_idx];
 				xresource::full_guid archtype_guid = pair.first;
 				std::shared_ptr<Archtype> archtype = pair.second;
 				std::string archtype_name = AssetManagerSystem::GetName(archtype_guid);
+				//Do not push indexes for IDs, as they are unreliable (asset_map is unordered and order of archtypes may change at any time).
+				ImGui::PushID(archtype_name.c_str());
+				CALL_AT_END(imgui_popid, ImGui::PopID(););
+
+				ImGui::BeginGroup();
 
 				//==Draw Archtype element (image button)
 				GLuint archtype_texture = DrawArchtypeElement(archtype_name, archtype, cell_w, texture_comp_id);
@@ -293,19 +300,9 @@ namespace EngineFramework
 				//Label the archtype element.
 				ImGui::TextWrapped(archtype_name.c_str());
 
+				ImGui::EndGroup();
 				//==Archtype popup menu, enabled when right clicking on the archtype element.
 				ArchtypePopupMenu(archtype_name, archtype);
-			}
-		}
-
-		//==Table Menu, appears when right clicking on the table (instead of archtype element).
-		//Open a popup menu if right clicking the table.
-		if (ImGui::BeginPopupContextWindow("Archtype Table Menu", ImGuiMouseButton_Right))
-		{
-			CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
-			if (ImGui::MenuItem("Create Archtype"))
-			{
-				delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::CREATE);
 			}
 		}
 	}
@@ -399,9 +396,9 @@ namespace EngineFramework
 			return ModelErrorCode::FILE_ALREADY_EXISTS;
 		}
 		//Create a basic archtype of an empty json.
-		nlohmann::json empty_json{};
+		nlohmann::json empty_json = nlohmann::json::object();
 		std::ofstream archtype_filestream{ archtype_path };
-		archtype_filestream << empty_json.dump(1, '\t');
+		archtype_filestream << empty_json.dump(1, '\t') << std::flush;
 
 		//Update archtypes with this new change.
 		AssetManagerSystem::ReloadAllResourcesOfType(AssetManagerSystem::ARCHTYPE, AssetManagerSystem::ARCHTYPE_GUID);
@@ -428,7 +425,7 @@ namespace EngineFramework
 
 		//Serialize the archtype into the created file, thereby copying it.
 		std::ofstream archtype_filestream{ archtype_path };
-		archtype_filestream << existing_archtype->Serialize();
+		archtype_filestream << existing_archtype->Serialize() << std::flush;
 
 		//Update archtypes with this new change.
 		AssetManagerSystem::ReloadAllResourcesOfType(AssetManagerSystem::ARCHTYPE, AssetManagerSystem::ARCHTYPE_GUID);
@@ -477,7 +474,7 @@ namespace EngineFramework
 		{
 			return ModelErrorCode::CANNOT_MODIFY_GUIDMETA;
 		}
-		nlohmann::json meta_json{ file_string };
+		nlohmann::json meta_json = nlohmann::json::parse(file_string);
 
 		//==Delete old and add new archtype entry.
 		if (!meta_json.contains(old_name)) return ModelErrorCode::SUCCESS; //No need to modify if there's no existing entry.
@@ -487,7 +484,7 @@ namespace EngineFramework
 
 		//==Write back to file.
 		std::ofstream meta_filestream{ meta_path };
-		meta_filestream << meta_json.dump(1, '\t');
+		meta_filestream << meta_json.dump(1, '\t') << std::flush;
 
 		return ModelErrorCode::SUCCESS;
 	}
@@ -520,7 +517,7 @@ namespace EngineFramework
 		{
 			return ModelErrorCode::CANNOT_MODIFY_GUIDMETA;
 		}
-		nlohmann::json meta_json{ file_string };
+		nlohmann::json meta_json = nlohmann::json::parse(file_string);
 
 		//==Delete entry and write back to file.
 		if (meta_json.erase(name) == 0)
@@ -528,7 +525,7 @@ namespace EngineFramework
 			return ModelErrorCode::CANNOT_MODIFY_GUIDMETA;
 		}
 		std::ofstream meta_filestream{ meta_path };
-		meta_filestream << meta_json.dump(1, '\t');
+		meta_filestream << meta_json.dump(1, '\t') << std::flush;
 
 		//Update archtypes with this new change.
 		AssetManagerSystem::ReloadAllResourcesOfType(AssetManagerSystem::ARCHTYPE, AssetManagerSystem::ARCHTYPE_GUID);
