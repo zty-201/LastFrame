@@ -64,8 +64,9 @@ namespace Engine {
     };
 
     struct LuaScriptComponent {
-        std::filesystem::path ScriptPath{};
+        xresource::instance_guid ScriptGuid; // Persistent reference to ScriptAsset
         bool Enabled{ true };
+
 #if defined(ENGINE_ENABLE_LUA)
         sol::environment Env{ sol::nil };
         sol::table       Self{ sol::nil };
@@ -77,6 +78,13 @@ namespace Engine {
         bool             Loaded{ false };
 #endif
     };
+
+	//For deserializiing in the Editor
+    /*  
+        auto fullGuid = xresource::full_guid(component.ScriptGuid,
+        EngineFramework::AssetManagerSystem::SCRIPT_GUID);
+        auto script = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(fullGuid);
+    */
 
     class ScriptSystem {
     public:

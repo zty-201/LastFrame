@@ -3,7 +3,7 @@
 /*!
 \file   Script.cpp
 \author Teng Jun Rong Jerron
-\par    t.junrongjerron\@digipen.edu
+\par    t.junrongjerron@digipen.edu
 \date   September 2025
 \brief
 This file contains the definitions of the functions that are needed for
@@ -15,8 +15,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 /* *******************************************************************/
 
 #include "Script.hpp"
-#include <fstream>
-#include <sstream>
+#include "Scripting/ScriptAsset.hpp"
 #include <iostream>
 #include "AssetManager.hpp"
 
@@ -71,8 +70,7 @@ namespace Engine {
                 if (lsc.Loaded && lsc.FnOnUpdate.valid()) {
                     try { lsc.FnOnUpdate(lsc.Self, dt); }
                     catch (const sol::error& err) {
-                        std::cerr << "[Lua] on_update error in " << lsc.ScriptPath.string()
-                            << " : " << err.what() << "\n";
+                        std::cerr << "[Lua] on_update error: " << err.what() << "\n";
                     }
                 }
             }
@@ -95,67 +93,77 @@ namespace Engine {
         if (nsc.Instance && nsc.Destroy) nsc.Destroy(nsc);
     }
 
-    // ---------------- Helpers: Lua (optional) ----------------
+    // ---------------- Helpers: Lua ----------------
 #if defined(ENGINE_ENABLE_LUA)
-    static std::string ReadTextFromAssets(const std::filesystem::path& relPath) {
-        // relPath should be relative to your Assets root, e.g. "Extern/Scripts/hello.lua"
-        auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
-        std::vector<unsigned char> bytes = AM.GetDataFromFile(relPath);
-        return std::string(bytes.begin(), bytes.end());
-    }
-
-
     void ScriptSystem::LoadLuaFor(entt::registry& reg,
         entt::entity /*e*/,
-        LuaScriptComponent& lsc) {
-		(void)reg; // Unused
+        LuaScriptComponent& lsc)
+    {
+        (void)reg; // Unused
         UnloadLuaFor(lsc, /*callOnDestroy*/false);
 
-        if (lsc.ScriptPath.empty()) { lsc.Loaded = false; return; }
+        if (lsc.ScriptGuid.m_Value == 0) {
+            std::cerr << "[Lua] Invalid Script GUID; skipping load.\n";
+            lsc.Loaded = false;
+            return;
+        }
 
-        // DEBUG: Print the full path being attempted
-        std::filesystem::path fullPath = std::filesystem::absolute(lsc.ScriptPath);
-        std::cerr << "[Lua] Attempting to read: " << fullPath.string() << "\n";
-        std::cerr << "[Lua] File exists: " << std::filesystem::exists(lsc.ScriptPath) << "\n";
+        // Retrieve ScriptAsset from AssetManager
+        auto full_guid = xresource::full_guid(
+            lsc.ScriptGuid,
+            EngineFramework::AssetManagerSystem::SCRIPT_GUID);
 
-        const std::string code = ReadTextFromAssets(lsc.ScriptPath);
+        auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(full_guid);
+        if (!scriptAsset) {
+            std::cerr << "[Lua] Unable to find ScriptAsset for GUID "
+                << lsc.ScriptGuid.m_Value << "\n";
+            lsc.Loaded = false;
+            return;
+        }
 
+        const std::string& code = scriptAsset->code;
         if (code.empty()) {
-            std::cerr << "[Lua] Failed to read " << lsc.ScriptPath.string() << "\n";
-            lsc.Loaded = false; return;
+            std::cerr << "[Lua] ScriptAsset has empty code (GUID "
+                << lsc.ScriptGuid.m_Value << ")\n";
+            lsc.Loaded = false;
+            return;
         }
 
         try {
-            // Create environment for this script
+            // Create a clean environment for this script
             lsc.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
 
-            // Load the script with the environment
-            auto result = s_Lua.script(code, lsc.Env);
+            // Use the asset name for error reporting
+            std::string label = EngineFramework::AssetManagerSystem::GetName(lsc.ScriptGuid);
+            auto result = s_Lua.load(code, label)(lsc.Env);
 
             if (!result.valid()) {
                 sol::error err = result;
-                std::cerr << "[Lua] Exec error in " << lsc.ScriptPath.string()
+                std::cerr << "[Lua] Exec error in " << label
                     << " : " << err.what() << "\n";
-                lsc.Loaded = false; return;
+                lsc.Loaded = false;
+                return;
             }
 
+            // Cache references
             lsc.Self = sol::table(s_Lua, sol::create);
             lsc.FnOnCreate = lsc.Env["on_create"];
             lsc.FnOnUpdate = lsc.Env["on_update"];
             lsc.FnOnDestroy = lsc.Env["on_destroy"];
             lsc.Loaded = true;
 
+            // Fire on_create if present
             if (lsc.FnOnCreate.valid()) {
                 try { lsc.FnOnCreate(lsc.Self); }
                 catch (const sol::error& err) {
-                    std::cerr << "[Lua] on_create error in " << lsc.ScriptPath.string()
+                    std::cerr << "[Lua] on_create error in " << label
                         << " : " << err.what() << "\n";
                 }
             }
         }
         catch (const sol::error& err) {
-            std::cerr << "[Lua] Unexpected error in " << lsc.ScriptPath.string()
-                << " : " << err.what() << "\n";
+            std::cerr << "[Lua] Unexpected error while loading GUID "
+                << lsc.ScriptGuid.m_Value << " : " << err.what() << "\n";
             lsc.Loaded = false;
         }
     }
@@ -164,10 +172,10 @@ namespace Engine {
         if (lsc.Loaded && callOnDestroy && lsc.FnOnDestroy.valid()) {
             try { lsc.FnOnDestroy(lsc.Self); }
             catch (const sol::error& err) {
-                std::cerr << "[Lua] on_destroy error in " << lsc.ScriptPath.string()
-                    << " : " << err.what() << "\n";
+                std::cerr << "[Lua] on_destroy error: " << err.what() << "\n";
             }
         }
+
         lsc.FnOnCreate = sol::nil;
         lsc.FnOnUpdate = sol::nil;
         lsc.FnOnDestroy = sol::nil;
