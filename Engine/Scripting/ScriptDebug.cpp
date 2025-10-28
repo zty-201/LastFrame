@@ -22,10 +22,27 @@ namespace Engine {
     static bool s_TestInitialized = false;
     static sol::function s_GreetFunc;
     static sol::function s_AddFunc;
+   // struct ScriptAsset
+   // {
+   //     Script()
+   //     {
+   //         sol::state& lua = ScriptSystem::GetLuaState();
+   //         // Load the test script once during initialization
+   //         auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
+   //         std::vector<unsigned char> bytes = AM.GetDataFromFile("Extern/Scripts/test.lua");
+   //         std::string code(bytes.begin(), bytes.end());
+   //         chunk = lua.load_buffer(bytes.data(), bytes.size());
+			//chunk(); // execute
+   //     }
+   //     sol::load_result chunk{};
+   // };
 
+   // struct ScriptComponent
+   // {
+   //     xresource::instance_guid script_guid;
+   // };
     void ScriptDebug::Initialize() {
         LOGI("[ScriptDebug] Lua script testing enabled. Press K/L to run test script.");
-
         try {
             sol::state& lua = ScriptSystem::GetLuaState();
 

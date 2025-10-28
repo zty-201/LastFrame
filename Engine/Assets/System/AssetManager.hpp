@@ -63,6 +63,12 @@
 
 		Note: I realise calling hashmap everytime the asset is accessed may be slower than caching the pointer in full_guid.m_instance.
 		However, I believe there will be <2500 asset access calls / frame, so it's likely negligible enough for M1 at least.
+		
+		- Asset Struct
+		- Loader Functions
+		- GUID, Name
+		- Modify config.json
+		- Add guid.meta
 		*/
 #pragma once
 #ifndef ASSET_MANAGER_HPP
