@@ -122,8 +122,8 @@ namespace EngineFramework
         if (!save_Archtypes()) return false;
         if (!save_Instances(filename)) return false;
 
+        InputManager::GetInstance().key_mapping_codegen();
         InputManager::GetInstance().seralise();
-        InputManager::GetInstance().key_mapping_code_gen();
 
         return true;
 

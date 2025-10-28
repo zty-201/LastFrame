@@ -15,6 +15,10 @@
 #ifndef MESH_COMPONENT
 #define MESH_COMPONENT
 
+// ================================ ( Gareth )
+#include<string>
+#include<cstdint>
+#include<cstddef>
 
 // A handle to a mesh resource (VAO, buffers, etc.)
 // This avoids duplicating mesh data for every entity.
@@ -23,8 +27,12 @@ struct MeshComponent {
     std::string meshName; // e.g., "Sphere", "Cube", "Extern/tree.obj"
 
     // Optional: Cache VAO and index count after loading
-    GLuint vao = 0;
+    uint32_t vao = 0;       // previously was GLuint
     size_t indexCount = 0;
 
+    // temp bounds
+    float localMin[3] = { -0.5f, -0.5f, -0.5f };
+    float localMax[3] = { +0.5f, +0.5f, +0.5f };
 };
+
 #endif
