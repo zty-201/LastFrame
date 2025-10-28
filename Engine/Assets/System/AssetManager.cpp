@@ -290,7 +290,7 @@ namespace EngineFramework {
 		//Decide if the json file needs to be modified.
 		bool isNewMapping = false;
 		std::vector<xresource::instance_guid> guid_arr{};
-		std::vector<unsigned char> guid_meta_string;
+		std::string guid_meta_string;
 		std::filesystem::path metadata_file = folder_path / "guid.meta";
 
 		/*
@@ -300,14 +300,13 @@ namespace EngineFramework {
 		*/
 		try
 		{
-			guid_meta_string = GetDataFromFile(metadata_file);
+			guid_meta_string = GetStringFromFile(metadata_file);
 		}
 		catch (std::exception&)
 		{
 			throw std::runtime_error((std::string("[AssetManager] Unable to find guid.meta in: ") + folder_path.string()).c_str());
 		}
-		std::string temp{ guid_meta_string.begin(), guid_meta_string.end() };
-		nlohmann::json guid_meta_json = nlohmann::json::parse(temp);
+		nlohmann::json guid_meta_json = nlohmann::json::parse(guid_meta_string);
 
 		/*
 			Find name mappings.
@@ -466,8 +465,7 @@ namespace EngineFramework {
 		/*
 			Access each folder specified in the json file.
 		*/
-		std::vector<unsigned char> config_json_buffer = GetDataFromFile(std::filesystem::path(ASSET_CONFIG_FILE));
-		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		std::string config_json_string = GetStringFromFile(std::filesystem::path(ASSET_CONFIG_FILE));
 		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
 
 		/*
@@ -558,8 +556,7 @@ namespace EngineFramework {
 		std::vector< std::shared_ptr<Scene::Texture>> loaded_resources{};
 
 		//Read the Config File
-		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
-		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		std::string config_json_string = GetStringFromFile(config_file);
 		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
 
 		//The config file should contain <name, filepath_arr> pairs
@@ -631,8 +628,7 @@ namespace EngineFramework {
 		std::vector< std::shared_ptr<ShaderProgram>> loaded_resources{};
 
 		//Read the Config File
-		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
-		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		std::string config_json_string = GetStringFromFile(config_file);
 		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
 
 		//The config file should contain <name, shader_filepaths> pairs
@@ -683,8 +679,7 @@ namespace EngineFramework {
 		*/
 
 		//Read the Config File
-		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
-		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		std::string config_json_string = GetStringFromFile(config_file);
 		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
 
 		//Reading all filepaths for audio files in the current directory.
@@ -775,8 +770,7 @@ namespace EngineFramework {
 			//Allocate resource
 			try
 			{
-				std::vector<unsigned char> temp = GetDataFromFile(path);
-				std::string json_string{ temp.begin(), temp.end() };
+				std::string json_string = GetStringFromFile(path);
 				loaded_resources.emplace_back(new Archtype(json_string));
 				asset_names.emplace_back(name); //Done if resource loading is a success.
 			}
@@ -845,8 +839,7 @@ namespace EngineFramework {
 			LOGE("No Function Loader for resource type %s", type.c_str());
 			return;
 		}
-		std::vector<unsigned char> config_json_buffer = GetDataFromFile(std::filesystem::path(ASSET_CONFIG_FILE));
-		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		std::string config_json_string = GetStringFromFile(std::filesystem::path(ASSET_CONFIG_FILE));
 		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
 		if (!config_json.contains(type))
 		{

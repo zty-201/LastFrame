@@ -78,8 +78,7 @@ namespace EngineFramework
 				if (ImGui::Selectable(scene.c_str()))
 				{
 					LOGD("Selected scene: %s", scene.c_str());
-					std::vector<unsigned char> sceneName = AssetManagerSystem::GetDataFromFile("Extern/Scenes/" + scene);
-					std::string sceneString{ sceneName.begin(), sceneName.end() };
+					std::string sceneString = AssetManagerSystem::GetStringFromFile("Extern/Scenes/" + scene);
 					GameObjectSystem::GetInstance().LoadScene(sceneString);
 					currentScene = scene;
 

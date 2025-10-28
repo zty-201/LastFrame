@@ -67,8 +67,7 @@ namespace EngineFramework
 	void GameObjectSystem::Initialize()
 	{
 		// Load a Scene
-		std::vector<unsigned char> start_scene_data = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
-		std::string start_scene{ start_scene_data.begin(), start_scene_data.end() };
+		std::string start_scene = AssetManagerSystem::GetStringFromFile("Extern/Scenes/Dummy1.json");
 		LoadScene(start_scene);
 		
 	}
