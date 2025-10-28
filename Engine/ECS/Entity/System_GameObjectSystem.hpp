@@ -79,6 +79,10 @@ namespace EngineFramework
 			Creates a single entity with the same component data (copied) from archtype
 		*/
 		entt::entity CreateInstance(std::string archtype);
+
+		// Getter for registry
+		static entt::registry& GetRegistry() { return registry; }
+
 	private:
 		void Initialize() override;
 		void Update(float delta_time) override;

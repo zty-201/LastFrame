@@ -16,7 +16,7 @@
  * @date Sept, 2025
  */
 #include "pch.hpp"
-#include "Scene.h"
+#include "scene.h"
 // For loading textures
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"

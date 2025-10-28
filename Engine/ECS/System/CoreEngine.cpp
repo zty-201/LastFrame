@@ -77,7 +77,8 @@ namespace EngineFramework
 	*/
 	void CoreEngine::PostUpdateSystems(float delta_time)
 	{
-		//Array has already been sorted in update order, in initialize.
+		//Array has already been sorted in update order, in initialize.	WA4COM =
+		 
 		for (CoreSystem& system : system_arr)
 		{
 
@@ -160,7 +161,7 @@ namespace EngineFramework
 			logFile << "Unknown exception in PostUpdate system ["
 				<< system.name << "]" << std::endl;
 #else
-			LOGD("Unknown exception in PostUpdate system[%s]: %s", system.name.c_str());
+			LOGD("Unknown exception in PostUpdate system[%s]", system.name.c_str());
 #endif
 			//throw;
 		}
