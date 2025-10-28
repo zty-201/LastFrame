@@ -603,7 +603,17 @@ namespace EngineFramework {
 
 			// Try catch guard for loading mesh
 			try {
-				loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
+				if (path.extension() == ".obj")
+				{
+					loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
+				}
+				else if (path.extension() == ".compiled")
+				{
+					std::string data = GetStringFromFile(path);
+					nlohmann::json json_data{};
+					json_data = json_data.parse(data);
+					loaded_resources.emplace_back(new Mesh::MeshData(json_data));
+				}
 				asset_names.emplace_back(name); // Done if resource loading is a success.
 			}
 			catch (std::exception& e) {

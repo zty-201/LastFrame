@@ -17,7 +17,7 @@
  */
 #ifndef MESH_H
 #define MESH_H
-
+#include "nlohmann/json.hpp"
 namespace Mesh {
 
 	// The Vertex struct.
@@ -64,6 +64,32 @@ namespace Mesh {
 		explicit MeshData(const std::string& fileName, bool genTangents = false)
 		{
 			generate(fileName.c_str(), genTangents);
+		}
+
+		// Constructor that reads precompiled data from json obj
+		explicit MeshData(const nlohmann::json& json_data)
+		{
+			if (json_data.contains("points")) points = json_data["points"].get<std::vector<GLfloat>>();
+			if (json_data.contains("normals")) normals = json_data["normals"].get<std::vector<GLfloat>>();
+			if (json_data.contains("texCoords")) texCoords = json_data["texCoords"].get<std::vector<GLfloat>>();
+			if (json_data.contains("tangents")) tangents = json_data["tangents"].get<std::vector<GLfloat>>();
+			if (json_data.contains("indices")) indices = json_data["indices"].get<std::vector<GLuint>>();
+		}
+	public:
+		//Returns the precompiled file as a json object.
+		inline nlohmann::json PrecompileFile(const char* fileName, bool genTangent = false)
+		{
+			//Precompiles the file and stores in current data.
+			generate(fileName, genTangent);
+			//Return current precompiled data as json.
+			nlohmann::json json_data{};
+			json_data["points"] = points;
+			json_data["normals"] = normals;
+			json_data["texCoords"] = texCoords;
+			json_data["tangents"] = tangents;
+			json_data["indices"] = indices;
+
+			return json_data;
 		}
 
 	private:
