@@ -6,8 +6,7 @@
 \par    t.junrongjerron@digipen.edu
 \date   September 2025
 \brief
-This file contains the definitions of the functions that are needed for
-handling the Scripts.
+Multi-script version: allows multiple Lua scripts per entity.
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
@@ -16,8 +15,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "Script.hpp"
 #include "Scripting/ScriptAsset.hpp"
-#include <iostream>
 #include "AssetManager.hpp"
+#include <iostream>
 
 namespace Engine {
 
@@ -37,7 +36,12 @@ namespace Engine {
 
     // ---------------- Runtime start/stop ----------------
     void ScriptSystem::OnRuntimeStart(entt::registry& reg) {
-        reg.view<LuaScriptComponent>().each([](auto& lsc) { lsc.Loaded = false; });
+#if defined(ENGINE_ENABLE_LUA)
+        reg.view<LuaScriptComponent>().each([](auto& comp) {
+            for (auto& inst : comp.Scripts)
+                inst.Loaded = false;
+            });
+#endif
     }
 
     void ScriptSystem::OnRuntimeStop(entt::registry& reg) {
@@ -45,15 +49,19 @@ namespace Engine {
         for (auto [e, nsc] : nativeView.each()) {
             if (nsc.Instance) { nsc.Instance->OnDestroy(); DestroyNativeInstance(nsc); }
         }
+
 #if defined(ENGINE_ENABLE_LUA)
         auto luaView = reg.view<LuaScriptComponent>();
-        for (auto [e, lsc] : luaView.each()) { UnloadLuaFor(lsc, /*callOnDestroy*/true); }
+        for (auto [e, comp] : luaView.each()) {
+            for (auto& inst : comp.Scripts)
+                UnloadLuaFor(inst, /*callOnDestroy*/true);
+        }
 #endif
     }
 
     // ---------------- Per-frame update ----------------
     void ScriptSystem::OnUpdate(entt::registry& reg, float dt) {
-        {   // Native
+        {   // Native scripts
             auto view = reg.view<NativeScriptComponent>();
             for (auto [e, nsc] : view.each()) {
                 if (!nsc.Enabled) continue;
@@ -61,16 +69,22 @@ namespace Engine {
                 if (nsc.Instance) nsc.Instance->OnUpdate(dt);
             }
         }
+
 #if defined(ENGINE_ENABLE_LUA)
-        {   // Lua
+        {   // Lua scripts
             auto view = reg.view<LuaScriptComponent>();
-            for (auto [e, lsc] : view.each()) {
-                if (!lsc.Enabled) continue;
-                if (!lsc.Loaded) LoadLuaFor(reg, e, lsc);
-                if (lsc.Loaded && lsc.FnOnUpdate.valid()) {
-                    try { lsc.FnOnUpdate(lsc.Self, dt); }
-                    catch (const sol::error& err) {
-                        std::cerr << "[Lua] on_update error: " << err.what() << "\n";
+            for (auto [e, comp] : view.each()) {
+                if (!comp.Enabled) continue;
+
+                for (auto& inst : comp.Scripts) {
+                    if (!inst.Loaded)
+                        LoadLuaFor(reg, e, inst);
+
+                    if (inst.Loaded && inst.FnOnUpdate.valid()) {
+                        try { inst.FnOnUpdate(inst.Self, dt); }
+                        catch (const sol::error& err) {
+                            std::cerr << "[Lua] on_update error: " << err.what() << "\n";
+                        }
                     }
                 }
             }
@@ -81,7 +95,8 @@ namespace Engine {
     // ---------------- Helpers: Native ----------------
     void ScriptSystem::EnsureNativeInstance(entt::registry& reg,
         entt::entity e,
-        NativeScriptComponent& nsc) {
+        NativeScriptComponent& nsc)
+    {
         if (!nsc.Instance && nsc.Instantiate) {
             nsc.Instance = nsc.Instantiate();
             nsc.Instance->SetEntity(e, &reg);
@@ -97,64 +112,62 @@ namespace Engine {
 #if defined(ENGINE_ENABLE_LUA)
     void ScriptSystem::LoadLuaFor(entt::registry& reg,
         entt::entity /*e*/,
-        LuaScriptComponent& lsc)
+        LuaScriptComponent::LuaInstance& inst)
     {
-        (void)reg; // Unused
-        UnloadLuaFor(lsc, /*callOnDestroy*/false);
+        (void)reg;
+        UnloadLuaFor(inst, /*callOnDestroy*/false);
 
-        if (lsc.ScriptGuid.m_Value == 0) {
+        if (inst.ScriptGuid.m_Value == 0) {
             std::cerr << "[Lua] Invalid Script GUID; skipping load.\n";
-            lsc.Loaded = false;
+            inst.Loaded = false;
             return;
         }
 
-        // Retrieve ScriptAsset from AssetManager
+        // Retrieve ScriptAsset
         auto full_guid = xresource::full_guid(
-            lsc.ScriptGuid,
+            inst.ScriptGuid,
             EngineFramework::AssetManagerSystem::SCRIPT_GUID);
 
         auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(full_guid);
         if (!scriptAsset) {
-            std::cerr << "[Lua] Unable to find ScriptAsset for GUID "
-                << lsc.ScriptGuid.m_Value << "\n";
-            lsc.Loaded = false;
+            std::cerr << "[Lua] ScriptAsset not found for GUID "
+                << inst.ScriptGuid.m_Value << "\n";
+            inst.Loaded = false;
             return;
         }
 
         const std::string& code = scriptAsset->code;
         if (code.empty()) {
-            std::cerr << "[Lua] ScriptAsset has empty code (GUID "
-                << lsc.ScriptGuid.m_Value << ")\n";
-            lsc.Loaded = false;
+            std::cerr << "[Lua] ScriptAsset empty for GUID "
+                << inst.ScriptGuid.m_Value << "\n";
+            inst.Loaded = false;
             return;
         }
 
         try {
-            // Create a clean environment for this script
-            lsc.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
-
-            // Use the asset name for error reporting
-            std::string label = EngineFramework::AssetManagerSystem::GetName(lsc.ScriptGuid);
-            auto result = s_Lua.load(code, label)(lsc.Env);
+            // Create isolated environment for each script
+            inst.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
+            std::string label = EngineFramework::AssetManagerSystem::GetName(inst.ScriptGuid);
+            auto result = s_Lua.load(code, label)(inst.Env);
 
             if (!result.valid()) {
                 sol::error err = result;
                 std::cerr << "[Lua] Exec error in " << label
                     << " : " << err.what() << "\n";
-                lsc.Loaded = false;
+                inst.Loaded = false;
                 return;
             }
 
-            // Cache references
-            lsc.Self = sol::table(s_Lua, sol::create);
-            lsc.FnOnCreate = lsc.Env["on_create"];
-            lsc.FnOnUpdate = lsc.Env["on_update"];
-            lsc.FnOnDestroy = lsc.Env["on_destroy"];
-            lsc.Loaded = true;
+            // Cache functions
+            inst.Self = sol::table(s_Lua, sol::create);
+            inst.FnOnCreate = inst.Env["on_create"];
+            inst.FnOnUpdate = inst.Env["on_update"];
+            inst.FnOnDestroy = inst.Env["on_destroy"];
+            inst.Loaded = true;
 
-            // Fire on_create if present
-            if (lsc.FnOnCreate.valid()) {
-                try { lsc.FnOnCreate(lsc.Self); }
+            // Fire on_create if defined
+            if (inst.FnOnCreate.valid()) {
+                try { inst.FnOnCreate(inst.Self); }
                 catch (const sol::error& err) {
                     std::cerr << "[Lua] on_create error in " << label
                         << " : " << err.what() << "\n";
@@ -163,25 +176,25 @@ namespace Engine {
         }
         catch (const sol::error& err) {
             std::cerr << "[Lua] Unexpected error while loading GUID "
-                << lsc.ScriptGuid.m_Value << " : " << err.what() << "\n";
-            lsc.Loaded = false;
+                << inst.ScriptGuid.m_Value << " : " << err.what() << "\n";
+            inst.Loaded = false;
         }
     }
 
-    void ScriptSystem::UnloadLuaFor(LuaScriptComponent& lsc, bool callOnDestroy) {
-        if (lsc.Loaded && callOnDestroy && lsc.FnOnDestroy.valid()) {
-            try { lsc.FnOnDestroy(lsc.Self); }
+    void ScriptSystem::UnloadLuaFor(LuaScriptComponent::LuaInstance& inst, bool callOnDestroy) {
+        if (inst.Loaded && callOnDestroy && inst.FnOnDestroy.valid()) {
+            try { inst.FnOnDestroy(inst.Self); }
             catch (const sol::error& err) {
                 std::cerr << "[Lua] on_destroy error: " << err.what() << "\n";
             }
         }
 
-        lsc.FnOnCreate = sol::nil;
-        lsc.FnOnUpdate = sol::nil;
-        lsc.FnOnDestroy = sol::nil;
-        lsc.Self = sol::nil;
-        lsc.Env = sol::nil;
-        lsc.Loaded = false;
+        inst.FnOnCreate = sol::nil;
+        inst.FnOnUpdate = sol::nil;
+        inst.FnOnDestroy = sol::nil;
+        inst.Self = sol::nil;
+        inst.Env = sol::nil;
+        inst.Loaded = false;
     }
 #endif // ENGINE_ENABLE_LUA
 
@@ -189,8 +202,9 @@ namespace Engine {
     void ScriptSystem::ReloadScript(entt::registry& reg, entt::entity e) {
 #if defined(ENGINE_ENABLE_LUA)
         if (reg.any_of<LuaScriptComponent>(e)) {
-            auto& lsc = reg.get<LuaScriptComponent>(e);
-            LoadLuaFor(reg, e, lsc);
+            auto& comp = reg.get<LuaScriptComponent>(e);
+            for (auto& inst : comp.Scripts)
+                LoadLuaFor(reg, e, inst);
         }
 #else
         (void)reg; (void)e;

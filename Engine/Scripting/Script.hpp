@@ -3,11 +3,11 @@
 /*!
 \file   Script.hpp
 \author Teng Jun Rong Jerron
-\par    t.junrongjerron\@digipen.edu
+\par    t.junrongjerron@digipen.edu
 \date   September 2025
 \brief
 This file contains the definitions of the functions that are needed for
-handling the Scripts.
+handling the Scripts (multi-script version).
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
@@ -18,6 +18,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <entt/entt.hpp>
 #include <filesystem>
 #include <string>
+#include <vector>
 
 #if defined(ENGINE_ENABLE_LUA)
 #include <sol/sol.hpp>
@@ -63,29 +64,32 @@ namespace Engine {
         }
     };
 
+    // ----------------------------------------------------------------
+    // Multi-script Lua component
+    // ----------------------------------------------------------------
     struct LuaScriptComponent {
-        xresource::instance_guid ScriptGuid; // Persistent reference to ScriptAsset
         bool Enabled{ true };
 
 #if defined(ENGINE_ENABLE_LUA)
-        sol::environment Env{ sol::nil };
-        sol::table       Self{ sol::nil };
-        sol::function    FnOnCreate{ sol::nil };
-        sol::function    FnOnUpdate{ sol::nil };
-        sol::function    FnOnDestroy{ sol::nil };
-        bool             Loaded{ false };
+        struct LuaInstance {
+            xresource::instance_guid ScriptGuid; // Which script this instance runs
+            sol::environment Env{ sol::nil };
+            sol::table       Self{ sol::nil };
+            sol::function    FnOnCreate{ sol::nil };
+            sol::function    FnOnUpdate{ sol::nil };
+            sol::function    FnOnDestroy{ sol::nil };
+            bool             Loaded{ false };
+        };
+
+        std::vector<LuaInstance> Scripts; // Multiple script instances per entity
 #else
-        bool             Loaded{ false };
+        std::vector<xresource::instance_guid> ScriptGuids; // Serialized in editor
 #endif
     };
 
-	//For deserializiing in the Editor
-    /*  
-        auto fullGuid = xresource::full_guid(component.ScriptGuid,
-        EngineFramework::AssetManagerSystem::SCRIPT_GUID);
-        auto script = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(fullGuid);
-    */
-
+    // ----------------------------------------------------------------
+    // Script System
+    // ----------------------------------------------------------------
     class ScriptSystem {
     public:
         static void Init();
@@ -105,8 +109,8 @@ namespace Engine {
         static void DestroyNativeInstance(NativeScriptComponent& nsc);
 
 #if defined(ENGINE_ENABLE_LUA)
-        static void LoadLuaFor(entt::registry& reg, entt::entity e, LuaScriptComponent& lsc);
-        static void UnloadLuaFor(LuaScriptComponent& lsc, bool callOnDestroy);
+        static void LoadLuaFor(entt::registry& reg, entt::entity e, LuaScriptComponent::LuaInstance& inst);
+        static void UnloadLuaFor(LuaScriptComponent::LuaInstance& inst, bool callOnDestroy);
 #endif
     };
 
