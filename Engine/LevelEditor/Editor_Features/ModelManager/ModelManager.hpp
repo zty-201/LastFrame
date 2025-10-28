@@ -81,7 +81,7 @@ namespace EngineFramework
             };
             ArchtypeEvent() { event = Event::NONE; }
             ArchtypeEvent(Event event, std::string current_name = {}, std::string new_name = {}, std::shared_ptr<Archtype> archtype = nullptr)
-            : event{event}, current_name{current_name}, new_name{new_name}, archtype{archtype}
+            : event{event}, current_name{current_name}, new_name{new_name}, archtype{archtype}, is_popup_active{ false }
             {
             }
             Event event;
@@ -91,35 +91,36 @@ namespace EngineFramework
             bool is_popup_active{}; //If active, the popup won't be reopened again.
         };
         //==Represents the top, left and right pane.
-        void DrawSelectedTypes();
-        void DrawTypeList(const std::unordered_map<std::string, std::vector<int>>& archtype_type_map);
-        void DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>>& archtype_arr);
+        static void DrawSelectedTypes();
+        static void DrawTypeList(const std::unordered_map<std::string, std::vector<int>>& archtype_type_map);
+        static void DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>>& archtype_arr);
 
         //==Popup menus for archtypes that were right clicked in the archtype table==//
-        void ArchtypePopupMenu(std::string archtype_name, const std::shared_ptr<Archtype> archtype);
+        static void ArchtypePopupMenu(std::string archtype_name, const std::shared_ptr<Archtype> archtype);
 
         //==Archtype Modification/Creation==//
         //Note: Ensure if any of these functions are called, that they are done at the end of Run().
         //This prevents invalidation of any map that currently uses std::shared_ptr<Archtype>
         //Creates archtype file, then reloads all archtypes. 
-        ModelErrorCode CreateArchtype(const std::string& name);
+        static ModelErrorCode CreateArchtype(const std::string& name);
         //Creates archtype file of "name" from existing archtype, then reloads all archtypes. 
-        ModelErrorCode CopyArchtype(const std::string& name, const std::shared_ptr<Archtype> existing_archtype);
+        static ModelErrorCode CopyArchtype(const std::string& name, const std::shared_ptr<Archtype> existing_archtype);
         //Rename archtype file, modifying guid.meta accordingly. 
-        ModelErrorCode RenameArchtype(const std::string& old_name, const std::string& new_name);
+        static ModelErrorCode RenameArchtype(const std::string& old_name, const std::string& new_name);
         //Deletes archtype file, modifying guid.meta accordingly. Archtypes are then reloaded. 
-        ModelErrorCode DeleteArchtype(const std::string& name);
+        static ModelErrorCode DeleteArchtype(const std::string& name);
         //Handles archtype modification events based on delayed_archtype_event contents. Call at the end of Run().
-        void HandleArchtypeEvent();
+        static void HandleArchtypeEvent();
         
         //The map of model types selected, allowing the user to pick which model types they want to see from the list.
-        std::unordered_map<std::string, bool> selected_types{};
+        static inline std::unordered_map<std::string, bool> selected_types{};
         
         //Name of the archtype selected by drag and drop
-        std::string selected_drag_drop_archtype{};
-
+        static inline std::string selected_drag_drop_archtype{};
+        
+        //Signifies what archtype modification/creation/deletion operation to perform at the end of the current Run() cycle.
         //Due to reload/renaming of archtypes, any shared_ptr<Archtype> map or indices can be affected by archtype modification/creation. Thus, only do these commands at the end of the run() cycle.
-        ArchtypeEvent delayed_archtype_event;
+        static inline ArchtypeEvent delayed_archtype_event;
     };
 }
 

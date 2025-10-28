@@ -151,27 +151,15 @@ namespace EngineFramework
 		}
 		if (ImGui::MenuItem("Rename Archtype"))
 		{
-			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::RENAME, archtype_name, {});
-			/*ImGui::Begin("Enter New Archtype Name");
-			CALL_AT_END(imgui_endrenamewindow, ImGui::End(););
-			ImGui::InputText("New Name", buffer, 100);
-			if (ImGui::Button("Submit"))
-			{
-				delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::RENAME, archtype_name, buffer);
-				buffer[0] = '\0';
-			}*/
+			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::RENAME, archtype_name);
 		}
 		if (ImGui::MenuItem("Change ModelType"))
 		{
 			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::CHANGE_MODEL_TYPE, {}, {}, archtype);
-			/*ImGui::Begin("Enter Model Type");
-			CALL_AT_END(imgui_endmodeltypewindow, ImGui::End(););
-			ImGui::InputText("Model Type", buffer, 100);
-			if (ImGui::Button("Submit"))
-			{
-				archtype->model_type = buffer;
-				buffer[0] = '\0';
-			}*/
+		}
+		if (ImGui::MenuItem("Delete ModelType"))
+		{
+			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::DELETE, archtype_name);
 		}
 
 	}
@@ -222,7 +210,7 @@ namespace EngineFramework
 	*/
 	void ModelManager::DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>>& archtype_arr)
 	{
-		
+
 		//==ImGui formatting
 		const float avail = ImGui::GetContentRegionAvail().x;
 		//Based on current window size, make the right pane 2/3 width by default.
@@ -307,6 +295,17 @@ namespace EngineFramework
 
 				//==Archtype popup menu, enabled when right clicking on the archtype element.
 				ArchtypePopupMenu(archtype_name, archtype);
+			}
+		}
+
+		//==Table Menu, appears when right clicking on the table (instead of archtype element).
+		//Open a popup menu if right clicking the table.
+		if (ImGui::BeginPopupContextWindow("Archtype Table Menu", ImGuiMouseButton_Right))
+		{
+			CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
+			if (ImGui::MenuItem("Create Archtype"))
+			{
+				delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::CREATE);
 			}
 		}
 	}
@@ -536,10 +535,11 @@ namespace EngineFramework
 		return ModelErrorCode::SUCCESS;
 	}
 
+	//Only handles one event at a time. To be called at the end of Run().
 	void ModelManager::HandleArchtypeEvent()
 	{
 		//Event data may be incomplete. If so, get further input.
-		constexpr int buffer_size = 100;
+		constexpr int buffer_size = 128;
 		static char input_buffer[buffer_size] = "";
 		//Only open a new popup if there's none currently.
 		if (delayed_archtype_event.event != ArchtypeEvent::ArchtypeEvent::NONE && !delayed_archtype_event.is_popup_active)
@@ -565,26 +565,172 @@ namespace EngineFramework
 			}
 		}
 
-		//== Copy Archtype, Get input and Execute event.
+		/*
+			Helper Functions
+		*/
+		//Called after successful or canceled operation, to reset state for next event.
+		auto clear_buffers_and_close_popup = []() {
+			input_buffer[0] = '\0';
+			delayed_archtype_event = {};
+			ImGui::CloseCurrentPopup();
+			};
+
+		//Called to debug log errors.
+		auto debug_log_errorcode = [](ModelErrorCode error) {
+
+			switch (error)
+			{
+			case ModelErrorCode::INVALID_ARGUMENTS:
+				LOGE("ModelManager::HandleArchtypeEvent Invalid Parameters passed when modifying/creating archtype.");
+				break;
+			case ModelErrorCode::FILE_ALREADY_EXISTS:
+				LOGE("ModelManager::HandleArchtypeEvent File already exists when modifying/creating archtype.");
+				break;
+			case ModelErrorCode::NOT_FOUND:
+				LOGE("ModelManager::HandleArchtypeEvent File not found when modifying/creating archtype.");
+				break;
+			case ModelErrorCode::CANNOT_MODIFY_GUIDMETA:
+				LOGE("ModelManager::HandleArchtypeEvent Unable to update guid.meta when modifying/creating archtype");
+				break;
+			case ModelErrorCode::UNKNOWN_FAILURE:
+				LOGE("ModelManager::HandleArchtypeEvent Unknown Error when modifying/creating archtype");
+				break;
+			}
+			};
+
+
+		/*==
+			Create popup windows for Copy,Rename,Create,Delete,Change Model Type.
+			These windows allow more input to be received from the user if necessary, and act as a final confirmation.
+		*/
+
+		//== Copy Archtype
 		if (ImGui::BeginPopupModal("Copy Archtype"))
+		{
+			CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
+			ImGui::InputText("New Archtype", input_buffer, buffer_size);
+			if (ImGui::Button("Confirm"))
+			{
+				//Ensure input is non-empty, then use it + event data to call archtype operation.
+				std::string input = input_buffer;
+				ModelErrorCode result{};
+				if (input.empty())
+				{
+					LOGE("ModelManager::HandleArchtypeEvent Archtype name cannot be blank when copying.");
+				}
+				else
+				{
+					result = CopyArchtype(input, delayed_archtype_event.archtype);
+					if (result != ModelErrorCode::SUCCESS) debug_log_errorcode(result);
+				}
+				clear_buffers_and_close_popup();
+			}
+			if (ImGui::Button("Close"))
+			{
+				//Ignore event, user has chosen not to give enough information.
+				clear_buffers_and_close_popup();
+			}
+			return;
+		}
+
+
+
+		//== Rename Archtype.
+		if (ImGui::BeginPopupModal("Rename Archtype"))
 		{
 			CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
 			ImGui::InputText("New Name", input_buffer, buffer_size);
 			if (ImGui::Button("Confirm"))
 			{
-				delayed_archtype_event.new_name = input_buffer;
-				input_buffer[0] = '\0';
-				ImGui::CloseCurrentPopup();
+				//Ensure input is non-empty, then use it + event data to call archtype operation.
+				std::string input = input_buffer;
+				ModelErrorCode result{};
+				if (input.empty())
+				{
+					LOGE("ModelManager::HandleArchtypeEvent Archtype name cannot be blank when renaming.");
+				}
+				else
+				{
+					result = RenameArchtype(delayed_archtype_event.current_name, input);
+					if (result != ModelErrorCode::SUCCESS) debug_log_errorcode(result);
+				}
+				clear_buffers_and_close_popup();
 			}
 			if (ImGui::Button("Close"))
 			{
 				//Ignore event, user has chosen not to give enough information.
-				delayed_archtype_event = {};
-				ImGui::CloseCurrentPopup();
+				clear_buffers_and_close_popup();
 			}
+			return;
 		}
 
-		
+		//== Create Archtype.
+		if (ImGui::BeginPopupModal("Create Archtype"))
+		{
+			CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
+			ImGui::InputText("New Archtype", input_buffer, buffer_size);
+			if (ImGui::Button("Confirm"))
+			{
+				//Ensure input is non-empty, then use it + event data to call archtype operation.
+				std::string input = input_buffer;
+				ModelErrorCode result{};
+				if (input.empty())
+				{
+					LOGE("ModelManager::HandleArchtypeEvent Archtype name cannot be blank when creating.");
+				}
+				else
+				{
+					result = CreateArchtype(input);
+					if (result != ModelErrorCode::SUCCESS) debug_log_errorcode(result);
+				}
+				clear_buffers_and_close_popup();
+			}
+			if (ImGui::Button("Close"))
+			{
+				//Ignore event, user has chosen not to give enough information.
+				clear_buffers_and_close_popup();
+			}
+			return;
+		}
+
+		//== Delete Archtype.
+		if (ImGui::BeginPopupModal("Delete Archtype"))
+		{
+			CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
+			ImGui::TextWrapped("Are You Sure? There's No Going Back.");
+			if (ImGui::Button("Confirm"))
+			{
+				ModelErrorCode result = DeleteArchtype(delayed_archtype_event.current_name);
+				if (result != ModelErrorCode::SUCCESS) debug_log_errorcode(result);
+				clear_buffers_and_close_popup();
+			}
+			if (ImGui::Button("Close"))
+			{
+				//Ignore event, user has chosen not to give enough information.
+				clear_buffers_and_close_popup();
+			}
+			return;
+		}
+
+		//== Change Model Type
+		if (ImGui::BeginPopupModal("Change Model Type"))
+		{
+			CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
+			ImGui::InputText("Model Type", input_buffer, buffer_size);
+			if (ImGui::Button("Confirm"))
+			{
+				//Input can be empty, since empty model type just means unlabelled.
+				delayed_archtype_event.archtype->model_type = input_buffer;
+				clear_buffers_and_close_popup();
+			}
+			if (ImGui::Button("Close"))
+			{
+				//Ignore event, user has chosen not to give enough information.
+				clear_buffers_and_close_popup();
+			}
+			return;
+		}
+
 	}
 
 
