@@ -56,6 +56,16 @@ namespace EngineFramework
         void Close() override;
 
         static bool feature_enabled;
+    
+        enum ModelErrorCode
+        {
+            NOT_FOUND,
+            FILE_ALREADY_EXISTS,
+            CANNOT_MODIFY_GUIDMETA,
+            INVALID_ARGUMENTS,
+            SUCCESS,
+            UNKNOWN_FAILURE
+        };
     private:
         //==Represents the top, left and right pane.
         void DrawSelectedTypes();
@@ -63,17 +73,17 @@ namespace EngineFramework
         void DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>>& archtype_arr);
 
         //==Popup menus for archtypes that were right clicked in the archtype table==//
-        
+        void ArchtypePopupMenu();
 
         //==Archtype Modification/Creation==//
-        //Creates archtype file, then reloads all archtypes.
-        void CreateArchtype(const std::string& name);
-        //Creates archtype file of "name" from existing archtype, then reloads all archtypes.
-        void CopyArchtype(const std::string& name, const std::shared_ptr<Archtype> existing_archtype);
-        //Rename archtype file, modifying guid.meta accordingly.
-        void RenameArchtype(const std::string& old_name, const std::string& new_name);
-        //Deletes archtype file, modifying guid.meta accordingly. Archtypes are then reloaded.
-        void DeleteArchtype(const std::string& name);
+        //Creates archtype file, then reloads all archtypes. 
+        ModelErrorCode CreateArchtype(const std::string& name);
+        //Creates archtype file of "name" from existing archtype, then reloads all archtypes. 
+        ModelErrorCode CopyArchtype(const std::string& name, const std::shared_ptr<Archtype> existing_archtype);
+        //Rename archtype file, modifying guid.meta accordingly. 
+        ModelErrorCode RenameArchtype(const std::string& old_name, const std::string& new_name);
+        //Deletes archtype file, modifying guid.meta accordingly. Archtypes are then reloaded. 
+        ModelErrorCode DeleteArchtype(const std::string& name);
 
         
         //The map of model types selected, allowing the user to pick which model types they want to see from the list.

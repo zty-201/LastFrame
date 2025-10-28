@@ -120,7 +120,64 @@ namespace EngineFramework {
 			std::istreambuf_iterator<char>());
 #endif
 	}
+	/*
+			Cross-platform reading of data from file.
+		*/
+	std::string AssetManagerSystem::GetStringFromFile(const std::filesystem::path& path)
+	{
+#ifdef PLATFORM_ANDROID
 
+		std::string buffer{};
+		if (!android_asset_manager)
+		{
+			throw std::invalid_argument("AAssetManager is not initialized in AssetManager");
+		}
+
+		LOGD("Opening Asset: %s", path.c_str());
+		AAsset* asset = AAssetManager_open(android_asset_manager, path.c_str(), AASSET_MODE_BUFFER);
+		if (!asset)
+		{
+			throw std::runtime_error("Failed to open asset: " + path.string());
+		}
+
+		/*
+			Get Asset struct from AAssetManager, and read it into the buffer.
+		*/
+
+		off_t size = AAsset_getLength(asset);
+		buffer.resize(size);
+
+		int bytesRead = AAsset_read(asset, buffer.data(), size);
+		if (bytesRead != size)
+		{
+			AAsset_close(asset);
+			throw std::runtime_error("Failed to read entire asset: " + path.string());
+		}
+
+		AAsset_close(asset);
+		return buffer;
+#endif
+#ifdef PLATFORM_WINDOWS
+		//Check if path already has folder prefix.
+		std::string prefix = GetAssetFolderPrefix().string();
+		std::string path_string = path.string();
+		//Not present, so append it.
+		if (path_string.find(prefix) != 0)
+		{
+			path_string = prefix + path_string;
+		}
+		std::filesystem::path filepath{ path_string };
+		// open the file:
+		std::ifstream file(filepath, std::ios::binary);
+		if (!file.is_open())
+		{
+			throw std::runtime_error("Failed to open asset: " + filepath.string());
+		}
+		// read the data:
+		return std::string((std::istreambuf_iterator<char>(file)),
+			std::istreambuf_iterator<char>());
+#endif
+	}
 	/*
 			Cross-platform.
 			List files in the given directory.

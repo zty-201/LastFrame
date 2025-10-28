@@ -95,6 +95,7 @@ namespace EngineFramework {
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
 	class AssetWindow;//forward declaration
+	class ModelManager;
 #endif
 
 	/*
@@ -129,6 +130,7 @@ namespace EngineFramework {
 			Cross-platform reading of data from file.
 		*/
 		static std::vector<unsigned char> GetDataFromFile(const std::filesystem::path& path);
+		static std::string GetStringFromFile(const std::filesystem::path& path);
 
 
 #ifdef PLATFORM_ANDROID
@@ -228,6 +230,7 @@ namespace EngineFramework {
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
 		friend AssetWindow;
+		friend ModelManager;
 #endif
 		
 		//== Functions that Level Editor can use.

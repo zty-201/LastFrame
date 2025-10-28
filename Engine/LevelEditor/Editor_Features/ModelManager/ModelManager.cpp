@@ -53,7 +53,7 @@ namespace EngineFramework
 		   --> Do this in a function overload for GameObjectSystem::CreateInstance().
 		   - Creation of instance
 		   --> Instead of drag and drop, just create as is without transform component added.
-		   
+
 		   - Switch archtype model_type
 
 		   - Copy of existing archtype
@@ -135,6 +135,14 @@ namespace EngineFramework
 			it++;
 		}
 	}
+
+	//Handles the popup menu when rightclicking the archtype element
+	void ModelManager::ArchtypePopupMenu()
+	{
+
+
+	}
+
 	namespace
 	{
 		//Helper function that draws an archtype image button. 
@@ -172,7 +180,7 @@ namespace EngineFramework
 			return texture_id;
 		}
 	}
-	
+
 
 	/*
 		Draws the table of archtypes in the right pane.
@@ -207,7 +215,7 @@ namespace EngineFramework
 		- Name of archtype
 		- Texture image if possible
 		*/
-		
+
 		entt::id_type texture_comp_id = entt::resolve<TextureComponent>().id();
 		CALL_AT_END(imgui_endtable, ImGui::EndTable(););
 		if (ImGui::BeginTable("model-grid", per_row, ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_NoBordersInBody))
@@ -228,7 +236,7 @@ namespace EngineFramework
 				//==Display archtypes belonging to that group.
 				const std::vector<int>& selected_archtype_arr = archtype_type_map[model_type];
 				if (selected_archtype_arr.empty()) continue;
-				for (int i = 0; i< selected_archtype_arr.size(); i++)
+				for (int i = 0; i < selected_archtype_arr.size(); i++)
 				{
 					int archtype_idx = selected_archtype_arr[i];
 					//==Setting of table element formatting
@@ -340,88 +348,154 @@ namespace EngineFramework
 		LOGI("model manager closed");
 	}
 
+	//Creates archtype file, then reloads all archtypes.
+	ModelManager::ModelErrorCode ModelManager::CreateArchtype(const std::string& name)
+	{
+		std::filesystem::path archtype_folder = AssetManagerSystem::GetAssetFolderPrefix() / AssetManagerSystem::GetFolderPath(AssetManagerSystem::ARCHTYPE);
+		std::string archtype_extension = name + ".json";
+		std::filesystem::path archtype_path = archtype_folder / archtype_extension;
+		
+		//Ensure the file doesn't already exist.
+		if (std::filesystem::is_regular_file(archtype_path))
+		{
+			return ModelErrorCode::FILE_ALREADY_EXISTS;
+		}
+		//Create a basic archtype of an empty json.
+		nlohmann::json empty_json{};
+		std::ofstream archtype_filestream{ archtype_path };
+		archtype_filestream << empty_json.dump(1, '\t');
+
+		//Update archtypes with this new change.
+		AssetManagerSystem::ReloadAllResourcesOfType(AssetManagerSystem::ARCHTYPE, AssetManagerSystem::ARCHTYPE_GUID);
+		return ModelErrorCode::SUCCESS;
+	}
+	//Creates archtype file of "name" from existing archtype, then reloads all archtypes.
+	ModelManager::ModelErrorCode ModelManager::CopyArchtype(const std::string& name, const std::shared_ptr<Archtype> existing_archtype)
+	{
+		//Nullptr given.
+		if (!existing_archtype)
+		{
+			LOGE("ModelManager::CopyArchtype Nullptr provided for archtype to copy.");
+			return ModelErrorCode::INVALID_ARGUMENTS;
+		}
+		std::filesystem::path archtype_folder = AssetManagerSystem::GetAssetFolderPrefix() / AssetManagerSystem::GetFolderPath(AssetManagerSystem::ARCHTYPE);
+		std::string archtype_extension = name + ".json";
+		std::filesystem::path archtype_path = archtype_folder / archtype_extension;
+
+		//Ensure the file doesn't already exist.
+		if (std::filesystem::is_regular_file(archtype_path))
+		{
+			return ModelErrorCode::FILE_ALREADY_EXISTS;
+		}
+		
+		//Serialize the archtype into the created file, thereby copying it.
+		std::ofstream archtype_filestream{ archtype_path };
+		archtype_filestream << existing_archtype->Serialize();
+
+		//Update archtypes with this new change.
+		AssetManagerSystem::ReloadAllResourcesOfType(AssetManagerSystem::ARCHTYPE, AssetManagerSystem::ARCHTYPE_GUID);
+		return ModelErrorCode::SUCCESS;
+	}
+	//Rename archtype file, modifying guid.meta accordingly. 
+	ModelManager::ModelErrorCode ModelManager::RenameArchtype(const std::string& old_name, const std::string& new_name)
+	{
+		std::filesystem::path archtype_folder = AssetManagerSystem::GetAssetFolderPrefix() / AssetManagerSystem::GetFolderPath(AssetManagerSystem::ARCHTYPE);
+		std::filesystem::path old_archtype_path = archtype_folder / (old_name + ".json");
+		std::filesystem::path new_archtype_path = archtype_folder / (new_name + ".json");
+
+		//Ensure file exists.
+		if (!std::filesystem::is_regular_file(old_archtype_path))
+		{
+			return ModelErrorCode::NOT_FOUND;
+		}
+
+		//Cannot rename if there's already another archtype file with the same name.
+		if (std::filesystem::is_regular_file(new_archtype_path))
+		{
+			return ModelErrorCode::FILE_ALREADY_EXISTS;
+		}
+		
+		//==Rename File
+		std::error_code result{};
+		std::filesystem::rename(old_archtype_path, new_archtype_path, result);
+		if (result) return ModelErrorCode::UNKNOWN_FAILURE;
+		
+		//Modify existing guid <-> name maps.
+		AssetManagerSystem::ModifyNameMappings(AssetManagerSystem::ARCHTYPE_GUID, old_name, new_name);
+
+		//==Modify guid.meta file
+		/*
+			1. Get json object from file
+			2. Delete old and add new archtype entry in json
+			3. Write json object back to file.
+		*/
+		std::filesystem::path meta_path = archtype_folder / "guid.meta";
+		if (!std::filesystem::is_regular_file(meta_path))
+		{
+			return ModelErrorCode::CANNOT_MODIFY_GUIDMETA;
+		}
+		std::string file_string = AssetManagerSystem::GetStringFromFile(meta_path);
+		if (file_string.empty()) //Nothing to modify.
+		{
+			return ModelErrorCode::CANNOT_MODIFY_GUIDMETA;
+		}
+		nlohmann::json meta_json{ file_string };
+		
+		//==Delete old and add new archtype entry.
+		if (!meta_json.contains(old_name)) return ModelErrorCode::SUCCESS; //No need to modify if there's no existing entry.
+		xresource::instance_guid asset_guid = meta_json[old_name].get<uint64_t>();
+		meta_json.erase(old_name);
+		meta_json[new_name] = asset_guid.m_Value;
+
+		//==Write back to file.
+		std::ofstream meta_filestream{ meta_path };
+		meta_filestream << meta_json.dump(1, '\t');
+
+		return ModelErrorCode::SUCCESS;
+	}
+	//Deletes archtype file, modifying guid.meta accordingly. Archtypes are then reloaded. Returns -1 if file can't be deleted, -2 if guid.meta can't be modified.
+	ModelManager::ModelErrorCode ModelManager::DeleteArchtype(const std::string& name)
+	{
+		std::filesystem::path archtype_folder = AssetManagerSystem::GetAssetFolderPrefix() / AssetManagerSystem::GetFolderPath(AssetManagerSystem::ARCHTYPE);
+		std::string archtype_extension = name + ".json";
+		std::filesystem::path archtype_path = archtype_folder / archtype_extension;
+
+		//Ensure the file exists, delete if so.
+		if (!std::filesystem::is_regular_file(archtype_path))
+		{
+			return ModelErrorCode::NOT_FOUND;
+		}
+		std::filesystem::remove(archtype_path);
+
+		/*
+			1. Get json object from file
+			2. Delete archtype entry from json
+			3. Write json object back to file.
+		*/
+		std::filesystem::path meta_path = archtype_folder / "guid.meta"; 
+		if (!std::filesystem::is_regular_file(meta_path))
+		{
+			return ModelErrorCode::CANNOT_MODIFY_GUIDMETA;
+		}
+		std::string file_string = AssetManagerSystem::GetStringFromFile(meta_path);
+		if (file_string.empty()) //Nothing to delete.
+		{
+			return ModelErrorCode::CANNOT_MODIFY_GUIDMETA;
+		}
+		nlohmann::json meta_json{file_string};
+
+		//==Delete entry and write back to file.
+		if (meta_json.erase(name) == 0)
+		{
+			return ModelErrorCode::CANNOT_MODIFY_GUIDMETA;
+		}
+		std::ofstream meta_filestream{ meta_path };
+		meta_filestream << meta_json.dump(1, '\t');
+
+		//Update archtypes with this new change.
+		AssetManagerSystem::ReloadAllResourcesOfType(AssetManagerSystem::ARCHTYPE, AssetManagerSystem::ARCHTYPE_GUID);
+		return ModelErrorCode::SUCCESS;
+	}
+
 }
 #endif
-
-
-
-
-/* for (auto asset : assets)
-		 {
-			 if (i % per_row == 0) ImGui::TableNextRow();
-			 ImGui::TableSetColumnIndex(i % per_row);
-			 ImGui::PushID(i);
-
-			 ImGui::BeginGroup();
-			 if (ImGui::ImageButton(asset.filename, (ImTextureID)0, ImVec2(cell_w, cell_w), { 0, 1 }, { 1, 0 }))
-			 {
-
-			 }
-
-			 if (ImGui::BeginDragDropSource())
-			 {
-				 ImGui::SetDragDropPayload("Models", asset.filename, strlen(asset.filename) + 1);
-
-				 ImGui::TextUnformatted(asset.filename);
-				 ImGui::Image((ImTextureID)0, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
-
-				 ImGui::EndDragDropSource();
-			 }
-
-			 ImGui::Text(asset.filename);
-
-			 ImGui::EndGroup();
-
-			 ImGui::PopID();
-
-			 i++;*/
-
-			 //}
-
-/*
-* O
-
-	//Get the archtypes stored in asset manager.
-std::vector<std::pair<xresource::instance_guid, std::shared_ptr<Archtype>>> archtype_arr = AssetManagerSystem::GetAllResourceOfType<Archtype>(AssetManagerSystem::ARCHTYPE_GUID);
-
-int i = 0;
-
-for (const auto& archtype_pair : archtype_arr)
-{
-	std::string archtype_name = AssetManagerSystem::GetName(archtype_pair.first);
-	if (archtype_name.empty()) continue; //Cannot serialize an archtype with no name or value.
-
-	ImGui::BeginGroup();
-
-	if (ImGui::ImageButton(archtype_name.c_str(), (ImTextureID)0, ImVec2(image_width, image_width), { 0, 1 }, { 1, 0 }))
-	{
-
-	}
-
-	if (ImGui::BeginDragDropSource())
-	{
-		ImGui::SetDragDropPayload("Models", archtype_name.c_str(), strlen(archtype_name.c_str()) + 1);
-
-		ImGui::TextUnformatted(archtype_name.c_str());
-		ImGui::Image((ImTextureID)0, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
-
-		ImGui::EndDragDropSource();
-	}
-
-	ImGui::Text(archtype_name.c_str());
-
-	ImGui::EndGroup();
-
-	const bool lastInRow = ((i + 1) % per_row) == 0;
-	if (!lastInRow) ImGui::SameLine(0.0f, (float)spacing);
-
-	i++;
-
-}
-
-ImGui::Text("* Sample testing of model drag drop *");
-ImGui::PopStyleVar();
-
-
-
-*/
