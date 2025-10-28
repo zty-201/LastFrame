@@ -116,35 +116,31 @@ namespace EngineFramework
 
                     std::string extension = entry.path().extension().string();
 
-                    bool isTexture = extension == ".png";
-
-                    if (isTexture)
-                    {
-                        // Draw as image button if you have thumbnails (placeholder here)
-                        if (ImGui::Button("Tex", { thumbnailSize, thumbnailSize })) {
-                            selectedAsset = entry.path();
-                        }
-
-                        // Begin drag-drop source for textures
-                        if (ImGui::BeginDragDropSource())
-                        {
-                            // Payload type = "Textures"
-                            std::string pathStr = entry.path().string();
-                            ImGui::SetDragDropPayload("Textures", pathStr.c_str(), pathStr.size() + 1);
-
-                            // Preview text + placeholder thumbnail
-                            ImGui::TextUnformatted(fileName.c_str());
-                            ImGui::Image((ImTextureID)0, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
-                            ImGui::EndDragDropSource();
-                        }
+                    // Draw simple button
+                    if (ImGui::Button(extension.c_str(), {thumbnailSize, thumbnailSize})) {
+                        selectedAsset = entry.path();
                     }
-                    else
+
+                    // Begin drag-drop source for all file types
+                    if (ImGui::BeginDragDropSource())
                     {
-                        // Non-texture files: draw simple button
-                        if (ImGui::Button("File", { thumbnailSize, thumbnailSize })) {
-                            selectedAsset = entry.path();
-                        }
+                        // Payload type
+                        std::string pathStr = entry.path().string();
+
+                        //*****Set payload type for targets with specific requirements*****
+                        const char* payloadType;
+                        if (extension == ".png") payloadType = "Textures";
+                        //else if (extension == ".xyz" || extension == ".abc") payloadType = "defghi";
+                        else payloadType = "GENERAL";
+
+                        ImGui::SetDragDropPayload(payloadType, pathStr.c_str(), pathStr.size() + 1);
+
+                        // Preview text + placeholder thumbnail
+                        ImGui::TextUnformatted(fileName.c_str());
+                        ImGui::Image((ImTextureID)0, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
+                        ImGui::EndDragDropSource();
                     }
+                    
 
                     ImGui::TextWrapped("%s", fileName.c_str());
 

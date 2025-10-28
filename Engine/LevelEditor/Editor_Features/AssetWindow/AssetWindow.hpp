@@ -21,11 +21,6 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "System_LevelEditor.hpp"
 #include "LFeature/LFeature.hpp"
 #include <filesystem>
-//#include <imgui.h>
-
-//#ifndef IMGUI_API
-//typedef void* ImTextureID;
-//#endif
 
 namespace EngineFramework
 {
@@ -47,14 +42,6 @@ namespace EngineFramework
 		// Recursive draw is replaced with a grid-style explorer
 		std::filesystem::path currentDirectory;
 		std::filesystem::path selectedAsset;
-
-		//Thumbnail and icon
-		/*std::unordered_map<std::string, ImTextureID> m_Thumbnails;
-		ImTextureID m_FolderIcon = NULL;
-		ImTextureID m_FileIcon = NULL;
-
-		ImTextureID LoadTextureFromFile(const std::string& path);
-		void UnloadTextures();*/
 	};
 }
 
