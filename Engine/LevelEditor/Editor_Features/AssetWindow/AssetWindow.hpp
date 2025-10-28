@@ -40,6 +40,7 @@ namespace EngineFramework
 
 	private:
 		// Recursive draw is replaced with a grid-style explorer
+		std::filesystem::path rootAssetDirectory;
 		std::filesystem::path currentDirectory;
 		std::filesystem::path selectedAsset;
 	};

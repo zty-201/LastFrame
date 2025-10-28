@@ -25,7 +25,7 @@ namespace EngineFramework
 {
 	AssetWindow::AssetWindow()
 	{
-		currentDirectory = AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern"; // Start at project asset root
+		rootAssetDirectory = currentDirectory = AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern"; // Start at project asset root
 	}
 
 	AssetWindow::~AssetWindow()
@@ -47,7 +47,7 @@ namespace EngineFramework
             // --- Header --- 
             ImGui::Text("Current: %s", currentDirectory.filename().string().c_str());
             ImGui::Separator();
-            if (currentDirectory.has_parent_path()) {
+            if (currentDirectory != rootAssetDirectory && currentDirectory.has_parent_path()) {
                 if (ImGui::Button("Back")) {
                     currentDirectory = currentDirectory.parent_path();
                 }
