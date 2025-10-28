@@ -140,44 +140,40 @@ namespace EngineFramework
 	void ModelManager::ArchtypePopupMenu(std::string archtype_name, std::shared_ptr<Archtype> archtype)
 	{
 		//Open a popup menu if right clicking the element.
+		//Determine what archtype event occurs.
 		if (!ImGui::BeginPopupContextWindow("Archtype Menu", ImGuiMouseButton_Right)) return;
 		CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
 
-		static char buffer[100];
-		buffer[0] = '\0';
+		//If chosen, only need to give the minimum amt of information necessary for the event to be executed.
 		if (ImGui::MenuItem("Copy Archtype"))
 		{
-			ImGui::Begin("Enter New Archtype Name");
-			CALL_AT_END(imgui_endcopywindow, ImGui::End(););
-			ImGui::InputText("New Name", buffer, 100);
-			if (ImGui::Button("Submit"))
-			{
-				delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::COPY, {}, buffer, archtype);
-				buffer[0] = '\0';
-			}
+			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::COPY, {}, {}, archtype);
 		}
 		if (ImGui::MenuItem("Rename Archtype"))
 		{
-			ImGui::Begin("Enter New Archtype Name");
+			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::RENAME, archtype_name, {});
+			/*ImGui::Begin("Enter New Archtype Name");
 			CALL_AT_END(imgui_endrenamewindow, ImGui::End(););
 			ImGui::InputText("New Name", buffer, 100);
 			if (ImGui::Button("Submit"))
 			{
 				delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::RENAME, archtype_name, buffer);
 				buffer[0] = '\0';
-			}
+			}*/
 		}
 		if (ImGui::MenuItem("Change ModelType"))
 		{
-			ImGui::Begin("Enter Model Type");
+			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::CHANGE_MODEL_TYPE, {}, {}, archtype);
+			/*ImGui::Begin("Enter Model Type");
 			CALL_AT_END(imgui_endmodeltypewindow, ImGui::End(););
 			ImGui::InputText("Model Type", buffer, 100);
 			if (ImGui::Button("Submit"))
 			{
 				archtype->model_type = buffer;
 				buffer[0] = '\0';
-			}
+			}*/
 		}
+
 	}
 
 	namespace
@@ -226,6 +222,7 @@ namespace EngineFramework
 	*/
 	void ModelManager::DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>>& archtype_arr)
 	{
+		
 		//==ImGui formatting
 		const float avail = ImGui::GetContentRegionAvail().x;
 		//Based on current window size, make the right pane 2/3 width by default.
@@ -380,6 +377,9 @@ namespace EngineFramework
 			ImGui::SameLine();
 			//==Display table of archtypes in the right pane
 			DrawSelectedArchtypeTable(spacing, per_row, archtype_type_map, archtype_arr);
+
+			//==Handle Archtype modification/creation events after everything else, to ensure that shared_ptr + index used by previous functions aren't invalidated.
+			HandleArchtypeEvent();
 		}
 
 	}
@@ -535,6 +535,58 @@ namespace EngineFramework
 		AssetManagerSystem::ReloadAllResourcesOfType(AssetManagerSystem::ARCHTYPE, AssetManagerSystem::ARCHTYPE_GUID);
 		return ModelErrorCode::SUCCESS;
 	}
+
+	void ModelManager::HandleArchtypeEvent()
+	{
+		//Event data may be incomplete. If so, get further input.
+		constexpr int buffer_size = 100;
+		static char input_buffer[buffer_size] = "";
+		//Only open a new popup if there's none currently.
+		if (delayed_archtype_event.event != ArchtypeEvent::ArchtypeEvent::NONE && !delayed_archtype_event.is_popup_active)
+		{
+			delayed_archtype_event.is_popup_active = true;
+			switch (delayed_archtype_event.event)
+			{
+			case ArchtypeEvent::ArchtypeEvent::COPY:
+				ImGui::OpenPopup("Copy Archtype");
+				break;
+			case ArchtypeEvent::ArchtypeEvent::RENAME:
+				ImGui::OpenPopup("Rename Archtype");
+				break;
+			case ArchtypeEvent::ArchtypeEvent::DELETE:
+				ImGui::OpenPopup("Delete Archtype");
+				break;
+			case ArchtypeEvent::ArchtypeEvent::CREATE:
+				ImGui::OpenPopup("Create Archtype");
+				break;
+			case ArchtypeEvent::ArchtypeEvent::CHANGE_MODEL_TYPE:
+				ImGui::OpenPopup("Change Model Type");
+				break;
+			}
+		}
+
+		//== Copy Archtype, Get input and Execute event.
+		if (ImGui::BeginPopupModal("Copy Archtype"))
+		{
+			CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
+			ImGui::InputText("New Name", input_buffer, buffer_size);
+			if (ImGui::Button("Confirm"))
+			{
+				delayed_archtype_event.new_name = input_buffer;
+				input_buffer[0] = '\0';
+				ImGui::CloseCurrentPopup();
+			}
+			if (ImGui::Button("Close"))
+			{
+				//Ignore event, user has chosen not to give enough information.
+				delayed_archtype_event = {};
+				ImGui::CloseCurrentPopup();
+			}
+		}
+
+		
+	}
+
 
 }
 #endif

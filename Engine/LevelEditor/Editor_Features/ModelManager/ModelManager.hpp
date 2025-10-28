@@ -76,6 +76,7 @@ namespace EngineFramework
                 COPY,
                 RENAME,
                 DELETE,
+                CHANGE_MODEL_TYPE,
                 NONE
             };
             ArchtypeEvent() { event = Event::NONE; }
@@ -87,6 +88,7 @@ namespace EngineFramework
             std::string current_name{};
             std::string new_name{};
             std::shared_ptr<Archtype> archtype{};
+            bool is_popup_active{}; //If active, the popup won't be reopened again.
         };
         //==Represents the top, left and right pane.
         void DrawSelectedTypes();
@@ -107,7 +109,8 @@ namespace EngineFramework
         ModelErrorCode RenameArchtype(const std::string& old_name, const std::string& new_name);
         //Deletes archtype file, modifying guid.meta accordingly. Archtypes are then reloaded. 
         ModelErrorCode DeleteArchtype(const std::string& name);
-        
+        //Handles archtype modification events based on delayed_archtype_event contents. Call at the end of Run().
+        void HandleArchtypeEvent();
         
         //The map of model types selected, allowing the user to pick which model types they want to see from the list.
         std::unordered_map<std::string, bool> selected_types{};
