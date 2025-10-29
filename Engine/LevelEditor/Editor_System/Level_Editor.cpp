@@ -179,9 +179,7 @@ namespace EngineFramework
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {
 
-			if (feature->is_enabled) {
-				feature->Initialize();
-			}
+			feature->Initialize();			
 		}
 
 	}
