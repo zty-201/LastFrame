@@ -43,10 +43,8 @@
 
 		0. Renaming Asset
 		- Note: Asset path should stay in the same folder.
-		- After renaming the asset file itself, parse guid.meta file and look for the old asset name.
-		- change that old name to the new name. e.g. "old_name" -> guid becomes "new_name" -> guid.
-		- Finally, change guid_to_name mapping (for level editor display of guids as readable names). 
-		- Unless accounted for in code, name_to_guid mapping should not change. otherwise for example a graphic system using "Basic" shader will not be able to find it any longer.
+		- After renaming the asset file itself, parse guid.meta file within the same folder and look for the old asset name. Change that old name to the new name. e.g. "old_name" -> guid becomes "new_name" -> guid.
+		- Finally, change guid_to_name mapping (for level editor display of guids as readable names) and name_to_guid mapping using ModifyNameMapping().
 
 		1. Accessing Asset
 		- For every component, all asset types like texture, shader, mesh, audio file etc. are stored as xresource::full_guid.
@@ -97,9 +95,25 @@ namespace EngineFramework {
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
 	class AssetWindow;//forward declaration
+	class ModelManager;
 #endif
 
+	/*
+		Public:
+		- GetInstance: Gets the singleton instance of this system
+		- GetResource<T>
+		- GetAllResourceOfType<T>
+		- HasResource
+		- GetName
+		- GetFullGuid
+		- type strings and guids
+
+		Private/Level Editor:
+		- LoadAllResource
+		- RemoveAllResource
+		- RemoveResource
 	
+	*/
 	class AssetManagerSystem : public ISystem
 	{
 	public:
@@ -116,6 +130,7 @@ namespace EngineFramework {
 			Cross-platform reading of data from file.
 		*/
 		static std::vector<unsigned char> GetDataFromFile(const std::filesystem::path& path);
+		static std::string GetStringFromFile(const std::filesystem::path& path);
 
 
 #ifdef PLATFORM_ANDROID
@@ -131,14 +146,7 @@ namespace EngineFramework {
 		void Initialize() override;
 		void Update(float) override;
 		void PostUpdate(float) override;
-		
-
-		// Add a resource to the resource map (store shared_ptr of the resource as meta_any)
-		template<typename T>
-		static void AddResource(const xresource::full_guid& guid, std::shared_ptr<T> resource)
-		{
-			resource_map[guid] = entt::meta_any{ std::move(resource) };
-		}
+	
 
 		//Gets a shared_ptr to the resource.
 		template<typename T>
@@ -160,9 +168,9 @@ namespace EngineFramework {
 
 		//Gets a vector of shared_ptr to the resource types. Each asset is accompanied with its instance guid.
 		template<typename T>
-		static std::vector<std::pair<xresource::instance_guid, std::shared_ptr<T>>> GetAllResourceOfType(const xresource::type_guid& guid)
+		static std::vector<std::pair<xresource::full_guid, std::shared_ptr<T>>> GetAllResourceOfType(const xresource::type_guid& guid)
 		{
-			std::vector<std::pair<xresource::instance_guid, std::shared_ptr<T>>> asset_vector{};
+			std::vector<std::pair<xresource::full_guid, std::shared_ptr<T>>> asset_vector{};
 			//Iterate over all resources
 			for (auto it = resource_map.begin(); it != resource_map.end(); it++)
 			{
@@ -173,7 +181,7 @@ namespace EngineFramework {
 				entt::type_info requested_type = entt::resolve<std::shared_ptr<T> >().info();
 				if (actual_type == requested_type)
 				{
-					asset_vector.emplace_back(it->first.m_Instance, it->second.cast<std::shared_ptr<T> >());
+					asset_vector.emplace_back(it->first, it->second.cast<std::shared_ptr<T> >());
 				}
 			}
 			
@@ -182,41 +190,21 @@ namespace EngineFramework {
 
 
 		//Return if the resource_map contains the resource.
-		static bool HasResource(const xresource::full_guid& guid)
-		{
-			return resource_map.find(guid) != resource_map.end();
-		}
+		static bool HasResource(const xresource::full_guid& guid);
 
 		/*
 			Return full guid of an asset given its name and type_guid.
 			Also adds <guid, name> mapping if not already done.
 		*/
-		static xresource::full_guid GetFullGuid(const xresource::type_guid& type_guid, std::string asset_name)
-		{
-			auto it = name_guid_map[type_guid].find(asset_name);
-			//Name guid map is set during loading of the respective asset.
-			if (it == name_guid_map[type_guid].end())
-			{
-				LOGE("%s %s", "[AssetManager] No Asset with this name found in name_guid_map", asset_name.c_str());
-				return {};
-			}
-			return xresource::full_guid{ it->second, type_guid };
-		}
+		static xresource::full_guid GetFullGuid(const xresource::type_guid& type_guid, std::string asset_name);
 
 		/*
 			Returns the name of an asset given its instance_guid.
 			Returns nothing if it can't be found.
 		*/
-		static std::string GetName(xresource::instance_guid instance_guid)
-		{
-			auto it = guid_name_map.find(instance_guid);
-			if (it != guid_name_map.end())
-			{
-				return it->second;
-			}
-			return {};
-		}
+		static std::string GetName(xresource::full_guid asset_guid);
 
+		
 		/*
 			String names for each asset type, so they are consistent across the entire program.
 		*/
@@ -236,31 +224,34 @@ namespace EngineFramework {
 		static inline constexpr xresource::type_guid CUBEMAP_GUID{ CUBEMAP };
 		static inline constexpr xresource::type_guid AUDIO_GUID{ AUDIO };
 		static inline constexpr xresource::type_guid ARCHTYPE_GUID{ ARCHTYPE };
+
 	private:
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
 		friend AssetWindow;
+		friend ModelManager;
 #endif
 		
-		/*
-			Reads the config file located at ASSET_CONFIG_FILE, and calls the respective asset function loaders for each folder/config path.
-			Will write into the resource maps.
-		*/
+		//== Functions that Level Editor can use.
+		//Loads all resources listed in ASSET_CONFIG_FILE.
 		static void LoadAllResources();
 
-		//Delete a resource from the map, calling its destructor.
-		static void RemoveResource(const xresource::full_guid& guid)
-		{
-			resource_map.erase(guid);
-		}
-		//Delete all resources from the map, calling their destructors.
-		static void RemoveAllResources()
-		{
-			resource_map.clear();
-			guid_name_map.clear();//
-			name_guid_map.clear();//
-		}
+		//Reloads all resource of a specific type, and calls destructors in the process.
+		static void ReloadAllResourcesOfType(std::string type, xresource::type_guid type_guid);
+
+		//Delete all resources from all maps, and calls destructors.
+		static void RemoveAllResources();
+
+		//Delete a resource from all maps, and calls destructors.
+		static void RemoveResource(const xresource::full_guid& guid);
+
+		//Modifies name_to_guid and guid_to_name mappings. If renaming an asset, the actual asset file and associated guid.meta file must be changed as well.
+		static void ModifyNameMappings(xresource::type_guid type, const std::string& old_name, const std::string& new_name);
+
+		static std::filesystem::path GetFolderPath(const std::string& type);
+
+		//== Helper Functions
 
 		/*
 			Cross-platform.
@@ -288,6 +279,13 @@ namespace EngineFramework {
 		template <typename T>
 		static void SetMappings(const xresource::type_guid& type_guid, const std::vector<std::string>& name_arr, const std::vector<std::shared_ptr<T>>& resource_arr, const std::filesystem::path& folder_path);
 
+		// Add a resource to the resource map (store shared_ptr of the resource as meta_any)
+		template<typename T>
+		static void AddResource(const xresource::full_guid& guid, std::shared_ptr<T> resource)
+		{
+			resource_map[guid] = entt::meta_any{ std::move(resource) };
+		}
+
 		//==Asset Loaders==//
 		static bool LoadTexture(const std::filesystem::path&);
 		static bool LoadCubemap(const std::filesystem::path&);
@@ -296,6 +294,10 @@ namespace EngineFramework {
 		static bool LoadAudio(const std::filesystem::path&);
 		static bool LoadArchtype(const std::filesystem::path&);
 
+		static void CompileIfNeeded(
+			const std::filesystem::path& srcFolder,
+			const std::filesystem::path& outFolder,
+			IAssetCompiler* compiler);
 
 		static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer
 #ifdef PLATFORM_ANDROID
@@ -306,26 +308,22 @@ namespace EngineFramework {
 #ifdef PLATFORM_WINDOWS
 		static inline std::filesystem::path extern_folder_prefix{};
 #endif
-
+		//==Asset Loading
+		// Stores the folderpaths for each type, modified when LoadAllResource is called. Does not account for AssetFolderPrefix.
+		static inline std::unordered_map<std::string, std::filesystem::path> type_folderpath_map;
 		// <resource_type, func> that maps a resource type to a function. The function loads all assets within the directory, and sets guid_name_map and name_guid_map as well.
 		static inline std::unordered_map<std::string, std::function<bool(const std::filesystem::path&)>> asset_loader_map{};
+		//For precompiling assets
+		static inline std::unordered_map<std::string, std::unique_ptr<IAssetCompiler>> compilers;
 
+		//==Asset storage and reference maps
 		// <full_guid, resource_type> that maps a guid to a resource.
 		static inline std::unordered_map<xresource::full_guid, entt::meta_any> resource_map{};
 		// This is used to get human-readable names from instance_guid, like for level editor usage.
-		static inline std::unordered_map<xresource::instance_guid, std::string> guid_name_map{};
+		static inline std::unordered_map<xresource::full_guid, std::string> guid_name_map{};
 		// This is used to get guids from human-readable names, like for anything "hardcoded", e.g. using a "Basic" shader. 
 		// Note that type_guid is requested jic there are different asset types with the same name.
-		// uint64_t is used for type_guid to allow hashing for unordered_map.
-		// <type, <string, guid>>
 		static inline std::unordered_map<xresource::type_guid, std::unordered_map<std::string, xresource::instance_guid>> name_guid_map{};
-
-		static inline std::unordered_map<std::string, std::unique_ptr<IAssetCompiler>> compilers;
-
-		static void CompileIfNeeded(
-			const std::filesystem::path& srcFolder,
-			const std::filesystem::path& outFolder,
-			IAssetCompiler* compiler);
 	};
 
 } // namespace EngineFramework

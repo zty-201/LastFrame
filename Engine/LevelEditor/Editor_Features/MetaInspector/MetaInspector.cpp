@@ -91,7 +91,7 @@ namespace EditorFeatures {
 		const auto textures = AssetManagerSystem::GetAllResourceOfType<SceneTexture>(AssetManagerSystem::TEXTURE_GUID);
 		const auto cubemaps = AssetManagerSystem::GetAllResourceOfType<SceneTexture>(AssetManagerSystem::CUBEMAP_GUID);
 
-		std::string current = guid.empty() ? none_label : AssetManagerSystem::GetName(guid.m_Instance);
+		std::string current = guid.empty() ? none_label : AssetManagerSystem::GetName(guid);
 		if (current.empty()) {
 			current = format_guid_hex(guid.m_Instance.m_Value);
 		}
@@ -106,13 +106,12 @@ namespace EditorFeatures {
 				changed = true;
 			}
 
-			auto draw_entries = [&](const auto& list, const xresource::type_guid& type, std::string_view suffix) {
-				for (const auto& [instance, _] : list) {
-					std::string name = AssetManagerSystem::GetName(instance);
+			auto draw_entries = [&](const auto& list, std::string_view suffix) {
+				for (const auto& [candidate, _] : list) {
+					std::string name = AssetManagerSystem::GetName(candidate);
 					if (name.empty()) {
-						name = format_guid_hex(instance.m_Value);
+						name = format_guid_hex(candidate.m_Instance.m_Value);
 					}
-					const xresource::full_guid candidate{ instance, type };
 					std::string label_text = suffix.empty() ? name : (name + " " + std::string{ suffix });
 					const bool selected = (!guid.empty() && guid == candidate);
 					if (ImGui::Selectable(label_text.c_str(), selected)) {
@@ -125,8 +124,8 @@ namespace EditorFeatures {
 				}
 			};
 
-			draw_entries(textures, AssetManagerSystem::TEXTURE_GUID, {});
-			draw_entries(cubemaps, AssetManagerSystem::CUBEMAP_GUID, "(Cubemap)");
+			draw_entries(textures, {});
+			draw_entries(cubemaps, "(Cubemap)");
 			ImGui::EndCombo();
 		}
 		return changed;
