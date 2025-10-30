@@ -5,10 +5,6 @@
             "key_action": "JUMP"
         },
         {
-            "glfw_key": 83,
-            "key_action": "MOVE_BACK"
-        },
-        {
             "glfw_key": 87,
             "key_action": "MOVE_FORWARD"
         },

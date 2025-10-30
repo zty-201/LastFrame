@@ -100,11 +100,13 @@ namespace EngineFramework
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         static std::map <std::string, int> key_mapping_data; //json file data
-        void deseralise(); //this wont be called often
+        
         void seralise();
-        void key_mapping_code_gen(); //write to initialise_keymapping
+        void codegen_deseralise();
+        void key_mapping_codegen(); //write to initialise_keymapping
 #endif
         void initialise_keymapping();
+        
         
 
 

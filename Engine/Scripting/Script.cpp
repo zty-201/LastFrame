@@ -100,8 +100,7 @@ namespace Engine {
     static std::string ReadTextFromAssets(const std::filesystem::path& relPath) {
         // relPath should be relative to your Assets root, e.g. "Extern/Scripts/hello.lua"
         auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
-        std::vector<unsigned char> bytes = AM.GetDataFromFile(relPath);
-        return std::string(bytes.begin(), bytes.end());
+        return AM.GetStringFromFile(relPath);
     }
 
 

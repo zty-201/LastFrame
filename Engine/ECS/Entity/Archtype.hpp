@@ -21,6 +21,10 @@ namespace EngineFramework
 
 		//Component data
 		std::vector<entt::meta_any> component_arr;
+		//Label, used by model_manager in level editor to indicate what type of archtype it is.
+		//e.g. "Characters" "Background Objects"
+		//Use a string to be easily customisable. 
+		std::string model_type{};
 	};
 }
 

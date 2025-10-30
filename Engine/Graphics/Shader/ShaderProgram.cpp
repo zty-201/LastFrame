@@ -98,16 +98,14 @@ void ShaderProgram::detachAndDeleteShaderObjects()
 void ShaderProgram::compileShaderFile(const char* fileName, GLenum type)
 {
     //Load using cross-platform compatible function.
-    std::vector<unsigned char> file_data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path(fileName));
+    std::string file_data = EngineFramework::AssetManagerSystem::GetStringFromFile(std::filesystem::path(fileName));
     if (file_data.empty())
     {
         throw std::runtime_error((std::string("Unable to read filepath: ") + fileName + ", when compiling shader.").c_str());
     }
-    //A null-terminated string is expected.
-    file_data.push_back('\0');
     try
     {
-        compileShader(reinterpret_cast<char*>(file_data.data()), type);  // Compile the shader using the code read from the file.
+        compileShader(file_data.c_str(), type);  // Compile the shader using the code read from the file.
     }
     //Rethrow with additional debug info.
     catch (std::runtime_error& e)

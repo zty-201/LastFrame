@@ -179,9 +179,7 @@ namespace EngineFramework
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {
 
-			if (feature->is_enabled) {
-				feature->Initialize();
-			}
+			feature->Initialize();			
 		}
 
 	}
@@ -361,9 +359,16 @@ namespace EngineFramework
 
 		//iterate through the featureMap and runs active subwindows/function
 		for (auto& [name, feature] : featureMap) {
-
-			if (feature->is_enabled) {
-				feature->Run();
+			try
+			{
+				if (feature->is_enabled) {
+					feature->Run();
+				}
+			}
+			catch (std::exception& e)
+			{
+				LOGE("Exception in Level_Editor::main_window() Feature %s: %s", name.c_str(), e.what());
+				continue;
 			}
 		}
 

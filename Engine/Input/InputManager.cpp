@@ -349,8 +349,9 @@ namespace EngineFramework
         windowHeight = GraphicsSystem::GetInstance().GetWindowSize().second;
         initialise_keymapping();
 
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-        deseralise();
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)       
+        codegen_deseralise();
+        seralise();
 #endif        
     }
 
@@ -447,38 +448,10 @@ namespace EngineFramework
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
     /*ONLY AVAILABLE IN DEBUG WHERE LEVEL EDITOR IS OPENED*/
 
-    void InputManager::deseralise() {
-
-        //STORE DATA FROM JSON FILE TO KEY_MAPPING_DATA
-        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Input/key_mapping_data.json";
-
-        std::ifstream Out_File(path);
-        if (!Out_File.is_open())
-        {
-            LOGE("Failed to open file for reading: %s", path.c_str());
-            return;
-        }
-
-        nlohmann::json data;
-        Out_File >> data;
-
-        // Loop through each player
-        for (const auto& KEYS : data["gameplay_keys"])
-        {
-            std::string name = KEYS["key_action"];
-            int score = KEYS["glfw_key"];
-            key_mapping_data[name] = score; 
-        }
-        
-        /*for (const auto& KEYS : key_mapping_data)
-        {
-            std::cout << "key_action: " << KEYS.first << ", glfw_key: " << KEYS.second << "\n";
-        }*/
-        
-    }
 
     void InputManager::seralise() {
         //STORE DATA FROM KEY_MAPPING_DATA TO JSON FILE
+        //logging purpose, does not key data
         nlohmann::json data; // root JSON object
         data["gameplay_keys"] = nlohmann::json::array(); 
 
@@ -507,7 +480,7 @@ namespace EngineFramework
 
     }
 
-    void InputManager::key_mapping_code_gen() {
+    void InputManager::key_mapping_codegen() {
 
         //write to initialise_keymapping
         //write to keyaction.hpp
@@ -559,10 +532,144 @@ namespace EngineFramework
         file_2.close();
 
     }
+
+    void InputManager::codegen_deseralise() {
+        //deseralise keyaction.hpp
+        //checking to be more safe
+
+        std::vector<std::string> enums;
+
+        {
+            std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Engine/Input/Key_Action.hpp";
+
+            std::ifstream in_file(path);
+            if (!in_file.is_open())
+            {
+                LOGE("Failed to open file for reading: %s", path.c_str());
+                return;
+            }
+
+            // Read the entire file into a string
+            std::stringstream buffer;
+            buffer << in_file.rdbuf();
+            std::string content = buffer.str();
+            in_file.close();
+
+            // Remove all whitespace (spaces, tabs, newlines, etc.)
+            content.erase(
+                std::remove_if(content.begin(), content.end(),
+                    [](unsigned char c) { return std::isspace(c); }),
+                content.end()
+            );
+
+            std::string start_token = "enumclassKey_Actions{";
+            std::string end_token = "};";
+
+            size_t start_pos = content.find(start_token);
+            size_t end_pos = content.find(end_token, start_pos);
+
+            if (start_pos != std::string::npos && end_pos != std::string::npos)
+            {
+                start_pos += start_token.length();
+                std::string enum_block = content.substr(start_pos, end_pos - start_pos);
+
+                // Split by commas
+                std::stringstream ss(enum_block);
+                std::string item;
+                while (std::getline(ss, item, ','))
+                {
+                    if (!item.empty())
+                        enums.push_back(item);
+                }
+            }
+
+            // Print results
+            std::cout << "Extracted enum tags:\n";
+            for (const auto& tag : enums)
+                std::cout << tag << std::endl;
+
+        
+        }
+
+        
+
+        //=========================================================================================================
+        //deseralise codegen to keymapping data
+
+        {
+            std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Engine/Input/InputManager_codegen.cpp";
+
+            std::ifstream in_file2(path);
+            if (!in_file2.is_open())
+            {
+                LOGE("Failed to open file for reading: %s", path.c_str());
+                return;
+            }
+
+            // Read the entire file into a string
+            std::stringstream buffer2;
+            buffer2 << in_file2.rdbuf();
+            std::string content = buffer2.str();
+            in_file2.close();
+
+            // Remove all whitespace (spaces, tabs, newlines, etc.)
+            content.erase(
+                std::remove_if(content.begin(), content.end(),
+                    [](unsigned char c) { return std::isspace(c); }),
+                content.end()
+            );
+
+            for (const auto& tag : enums)
+            {
+                // Find Key_Actions::<tag>
+                std::string enum_tag = "Key_Actions::" + tag;
+                size_t pos = content.find(enum_tag);
+                if (pos != std::string::npos)
+                {
+                    //2 cases
+                    //1: key_mapping[Key_Actions::JUMP] = 74;
+                    //2: key_mapping[Key_Actions::JUMP] = 74, key_mapping[Key_Actions::RUN] = 73;
+                    //Pick the nearest next pos of either
+                    size_t equal_pos = content.find('=', pos);
+
+                    if (equal_pos != std::string::npos)
+                    {
+                        size_t semi_pos = content.find(';', equal_pos);
+                        size_t comma_pos = content.find(',', equal_pos);
+                        size_t end_pos = 0;
+
+                        //this is rather impossible, if so, ur program cant compile :/
+                        if (semi_pos == std::string::npos && comma_pos == std::string::npos) {
+                            LOGE("No valid end found for key mapping assignment.");
+                            continue;
+                        }
+
+                        // if ',' exists and it comes before ';'
+                        if (comma_pos != std::string::npos && comma_pos < semi_pos) {
+                            end_pos = comma_pos;
+                        }
+                        else {
+                            end_pos = semi_pos;
+                        }
+
+                        if (end_pos != std::string::npos)
+                        {
+                            std::string number_str = content.substr(equal_pos + 1, end_pos - equal_pos - 1);
+                            if (!number_str.empty())
+                                key_mapping_data[tag] = std::stoi(number_str);
+                        }
+                    }
+                }
+            }
+
+            
+            /*for (const auto& [key, value] : key_mapping_data)
+                std::cout << key << " = " << value << std::endl;*/
+        
+        }
+
+    }
     
-
 #endif
-
-
 
 }
