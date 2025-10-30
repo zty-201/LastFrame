@@ -12,7 +12,7 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 
-// Reuse your existing structs
+// Lighting
 struct Light {
     vec3 position;
     vec3 L;
@@ -32,21 +32,65 @@ struct Material {
     float effect;          
 };
 
-struct Fog {
-    float minDist;            
-    float maxDist;            
-    vec3 color;            
-};
-
 uniform Light light[1];
 uniform Material material;
-uniform Fog fog;
 uniform mat4 V;
-uniform int materialType;
+
+// FOG PARAMETERS
+uniform vec3 fogColor;
+uniform float fogDensity;
+uniform float fogAbsorption;
+uniform vec3 fogLightDirection;
+uniform vec3 fogLightColor;
+uniform float fogLightIntensity;
+uniform float fogAnisotropy;
 
 const float PI = 3.14159265358979323846;
 
-// Copy your lighting calculation functions from Basic.frag
+// =====================================================
+// FOG FUNCTIONS
+// =====================================================
+
+float phaseFunction(float cosAngle, float g)
+{
+    float g2 = g * g;
+    float denom = 1.0 + g2 - 2.0 * g * cosAngle;
+    return (1.0 - g2) / (4.0 * PI * denom * sqrt(denom));
+}
+
+vec3 calculateFog(vec3 viewSpacePos, vec3 litColor)
+{
+    float viewDepth = length(viewSpacePos);
+    
+    // Clamp max distance for stronger effect
+    if (viewDepth > 80.0) {
+        return fogColor;  // ← Objects far away = solid fog color
+    }
+    
+    // Exponential fog falloff - much stronger
+    float fogAmount = 1.0 - exp(-viewDepth * viewDepth * fogDensity * 0.01);
+    
+    // View direction for phase function
+    vec3 viewDir = normalize(viewSpacePos);
+    float cosAngle = dot(viewDir, normalize(fogLightDirection));
+    float phase = phaseFunction(cosAngle, fogAnisotropy);
+    
+    // Light contribution through fog
+    vec3 fogLighting = fogLightColor * fogLightIntensity * phase;
+    
+    // Mix fog color with light contribution
+    vec3 finalFogColor = mix(fogLighting, fogColor, 0.7);  // ← Increase fog color influence
+    
+    // Stronger blending
+    vec3 result = mix(litColor, finalFogColor, fogAmount * 1.2);
+    
+    return result;
+}
+
+// =====================================================
+// PBR FUNCTIONS
+// =====================================================
+
 float ggxDistribution(float nDotH, float roughness) {
     float alpha2 = roughness * roughness * roughness * roughness;
     float d = (nDotH * nDotH) * (alpha2 - 1.0f) + 1.0f;
@@ -63,7 +107,7 @@ vec3 schlickFresnel(float lDotH, vec3 baseReflectivity) {
     return baseReflectivity + (1.0f - baseReflectivity) * pow(1.0f - lDotH, 5.0);
 }
 
-vec3 microfacetModel(vec3 position, vec3 normal, vec3 albedo, float metallic) {
+vec3 microfacetModel(vec3 position, vec3 normal, vec3 albedo, float metallic, float roughness) {
     vec3 lightI = light[0].L;
     vec3 lightPositionInView = (V * vec4(light[0].position, 1.0f)).xyz;
 
@@ -77,40 +121,23 @@ vec3 microfacetModel(vec3 position, vec3 normal, vec3 albedo, float metallic) {
     float nDotH = dot(normal, h);
     float lDotH = dot(l, h);
     float nDotL = max(dot(normal, l), 0.0f);
-    float nDotV = dot(normal, v);
+    float nDotV = max(dot(normal, v), 0.0f);
     
     // Base reflectivity for metals vs dielectrics
     vec3 f0 = vec3(0.04); 
     if (metallic > 0.5) f0 = albedo;
     
-    vec3 specBrdf = 0.25f * ggxDistribution(nDotH, material.rough) * 
-                           schlickFresnel(lDotH, f0) * 
-                           geomSmith(nDotL, material.rough) * 
-                           geomSmith(nDotV, material.rough);
+    vec3 specBrdf = ggxDistribution(nDotH, roughness) * 
+                    schlickFresnel(lDotH, f0) * 
+                    geomSmith(nDotL, roughness) * 
+                    geomSmith(nDotV, roughness) * 0.25f;
 
-    return (albedo + PI * specBrdf) * lightI * nDotL;
+    return (albedo / PI + specBrdf) * lightI * nDotL;
 }
 
-vec3 BlinnPhong(vec3 position, vec3 normal, vec3 albedo) {
-    vec3 lightPosView = vec3(V * vec4(light[0].position, 1.0f));
-
-    vec3 L = lightPosView - position;
-    if (length(L) < 1e-6f) return vec3(0.0f);
-    L = normalize(L);
-
-    vec3 V = normalize(-position);
-    vec3 H = normalize(L + V);
-
-    float NdotL = max(dot(normal, L), 0.0f);
-    float NdotH = max(dot(normal, H), 0.0f);
-
-    vec3 ambient = light[0].La * material.Ka;
-    vec3 diffuse = light[0].Ld * material.Kd * NdotL * albedo;
-    vec3 specular = (NdotL > 0.0f) ? light[0].Ls * material.Ks * 
-                    pow(NdotH, material.shininess) : vec3(0.0f);
-
-    return ambient + diffuse + specular;
-}
+// =====================================================
+// MAIN
+// =====================================================
 
 void main() {
     // 1. Retrieve data from G-buffer
@@ -120,20 +147,16 @@ void main() {
     vec3 albedo = albedoSpec.rgb;
     float metallic = albedoSpec.a;
     
-    // 2. Calculate lighting based on material type
-    vec3 color;
-    if (materialType == 0) {
-        color = microfacetModel(position, normal, albedo, metallic);
-    } else {
-        color = BlinnPhong(position, normal, albedo);
-    }
+    // 2. Calculate PBR lighting
+    vec3 color = microfacetModel(position, normal, albedo, metallic, material.rough);
     
-    // 3. Apply fog (same as in your Basic.frag)
-    float dist = length(position);
-    float fogFactor = clamp((dist - fog.minDist) / (fog.maxDist - fog.minDist), 0.0f, 1.0f);
-    color = mix(color, fog.color, fogFactor);
+    // 3. Add ambient lighting
+    color += albedo * material.Ka;
     
-    // 4. Apply gamma correction
+    // 4. APPLY FOG
+    color = calculateFog(position, color);
+    
+    // 5. Apply gamma correction
     color = pow(color, vec3(1.0f/2.2f));
     
     FragColor = vec4(color, 1.0);

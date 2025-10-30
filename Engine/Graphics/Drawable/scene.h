@@ -107,7 +107,6 @@ struct Scene
     glm::vec3 fogColor;
     float fogMinDist;
     float fogMaxDist;
-    int shadingModel;
 
    
 };

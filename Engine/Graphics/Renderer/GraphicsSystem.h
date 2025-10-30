@@ -98,7 +98,7 @@ namespace EngineFramework
         void SetupGraphics();
 		void GeometryPass(glm::mat4& V, glm::mat4& P);
 		void LightingPass(glm::mat4& V);
-		void ForwardRenderPass(glm::mat4& V, glm::mat4& P, GLuint targetFBO);
+		void ForwardRenderPass(glm::mat4& V, glm::mat4& P);
         void InitializeFullscreenQuad();
 		void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
 

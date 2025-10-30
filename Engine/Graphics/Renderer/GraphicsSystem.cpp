@@ -125,10 +125,6 @@ namespace EngineFramework
 
 		// Other setup code...
 		pScene = std::make_unique<Scene>();
-		pScene->fogColor = { 0.0f, 0.0f, 0.0f };
-		pScene->fogMinDist = 5.0f;
-		pScene->fogMaxDist = 15.0f;
-		pScene->shadingModel = 0;
 	}
 
 	void GraphicsSystem::Update(float deltaTime)
@@ -242,16 +238,15 @@ namespace EngineFramework
 
 	void GraphicsSystem::LightingPass(glm::mat4& V)
 	{
-
 		//-------------------------------------------------------------------------
 		// LIGHTING PASS - Calculate lighting using G-buffer data
 		//-------------------------------------------------------------------------
 		auto light_view = registry.view<LightComponent>();
-		GLuint targetFBO = m_isRenderingToFBO ? mainFBO.handle : 0;
-		glBindFramebuffer(GL_FRAMEBUFFER, targetFBO);
+
+		// render to mainFBO
+		glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
 		glViewport(0, 0, static_cast<GLsizei>(screen.x), static_cast<GLsizei>(screen.y));
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
 		std::shared_ptr<ShaderProgram> lighting_shader{};
 		if (lighting_shader_guid != xresource::full_guid{})
@@ -281,10 +276,6 @@ namespace EngineFramework
 		lighting_shader->setUniform("gAlbedoSpec", 2);
 
 		// Set lighting uniforms
-		lighting_shader->setUniform("materialType", pScene->shadingModel);
-		lighting_shader->setUniform("fog.color", pScene->fogColor);
-		lighting_shader->setUniform("fog.minDist", pScene->fogMinDist);
-		lighting_shader->setUniform("fog.maxDist", pScene->fogMaxDist);
 		lighting_shader->setUniform("V", V);
 
 		// Set light uniforms
@@ -326,32 +317,47 @@ namespace EngineFramework
 		lighting_shader->setUniform("material.Kd", glm::vec3(0.7f));
 		lighting_shader->setUniform("material.Ks", glm::vec3(1.0f));
 		lighting_shader->setUniform("material.shininess", 32.0f);
-		lighting_shader->setUniform("material.rough", 0.5f);  
+		lighting_shader->setUniform("material.rough", 0.5f);
 		lighting_shader->setUniform("material.metal", 0.0f);
-		// Draw fullscreen quad to apply lighting
+
+		// ========== FOG UNIFORMS ==========
+		lighting_shader->setUniform("fogColor", glm::vec3(0.5f, 0.55f, 0.65f));  // Darker fog
+		lighting_shader->setUniform("fogDensity", 0.20f);  // INCREASE from 0.08f
+		lighting_shader->setUniform("fogAbsorption", 0.7f);  // INCREASE from 0.5f
+		lighting_shader->setUniform("fogLightDirection", glm::normalize(glm::vec3(0.2f, 0.8f, 0.3f)));
+		lighting_shader->setUniform("fogLightColor", glm::vec3(1.0f, 0.95f, 0.85f));
+		lighting_shader->setUniform("fogLightIntensity", 1.5f);  // INCREASE from 1.2f
+		lighting_shader->setUniform("fogAnisotropy", 0.4f);  // INCREASE from 0.3f
+
+		// Draw fullscreen quad
 		glDisable(GL_DEPTH_TEST);
 		glBindVertexArray(fullscreenQuadVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glEnable(GL_DEPTH_TEST);
 
-		// Copy depth buffer from G-buffer to main framebuffer for forward rendering
+		lighting_shader->disuse();
+
+		// Copy depth buffer from G-buffer to mainFBO for forward rendering
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferFBO.handle);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, targetFBO);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mainFBO.handle);
 		glBlitFramebuffer(
 			0, 0, static_cast<GLuint>(screen.x), static_cast<GLuint>(screen.y),
 			0, 0, static_cast<GLuint>(screen.x), static_cast<GLuint>(screen.y),
 			GL_DEPTH_BUFFER_BIT, GL_NEAREST
 		);
-		glBindFramebuffer(GL_FRAMEBUFFER, targetFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
 	}
 
-	void GraphicsSystem::ForwardRenderPass(glm::mat4& V, glm::mat4& P, GLuint targetFBO)
+	void GraphicsSystem::ForwardRenderPass(glm::mat4& V, glm::mat4& P)
 	{
 		//-------------------------------------------------------------------------
 		// FORWARD PASS - Render transparent objects and skybox
 		//-------------------------------------------------------------------------
+		glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
+		glViewport(0, 0, static_cast<GLsizei>(screen.x), static_cast<GLsizei>(screen.y));
+		// Don't clear - we're compositing on top of lighting result
+
 		auto light_view = registry.view<LightComponent>();
-		// Use the forward rendering shader for transparent objects and skybox
 
 		std::shared_ptr<ShaderProgram> forward_shader{};
 		if (forward_shader_guid != xresource::full_guid{})
@@ -369,10 +375,6 @@ namespace EngineFramework
 
 		// Set global uniforms
 		forward_shader->setUniform("Pass", 0);
-		forward_shader->setUniform("fog.color", pScene->fogColor);
-		forward_shader->setUniform("fog.minDist", pScene->fogMinDist);
-		forward_shader->setUniform("fog.maxDist", pScene->fogMaxDist);
-		forward_shader->setUniform("materialType", pScene->shadingModel);
 		forward_shader->setUniform("V", V);
 		forward_shader->setUniform("P", P);
 
@@ -383,7 +385,7 @@ namespace EngineFramework
 			Light::setUniforms(light, forward_shader, light_index++);
 		}
 
-		// --- 3. RENDER SCENE OBJECTS ---
+		// --- RENDER SCENE OBJECTS ---
 		glDepthFunc(GL_LESS);
 		glDepthMask(GL_TRUE);
 		glEnable(GL_CULL_FACE);
@@ -406,7 +408,7 @@ namespace EngineFramework
 			glBindVertexArray(vao);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, batch.instanceSSBO);
 
-			// Set per-batch material uniforms (same as geometry pass)
+			// Set per-batch material uniforms
 			forward_shader->setUniform("material.Ka", batch.batchMaterial.Ka);
 			forward_shader->setUniform("material.Kd", batch.batchMaterial.Kd);
 			forward_shader->setUniform("material.Ks", batch.batchMaterial.Ks);
@@ -445,106 +447,13 @@ namespace EngineFramework
 				GL_UNSIGNED_INT,
 				nullptr,
 				static_cast<GLsizei>(batch.currentInstanceCount));
+
+			if (isCheckerboard) {
+				glCullFace(GL_BACK);
+			}
 		}
 
-		//auto scene_view = registry.view<TransformComponent, MaterialComponent, MeshComponent, SceneRenderPass>();
-		//for (auto [entity, transform, material, mesh] : scene_view.each())
-		//{
-		//	// Load mesh if not cached
-		//	if (meshCache.find(mesh.meshName) == meshCache.end()) {
-		//		LoadAndCacheMesh(mesh.meshName);
-		//	}
-		//	auto& [vao, indexCount] = meshCache[mesh.meshName];
-
-		//	glBindVertexArray(vao);
-
-		//	bool isCheckerboard = (material.effect == 3.0f);
-		//	if (isCheckerboard) {
-		//		glCullFace(GL_FRONT);
-		//	}
-
-		//	// **NEW: Check for texture and bind it**
-		//	bool hasTexture = false;
-		//	if (registry.all_of<TextureComponent>(entity))
-		//	{
-		//		auto& texComp = registry.get<TextureComponent>(entity);
-		//		auto texture = AssetManagerSystem::GetResource<Scene::Texture>(texComp.texture_guid);
-
-		//		if (texture && texture->id != 0)
-		//		{
-		//			glActiveTexture(GL_TEXTURE0); // Diffuse always on unit 0
-		//			glBindTexture(texture->target, texture->id);
-		//			forward_shader->setUniform("DiffuseTex", 0);
-		//			hasTexture = true;
-		//		}
-		//	}
-		//	forward_shader->setUniform("UseTexture", hasTexture);
-
-		//	// Bind normal map (separate check)
-		//	bool hasNormalMap = false;
-		//	if (registry.all_of<NormalMapComponent>(entity))
-		//	{
-		//		auto& normalComp = registry.get<NormalMapComponent>(entity);
-		//		auto normalMap = AssetManagerSystem::GetResource<Scene::Texture>(normalComp.normalmap_guid);
-
-		//		if (normalMap && normalMap->id != 0)
-		//		{
-		//			glActiveTexture(GL_TEXTURE2); // Normal map on unit 2
-		//			glBindTexture(GL_TEXTURE_2D, normalMap->id);
-		//			forward_shader->setUniform("NormalMap", 2);
-		//			hasNormalMap = true;
-		//		}
-		//	}
-		//	forward_shader->setUniform("UseNormalMap", hasNormalMap);
-
-		//	forward_shader->setMaterialUniforms(material);
-		//	CalculateModelMatrix(transform, transform.modelMatrix);
-		//	forward_shader->setUniform("M", transform.modelMatrix);
-
-		//	glDrawElements(GL_TRIANGLES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
-
-		//	if (isCheckerboard) {
-		//		glCullFace(GL_BACK);
-		//	}
-
-		//	// --- 3.5. Debug Drawing ---
-		//	if (show_debugDraw) {
-		//		// 1) Ensure a wire VAO exists for this mesh
-		//		auto itWire = meshCacheWire.find(mesh.meshName);
-		//		if (itWire == meshCacheWire.end()) {
-		//			// Rebuild cache entries (creates wire VAO/EBO too)
-		//			LoadAndCacheMesh(mesh.meshName);
-		//			itWire = meshCacheWire.find(mesh.meshName);
-		//		}
-		//		if (itWire == meshCacheWire.end())
-		//			break; // nothing to draw for this mesh
-
-		//		const auto& [wireVAO, wireIndexCount] = itWire->second;
-
-		//		// 2) Save minimal GL state we’re about to touch
-		//		const GLboolean depthEnabled = glIsEnabled(GL_DEPTH_TEST);
-		//		const GLboolean cullEnabled = glIsEnabled(GL_CULL_FACE);
-
-		//		// 3) Overlay: draw lines without depth testing so they’re always visible
-		//		glDisable(GL_DEPTH_TEST);
-		//		glDisable(GL_CULL_FACE);
-		//		glLineWidth(1.0f);                 // ES often clamps to 1.0
-
-		//		forward_shader->setUniform("Pass", 2);     // flat debug branch in your frag shader
-		//		forward_shader->setUniform("M", transform.modelMatrix);
-
-		//		glBindVertexArray(wireVAO);
-		//		glDrawElements(GL_LINES, (GLsizei)wireIndexCount, GL_UNSIGNED_INT, 0);
-		//		glBindVertexArray(0);
-
-		//		// 4) Restore shader + GL state
-		//		forward_shader->setUniform("Pass", 0);
-		//		if (cullEnabled)  glEnable(GL_CULL_FACE);  else glDisable(GL_CULL_FACE);
-		//		if (depthEnabled) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
-		//	}
-		//}
-
-		// --- 4. RENDER SKYBOX ---
+		// --- RENDER SKYBOX ---
 		glDepthFunc(GL_LEQUAL);
 		glDepthMask(GL_FALSE);
 		glDisable(GL_CULL_FACE);
@@ -554,7 +463,6 @@ namespace EngineFramework
 		auto skybox_view = registry.view<MeshComponent, SkyboxRenderPass>();
 		for (auto [entity, mesh] : skybox_view.each())
 		{
-
 			if (meshCache.find(mesh.meshName) == meshCache.end()) {
 				LoadAndCacheMesh(mesh.meshName);
 			}
@@ -572,20 +480,16 @@ namespace EngineFramework
 				}
 			}
 
-
 			glBindVertexArray(vao);
 			glDrawElements(GL_TRIANGLES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
 		}
 
-		// --- FINAL CLEANUP ---
+		// --- CLEANUP ---
 		glBindVertexArray(0);
 		forward_shader->disuse();
 		glDepthFunc(GL_LESS);
 		glEnable(GL_CULL_FACE);
 		glDepthMask(GL_TRUE);
-		if (targetFBO != 0) {
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		}
 	}
 
 	void GraphicsSystem::RenderScene()
@@ -604,15 +508,41 @@ namespace EngineFramework
 		glm::mat4 P = Camera::getPerspective(*active_camera, aspect);
 
 		m_instancingSystem->PrepareBatches();
-		m_instancingSystem->PrintStatistics();
+		//m_instancingSystem->PrintStatistics();
 
-		// Geometry Pass
+		LOGI("\n========== RENDER FRAME START ==========");
+
+		// Step 1: Geometry Pass
+		LOGI(">>> Starting Geometry Pass");
 		GeometryPass(V, P);
-		// Lighting Pass
+		LOGI("<<< Geometry Pass Complete");
+
+		// Step 2: Lighting Pass (WITH FOG INTEGRATED)
+		LOGI(">>> Starting Lighting Pass (with fog)");
 		LightingPass(V);
-		// Forward Render Pass
-		GLuint targetFBO = m_isRenderingToFBO ? mainFBO.handle : 0;
-		ForwardRenderPass(V, P, targetFBO);
+		LOGI("<<< Lighting Pass Complete");
+
+		// Step 3: Forward Render Pass
+		LOGI(">>> Starting Forward Render Pass");
+		// Determine target FBO
+		ForwardRenderPass(V, P);
+		LOGI("<<< Forward Render Pass Complete");
+
+		// Step 4: Copy to screen if not rendering to FBO
+		if (!m_isRenderingToFBO) {
+			LOGI(">>> Copying result to screen");
+			glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glBlitFramebuffer(
+				0, 0, static_cast<GLuint>(screen.x), static_cast<GLuint>(screen.y),
+				0, 0, static_cast<GLuint>(screen.x), static_cast<GLuint>(screen.y),
+				GL_COLOR_BUFFER_BIT, GL_NEAREST
+			);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			LOGI("<<< Copy Complete");
+		}
+
+		LOGI("========== RENDER FRAME END ==========\n");
 		
 	}
 
