@@ -25,7 +25,8 @@ namespace EngineFramework
 {
 	AssetWindow::AssetWindow()
 	{
-		currentDirectory = AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern"; // Start at project asset root
+        this_class = this;
+		rootAssetDirectory = currentDirectory = AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern"; // Start at project asset root
 	}
 
 	AssetWindow::~AssetWindow()
@@ -36,18 +37,32 @@ namespace EngineFramework
 	void AssetWindow::Initialize()
 	{
         /*m_FolderIcon = LoadTextureFromFile("")*/
+        is_window = false;   
+        init_flags();
+        init_extensions();
+
+        /*
+        * 
+        */
+        
 	}
 
 	void AssetWindow::Run()
 	{
+        
+
         if (!is_enabled) return;
+
+        if (is_window) {
+            open_window();
+        }
 
         if (ImGui::Begin("Asset Browser", &is_enabled))
         {
             // --- Header --- 
             ImGui::Text("Current: %s", currentDirectory.filename().string().c_str());
             ImGui::Separator();
-            if (currentDirectory.has_parent_path()) {
+            if (currentDirectory != rootAssetDirectory && currentDirectory.has_parent_path()) {
                 if (ImGui::Button("Back")) {
                     currentDirectory = currentDirectory.parent_path();
                 }
@@ -68,6 +83,10 @@ namespace EngineFramework
             if (ImGui::Button("Refresh", ImVec2(buttonWidth, 0))) {
                 AssetManagerSystem::GetInstance().RemoveAllResources();
                 AssetManagerSystem::GetInstance().LoadAllResources();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Link Component")) {
+                is_window = true;
             }
 
             ImGui::Separator();
@@ -116,35 +135,31 @@ namespace EngineFramework
 
                     std::string extension = entry.path().extension().string();
 
-                    bool isTexture = extension == ".png";
-
-                    if (isTexture)
-                    {
-                        // Draw as image button if you have thumbnails (placeholder here)
-                        if (ImGui::Button("Tex", { thumbnailSize, thumbnailSize })) {
-                            selectedAsset = entry.path();
-                        }
-
-                        // Begin drag-drop source for textures
-                        if (ImGui::BeginDragDropSource())
-                        {
-                            // Payload type = "Textures"
-                            std::string pathStr = entry.path().string();
-                            ImGui::SetDragDropPayload("Textures", pathStr.c_str(), pathStr.size() + 1);
-
-                            // Preview text + placeholder thumbnail
-                            ImGui::TextUnformatted(fileName.c_str());
-                            ImGui::Image((ImTextureID)0, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
-                            ImGui::EndDragDropSource();
-                        }
+                    // Draw simple button
+                    if (ImGui::Button(extension.c_str(), {thumbnailSize, thumbnailSize})) {
+                        selectedAsset = entry.path();
                     }
-                    else
+
+                    // Begin drag-drop source for all file types
+                    if (ImGui::BeginDragDropSource())
                     {
-                        // Non-texture files: draw simple button
-                        if (ImGui::Button("File", { thumbnailSize, thumbnailSize })) {
-                            selectedAsset = entry.path();
-                        }
+                        // Payload type
+                        std::string pathStr = entry.path().string();
+
+                        //*****Set payload type for targets with specific requirements*****
+                        const char* payloadType;
+                        if (extension == ".png") payloadType = "Textures";
+                        //else if (extension == ".xyz" || extension == ".abc") payloadType = "defghi";
+                        else payloadType = "GENERAL";
+
+                        ImGui::SetDragDropPayload(payloadType, pathStr.c_str(), pathStr.size() + 1);
+
+                        // Preview text + placeholder thumbnail
+                        ImGui::TextUnformatted(fileName.c_str());
+                        ImGui::Image((ImTextureID)0, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
+                        ImGui::EndDragDropSource();
                     }
+                    
 
                     ImGui::TextWrapped("%s", fileName.c_str());
 
@@ -165,6 +180,504 @@ namespace EngineFramework
         }
         ImGui::End();
 	}
+
+    void AssetWindow::open_window() {
+
+        static bool open_popup= false;
+        static std::string POPUP_NAME;
+        static std::pair<std::string, std::string> component_variable_selected;
+
+        if (open_popup) {
+            ImGui::OpenPopup(POPUP_NAME.c_str()); //if edited, open popup
+            open_popup = false;
+        }
+
+        if (ImGui::Begin("Manage Component Asset", &is_window)) {
+            ImGui::TextWrapped("Select a componenent that is registered to entt:meta. Select it's variable that require asset from the asset browser. Include the file type that it accepts.");
+            
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+            ImGui::TextWrapped("Variables without any file types selected will be marked red. It will not be seralised when saved.");
+            ImGui::PopStyleColor();
+            
+            ImGui::Dummy(ImVec2(0.0f, 20.f));
+            if (ImGui::Button("Choose Component")) {
+                open_popup = true;
+                POPUP_NAME = "Choose A Component";
+            }
+            ImGui::Dummy(ImVec2(0.0f, 20.f));
+            for (const auto& [component, variables] : component_mapping) {
+                
+                ImGui::SeparatorText(component.c_str());
+                ImGui::Dummy(ImVec2(0.0f, 20.f));
+
+                for (const auto& [variable, tags] : variables) {
+
+                    if (tags.empty()) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+                        ImGui::Text(variable.c_str());
+                        ImGui::PopStyleColor();
+                    }else{
+                        ImGui::Text(variable.c_str());
+                    }
+                    
+                    ImGui::SameLine();
+
+                    std::string button_id = "Edit Tags##" + variable; // text before ## is visible, after ## is internal ID
+
+                    if (ImGui::Button(button_id.c_str()))
+                    {
+                        ImGui::CloseCurrentPopup();
+                        
+                        POPUP_NAME = "Edit/Add Tags";
+                        open_popup = true;
+                        component_variable_selected.first = component;
+                        component_variable_selected.second = variable;
+                    }
+
+                }
+                ImGui::Dummy(ImVec2(0.0f, 20.f));
+            }
+
+        }
+        ImGui::End();
+
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+        ImGui::SetNextWindowSize(ImVec2(600, 720), ImGuiCond_Once);
+
+        ImGui::SetNextWindowSize(ImVec2(600, 720), ImGuiCond_Once);
+        if (ImGui::BeginPopupModal("Choose A Component", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove))
+        {
+            static entt::meta_type selected_type{};
+
+            ImGui::BeginChild("LeftPanel", ImVec2(300, 600), true);
+            {
+                ImGui::TextWrapped("Select a new Component");
+                ImGui::Dummy(ImVec2(0.0f, 20.f));
+                ImGui::Separator();
+
+                for (const auto& [type_id, meta] : entt::resolve()) {
+                    // Only show if the meta type represents a real class
+                    if (!meta.is_class())
+                        continue;
+
+                    // Only show if the registry has storage for this component type
+                    auto* storage = registry.storage(type_id);
+                    if (!storage || storage->size() == 0)
+                        continue;
+
+                    // Get the registered type name (the string from .type("MeshComponent"))
+                    const char* name = meta.name();
+                    if (!name || name[0] == '\0')
+                        continue;
+
+                    if (ImGui::Selectable(name, selected_type == meta, ImGuiSelectableFlags_DontClosePopups)) {
+                        selected_type = meta;
+                    }
+                }
+
+
+            }
+            ImGui::EndChild();
+
+            
+            ImGui::SameLine();
+
+            // --- Right panel ---
+            ImGui::BeginChild("RightPanel", ImVec2(0, 600), true);
+            {
+                
+                if (selected_type) {
+
+                    ImGui::Text("Choose the variable(s) to link");
+                    ImGui::Separator();
+
+                   
+                    for (auto&& [id, variable] : selected_type.data()) {
+                        
+                        const char* name = variable.name();                            
+                        ImGui::Checkbox(name, &flag(selected_type.name(), name));
+
+                    }
+
+                    
+
+                }
+
+            }
+            ImGui::EndChild();
+
+            ImGui::Dummy(ImVec2(0.0f, 20.f));
+            if (ImGui::Button("Confirm and Close"))
+            {
+                ImGui::CloseCurrentPopup();
+                open_popup = false;
+                selected_type = entt::meta_type{};
+                update_map(); //update component_map
+            }
+
+            ImGui::EndPopup();
+        }
+
+        ImGui::SetNextWindowSize(ImVec2(600, 600), ImGuiCond_Once);
+        if (ImGui::BeginPopupModal("Edit/Add Tags", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove))
+        {
+            auto it = component_mapping.find(component_variable_selected.first);
+            if (it != component_mapping.end()) {
+                auto iter = it->second.find(component_variable_selected.second);
+                if (iter != it->second.end()) {
+
+                    static int current_item = -1; // none is selected
+                    const char* preview = (current_item >= 0) ? valid_extensions[current_item].c_str() : "Choose a file extension";
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    if (ImGui::BeginCombo("##ExtensionCombo", preview)) {
+                        for (int n = 0; n < valid_extensions.size(); n++) {
+                            bool is_selected = (current_item == n);
+                            if (ImGui::Selectable(valid_extensions[n].c_str(), is_selected))
+                                current_item = n;
+
+                            if (is_selected)
+                                ImGui::SetItemDefaultFocus();
+                        }
+                        ImGui::EndCombo();
+                    }
+
+                    if (ImGui::Button("Add")) {
+                        //if it the tag is not repeated, then add)
+                        if (current_item != -1 && check_extension_validity(valid_extensions[current_item])) {
+                            iter->second.insert(valid_extensions[current_item]);
+                            current_item = -1;
+                        }                       
+                    }
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.90f, 0.20f, 0.20f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.95f, 0.35f, 0.35f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.80f, 0.15f, 0.15f, 1.0f));
+
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    for (std::string tag : iter->second) {
+                        ImGui::TextWrapped(tag.c_str());
+                        ImGui::SameLine();
+                        if (ImGui::Button(("-##" + tag).c_str()))
+                        {
+                            iter->second.erase(tag);                                                 
+                            break;
+                        }
+                    }
+
+                    ImGui::PopStyleColor(3);
+
+                }
+            }
+            ImGui::Dummy(ImVec2(0.0f, 20.f));
+           
+            if (ImGui::Button("Confirm"))
+            {               
+                ImGui::CloseCurrentPopup();
+                open_popup = false;                              
+            }
+
+            ImGui::EndPopup();
+        }
+
+
+    }
+
+    bool AssetWindow::check_extension_validity(std::string tag) {
+        
+        for (std::string extension: valid_extensions) {
+            if (extension == tag) return true;
+        }
+        return false;
+    }
+    void AssetWindow::update_map() {
+       
+        for (const auto& [component, variables] : component_validity_flags) {
+            
+            for (const auto& [variable, flag] : variables) {
+                if (flag) {
+                    //2 cases
+                    //case 1: newly added
+                    //case2: based on old value (carry forward)
+                    std::vector<std::string> tags{};
+                    if (!get_tags(component,variable, tags)) {                        
+                        component_mapping[component][variable] = std::set<std::string>{};
+                    }                   
+                    
+                }
+                else {
+                    //2 cases
+                    //case 1: removed if it exists
+                    //case2: based on old value (carry forward)
+
+                    std::vector<std::string> tags{};
+                    if (get_tags(component, variable, tags)) {
+                        //case 1, do not care about case 2
+
+                        auto it = component_mapping.find(component);
+                        if (it != component_mapping.end()) {
+                            auto& iter = it->second;
+                            iter.erase(variable);
+
+                            // if component has no variables left, erase it too
+                            if (iter.empty()) {
+                                component_mapping.erase(it);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        
+
+    }
+    
+
+    /*
+    * return false if the component's variable does not exists in the component mapping
+    */
+    bool AssetWindow::get_tags(const std::string& component, const std::string& variable, std::vector<std::string> &tags) {
+
+        auto it = component_mapping.find(component);
+        if (it == component_mapping.end()) {
+            return false;
+        }
+
+        auto iter = it->second.find(variable);
+        if (iter == it->second.end())
+            return false;
+
+        std::vector<std::string> all_tags{};
+        for (std::string tag: iter->second) {
+            all_tags.push_back(tag);
+        }
+        tags = all_tags;
+
+        return true;
+    }
+
+    /*
+        have to ensure that whatever you are passing is in the map
+    */
+
+    void AssetWindow::init_extensions() {
+
+        valid_extensions = {
+            // --- Images ---
+            ".png", ".jpg", ".jpeg",
+
+            // --- Audio ---
+            ".wav", ".mp3",
+
+            // --- 3D Models / Meshes ---
+            ".obj",
+
+            // --- Text / Config / Data ---
+            ".txt", ".json",
+
+            // --- Shaders / Code ---
+            ".vert", ".frag", ".comp", ".glsl", ".shader",
+
+            // --- Fonts ---
+            ".ttf", ".otf", ".fnt",
+
+            // --- Video ---
+            ".mp4", ".mov", ".mkv"
+        };
+
+    }
+    void AssetWindow::init_flags() {
+
+        /*
+            contains all components and variable in entt::meta, all flags are false
+        */
+        
+        for (const auto& [type_id, meta] : entt::resolve()) {
+            // Only show if the meta type represents a real class
+            if (!meta.is_class())
+                continue;
+
+            auto* storage = registry.storage(type_id);
+            if (!storage || storage->size() == 0)
+                continue;
+
+            const char* name = meta.name();
+            if (!name || name[0] == '\0')
+                continue;
+
+            for (auto&& [id, variable] :meta.data()) {
+
+                const char* var_name = variable.name();
+
+                component_validity_flags[name][var_name] = false;
+
+            }
+
+        }
+
+        /*
+        *   deseralise file that contains tags, then turn the selected flags  = true
+        */
+
+        deseralise();
+        for (const auto& [component, variables] : component_mapping) {
+
+            auto it = component_validity_flags.find(component);
+            if (it != component_validity_flags.end()) {
+
+                for (const auto& [variable, tags] : variables) {
+                    auto iter = it->second.find(variable);
+                    if (iter != it->second.end()) {
+                        iter->second = true;
+                    }
+                }
+            }
+                
+        }
+
+    }
+
+    void AssetWindow::seralise() {
+
+        //STORE DATA FROM KEY_MAPPING_DATA TO JSON FILE
+        //logging purpose, does not key data
+        nlohmann::json data;
+        data["component_mapping"] = nlohmann::json::array();
+
+        // Loop through outer map (component → variables)
+        for (const auto& [component, variables] : component_mapping) {
+            // Loop through inner map (variable → tags)
+            for (const auto& [variable, tags] : variables) {
+                //only write those componet-variable where extensions are included.
+                if (!tags.empty()) {
+                    nlohmann::json entry;
+                    entry["component"] = component;
+                    entry["variable"] = variable;
+                    entry["tags"] = tags; // vector<string> auto converts to JSON array
+
+                    data["component_mapping"].push_back(entry);
+                }
+                
+            }
+        }
+
+        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/LevelEditor/component_mapping.json";
+
+        std::ofstream file(path);
+        if (!file.is_open()) {
+            LOGE("Failed to open file for writing: %s", path.c_str());
+            return;
+        }
+
+        file << data.dump(4); // pretty-print with indentation
+        file.close();
+
+
+    }
+
+    void AssetWindow::deseralise() {
+
+        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/LevelEditor/component_mapping.json";
+
+        std::ifstream file(path);
+        if (!file.is_open()) {
+            LOGE("Failed to open file for reading: %s", path.c_str());
+            return;
+        }
+
+        nlohmann::json data;
+        file >> data;
+        file.close();
+
+        component_mapping.clear();
+
+        // Ensure expected JSON structure
+        if (!data.contains("component_mapping") || !data["component_mapping"].is_array())
+            return;
+
+        for (const auto& entry : data["component_mapping"]) {
+            // Extract component, variable, and tags
+            std::string component = entry.value("component", "");
+            std::string variable = entry.value("variable", "");
+            std::set<std::string> tags;
+
+            if (entry.contains("tags") && entry["tags"].is_array()) {
+                for (const auto& t : entry["tags"]) {
+                    if (t.is_string())
+                        tags.insert(t.get<std::string>());
+                }
+            }
+
+            // Only insert valid entries
+            if (!component.empty() && !variable.empty()) {
+                component_mapping[component][variable] = tags;
+            }
+        }
+
+    }
+
+
+    const bool& AssetWindow::flag(const std::string& component, const std::string& variable) const{
+
+        auto it = component_validity_flags.find(component);
+        if (it == component_validity_flags.end()) {
+            throw std::out_of_range("No such component or variable: " + variable + " in: " + component);
+        }
+
+        auto iter = it->second.find(variable);
+        if (iter == it->second.end())
+            throw std::out_of_range("No such component or variable: " + variable + " in: " + component);
+
+        return iter->second;
+
+    }
+
+    bool& AssetWindow::flag(const std::string& component, const std::string& variable) {
+
+        auto it = component_validity_flags.find(component);
+        if (it == component_validity_flags.end()) {
+            throw std::out_of_range("No such component or variable: " + variable + " in: " + component);
+        }
+
+        auto iter = it->second.find(variable);
+        if (iter == it->second.end())
+            throw std::out_of_range("No such component or variable: " + variable + " in: " + component);
+
+
+        return iter->second;
+
+    }
+
+    void AssetWindow::sample_drag_drop() {
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            std::vector<std::string> tags; //a reference
+
+            //component name, variable name, 
+            //get tags return false if whatever we are looking for is not in the component_mapping map
+            //component_mapping map contains the elements (and the extension that they accepts) that requires asset browser
+            if (get_tags("MeshComponent", "indexCount", tags)) {
+
+                for (const auto& type : tags)
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(type.c_str()))
+                    {
+                        const char* droppedPath = static_cast<const char*>(payload->Data);
+
+                        std::cout << "filedropped: " << droppedPath << std::endl;
+
+                        //.... change the variable value to whatever ...
+
+                        break; 
+                    }
+                }
+            }
+
+            ImGui::EndDragDropTarget();
+        }
+    }
 
 	void AssetWindow::Close()
 	{

@@ -35,7 +35,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Save.hpp"
 //#include <iostream>
 #include "System_GameObjectSystem.hpp"
-
+#include "InputManager.hpp"
+#include "AssetWindow.hpp"
 namespace EngineFramework
 {
     Save::Save() {
@@ -121,6 +122,10 @@ namespace EngineFramework
 
         if (!save_Archtypes()) return false;
         if (!save_Instances(filename)) return false;
+
+        InputManager::GetInstance().key_mapping_codegen();
+        InputManager::GetInstance().seralise();
+        AssetWindow::GetInstance().seralise();
 
         return true;
 

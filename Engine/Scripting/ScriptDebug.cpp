@@ -31,8 +31,7 @@ namespace Engine {
 
             // Load the test script once during initialization
             auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
-            std::vector<unsigned char> bytes = AM.GetDataFromFile("Extern/Scripts/test.lua");
-            std::string code(bytes.begin(), bytes.end());
+            std::string code = AM.GetStringFromFile("Extern/Scripts/test.lua");
             auto chunk = lua.load(code, "Extern/Scripts/test.lua");
             chunk(); // execute
 

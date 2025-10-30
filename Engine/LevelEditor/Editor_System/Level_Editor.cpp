@@ -49,6 +49,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 // /Debug
 #include "Profiler.hpp"
 
+// Property
+#include "PropertyManager.hpp"
+#include "GameplayKeyManager.hpp"
+
 namespace EngineFramework
 {
 	bool LevelEditor::is_enabled = true;
@@ -113,8 +117,14 @@ namespace EngineFramework
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 		io.ConfigWindowsMoveFromTitleBarOnly = true;
+		
+		// Register reflection (TESTING PURPOSES)
+		EngineFramework::RegisterReflection();
 
-
+		auto cam = entt::resolve<CameraComponent>();
+		const size_t camFields = (size_t)std::distance(cam.data().begin(), cam.data().end());
+		printf("[Reflection] CameraComponent fields registered: %zu\n", camFields);
+		
 		/*
 		 Check if ImGui needs the keyboard. If so, disable in-game key input.
 		 e.g. Typing into an imgui text field shouldn't move the player.
@@ -160,7 +170,8 @@ namespace EngineFramework
 		addFeature("SceneManager", std::make_unique<SceneManager>()); //
 		addFeature("AssetWindow", std::make_unique<AssetWindow>());//
 		addFeature("ModelManager", std::make_unique<ModelManager>());//
-
+		addFeature("Gameplay_KeyManager", std::make_unique<Gameplay_KeyManager>());
+		addFeature("PropertyManager", std::make_unique<LFeature_PropertyManager>());
 		
 
 		SceneManager::GetInstance().ScanScenes(AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scenes");//
@@ -168,9 +179,7 @@ namespace EngineFramework
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {
 
-			if (feature->is_enabled) {
-				feature->Initialize();
-			}
+			feature->Initialize();			
 		}
 
 	}
@@ -247,17 +256,32 @@ namespace EngineFramework
 
 
 				if (ImGui::BeginMenu("Manage")) {
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
 
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));      // White text
+					ImGui::MenuItem("Model Manager", nullptr, &featureFlag("ModelManager"));
+					ImGui::Separator();
+					ImGui::MenuItem("Object Manager", nullptr, &featureFlag("ObjectManager"));
 
-					ImGui::MenuItem("Model Manager", NULL, &featureFlag("ModelManager"));
 					ImGui::Separator();
-					ImGui::MenuItem("Object Manager", NULL, &featureFlag("ObjectManager"));
+					if (ImGui::BeginMenu("Property Manager")) {
+						if (auto it = featureMap.find("PropertyManager"); it != featureMap.end()) {
+							bool& enabled = it->second->is_enabled;
+							if (ImGui::MenuItem("Show Properties", nullptr, enabled)) {
+								enabled = !enabled;
+							}
+						}
+						else {
+							ImGui::TextDisabled("Feature not registered");
+						}
+						ImGui::EndMenu();   // <-- restore balance
+					}
+
 					ImGui::Separator();
-					ImGui::MenuItem("Property Manager", NULL);
+					ImGui::MenuItem("Asset Browser", nullptr, &featureFlag("AssetWindow"));
 					ImGui::Separator();
-					ImGui::MenuItem("Asset Browser", NULL, &featureFlag("AssetWindow"));
-					ImGui::PopStyleColor();  // Pop the white text color for "File" menu
+					ImGui::MenuItem("Input Key Manager", NULL, &featureFlag("Gameplay_KeyManager"));
+					ImGui::Separator();
+					ImGui::PopStyleColor();
 					ImGui::EndMenu();
 				}
 
@@ -290,6 +314,30 @@ namespace EngineFramework
 
 					ImGui::EndMenu();
 				}
+				//if (ImGui::BeginMenu("Property Manager")) {
+				//	bool* enabledPtr = nullptr;
+
+				//	if (auto it = featureMap.find("PropertyManager"); it != featureMap.end()) {
+				//		enabledPtr = &it->second->is_enabled;               // use base pointer, no cast
+				//	}
+
+				//	bool on = enabledPtr ? *enabledPtr : false;
+
+				//	// If feature not found, item is disabled and shows (so you see text)
+				//	if (ImGui::MenuItem("Show Properties", nullptr,
+				//		enabledPtr ? &on : nullptr,          // checkbox only if feature exists
+				//		enabledPtr != nullptr))              // enabled/disabled state
+				//	{
+				//		*enabledPtr = on;                                    // toggle when present
+				//	}
+
+				//	if (!enabledPtr) {
+				//		ImGui::TextDisabled("Feature not registered");
+				//	}
+
+				//	ImGui::EndMenu();
+				//}
+
 
 				ImGui::SameLine(0, 50.f);
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
@@ -311,9 +359,16 @@ namespace EngineFramework
 
 		//iterate through the featureMap and runs active subwindows/function
 		for (auto& [name, feature] : featureMap) {
-
-			if (feature->is_enabled) {
-				feature->Run();
+			try
+			{
+				if (feature->is_enabled) {
+					feature->Run();
+				}
+			}
+			catch (std::exception& e)
+			{
+				LOGE("Exception in Level_Editor::main_window() Feature %s: %s", name.c_str(), e.what());
+				continue;
 			}
 		}
 

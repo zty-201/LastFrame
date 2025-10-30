@@ -64,6 +64,8 @@ struct FBO
     // Resizes the framebuffer object based on its type
     void resize(int width, int height)
     {
+        //Can't have a zero size framebuffer.
+        if (width == 0 || height == 0) return;
         switch (type)
         {
         case Default:

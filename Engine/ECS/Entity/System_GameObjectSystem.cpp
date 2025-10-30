@@ -67,35 +67,13 @@ namespace EngineFramework
 	void GameObjectSystem::Initialize()
 	{
 		// Load a Scene
-		std::vector<unsigned char> start_scene_data = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
-		std::string start_scene{ start_scene_data.begin(), start_scene_data.end() };
+		std::string start_scene = AssetManagerSystem::GetStringFromFile("Extern/Scenes/Dummy1.json");
 		LoadScene(start_scene);
 		
 	}
 	void GameObjectSystem::Update(float delta_time)
 	{
 		UNREFERENCED_PARAMETER(delta_time);
-
-		////TODO: Testing, to delete.
-		//std::vector<unsigned char> test_dummy_scene = AssetManagerSystem::GetDataFromFile("Extern/Scenes/Dummy1.json");
-		//std::string test_scene{ test_dummy_scene.begin(), test_dummy_scene.end() };
-		////DeSerializeAllEntityInstances(test_scene);
-		//auto view = registry.view<TODELETE>();
-		//auto view2 = registry.view<TODELETE2>();
-		//for (entt::entity entity_id : view)
-		//{
-		//	TODELETE& comp = view.get<TODELETE>(entity_id);
-		//	//LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-		//	UNREFERENCED_PARAMETER(comp);
-		//}
-		//for (entt::entity entity_id : view2)
-		//{
-		//	TODELETE2& comp = view2.get<TODELETE2>(entity_id);
-		//	//LOGD("[Gameobjectsystem update] %s", comp.c.c_str());
-		//	UNREFERENCED_PARAMETER(comp);
-		//}
-		////std::string test_save_data = SerializeAllEntityInstances();
-		////LOGD("Testing Serialization: %s", test_save_data.c_str());
 	}
 
 
@@ -107,7 +85,7 @@ namespace EngineFramework
 	std::vector<std::pair<std::string, std::string>> GameObjectSystem::SerializeAllEntityArchtypes()
 	{
 		//Get the archtypes stored in asset manager.
-		std::vector<std::pair<xresource::instance_guid, std::shared_ptr<Archtype>>> archtype_arr = AssetManagerSystem::GetAllResourceOfType<Archtype>(AssetManagerSystem::ARCHTYPE_GUID);
+		std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>> archtype_arr = AssetManagerSystem::GetAllResourceOfType<Archtype>(AssetManagerSystem::ARCHTYPE_GUID);
 		//Each pair represents <archtype_name, archtype_json_data>
 		std::vector<std::pair<std::string, std::string>> save_data{};
 		//	Iterate over all archtypes, save their component data and registered members to json.

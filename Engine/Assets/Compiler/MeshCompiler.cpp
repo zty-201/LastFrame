@@ -11,7 +11,7 @@
  */
 #include "pch.hpp"
 #include "MeshCompiler.h"
-
+#include "Mesh.h"
 namespace EngineFramework {
 
     bool MeshCompiler::NeedsCompilation(
@@ -35,10 +35,14 @@ namespace EngineFramework {
 #ifdef PLATFORM_WINDOWS
         try {
             LOGI("Compiling mesh: %s", src.string().c_str());
-
             std::filesystem::create_directories(out.parent_path());
-            std::filesystem::copy(src, out,
-                std::filesystem::copy_options::overwrite_existing);
+
+            //Precompile data into json and write to output file.
+            Mesh::MeshData data{};
+            nlohmann::json precompiled_json_data = data.PrecompileFile(src.string().c_str());
+
+            std::ofstream out_stream{ out };
+            out_stream << precompiled_json_data.dump();
 
             return true;
         }

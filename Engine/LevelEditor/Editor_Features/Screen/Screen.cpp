@@ -415,7 +415,7 @@ namespace EngineFramework
                     if (registry.all_of<TextureComponent>(id)) {
 
                         auto& object = registry.get<TextureComponent>(id);
-                        std::string name = AssetManagerSystem::GetInstance().GetName(object.texture_guid.m_Instance);             
+                        std::string name = AssetManagerSystem::GetInstance().GetName(object.texture_guid);             
                         ImGui::SameLine();
                         
                         ImGui::TextUnformatted(name.c_str());

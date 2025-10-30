@@ -18,8 +18,14 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include <unordered_map>
 #include "ISystem.hpp"
+#include "Key_Action.hpp"
+
 #ifdef PLATFORM_WINDOWS
     #include "GLFW/glfw3.h"
+#endif
+
+#if defined(DEBUG)
+    #include "KeyMapping.hpp"
 #endif
 
 #ifdef PLATFORM_ANDROID
@@ -54,6 +60,10 @@ namespace EngineFramework
         static bool GetKeyDown(int key);   // true on press
         static bool GetKeyUp(int key);     // true on release
 
+        static bool GetKey(Key_Actions action);       // true while held
+        static bool GetKeyDown(Key_Actions action);   // true on press
+        static bool GetKeyUp(Key_Actions action);     // true on release
+
         // --- Mouse API ---
         static bool GetMouseButton(int button);
         static bool GetMouseButtonDown(int button);
@@ -72,6 +82,7 @@ namespace EngineFramework
         const std::unordered_map<int, KeyState>& GetKeyStates() const { return keyStates; }
         const std::unordered_map<int, KeyState>& GetMouseButtonStates() const { return mouseButtonStates; }
 
+
 #ifdef PLATFORM_ANDROID
         static void RegisterCallbacks(struct android_app* app);
         static void UpdateGyroscope(float x, float y, float z, long long timestamp);
@@ -87,6 +98,19 @@ namespace EngineFramework
         static std::unordered_map<int, KeyState> keyStates;
 
         static glm::vec3 GetGyroscopeRotatioRate();
+        static std::unordered_map<Key_Actions, int> key_mapping;
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        static std::map <std::string, int> key_mapping_data; //json file data
+        
+        void seralise();
+        void codegen_deseralise();
+        void key_mapping_codegen(); //write to initialise_keymapping
+#endif
+        void initialise_keymapping();
+        
+        
+
 
     private:
 #ifdef PLATFORM_WINDOWS
