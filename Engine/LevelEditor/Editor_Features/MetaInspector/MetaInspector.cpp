@@ -163,8 +163,8 @@ namespace EditorFeatures {
 	static bool draw_asset_guid_picker(const char* label, xresource::full_guid& guid, std::string_view none_label, const std::vector<AssetPickerOptions>& sources, AssetDisplayFormatter formatter = {}) {
 		using EngineFramework::AssetManagerSystem;
 
-		std::string current = guid.empty() ? std::string{ none_label } : AssetManagerSystem::GetName(guid.m_Instance);
-		if (current.empty() && !guid.empty()) {
+		std::string current = guid.empty() ? none_label : AssetManagerSystem::GetName(guid);
+		if (current.empty()) {
 			current = format_guid_hex(guid.m_Instance.m_Value);
 		}
 		if (formatter && !guid.empty()) {
@@ -179,19 +179,13 @@ namespace EditorFeatures {
 				changed = true;
 			}
 
-			for (const auto& source : sources) {
-				for (const auto& [instance, display] : source.entries) {
-					std::string row_label = display.empty() ? format_guid_hex(instance.m_Value) : display;
-
-					const xresource::full_guid candidate{ instance, source.type_guid };
-					if (formatter) {
-						row_label = formatter(candidate, std::move(row_label), source.suffix);
+			auto draw_entries = [&](const auto& list, std::string_view suffix) {
+				for (const auto& [candidate, _] : list) {
+					std::string name = AssetManagerSystem::GetName(candidate);
+					if (name.empty()) {
+						name = format_guid_hex(candidate.m_Instance.m_Value);
 					}
-					else if (!source.suffix.empty()) {
-						row_label += " ";
-						row_label.append(source.suffix);
-					}
-
+					std::string label_text = suffix.empty() ? name : (name + " " + std::string{ suffix });
 					const bool selected = (!guid.empty() && guid == candidate);
 					if (ImGui::Selectable(row_label.c_str(), selected)) {
 						guid = candidate;
@@ -203,6 +197,8 @@ namespace EditorFeatures {
 				}
 			}
 
+			draw_entries(textures, {});
+			draw_entries(cubemaps, "(Cubemap)");
 			ImGui::EndCombo();
 		}
 

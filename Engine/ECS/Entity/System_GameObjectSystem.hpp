@@ -62,6 +62,8 @@ namespace EngineFramework
 		- all entities with so and so component
 		entt::storage for iterating over all components of a specific type.
 
+		Deletion of instance
+		- Ensure the respective entry in entity_archtype_map is deleted, so it won't store unnecessary entity.
 
 	*/
 	class GameObjectSystem : public ISystem
