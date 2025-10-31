@@ -59,7 +59,8 @@ namespace EngineFramework
 		}
 
 		if (auto it = entity_archtype_map.find(entity); it != entity_archtype_map.end()) {
-			std::string name = AssetManagerSystem::GetName(it->second);
+			const xresource::full_guid archtype_guid{ it->second, AssetManagerSystem::ARCHTYPE_GUID };
+			std::string name = AssetManagerSystem::GetName(archtype_guid);
 			if (!name.empty()) {
 				return name;
 			}
