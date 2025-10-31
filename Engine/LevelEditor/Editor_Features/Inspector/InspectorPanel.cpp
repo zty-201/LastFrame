@@ -230,6 +230,7 @@ namespace EditorFeatures {
 			return false;
 		}
 
+		// Retrieve a live component instance from registry without hardcoding component types
 		static entt::meta_any get_component_ref(entt::entity entity, const entt::meta_type& type) {
 			auto get_ref = type.func("get_ref"_hs);
 			if (!get_ref) {
@@ -238,12 +239,44 @@ namespace EditorFeatures {
 			return get_ref.invoke({}, entity);
 		}
 
+		struct EntityComponentEntry {
+			entt::id_type type_id{};
+			entt::meta_type meta{};
+			entt::meta_any instance{};
+		};
+
+		// Walk through the entt::registry, keeps only those that contain the entity, resolve the meta type and fetches the component reference
+		// Then, store the trio in a struct (id_type, meta_type, meta_any) defined above
+		static std::vector<EntityComponentEntry> collect_entity_components(entt::registry& reg, entt::entity entity) {
+			std::vector<EntityComponentEntry> components{};
+			for (auto&& [type_id, storage] : reg.storage()) {
+				if (!storage.contains(entity)) {
+					continue;
+				}
+
+				entt::meta_type meta = entt::resolve(storage.info());
+				if (!meta) {
+					continue;
+				}
+
+				entt::meta_any reference = get_component_ref(entity, meta);
+				if (!reference) {
+					continue;
+				}
+
+				components.emplace_back(EntityComponentEntry{
+					type_id,
+					meta,
+					std::move(reference)
+					});
+			}
+			return components;
+		}
+
 	} // namespace
 
 	void DrawInspector(entt::registry& reg, entt::entity e) {
 		ImGui::Begin("Inspector");
-
-		const entt::id_type GET_REF_ID = entt::hashed_string::value("get_ref");
 
 		// Diagnostics at the top
 		//ImGui::Text("Entity: 0x%08X  valid:%d  selected:%s",
@@ -480,31 +513,21 @@ namespace EditorFeatures {
 
 		// Actual draw
 		std::vector<std::pair<entt::meta_type, std::string>> components_to_remove{};
+		std::vector<EntityComponentEntry> components = collect_entity_components(reg, e);
 
-		for (auto&& [type_id, storage] : reg.storage()) {
-			if (!storage.contains(e)) continue;
-
-			entt::meta_type mt = entt::resolve(storage.info());
-			if (!mt) continue;
-
-			auto get_ref = mt.func(GET_REF_ID);      // STRING lookup
-			if (!get_ref) continue;
-
-			entt::meta_any comp = get_ref.invoke({}, e);
-			if (!comp) continue;
-
-			const char* header = mt.name();
+		for (auto& component : components) {
+			const char* header = component.meta.name();
 			if (!header || !*header) header = "Component";
 
-			ImGui::PushID(reinterpret_cast<void*>(static_cast<uintptr_t>(type_id)));
+			ImGui::PushID(reinterpret_cast<void*>(static_cast<uintptr_t>(component.type_id)));
 
 			bool component_visible = true;
 			if (ImGui::CollapsingHeader(header, &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
-				EditorFeatures::DrawMetaObject(mt, comp);
+				EditorFeatures::DrawMetaObject(component.meta, component.instance);
 			}
 
 			if (!component_visible) {
-				components_to_remove.emplace_back(mt, std::string{ header });
+				components_to_remove.emplace_back(component.meta, std::string{ header });
 			}
 
 			ImGui::PopID();

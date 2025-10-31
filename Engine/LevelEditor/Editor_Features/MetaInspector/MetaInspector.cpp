@@ -409,7 +409,9 @@ namespace EditorFeatures {
 	//	}
 	//	return changed;
 	//}
-
+	
+	// Main function to view/edit property
+	// Takes a mneta type and the corresponding instance and writes the edited values back through entt::meta_data::set
 	void DrawMetaObject(entt::meta_type& mt, entt::meta_any& obj) {
 		//const char* typeName = mt.name();
 
