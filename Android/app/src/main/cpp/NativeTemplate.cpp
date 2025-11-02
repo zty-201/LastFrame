@@ -133,16 +133,3 @@ Java_com_example_jnicpp_MainActivity_setDisplaySize(
     EngineFramework::InputManager::SetWindowWidth((int)width);
     EngineFramework::InputManager::SetWindowHeight((int)height);
 }
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_jnicpp_MainActivity_handleNativeGyroscope(
-        JNIEnv* env,
-        jobject /* this */,
-        jfloat x,
-        jfloat y,
-        jfloat z,
-        jlong timestamp) {
-
-    //Pass raw sensor data to C++ system
-    EngineFramework::InputManager::UpdateGyroscope(x, y, z, timestamp);
-}

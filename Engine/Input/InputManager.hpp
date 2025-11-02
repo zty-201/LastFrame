@@ -78,15 +78,15 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
         static void RegisterCallbacks(GLFWwindow* window);
 #endif
+#ifdef PLATFORM_ANDROID
+        static void RegisterCallbacks(struct android_app* app);
+#endif
 
         const std::unordered_map<int, KeyState>& GetKeyStates() const { return keyStates; }
         const std::unordered_map<int, KeyState>& GetMouseButtonStates() const { return mouseButtonStates; }
 
 
 #ifdef PLATFORM_ANDROID
-        static void RegisterCallbacks(struct android_app* app);
-        static void UpdateGyroscope(float x, float y, float z, long long timestamp);
-
         static void UpdateKey(int keyCode, bool isDown);
         static void UpdateTouch(int action, float x, float y);
 
@@ -96,8 +96,6 @@ namespace EngineFramework
 #endif
 
         static std::unordered_map<int, KeyState> keyStates;
-
-        static glm::vec3 GetGyroscopeRotatioRate();
         static std::unordered_map<Key_Actions, int> key_mapping;
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
@@ -131,9 +129,6 @@ namespace EngineFramework
         static double lastMouseX, lastMouseY;
         static double scrollX, scrollY;
         static int windowWidth, windowHeight;
-
-        static glm::vec3 currentGyroRate; //Store angular velocity (rad/s)
-        static long long lastGyroTimestamp;
     };
 
 }
