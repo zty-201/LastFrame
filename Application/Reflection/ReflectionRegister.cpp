@@ -13,10 +13,8 @@
 #include "TransformComponent.h"
 #include "TextureComponent.h"
 #include "NormalMapComponent.h"
-#include "AudioComponent.h"
-#include "Scripting/Script.hpp"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
-#include "MetaInspector.hpp"
+
 /*
 	This is for third-party types.
 	For your own types, simply put to/from_json in global namespace or in the respective namespace of the type e.g. namespace hello{ to/fromjson}
@@ -104,16 +102,6 @@ struct adl_serializer<CameraComponent::CameraType> {
 	}
 };
 
-template<>
-struct adl_serializer<std::filesystem::path> {
-	static void to_json(json& j, const std::filesystem::path& p) {
-		j = p.generic_string();
-	}
-	static void from_json(const json& j, std::filesystem::path& p) {
-		p = j.get<std::string>();
-	}
-};
-
 
 
 NLOHMANN_JSON_NAMESPACE_END
@@ -170,8 +158,7 @@ namespace EngineFramework
 		SetMeta(std::vector<float>),
 		SetMeta(std::vector<std::string>),
 		SetMeta(std::vector<glm::vec3>),
-		SetMeta(CameraComponent::CameraType),
-		SetMeta(std::filesystem::path)
+		SetMeta(CameraComponent::CameraType)
 	};
 #define SetJson(T) {entt::resolve<T>().id(), SetJsonWithMetaAny<T>}
 	static std::unordered_map<entt::id_type, std::function<void(nlohmann::json&, const std::string&, const entt::meta_any&)>> set_json_with_meta_map
@@ -204,18 +191,17 @@ namespace EngineFramework
 		SetJson(std::vector<float>),
 		SetJson(std::vector<std::string>),
 		SetJson(std::vector<glm::vec3>),
-		SetJson(CameraComponent::CameraType),
-		SetJson(std::filesystem::path)
+		SetJson(CameraComponent::CameraType)
 	};
 
 
 
-	// Templated class, to provide different function overloads for each type that all do the same thing
+	//Templated class, to provide different function overloads for each type that all do the same thing.
 	template <typename T>
 	class Emplacer
 	{
 	public:
-		// Taking in entt::meta_any*, as references do not work
+		//Taking in entt::meta_any*, as references do not work.
 		static bool EmplaceComponent(entt::entity entity, const void* data)
 		{
 			//Don't emplace duplicate components, so check if it exists in entity first.
@@ -225,22 +211,6 @@ namespace EngineFramework
 			}
 			//Make a copy using the ptr provided
 			registry.emplace<T>(entity, static_cast<const entt::meta_any*>(data)->cast<T>());
-			return true;
-		}
-	};
-
-	// Templated class to remove components uniformly through entt::meta
-	template <typename T>
-	class Remover
-	{
-	public:
-		static bool RemoveComponent(entt::entity entity)
-		{
-			if (!registry.all_of<T>(entity))
-			{
-				return false;
-			}
-			registry.remove<T>(entity);
 			return true;
 		}
 	};
@@ -325,10 +295,8 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(xresource::full_guid);
 		REGISTER_ARBITRARY_TYPE(std::vector<glm::vec3>);
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
-		REGISTER_ARBITRARY_TYPE(std::filesystem::path);
 		// Helper function to return a meta_any wrapping a reference
 
-		// TODO - Register additional components (script, audio etc) and remember to tag them when registering (refer to TextureComponent)
 		// === Register TransformComponent ===
 		entt::meta_factory<TransformComponent>()
 			.type("TransformComponent")
@@ -337,7 +305,6 @@ namespace EngineFramework
 			.data<&TransformComponent::scale>("scale")
 			.data<&TransformComponent::modelMatrix>("modelMatrix")
 			.func<&Emplacer<TransformComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<TransformComponent>::RemoveComponent>("remove")
 			.func<&Getter<TransformComponent>::GetComponent>("get")
 			.func<&GetRef<TransformComponent>>("get_ref");
 
@@ -348,7 +315,6 @@ namespace EngineFramework
 			.data<&MeshComponent::vao>("vao")
 			.data<&MeshComponent::indexCount>("indexCount")
 			.func<&Emplacer<MeshComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<MeshComponent>::RemoveComponent>("remove")
 			.func<&Getter<MeshComponent>::GetComponent>("get")
 			.func<&GetRef<MeshComponent>>("get_ref");
 
@@ -365,7 +331,6 @@ namespace EngineFramework
 			.data<&MaterialComponent::effect>("effect")
 			.data<&MaterialComponent::materialName>("materialName")
 			.func<&Emplacer<MaterialComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<MaterialComponent>::RemoveComponent>("remove")
 			.func<&Getter<MaterialComponent>::GetComponent>("get")
 			.func<&GetRef<MaterialComponent>>("get_ref");
 
@@ -375,7 +340,6 @@ namespace EngineFramework
 			.data<&LightComponent::position>("position")
 			.data<&LightComponent::L>("L")
 			.func<&Emplacer<LightComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<LightComponent>::RemoveComponent>("remove")
 			.func<&Getter<LightComponent>::GetComponent>("get")
 			.func<&GetRef<LightComponent>>("get_ref");
 
@@ -388,7 +352,7 @@ namespace EngineFramework
 
 
 		// === Register CameraComponent ===
-		// Tag assets that need needs a dropdown
+		// Commented out certain fields that I do not want it to appear in inspector (can uncomment them out if need to)
 		entt::meta_factory<CameraComponent>()
 			.type("CameraComponent")
 			.data<&CameraComponent::camType>("camType")
@@ -402,7 +366,6 @@ namespace EngineFramework
 			.data<&CameraComponent::oldx>("oldx")
 			.data<&CameraComponent::oldy>("oldy")
 			.func<&Emplacer<CameraComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<CameraComponent>::RemoveComponent>("remove")
 			.func<&Getter<CameraComponent>::GetComponent>("get")
 			.func<&GetRef<CameraComponent>>("get_ref");
 
@@ -410,39 +373,15 @@ namespace EngineFramework
 		entt::meta_factory<TextureComponent>()
 			.type("TextureComponent")
 			.data<&TextureComponent::texture_guid>("texture_guid")
-			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture }) // Need to add tags like that for certain components
 			.func<&Emplacer<TextureComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<TextureComponent>::RemoveComponent>("remove")
 			.func<&Getter<TextureComponent>::GetComponent>("get")
 			.func<&GetRef<TextureComponent>>("get_ref");
-
-		// === Register AudioComponent ===
-		entt::meta_factory<AudioComponent>()
-			.type("AudioComponent")
-			.data<&AudioComponent::audio_guid>("audio_guid")
-			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Audio })
-			.func<&Emplacer<AudioComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<AudioComponent>::RemoveComponent>("remove")
-			.func<&Getter<AudioComponent>::GetComponent>("get")
-			.func<&GetRef<AudioComponent>>("get_ref");
-
-		// === Register LuaScriptComponent ===
-		entt::meta_factory<Engine::LuaScriptComponent>()
-			.type("LuaScriptComponent")
-			.data<&Engine::LuaScriptComponent::ScriptPath>("ScriptPath")
-			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Script })
-			.data<&Engine::LuaScriptComponent::Enabled>("Enabled")
-			.func<&Emplacer<Engine::LuaScriptComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<Engine::LuaScriptComponent>::RemoveComponent>("remove")
-			.func<&Getter<Engine::LuaScriptComponent>::GetComponent>("get")
-			.func<&GetRef<Engine::LuaScriptComponent>>("get_ref");
 
 		// === Register NormalMapComponent ===
 		entt::meta_factory<NormalMapComponent>()
 			.type("NormalMapComponent")
 			.data<&NormalMapComponent::normalmap_guid>("normalmap_guid")
 			.func<&Emplacer<NormalMapComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<NormalMapComponent>::RemoveComponent>("remove")
 			.func<&Getter<NormalMapComponent>::GetComponent>("get")
 			.func<&GetRef<NormalMapComponent>>("get_ref");
 
@@ -450,13 +389,11 @@ namespace EngineFramework
 		entt::meta_factory<SceneRenderPass>()
 			.type("SceneRenderPass")
 			.func<&Emplacer<SceneRenderPass>::EmplaceComponent>("emplace")
-			.func<&Remover<SceneRenderPass>::RemoveComponent>("remove")
 			.func<&Getter<SceneRenderPass>::GetComponent>("get");
 
 		entt::meta_factory<SkyboxRenderPass>()
 			.type("SkyboxRenderPass")
 			.func<&Emplacer<SkyboxRenderPass>::EmplaceComponent>("emplace")
-			.func<&Remover<SkyboxRenderPass>::RemoveComponent>("remove")
 			.func<&Getter<SkyboxRenderPass>::GetComponent>("get");
 
 
@@ -466,7 +403,6 @@ namespace EngineFramework
 			.data<&TODELETE::b>("b")
 			.data<&TODELETE::c>("c")
 			.func<&Emplacer<TODELETE>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE>::RemoveComponent>("remove")
 			.func<&Getter<TODELETE>::GetComponent>("get");
 
 		//If necessary, may want to add a set method too.
@@ -476,14 +412,12 @@ namespace EngineFramework
 			.data<&TODELETE2::e>("e")
 			.data<&TODELETE2::c>("c")
 			.func<&Emplacer<TODELETE2>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE2>::RemoveComponent>("remove")
 			.func<&Getter<TODELETE2>::GetComponent>("get");
 
 		entt::meta_factory<EngineFramework::TODELETE3>()
 			.type("TestClass3")
 			.data<&TODELETE3::pos>("player_pos")
 			.func<&Emplacer<TODELETE3>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE3>::RemoveComponent>("remove")
 			.func<&Getter<TODELETE3>::GetComponent>("get");
 
 	}

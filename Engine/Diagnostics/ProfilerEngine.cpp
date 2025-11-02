@@ -1,18 +1,3 @@
-/*****************************************************************/
-/*!
-\file   ProfilerEngine.cpp
-\author Neo HuiZong
-\par    neo.h\@digipen.edu
-\date   September 2025
-\brief
-This file contains the definitions of the functions that are needed to keep track
-of the different system run time on the engine for debugging purposes.
-Copyright (C) 2025 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents without the
-prior written consent of DigiPen Institute of Technology is prohibited.
-*/
-/* *******************************************************************/
-
 #include "pch.hpp"
 #include "ProfilerEngine.hpp"
 

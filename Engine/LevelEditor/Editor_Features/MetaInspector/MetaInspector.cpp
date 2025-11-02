@@ -1,18 +1,3 @@
-/*****************************************************************/
-/*!
-\file   MetaInspector.cpp
-\author Neo HuiZong
-\par    neo.h\@digipen.edu
-\date   October 2025
-\brief
-This file contains the definitions of the functions that are needed to
-draw the controls and pushes the changes straight into live components
-of the selected entity.
-Copyright (C) 2025 DigiPen Institute of Technology.
-Reproduction or disclosure of this file or its contents without the
-prior written consent of DigiPen Institute of Technology is prohibited.
-*/
-/* *******************************************************************/
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
 #include "pch.hpp"
@@ -24,36 +9,38 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "MaterialComponent.h"
 #include "TextureComponent.h"
 #include "AssetManager.hpp"
-#include "SoundAsset.hpp"
 #include "scene.h"
 #include <string_view>
 #include <imgui.h>
 #include <array>
 #include <iomanip>
 #include <sstream>
-#include <filesystem>
-#include <cstring>
+
+// Temporary shim: some compilers require the tag types backing xresource::guid to be complete.
+namespace xresource {
+	struct rsc_instance_guid_tag {};
+	struct rsc_instance_guid_large_tag {};
+	struct rsc_type_guid_tag {};
+} // namespace xresource
 
 // FILE TO HANDLE THE META DATA OF THE ENTITIY
 namespace EditorFeatures {
 
-	// Add on to this map if want to hide any fields
 	static const std::unordered_map<std::string_view, std::unordered_set<std::string_view>> hidden_fields = {
 		{"CameraComponent", {"view_vector", "proj_matrix", "oldx", "oldy"}},
 		{"MeshComponent", {"vao", "indexCount"}},
 		{"LightComponent", {"L"}},
 		{"TransformComponent", {"modelMatrix"}},
-		{"MaterialComponent", {"Ka", "Kd", "Ks", "shininess", "effect", "materialName"}},
-		{"NormalMapComponent", {"normalmap_guid"}} // Hidden for now - testing purposes
+		{"MaterialComponent", {"Ka", "Kd", "Ks", "shininess", "effect"}}
 	};
-
-	static constexpr entt::id_type asset_picker_prop = entt::hashed_string{ "editor.asset_picker" }.value();
 
 	static std::string to_lower(std::string s) {
 		std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 		return s;
 	}
 
+	//static constexpr entt::id_type DISPLAY_NAME_ID = entt::hashed_string::value("display.name");
+	//static constexpr entt::id_type UI_COLOR_ID = entt::hashed_string::value("ui.color");
 
 	static std::string label_for(const entt::meta_data &data, entt::id_type id) {
 		if (const char* n = data.name(); n && *n) {
@@ -85,333 +72,65 @@ namespace EditorFeatures {
 		return oss.str();
 	}
 
-	static const char* payload_type_for_kind(AssetPickerKind kind)
+	static std::string describe_guid_name(const xresource::full_guid& guid, std::string display)
 	{
-		switch (kind) {
-		case AssetPickerKind::Texture: return "Textures";
-		case AssetPickerKind::Audio:   return "Audio";
-		case AssetPickerKind::Script:  return "Scripts";
-		default: break;
+		if (guid.m_Type == EngineFramework::AssetManagerSystem::TEXTURE_GUID) {
+			return display;
 		}
-		return nullptr;
+		if (guid.m_Type == EngineFramework::AssetManagerSystem::CUBEMAP_GUID) {
+			return display + " (Cubemap)";
+		}
+		return display + " (Unknown)";
 	}
 
-	// Make the dropped file path into corresponding asset GUID
-	static bool apply_payload_to_guid(xresource::full_guid& guid, AssetPickerKind kind, const std::filesystem::path& dropped_path)
+	static bool draw_texture_guid_picker(const char* label, xresource::full_guid& guid, const char* none_label = "None")
 	{
 		using EngineFramework::AssetManagerSystem;
+		using SceneTexture = Scene::Texture;
 
-		// Bail out if no path
-		if (dropped_path.empty()) {
-			return false;
-		}
+		const auto textures = AssetManagerSystem::GetAllResourceOfType<SceneTexture>(AssetManagerSystem::TEXTURE_GUID);
+		const auto cubemaps = AssetManagerSystem::GetAllResourceOfType<SceneTexture>(AssetManagerSystem::CUBEMAP_GUID);
 
-		const std::string asset_name = dropped_path.stem().string();
-		if (asset_name.empty()) {
-			return false;
+		std::string current = guid.empty() ? none_label : AssetManagerSystem::GetName(guid);
+		if (current.empty()) {
+			current = format_guid_hex(guid.m_Instance.m_Value);
 		}
-
-		// Specifically, check for texture texture, audio and script
-		switch (kind) {
-		case AssetPickerKind::Texture: {
-			auto candidate = AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, asset_name);
-			if (candidate.empty()) {
-				candidate = AssetManagerSystem::GetFullGuid(AssetManagerSystem::CUBEMAP_GUID, asset_name);
-			}
-			if (!candidate.empty()) {
-				guid = candidate;
-				return true;
-			}
-			break;
+		if (!guid.empty()) {
+			current = describe_guid_name(guid, current);
 		}
-		case AssetPickerKind::Audio: {
-			auto candidate = AssetManagerSystem::GetFullGuid(AssetManagerSystem::AUDIO_GUID, asset_name);
-			if (!candidate.empty()) {
-				guid = candidate;
-				return true;
-			}
-			break;
-		}
-		case AssetPickerKind::Script: {
-			auto candidate = AssetManagerSystem::GetFullGuid(AssetManagerSystem::SCRIPT_GUID, asset_name);
-			if (!candidate.empty()) {
-				guid = candidate;
-				return true;
-			}
-			break;
-		}
-		default:
-			break;
-		}
-
-		return false;
-	}
-
-	// To handle the guid dropped from asset browser based on their tags
-	static bool handle_asset_guid_drop(xresource::full_guid& guid, AssetPickerKind kind)
-	{
-		const char* payload_type = payload_type_for_kind(kind);
 
 		bool changed = false;
-		if (ImGui::BeginDragDropTarget()) {
-			const char* candidates[4] = {};
-			int candidate_count = 0;
-			auto add_candidate = [&](const char* type) {
-				if (!type) {
-					return;
-				}
-				for (int idx = 0; idx < candidate_count; ++idx) {
-					if (std::strcmp(candidates[idx], type) == 0) {
-						return;
+		if (ImGui::BeginCombo(label, current.c_str())) {
+			if (ImGui::Selectable(none_label, guid.empty())) {
+				guid.clear();
+				changed = true;
+			}
+
+			auto draw_entries = [&](const auto& list, std::string_view suffix) {
+				for (const auto& [candidate, _] : list) {
+					std::string name = AssetManagerSystem::GetName(candidate);
+					if (name.empty()) {
+						name = format_guid_hex(candidate.m_Instance.m_Value);
+					}
+					std::string label_text = suffix.empty() ? name : (name + " " + std::string{ suffix });
+					const bool selected = (!guid.empty() && guid == candidate);
+					if (ImGui::Selectable(label_text.c_str(), selected)) {
+						guid = candidate;
+						changed = true;
+					}
+					if (selected) {
+						ImGui::SetItemDefaultFocus();
 					}
 				}
-				candidates[candidate_count++] = type;
 			};
 
-			add_candidate(payload_type);
-			add_candidate("GENERAL");
-
-			const ImGuiPayload* payload = nullptr;
-			for (int idx = 0; idx < candidate_count && !payload; ++idx) {
-				payload = ImGui::AcceptDragDropPayload(candidates[idx]);
-			}
-
-			if (payload && payload->Data && payload->DataSize > 0) {
-				const char* raw = static_cast<const char*>(payload->Data);
-				std::string dropped(raw, raw + payload->DataSize - 1);
-				std::filesystem::path dropped_path = std::filesystem::path{ dropped }.lexically_normal();
-				if (apply_payload_to_guid(guid, kind, dropped_path)) {
-					changed = true;
-				}
-			}
-			ImGui::EndDragDropTarget();
+			draw_entries(textures, {});
+			draw_entries(cubemaps, "(Cubemap)");
+			ImGui::EndCombo();
 		}
 		return changed;
 	}
 
-	template<typename T>
-	static std::vector<std::pair<xresource::instance_guid, std::string>> build_asset_entries(const std::vector<std::pair<xresource::full_guid, std::shared_ptr<T>>>& list) {
-		std::vector<std::pair<xresource::instance_guid, std::string>> out;
-		out.reserve(list.size());
-		for (const auto& [guid, _] : list) {
-			std::string name = EngineFramework::AssetManagerSystem::GetName(guid);
-			if (name.empty()) {
-				name = format_guid_hex(guid.m_Instance.m_Value);
-			}
-			out.emplace_back(guid.m_Instance, std::move(name));
-		}
-		return out;
-	}
-
-	static AssetPickerDescriptor make_asset_picker_descriptor(AssetPickerKind kind) {
-		using EngineFramework::AssetManagerSystem;
-
-		switch (kind) {
-		case AssetPickerKind::Texture: {
-			using SceneTexture = Scene::Texture;
-			auto textures =
-				build_asset_entries(AssetManagerSystem::GetAllResourceOfType<SceneTexture>(
-					AssetManagerSystem::TEXTURE_GUID));
-			auto cubemaps =
-				build_asset_entries(AssetManagerSystem::GetAllResourceOfType<SceneTexture>(
-					AssetManagerSystem::CUBEMAP_GUID));
-			return {
-				"None",
-				{
-					{ AssetManagerSystem::TEXTURE_GUID, {}, std::move(textures) },
-					{ AssetManagerSystem::CUBEMAP_GUID, "(Cubemap)", std::move(cubemaps) }
-				},
-				[](const xresource::full_guid&, std::string display, std::string_view suffix) {
-					if (!suffix.empty()) {
-						display += " ";
-						display.append(suffix);
-					}
-					return display;
-				}
-			};
-		}
-		case AssetPickerKind::Audio: {
-			auto sounds =
-				build_asset_entries(AssetManagerSystem::GetAllResourceOfType<SoundAsset>(
-					AssetManagerSystem::AUDIO_GUID));
-			return { "No Audio", { { AssetManagerSystem::AUDIO_GUID, {}, std::move(sounds) } }, {} };
-		}
-		}
-		return { "None", {}, {} };
-	}
-
-	// To render the inspector widget used for asset-back fields
-	static bool draw_asset_guid_picker(const char* label, xresource::full_guid& guid, AssetPickerKind kind, std::string_view none_label, const std::vector<AssetPickerOptions>& sources, AssetDisplayFormatter formatter = {}) {
-		using EngineFramework::AssetManagerSystem;
-
-		std::string current;
-
-		// If GUID is empty, display none
-		// If not look through the asset manager system to get the current guid
-		if (guid.empty()) {
-			current = std::string{ none_label };
-		}
-		else {
-			current = AssetManagerSystem::GetName(guid);
-			if (current.empty()) {
-				current = format_guid_hex(guid.m_Instance.m_Value);
-			}
-			if (formatter) {
-				std::string_view suffix{};
-				for (const auto& source : sources) {
-					if (source.type_guid == guid.m_Type) {
-						suffix = source.suffix;
-						break;
-					}
-				}
-				current = formatter(guid, std::move(current), suffix);
-			}
-		}
-
-		bool changed = false;
-
-		if (ImGui::BeginCombo(label, current.c_str())) {
-				if (ImGui::Selectable(none_label.data(), guid.empty())) {
-					guid.clear();
-					changed = true;
-				}
-
-				for (const auto& source : sources) {
-					for (const auto& [instance, display] : source.entries) {
-						const xresource::full_guid candidate{ instance, source.type_guid };
-						std::string row_label = display;
-						if (formatter) {
-							row_label = formatter(candidate, std::move(row_label), source.suffix);
-						}
-						else if (!source.suffix.empty()) {
-							row_label += " ";
-							row_label.append(source.suffix);
-						}
-						const bool selected = (!guid.empty() && guid == candidate);
-						if (ImGui::Selectable(row_label.c_str(), selected)) {
-							guid = candidate;
-							changed = true;
-						}
-						if (selected) {
-							ImGui::SetItemDefaultFocus();
-						}
-					}
-				}
-				ImGui::EndCombo();
-			}
-			
-		// To accept a payload matching either the component's specialized type (currently is texture, audio, scripts - can add on further uh) or general payload from the asset browser
-		// Resolves the asset name, set GUID
-			if (handle_asset_guid_drop(guid, kind)) {
-				changed = true;
-			}
-
-			return changed;
-		}
-
-	//static bool draw_texture_guid_picker(const char* label, xresource::full_guid& guid, const char* none_label = "None") {
-	//	using EngineFramework::AssetManagerSystem;
-	//	using SceneTexture = Scene::Texture;
-
-	//	auto build_entries = [](const auto& list) {
-	//		std::vector<std::pair<xresource::instance_guid, std::string>> out;
-	//		out.reserve(list.size());
-	//		for (const auto& [instance, _] : list) {
-	//			std::string name = AssetManagerSystem::GetName(instance);
-	//			if (name.empty()) {
-	//				name = format_guid_hex(instance.m_Value);
-	//			}
-	//			out.emplace_back(instance, std::move(name));
-	//		}
-	//		return out;
-	//		};
-
-	//	std::vector<AssetPickerOptions> sources = {
-	//		{ AssetManagerSystem::TEXTURE_GUID,
-	//		  {},
-	//		  build_entries(AssetManagerSystem::GetAllResourceOfType<SceneTexture>(
-	//			  AssetManagerSystem::TEXTURE_GUID)) },
-	//		{ AssetManagerSystem::CUBEMAP_GUID,
-	//		  "(Cubemap)",
-	//		  build_entries(AssetManagerSystem::GetAllResourceOfType<SceneTexture>(
-	//			  AssetManagerSystem::CUBEMAP_GUID)) }
-	//	};
-
-	//	auto formatter = [](const xresource::full_guid& candidate,
-	//		std::string display,
-	//		std::string_view suffix) {
-	//			if (!suffix.empty()) {
-	//				display += " ";
-	//				display.append(suffix);
-	//			}
-	//			return display;
-	//		};
-
-	//	return draw_asset_guid_picker(label, guid, none_label, sources, formatter);
-	//}
-
-	//static std::string describe_guid_name(const xresource::full_guid& guid, std::string display)
-	//{
-	//	if (guid.m_Type == EngineFramework::AssetManagerSystem::TEXTURE_GUID) {
-	//		return display;
-	//	}
-	//	if (guid.m_Type == EngineFramework::AssetManagerSystem::CUBEMAP_GUID) {
-	//		return display + " (Cubemap)";
-	//	}
-	//	return display + " (Unknown)";
-	//}
-
-	//static bool draw_texture_guid_picker(const char* label, xresource::full_guid& guid, const char* none_label = "None")
-	//{
-	//	using EngineFramework::AssetManagerSystem;
-	//	using SceneTexture = Scene::Texture;
-
-	//	const auto textures = AssetManagerSystem::GetAllResourceOfType<SceneTexture>(AssetManagerSystem::TEXTURE_GUID);
-	//	const auto cubemaps = AssetManagerSystem::GetAllResourceOfType<SceneTexture>(AssetManagerSystem::CUBEMAP_GUID);
-
-	//	std::string current = guid.empty() ? none_label : AssetManagerSystem::GetName(guid.m_Instance);
-	//	if (current.empty()) {
-	//		current = format_guid_hex(guid.m_Instance.m_Value);
-	//	}
-	//	if (!guid.empty()) {
-	//		current = describe_guid_name(guid, current);
-	//	}
-
-	//	bool changed = false;
-	//	if (ImGui::BeginCombo(label, current.c_str())) {
-	//		if (ImGui::Selectable(none_label, guid.empty())) {
-	//			guid.clear();
-	//			changed = true;
-	//		}
-
-	//		auto draw_entries = [&](const auto& list, const xresource::type_guid& type, std::string_view suffix) {
-	//			for (const auto& [instance, _] : list) {
-	//				std::string name = AssetManagerSystem::GetName(instance);
-	//				if (name.empty()) {
-	//					name = format_guid_hex(instance.m_Value);
-	//				}
-	//				const xresource::full_guid candidate{ instance, type };
-	//				std::string label_text = suffix.empty() ? name : (name + " " + std::string{ suffix });
-	//				const bool selected = (!guid.empty() && guid == candidate);
-	//				if (ImGui::Selectable(label_text.c_str(), selected)) {
-	//					guid = candidate;
-	//					changed = true;
-	//				}
-	//				if (selected) {
-	//					ImGui::SetItemDefaultFocus();
-	//				}
-	//			}
-	//		};
-
-	//		draw_entries(textures, AssetManagerSystem::TEXTURE_GUID, {});
-	//		draw_entries(cubemaps, AssetManagerSystem::CUBEMAP_GUID, "(Cubemap)");
-	//		ImGui::EndCombo();
-	//	}
-	//	return changed;
-	//}
-	
-	// Main function to view/edit property
-	// Takes a mneta type and the corresponding instance and writes the edited values back through entt::meta_data::set
 	void DrawMetaObject(entt::meta_type& mt, entt::meta_any& obj) {
 		//const char* typeName = mt.name();
 
@@ -431,8 +150,6 @@ namespace EditorFeatures {
 				continue;
 			}
 
-			ImGui::PushID(reinterpret_cast<void*>(static_cast<uintptr_t>(id)));
-
 			entt::meta_any field = data.get(obj);
 
 			// Skip the hidden fields
@@ -447,7 +164,6 @@ namespace EditorFeatures {
 				entt::meta_any tmp = field;                  // copy keeps original untouched
 				if (!tmp.allow_cast<int>()) {
 					ImGui::TextDisabled("%s (enum, no int conversion)", label.c_str());
-					ImGui::PopID();
 					continue;
 				}
 
@@ -561,12 +277,13 @@ namespace EditorFeatures {
 
 			else if (field.type() == entt::resolve<xresource::full_guid>()) {
 				auto& guid = field.cast<xresource::full_guid&>();
-					if (const auto tag = static_cast<const AssetPickerTag*>(data.custom())) {
-						const auto descriptor = make_asset_picker_descriptor(tag->kind);
-						if (!descriptor.sources.empty() && draw_asset_guid_picker(label.c_str(), guid, tag->kind, descriptor.none_label, descriptor.sources, descriptor.formatter)) {
-							data.set(obj, guid);
-						}
+				const bool is_texture = type_key == "TextureComponent";
+				const bool is_normal = type_key == "NormalMapComponent";
+				if (is_texture || is_normal) {
+					if (draw_texture_guid_picker(label.c_str(), guid)) {
+						data.set(obj, guid);
 					}
+				}
 				else {
 					ImGui::TextDisabled("%s (full_guid editor not implemented)", label.c_str());
 				}
@@ -583,8 +300,6 @@ namespace EditorFeatures {
 			else {
 				ImGui::TextDisabled("%s (unhandled type)", label.c_str());
 			}
-
-			ImGui::PopID();
 		}
 	}
 }

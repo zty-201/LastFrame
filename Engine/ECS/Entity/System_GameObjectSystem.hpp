@@ -74,8 +74,6 @@ namespace EngineFramework
 		//Return reference to the one and only instance of this system, created by core engine.
 		static GameObjectSystem& GetInstance();
 
-		static std::string GetEntityName(entt::entity entity);
-
 		//Quick Call function to load scene and destroy current scene.
 		void LoadScene(const std::string& json_input);
 		
