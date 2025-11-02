@@ -387,11 +387,11 @@ namespace Engine {
 
         try {
             LOGI("[LuaRuntime] Loading script '%s' (GUID %llu) for entity %u",
-                EngineFramework::AssetManagerSystem::GetName(inst.ScriptGuid).c_str(),
+                EngineFramework::AssetManagerSystem::GetName(full_guid).c_str(),
                 inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
 
             inst.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
-            std::string label = EngineFramework::AssetManagerSystem::GetName(inst.ScriptGuid);
+            std::string label = EngineFramework::AssetManagerSystem::GetName(full_guid);
             auto result = s_Lua.load(code, label)(inst.Env);
 
             if (!result.valid()) {
