@@ -138,31 +138,32 @@ namespace Engine {
         (void)dt;
         if (!s_TestInitialized) return;
 
-        if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_K)) {
-            LOGI("[ScriptDebug] K pressed - Running greet() from test.lua");
-            try {
-                if (s_GreetFunc.valid()) {
-                    std::string result = s_GreetFunc("Developer from test.lua");
-                    LOGI("[ScriptDebug] test.lua greet() returned: %s", result.c_str());
-                }
-            }
-            catch (const sol::error& e) {
-                LOGE("[ScriptDebug] Lua error in test.lua: %s", e.what());
-            }
-        }
+        ////if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_K)) {
+        //if (EngineFramework::InputManager::GetMouseButtonDown(0)) {
+        //    LOGI("[ScriptDebug] K pressed - Running greet() from test.lua");
+        //    try {
+        //        if (s_GreetFunc.valid()) {
+        //            std::string result = s_GreetFunc("Developer from test.lua");
+        //            LOGI("[ScriptDebug] test.lua greet() returned: %s", result.c_str());
+        //        }
+        //    }
+        //    catch (const sol::error& e) {
+        //        LOGE("[ScriptDebug] Lua error in test.lua: %s", e.what());
+        //    }
+        //}
 
-        if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_L)) {
-            LOGI("[ScriptDebug] L pressed - Running add() from test2.lua");
-            try {
-                if (s_AddFunc.valid()) {
-                    int sum = s_AddFunc(21, 79);
-                    LOGI("[ScriptDebug] test2.lua add() returned: %d", sum);
-                }
-            }
-            catch (const sol::error& e) {
-                LOGE("[ScriptDebug] Lua error in test2.lua: %s", e.what());
-            }
-        }
+        //if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_L)) {
+        //    LOGI("[ScriptDebug] L pressed - Running add() from test2.lua");
+        //    try {
+        //        if (s_AddFunc.valid()) {
+        //            int sum = s_AddFunc(21, 79);
+        //            LOGI("[ScriptDebug] test2.lua add() returned: %d", sum);
+        //        }
+        //    }
+        //    catch (const sol::error& e) {
+        //        LOGE("[ScriptDebug] Lua error in test2.lua: %s", e.what());
+        //    }
+        //}
     }
 
     void ScriptDebug::Shutdown() {
