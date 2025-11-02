@@ -45,7 +45,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetWindow.hpp"
 #include "ModelManager.hpp"
 #include "AssetManager.hpp"
-
+#include "GameplayKeyManager.hpp"
 // /Debug
 #include "Profiler.hpp"
 
@@ -179,9 +179,7 @@ namespace EngineFramework
 		/*initialise all the features*/
 		for (auto& [name, feature] : featureMap) {
 
-			if (feature->is_enabled) {
-				feature->Initialize();
-			}
+			feature->Initialize();			
 		}
 
 	}
@@ -275,7 +273,7 @@ namespace EngineFramework
 						else {
 							ImGui::TextDisabled("Feature not registered");
 						}
-						ImGui::EndMenu();   // <-- restore balance
+						ImGui::EndMenu(); 
 					}
 
 					ImGui::Separator();
@@ -361,9 +359,16 @@ namespace EngineFramework
 
 		//iterate through the featureMap and runs active subwindows/function
 		for (auto& [name, feature] : featureMap) {
-
-			if (feature->is_enabled) {
-				feature->Run();
+			try
+			{
+				if (feature->is_enabled) {
+					feature->Run();
+				}
+			}
+			catch (std::exception& e)
+			{
+				LOGE("Exception in Level_Editor::main_window() Feature %s: %s", name.c_str(), e.what());
+				continue;
 			}
 		}
 
