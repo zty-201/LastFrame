@@ -38,57 +38,7 @@ namespace Engine {
 
     // ---------------- Runtime start/stop ----------------
     void ScriptSystem::OnRuntimeStart(entt::registry& reg) {
-#if defined(ENGINE_ENABLE_LUA)
-        LOGI("[ScriptSystem] OnRuntimeStart called � initializing Lua scripts...");
-
-        // Reset load state for all LuaScriptComponents
-        reg.view<LuaScriptComponent>().each([](auto& comp) {
-            for (auto& inst : comp.Scripts)
-                inst.Loaded = false;
-            });
-
-        // Attach camera_touch_control.lua to main camera (for Android + Windows)
-        auto cameraView = reg.view<CameraComponent>();
-        if (!cameraView.empty()) {
-            auto cameraEntity = cameraView.front();
-
-            LOGI("[ScriptSystem] Attaching script to camera entity (%u) with registry %p",
-                static_cast<unsigned>(cameraEntity), (void*)&reg);
-
-            if (!reg.all_of<LuaScriptComponent>(cameraEntity)) {
-                reg.emplace<LuaScriptComponent>(cameraEntity);
-            }
-
-            auto& lsc = reg.get<LuaScriptComponent>(cameraEntity);
-            lsc.Enabled = true;
-
-            Engine::LuaScriptComponent::LuaInstance inst;
-            inst.ScriptGuid = EngineFramework::AssetManagerSystem::GetFullGuid(
-                EngineFramework::AssetManagerSystem::SCRIPT_GUID,
-                "camera_touch_control"
-            ).m_Instance;
-
-            bool alreadyAttached = false;
-            for (auto& s : lsc.Scripts) {
-                if (s.ScriptGuid == inst.ScriptGuid) {
-                    alreadyAttached = true;
-                    LOGE("[ScriptSystem] camera_touch_control already attached to camera, skipping reattach.");
-                    break;
-                }
-            }
-
-            if (!alreadyAttached) {
-                lsc.Scripts.push_back(inst);
-                LOGI("[ScriptSystem] camera_touch_control successfully attached to camera entity (%u).",
-                    static_cast<unsigned>(cameraEntity));
-
-                Engine::ScriptSystem::ReloadScript(reg, cameraEntity);
-            }
-        }
-        else {
-            LOGE("[ScriptSystem] No camera entity found! Skipping camera_touch_control attachment.");
-        }
-#endif
+        reg.view<LuaScriptComponent>().each([](auto& lsc) { lsc.Loaded = false; });
     }
 
     void ScriptSystem::OnRuntimeStop(entt::registry& reg) {
