@@ -23,6 +23,17 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 namespace EngineFramework
 {
+    namespace {
+
+        // Any meta-registered component with emplace/get_ref is now eligible even when no instances contain them
+        static bool is_meta_component(const entt::meta_type& meta) {
+            if (!meta || !meta.is_class()) {
+                return false;
+            }
+            using namespace entt::literals;
+            return meta.func("emplace"_hs) && meta.func("get_ref"_hs);
+        }
+    }
 	AssetWindow::AssetWindow()
 	{
         this_class = this;
@@ -257,14 +268,9 @@ namespace EngineFramework
                 ImGui::Separator();
 
                 for (const auto& [type_id, meta] : entt::resolve()) {
-                    // Only show if the meta type represents a real class
-                    if (!meta.is_class())
+                    if (!is_meta_component(meta))
                         continue;
-
-                    // Only show if the registry has storage for this component type
-                    auto* storage = registry.storage(type_id);
-                    if (!storage || storage->size() == 0)
-                        continue;
+                    (void)type_id;
 
                     // Get the registered type name (the string from .type("MeshComponent"))
                     const char* name = meta.name();
@@ -474,7 +480,7 @@ namespace EngineFramework
             ".obj",
 
             // --- Text / Config / Data ---
-            ".txt", ".json",
+            ".txt", ".json", ".lua",
 
             // --- Shaders / Code ---
             ".vert", ".frag", ".comp", ".glsl", ".shader",
@@ -494,13 +500,9 @@ namespace EngineFramework
         */
         
         for (const auto& [type_id, meta] : entt::resolve()) {
-            // Only show if the meta type represents a real class
-            if (!meta.is_class())
+            if (!is_meta_component(meta))
                 continue;
-
-            auto* storage = registry.storage(type_id);
-            if (!storage || storage->size() == 0)
-                continue;
+            (void)type_id;
 
             const char* name = meta.name();
             if (!name || name[0] == '\0')
