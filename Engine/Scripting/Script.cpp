@@ -135,6 +135,10 @@ namespace Engine {
             static_cast<bool(*)(int)>(&EngineFramework::InputManager::GetKeyUp),
             static_cast<bool(*)(EngineFramework::Key_Actions)>(&EngineFramework::InputManager::GetKeyUp)
         ));
+        inputTable.set_function("GetGyroRotationRate", []() {
+            glm::vec3 rate = EngineFramework::InputManager::GetGyroscopeRotationRate();
+            return std::make_tuple(rate.x, rate.y, rate.z);
+            });
 
         LOGI("[ScriptSystem] InputManager bindings complete (static table approach)");
         // ===============================================================
@@ -315,9 +319,9 @@ namespace Engine {
             return;
         }
 
-        auto full_guid = xresource::full_guid(
+        auto full_guid = xresource::full_guid{
             inst.ScriptGuid,
-            EngineFramework::AssetManagerSystem::SCRIPT_GUID);
+            EngineFramework::AssetManagerSystem::SCRIPT_GUID };
 
         auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(full_guid);
         if (!scriptAsset) {

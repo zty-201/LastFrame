@@ -97,7 +97,7 @@ namespace EngineFramework
 
         static std::unordered_map<int, KeyState> keyStates;
 
-        static glm::vec3 GetGyroscopeRotatioRate();
+        static glm::vec3 GetGyroscopeRotationRate();
         static std::unordered_map<Key_Actions, int> key_mapping;
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)

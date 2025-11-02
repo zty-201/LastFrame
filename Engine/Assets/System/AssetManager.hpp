@@ -219,7 +219,7 @@ namespace EngineFramework {
 		static inline constexpr const char SHADER[7]{ "shader" };
 		static inline constexpr const char CUBEMAP[8]{ "cubemap" };
 		static inline constexpr const char AUDIO[6]{ "audio" };
-		static inline constexpr const char SCRIPT[7]{ "script" };
+		//static inline constexpr const char SCRIPT[7]{ "script" };
 		static inline constexpr const char ARCHTYPE[9]{ "archtype" };
 		static inline constexpr const char SCRIPT[7]{ "script" };
 		/*
@@ -230,7 +230,7 @@ namespace EngineFramework {
 		static inline constexpr xresource::type_guid SHADER_GUID{ SHADER };
 		static inline constexpr xresource::type_guid CUBEMAP_GUID{ CUBEMAP };
 		static inline constexpr xresource::type_guid AUDIO_GUID{ AUDIO };
-		static inline constexpr xresource::type_guid SCRIPT_GUID{ SCRIPT };
+		//static inline constexpr xresource::type_guid SCRIPT_GUID{ SCRIPT };
 		static inline constexpr xresource::type_guid ARCHTYPE_GUID{ ARCHTYPE };
 		static inline constexpr xresource::type_guid SCRIPT_GUID{ SCRIPT };
 
