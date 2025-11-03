@@ -14,6 +14,7 @@
 #include "TextureComponent.h"
 #include "NormalMapComponent.h"
 #include "AudioComponent.h"
+#include "ColliderComponent.h"
 #include "Scripting/Script.hpp"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 #include "MetaInspector.hpp"
