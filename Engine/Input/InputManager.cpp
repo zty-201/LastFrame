@@ -62,8 +62,8 @@ namespace EngineFramework
     int InputManager::windowWidth = 0;
     int InputManager::windowHeight = 0;
 
-    glm::vec3 InputManager::currentGyroRate = glm::vec3(0.f);
-    long long InputManager::lastGyroTimestamp = 0;
+    glm::vec3 InputManager::currentGyroRate{};
+    long long InputManager::lastGyroTimestamp{};
 
 #ifdef PLATFORM_WINDOWS
     void InputManager::RegisterCallbacks(GLFWwindow* window)
