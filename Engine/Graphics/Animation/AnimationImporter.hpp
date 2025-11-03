@@ -6,6 +6,17 @@ namespace EngineFramework
 	// Helper functions for FBX processing
 	inline std::vector<uint8_t> ReadFBXFile(const std::string& path);
 
+	// Sampling struct
+	struct TRSSample {
+		glm::vec3 T = { 0.f, 0.f, 0.f };
+		glm::vec3 Rdeg = { 0.f, 0.f, 0.f };
+		glm::vec3 S = { 1,1,1 };
+		bool hasT = false;
+		bool hasR = false;
+		bool hasS = false;
+	};
+
+
 	// Convert FBX vec3 to glm vec3
 	inline glm::vec3 vec3Converter(const ofbx::Vec3& v) {
 		return glm::vec3(static_cast<float>(v.x), static_cast<float>(v.y), static_cast<float>(v.z));
@@ -43,6 +54,14 @@ namespace EngineFramework
 		T = glm::scale(T, scale);
 		return T;
 	}
+
+	inline std::pair<bool, float> Sample1D(const ofbx::AnimationCurve* curve, double t;
+
+	inline TRSSample SampleTRS(const ofbx::Object* obj, const ofbx::AnimationLayer* layer, double t);
+
+	static inline const ofbx::AnimationCurveNode* GetPropNode(const ofbx::Object* obj,const ofbx::AnimationLayer* layer, const char* prop);
+
+	inline void BuildParentFirstSkeleton(const std::vector<const ofbx::Object*>& boneObjs, std::vector<int>& outOrder, const std::unordered_map<const ofbx::Object*, int>& indexOf);
 
 	// Get the animation curve node
 	inline const ofbx::AnimationCurveNode* GetPropertyNode(const ofbx::Object* obj, const ofbx::AnimationLayer* layer, const char* propName) {
