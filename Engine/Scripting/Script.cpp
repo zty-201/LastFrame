@@ -199,7 +199,7 @@ namespace Engine {
         // Quick sanity check that camera_touch_control.lua is loaded
         auto guid = EngineFramework::AssetManagerSystem::GetFullGuid(
             EngineFramework::AssetManagerSystem::SCRIPT_GUID, "camera_touch_control");
-        LOGI("[Check] camera_touch_control full GUID = %lu", guid.m_Instance.m_Value);
+        LOGI("[Check] camera_touch_control full GUID = %llu", guid.m_Instance.m_Value);
 
         auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(guid);
         if (!scriptAsset)
@@ -323,7 +323,7 @@ namespace Engine {
                             inst.FnOnUpdate(inst.Self, dt);
                         }
                         catch (const sol::error& err) {
-                            LOGE("[LuaRuntime] on_update() error (GUID %lu): %s",
+                            LOGE("[LuaRuntime] on_update() error (GUID %llu): %s",
                                 inst.ScriptGuid.m_Value, err.what());
                         }
                     }
@@ -382,7 +382,7 @@ namespace Engine {
 
         auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(full_guid);
         if (!scriptAsset) {
-            LOGE("[LuaRuntime] ScriptAsset not found for GUID %lu (entity %u)",
+            LOGE("[LuaRuntime] ScriptAsset not found for GUID %llu (entity %u)",
                 inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
             inst.Loaded = false;
             return;
@@ -390,7 +390,7 @@ namespace Engine {
 
         const std::string& code = scriptAsset->code;
         if (code.empty()) {
-            LOGE("[LuaRuntime] ScriptAsset empty for GUID %lu (entity %u)",
+            LOGE("[LuaRuntime] ScriptAsset empty for GUID %llu (entity %u)",
                 inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
             inst.Loaded = false;
             return;
@@ -402,7 +402,7 @@ namespace Engine {
                 EngineFramework::AssetManagerSystem::SCRIPT_GUID
             );
 
-            LOGI("[LuaRuntime] Loading script '%s' (GUID %lu) for entity %u",
+            LOGI("[LuaRuntime] Loading script '%s' (GUID %llu) for entity %u",
                 EngineFramework::AssetManagerSystem::GetName(full_guid).c_str(),
                 inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
 
@@ -424,7 +424,7 @@ namespace Engine {
             inst.Loaded = true;
 
             if (inst.FnOnCreate.valid()) {
-                LOGI("[LuaRuntime] Calling on_create() for script '%s' (entity %u, GUID %lu)",
+                LOGI("[LuaRuntime] Calling on_create() for script '%s' (entity %u, GUID %llu)",
                     label.c_str(), static_cast<unsigned>(e), inst.ScriptGuid.m_Value);
                 try {
                     inst.FnOnCreate(inst.Self);
@@ -439,7 +439,7 @@ namespace Engine {
             }
         }
         catch (const sol::error& err) {
-            LOGE("[LuaRuntime] Unexpected load error (GUID %lu): %s",
+            LOGE("[LuaRuntime] Unexpected load error (GUID %llu): %s",
                 inst.ScriptGuid.m_Value, err.what());
             inst.Loaded = false;
         }
@@ -447,13 +447,13 @@ namespace Engine {
 
     void ScriptSystem::UnloadLuaFor(LuaScriptComponent::LuaInstance& inst, bool callOnDestroy) {
         if (inst.Loaded && callOnDestroy && inst.FnOnDestroy.valid()) {
-            LOGI("[LuaRuntime] Calling on_destroy() for script GUID %lu", inst.ScriptGuid.m_Value);
+            LOGI("[LuaRuntime] Calling on_destroy() for script GUID %llu", inst.ScriptGuid.m_Value);
             try {
                 inst.FnOnDestroy(inst.Self);
-                LOGI("[LuaRuntime] on_destroy() finished successfully (GUID %lu)", inst.ScriptGuid.m_Value);
+                LOGI("[LuaRuntime] on_destroy() finished successfully (GUID %llu)", inst.ScriptGuid.m_Value);
             }
             catch (const sol::error& err) {
-                LOGE("[LuaRuntime] on_destroy() error (GUID %lu): %s", inst.ScriptGuid.m_Value, err.what());
+                LOGE("[LuaRuntime] on_destroy() error (GUID %llu): %s", inst.ScriptGuid.m_Value, err.what());
             }
         }
 
