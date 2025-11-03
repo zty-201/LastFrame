@@ -93,6 +93,12 @@ namespace Engine {
                 auto full_guid = EngineFramework::AssetManagerSystem::GetFullGuid(
                     EngineFramework::AssetManagerSystem::SCRIPT_GUID,
                     scriptName);
+            // Load the test script once during initialization
+            auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
+            std::string code = AM.GetStringFromFile("Extern/Scripts/test.lua");
+            auto chunk = lua.load(code, "Extern/Scripts/test.lua");
+            chunk(); // execute
+
 
                 auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(full_guid);
                 if (!scriptAsset) {

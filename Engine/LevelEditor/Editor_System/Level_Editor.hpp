@@ -93,6 +93,25 @@ namespace EngineFramework
 
 	};
 
+	//For exception safety, to guarantee XX will be called even if exception is thrown.
+	//e.g. calling Imgui::End or Imgui::Endtable().
+	struct ScopeGuard
+	{
+		std::function<void()> on_exit{};
+		ScopeGuard(std::function<void()> function)
+		{
+			on_exit = function;
+		}
+		~ScopeGuard()
+		{
+			on_exit();
+		}
+	};
+
+	//Exception safe, guaranteed to call when out of scope.
+#define CALL_AT_END(name, function) ScopeGuard name{ []() {function} }
+
+
 
 }
 

@@ -21,6 +21,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "System_LevelEditor.hpp"
 #include "LFeature/LFeature.hpp"
 #include <filesystem>
+#include <set>
 
 namespace EngineFramework
 {
@@ -37,12 +38,34 @@ namespace EngineFramework
 		void Close() override;
 
 		static bool feature_enabled;
+		
+		static AssetWindow& GetInstance() { return *this_class; }
+		static inline AssetWindow* this_class = nullptr;
 
+		void seralise();
+		bool get_tags(const std::string& component, const std::string& variable, std::vector<std::string>& tags);
+		void sample_drag_drop();
 	private:
 		// Recursive draw is replaced with a grid-style explorer
 		std::filesystem::path rootAssetDirectory;
 		std::filesystem::path currentDirectory;
 		std::filesystem::path selectedAsset;
+		std::map <std::string, std::map <std::string,std::set<std::string>>> component_mapping;
+		std::map <std::string, std::map <std::string, bool>> component_validity_flags;
+		std::vector<std::string> valid_extensions;
+
+		bool is_window;
+		void open_window();
+		void init_flags();
+		void init_extensions();
+		
+		void deseralise();
+		const bool& flag(const std::string&, const std::string&) const; //flag_state read only
+		bool& flag(const std::string&, const std::string&); //flag_state
+
+		void update_map();
+		bool check_extension_validity(std::string);
+		
 	};
 }
 

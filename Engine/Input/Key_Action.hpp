@@ -4,7 +4,6 @@
 namespace EngineFramework
 {
 	enum class Key_Actions{
-		
 		JUMP,
 		MOVE_FORWARD,
 		MOVE_LEFT,

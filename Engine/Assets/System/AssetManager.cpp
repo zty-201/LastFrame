@@ -121,7 +121,64 @@ namespace EngineFramework {
 			std::istreambuf_iterator<char>());
 #endif
 	}
+	/*
+			Cross-platform reading of data from file.
+		*/
+	std::string AssetManagerSystem::GetStringFromFile(const std::filesystem::path& path)
+	{
+#ifdef PLATFORM_ANDROID
 
+		std::string buffer{};
+		if (!android_asset_manager)
+		{
+			throw std::invalid_argument("AAssetManager is not initialized in AssetManager");
+		}
+
+		LOGD("Opening Asset: %s", path.c_str());
+		AAsset* asset = AAssetManager_open(android_asset_manager, path.c_str(), AASSET_MODE_BUFFER);
+		if (!asset)
+		{
+			throw std::runtime_error("Failed to open asset: " + path.string());
+		}
+
+		/*
+			Get Asset struct from AAssetManager, and read it into the buffer.
+		*/
+
+		off_t size = AAsset_getLength(asset);
+		buffer.resize(size);
+
+		int bytesRead = AAsset_read(asset, buffer.data(), size);
+		if (bytesRead != size)
+		{
+			AAsset_close(asset);
+			throw std::runtime_error("Failed to read entire asset: " + path.string());
+		}
+
+		AAsset_close(asset);
+		return buffer;
+#endif
+#ifdef PLATFORM_WINDOWS
+		//Check if path already has folder prefix.
+		std::string prefix = GetAssetFolderPrefix().string();
+		std::string path_string = path.string();
+		//Not present, so append it.
+		if (path_string.find(prefix) != 0)
+		{
+			path_string = prefix + path_string;
+		}
+		std::filesystem::path filepath{ path_string };
+		// open the file:
+		std::ifstream file(filepath, std::ios::binary);
+		if (!file.is_open())
+		{
+			throw std::runtime_error("Failed to open asset: " + filepath.string());
+		}
+		// read the data:
+		return std::string((std::istreambuf_iterator<char>(file)),
+			std::istreambuf_iterator<char>());
+#endif
+	}
 	/*
 			Cross-platform.
 			List files in the given directory.
@@ -186,6 +243,41 @@ namespace EngineFramework {
 		return file_list;
 	}
 
+	//Return if the resource_map contains the resource.
+	bool AssetManagerSystem::HasResource(const xresource::full_guid& guid)
+	{
+		return resource_map.find(guid) != resource_map.end();
+	}
+
+	/*
+			Return full guid of an asset given its name and type_guid.
+			Also adds <guid, name> mapping if not already done.
+		*/
+	xresource::full_guid AssetManagerSystem::GetFullGuid(const xresource::type_guid& type_guid, std::string asset_name)
+	{
+		auto it = name_guid_map[type_guid].find(asset_name);
+		//Name guid map is set during loading of the respective asset.
+		if (it == name_guid_map[type_guid].end())
+		{
+			LOGE("%s %s", "[AssetManager] No Asset with this name found in name_guid_map", asset_name.c_str());
+			return {};
+		}
+		return xresource::full_guid{ it->second, type_guid };
+	}
+
+	/*
+			Returns the name of an asset given its instance_guid.
+			Returns nothing if it can't be found.
+		*/
+	std::string AssetManagerSystem::GetName(xresource::full_guid asset_guid)
+	{
+		auto it = guid_name_map.find(asset_guid);
+		if (it != guid_name_map.end())
+		{
+			return it->second;
+		}
+		return {};
+	}
 
 	/*
 			Reads name->guid mapping from the metadata file in the folder provided.
@@ -199,7 +291,7 @@ namespace EngineFramework {
 		//Decide if the json file needs to be modified.
 		bool isNewMapping = false;
 		std::vector<xresource::instance_guid> guid_arr{};
-		std::vector<unsigned char> guid_meta_string;
+		std::string guid_meta_string;
 		std::filesystem::path metadata_file = folder_path / "guid.meta";
 
 		/*
@@ -209,14 +301,13 @@ namespace EngineFramework {
 		*/
 		try
 		{
-			guid_meta_string = GetDataFromFile(metadata_file);
+			guid_meta_string = GetStringFromFile(metadata_file);
 		}
 		catch (std::exception&)
 		{
 			throw std::runtime_error((std::string("[AssetManager] Unable to find guid.meta in: ") + folder_path.string()).c_str());
 		}
-		std::string temp{ guid_meta_string.begin(), guid_meta_string.end() };
-		nlohmann::json guid_meta_json = nlohmann::json::parse(temp);
+		nlohmann::json guid_meta_json = nlohmann::json::parse(guid_meta_string);
 
 		/*
 			Find name mappings.
@@ -280,13 +371,14 @@ namespace EngineFramework {
 		for (int i = 0; i < resource_arr.size(); i++)
 		{
 			xresource::instance_guid &instance_guid = guid_mapping[i];
+			xresource::full_guid asset_guid{instance_guid, type_guid};
 			const std::string &name = name_arr[i];
 
 			//	Add resource to the resource map.
-			AddResource(xresource::full_guid(instance_guid, type_guid), resource_arr[i]);
+			AddResource(asset_guid, resource_arr[i]);
 
 			//Add <guid, name> and <name, guid> mapping.
-			guid_name_map[instance_guid] = name;
+			guid_name_map[asset_guid] = name;
 			name_guid_map[type_guid][name] = instance_guid;
 		}
 	}
@@ -302,8 +394,8 @@ namespace EngineFramework {
 		asset_loader_map[SCRIPT] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadScript);
 		asset_loader_map[ARCHTYPE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadArchtype);
 		//=====================================//
-		compilers["texture"] = std::make_unique<TextureCompiler>();
-		compilers["mesh"] = std::make_unique<MeshCompiler>();
+		compilers[TEXTURE] = std::make_unique<TextureCompiler>();
+		compilers[MESH] = std::make_unique<MeshCompiler>();
 
 		//Set AAsetManager for android, in audio system.
 #ifdef PLATFORM_ANDROID
@@ -375,8 +467,7 @@ namespace EngineFramework {
 		/*
 			Access each folder specified in the json file.
 		*/
-		std::vector<unsigned char> config_json_buffer = GetDataFromFile(std::filesystem::path(ASSET_CONFIG_FILE));
-		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		std::string config_json_string = GetStringFromFile(std::filesystem::path(ASSET_CONFIG_FILE));
 		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
 
 		/*
@@ -391,6 +482,7 @@ namespace EngineFramework {
 		for (auto& [resource_type, folderpath_string] : config_json.items())
 		{
 			std::filesystem::path folder_path{ folderpath_string.get<std::string>() };
+			type_folderpath_map[resource_type] = folder_path;
 			//Compile if needed, then load from compiled folder.
 			if (compilers.find(resource_type) != compilers.end())
 			{
@@ -466,8 +558,7 @@ namespace EngineFramework {
 		std::vector< std::shared_ptr<Scene::Texture>> loaded_resources{};
 
 		//Read the Config File
-		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
-		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		std::string config_json_string = GetStringFromFile(config_file);
 		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
 
 		//The config file should contain <name, filepath_arr> pairs
@@ -514,7 +605,17 @@ namespace EngineFramework {
 
 			// Try catch guard for loading mesh
 			try {
-				loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
+				if (path.extension() == ".obj")
+				{
+					loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
+				}
+				else if (path.extension() == ".compiled")
+				{
+					std::string data = GetStringFromFile(path);
+					nlohmann::json json_data{};
+					json_data = json_data.parse(data);
+					loaded_resources.emplace_back(new Mesh::MeshData(json_data));
+				}
 				asset_names.emplace_back(name); // Done if resource loading is a success.
 			}
 			catch (std::exception& e) {
@@ -539,8 +640,7 @@ namespace EngineFramework {
 		std::vector< std::shared_ptr<ShaderProgram>> loaded_resources{};
 
 		//Read the Config File
-		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
-		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		std::string config_json_string = GetStringFromFile(config_file);
 		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
 
 		//The config file should contain <name, shader_filepaths> pairs
@@ -591,8 +691,7 @@ namespace EngineFramework {
 		*/
 
 		//Read the Config File
-		std::vector<unsigned char> config_json_buffer = GetDataFromFile(config_file);
-		std::string config_json_string(config_json_buffer.begin(), config_json_buffer.end());
+		std::string config_json_string = GetStringFromFile(config_file);
 		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
 
 		//Reading all filepaths for audio files in the current directory.
@@ -710,7 +809,7 @@ namespace EngineFramework {
 			Resources are kept in an array until guid mappings are read.
 		*/
 		std::vector<std::string> asset_names{};
-		std::vector< std::shared_ptr<Archtype>> loaded_resources{};
+		std::vector<std::shared_ptr<Archtype>> loaded_resources{};
 		//Acceptable files that can be loaded as a texture.
 		std::vector<std::string> archtype_extensions{ ".json" };
 
@@ -725,8 +824,7 @@ namespace EngineFramework {
 			//Allocate resource
 			try
 			{
-				std::vector<unsigned char> temp = GetDataFromFile(path);
-				std::string json_string{ temp.begin(), temp.end() };
+				std::string json_string = GetStringFromFile(path);
 				loaded_resources.emplace_back(new Archtype(json_string));
 				asset_names.emplace_back(name); //Done if resource loading is a success.
 			}
@@ -741,6 +839,118 @@ namespace EngineFramework {
 		return true;
 	}
 
+
+	//Delete all resources from the map, calling their destructors.
+	void AssetManagerSystem::RemoveAllResources()
+	{
+		resource_map.clear();
+		guid_name_map.clear();
+		name_guid_map.clear();
+	}
+
+
+	//Delete a resource from the map, calling its destructor.
+	void AssetManagerSystem::RemoveResource(const xresource::full_guid& guid)
+	{
+		resource_map.erase(guid);
+		guid_name_map.erase(guid);
+		auto& map = name_guid_map[guid.m_Type];
+		for (auto it = map.begin(); it != map.end(); it++)
+		{
+			if (it->second != guid.m_Instance) continue;
+			map.erase(it);
+			break;
+		}
+	}
+
+	void AssetManagerSystem::ModifyNameMappings(xresource::type_guid type, const std::string& old_name, const std::string& new_name)
+	{
+		//Modify name_guid_map and guid_name_map
+		xresource::full_guid asset_guid = GetFullGuid(type, old_name);
+		guid_name_map[asset_guid] = new_name;
+		//Add new entry and delete old entry.
+		name_guid_map[type][new_name] = asset_guid.m_Instance;
+		name_guid_map[type].erase(old_name);
+	}
+
+	std::filesystem::path AssetManagerSystem::GetFolderPath(const std::string& type)
+	{
+		auto result = type_folderpath_map.find(type);
+		if (result != type_folderpath_map.end())
+		{
+			return result->second;
+		}
+		return {};
+	}
+
+
+	//Reloads all resource of a specific type, and calls destructors in the process.
+	void AssetManagerSystem::ReloadAllResourcesOfType(std::string type, xresource::type_guid type_guid)
+	{
+		//==First ensure that type is a valid string, to prevent deletion of existing assets without loading them back.
+		if (asset_loader_map.find(type) == asset_loader_map.end())
+		{
+			LOGE("No Function Loader for resource type %s", type.c_str());
+			return;
+		}
+		std::string config_json_string = GetStringFromFile(std::filesystem::path(ASSET_CONFIG_FILE));
+		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
+		if (!config_json.contains(type))
+		{
+			LOGE("Asset Manager ReloadAllResourceOfType: No such resource type %s in asset config file", type.c_str());
+			return;
+		}
+		std::string folderpath_string = config_json[type];
+		if(folderpath_string.empty())
+		{
+			LOGE("Asset Manager ReloadAllResourceOfType: No folderpath for resource type %s in asset config file", type.c_str());
+			return;
+		}
+		
+
+		//==From each of the 3 maps, remove every asset corresponding to type.
+		for (auto it = resource_map.begin(); it != resource_map.end(); )
+		{
+			if (it->first.m_Type != type_guid)
+			{
+				it++;
+				continue;
+			}
+			it = resource_map.erase(it);
+		}
+		for (auto it = guid_name_map.begin(); it != guid_name_map.end(); )
+		{
+			if (it->first.m_Type != type_guid)
+			{
+				it++;
+				continue;
+			}
+			it = guid_name_map.erase(it);
+		}
+		name_guid_map.erase(type_guid);
+
+		//==Load again.
+		std::filesystem::path folder_path{ folderpath_string };
+
+		//Compile if needed, then load from compiled folder.
+		if (compilers.find(type) != compilers.end())
+		{
+			std::filesystem::path compiledFolder =
+				folder_path.parent_path() /
+				(folder_path.filename().string() + "_Compiled");
+
+			CompileIfNeeded(folder_path, compiledFolder, compilers[type].get());
+
+			// Load from compiled folder
+			folder_path = compiledFolder;
+		}
+
+		//Call the asset loader for that respective asset type, and pass in the folderpath.
+		if (!asset_loader_map[type](folder_path))
+		{
+			LOGE("Unable to load assets of type: %s", type.c_str());
+		}
+	}
 	
 } // namespace EngineFramework
 

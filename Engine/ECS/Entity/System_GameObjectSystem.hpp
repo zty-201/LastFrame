@@ -62,6 +62,8 @@ namespace EngineFramework
 		- all entities with so and so component
 		entt::storage for iterating over all components of a specific type.
 
+		Deletion of instance
+		- Ensure the respective entry in entity_archtype_map is deleted, so it won't store unnecessary entity.
 
 	*/
 	class GameObjectSystem : public ISystem
@@ -71,6 +73,8 @@ namespace EngineFramework
 
 		//Return reference to the one and only instance of this system, created by core engine.
 		static GameObjectSystem& GetInstance();
+
+		static std::string GetEntityName(entt::entity entity);
 
 		//Quick Call function to load scene and destroy current scene.
 		void LoadScene(const std::string& json_input);

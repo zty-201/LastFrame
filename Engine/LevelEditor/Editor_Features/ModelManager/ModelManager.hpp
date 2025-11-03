@@ -37,6 +37,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "entt/entity/registry.hpp"
 #include "System_LevelEditor.hpp"
 #include "LFeature.hpp"
+#include "Archtype.hpp"
 
 
 namespace EngineFramework
@@ -55,6 +56,71 @@ namespace EngineFramework
         void Close() override;
 
         static bool feature_enabled;
+    
+        enum ModelErrorCode
+        {
+            NOT_FOUND,
+            FILE_ALREADY_EXISTS,
+            CANNOT_MODIFY_GUIDMETA,
+            INVALID_ARGUMENTS,
+            SUCCESS,
+            UNKNOWN_FAILURE
+        };
+    private:
+        //Used to store archtype commands by the user, so that it can be run at the end of the Run() cycle.
+        struct ArchtypeEvent
+        {
+            enum Event
+            {
+                CREATE,
+                COPY,
+                RENAME,
+                DELETE,
+                CHANGE_MODEL_TYPE,
+                NONE
+            };
+            ArchtypeEvent() { event = Event::NONE; }
+            ArchtypeEvent(Event event, std::string current_name = {}, std::string new_name = {}, std::shared_ptr<Archtype> archtype = nullptr)
+            : event{event}, current_name{current_name}, new_name{new_name}, archtype{archtype}, is_popup_active{ false }
+            {
+            }
+            Event event;
+            std::string current_name{};
+            std::string new_name{};
+            std::shared_ptr<Archtype> archtype{};
+            bool is_popup_active{}; //If active, the popup won't be reopened again.
+        };
+        //==Represents the top, left and right pane.
+        static void DrawSelectedTypes();
+        static void DrawTypeList(const std::unordered_map<std::string, std::vector<int>>& archtype_type_map);
+        static void DrawSelectedArchtypeTable(int spacing, int per_row, std::unordered_map<std::string, std::vector<int>>& archtype_type_map, const std::vector<std::pair<xresource::full_guid, std::shared_ptr<Archtype>>>& archtype_arr);
+
+        //==Popup menus for archtypes that were right clicked in the archtype table==//
+        static void ArchtypePopupMenu(std::string archtype_name, const std::shared_ptr<Archtype> archtype);
+
+        //==Archtype Modification/Creation==//
+        //Note: Ensure if any of these functions are called, that they are done at the end of Run().
+        //This prevents invalidation of any map that currently uses std::shared_ptr<Archtype>
+        //Creates archtype file, then reloads all archtypes. 
+        static ModelErrorCode CreateArchtype(const std::string& name);
+        //Creates archtype file of "name" from existing archtype, then reloads all archtypes. 
+        static ModelErrorCode CopyArchtype(const std::string& name, const std::shared_ptr<Archtype> existing_archtype);
+        //Rename archtype file, modifying guid.meta accordingly. 
+        static ModelErrorCode RenameArchtype(const std::string& old_name, const std::string& new_name);
+        //Deletes archtype file, modifying guid.meta accordingly. Archtypes are then reloaded. 
+        static ModelErrorCode DeleteArchtype(const std::string& name);
+        //Handles archtype modification events based on delayed_archtype_event contents. Call at the end of Run().
+        static void HandleArchtypeEvent();
+        
+        //The map of model types selected, allowing the user to pick which model types they want to see from the list.
+        static inline std::unordered_map<std::string, bool> selected_types{};
+        
+        //Name of the archtype selected by drag and drop
+        static inline std::string selected_drag_drop_archtype{};
+        
+        //Signifies what archtype modification/creation/deletion operation to perform at the end of the current Run() cycle.
+        //Due to reload/renaming of archtypes, any shared_ptr<Archtype> map or indices can be affected by archtype modification/creation. Thus, only do these commands at the end of the run() cycle.
+        static inline ArchtypeEvent delayed_archtype_event;
     };
 }
 

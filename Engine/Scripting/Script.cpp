@@ -351,6 +351,13 @@ namespace Engine {
     // Lua helpers
     // ------------------------------------------------------------------
 #if defined(ENGINE_ENABLE_LUA)
+
+    static std::string ReadTextFromAssets(const std::filesystem::path& relPath) {
+        // relPath should be relative to your Assets root, e.g. "Extern/Scripts/hello.lua"
+        auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
+        return AM.GetStringFromFile(relPath);
+    }
+
     void ScriptSystem::LoadLuaFor(entt::registry& reg,
         entt::entity e,
         LuaScriptComponent::LuaInstance& inst)
