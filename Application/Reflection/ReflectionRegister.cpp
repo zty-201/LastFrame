@@ -426,16 +426,27 @@ namespace EngineFramework
 			.func<&Getter<AudioComponent>::GetComponent>("get")
 			.func<&GetRef<AudioComponent>>("get_ref");
 
-		// === Register LuaScriptComponent ===
+		// === Register LuaScriptComponent and nested LuaInstance ===
+
+		// First, register the inner LuaInstance struct
+		entt::meta_factory<Engine::LuaScriptComponent::LuaInstance>()
+			.type("LuaInstance")
+			.data<&Engine::LuaScriptComponent::LuaInstance::ScriptGuid>("ScriptGuid")
+			.data<&Engine::LuaScriptComponent::LuaInstance::Loaded>("Loaded");
+
+		// Then register the main LuaScriptComponent
 		entt::meta_factory<Engine::LuaScriptComponent>()
 			.type("LuaScriptComponent")
-			.data<&Engine::LuaScriptComponent::ScriptPath>("ScriptPath")
-			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Script })
 			.data<&Engine::LuaScriptComponent::Enabled>("Enabled")
+			.data<&Engine::LuaScriptComponent::Scripts>("Scripts")
+			.custom<EditorFeatures::AssetPickerTag>(
+				EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Script }
+			)
 			.func<&Emplacer<Engine::LuaScriptComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<Engine::LuaScriptComponent>::RemoveComponent>("remove")
 			.func<&Getter<Engine::LuaScriptComponent>::GetComponent>("get")
 			.func<&GetRef<Engine::LuaScriptComponent>>("get_ref");
+
 
 		// === Register NormalMapComponent ===
 		entt::meta_factory<NormalMapComponent>()
