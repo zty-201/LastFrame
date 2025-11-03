@@ -199,7 +199,7 @@ namespace Engine {
         // Quick sanity check that camera_touch_control.lua is loaded
         auto guid = EngineFramework::AssetManagerSystem::GetFullGuid(
             EngineFramework::AssetManagerSystem::SCRIPT_GUID, "camera_touch_control");
-        LOGI("[Check] camera_touch_control full GUID = %llu", guid.m_Instance.m_Value);
+        LOGI("[Check] camera_touch_control full GUID = %llu", guid.m_Instance.m_Value); //Error here
 
         auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(guid);
         if (!scriptAsset)

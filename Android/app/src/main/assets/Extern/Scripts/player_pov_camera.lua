@@ -6,7 +6,7 @@
 -- ============================================================
 
 local sensitivity = 0.25     -- how fast camera rotates
-local moveSpeed   = 4.0      -- how fast camera moves
+local moveSpeed   = 100.0      -- how fast camera moves
 local deadZone    = 20.0     -- ignore small touch drags
 local yaw, pitch  = 0.0, 0.0
 local gyroSensitivity = 15.0
@@ -84,12 +84,12 @@ function on_update(self, dt)
         local radYaw = math.rad(yaw)
         local forwardX = math.cos(radYaw)
         local forwardZ = math.sin(radYaw)
-        local rightX   = math.cos(radYaw - math.pi / 2)
-        local rightZ   = math.sin(radYaw - math.pi / 2)
+        local rightX   = math.cos(radYaw + math.pi / 2)
+        local rightZ   = math.sin(radYaw + math.pi / 2)
 
         -- Combine movement vectors based on facing direction
-        local worldMoveX = (rightX * moveX + forwardX * moveZ)
-        local worldMoveZ = (rightZ * moveX + forwardZ * moveZ)
+        local worldMoveX = (-rightX * moveX + forwardX * moveZ)
+        local worldMoveZ = (-rightZ * moveX + forwardZ * moveZ)
 
         -- Apply movement
         local posX, posY, posZ = camera:GetPosition()
