@@ -2,238 +2,163 @@
 #define ENGINE_PHYSICS_SYSTEM_HPP
 #pragma once
 
-#include "pch.hpp"
 #include "ISystem.hpp"
-
-#include <entt/entt.hpp>
 #include <memory>
 #include <unordered_map>
-#include <cstdint>
-#include <cstdio>
-#include <cstdarg>
-#include <sstream>
 
-#include <glm/vec3.hpp>
-#include <glm/gtc/quaternion.hpp>
-
+// Jolt includes only if enabled
 #ifdef USE_JOLT
 #include <Jolt/Jolt.h>
-#include <Jolt/Physics/Body/BodyID.h>
-#include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
+#include <Jolt/Core/JobSystem.h>
 #include <Jolt/Core/TempAllocator.h>
-#include <Jolt/Core/JobSystemThreadPool.h>
-#include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
-#include <Jolt/Physics/Collision/Shape/SphereShape.h>
-#include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
-#include <Jolt/Physics/Body/BodyCreationSettings.h>
-#include <Jolt/Physics/Body/BodyActivationListener.h>
+#include <Jolt/Physics/Body/BodyID.h>
 #include <Jolt/Physics/Body/BodyLockInterface.h>
-#include <Jolt/Physics/Body/BodyInterface.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <Jolt/Physics/Collision/ObjectLayer.h>
 #endif
-
-// Forward declares for ECS components
-struct TransformComponent;
-struct PhysicsComponent;
-struct ColliderComponent;
 
 namespace EngineFramework {
 
-#ifdef USE_JOLT
-    // -------- Logging / assert callbacks --------
-    static void TraceImpl(const char* inFMT, ...)
-    {
-        va_list list;
-        va_start(list, inFMT);
-        char buffer[1024];
-        vsnprintf(buffer, sizeof(buffer), inFMT, list);
-        va_end(list);
-
-        std::stringstream out;
-        out << buffer;
-        LOGE("[PhysicsSystem] %s", out.str().c_str());
-    }
-
-#ifdef JPH_ENABLE_ASSERTS
-    static bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, unsigned int inLine)
-    {
-        std::stringstream out{};
-        out << inFile << ":" << inLine << ": (" << inExpression << ") " << (inMessage != nullptr ? inMessage : "") << std::endl;
-        LOGE("[PhysicsSystem] %s", out.str().c_str());
-        return true;
-    };
-#endif
-
-    // -------- Layers / Filters --------
-    namespace Layers
-    {
-        static constexpr JPH::ObjectLayer NON_MOVING = 0;
-        static constexpr JPH::ObjectLayer MOVING = 1;
-        static constexpr JPH::ObjectLayer NUM_LAYERS = 2;
-    };
-
-    class ObjectLayerPairFilterImpl : public JPH::ObjectLayerPairFilter
-    {
-    public:
-        bool ShouldCollide(JPH::ObjectLayer a, JPH::ObjectLayer b) const override
-        {
-            switch (a)
-            {
-            case Layers::NON_MOVING:
-                return b == Layers::MOVING;     // static collides only with moving
-            case Layers::MOVING:
-                return true;                    // moving collides with everything
-            default:
-                JPH_ASSERT(false); return false;
-            }
-        }
-    };
-
-    namespace BroadPhaseLayers
-    {
-        static constexpr JPH::BroadPhaseLayer NON_MOVING(0);
-        static constexpr JPH::BroadPhaseLayer MOVING(1);
-        static constexpr unsigned int NUM_LAYERS(2);
-    };
-
-    class BPLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface
-    {
-    public:
-        BPLayerInterfaceImpl()
-        {
-            mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
-            mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
-        }
-
-        unsigned int GetNumBroadPhaseLayers() const override
-        {
-            return BroadPhaseLayers::NUM_LAYERS;
-        }
-
-        JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer inLayer) const override
-        {
-            JPH_ASSERT(inLayer < Layers::NUM_LAYERS);
-            return mObjectToBroadPhase[inLayer];
-        }
-
-#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
-        const char* GetBroadPhaseLayerName(JPH::BroadPhaseLayer inLayer) const override
-        {
-            switch ((JPH::BroadPhaseLayer::Type)inLayer)
-            {
-            case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::NON_MOVING:
-                return "NON_MOVING";
-            case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::MOVING:
-                return "MOVING";
-            default:
-                JPH_ASSERT(false); return "INVALID";
-            }
-        }
-#endif
-    private:
-        JPH::BroadPhaseLayer mObjectToBroadPhase[Layers::NUM_LAYERS];
-    };
-
-    class ObjectVsBroadPhaseLayerFilterImpl : public JPH::ObjectVsBroadPhaseLayerFilter
-    {
-    public:
-        bool ShouldCollide(JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2) const override
-        {
-            switch (inLayer1)
-            {
-            case Layers::NON_MOVING:
-                return inLayer2 == BroadPhaseLayers::MOVING;
-            case Layers::MOVING:
-                return true;
-            default:
-                JPH_ASSERT(false);
-                return false;
-            }
-        }
-    };
-
-#endif // USE_JOLT
-
-#ifdef USE_JOLT
-    struct BodyIDHasher {
-        size_t operator()(const JPH::BodyID& id) const noexcept {
-            return static_cast<size_t>(id.GetIndexAndSequenceNumber());
-        }
-    };
-    struct BodyIDEqual {
-        bool operator()(const JPH::BodyID& a, const JPH::BodyID& b) const noexcept {
-            return a.GetIndexAndSequenceNumber() == b.GetIndexAndSequenceNumber();
-        }
-    };
-#endif
-
-    // ------------------ PhysicsSystem ------------------
     class PhysicsSystem final : public ISystem {
     public:
+        // Pseudo-singleton (CoreEngine creates exactly one; we keep a back-pointer)
+        static PhysicsSystem& GetInstance();
+
         PhysicsSystem();
-        ~PhysicsSystem();
+        ~PhysicsSystem() override;
 
-        static PhysicsSystem& Get();
+        // Timestep control (public API you may tweak at runtime)
+        void SetFixedDelta(float step) { m_fixed_dt = step; }
+        float GetFixedDelta() const { return m_fixed_dt; }
 
-        // Public helpers but might not need
-        void CreateBoxBody(entt::entity entity, const glm::vec3& position, const glm::vec3& halfSize, bool isStatic = false);
-        void CreateSphereBody(entt::entity entity, const glm::vec3& position, float radius, bool isStatic = false);
-        void CreateCapsuleBody(entt::entity entity, const glm::vec3& position, float height, float radius, bool isStatic = false);
+        // Cleanup methods (public so you can call from CoreEngine)
+        void ClearWorld();
+        void Shutdown();
 
-        void RemoveBody(entt::entity entity);
-        void SetBodyPosition(entt::entity entity, const glm::vec3& position);
-        void SetBodyRotation(entt::entity entity, const glm::quat& rotation);
-        void AddForce(entt::entity entity, const glm::vec3& force);
-        void AddImpulse(entt::entity entity, const glm::vec3& impulse);
+#ifdef USE_JOLT
+        // Simple query API you can call from gameplay
+        struct RayHit {
+            bool hit{ false };
+            unsigned int entity_u32{ 0 }; // BodyID index if hit
+            float t{ 0.0f };
+            float nx{ 0 }, ny{ 0 }, nz{ 0 }; // Normal
+            float px{ 0 }, py{ 0 }, pz{ 0 }; // Position
+        };
 
-        glm::vec3 GetBodyPosition(entt::entity entity) const;
-        glm::quat GetBodyRotation(entt::entity entity) const;
-        glm::vec3 GetBodyVelocity(entt::entity entity) const;
+        RayHit RayCastClosest(float ox, float oy, float oz,
+            float dx, float dy, float dz,
+            float max_distance = 1000.0f) const;
 
-        // ECS registry access
-        void SetRegistry(entt::registry* registry);
+        // Velocity setters/getters (stub for now - needs entity mapping)
+        void SetLinearVelocity(unsigned entity, const JPH::Vec3& v);
+        void SetAngularVelocity(unsigned entity, const JPH::Vec3& w);
+        JPH::Vec3 GetLinearVelocity(unsigned entity) const;
+        JPH::Vec3 GetAngularVelocity(unsigned entity) const;
+#endif
 
     private:
-        // ISystem overrides
+        // ===== ISystem interface (private by design; only CoreEngine can call) =====
         void Initialize() override;
         void Update(float delta_time) override;
         void PostUpdate(float delta_time) override;
 
-        // ---- ECS <-> Physics sync declarations  ----
-        void SyncECS2Physics(); // push ECS -> Jolt (teleports / kinematic)
-        void SyncPhysics2ECS(); // pull Jolt -> ECS (dynamic body poses)
-
-        // Fixed-step timing
-        float m_accumulator{ 0.0f };
-        const float m_fixed_dt{ 1.0f / 60.0f };;
-
-        // ECS registry
-        entt::registry* m_registry{ nullptr };
-
-        // Optional singleton-style access
-        static inline PhysicsSystem* s_instance{ nullptr };
-
 #ifdef USE_JOLT
-        // Jolt world / infra
-        std::unique_ptr<JPH::TempAllocatorImpl>           m_temp_allocator;
-        std::unique_ptr<JPH::JobSystemThreadPool>         m_job_system;
-        std::unique_ptr<BPLayerInterfaceImpl>             m_broad_phase_layer_interface;
-        std::unique_ptr<ObjectVsBroadPhaseLayerFilterImpl> m_object_vs_broadphase_layer_filter;
-        std::unique_ptr<ObjectLayerPairFilterImpl>        m_object_vs_object_layer_filter;
-        std::unique_ptr<JPH::PhysicsSystem>               m_physics_system;
+        // ---------- Minimal layer/filter setup like Jolt HelloWorld ----------
+        struct Layers {
+            static constexpr JPH::ObjectLayer NON_MOVING = 0;
+            static constexpr JPH::ObjectLayer MOVING = 1;
+            static constexpr JPH::ObjectLayer NUM_LAYERS = 2;
+        };
 
-        // glm <-> Jolt helpers (inline here is fine since we include Jolt)
-        JPH::RVec3 ToJolt(const glm::vec3& v) const { return JPH::RVec3(v.x, v.y, v.z); }
-        JPH::Quat  ToJolt(const glm::quat& q) const { return JPH::Quat(q.x, q.y, q.z, q.w); }
-        glm::vec3  FromJolt(const JPH::RVec3& v) const { return glm::vec3(v.GetX(), v.GetY(), v.GetZ()); }
-        glm::quat  FromJolt(const JPH::Quat& q)   const { return glm::quat(q.GetW(), q.GetX(), q.GetY(), q.GetZ()); }
+        struct BroadLayers {
+            static constexpr JPH::BroadPhaseLayer NON_MOVING{ 0 };
+            static constexpr JPH::BroadPhaseLayer MOVING{ 1 };
+            static constexpr JPH::uint NUM{ 2 };
+        };
 
-        // Entity <-> Body mapping
-        std::unordered_map<entt::entity, JPH::BodyID>                               m_entity_to_body;
-        std::unordered_map<JPH::BodyID, entt::entity, BodyIDHasher, BodyIDEqual>    m_body_to_entity;
+        class BPInterface final : public JPH::BroadPhaseLayerInterface {
+        public:
+            BPInterface() {
+                m_map[Layers::NON_MOVING] = BroadLayers::NON_MOVING;
+                m_map[Layers::MOVING] = BroadLayers::MOVING;
+            }
+
+            JPH::uint GetNumBroadPhaseLayers() const override {
+                return BroadLayers::NUM;
+            }
+
+            JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer layer) const override {
+                JPH_ASSERT(layer < Layers::NUM_LAYERS);
+                return m_map[layer];
+            }
+
+#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
+            const char* GetBroadPhaseLayerName(JPH::BroadPhaseLayer layer) const override {
+                // FIXED: Proper comparison using BroadPhaseLayer equality
+                if (layer == BroadLayers::NON_MOVING)
+                    return "NON_MOVING";
+                else if (layer == BroadLayers::MOVING)
+                    return "MOVING";
+                else
+                    return "UNKNOWN";
+            }
 #endif
+        private:
+            JPH::BroadPhaseLayer m_map[Layers::NUM_LAYERS];
+        };
+
+        class ObjVsBPFilter final : public JPH::ObjectVsBroadPhaseLayerFilter {
+        public:
+            bool ShouldCollide(JPH::ObjectLayer layer, JPH::BroadPhaseLayer bp) const override {
+                switch (layer) {
+                case Layers::NON_MOVING:
+                    return bp == BroadLayers::MOVING;
+                case Layers::MOVING:
+                    return true;
+                default:
+                    JPH_ASSERT(false);
+                    return false;
+                }
+            }
+        };
+
+        class ObjPairFilter final : public JPH::ObjectLayerPairFilter {
+        public:
+            bool ShouldCollide(JPH::ObjectLayer a, JPH::ObjectLayer b) const override {
+                switch (a) {
+                case Layers::NON_MOVING:
+                    return b == Layers::MOVING;
+                case Layers::MOVING:
+                    return true;
+                default:
+                    JPH_ASSERT(false);
+                    return false;
+                }
+            }
+        };
+
+        // ---------- World state ----------
+        std::unique_ptr<JPH::TempAllocator> m_temp_alloc;
+        std::unique_ptr<JPH::JobSystem>     m_job_system;
+        std::unique_ptr<JPH::PhysicsSystem> m_world;
+
+        BPInterface   m_bp{};
+        ObjVsBPFilter m_obj_vs_bp{};
+        ObjPairFilter m_obj_pair{};
+
+        // Demo bodies (HelloWorld-style: one ground, one sphere)
+        JPH::BodyID   m_ground{};
+        JPH::BodyID   m_ball{};
+#endif
+
+        // ---------- Stepping ----------
+        float m_fixed_dt{ 1.0f / 60.0f };
+        float m_accum{ 0.0f };
+
+        // ---------- Singleton back-pointer ----------
+        static PhysicsSystem* s_instance;
     };
 
 } // namespace EngineFramework

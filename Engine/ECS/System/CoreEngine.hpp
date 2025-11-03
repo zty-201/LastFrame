@@ -4,10 +4,13 @@
 
 #ifndef CORE_ENGINE_HPP
 #define CORE_ENGINE_HPP
+
 #include <string>
 #include <memory>
 #include <vector>
+#include <entt/entity/registry.hpp>
 #include "ISystem.hpp"
+
 namespace EngineFramework
 {
 	class ISystem;
@@ -25,13 +28,21 @@ namespace EngineFramework
 		//A class type used to hold the order the system should be init/updated/destroyed, and other data necessary.
 		struct CoreSystem
 		{
-			CoreSystem(std::string name, std::unique_ptr<ISystem> system, char init_order, char update_order, char destruct_order)
-				: name{name}, system{std::move(system)}, init_order{init_order}, update_order{update_order}, destruct_order{destruct_order}
+			CoreSystem(std::string name, std::unique_ptr<ISystem> system, 
+				char init_order, char update_order, char destruct_order)
+				: name{name}
+				, system{std::move(system)}
+				, init_order{init_order}
+				, update_order{update_order}
+				, destruct_order{destruct_order}
 			{}
+
 			//Used to identify the system, like for debug purposes.
 			std::string name;
+
 			//Use a pointer to prevent slicing, smart pointer for RAII destruction call, unique_ptr for sole ownership.
 			std::unique_ptr<ISystem> system;
+
 			//Specified orders of initialization, Update, Destruction. These orders aren't necessarily the same.
 			char init_order{}, update_order{}, destruct_order{};
 
@@ -48,7 +59,8 @@ namespace EngineFramework
 			Systems do not need to be added in any particular order, but the order of init/update/destruction needs to be specified (relative to other systems added).
 			Add all systems before calling initialize.
 		*/
-		void AddSystem(std::string name, std::unique_ptr<ISystem> system, char init_order, char update_order, char destruct_order);
+		void AddSystem(std::string name, std::unique_ptr<ISystem> system, 
+			char init_order, char update_order, char destruct_order);
 		
 		/*
 			Initializes all systems in order.
@@ -68,6 +80,9 @@ namespace EngineFramework
 		*/
 		void PostUpdateSystems(float delta_time);
 
+		entt::registry& GetRegistry() { return m_registry; }
+		const entt::registry& GetRegistry() const { return m_registry; }
+
 		//Rule of 0, delete as they shouldn't be used.
 		CoreEngine(const CoreEngine& rhs) = delete;
 		CoreEngine& operator=(const CoreEngine& rhs) = delete;
@@ -81,6 +96,8 @@ namespace EngineFramework
 
 		//Array containing all systems. Sorted based on order of init/update/destruct according to current needs.
 		std::vector<CoreSystem> system_arr;
+
+		entt::registry m_registry;
 
 		// Helper functions to safely call system methods with try-catch and error logging.
 		void SafeUpdateSystem(CoreSystem& system, float delta_time);
