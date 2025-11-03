@@ -141,7 +141,7 @@ function on_update(self, dt)
         if math.abs(gyroX) > 0.001 or math.abs(gyroY) > 0.001 then
         
             -- Calculate intermediate deltas
-            local tempYaw = -math.deg(gyroX) * dt * gyroSensitivity 
+            local tempYaw = math.deg(gyroX) * dt * gyroSensitivity
             local tempPitch = math.deg(gyroY) * dt * gyroSensitivity
         
             -- Accumulate gyro change
