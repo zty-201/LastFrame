@@ -9,6 +9,10 @@ local sensitivity = 0.25     -- how fast camera rotates
 local moveSpeed   = 4.0      -- how fast camera moves
 local deadZone    = 20.0     -- ignore small touch drags
 local yaw, pitch  = 0.0, 0.0
+local gyroSensitivity = 15.0
+local pitchLimit = 89.0
+
+local gyroEnabled = true
 
 local camera = nil
 
@@ -39,6 +43,8 @@ end
 function on_update(self, dt)
     if not camera then return end
 
+    local deltaYaw = 0.0
+    local deltaPitch = 0.0
     -- =======================================
     -- TOUCH AREA: MOVEMENT (bottom-left)
     -- =======================================
@@ -116,34 +122,78 @@ function on_update(self, dt)
         local dx = mx - lastX
         local dy = my - lastY
 
-        yaw   = yaw + dx * sensitivity
-        pitch = pitch - dy * sensitivity
-
-        if pitch > 89.0 then pitch = 89.0 end
-        if pitch < -89.0 then pitch = -89.0 end
-
-        lastX, lastY = mx, my
+        -- 🌟 Accumulate into local deltas, do NOT update global yaw/pitch 🌟
+        deltaYaw = deltaYaw + dx * sensitivity
+        deltaPitch = deltaPitch - dy * sensitivity
+        
+        lastX, lastY = mx, my 
+        -- Clamping and final application will now happen in the UNIFIED block
     end
 
     -- =======================================
-    -- UPDATE CAMERA ORIENTATION
+    -- GYROSCOPE LOOK CONTROL
     -- =======================================
-    local radYaw   = math.rad(yaw)
-    local radPitch = math.rad(pitch)
-    local forward = {
-        x = math.cos(radYaw) * math.cos(radPitch),
-        y = math.sin(radPitch),
-        z = math.sin(radYaw) * math.cos(radPitch)
-    }
+    if gyroEnabled and not moveTouchActive then 
+        local gyroX, gyroY, gyroZ = Input.GetGyroscopeRotatioRate()
+        local dt = dt 
+        
+        -- Skip if gyro is reporting zero (or near-zero) rate
+        if math.abs(gyroX) > 0.001 or math.abs(gyroY) > 0.001 then
+        
+            -- Calculate intermediate deltas
+            local tempYaw = -math.deg(gyroX) * dt * gyroSensitivity 
+            local tempPitch = math.deg(gyroY) * dt * gyroSensitivity
+        
+            -- Accumulate gyro change
+            deltaYaw = deltaYaw + tempYaw
+            deltaPitch = deltaPitch + tempPitch
+        end
+    end
 
-    local camX, camY, camZ = camera:GetPosition()
-    local lookAt = {
-        x = camX + forward.x,
-        y = camY + forward.y,
-        z = camZ + forward.z
-    }
-    camera:LookAt(lookAt.x, lookAt.y, lookAt.z)
+-- =======================================
+    -- UPDATE CAMERA ORIENTATION (UNIFIED)
+    -- =======================================
+    -- Apply the rotation only if an accumulated delta exists
+    if math.abs(deltaYaw) > 0 or math.abs(deltaPitch) > 0 then 
+        
+        -- Apply accumulated local change to the GLOBAL variables
+        yaw = yaw + deltaYaw
+        pitch = pitch + deltaPitch
+        
+        -- Clamp pitch
+        if pitch > pitchLimit then pitch = pitchLimit end
+        if pitch < -pitchLimit then pitch = -pitchLimit end
+        
+        -- Calculate the new 'Front' vector using yaw and pitch
+        local radYaw   = math.rad(yaw)
+        local radPitch = math.rad(pitch)
+        local cosPitch = math.cos(radPitch)
+        
+        local forward = {
+            x = cosPitch * math.sin(radYaw), -- Note: sin/cos mapping is often swapped depending on engine conventions
+            y = math.sin(radPitch),
+            z = cosPitch * math.cos(radYaw)
+        }
+
+        local camX, camY, camZ = camera:GetPosition()
+        local lookAt = {
+            x = camX + forward.x,
+            y = camY + forward.y,
+            z = camZ + forward.z
+        }
+        camera:LookAt(lookAt.x, lookAt.y, lookAt.z)
+    end
 end
+
+-- function ToggleGyro(enable)
+--     Check if 'enable' is explicitly provided; otherwise, toggle the current state
+--     if enable ~= nil then
+--         gyroEnabled = enable
+--     else
+--         gyroEnabled = not gyroEnabled
+--     end
+--     print("[Lua] Gyroscope Toggled: " .. tostring(gyroEnabled))
+-- end
 
 function on_destroy()
     print("[player_touch_camera.lua] Destroyed")
