@@ -221,7 +221,6 @@ namespace EngineFramework {
 		static inline constexpr const char AUDIO[6]{ "audio" };
 		static inline constexpr const char SCRIPT[7]{ "script" };
 		static inline constexpr const char ARCHTYPE[9]{ "archtype" };
-
 		/*
 			Precomputed type guids.
 		*/

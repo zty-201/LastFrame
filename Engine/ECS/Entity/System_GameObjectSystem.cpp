@@ -52,6 +52,26 @@ namespace EngineFramework
 		return *this_system;
 	}
 
+	// To get the entity name to be displayed
+	std::string GameObjectSystem::GetEntityName(entt::entity entity) {
+		if (entity == entt::null || !registry.valid(entity)) {
+			return {};
+		}
+
+		if (auto it = entity_archtype_map.find(entity); it != entity_archtype_map.end()) {
+			const xresource::full_guid archtype_guid{ it->second, AssetManagerSystem::ARCHTYPE_GUID };
+			std::string name = AssetManagerSystem::GetName(archtype_guid);
+			if (!name.empty()) {
+				return name;
+			}
+		}
+
+		// Fall back for if there is no proper name of the entity
+		std::ostringstream label;
+		label << "Entity " << static_cast<std::uint32_t>(entt::to_integral(entity));
+		return label.str();
+	}
+
 	void GameObjectSystem::LoadScene(const std::string& json_input)
 	{
 		ClearAllInstances();

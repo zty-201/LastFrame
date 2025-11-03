@@ -1,3 +1,17 @@
+/*****************************************************************/
+/*!
+\file   PropertyManager.cpp
+\author Neo HuiZong
+\par    neo.h\@digipen.edu
+\date   October 2025
+\brief
+This file contains the definitions of the functions that are needed to
+decide which entity to inspect for the inspector.
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/* *******************************************************************/
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
 #include "pch.hpp"
@@ -5,8 +19,7 @@
 #include "InspectorPanel.hpp"
 #include "System_GameObjectSystem.hpp"
 #include "Level_Editor.hpp"              // ensure LevelEditor is declared
-#include "Components/CameraComponent.h"   // <-- adjust path/name to yours
-
+#include "Components/CameraComponent.h"  
 
 using EngineFramework::GameObjectSystem;
 
@@ -18,9 +31,9 @@ namespace EngineFramework {
             auto& storage = pair.second;
             if (storage.size() == 0) continue;
 
-            // take the first entity from this storage
+            // Take the first entity from this storage
             entt::entity ent = *storage.begin();
-            return ent;                      // first one is enough
+            return ent;                      // First one is enough
         }
         return entt::null;
     }
@@ -28,19 +41,19 @@ namespace EngineFramework {
     void LFeature_PropertyManager::Initialize() {}
 
     void LFeature_PropertyManager::Run() {
-        if (!is_enabled) return;   // match your feature pattern (like Profiler)
+        if (!is_enabled) return;
 
         auto& reg = GameObjectSystem::GetRegistry();
 
-        // current selection
+        // Current selection
         entt::entity ent = LevelEditor::GetInstance().variables.selected_objectID;
 
-        // fallback (no duplicate condition)
+        // Fallback (no duplicate condition)
         if (ent == entt::null || !reg.valid(ent)) {
             ent = pick_any_entity(reg);
         }
 
-        // draw inspector even if ent is still null; the panel handles that message
+        // Draw inspector even if ent is still null; the panel handles that message
         EditorFeatures::DrawInspector(reg, ent);
     }
 

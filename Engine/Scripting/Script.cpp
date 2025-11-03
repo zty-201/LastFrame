@@ -351,12 +351,12 @@ namespace Engine {
     // Lua helpers
     // ------------------------------------------------------------------
 #if defined(ENGINE_ENABLE_LUA)
-    static std::string ReadTextFromAssets(const std::filesystem::path& relPath) {
-        // relPath should be relative to your Assets root, e.g. "Extern/Scripts/hello.lua"
-        auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
-        return AM.GetStringFromFile(relPath);
-    }
 
+    //static std::string ReadTextFromAssets(const std::filesystem::path& relPath) {
+    //    // relPath should be relative to your Assets root, e.g. "Extern/Scripts/hello.lua"
+    //    auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
+    //    return AM.GetStringFromFile(relPath);
+    //}
 
     void ScriptSystem::LoadLuaFor(entt::registry& reg,
         entt::entity e,
@@ -393,12 +393,17 @@ namespace Engine {
         }
 
         try {
+            full_guid = xresource::full_guid(
+                inst.ScriptGuid,
+                EngineFramework::AssetManagerSystem::SCRIPT_GUID
+            );
+
             LOGI("[LuaRuntime] Loading script '%s' (GUID %llu) for entity %u",
-                EngineFramework::AssetManagerSystem::GetName(inst.ScriptGuid).c_str(),
+                EngineFramework::AssetManagerSystem::GetName(full_guid).c_str(),
                 inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
 
             inst.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
-            std::string label = EngineFramework::AssetManagerSystem::GetName(inst.ScriptGuid);
+            std::string label = EngineFramework::AssetManagerSystem::GetName(full_guid);
             auto result = s_Lua.load(code, label)(inst.Env);
 
             if (!result.valid()) {

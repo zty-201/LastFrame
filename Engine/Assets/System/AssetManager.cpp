@@ -9,7 +9,7 @@
 #include "pch.hpp"
 #include "AssetManager.hpp"
 #include "Audio.hpp"
-#include "ScriptAsset.hpp" //For script asset type registration.
+#include "Scripting/ScriptAsset.hpp" //For script asset type registration.
 #include <system_error>
 
 //For guid metadata file reading.
