@@ -72,36 +72,37 @@ function on_update(self, dt)
         print("[Lua] Started dragging")
     end
     
-    -- Handle drag motion
-    if dragging and Input.GetMouseButton(0) then
-        local deltaX = mx - lastX
-        local deltaY = my - lastY
-        
-        if deltaX ~= 0 or deltaY ~= 0 then
-            deltaYaw = deltaYaw + deltaX * sensitivity
-            deltaPitch = deltaPitch - deltaY * sensitivity
-            
-            -- Clamp pitch
-            if pitch > pitchLimit then pitch = pitchLimit end
-            if pitch < -pitchLimit then pitch = -pitchLimit end
-            
-            -- print(string.format("[Lua] Camera rotation: yaw=%.2f pitch=%.2f", yaw, pitch))
-            
-            -- -- Update camera position (implement your rotation logic here)
-            -- -- Example: Convert spherical coordinates to Cartesian
-            -- local radYaw = math.rad(yaw)
-            -- local radPitch = math.rad(pitch)
-            
-            -- local x = target.x + distance * math.cos(radPitch) * math.sin(radYaw)
-            -- local y = target.y + distance * math.sin(radPitch)
-            -- local z = target.z + distance * math.cos(radPitch) * math.cos(radYaw)
-            
-            -- camera:SetPosition(x, y, z)
-            -- camera:LookAt(target.x, target.y, target.z)
-        end
-        
-        lastX, lastY = mx, my
+-- Handle drag motion
+if dragging and Input.GetMouseButton(0) then
+    local deltaX = mx - lastX
+    local deltaY = my - lastY
+
+    if deltaX ~= 0 or deltaY ~= 0 then
+        -- Invert rotation direction here 👇
+        yaw = yaw - deltaX * sensitivity
+        pitch = pitch + deltaY * sensitivity
+
+        -- Clamp pitch
+        if pitch > pitchLimit then pitch = pitchLimit end
+        if pitch < -pitchLimit then pitch = -pitchLimit end
+
+        print(string.format("[Lua] Camera rotation: yaw=%.2f pitch=%.2f", yaw, pitch))
+
+        -- Update camera position (spherical to Cartesian)
+        local radYaw = math.rad(yaw)
+        local radPitch = math.rad(pitch)
+
+        local x = target.x + distance * math.cos(radPitch) * math.sin(radYaw)
+        local y = target.y + distance * math.sin(radPitch)
+        local z = target.z + distance * math.cos(radPitch) * math.cos(radYaw)
+
+        camera:SetPosition(x, y, z)
+        camera:LookAt(target.x, target.y, target.z)
     end
+
+    lastX, lastY = mx, my
+end
+
     
     -- Handle release
     if dragging and not Input.GetMouseButton(0) then

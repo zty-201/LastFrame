@@ -242,7 +242,7 @@ namespace Engine {
             Engine::LuaScriptComponent::LuaInstance inst;
             inst.ScriptGuid = EngineFramework::AssetManagerSystem::GetFullGuid(
                 EngineFramework::AssetManagerSystem::SCRIPT_GUID,
-                "camera_touch_control"
+                "player_pov_camera"
             ).m_Instance;
 
             bool alreadyAttached = false;
