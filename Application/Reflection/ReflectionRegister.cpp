@@ -56,6 +56,16 @@ struct adl_serializer<std::vector<glm::vec3>> {
 };
 
 template<>
+struct adl_serializer<ColliderType> {
+	static void to_json(nlohmann::json& j, const ColliderType& t) {
+		j = static_cast<int>(t);       // store as int (0=Box, 1=Sphere)
+	}
+	static void from_json(const nlohmann::json& j, ColliderType& t) {
+		t = static_cast<ColliderType>(j.get<int>());
+	}
+};
+
+template<>
 struct adl_serializer<glm::mat4> {
 	static void to_json(json& j, const glm::mat4& m) {
 
@@ -172,7 +182,8 @@ namespace EngineFramework
 		SetMeta(std::vector<std::string>),
 		SetMeta(std::vector<glm::vec3>),
 		SetMeta(CameraComponent::CameraType),
-		SetMeta(std::filesystem::path)
+		SetMeta(std::filesystem::path),
+		SetMeta(ColliderType)
 	};
 #define SetJson(T) {entt::resolve<T>().id(), SetJsonWithMetaAny<T>}
 	static std::unordered_map<entt::id_type, std::function<void(nlohmann::json&, const std::string&, const entt::meta_any&)>> set_json_with_meta_map
@@ -206,7 +217,8 @@ namespace EngineFramework
 		SetJson(std::vector<std::string>),
 		SetJson(std::vector<glm::vec3>),
 		SetJson(CameraComponent::CameraType),
-		SetJson(std::filesystem::path)
+		SetJson(std::filesystem::path),
+		SetJson(ColliderType)
 	};
 
 
@@ -327,6 +339,8 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(std::vector<glm::vec3>);
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
 		REGISTER_ARBITRARY_TYPE(std::filesystem::path);
+		REGISTER_ARBITRARY_TYPE(ColliderType);
+
 		// Helper function to return a meta_any wrapping a reference
 
 		// TODO - Register additional components (script, audio etc) and remember to tag them when registering (refer to TextureComponent)
@@ -426,6 +440,20 @@ namespace EngineFramework
 			.func<&Remover<AudioComponent>::RemoveComponent>("remove")
 			.func<&Getter<AudioComponent>::GetComponent>("get")
 			.func<&GetRef<AudioComponent>>("get_ref");
+
+		// === Register ColliderComponent ===
+		entt::meta_factory<ColliderComponent>()
+			.type("ColliderComponent")
+			.data<&ColliderComponent::type>("type")
+			.data<&ColliderComponent::offset>("offset")
+			.data<&ColliderComponent::half_extents>("half_extents")
+			.data<&ColliderComponent::radius>("radius")
+			.data<&ColliderComponent::dirty>("dirty")
+			// don’t expose _has_body – runtime only
+			.func<&Emplacer<ColliderComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<ColliderComponent>::RemoveComponent>("remove")
+			.func<&Getter<ColliderComponent>::GetComponent>("get")
+			.func<&GetRef<ColliderComponent>>("get_ref");
 
 		// === Register LuaScriptComponent and nested LuaInstance ===
 
