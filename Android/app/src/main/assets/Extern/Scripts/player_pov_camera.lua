@@ -6,7 +6,7 @@
 -- ============================================================
 
 local sensitivity = 0.25     -- how fast camera rotates
-local moveSpeed   = 4.0      -- how fast camera moves
+local moveSpeed   = 40.0      -- how fast camera moves
 local deadZone    = 20.0     -- ignore small touch drags
 local yaw, pitch  = 0.0, 0.0
 
