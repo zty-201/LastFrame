@@ -522,7 +522,7 @@ namespace EngineFramework {
 			Resources are kept in an array until guid mappings are read.
 		*/
 		std::vector<std::string> asset_names{};
-		std::vector< std::shared_ptr<Scene::Texture>> loaded_resources{};
+		std::vector<std::shared_ptr<Scene::Texture>> loaded_resources{};
 
 		//Iterate through all texture files
 		for (const std::filesystem::path& path : files)
@@ -627,6 +627,53 @@ namespace EngineFramework {
 		return true;
 	}
 
+	/**
+	 * @brief Loads a shader source file and recursively processes all #include directives.
+	 * @param filepath The path to the shader file to load.
+	 * @return A string containing the full, combined shader source code.
+	*/
+	static std::string LoadShaderSourceWithIncludes(const std::filesystem::path& filepath) {
+		// Use the AssetManager's own file reading utility to be platform-agnostic
+		std::string full_source = AssetManagerSystem::GetStringFromFile(filepath);
+		std::stringstream final_source;
+		std::stringstream file_stream(full_source);
+
+		std::string line;
+		while (getline(file_stream, line)) {
+			// Check for the #include directive
+			if (line.rfind("#include", 0) == 0) {
+				// Found an include, parse the filename (e.g., <common.glsl>)
+				size_t start = line.find('<');
+				size_t end = line.rfind('>');
+				if (start == std::string::npos || end == std::string::npos || start >= end) {
+					final_source << line << "\n"; // Malformed include, pass it along
+					continue;
+				}
+
+				std::string include_path_str = line.substr(start + 1, end - start - 1);
+
+				// Assume the included file is in the same directory as the parent shader
+				std::filesystem::path include_filepath = filepath.parent_path() / include_path_str;
+
+				// Recursively call this function to load the included file's source
+				std::string include_source = LoadShaderSourceWithIncludes(include_filepath);
+
+				if (!include_source.empty()) {
+					final_source << include_source << "\n";
+				}
+				else {
+					LOGE("Failed to include shader file: %s", include_filepath.string().c_str());
+				}
+			}
+			else {
+				// Not an include line, just append it to the final source
+				final_source << line << "\n";
+			}
+		}
+
+		return final_source.str();
+	}
+
 	bool AssetManagerSystem::LoadShader(const std::filesystem::path& config_file)
 	{
 		LOGI("Loading Shader");
@@ -646,22 +693,37 @@ namespace EngineFramework {
 		{
 			//Read vertex and fragment shader filepaths.
 			//Always throw an error if not present, as these are critical for a shader program (unlike geometry or tesselation).
-			if (!shader_filepaths.contains("vertex"))
-			{
-				LOGE("%s %s %s", "No vertex filepath in config file for shader program", shader_name.c_str(), ", did you mispell it ?");
-				continue;
-			}
-			if (!shader_filepaths.contains("fragment"))
-			{
-				LOGE("%s %s %s", "No fragment filepath in config file for shader program", shader_name.c_str(), ", did you mispell it ?");
-				continue;
-			}
-			std::string vertex_shader = shader_filepaths["vertex"];
-			std::string fragment_shader = shader_filepaths["fragment"];
 			try
 			{
-				loaded_resources.emplace_back(new ShaderProgram(vertex_shader.c_str(), fragment_shader.c_str()));
-				asset_names.emplace_back(shader_name); //Done if resource loading is a success.
+				// Case 1: Compute Shader (has a "compute" key)
+				if (shader_filepaths.contains("compute"))
+				{
+					std::string compute_shader_path = shader_filepaths["compute"];
+					std::string compute_source = LoadShaderSourceWithIncludes(compute_shader_path);
+					if (compute_source.empty()) throw std::runtime_error("Failed to load compute shader.");
+
+					loaded_resources.emplace_back(new ShaderProgram(compute_source.c_str()));
+					asset_names.emplace_back(shader_name);
+				}
+				// Case 2: Graphics Shader (has "vertex" and "fragment" keys)
+				else if (shader_filepaths.contains("vertex") && shader_filepaths.contains("fragment"))
+				{
+					std::string vertex_shader_path = shader_filepaths["vertex"];
+					std::string fragment_shader_path = shader_filepaths["fragment"];
+
+					std::string vertex_source = LoadShaderSourceWithIncludes(vertex_shader_path);
+					std::string fragment_source = LoadShaderSourceWithIncludes(fragment_shader_path);
+					if (vertex_source.empty() || fragment_source.empty()) throw std::runtime_error("Failed to load graphics shaders.");
+
+					// Call the new constructor that takes source code
+					loaded_resources.emplace_back(new ShaderProgram(vertex_source.c_str(), fragment_source.c_str(), true));
+					asset_names.emplace_back(shader_name);
+				}
+				else
+				{
+					LOGE("Shader '%s' in config is missing required keys. Expected 'compute' or both 'vertex' and 'fragment'.", shader_name.c_str());
+					continue;
+				}
 			}
 			catch (std::exception& e)
 			{

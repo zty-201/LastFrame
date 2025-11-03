@@ -87,7 +87,7 @@ namespace EngineFramework
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
             batch.maxInstanceCapacity = m_maxInstancesPerBatch;
-            LOGD("Created SSBO for batch %s (capacity: %zu)", batch.meshName.c_str(), m_maxInstancesPerBatch);
+            //LOGD("Created SSBO for batch %s (capacity: %zu)", batch.meshName.c_str(), m_maxInstancesPerBatch);
         }
     }
 
@@ -105,7 +105,7 @@ namespace EngineFramework
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
         batch.needsBufferUpdate = false;
-        LOGD("Updated SSBO for batch %s: %zu instances", batch.meshName.c_str(), batch.currentInstanceCount);
+        //LOGD("Updated SSBO for batch %s: %zu instances", batch.meshName.c_str(), batch.currentInstanceCount);
     }
 
     void InstancingSystem::PrepareBatches() {

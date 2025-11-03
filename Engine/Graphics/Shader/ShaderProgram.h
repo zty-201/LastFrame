@@ -46,14 +46,15 @@ private:
         return pos->second; // Return cached location if found
     }
 
-    void detachAndDeleteShaderObjects(); // Detach and delete shader objects (not implemented here)
-    void link(); // Link the shader program (not implemented here)
-
 public:
     // Constructor that takes a pre-existing OpenGL program handle
     ShaderProgram(GLuint handle);
     // Constructor that takes file paths for a vertex shader and a fragment shader
     ShaderProgram(const char* sv, const char* sf);
+    // Takes source code strings directly.
+    ShaderProgram(const char* vertexSource, const char* fragmentSource, bool isSourceCode);
+	// Takes source code strings directly for a compute shader.
+    ShaderProgram(const char* cs);
 
     ~ShaderProgram(); // Destructor to clean up resources
 
@@ -70,11 +71,13 @@ public:
     // Compile a shader from a file
     void compileShaderFile(const char* fileName, GLenum type);
     // Compile a shader from a code string
-    void compileShader(const char* code, GLenum type);
+    void compileShaderString(const char* code, GLenum type);
 
     void validate(); // Validate the program (ensure it works correctly)
     void use() const; // Activate the shader program for use
     void disuse() const; // Deactivate the shader program
+    void detachAndDeleteShaderObjects(); // Detach and delete shader objects (not implemented here)
+    void link(); // Link the shader program (not implemented here)
 
     // Bind an attribute location (used to associate vertex data with shader inputs)
     void bindAttribLocation(GLuint location, const char* name) {

@@ -187,6 +187,16 @@ endif()
 set(OVERRIDE_CXX_FLAGS OFF CACHE BOOL "" FORCE)   # stop Jolt from rewriting CXX flags
 set(JPH_USE_STATIC_VCRT OFF CACHE BOOL "" FORCE)  # OFF => /MD(/MDd), ON => /MT(/MTd)
 
+# ====================================================================
+# NEW: Configure Assimp Build Options BEFORE adding the subdirectory
+# ====================================================================
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable Assimp's tests")
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Disable Assimp's command-line tools")
+set(ASSIMP_NO_EXPORT ON CACHE BOOL "Disable Assimp's exporting feature")
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE BOOL "Disable all importers by default")
+set(ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "Enable ONLY the OBJ importer")
+# ====================================================================
+
 #Build external dependencies ( Jolt lives here )
 add_subdirectory(Lib)
 
@@ -199,7 +209,7 @@ if (TARGET Jolt)
 endif()
 
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp CACHE INTERNAL "")
 
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")

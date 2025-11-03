@@ -24,6 +24,13 @@
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
 
+#include "stb_image.h"
+#define VOXEL_GRID_SIZE_X 160
+#define VOXEL_GRID_SIZE_Y 90
+#define VOXEL_GRID_SIZE_Z 128
+#define NUM_BLUE_NOISE_TEXTURES 16
+#define SHADOW_WIDTH 1024
+#define SHADOW_HEIGHT 1024
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
@@ -108,22 +115,51 @@ namespace EngineFramework
 		FBO tempFBO(FBO::Texture, WIDTH, HEIGHT, &sceneTextureID);
 		mainFBO = std::move(tempFBO);
 
-		// Create the G-buffer framebuffer for deferred rendering
-		gBufferFBO = FBO(FBO::Deferred, WIDTH, HEIGHT);
+		// Create the shadow map framebuffer
+		FBO tempShadowFBO(FBO::TextureDepth, SHADOW_WIDTH, SHADOW_HEIGHT, &m_shadowMapTextureID);
+		m_shadowFBO = std::move(tempShadowFBO);
 
-		// Get shader GUIDs
-		forward_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Forward");
-		geometric_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Geometric");
-		lighting_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Lighting");
+		// Get shader GUIDs 
+		mesh_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Mesh");
+		skybox_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Skybox");
+		shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "ShadowMap");
+		light_injection_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "LightInjection");
+		ray_march_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "RayMarch");
 
 		// Initialize instancing system
 		m_instancingSystem = std::make_unique<InstancingSystem>();
 		m_instancingSystem->Initialize(10000);
 
-		// Initialize the fullscreen quad for the lighting pass
-		InitializeFullscreenQuad();
+		// === UBO SETUP ===
+		glGenBuffers(1, &m_volumetricUBO);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBO);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(VolumetricUBO), nullptr, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		// Other setup code...
+		// === VOLUMETRIC FOG SETUP (mostly unchanged) ===
+		glGenTextures(1, &m_ray_march_voxel_grid);
+		glBindTexture(GL_TEXTURE_3D, m_ray_march_voxel_grid);
+		glTexStorage3D(GL_TEXTURE_3D, 1, GL_RGBA16F, VOXEL_GRID_SIZE_X, VOXEL_GRID_SIZE_Y, VOXEL_GRID_SIZE_Z);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		glGenTextures(2, m_temporal_integration_voxel_grid);
+		for (int i = 0; i < 2; i++)
+		{
+			glBindTexture(GL_TEXTURE_3D, m_temporal_integration_voxel_grid[i]);
+			glTexStorage3D(GL_TEXTURE_3D, 1, GL_RGBA16F, VOXEL_GRID_SIZE_X, VOXEL_GRID_SIZE_Y, VOXEL_GRID_SIZE_Z);
+			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		}
+		glBindTexture(GL_TEXTURE_3D, 0);
+		LoadBlueNoiseTextures();
+
 		pScene = std::make_unique<Scene>();
 	}
 
@@ -143,520 +179,388 @@ namespace EngineFramework
 #endif
 	}
 
-	void GraphicsSystem::GeometryPass(glm::mat4& V, glm::mat4& P)
-	{
-		//-------------------------------------------------------------------------
-		// GEOMETRY PASS - Render scene geometry info to G-buffer
-		//-------------------------------------------------------------------------
-		glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO.handle);
-		glViewport(0, 0, static_cast<GLsizei>(screen.x), static_cast<GLsizei>(screen.y));
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		std::shared_ptr<ShaderProgram> geometric_shader{};
-		if (geometric_shader_guid != xresource::full_guid{}) {
-			geometric_shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(geometric_shader_guid);
-		}
-		else {
-			using E_AM = EngineFramework::AssetManagerSystem;
-			geometric_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Geometric");
-			geometric_shader = E_AM::GetResource<ShaderProgram>(geometric_shader_guid);
-		}
-
-		geometric_shader->use();
-		geometric_shader->setUniform("V", V);
-		geometric_shader->setUniform("P", P);
-
-		glDepthFunc(GL_LESS);
-		glDepthMask(GL_TRUE);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-
-		// ====================================================================
-		// INSTANCED RENDERING - ITERATE THROUGH BATCHES
-		// ====================================================================
-
-		const auto& deferredBatches = m_instancingSystem->GetDeferredBatches();
-
-		for (const auto& [batchKey, batch] : deferredBatches) {
-			// Load mesh if not cached
-			if (meshCache.find(batch.meshName) == meshCache.end()) {
-				LoadAndCacheMesh(batch.meshName);
-			}
-
-			auto& [vao, indexCount] = meshCache[batch.meshName];
-			glBindVertexArray(vao);
-
-			// Bind instance SSBO to binding point 0
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, batch.instanceSSBO);
-
-			geometric_shader->setUniform("material.Ka", batch.batchMaterial.Ka);
-			geometric_shader->setUniform("material.Kd", batch.batchMaterial.Kd);
-			geometric_shader->setUniform("material.Ks", batch.batchMaterial.Ks);
-			geometric_shader->setUniform("material.rough", batch.batchMaterial.rough);
-			geometric_shader->setUniform("material.metal", batch.batchMaterial.metal);
-			geometric_shader->setUniform("material.shininess", batch.batchMaterial.shininess);
-			geometric_shader->setUniform("material.effect", batch.batchMaterial.effect);
-
-			// Bind diffuse texture for this batch
-			bool hasTexture = false;
-			if (!batchKey.textureGUID.empty()) {
-				auto texture = AssetManagerSystem::GetResource<Scene::Texture>(batchKey.textureGUID);
-				if (texture && texture->id != 0) {
-					glActiveTexture(GL_TEXTURE0);
-					glBindTexture(texture->target, texture->id);
-					geometric_shader->setUniform("DiffuseTex", 0);
-					hasTexture = true;
-				}
-			}
-			geometric_shader->setUniform("UseTexture", hasTexture);
-
-			// Bind normal map for this batch
-			bool hasNormalMap = false;
-			if (!batchKey.normalMapGUID.empty()) {
-				auto normalMap = AssetManagerSystem::GetResource<Scene::Texture>(batchKey.normalMapGUID);
-				if (normalMap && normalMap->id != 0) {
-					glActiveTexture(GL_TEXTURE2);
-					glBindTexture(GL_TEXTURE_2D, normalMap->id);
-					geometric_shader->setUniform("NormalMap", 2);
-					hasNormalMap = true;
-				}
-			}
-			geometric_shader->setUniform("UseNormalMap", hasNormalMap);
-
-			// Single draw call for all instances in this batch
-			glDrawElementsInstanced(GL_TRIANGLES,
-				static_cast<GLsizei>(indexCount),
-				GL_UNSIGNED_INT,
-				nullptr,
-				static_cast<GLsizei>(batch.currentInstanceCount));
-		}
-
-		glBindVertexArray(0);
-		geometric_shader->disuse();
-	}
-
-	void GraphicsSystem::LightingPass(glm::mat4& V)
-	{
-		//-------------------------------------------------------------------------
-		// LIGHTING PASS - Calculate lighting using G-buffer data
-		//-------------------------------------------------------------------------
-		auto light_view = registry.view<LightComponent>();
-
-		// render to mainFBO
-		glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
-		glViewport(0, 0, static_cast<GLsizei>(screen.x), static_cast<GLsizei>(screen.y));
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		std::shared_ptr<ShaderProgram> lighting_shader{};
-		if (lighting_shader_guid != xresource::full_guid{})
-		{
-			lighting_shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(lighting_shader_guid);
-		}
-		else
-		{
-			using E_AM = EngineFramework::AssetManagerSystem;
-			lighting_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Lighting");
-			lighting_shader = E_AM::GetResource<ShaderProgram>(lighting_shader_guid);
-		}
-
-		lighting_shader->use();
-
-		// Bind G-buffer textures
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gBufferFBO.getPositionTexture());
-		lighting_shader->setUniform("gPosition", 0);
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, gBufferFBO.getNormalTexture());
-		lighting_shader->setUniform("gNormal", 1);
-
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, gBufferFBO.getAlbedoSpecTexture());
-		lighting_shader->setUniform("gAlbedoSpec", 2);
-
-		// Set lighting uniforms
-		lighting_shader->setUniform("V", V);
-
-		// Set light uniforms
-		int light_index = 0;
-		for (auto entity : light_view) {
-			auto& light = light_view.get<LightComponent>(entity);
-
-			std::stringstream s;
-			s << "light[" << light_index << "].position";
-			lighting_shader->setUniform(s.str(), light.position);
-
-			if (light.L.size() > 0) {
-				s.str("");
-				s << "light[" << light_index << "].L";
-				lighting_shader->setUniform(s.str(), light.L[0]);
-
-				s.str("");
-				s << "light[" << light_index << "].La";
-				lighting_shader->setUniform(s.str(), light.L[0]);
-			}
-
-			if (light.L.size() > 1) {
-				s.str("");
-				s << "light[" << light_index << "].Ld";
-				lighting_shader->setUniform(s.str(), light.L[1]);
-			}
-
-			if (light.L.size() > 2) {
-				s.str("");
-				s << "light[" << light_index << "].Ls";
-				lighting_shader->setUniform(s.str(), light.L[2]);
-			}
-
-			light_index++;
-		}
-
-		// Material defaults for lighting calculations
-		lighting_shader->setUniform("material.Ka", glm::vec3(0.1f));
-		lighting_shader->setUniform("material.Kd", glm::vec3(0.7f));
-		lighting_shader->setUniform("material.Ks", glm::vec3(1.0f));
-		lighting_shader->setUniform("material.shininess", 32.0f);
-		lighting_shader->setUniform("material.rough", 0.5f);
-		lighting_shader->setUniform("material.metal", 0.0f);
-
-		// ========== FOG UNIFORMS ==========
-		lighting_shader->setUniform("fogColor", glm::vec3(0.5f, 0.55f, 0.65f));  // Darker fog
-		lighting_shader->setUniform("fogDensity", 0.20f);  // INCREASE from 0.08f
-		lighting_shader->setUniform("fogAbsorption", 0.7f);  // INCREASE from 0.5f
-		lighting_shader->setUniform("fogLightDirection", glm::normalize(glm::vec3(0.2f, 0.8f, 0.3f)));
-		lighting_shader->setUniform("fogLightColor", glm::vec3(1.0f, 0.95f, 0.85f));
-		lighting_shader->setUniform("fogLightIntensity", 1.5f);  // INCREASE from 1.2f
-		lighting_shader->setUniform("fogAnisotropy", 0.4f);  // INCREASE from 0.3f
-
-		// Draw fullscreen quad
-		glDisable(GL_DEPTH_TEST);
-		glBindVertexArray(fullscreenQuadVAO);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glEnable(GL_DEPTH_TEST);
-
-		lighting_shader->disuse();
-
-		// Copy depth buffer from G-buffer to mainFBO for forward rendering
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferFBO.handle);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mainFBO.handle);
-		glBlitFramebuffer(
-			0, 0, static_cast<GLuint>(screen.x), static_cast<GLuint>(screen.y),
-			0, 0, static_cast<GLuint>(screen.x), static_cast<GLuint>(screen.y),
-			GL_DEPTH_BUFFER_BIT, GL_NEAREST
-		);
-		glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
-	}
-
-	void GraphicsSystem::ForwardRenderPass(glm::mat4& V, glm::mat4& P)
-	{
-		//-------------------------------------------------------------------------
-		// FORWARD PASS - Render transparent objects and skybox
-		//-------------------------------------------------------------------------
-		glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
-		glViewport(0, 0, static_cast<GLsizei>(screen.x), static_cast<GLsizei>(screen.y));
-		// Don't clear - we're compositing on top of lighting result
-
-		auto light_view = registry.view<LightComponent>();
-
-		std::shared_ptr<ShaderProgram> forward_shader{};
-		if (forward_shader_guid != xresource::full_guid{})
-		{
-			forward_shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(forward_shader_guid);
-		}
-		else
-		{
-			using E_AM = EngineFramework::AssetManagerSystem;
-			forward_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Forward");
-			forward_shader = E_AM::GetResource<ShaderProgram>(forward_shader_guid);
-		}
-
-		forward_shader->use();
-
-		// Set global uniforms
-		forward_shader->setUniform("Pass", 0);
-		forward_shader->setUniform("V", V);
-		forward_shader->setUniform("P", P);
-
-		// Set light uniforms
-		int light_index = 0;
-		for (auto entity : light_view) {
-			auto& light = light_view.get<LightComponent>(entity);
-			Light::setUniforms(light, forward_shader, light_index++);
-		}
-
-		// --- RENDER SCENE OBJECTS ---
-		glDepthFunc(GL_LESS);
-		glDepthMask(GL_TRUE);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-
-		const auto& forwardBatches = m_instancingSystem->GetForwardBatches();
-
-		for (const auto& [batchKey, batch] : forwardBatches) {
-			if (batchKey.meshName == "SkyBox") continue;
-
-			bool isCheckerboard = (batch.batchMaterial.effect == 3.0f);
-			if (isCheckerboard) {
-				glCullFace(GL_FRONT);
-			}
-			if (meshCache.find(batch.meshName) == meshCache.end()) {
-				LoadAndCacheMesh(batch.meshName);
-			}
-
-			auto& [vao, indexCount] = meshCache[batch.meshName];
-			glBindVertexArray(vao);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, batch.instanceSSBO);
-
-			// Set per-batch material uniforms
-			forward_shader->setUniform("material.Ka", batch.batchMaterial.Ka);
-			forward_shader->setUniform("material.Kd", batch.batchMaterial.Kd);
-			forward_shader->setUniform("material.Ks", batch.batchMaterial.Ks);
-			forward_shader->setUniform("material.rough", batch.batchMaterial.rough);
-			forward_shader->setUniform("material.metal", batch.batchMaterial.metal);
-			forward_shader->setUniform("material.shininess", batch.batchMaterial.shininess);
-			forward_shader->setUniform("material.effect", batch.batchMaterial.effect);
-
-			// Bind textures
-			bool hasTexture = false;
-			if (!batchKey.textureGUID.empty()) {
-				auto texture = AssetManagerSystem::GetResource<Scene::Texture>(batchKey.textureGUID);
-				if (texture && texture->id != 0) {
-					glActiveTexture(GL_TEXTURE0);
-					glBindTexture(texture->target, texture->id);
-					forward_shader->setUniform("DiffuseTex", 0);
-					hasTexture = true;
-				}
-			}
-			forward_shader->setUniform("UseTexture", hasTexture);
-
-			bool hasNormalMap = false;
-			if (!batchKey.normalMapGUID.empty()) {
-				auto normalMap = AssetManagerSystem::GetResource<Scene::Texture>(batchKey.normalMapGUID);
-				if (normalMap && normalMap->id != 0) {
-					glActiveTexture(GL_TEXTURE2);
-					glBindTexture(GL_TEXTURE_2D, normalMap->id);
-					forward_shader->setUniform("NormalMap", 2);
-					hasNormalMap = true;
-				}
-			}
-			forward_shader->setUniform("UseNormalMap", hasNormalMap);
-
-			glDrawElementsInstanced(GL_TRIANGLES,
-				static_cast<GLsizei>(indexCount),
-				GL_UNSIGNED_INT,
-				nullptr,
-				static_cast<GLsizei>(batch.currentInstanceCount));
-
-			if (isCheckerboard) {
-				glCullFace(GL_BACK);
-			}
-		}
-
-		// --- RENDER SKYBOX ---
-		glDepthFunc(GL_LEQUAL);
-		glDepthMask(GL_FALSE);
-		glDisable(GL_CULL_FACE);
-
-		forward_shader->setUniform("Pass", 1);
-
-		auto skybox_view = registry.view<MeshComponent, SkyboxRenderPass>();
-		for (auto [entity, mesh] : skybox_view.each())
-		{
-			if (meshCache.find(mesh.meshName) == meshCache.end()) {
-				LoadAndCacheMesh(mesh.meshName);
-			}
-			auto& [vao, indexCount] = meshCache[mesh.meshName];
-			if (registry.all_of<TextureComponent>(entity))
-			{
-				auto& texComp = registry.get<TextureComponent>(entity);
-				auto texture = AssetManagerSystem::GetResource<Scene::Texture>(texComp.texture_guid);
-
-				if (texture && texture->id != 0)
-				{
-					glActiveTexture(GL_TEXTURE1);
-					glBindTexture(GL_TEXTURE_CUBE_MAP, texture->id);
-					forward_shader->setUniform("CubeMapTex", 1);
-				}
-			}
-
-			glBindVertexArray(vao);
-			glDrawElements(GL_TRIANGLES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
-		}
-
-		// --- CLEANUP ---
-		glBindVertexArray(0);
-		forward_shader->disuse();
-		glDepthFunc(GL_LESS);
-		glEnable(GL_CULL_FACE);
-		glDepthMask(GL_TRUE);
-	}
-
 	void GraphicsSystem::RenderScene()
 	{
 		glEnable(GL_DEPTH_TEST);
 
-		// Get camera information first
 		auto camera_view = registry.view<CameraComponent>();
-		if (camera_view.empty()) {
-			LOGI("No cameras in registry yet, skipping render");
-			return;
-		}
-		CameraComponent* active_camera = &camera_view.get<CameraComponent>(camera_view.front());
-		glm::mat4 V = Camera::getLookAt(*active_camera);
+		if (camera_view.empty()) return;
+		CameraComponent& active_camera = camera_view.get<CameraComponent>(camera_view.front());
+
+		glm::mat4 V = Camera::getLookAt(active_camera);
 		float aspect = (screen.y > 0) ? (float)screen.x / screen.y : 1.0f;
-		glm::mat4 P = Camera::getPerspective(*active_camera, aspect);
+		glm::mat4 P = Camera::getPerspective(active_camera, aspect);
 
-		m_instancingSystem->PrepareBatches();
-		//m_instancingSystem->PrintStatistics();
+		// instancing temporary disabled, needs upgrade
+		//m_instancingSystem->PrepareBatches();
 
-		LOGI("\n========== RENDER FRAME START ==========");
+		// NEW RENDER LOOP
+		// 1. Create shadow map
+		ShadowPass();
+		// 2. Update all uniforms now that shadow pass is done
+		UpdateUBOs(active_camera, V, P);
+		// 3. Inject shadowed light into the volume
+		VolumetricLightInjectionPass();
+		// 4. Integrate the light through the volume
+		VolumetricRayMarchPass();
+		// 5. Render all meshes
+		MeshPass();
+		// 6. Render the skybox last
+		SkyboxPass();
 
-		// Step 1: Geometry Pass
-		LOGI(">>> Starting Geometry Pass");
-		GeometryPass(V, P);
-		LOGI("<<< Geometry Pass Complete");
-
-		// Step 2: Lighting Pass (WITH FOG INTEGRATED)
-		LOGI(">>> Starting Lighting Pass (with fog)");
-		LightingPass(V);
-		LOGI("<<< Lighting Pass Complete");
-
-		// Step 3: Forward Render Pass
-		LOGI(">>> Starting Forward Render Pass");
-		// Determine target FBO
-		ForwardRenderPass(V, P);
-		LOGI("<<< Forward Render Pass Complete");
-
-		// Step 4: Copy to screen if not rendering to FBO
+		// 7. Copy to screen if needed
 		if (!m_isRenderingToFBO) {
-			LOGI(">>> Copying result to screen");
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glBlitFramebuffer(
-				0, 0, static_cast<GLuint>(screen.x), static_cast<GLuint>(screen.y),
-				0, 0, static_cast<GLuint>(screen.x), static_cast<GLuint>(screen.y),
-				GL_COLOR_BUFFER_BIT, GL_NEAREST
-			);
+			glBlitFramebuffer(0, 0, (GLint)screen.x, (GLint)screen.y, 0, 0, (GLint)screen.x, (GLint)screen.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			LOGI("<<< Copy Complete");
 		}
 
-		LOGI("========== RENDER FRAME END ==========\n");
-		
+		m_prev_view_projection = P * V;
+		m_frame_idx++;
 	}
 
-	void GraphicsSystem::LoadAndCacheMesh(const std::string& meshName)
+	void GraphicsSystem::ShadowPass()
 	{
-		Mesh::MeshData meshData; // Temporary struct to hold raw mesh data
+		auto light_view = registry.view<LightComponent>();
+		if (light_view.empty()) return;
+		auto& main_light = light_view.get<LightComponent>(light_view.front());
 
-		if (meshName == "Quad") Mesh::generateQuad(meshData);
-		else if (meshName == "Plane") Mesh::generatePlane(meshData);
-		else if (meshName == "Cube") Mesh::generateCube(meshData);
-		else if (meshName == "Sphere") Mesh::generateSphere(meshData);
-		else if (meshName == "SkyBox") Mesh::generateSkyBox(meshData);
-		else {
-			// Here you would load from a file, e.g., using your old Mesh::generate
-			// For now, we'll throw an error for unknown primitives.
+		float near_plane = 1.0f, far_plane = 200.0f; // Increased far plane
+		glm::mat4 lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
+		glm::mat4 lightView = glm::lookAt(main_light.position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		m_lightSpaceMatrix = lightProjection * lightView;
 
-			// Try to see if file is valid
-			try {
-				Mesh::MeshData meshFile(meshName, true);
-				meshData = std::move(meshFile);
+		std::shared_ptr<ShaderProgram> shader{};
+		if (shadow_shader_guid != xresource::full_guid{})
+		{
+			shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(shadow_shader_guid);
+		}
+		else
+		{
+			using E_AM = EngineFramework::AssetManagerSystem;
+			shadow_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Shadow");
+			shader = E_AM::GetResource<ShaderProgram>(shadow_shader_guid);
+		}
+
+		shader->use();
+
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+
+		auto view = registry.view<MeshComponent, TransformComponent>();
+		for (auto [entity, meshComp, transformComp] : view.each())
+		{
+			if (meshComp.meshName == "SkyBox") continue;
+
+			if (meshCache.find(meshComp.meshName) == meshCache.end()) {
+				LoadAndCacheMesh(meshComp.meshName);
 			}
-			// File name is invalid
-			catch (const std::exception& e) {
-				throw std::runtime_error("Failed to load mesh: " + meshName + ". Error: " + e.what());
+			auto meshData = meshCache[meshComp.meshName];
+			if (!meshData || meshData->vao == 0) continue;
+
+			// For shadows, we don't care about materials, we just draw all geometry.
+			// Note: Your ShadowMap.vert needs to be updated to use u_Model instead of SSBO.
+			// For now, let's assume it has `uniform mat4 u_Model;`
+			shader->setUniform("u_Model", transformComp.modelMatrix);
+
+			glBindVertexArray(meshData->vao);
+			// Draw all sub-meshes
+			for (const auto& subMesh : meshData->subMeshes) {
+				glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * subMesh.baseIndex));
+			}
+		}
+		// ===============================================
+
+		glCullFace(GL_BACK);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		shader->disuse();
+		glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
+	}
+
+	void GraphicsSystem::UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBO);
+		VolumetricUBO* ubo = (VolumetricUBO*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(VolumetricUBO), GL_MAP_WRITE_BIT);
+
+		auto light_view = registry.view<LightComponent>();
+		LightComponent& main_light = light_view.get<LightComponent>(light_view.front());
+		glm::vec3 lightDir = glm::normalize(glm::vec3(0.0f) - main_light.position);
+
+		ubo->view = V;
+		ubo->projection = P;
+		ubo->view_proj = P * V;
+		ubo->prev_view_proj = m_frame_idx == 0 ? P * V : m_prev_view_projection;
+		ubo->light_view_proj = m_lightSpaceMatrix;
+		ubo->inv_view_proj = glm::inverse(ubo->view_proj);
+		ubo->light_direction = glm::vec4(lightDir, 0.0f);
+		ubo->light_color = glm::vec4(main_light.color * main_light.intensity, m_ambient_light_intensity);
+		ubo->camera_position = glm::vec4(camera.position, 1.0f);
+		ubo->bias_near_far_pow = glm::vec4(m_shadow_bias, camera.nearPlane, camera.farPlane, m_depth_power);
+		ubo->aniso_density_scattering_absorption = glm::vec4(m_anisotropy, m_density, m_scattering, m_absorption);
+		ubo->time = glm::vec4(static_cast<float>(glfwGetTime()), 0, 0, 0);
+		ubo->width_height = glm::ivec4(screen.x, screen.y, 0, 0);
+
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
+	void GraphicsSystem::VolumetricLightInjectionPass()
+	{
+		std::shared_ptr<ShaderProgram> shader{};
+		if (light_injection_shader_guid != xresource::full_guid{})
+		{
+			shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(light_injection_shader_guid);
+		}
+		else
+		{
+			using E_AM = EngineFramework::AssetManagerSystem;
+			light_injection_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "LightInjection");
+			shader = E_AM::GetResource<ShaderProgram>(light_injection_shader_guid);
+		}
+
+		shader->use();
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
+
+		uint32_t read_idx = static_cast<uint32_t>(m_ping_pong);
+		uint32_t write_idx = static_cast<uint32_t>(!m_ping_pong);
+
+		glBindImageTexture(0, m_temporal_integration_voxel_grid[write_idx], 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+
+		glActiveTexture(GL_TEXTURE0 + TextureUnits::VOLUMETRIC_HISTORY_UNIT);
+		glBindTexture(GL_TEXTURE_3D, m_temporal_integration_voxel_grid[read_idx]);
+		shader->setUniform("s_History", TextureUnits::VOLUMETRIC_HISTORY_UNIT);
+
+		glActiveTexture(GL_TEXTURE0 + TextureUnits::VOLUMETRIC_BLUE_NOISE_UNIT);
+		glBindTexture(GL_TEXTURE_2D, m_blue_noise_textures[m_temporal_accumulation ? m_frame_idx % NUM_BLUE_NOISE_TEXTURES : 0]);
+		shader->setUniform("s_BlueNoise", TextureUnits::VOLUMETRIC_BLUE_NOISE_UNIT);
+
+		glActiveTexture(GL_TEXTURE0 + TextureUnits::SHADOW_MAP_UNIT);
+		glBindTexture(GL_TEXTURE_2D, m_shadowMapTextureID);
+		shader->setUniform("s_ShadowMap", TextureUnits::SHADOW_MAP_UNIT);
+
+		shader->setUniform("u_Accumulation", m_frame_idx > 0 && m_temporal_accumulation);
+
+		glDispatchCompute((VOXEL_GRID_SIZE_X + 7) / 8, (VOXEL_GRID_SIZE_Y + 7) / 8, (VOXEL_GRID_SIZE_Z + 0) / 1);
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+		m_ping_pong = !m_ping_pong;
+		shader->disuse();
+	}
+
+	void GraphicsSystem::VolumetricRayMarchPass()
+	{
+		std::shared_ptr<ShaderProgram> shader{};
+		if (ray_march_shader_guid != xresource::full_guid{})
+		{
+			shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(ray_march_shader_guid);
+		}
+		else
+		{
+			using E_AM = EngineFramework::AssetManagerSystem;
+			ray_march_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "RayMarch");
+			shader = E_AM::GetResource<ShaderProgram>(ray_march_shader_guid);
+		}
+
+		shader->use();
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
+		glBindImageTexture(0, m_ray_march_voxel_grid, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+
+		uint32_t read_idx = static_cast<uint32_t>(m_ping_pong);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_3D, m_temporal_integration_voxel_grid[read_idx]);
+		shader->setUniform("s_VoxelGrid", 0);
+
+		glDispatchCompute((VOXEL_GRID_SIZE_X + 7) / 8, (VOXEL_GRID_SIZE_Y + 7) / 8, 1);
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+		shader->disuse();
+	}
+
+	void GraphicsSystem::MeshPass()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
+		glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear for the first pass writing to mainFBO
+
+		std::shared_ptr<ShaderProgram> shader{};
+		if (mesh_shader_guid != xresource::full_guid{})
+		{
+			shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(mesh_shader_guid);
+		}
+		else
+		{
+			using E_AM = EngineFramework::AssetManagerSystem;
+			mesh_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Mesh");
+			shader = E_AM::GetResource<ShaderProgram>(mesh_shader_guid);
+		}
+
+		shader->use();
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
+
+		// Bind common textures
+		glActiveTexture(GL_TEXTURE0 + TextureUnits::SHADOW_MAP_UNIT);
+		glBindTexture(GL_TEXTURE_2D, m_shadowMapTextureID);
+		shader->setUniform("s_ShadowMap", TextureUnits::SHADOW_MAP_UNIT);
+
+		glActiveTexture(GL_TEXTURE0 + TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
+		glBindTexture(GL_TEXTURE_3D, m_ray_march_voxel_grid);
+		shader->setUniform("s_VoxelGrid", TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
+		shader->setUniform("u_Tricubic", m_tricubic_filtering);
+
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glDepthFunc(GL_LESS);
+
+		// NOTE: This part needs a major refactor. The new `mesh_fs` expects multiple PBR textures
+		// per object, not just one diffuse map. The SSBO material needs to be replaced with
+		// individual texture bindings.
+		auto view = registry.view<MeshComponent, TransformComponent>();
+		for (auto [entity, meshComp, transformComp] : view.each())
+		{
+			if (meshComp.meshName == "SkyBox") continue;
+
+			// Load mesh if not in cache
+			if (meshCache.find(meshComp.meshName) == meshCache.end()) {
+				LoadAndCacheMesh(meshComp.meshName);
+			}
+			auto meshData = meshCache[meshComp.meshName];
+			if (!meshData || meshData->vao == 0) continue;
+
+			// Set the per-object model matrix
+			// Note: Your Mesh.vert needs to be updated to use a `uniform mat4 u_Model`
+			// instead of the SSBO for instance data.
+			shader->setUniform("u_Model", transformComp.modelMatrix);
+
+			glBindVertexArray(meshData->vao);
+
+			// Loop through each sub-mesh of this model
+			for (const auto& subMesh : meshData->subMeshes)
+			{
+				// Get the material for this specific sub-mesh
+				if (subMesh.materialIndex < 0 || subMesh.materialIndex >= meshData->materials.size()) continue;
+				const auto& material = meshData->materials[subMesh.materialIndex];
+
+				// Bind the textures for THIS material
+				auto albedoTex = AssetManagerSystem::GetResource<Scene::Texture>(material.albedoMap);
+				if (albedoTex && albedoTex->id != 0) {
+					glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_ALBEDO_UNIT);
+					glBindTexture(GL_TEXTURE_2D, albedoTex->id);
+					shader->setUniform("s_Albedo", TextureUnits::MESH_ALBEDO_UNIT);
+				}
+
+				auto normalTex = AssetManagerSystem::GetResource<Scene::Texture>(material.normalMap);
+				if (normalTex && normalTex->id != 0) {
+					glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_NORMAL_UNIT);
+					glBindTexture(GL_TEXTURE_2D, normalTex->id);
+					shader->setUniform("s_Normal", TextureUnits::MESH_NORMAL_UNIT);
+				}
+
+				// (TODO: Bind roughness, metallic maps here)
+
+				// Draw ONLY this part of the mesh
+				glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * subMesh.baseIndex));
 			}
 		}
 
-		if (meshData.indices.empty() || meshData.points.empty()) {
+		shader->disuse();
+	}
+
+	void GraphicsSystem::SkyboxPass()
+	{
+		// The main framebuffer is already bound from the Mesh pass. We just draw over it.
+		std::shared_ptr<ShaderProgram> shader{};
+		if (skybox_shader_guid != xresource::full_guid{})
+		{
+			shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(skybox_shader_guid);
+		}
+		else
+		{
+			using E_AM = EngineFramework::AssetManagerSystem;
+			skybox_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "SkyBox");
+			shader = E_AM::GetResource<ShaderProgram>(skybox_shader_guid);
+		}
+
+		shader->use();
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
+
+		glDepthFunc(GL_LEQUAL); // Standard skybox trick
+
+		auto skybox_view = registry.view<MeshComponent, SkyboxRenderPass>();
+		for (auto [entity, meshComp] : skybox_view.each()) {
+			if (meshCache.find(meshComp.meshName) == meshCache.end()) LoadAndCacheMesh(meshComp.meshName);
+
+			auto& meshData = meshCache[meshComp.meshName];
+			if (!meshData || meshData->vao == 0) continue;
+
+			// ... (get texture from TextureComponent, bind cubemap, etc.) ...
+
+			glBindVertexArray(meshData->vao);
+			// The Skybox should just be one submesh
+			if (!meshData->subMeshes.empty()) {
+				glDrawElements(GL_TRIANGLES, meshData->subMeshes[0].indexCount, GL_UNSIGNED_INT, 0);
+			}
+		}
+
+		glDepthFunc(GL_LESS);
+		shader->disuse();
+	}
+	
+	void GraphicsSystem::LoadAndCacheMesh(const std::string& meshName)
+	{
+		if (meshName == "Quad" || meshName == "Plane" || meshName == "Cube" || meshName == "Sphere" || meshName == "SkyBox")
+		{
+			// TODO: You'll need a separate function to generate and cache these primitives
+			// using the new MeshData structure. For now, we'll let it fail silently
+			// if they are not pre-loaded.
+			LOGE("Attempted to load primitive '%s' via file loader. Primitives should be pre-generated.", meshName.c_str());
 			return;
 		}
 
-		GLuint vao = 0, indexBuf = 0, posBuf = 0, normBuf = 0;
-		std::vector<GLuint> buffers;
-
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-
-		glGenBuffers(1, &indexBuf);
-		buffers.push_back(indexBuf);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuf);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, meshData.indices.size() * sizeof(GLuint), meshData.indices.data(), GL_STATIC_DRAW);
-
-		glGenBuffers(1, &posBuf);
-		buffers.push_back(posBuf);
-		glBindBuffer(GL_ARRAY_BUFFER, posBuf);
-		glBufferData(GL_ARRAY_BUFFER, meshData.points.size() * sizeof(GLfloat), meshData.points.data(), GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(0);
-		
-		// Setup normals
-		if (!meshData.normals.empty()) {
-			glGenBuffers(1, &normBuf);
-			buffers.push_back(normBuf);
-			glBindBuffer(GL_ARRAY_BUFFER, normBuf);
-			glBufferData(GL_ARRAY_BUFFER, meshData.normals.size() * sizeof(GLfloat), meshData.normals.data(), GL_STATIC_DRAW);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			glEnableVertexAttribArray(1);
+		try {
+			LOGI("Loading mesh from file: %s", meshName.c_str());
+			auto meshData = std::make_shared<Mesh::MeshData>(meshName);
+			meshCache[meshName] = meshData;
 		}
-
-		// Setup texture coordinates
-		GLuint tcBuf = 0;
-		if (!meshData.texCoords.empty()) {
-			glGenBuffers(1, &tcBuf);
-			buffers.push_back(tcBuf);
-			glBindBuffer(GL_ARRAY_BUFFER, tcBuf);
-			glBufferData(GL_ARRAY_BUFFER, meshData.texCoords.size() * sizeof(GLfloat), meshData.texCoords.data(), GL_STATIC_DRAW);
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-			glEnableVertexAttribArray(2);
+		catch (const std::exception& e) {
+			LOGE("Failed to load mesh: %s. Error: %s", meshName.c_str(), e.what());
+			// Insert a null pointer to prevent trying to load it again.
+			meshCache[meshName] = nullptr;
 		}
-
-		// Setup tangents 
-		GLuint tangentBuf = 0;
-		if (!meshData.tangents.empty()) {
-			glGenBuffers(1, &tangentBuf);
-			buffers.push_back(tangentBuf);
-			glBindBuffer(GL_ARRAY_BUFFER, tangentBuf);
-			glBufferData(GL_ARRAY_BUFFER, meshData.tangents.size() * sizeof(GLfloat), meshData.tangents.data(), GL_STATIC_DRAW);
-			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, 0);
-			glEnableVertexAttribArray(3);
-		}
-
-		glBindVertexArray(0);
-
-		// Store the VAO and index count in the cache
-		meshCache[meshName] = { vao, meshData.indices.size() };
-
-		// Note: The raw buffer handles (indexBuf, posBuf, etc.) should be stored somewhere
-		// to be deleted when the mesh is unloaded. For simplicity, this is omitted here.
-
-		// Build edges using helper function
-		std::vector<uint32_t> wireIdx = BuildUniqueEdgeIndices(meshData.indices);
-
-		// Create wire VAO and EBO
-		GLuint wireVAO = 0, wireEBO = 0;
-		glGenVertexArrays(1, &wireVAO);
-		glBindVertexArray(wireVAO);
-
-		glBindBuffer(GL_ARRAY_BUFFER, posBuf);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-		glGenBuffers(1, &wireEBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wireEBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			wireIdx.size() * sizeof(GLuint),
-			wireIdx.data(),
-			GL_STATIC_DRAW);
-
-		glBindVertexArray(0);
-
-		// Store in wire cache
-		meshCacheWire[meshName] = { wireVAO, wireIdx.size() };
 	}
 
+	void GraphicsSystem::LoadBlueNoiseTextures()
+	{
+		m_blue_noise_textures.resize(NUM_BLUE_NOISE_TEXTURES);
+		glGenTextures(NUM_BLUE_NOISE_TEXTURES, m_blue_noise_textures.data());
+		
+		for (int i = 0; i < NUM_BLUE_NOISE_TEXTURES; i++)
+		{
+			std::string filename = "Extern/Graphics/Texture/blue_noise/LDR_LLL1_" + std::to_string(i) + ".png";
+			int width, height, bytesPerPix;
+			
+			std::vector<unsigned char> texture_data = AssetManagerSystem::GetDataFromFile(std::filesystem::path(filename));
+			unsigned char* data = stbi_load_from_memory(texture_data.data(), static_cast<int>(texture_data.size()), &width, &height, &bytesPerPix, 1);
+			
+			if (!data) {
+				LOGE("Failed to load blue noise texture: %s", filename.c_str());
+				continue;	
+			}
+			
+			glBindTexture(GL_TEXTURE_2D, m_blue_noise_textures[i]);
+			glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8, width, height);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, data);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			
+			stbi_image_free(data);
+		}
+	}
+	
 	//==Event Handlers==//
 
 	//When level editor is toggled on/off.
@@ -675,50 +579,11 @@ namespace EngineFramework
 
 		// Resize framebuffers
 		mainFBO.resize(window_resize.width, window_resize.height);
-		gBufferFBO.resize(window_resize.width, window_resize.height);
-
 		screen.x = static_cast<float>(window_resize.width);
 		screen.y = static_cast<float>(window_resize.height);
 
 		// Restore previous texture bindings
 		glBindTexture(GL_TEXTURE_2D, prevTexture);
-	}
-
-	void GraphicsSystem::CalculateModelMatrix(const TransformComponent& transform, glm::mat4& model)
-	{
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, transform.position);
-		model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, transform.scale);
-	}
-
-	void GraphicsSystem::InitializeFullscreenQuad() {
-		// Vertex data for a fullscreen quad (NDC coordinates)
-		float quadVertices[] = {
-			// positions   // texCoords
-			-1.0f,  1.0f,  0.0f, 1.0f,
-			-1.0f, -1.0f,  0.0f, 0.0f,
-			 1.0f,  1.0f,  1.0f, 1.0f,
-			 1.0f, -1.0f,  1.0f, 0.0f,
-		};
-
-		// Create buffers
-		glGenVertexArrays(1, &fullscreenQuadVAO);
-		glGenBuffers(1, &fullscreenQuadVBO);
-		glBindVertexArray(fullscreenQuadVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, fullscreenQuadVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-
-		// Position attribute
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-		// TexCoords attribute
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-		glBindVertexArray(0);
 	}
 
 }

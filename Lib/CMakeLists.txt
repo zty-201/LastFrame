@@ -14,7 +14,7 @@ add_subdirectory(Shared/stb_image)
 add_subdirectory(Shared/xresource)
 add_subdirectory(Shared/lua)
 add_subdirectory(Shared/sol)
-
+add_subdirectory(Shared/assimp)
 add_subdirectory(Shared/JoltPhysics/Build)
 
 # Windowsx64 Shared

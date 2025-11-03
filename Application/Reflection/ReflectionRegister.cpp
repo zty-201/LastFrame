@@ -36,23 +36,6 @@ struct adl_serializer<glm::vec3> {
 };
 
 template<>
-struct adl_serializer<std::vector<glm::vec3>> {
-	static void to_json(json& j, const std::vector<glm::vec3>& vec) {
-		j = json::array();
-		for (const auto& v : vec) {
-			j.push_back(json::array({ v.x, v.y, v.z }));
-		}
-	}
-
-	static void from_json(const json& j, std::vector<glm::vec3>& vec) {
-		vec.clear();
-		for (const auto& item : j) {
-			vec.push_back(glm::vec3{ item[0], item[1], item[2] });
-		}
-	}
-};
-
-template<>
 struct adl_serializer<glm::mat4> {
 	static void to_json(json& j, const glm::mat4& m) {
 
@@ -157,7 +140,6 @@ namespace EngineFramework
 		SetMeta(std::vector<int>),
 		SetMeta(std::vector<float>),
 		SetMeta(std::vector<std::string>),
-		SetMeta(std::vector<glm::vec3>),
 		SetMeta(CameraComponent::CameraType)
 	};
 #define SetJson(T) {entt::resolve<T>().id(), SetJsonWithMetaAny<T>}
@@ -190,7 +172,6 @@ namespace EngineFramework
 		SetJson(std::vector<int>),
 		SetJson(std::vector<float>),
 		SetJson(std::vector<std::string>),
-		SetJson(std::vector<glm::vec3>),
 		SetJson(CameraComponent::CameraType)
 	};
 
@@ -321,15 +302,15 @@ namespace EngineFramework
 		// === Register MaterialComponent ===
 		entt::meta_factory<MaterialComponent>()
 			.type("MaterialComponent")
-			.data<&MaterialComponent::rough>("rough")
-			.data<&MaterialComponent::metal>("metal")
-			.data<&MaterialComponent::color>("color")
-			.data<&MaterialComponent::Ka>("Ka")
-			.data<&MaterialComponent::Kd>("Kd")
-			.data<&MaterialComponent::Ks>("Ks")
-			.data<&MaterialComponent::shininess>("shininess")
-			.data<&MaterialComponent::effect>("effect")
-			.data<&MaterialComponent::materialName>("materialName")
+			.data<&MaterialComponent::name>("name")
+			.data<&MaterialComponent::albedoMap>("albedoMap")
+			.data<&MaterialComponent::normalMap>("normalMap")
+			.data<&MaterialComponent::metallicMap>("metallicMap")
+			.data<&MaterialComponent::roughnessMap>("roughnessMap")
+			.data<&MaterialComponent::ambientOcclusionMap>("ambientOcclusionMap")
+			.data<&MaterialComponent::diffuseColor>("diffuseColor")
+			.data<&MaterialComponent::metallic>("metallic")
+			.data<&MaterialComponent::roughness>("roughness")
 			.func<&Emplacer<MaterialComponent>::EmplaceComponent>("emplace")
 			.func<&Getter<MaterialComponent>::GetComponent>("get")
 			.func<&GetRef<MaterialComponent>>("get_ref");
@@ -338,7 +319,8 @@ namespace EngineFramework
 		entt::meta_factory<LightComponent>()
 			.type("LightComponent")
 			.data<&LightComponent::position>("position")
-			.data<&LightComponent::L>("L")
+			.data<&LightComponent::color>("color")
+			.data<&LightComponent::intensity>("intensity")
 			.func<&Emplacer<LightComponent>::EmplaceComponent>("emplace")
 			.func<&Getter<LightComponent>::GetComponent>("get")
 			.func<&GetRef<LightComponent>>("get_ref");

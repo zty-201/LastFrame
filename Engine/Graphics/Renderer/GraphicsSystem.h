@@ -24,8 +24,39 @@
 #include "scene.h"
 #include "InstancingSystem.h"
 
+struct VolumetricUBO
+{
+    glm::mat4 view;
+    glm::mat4 projection;
+    glm::mat4 view_proj;
+    glm::mat4 prev_view_proj;
+    glm::mat4 light_view_proj;
+    glm::mat4 inv_view_proj;
+    glm::vec4 light_direction;
+    glm::vec4 light_color;
+    glm::vec4 camera_position;
+    glm::vec4 bias_near_far_pow; // x: bias, y: near, z: far, w: power
+    glm::vec4 aniso_density_scattering_absorption;
+    glm::vec4 time; // x: current time
+    glm::ivec4 width_height;
+};
+
 namespace EngineFramework
 {
+    namespace TextureUnits
+    {
+        // Define texture units for the new shader bindings
+        const int MESH_ALBEDO_UNIT = 0;
+        const int MESH_NORMAL_UNIT = 1;
+        const int MESH_METALLIC_UNIT = 2;
+        const int MESH_ROUGHNESS_UNIT = 3;
+        const int SHADOW_MAP_UNIT = 4;
+        const int VOLUMETRIC_VOXEL_GRID_UNIT = 5;
+        const int SKYBOX_CUBEMAP_UNIT = 6;
+        const int VOLUMETRIC_BLUE_NOISE_UNIT = 7;
+        const int VOLUMETRIC_HISTORY_UNIT = 8;
+    }
+
     class GraphicsSystem : public ISystem
     {
     public:
@@ -39,12 +70,8 @@ namespace EngineFramework
 
         void RenderScene(); 
         void LoadAndCacheMesh(const std::string& meshName);
-        void ApplyPendingResize();
 
-        static GraphicsSystem& GetInstance()
-        {
-            return *this_graphics_ptr;
-        }
+        static GraphicsSystem& GetInstance(){ return *this_graphics_ptr; }
 
         // Mutator for boolean
         void SetDebugStatus(bool enable) { show_debugDraw = enable; }
@@ -66,47 +93,68 @@ namespace EngineFramework
 
         std::unique_ptr<InstancingSystem> m_instancingSystem;
         // A map to cache loaded mesh data (VAO, index count)
-        xresource::full_guid geometric_shader_guid;
-        xresource::full_guid lighting_shader_guid;
-		xresource::full_guid forward_shader_guid;
+        xresource::full_guid mesh_shader_guid;
+        xresource::full_guid skybox_shader_guid;
+        xresource::full_guid shadow_shader_guid;
+        xresource::full_guid light_injection_shader_guid;
+        xresource::full_guid ray_march_shader_guid;
 
-        // For fullscreen quad in lighting pass
-        GLuint fullscreenQuadVAO = 0;
-        GLuint fullscreenQuadVBO = 0;
+        GLuint m_volumetricUBO = 0;
 
-        std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCache;
+        std::unordered_map<std::string, std::shared_ptr<Mesh::MeshData>> meshCache;
         std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCacheWire;
 
         std::unique_ptr<Scene> pScene;
 
         FBO mainFBO;
-        FBO gBufferFBO;
+        FBO m_shadowFBO;
 
         GLuint sceneTextureID;
+        GLuint m_shadowMapTextureID;
+        
+        // === VOLUMETRIC FOG RESOURCES ===
+        // 3D textures for volumetric fog passes
+        GLuint m_ray_march_voxel_grid = 0;
+        GLuint m_temporal_integration_voxel_grid[2] = { 0, 0 };
+        std::vector<GLuint> m_blue_noise_textures;
+        
+        // Fog control parameters
+        float m_anisotropy = 0.2f;
+        float m_density = 0.05f;
+        float m_scattering = 0.1f;
+        float m_absorption = 0.01f; // Corresponds to the 0.01 in ray_march_cs
+        float m_shadow_bias = 0.005f;
+        float m_depth_power = 1.0f; // For exponential depth mapping
+        float m_ambient_light_intensity = 0.0001f;
+        bool m_temporal_accumulation = true;
+        bool m_tricubic_filtering = false;
+        int m_frame_idx = 0;
+        bool m_ping_pong = false;
+        glm::mat4 m_prev_view_projection;
+        glm::mat4 m_lightSpaceMatrix;
 
+        // === END VOLUMETRIC FOG RESOURCES ===
         glm::vec2 screen = { WIDTH,HEIGHT };
         
         bool show_debugDraw = false;
-
-        bool m_hasPendingResize = false;
         bool m_isRenderingToFBO = false;
-        int m_pendingWidth = 0;
-        int m_pendingHeight = 0;
 
         // Setup methods
         void SetupGLFW();
         void SetupGraphics();
-		void GeometryPass(glm::mat4& V, glm::mat4& P);
-		void LightingPass(glm::mat4& V);
-		void ForwardRenderPass(glm::mat4& V, glm::mat4& P);
-        void InitializeFullscreenQuad();
-		void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
+
+		// Rendering passes
+        void ShadowPass();
+        void MeshPass();
+        void SkyboxPass();
+        void VolumetricLightInjectionPass();
+        void VolumetricRayMarchPass();
+        void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
+
+        void LoadBlueNoiseTextures();
 
         //==Event Handlers, one for each type of event.
-
-        //When level editor is toggled on/off.
         void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
-        //When drawing area should be resized.
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);
 
         static inline GraphicsSystem* this_graphics_ptr = nullptr;
