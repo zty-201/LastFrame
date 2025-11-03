@@ -62,6 +62,9 @@ namespace EngineFramework
     int InputManager::windowWidth = 0;
     int InputManager::windowHeight = 0;
 
+    glm::vec3 InputManager::currentGyroRate{};
+    long long InputManager::lastGyroTimestamp{};
+
 #ifdef PLATFORM_WINDOWS
     void InputManager::RegisterCallbacks(GLFWwindow* window)
     {
@@ -258,6 +261,15 @@ namespace EngineFramework
     {
         windowHeight = height;
     }
+
+    void InputManager::UpdateGyroscope(float x, float y, float z, long long timestamp)
+    {
+        //Android provides angular velocity in rad/s
+        currentGyroRate.x = x;
+        currentGyroRate.y = y;
+        currentGyroRate.z = z;
+        lastGyroTimestamp = timestamp;
+    }
 #endif
     void InputManager::ErrorCallback(int error, const char* description)
     {
@@ -434,6 +446,10 @@ namespace EngineFramework
         lastMouseY = mouseY;
     }
 
+    glm::vec3 InputManager::GetGyroscopeRotatioRate()
+    {
+        return currentGyroRate;
+    }
     /*void InputManager::initialise_keymapping() {
 
         key_mapping[Key_Actions::MOVE_LEFT] = GLFW_KEY_A;
