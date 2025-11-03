@@ -212,7 +212,7 @@ namespace Engine {
     // ------------------------------------------------------------------
     void ScriptSystem::OnRuntimeStart(entt::registry& reg) {
 #if defined(ENGINE_ENABLE_LUA)
-        LOGI("[ScriptSystem] OnRuntimeStart called � initializing Lua scripts...");
+        LOGI("[ScriptSystem] OnRuntimeStart called — initializing Lua scripts...");
 
         // Reset load state for all LuaScriptComponents
         reg.view<LuaScriptComponent>().each([](auto& comp) {
@@ -351,6 +351,13 @@ namespace Engine {
     // Lua helpers
     // ------------------------------------------------------------------
 #if defined(ENGINE_ENABLE_LUA)
+
+    //static std::string ReadTextFromAssets(const std::filesystem::path& relPath) {
+    //    // relPath should be relative to your Assets root, e.g. "Extern/Scripts/hello.lua"
+    //    auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
+    //    return AM.GetStringFromFile(relPath);
+    //}
+
     void ScriptSystem::LoadLuaFor(entt::registry& reg,
         entt::entity e,
         LuaScriptComponent::LuaInstance& inst)
@@ -386,6 +393,11 @@ namespace Engine {
         }
 
         try {
+            full_guid = xresource::full_guid(
+                inst.ScriptGuid,
+                EngineFramework::AssetManagerSystem::SCRIPT_GUID
+            );
+
             LOGI("[LuaRuntime] Loading script '%s' (GUID %llu) for entity %u",
                 EngineFramework::AssetManagerSystem::GetName(full_guid).c_str(),
                 inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
