@@ -22,6 +22,15 @@
             "variable": "vao"
         },
         {
+            "component": "TextureComponent",
+            "tags": [
+                ".jpeg",
+                ".jpg",
+                ".png"
+            ],
+            "variable": "texture_guid"
+        },
+        {
             "component": "TransformComponent",
             "tags": [
                 ".mp3"
