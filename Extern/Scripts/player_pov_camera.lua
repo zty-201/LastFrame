@@ -82,8 +82,8 @@ function on_update(self, dt)
         local rightZ   = math.sin(radYaw + math.pi / 2)
 
         -- Combine movement vectors based on facing direction
-        local worldMoveX = (rightX * moveX + forwardX * moveZ)
-        local worldMoveZ = (rightZ * moveX + forwardZ * moveZ)
+        local worldMoveX = (-rightX * moveX + forwardX * moveZ)
+        local worldMoveZ = (-rightZ * moveX + forwardZ * moveZ)
 
         -- Apply movement
         local posX, posY, posZ = camera:GetPosition()
