@@ -189,6 +189,76 @@ namespace EditorFeatures {
 		return changed;
 	}
 
+	static std::filesystem::path make_relative_to_assets(const std::filesystem::path& input_path)
+	{
+		if (input_path.empty()) {
+			return {};
+		}
+
+		std::error_code ec_root{};
+		std::error_code ec_path{};
+
+		const std::filesystem::path root = EngineFramework::AssetManagerSystem::GetAssetFolderPrefix();
+		const std::filesystem::path abs_root = std::filesystem::absolute(root, ec_root);
+		const std::filesystem::path abs_path = std::filesystem::absolute(input_path, ec_path);
+
+		if (!ec_root && !ec_path) {
+			std::error_code ec_rel{};
+			std::filesystem::path relative = std::filesystem::relative(abs_path, abs_root, ec_rel);
+			if (!ec_rel && !relative.empty()) {
+				return relative.lexically_normal();
+			}
+		}
+
+		return input_path.lexically_normal();
+	}
+
+	static std::vector<std::filesystem::path> collect_script_paths()
+	{
+		std::vector<std::filesystem::path> scripts{};
+
+		const std::filesystem::path root = EngineFramework::AssetManagerSystem::GetAssetFolderPrefix();
+		const std::filesystem::path scripts_dir = root / "Extern/Scripts";
+
+		std::error_code ec{};
+		if (!std::filesystem::exists(scripts_dir, ec)) {
+			return scripts;
+		}
+
+		std::filesystem::recursive_directory_iterator it{ scripts_dir, std::filesystem::directory_options::skip_permission_denied, ec };
+		std::filesystem::recursive_directory_iterator end{};
+
+		for (; it != end && !ec; it.increment(ec)) {
+			if (ec) {
+				break;
+			}
+
+			const auto& entry = *it;
+			if (!entry.is_regular_file()) {
+				continue;
+			}
+
+			const std::string ext = to_lower(entry.path().extension().string());
+			if (ext != ".lua") {
+				continue;
+			}
+
+			std::filesystem::path relative = make_relative_to_assets(entry.path());
+			if (!relative.empty()) {
+				scripts.emplace_back(std::move(relative));
+			}
+		}
+
+		std::sort(scripts.begin(), scripts.end(), [](const std::filesystem::path& a, const std::filesystem::path& b) {
+			return a.generic_string() < b.generic_string();
+			});
+		scripts.erase(std::unique(scripts.begin(), scripts.end(), [](const std::filesystem::path& a, const std::filesystem::path& b) {
+			return a.generic_string() == b.generic_string();
+			}), scripts.end());
+
+		return scripts;
+	}
+
 	template<typename T>
 	static std::vector<std::pair<xresource::instance_guid, std::string>> build_asset_entries(const std::vector<std::pair<xresource::full_guid, std::shared_ptr<T>>>& list) {
 		std::vector<std::pair<xresource::instance_guid, std::string>> out;
@@ -518,6 +588,99 @@ namespace EditorFeatures {
 				std::snprintf(buffer, sizeof(buffer), "%s", s.c_str());
 				if (ImGui::InputText(label.c_str(), buffer, sizeof(buffer))) {
 					data.set(obj, std::string{ buffer });
+				}
+			}
+
+			else if (field.type() == entt::resolve<std::filesystem::path>()) {
+				auto& path = field.cast<std::filesystem::path&>();
+				const auto* picker = static_cast<const AssetPickerTag*>(data.custom());
+				const bool is_script_field = picker && picker->kind == AssetPickerKind::Script;
+
+				if (is_script_field) {
+					std::filesystem::path normalized = path.lexically_normal();
+					std::string preview = normalized.filename().string();
+					if (preview.empty()) {
+						preview = normalized.empty() ? "No Script" : normalized.generic_string();
+					}
+
+					const std::string combo_preview = preview.empty() ? "No Script" : preview;
+					const std::string tooltip_text = normalized.empty() ? std::string{} : normalized.generic_string();
+
+					if (ImGui::BeginCombo(label.c_str(), combo_preview.c_str())) {
+						const bool is_none_selected = normalized.empty();
+						if (ImGui::Selectable("No Script", is_none_selected)) {
+							if (!is_none_selected) {
+								path.clear();
+								data.set(obj, path);
+								normalized.clear();
+							}
+						}
+
+						const std::vector<std::filesystem::path> scripts = collect_script_paths();
+						const std::string current_value = normalized.generic_string();
+						for (const auto& script_rel : scripts) {
+							const std::string script_rel_str = script_rel.generic_string();
+							std::string row_label = script_rel.filename().string();
+							if (row_label.empty()) {
+								row_label = script_rel_str;
+							}
+
+							const bool selected = (!current_value.empty() && current_value == script_rel_str);
+							if (ImGui::Selectable(row_label.c_str(), selected)) {
+								if (!selected) {
+									path = script_rel;
+									path = path.lexically_normal();
+									data.set(obj, path);
+									normalized = path;
+								}
+							}
+							if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort) && !script_rel_str.empty()) {
+								ImGui::SetTooltip("%s", script_rel_str.c_str());
+							}
+							if (selected) {
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
+					}
+
+					if (!tooltip_text.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
+						ImGui::SetTooltip("%s", tooltip_text.c_str());
+					}
+
+					if (ImGui::BeginDragDropTarget()) {
+						const char* payload_types[] = { "Scripts", "GENERAL" };
+						const ImGuiPayload* payload = nullptr;
+						for (const char* type : payload_types) {
+							if (!payload) {
+								payload = ImGui::AcceptDragDropPayload(type);
+							}
+						}
+						if (payload && payload->Data && payload->DataSize > 0) {
+							const char* raw = static_cast<const char*>(payload->Data);
+							std::string dropped(raw, raw + payload->DataSize - 1);
+							std::filesystem::path dropped_path = std::filesystem::path{ dropped }.lexically_normal();
+							const std::string ext = to_lower(dropped_path.extension().string());
+							if (ext == ".lua") {
+								std::filesystem::path relative = make_relative_to_assets(dropped_path);
+								if (!relative.empty()) {
+									path = relative.lexically_normal();
+									data.set(obj, path);
+									normalized = path;
+								}
+							}
+						}
+						ImGui::EndDragDropTarget();
+					}
+				}
+				else {
+					std::string current = path.generic_string();
+					char buffer[512];
+					std::snprintf(buffer, sizeof(buffer), "%s", current.c_str());
+					if (ImGui::InputText(label.c_str(), buffer, sizeof(buffer))) {
+						path = std::filesystem::path{ buffer };
+						data.set(obj, path);
+					}
 				}
 			}
 
