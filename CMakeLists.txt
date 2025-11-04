@@ -22,7 +22,7 @@ project("LastFrame" VERSION 1.0 LANGUAGES C CXX)
 # Global compile setting: align all Debug iterator levels with Jolt (Release-like)
 # This ensures the precompiled header (cmake_pch.obj) and all TUs agree with Jolt.lib.
 # -------------------------------------------------------------------------------------
-if(MSVC)
+if(WIN32)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /D_ITERATOR_DEBUG_LEVEL=0")
 endif()
@@ -192,7 +192,9 @@ set(USE_STATIC_MSVC_RUNTIME_LIBRARY OFF CACHE BOOL "" FORCE)
 
 # Make sure Debug builds don’t enable the MSVC “checked iterators” level that conflicts with Jolt
 # (You’ve already added this globally; keeping it here makes intent explicit for Jolt’s configure step.)
+if(WIN32)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
+endif()
 
 # Optional Jolt feature toggles (safe defaults for your engine)
 # Turn off exceptions/RTTI for smaller, faster Jolt (unless your code needs them)

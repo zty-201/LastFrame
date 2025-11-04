@@ -89,7 +89,6 @@ namespace EngineFramework
 		// Load a Scene
 		std::string start_scene = AssetManagerSystem::GetStringFromFile("Extern/Scenes/Dummy1.json");
 		LoadScene(start_scene);
-		
 	}
 	void GameObjectSystem::Update(float delta_time)
 	{
