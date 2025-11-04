@@ -112,10 +112,12 @@ namespace EngineFramework
         GLuint sceneTextureID;
         GLuint m_shadowMapTextureID;
         
-        // === VOLUMETRIC FOG RESOURCES ===
         // 3D textures for volumetric fog passes
         GLuint m_ray_march_voxel_grid = 0;
         GLuint m_temporal_integration_voxel_grid[2] = { 0, 0 };
+
+        GLuint m_defaultWhiteTexture = 0;
+        GLuint m_defaultNormalTexture = 0;
         std::vector<GLuint> m_blue_noise_textures;
         
         // Fog control parameters
@@ -150,7 +152,7 @@ namespace EngineFramework
         void VolumetricLightInjectionPass();
         void VolumetricRayMarchPass();
         void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
-
+        void PreGeneratePrimitives();
         void LoadBlueNoiseTextures();
 
         //==Event Handlers, one for each type of event.

@@ -23,7 +23,7 @@ out vec3 FS_IN_Bitangent;
 // UNIFORMS ---------------------------------------------------------
 // ------------------------------------------------------------------
 
-layout(std140, binding = 0) uniform Uniforms
+layout(std140, binding = 0) uniform VolumetricUBO
 {
     mat4  view;
     mat4  projection;
@@ -62,9 +62,6 @@ void main()
     FS_IN_Tangent   = normalize(mat3(model) * VS_IN_Tangent.xyz);
     FS_IN_Bitangent = cross(FS_IN_Normal, FS_IN_Tangent) * VS_IN_Tangent.w;
 
-    // --- PASS MATERIAL PROPS TO FRAGMENT SHADER ---
-    FS_IN_Roughness = instance.roughness;
-    FS_IN_Metallic  = instance.metallic;
     // ----------------------------------------------
 
     gl_Position = view_proj * world_pos;

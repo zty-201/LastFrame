@@ -10,7 +10,7 @@ layout(location = 0) in vec4 VS_IN_Position;
 // UNIFORMS ---------------------------------------------------------
 // ------------------------------------------------------------------
 
-layout(std140, binding = 0) uniform Uniforms
+layout(std140, binding = 0) uniform VolumetricUBO
 {
     mat4  view;
     mat4  projection;
@@ -27,36 +27,13 @@ layout(std140, binding = 0) uniform Uniforms
     ivec4 width_height;
 };
 
-// ------------------------------------------------------------------
-// SSBO -------------------------------------------------------------
-// ------------------------------------------------------------------
-struct InstanceData {
-    mat4 modelMatrix;
-    vec4 tintColor;
-    vec3 Ka;
-    float roughness;
-    vec3 Kd;
-    float metallic;
-    vec3 Ks;
-    float shininess;
-    uint effect;
-    uint padding[3];
-};
-
-layout(std430, binding = 0) readonly buffer InstanceBuffer {
-    InstanceData instances[];
-};
-
+uniform mat4 u_Model;
 // ------------------------------------------------------------------
 // MAIN -------------------------------------------------------------
 // ------------------------------------------------------------------
 
 void main()
 {
-    // --- GET INSTANCE DATA ---
-    InstanceData instance = instances[gl_InstanceID];
-    mat4 model = instance.modelMatrix;
-    // -------------------------
 
-    gl_Position = light_view_proj * model * vec4(VS_IN_Position.xyz, 1.0f);
+    gl_Position = light_view_proj * u_Model * vec4(VS_IN_Position.xyz, 1.0f);
 }

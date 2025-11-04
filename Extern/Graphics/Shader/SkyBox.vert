@@ -16,7 +16,7 @@ out vec3 FS_IN_WorldPos;
 // UNIFORMS  --------------------------------------------------------
 // ------------------------------------------------------------------
 
-layout(std140, binding = 0) uniform Uniforms
+layout(std140, binding = 0) uniform VolumetricUBO
 {
     mat4  view;
     mat4  projection;

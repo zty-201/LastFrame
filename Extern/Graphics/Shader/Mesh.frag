@@ -36,7 +36,7 @@ in flat float FS_IN_Metallic;
 // UNIFORMS ---------------------------------------------------------
 // ------------------------------------------------------------------
 
-layout(std140, binding = 0) uniform Uniforms
+layout(std140, binding = 0) uniform VolumetricUBO
 {
     mat4  view;
     mat4  projection;
@@ -53,8 +53,15 @@ layout(std140, binding = 0) uniform Uniforms
     ivec4 width_height;
 };
 
-layout(binding = 0) uniform sampler2D       s_Albedo;
-layout(binding = 1) uniform sampler2D       s_Normal;
+uniform sampler2D s_Albedo;
+uniform sampler2D s_Normal;
+uniform sampler2D s_Roughness;
+uniform sampler2D s_Metallic;   
+
+uniform vec3  u_AlbedoFactor;
+uniform float u_RoughnessFactor;
+uniform float u_MetallicFactor;
+
 layout(binding = 4) uniform sampler2DShadow s_ShadowMap;
 layout(binding = 5) uniform sampler3D       s_VoxelGrid;
 
@@ -274,28 +281,23 @@ vec3 add_inscattered_light(vec3 color, vec3 world_pos)
 
 void main()
 {
-
-    vec3 diffuse = texture(s_Albedo, FS_IN_TexCoord).rgb;
-    // Use the per-instance values passed from the vertex shader.
-    float metallic  = FS_IN_Metallic;
-    float roughness = FS_IN_Roughness;
+    // Combine texture and factor for each property
+    vec3  albedo    = texture(s_Albedo, FS_IN_TexCoord).rgb * u_AlbedoFactor;
+    float roughness = texture(s_Roughness, FS_IN_TexCoord).r * u_RoughnessFactor;
+    float metallic  = texture(s_Metallic, FS_IN_TexCoord).r * u_MetallicFactor;
     
     vec3  N  = get_normal_from_map(FS_IN_Tangent, FS_IN_Bitangent, FS_IN_Normal, FS_IN_TexCoord, s_Normal);
     vec3 Wo = normalize(camera_position.xyz - FS_IN_WorldPos);
-    vec3 F0 = mix(vec3(0.04f), diffuse, metallic);
+    vec3 F0 = mix(vec3(0.04f), albedo, metallic);
 
-    vec3 color = direct_lighting(Wo, N, FS_IN_WorldPos, F0, diffuse, roughness);
+    vec3 color = direct_lighting(Wo, N, FS_IN_WorldPos, F0, albedo, roughness);
 
     // Ambient
-    color += diffuse * light_color.w;;
+    color += albedo * light_color.w;
 
-    // Volumetric Light
+    // Volumetric Light & Tonemapping (unchanged)
     color = add_inscattered_light(color, FS_IN_WorldPos);
-
-    // Tone Map
     color = color / (color + vec3(1.0));
-
-    // Gamma Correct
     color = pow(color, vec3(1.0 / 2.2));
 
     FS_OUT_Color = vec4(color, 1.0);

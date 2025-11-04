@@ -308,9 +308,9 @@ namespace EngineFramework
 			.data<&MaterialComponent::metallicMap>("metallicMap")
 			.data<&MaterialComponent::roughnessMap>("roughnessMap")
 			.data<&MaterialComponent::ambientOcclusionMap>("ambientOcclusionMap")
-			.data<&MaterialComponent::diffuseColor>("diffuseColor")
-			.data<&MaterialComponent::metallic>("metallic")
-			.data<&MaterialComponent::roughness>("roughness")
+			.data<&MaterialComponent::albedoFactor>("albedoFactor")
+			.data<&MaterialComponent::metallicFactor>("metallicFactor")
+			.data<&MaterialComponent::roughnessFactor>("roughnessFactor")
 			.func<&Emplacer<MaterialComponent>::EmplaceComponent>("emplace")
 			.func<&Getter<MaterialComponent>::GetComponent>("get")
 			.func<&GetRef<MaterialComponent>>("get_ref");

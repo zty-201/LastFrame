@@ -71,7 +71,7 @@ namespace Mesh {
             primitiveSubMesh.materialIndex = 0;
             primitiveSubMesh.baseIndex = 0;
             primitiveSubMesh.baseVertex = 0;
-            primitiveSubMesh.indexCount = indices.size();
+            primitiveSubMesh.indexCount = static_cast<GLuint>(indices.size());
             subMeshes.push_back(primitiveSubMesh);
 
             MaterialComponent defaultMaterial;
@@ -111,15 +111,58 @@ namespace Mesh {
                 newMat.name = mat->GetName().C_Str();
                 aiString path_str;
 
+                using AssetMgr = EngineFramework::AssetManagerSystem;
+
+                // Albedo
                 if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &path_str) == AI_SUCCESS) {
                     std::filesystem::path texture_path(path_str.C_Str());
-                    newMat.albedoMap = EngineFramework::AssetManagerSystem::GetFullGuid(EngineFramework::AssetManagerSystem::TEXTURE_GUID, texture_path.stem().string());
+                    newMat.albedoMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
                 }
+                else {
+                    aiColor3D color;
+                    if (mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
+                        newMat.albedoFactor = { color.r, color.g, color.b };
+                    }
+                }
+
+                // Normal
                 if (mat->GetTexture(aiTextureType_NORMALS, 0, &path_str) == AI_SUCCESS) {
                     std::filesystem::path texture_path(path_str.C_Str());
-                    newMat.normalMap = EngineFramework::AssetManagerSystem::GetFullGuid(EngineFramework::AssetManagerSystem::TEXTURE_GUID, texture_path.stem().string());
+                    newMat.normalMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
                 }
-                // Add other texture types as needed (metallic, roughness, etc.)
+
+                // --- NEW: Load Metallic Texture ---
+                // Assimp often uses SPECULAR for glTF metallic maps or defines it explicitly.
+                if (mat->GetTexture(aiTextureType_METALNESS, 0, &path_str) == AI_SUCCESS) {
+                    std::filesystem::path texture_path(path_str.C_Str());
+                    newMat.metallicMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
+                }
+                else if (mat->GetTexture(aiTextureType_SPECULAR, 0, &path_str) == AI_SUCCESS) { // Fallback for some formats
+                    std::filesystem::path texture_path(path_str.C_Str());
+                    newMat.metallicMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
+                }
+                else {
+                    float metallic;
+                    if (mat->Get(AI_MATKEY_METALLIC_FACTOR, metallic) == AI_SUCCESS) {
+                        newMat.metallicFactor = metallic;
+                    }
+                }
+
+                // --- NEW: Load Roughness Texture ---
+                if (mat->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &path_str) == AI_SUCCESS) {
+                    std::filesystem::path texture_path(path_str.C_Str());
+                    newMat.roughnessMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
+                }
+                else {
+                    float roughness;
+                    if (mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness) == AI_SUCCESS) {
+                        newMat.roughnessFactor = roughness;
+                    }
+                    else if (mat->Get(AI_MATKEY_SHININESS, roughness) == AI_SUCCESS) {
+                        // Old formats use "shininess". We can convert it to roughness.
+                        newMat.roughnessFactor = 1.0f - (roughness / 1000.0f); // Approximate conversion
+                    }
+                }
 
                 materials.push_back(newMat);
             }
@@ -137,11 +180,12 @@ namespace Mesh {
 
         // Extracts vertex data from a single Assimp mesh.
         void processSubMesh(aiMesh* mesh, const aiScene* scene) {
+            UNREFERENCED_PARAMETER(scene);
             SubMesh subMesh;
             subMesh.name = mesh->mName.C_Str();
             subMesh.materialIndex = mesh->mMaterialIndex;
-            subMesh.baseVertex = m_temp_vertices.size();
-            subMesh.baseIndex = m_temp_indices.size();
+            subMesh.baseVertex = static_cast<GLuint>(m_temp_vertices.size());
+            subMesh.baseIndex = static_cast<GLuint>(m_temp_indices.size());
             subMesh.indexCount = 0;
 
             for (unsigned int i = 0; i < mesh->mNumVertices; i++) {

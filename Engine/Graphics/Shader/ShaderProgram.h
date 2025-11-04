@@ -150,18 +150,6 @@ public:
         glUniform1uiv(getUniformLocation(name), count, value);
     }
 
-    void setMaterialUniforms(const MaterialComponent& material)
-    {
-        setUniform("material.rough", material.rough);
-        setUniform("material.metal", material.metal);
-        setUniform("material.color", material.color);
-        setUniform("material.Ka", material.Ka);
-        setUniform("material.Kd", material.Kd);
-        setUniform("material.Ks", material.Ks);
-        setUniform("material.shininess", material.shininess);
-        setUniform("material.effect", material.effect); // *** ADD THIS LINE ***
-    }
-
     // Implemented in .cpp file
     void findUniformLocations();
 

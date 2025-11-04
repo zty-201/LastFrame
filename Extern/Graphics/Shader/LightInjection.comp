@@ -35,7 +35,7 @@ layout(binding = 0, rgba16f) uniform writeonly image3D i_VoxelGrid;
 // UNIFORMS ---------------------------------------------------------
 // ------------------------------------------------------------------
 
-layout(std140, binding = 0) uniform Uniforms
+layout(std140, binding = 0) uniform VolumetricUBO
 {
     mat4  view;
     mat4  projection;

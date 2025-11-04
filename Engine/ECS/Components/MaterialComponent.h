@@ -25,16 +25,16 @@ struct MaterialComponent
     xresource::full_guid roughnessMap{};
     xresource::full_guid ambientOcclusionMap{};
 
-    glm::vec3 diffuseColor = { 1.0f, 1.0f, 1.0f };
-    float metallic = 0.0f;
-    float roughness = 0.5f;
+    glm::vec3 albedoFactor = { 1.0f, 1.0f, 1.0f };
+    float metallicFactor = 1.0f;
+    float roughnessFactor = 1.0f;
 };
 
 inline bool operator==(const MaterialComponent& a, const MaterialComponent& b)
 {
-    return  a.roughness == b.roughness
-        && a.metallic == b.metallic
-        && a.diffuseColor == b.diffuseColor
+    return  a.roughnessFactor == b.roughnessFactor
+        && a.metallicFactor == b.metallicFactor
+        && a.albedoFactor == b.albedoFactor
         && a.albedoMap == b.albedoMap
         && a.normalMap == b.normalMap
         && a.metallicMap == b.metallicMap

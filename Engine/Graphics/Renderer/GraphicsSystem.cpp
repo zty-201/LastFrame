@@ -127,8 +127,8 @@ namespace EngineFramework
 		ray_march_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "RayMarch");
 
 		// Initialize instancing system
-		m_instancingSystem = std::make_unique<InstancingSystem>();
-		m_instancingSystem->Initialize(10000);
+		//m_instancingSystem = std::make_unique<InstancingSystem>();
+		//m_instancingSystem->Initialize(10000);
 
 		// === UBO SETUP ===
 		glGenBuffers(1, &m_volumetricUBO);
@@ -159,7 +159,7 @@ namespace EngineFramework
 		}
 		glBindTexture(GL_TEXTURE_3D, 0);
 		LoadBlueNoiseTextures();
-
+		PreGeneratePrimitives();
 		pScene = std::make_unique<Scene>();
 	}
 
@@ -443,6 +443,11 @@ namespace EngineFramework
 				if (subMesh.materialIndex < 0 || subMesh.materialIndex >= meshData->materials.size()) continue;
 				const auto& material = meshData->materials[subMesh.materialIndex];
 
+				// --- SET MATERIAL FACTOR UNIFORMS ---
+				shader->setUniform("u_AlbedoFactor", material.albedoFactor);
+				shader->setUniform("u_RoughnessFactor", material.roughnessFactor);
+				shader->setUniform("u_MetallicFactor", material.metallicFactor);
+
 				// Bind the textures for THIS material
 				auto albedoTex = AssetManagerSystem::GetResource<Scene::Texture>(material.albedoMap);
 				if (albedoTex && albedoTex->id != 0) {
@@ -458,7 +463,18 @@ namespace EngineFramework
 					shader->setUniform("s_Normal", TextureUnits::MESH_NORMAL_UNIT);
 				}
 
-				// (TODO: Bind roughness, metallic maps here)
+				// Roughness
+				auto roughTex = AssetManagerSystem::GetResource<Scene::Texture>(material.roughnessMap);
+				glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_ROUGHNESS_UNIT);
+				glBindTexture(GL_TEXTURE_2D, (roughTex && roughTex->id != 0) ? roughTex->id : m_defaultWhiteTexture);
+				shader->setUniform("s_Roughness", TextureUnits::MESH_ROUGHNESS_UNIT);
+
+				// Metallic
+				auto metalTex = AssetManagerSystem::GetResource<Scene::Texture>(material.metallicMap);
+				glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_METALLIC_UNIT);
+				glBindTexture(GL_TEXTURE_2D, (metalTex && metalTex->id != 0) ? metalTex->id : m_defaultWhiteTexture);
+				shader->setUniform("s_Metallic", TextureUnits::MESH_METALLIC_UNIT);
+
 
 				// Draw ONLY this part of the mesh
 				glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * subMesh.baseIndex));
@@ -559,6 +575,15 @@ namespace EngineFramework
 			
 			stbi_image_free(data);
 		}
+	}
+
+	void GraphicsSystem::PreGeneratePrimitives() {
+		LOGI("Pre-generating primitive meshes...");
+		meshCache["Cube"] = Mesh::generateCube();
+		meshCache["Sphere"] = Mesh::generateSphere();
+		meshCache["Quad"] = Mesh::generateQuad();
+		meshCache["SkyBox"] = Mesh::generateSkyBox();
+		LOGI("Primitive meshes cached.");
 	}
 	
 	//==Event Handlers==//
