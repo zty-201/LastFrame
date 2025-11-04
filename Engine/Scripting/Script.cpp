@@ -23,6 +23,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "CameraComponent.h"
 #include "Camera.h"
 
+//For platform android vs windows
+#include "Platform.h"
+
 namespace Engine {
 
 #if defined(ENGINE_ENABLE_LUA)
@@ -68,6 +71,19 @@ namespace Engine {
 #if defined(ENGINE_ENABLE_LUA)
         s_Lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math,
             sol::lib::table, sol::lib::string, sol::lib::io);
+
+    // ===============================================================
+    // Platform constant exposed to Lua
+    // ===============================================================
+#if defined(PLATFORM_ANDROID)
+        s_Lua["PLATFORM"] = "android";
+#elif defined(PLATFORM_WINDOWS)
+        s_Lua["PLATFORM"] = "windows";
+#else
+        s_Lua["PLATFORM"] = "unknown";
+#endif
+        LOGI("[ScriptSystem] PLATFORM exposed to Lua: %s", s_Lua["PLATFORM"].get<std::string>().c_str());
+
 
         BindLuaPrintToEngine(s_Lua);
         
@@ -141,6 +157,7 @@ namespace Engine {
             });
 
         LOGI("[ScriptSystem] InputManager bindings complete (static table approach)");
+
         // ===============================================================
         // CameraComponent bindings //alot of extras lol
         // ===============================================================
