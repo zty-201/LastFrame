@@ -32,6 +32,8 @@ struct CameraComponent
 
     double oldx; // Previous x-coordinate for cursor handling
     double oldy; // Previous y-coordinate for cursor handling
+
+    bool is_active{}; //Represents if the camera is being used to draw the current scene.
 };
 // --- Other Scene Entity Components ---
 

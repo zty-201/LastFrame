@@ -363,4 +363,15 @@ namespace EngineFramework
 		//Create instance from archtype component data.
 		return Instantiate(archtype, archtype_guid.m_Instance);
 	}
+
+	/*
+			Creates a single entity with the same component data (copied) from archtype,
+			and sets its transform.
+		*/
+	entt::entity GameObjectSystem::CreateInstance(std::string archtype, const TransformComponent& transform)
+	{
+		entt::entity entity = CreateInstance(archtype);
+		registry.emplace_or_replace<TransformComponent>(entity, transform);
+		return entity;
+	}
 }
