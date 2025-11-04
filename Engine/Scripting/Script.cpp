@@ -135,6 +135,10 @@ namespace Engine {
             static_cast<bool(*)(int)>(&EngineFramework::InputManager::GetKeyUp),
             static_cast<bool(*)(EngineFramework::Key_Actions)>(&EngineFramework::InputManager::GetKeyUp)
         ));
+        inputTable.set_function("GetGyroscopeRotatioRate", []() {
+            glm::vec3 rate = EngineFramework::InputManager::GetGyroscopeRotatioRate();
+            return std::make_tuple(rate.x, rate.y, rate.z);
+            });
 
         LOGI("[ScriptSystem] InputManager bindings complete (static table approach)");
         // ===============================================================
