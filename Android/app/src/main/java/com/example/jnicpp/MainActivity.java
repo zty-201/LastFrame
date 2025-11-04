@@ -1,7 +1,12 @@
 package com.example.jnicpp;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.res.AssetManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +36,13 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     private ActivityMainBinding binding;
     private GLSurfaceView glSurfaceView;
     private boolean isInitialized = false;
+
+    private SensorManager mSensorManager;
+    private Sensor mGyroscope;
+    private SensorEventListener mSensorListener;
+
+    public native void handleNativeGyroscope(float x, float y, float z, long timestamp);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +50,32 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
         try {
             binding = ActivityMainBinding.inflate(getLayoutInflater());
             setContentView(binding.getRoot());
+
+//GYROSCOPE Initialization
+            mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+            mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
+//Implement Listener
+            mSensorListener = new SensorEventListener() {
+                @Override
+                public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                    //Do nothing for now
+                }
+
+                @Override
+                public void onSensorChanged(SensorEvent event) {
+                    // Only forward data if initialized and the sensor is the gyroscope
+                    if (isInitialized && event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+                        handleNativeGyroscope(
+                                event.values[0],
+                                event.values[1],
+                                event.values[2],
+                                event.timestamp
+                        );
+                    }
+                }
+            };
+
 // Setup GLSurfaceView
             glSurfaceView = binding.glSurfaceView;
             glSurfaceView.setEGLContextClientVersion(3); // OpenGL ES 3.X, uses highest version.
@@ -56,6 +94,16 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "onPause called");
+
+        // --- GYROSCOPE UNREGISTER ---
+        if (mSensorManager != null) {
+            mSensorManager.unregisterListener(mSensorListener);
+        }
+
+        if (glSurfaceView != null) {
+            glSurfaceView.onPause();
+        }
+
         if (glSurfaceView != null) {
             glSurfaceView.onPause();
         }
@@ -64,6 +112,17 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume called");
+
+        // --- GYROSCOPE REGISTER ---
+        if (mGyroscope != null) {
+            // SENSOR_DELAY_GAME is a standard rate for games (about 50Hz)
+            mSensorManager.registerListener(mSensorListener, mGyroscope, SensorManager.SENSOR_DELAY_GAME);
+        }
+
+        if (glSurfaceView != null) {
+            glSurfaceView.onResume();
+        }
+
         if (glSurfaceView != null) {
             glSurfaceView.onResume();
         }

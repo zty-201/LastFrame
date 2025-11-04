@@ -1,347 +1,274 @@
 #include "System_Physics.hpp"
 
+#include <algorithm> // std::min
+#include <cmath>
+#include <thread>
+
 #ifdef USE_JOLT
-#include <Jolt/Physics/Body/BodyInterface.h>
+// Core Jolt setup
+#include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
+#include <Jolt/Core/TempAllocator.h>
+
+// Shapes / body creation
+#include <Jolt/Physics/Body/BodyCreationSettings.h>
+#include <Jolt/Physics/Collision/Shape/BoxShape.h>
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+
+// CRITICAL: This include was missing!
+#include <Jolt/Physics/PhysicsSettings.h>
+
+// System & Queries
+#include <Jolt/Physics/PhysicsSystem.h>
+#include <Jolt/Physics/Collision/NarrowPhaseQuery.h>
+#include <Jolt/Physics/Collision/RayCast.h>
+#include <Jolt/Physics/Collision/CastResult.h>
+#include <Jolt/Physics/Body/Body.h>
 #endif
 
 namespace EngineFramework {
 
-#ifdef USE_JOLT
-    // Install callbacks for Jolt
-    static void InstallJoltCallbacks()
-    {
-        JPH::Trace = TraceImpl;
-#ifdef JPH_ENABLE_ASSERTS
-        JPH::AssertFailed = AssertFailedImpl;
-#endif
-    }
-#endif
+    // ---------------- Singleton plumbing ----------------
+    PhysicsSystem* PhysicsSystem::s_instance = nullptr;
 
-    PhysicsSystem::PhysicsSystem()
-    {
+    PhysicsSystem& PhysicsSystem::GetInstance() {
+        static PhysicsSystem g;
+        return g;
+    }
+
+    PhysicsSystem::PhysicsSystem() {
         s_instance = this;
     }
 
-    PhysicsSystem::~PhysicsSystem()
-    {
-#ifdef USE_JOLT
-        if (m_physics_system)
-        {
-            // Unregister the factory before shutting down
-            JPH::UnregisterTypes();
-            JPH::Factory::sInstance = nullptr;
-        }
-#endif
+    PhysicsSystem::~PhysicsSystem() {
+        Shutdown(); // Ensure cleanup happens
         s_instance = nullptr;
     }
 
-    PhysicsSystem& PhysicsSystem::Get()
-    {
-        return *s_instance;
+    // --------------- ISystem: Initialize -----------------
+    void PhysicsSystem::Initialize() {
+#ifdef USE_JOLT
+        // Allocator + factory + type registry
+        JPH::RegisterDefaultAllocator();
+        JPH::Factory::sInstance = new JPH::Factory();
+        JPH::RegisterTypes();
+
+        // Temporary allocator (scratch) and job system (threads)
+        m_temp_alloc = std::make_unique<JPH::TempAllocatorImpl>(8u * 1024u * 1024u); // 8MB scratch
+        const int num_worker_threads =
+            std::max(1, int(std::thread::hardware_concurrency()) - 1);
+        m_job_system = std::make_unique<JPH::JobSystemThreadPool>(JPH::cMaxPhysicsJobs,
+            JPH::cMaxPhysicsBarriers,
+            num_worker_threads);
+
+        // Physics world
+        m_world = std::make_unique<JPH::PhysicsSystem>();
+
+        // Tuning (HelloWorld-style numbers)
+        const JPH::uint cMaxBodies = 4096;
+        const JPH::uint cNumBodyMutexes = 0;     // 0 = default internal
+        const JPH::uint cMaxBodyPairs = 4096;
+        const JPH::uint cMaxContactConstraints = 4096;
+
+        m_world->Init(cMaxBodies,
+            cNumBodyMutexes,
+            cMaxBodyPairs,
+            cMaxContactConstraints,
+            m_bp,
+            m_obj_vs_bp,
+            m_obj_pair);
+
+        // Gravity
+        m_world->SetGravity(JPH::Vec3(0.0f, -9.81f, 0.0f));
+
+        // Create a static ground box
+        {
+            JPH::BoxShapeSettings box(JPH::Vec3(50.0f, 1.0f, 50.0f)); // half-extents
+            JPH::ShapeSettings::ShapeResult shape_result = box.Create();
+            JPH::ShapeRefC shape = shape_result.Get();
+
+            JPH::BodyCreationSettings s(shape,
+                JPH::RVec3(0.0, -1.0, 0.0), // put top at y=0
+                JPH::Quat::sIdentity(),
+                JPH::EMotionType::Static,
+                Layers::NON_MOVING);
+
+            auto& bi = m_world->GetBodyInterface();
+            m_ground = bi.CreateAndAddBody(s, JPH::EActivation::DontActivate);
+        }
+
+        // Create a dynamic sphere that falls onto the ground
+        {
+            JPH::SphereShapeSettings sph(0.5f); // radius
+            JPH::ShapeSettings::ShapeResult shape_result = sph.Create();
+            JPH::ShapeRefC shape = shape_result.Get();
+
+            JPH::BodyCreationSettings s(shape,
+                JPH::RVec3(0.0, 3.0, 0.0),
+                JPH::Quat::sIdentity(),
+                JPH::EMotionType::Dynamic,
+                Layers::MOVING);
+
+            // Give it mass (and auto inertia)
+            s.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
+            s.mMassPropertiesOverride.mMass = 1.0f;
+
+            auto& bi = m_world->GetBodyInterface();
+            m_ball = bi.CreateAndAddBody(s, JPH::EActivation::Activate);
+        }
+#endif // USE_JOLT
     }
 
-    void PhysicsSystem::Initialize()
-    {
+    // ---------------- ISystem: Update --------------------
+    void PhysicsSystem::Update(float delta_time) {
 #ifdef USE_JOLT
-        // Initialise Jolt
-        InstallJoltCallbacks();                         // Routing trace
-        JPH::RegisterDefaultAllocator();                // Register allocation hook
-        JPH::Factory::sInstance = new JPH::Factory();   // Create a factory
-        JPH::RegisterTypes();                           // Register all Jolt shapes / constraints
+        if (!m_world) return;
 
-        // Threading and Memory
-        m_temp_allocator = std::make_unique<JPH::TempAllocatorImpl>(10 * 1024 * 1024); // Create temp allocator
-        m_job_system = std::make_unique<JPH::JobSystemThreadPool>(          // Create job system
-            JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, 
-            std::thread::hardware_concurrency() - 1);
+        // Clamp hostile frame spikes and accumulator growth
+        delta_time = std::min(delta_time, 0.25f);
+        m_accum = std::min(m_accum + delta_time, 0.5f);
 
-        // Broadphase / Layering
-        // Create mapping table from object layer to broadphase layer
-        m_broad_phase_layer_interface = std::make_unique<BPLayerInterfaceImpl>();
-
-        // Create filters
-        m_object_vs_broadphase_layer_filter = std::make_unique<ObjectVsBroadPhaseLayerFilterImpl>();
-        m_object_vs_object_layer_filter = std::make_unique<ObjectLayerPairFilterImpl>();
-
-        // physics system core
-        // Create the actual physics system
-        m_physics_system = std::make_unique<JPH::PhysicsSystem>();
-        m_physics_system->Init(
-            10240,  // max bodies
-            0,      // num body mutexes
-            65536,  // max body pairs
-            65536,  // max contact constraints
-            *m_broad_phase_layer_interface,
-            *m_object_vs_broadphase_layer_filter,
-            *m_object_vs_object_layer_filter
-        );
-
-        // Set gravity
-        m_physics_system->SetGravity(JPH::Vec3(0, -9.81f, 0));
-
-        LOGI("[PhysicsSystem] Initialized with Jolt Physics");
+        // Step the world in fixed increments
+        int substeps = 0;
+        const int max_substeps = 4;
+        while (m_accum >= m_fixed_dt && substeps++ < max_substeps) {
+            // Note: collision_steps = 1 is typical for most games
+            m_world->Update(m_fixed_dt, 1, m_temp_alloc.get(), m_job_system.get());
+            m_accum -= m_fixed_dt;
+        }
 #else
-        LOGI("[PhysicsSystem] Initialized (no physics backend compiled)");
+        (void)delta_time;
 #endif
     }
 
-    void PhysicsSystem::Update(float delta_time)
-    {
+    // -------------- ISystem: PostUpdate ------------------
+    void PhysicsSystem::PostUpdate(float delta_time) {
+        // Hook for debug draw / overlays if you wire Jolt's debug renderer later
+        (void)delta_time;
+    }
+
+    // --------------------- Shutdown ----------------------
 #ifdef USE_JOLT
-        if (!m_physics_system) return;
+    static void DestroyBodyIfValid(JPH::PhysicsSystem& world, JPH::BodyID id) {
+        if (id == JPH::BodyID()) return; // Check if default/invalid
+        auto& bi = world.GetBodyInterface();
+        bi.RemoveBody(id);
+        bi.DestroyBody(id);
+    }
+#endif
 
-        // Fixed timestep accumulator
-        m_accumulator += delta_time;
+    void PhysicsSystem::ClearWorld() {
+#ifdef USE_JOLT
+        if (!m_world) return;
+        DestroyBodyIfValid(*m_world, m_ball);
+        DestroyBodyIfValid(*m_world, m_ground);
+        m_ball = JPH::BodyID();
+        m_ground = JPH::BodyID();
+#endif
+    }
 
-        while (m_accumulator >= m_fixed_dt)
-        {
-            // Step the physics world
-            m_physics_system->Update(m_fixed_dt, 1, m_temp_allocator.get(), m_job_system.get());
-            m_accumulator -= m_fixed_dt;
+    void PhysicsSystem::Shutdown() {
+#ifdef USE_JOLT
+        if (m_world) {
+            ClearWorld();
+            m_world.reset();
+        }
+        m_job_system.reset();
+        m_temp_alloc.reset();
+
+        // Tear down type registry & factory
+        JPH::UnregisterTypes();
+        if (JPH::Factory::sInstance != nullptr) {
+            delete JPH::Factory::sInstance;
+            JPH::Factory::sInstance = nullptr;
         }
 #endif
     }
 
-    void PhysicsSystem::PostUpdate(float /*delta_time*/)
-    {
-        // No component syncing for now - just step the physics
-        // You can add transform syncing later when you have components set up
-    }
-
-    /*
-    void PhysicsSystem::SetRegistry(entt::registry* registry)
-    {
-        m_registry = registry;
-    }
-    */
-
-    void PhysicsSystem::CreateBoxBody(entt::entity entity, const glm::vec3& position, const glm::vec3& size, bool isStatic)
-    {
+    // -------------------- Queries ------------------------
 #ifdef USE_JOLT
-        if (!m_physics_system) return;
-
-        // Create a box shape
-        JPH::BoxShapeSettings box_settings(JPH::Vec3(size.x * 0.5f, size.y * 0.5f, size.z * 0.5f));
-        JPH::ShapeSettings::ShapeResult box_shape_result = box_settings.Create();
-        JPH::ShapeRefC box_shape = box_shape_result.Get();
-
-        // Create body creation settings
-        JPH::BodyCreationSettings body_settings(
-            box_shape,
-            ToJolt(position),
-            JPH::Quat::sIdentity(),
-            isStatic ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic,
-            isStatic ? Layers::NON_MOVING : Layers::MOVING
-        );
-
-        // Create the body
-        JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
-        JPH::Body* body = body_interface.CreateBody(body_settings);
-
-        if (body)
-        {
-            JPH::BodyID body_id = body->GetID();
-            body_interface.AddBody(body_id, JPH::EActivation::Activate);
-
-            // Store mapping
-            m_entity_to_body[entity] = body_id;
-            m_body_to_entity[body_id] = entity;
-        }
-#endif
-    }
-
-    void PhysicsSystem::CreateSphereBody(entt::entity entity, const glm::vec3& position, float radius, bool isStatic)
+    PhysicsSystem::RayHit PhysicsSystem::RayCastClosest(float ox, float oy, float oz,
+        float dx, float dy, float dz,
+        float max_distance) const
     {
-#ifdef USE_JOLT
-        if (!m_physics_system) return;
+        RayHit out{};
 
-        // Create a sphere shape
-        JPH::SphereShapeSettings sphere_settings(radius);
-        JPH::ShapeSettings::ShapeResult sphere_shape_result = sphere_settings.Create();
-        JPH::ShapeRefC sphere_shape = sphere_shape_result.Get();
+        if (!m_world) return out;
 
-        // Create body creation settings
-        JPH::BodyCreationSettings body_settings(
-            sphere_shape,
-            ToJolt(position),
-            JPH::Quat::sIdentity(),
-            isStatic ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic,
-            isStatic ? Layers::NON_MOVING : Layers::MOVING
-        );
+        // Normalize direction; guard zero length
+        const float len = std::sqrt(dx * dx + dy * dy + dz * dz);
+        if (len < 1e-6f) return out; // Invalid direction
 
-        // Create the body
-        JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
-        JPH::Body* body = body_interface.CreateBody(body_settings);
+        const float inv = 1.0f / len;
+        const JPH::RVec3 origin(ox, oy, oz);
+        const JPH::Vec3 direction(dx * inv, dy * inv, dz * inv);
 
-        if (body)
-        {
-            JPH::BodyID body_id = body->GetID();
-            body_interface.AddBody(body_id, JPH::EActivation::Activate);
+        JPH::RRayCast ray;
+        ray.mOrigin = origin;
+        ray.mDirection = direction * max_distance;
 
-            // Store mapping
-            m_entity_to_body[entity] = body_id;
-            m_body_to_entity[body_id] = entity;
+        JPH::RayCastResult result;
+        const bool hit = m_world->GetNarrowPhaseQuery().CastRay(ray, result);
+
+        if (hit) {
+            out.hit = true;
+            out.t = result.mFraction * max_distance;
+
+            const JPH::RVec3 p = origin + JPH::RVec3(direction) * out.t;
+            out.px = static_cast<float>(p.GetX());
+            out.py = static_cast<float>(p.GetY());
+            out.pz = static_cast<float>(p.GetZ());
+
+            // Get the body to retrieve the surface normal
+            auto& body_lock_interface = m_world->GetBodyLockInterface();
+            JPH::BodyLockRead lock(body_lock_interface, result.mBodyID);
+            if (lock.Succeeded()) {
+                const JPH::Body& body = lock.GetBody();
+
+                // Get surface normal using shape
+                JPH::Vec3 normal = body.GetWorldSpaceSurfaceNormal(result.mSubShapeID2,
+                    JPH::RVec3(out.px, out.py, out.pz));
+
+                out.nx = normal.GetX();
+                out.ny = normal.GetY();
+                out.nz = normal.GetZ();
+            }
+
+            // If you later map BodyID -> entity, fill it here from result.mBodyID
+            out.entity_u32 = result.mBodyID.GetIndex();
         }
-#endif
+
+        return out;
     }
 
-    void PhysicsSystem::CreateCapsuleBody(entt::entity entity, const glm::vec3& position, float height, float radius, bool isStatic)
-    {
-#ifdef USE_JOLT
-        if (!m_physics_system) return;
-
-        // Create a capsule shape (height is the cylinder height, not including the hemispheres)
-        JPH::CapsuleShapeSettings capsule_settings(height * 0.5f, radius);
-        JPH::ShapeSettings::ShapeResult capsule_shape_result = capsule_settings.Create();
-        JPH::ShapeRefC capsule_shape = capsule_shape_result.Get();
-
-        // Create body creation settings
-        JPH::BodyCreationSettings body_settings(
-            capsule_shape,
-            ToJolt(position),
-            JPH::Quat::sIdentity(),
-            isStatic ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic,
-            isStatic ? Layers::NON_MOVING : Layers::MOVING
-        );
-
-        // Create the body
-        JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
-        JPH::Body* body = body_interface.CreateBody(body_settings);
-
-        if (body)
-        {
-            JPH::BodyID body_id = body->GetID();
-            body_interface.AddBody(body_id, JPH::EActivation::Activate);
-
-            // Store mapping
-            m_entity_to_body[entity] = body_id;
-            m_body_to_entity[body_id] = entity;
-        }
-#endif
+    void PhysicsSystem::SetLinearVelocity(unsigned entity, const JPH::Vec3& v) {
+        if (!m_world) return;
+        // TODO: Implement entity -> BodyID mapping
+        // For now, stub implementation
+        (void)entity;
+        (void)v;
     }
 
-    void PhysicsSystem::RemoveBody(entt::entity entity)
-    {
-#ifdef USE_JOLT
-        if (!m_physics_system) return;
-
-        auto it = m_entity_to_body.find(entity);
-        if (it != m_entity_to_body.end())
-        {
-            JPH::BodyID body_id = it->second;
-            JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
-
-            // Remove and destroy the body
-            body_interface.RemoveBody(body_id);
-            body_interface.DestroyBody(body_id);
-
-            // Remove from mappings
-            m_body_to_entity.erase(body_id);
-            m_entity_to_body.erase(it);
-        }
-#endif
+    void PhysicsSystem::SetAngularVelocity(unsigned entity, const JPH::Vec3& w) {
+        if (!m_world) return;
+        // TODO: Implement entity -> BodyID mapping
+        (void)entity;
+        (void)w;
     }
 
-    void PhysicsSystem::SetBodyPosition(entt::entity entity, const glm::vec3& position)
-    {
-#ifdef USE_JOLT
-        if (!m_physics_system) return;
-
-        auto it = m_entity_to_body.find(entity);
-        if (it != m_entity_to_body.end())
-        {
-            JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
-            body_interface.SetPosition(it->second, ToJolt(position), JPH::EActivation::Activate);
-        }
-#endif
+    JPH::Vec3 PhysicsSystem::GetLinearVelocity(unsigned entity) const {
+        if (!m_world) return JPH::Vec3::sZero();
+        // TODO: Implement entity -> BodyID mapping
+        (void)entity;
+        return JPH::Vec3::sZero();
     }
 
-    void PhysicsSystem::SetBodyRotation(entt::entity entity, const glm::quat& rotation)
-    {
-#ifdef USE_JOLT
-        if (!m_physics_system) return;
-
-        auto it = m_entity_to_body.find(entity);
-        if (it != m_entity_to_body.end())
-        {
-            JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
-            body_interface.SetRotation(it->second, ToJolt(rotation), JPH::EActivation::Activate);
-        }
-#endif
+    JPH::Vec3 PhysicsSystem::GetAngularVelocity(unsigned entity) const {
+        if (!m_world) return JPH::Vec3::sZero();
+        // TODO: Implement entity -> BodyID mapping
+        (void)entity;
+        return JPH::Vec3::sZero();
     }
-
-    void PhysicsSystem::AddForce(entt::entity entity, const glm::vec3& force)
-    {
-#ifdef USE_JOLT
-        if (!m_physics_system) return;
-
-        auto it = m_entity_to_body.find(entity);
-        if (it != m_entity_to_body.end())
-        {
-            JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
-            body_interface.AddForce(it->second, ToJolt(force));
-        }
-#endif
-    }
-
-    void PhysicsSystem::AddImpulse(entt::entity entity, const glm::vec3& impulse)
-    {
-#ifdef USE_JOLT
-        if (!m_physics_system) return;
-
-        auto it = m_entity_to_body.find(entity);
-        if (it != m_entity_to_body.end())
-        {
-            JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
-            body_interface.AddImpulse(it->second, ToJolt(impulse));
-        }
-#endif
-    }
-
-    glm::vec3 PhysicsSystem::GetBodyPosition(entt::entity entity) const
-    {
-#ifdef USE_JOLT
-        if (!m_physics_system) return glm::vec3(0.0f);
-
-        auto it = m_entity_to_body.find(entity);
-        if (it != m_entity_to_body.end())
-        {
-            JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
-            return FromJolt(body_interface.GetPosition(it->second));
-        }
-#endif
-        return glm::vec3(0.0f);
-    }
-
-    glm::quat PhysicsSystem::GetBodyRotation(entt::entity entity) const
-    {
-#ifdef USE_JOLT
-        if (!m_physics_system) return glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-
-        auto it = m_entity_to_body.find(entity);
-        if (it != m_entity_to_body.end())
-        {
-            JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
-            return FromJolt(body_interface.GetRotation(it->second));
-        }
-#endif
-        return glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-    }
-
-    glm::vec3 PhysicsSystem::GetBodyVelocity(entt::entity entity) const
-    {
-#ifdef USE_JOLT
-        if (!m_physics_system) return glm::vec3(0.0f);
-
-        auto it = m_entity_to_body.find(entity);
-        if (it != m_entity_to_body.end())
-        {
-            JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
-            return FromJolt(body_interface.GetLinearVelocity(it->second));
-        }
-#endif
-        return glm::vec3(0.0f);
-    }
+#endif // USE_JOLT
 
 } // namespace EngineFramework
