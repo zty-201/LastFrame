@@ -9,6 +9,7 @@
 #include "pch.hpp"
 #include "AssetManager.hpp"
 #include "Audio.hpp"
+#include "Scripting/ScriptAsset.hpp" //For script asset type registration.
 #include <system_error>
 
 //For guid metadata file reading.
@@ -390,6 +391,7 @@ namespace EngineFramework {
 		asset_loader_map[MESH] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadMesh);
 		asset_loader_map[SHADER] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadShader);
 		asset_loader_map[AUDIO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAudio);
+		asset_loader_map[SCRIPT] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadScript);
 		asset_loader_map[ARCHTYPE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadArchtype);
 		//=====================================//
 
@@ -748,6 +750,48 @@ namespace EngineFramework {
 		}
 
 		SetMappings(AUDIO_GUID, asset_names, loaded_resources, folder_path);
+
+		return true;
+	}
+
+	bool AssetManagerSystem::LoadScript(const std::filesystem::path& folder_path)
+	{
+		LOGD("Loading Script");
+		//Acceptable files that can be loaded as a texture.
+		std::vector<std::string> script_extensions{ ".lua"};
+		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, script_extensions);
+
+		/*
+			Asset names used for mapping to guid.
+			Resources are kept in an array until guid mappings are read.
+		*/
+		std::vector<std::string> asset_names{};
+		std::vector< std::shared_ptr<ScriptAsset>> loaded_resources{};
+
+		//Iterate through all texture files
+		for (const std::filesystem::path& path : files)
+		{
+			std::string name = path.stem().string();
+			//Allocate resource
+			try
+			{
+				auto script = std::make_shared<ScriptAsset>();
+				script->relPath = path;
+
+				// Read Lua code once at load time (works on both Windows/Android)
+				auto bytes = GetDataFromFile(path);
+				script->code = std::string(bytes.begin(), bytes.end());
+
+				loaded_resources.emplace_back(script);
+				asset_names.emplace_back(name);
+			}
+			catch (std::exception& e)
+			{
+				LOGE("%s %s %s", "Unable to Load Script", name.c_str(), e.what());
+			}
+		}
+
+		SetMappings(SCRIPT_GUID, asset_names, loaded_resources, folder_path);
 
 		return true;
 	}

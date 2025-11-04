@@ -61,6 +61,12 @@
 
 		Note: I realise calling hashmap everytime the asset is accessed may be slower than caching the pointer in full_guid.m_instance.
 		However, I believe there will be <2500 asset access calls / frame, so it's likely negligible enough for M1 at least.
+		
+		- Asset Struct
+		- Loader Functions
+		- GUID, Name
+		- Modify config.json
+		- Add guid.meta
 		*/
 #pragma once
 #ifndef ASSET_MANAGER_HPP
@@ -208,8 +214,8 @@ namespace EngineFramework {
 		static inline constexpr const char SHADER[7]{ "shader" };
 		static inline constexpr const char CUBEMAP[8]{ "cubemap" };
 		static inline constexpr const char AUDIO[6]{ "audio" };
+		static inline constexpr const char SCRIPT[7]{ "script" };
 		static inline constexpr const char ARCHTYPE[9]{ "archtype" };
-
 		/*
 			Precomputed type guids.
 		*/
@@ -218,6 +224,7 @@ namespace EngineFramework {
 		static inline constexpr xresource::type_guid SHADER_GUID{ SHADER };
 		static inline constexpr xresource::type_guid CUBEMAP_GUID{ CUBEMAP };
 		static inline constexpr xresource::type_guid AUDIO_GUID{ AUDIO };
+		static inline constexpr xresource::type_guid SCRIPT_GUID{ SCRIPT };
 		static inline constexpr xresource::type_guid ARCHTYPE_GUID{ ARCHTYPE };
 
 	private:
@@ -287,6 +294,7 @@ namespace EngineFramework {
 		static bool LoadMesh(const std::filesystem::path&);
 		static bool LoadShader(const std::filesystem::path&);
 		static bool LoadAudio(const std::filesystem::path&);
+		static bool LoadScript(const std::filesystem::path&);
 		static bool LoadArchtype(const std::filesystem::path&);
 
 		static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer

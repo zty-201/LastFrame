@@ -262,7 +262,7 @@ void Game_Update()
 
 	// tick scripting by jerron
 	extern entt::registry registry;                       // or EngineFramework::GetRegistry()
-	Engine::ScriptSystem::OnUpdate(registry, delta_time);
+	Engine::ScriptSystem::OnUpdate(registry, delta_time); //Not sure why this isnt running in android?
 
 #if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
 	Engine::ScriptDebug::Update(delta_time);

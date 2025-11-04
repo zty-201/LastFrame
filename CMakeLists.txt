@@ -18,6 +18,15 @@ cmake_minimum_required(VERSION 3.20)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project("LastFrame" VERSION 1.0 LANGUAGES C CXX)
 
+# -------------------------------------------------------------------------------------
+# Global compile setting: align all Debug iterator levels with Jolt (Release-like)
+# This ensures the precompiled header (cmake_pch.obj) and all TUs agree with Jolt.lib.
+# -------------------------------------------------------------------------------------
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /D_ITERATOR_DEBUG_LEVEL=0")
+endif()
+
 # Set the directory where custom CMake modules are stored
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -167,25 +176,44 @@ endif()
 #NOTE: importDependencies is failing and I don't know how to debug it, so Vendoring will be used instead.
 #importDependencies()
 
-# Make CMAKE_MSVC_RUNTIME_LIBRARY effective everywhere (CMake >= 3.15)
-cmake_policy(SET CMP0091 NEW)
+# -----------------------------------------------------------------------------
+# Jolt overrides (must be set **before** add_subdirectory(Lib))
+# Keep Jolt aligned with our toolchain and avoid CRT/iterator mismatches.
+# -----------------------------------------------------------------------------
 
+# Ensure we use dynamic CRT (/MD, /MDd) everywhere
+cmake_policy(SET CMP0091 NEW)
 if(MSVC)
-  # Pick ONE runtime for all targets. Recommended: DLL CRT (/MD, /MDd)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-  # If you truly want static CRT instead, use:
-  # set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
-
-# ---- MSVC: force /MD (Release) and /MDd (Debug) for everything
-cmake_policy(SET CMP0091 NEW)
-if (MSVC)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
-# ---- Jolt: do not override flags; do not use static CRT
-set(OVERRIDE_CXX_FLAGS OFF CACHE BOOL "" FORCE)   # stop Jolt from rewriting CXX flags
-set(JPH_USE_STATIC_VCRT OFF CACHE BOOL "" FORCE)  # OFF => /MD(/MDd), ON => /MT(/MTd)
+# Tell Jolt explicitly to use dynamic CRT too (matching the line we fixed above)
+set(USE_STATIC_MSVC_RUNTIME_LIBRARY OFF CACHE BOOL "" FORCE)
+
+# Make sure Debug builds don’t enable the MSVC “checked iterators” level that conflicts with Jolt
+# (You’ve already added this globally; keeping it here makes intent explicit for Jolt’s configure step.)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
+
+# Optional Jolt feature toggles (safe defaults for your engine)
+# Turn off exceptions/RTTI for smaller, faster Jolt (unless your code needs them)
+set(CPP_EXCEPTIONS_ENABLED OFF CACHE BOOL "" FORCE)
+set(CPP_RTTI_ENABLED OFF CACHE BOOL "" FORCE)
+
+# Keep platform CPU feature requirements conservative
+# (You can bump these if you’re targeting only your dev machine.)
+set(USE_SSE4_1 ON  CACHE BOOL "" FORCE)
+set(USE_SSE4_2 ON  CACHE BOOL "" FORCE)
+set(USE_AVX     OFF CACHE BOOL "" FORCE)
+set(USE_AVX2    OFF CACHE BOOL "" FORCE)
+set(USE_AVX512  OFF CACHE BOOL "" FORCE)
+set(USE_LZCNT   ON  CACHE BOOL "" FORCE)
+set(USE_TZCNT   ON  CACHE BOOL "" FORCE)
+set(USE_F16C    ON  CACHE BOOL "" FORCE)
+set(USE_FMADD   ON  CACHE BOOL "" FORCE)
+
+# Leave IPO/LTO off unless you plan to enable it for **your** targets too
+# (mismatched LTO between app/lib can cause linker issues or lost benefits).
+set(INTERPROCEDURAL_OPTIMIZATION OFF CACHE BOOL "" FORCE)
 
 # ====================================================================
 # NEW: Configure Assimp Build Options BEFORE adding the subdirectory
@@ -200,13 +228,11 @@ set(ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "Enable ONLY the OBJ importer")
 #Build external dependencies ( Jolt lives here )
 add_subdirectory(Lib)
 
-# ---- (optional) sanity print + last-resort enforcement
+# Safety: enforce CRT on Jolt target
 if (TARGET Jolt)
-  get_target_property(_rt Jolt MSVC_RUNTIME_LIBRARY)
-  message(STATUS "✅ Jolt present. Runtime = ${_rt}")
-  # Usually unnecessary, but safe if cache was sticky:
   set_property(TARGET Jolt PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
+
 
 # Set variables for cmake to easily use.
 set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp CACHE INTERNAL "")
@@ -252,6 +278,7 @@ if(WIN32)
 target_link_libraries(engine_library PUBLIC ${EXTERNAL_LIBRARY_DEPENDENCIES})
 target_link_libraries(application_executable PUBLIC engine_library)
 target_compile_definitions(engine_library PUBLIC USE_JOLT)
+
 #Android==============
 elseif(ANDROID)
 	list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES ${ANDROID_LIBRARIES})

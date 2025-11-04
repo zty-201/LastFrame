@@ -1,3 +1,18 @@
+/*****************************************************************/
+/*!
+\file   PropertyManager.hpp
+\author Neo HuiZong
+\par    neo.h\@digipen.edu
+\date   October 2025
+\brief
+This file contains the declaration of the functions that are needed to
+decide which entity to inspect for the inspector.
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the
+prior written consent of DigiPen Institute of Technology is prohibited.
+*/
+/* *******************************************************************/
+
 #include "pch.hpp"
 #pragma once
 #include "InspectorPanel.hpp"
