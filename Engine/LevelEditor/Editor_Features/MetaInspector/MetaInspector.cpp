@@ -26,6 +26,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetManager.hpp"
 #include "SoundAsset.hpp"
 #include "scene.h"
+#if defined(ENGINE_ENABLE_LUA)
+#include "Scripting/Script.hpp"
+#include "Scripting/ScriptAsset.hpp"
+#endif
 #include <string_view>
 #include <imgui.h>
 #include <array>
@@ -259,6 +263,137 @@ namespace EditorFeatures {
 		return scripts;
 	}
 
+	static AssetPickerDescriptor make_asset_picker_descriptor(AssetPickerKind kind);
+	static bool draw_asset_guid_picker(const char* label, xresource::full_guid& guid, AssetPickerKind kind, std::string_view none_label, const std::vector<AssetPickerOptions>& sources, AssetDisplayFormatter formatter = {});
+
+#if defined(ENGINE_ENABLE_LUA)
+	static bool accept_script_payload(xresource::instance_guid& guid) {
+		const char* payload_types[] = { "Scripts", "GENERAL" };
+		for (const char* type : payload_types) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(type)) {
+				if (payload && payload->Data && payload->DataSize > 0) {
+					const char* raw = static_cast<const char*>(payload->Data);
+					std::string dropped(raw, raw + payload->DataSize - 1);
+					std::filesystem::path dropped_path = std::filesystem::path{ dropped }.lexically_normal();
+					xresource::full_guid resolved{};
+					if (apply_payload_to_guid(resolved, AssetPickerKind::Script, dropped_path)) {
+						guid = resolved.m_Instance;
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	static void draw_lua_script_component(Engine::LuaScriptComponent& component) {
+		ImGui::Checkbox("Enabled", &component.Enabled);
+		ImGui::Spacing();
+
+		const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Script);
+		const bool has_sources = !descriptor.sources.empty();
+
+		std::vector<std::size_t> to_remove{};
+		to_remove.reserve(component.Scripts.size());
+
+		if (ImGui::BeginTable("LuaScriptsTable", 3, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoSavedSettings)) {
+			ImGui::TableSetupColumn("Slot", ImGuiTableColumnFlags_WidthFixed, 90.0f);
+			ImGui::TableSetupColumn("Script", ImGuiTableColumnFlags_WidthStretch);
+			ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+
+			if (component.Scripts.empty()) {
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				ImGui::TextDisabled("-");
+				ImGui::TableSetColumnIndex(1);
+				ImGui::TextDisabled("No scripts attached.");
+				ImGui::TableSetColumnIndex(2);
+				ImGui::Dummy(ImVec2(0.0f, 0.0f));
+			}
+			else {
+				for (std::size_t idx = 0; idx < component.Scripts.size(); ++idx) {
+					auto& inst = component.Scripts[idx];
+
+					ImGui::TableNextRow();
+
+					ImGui::TableSetColumnIndex(0);
+					ImGui::Text("Script %zu", idx + 1);
+					const ImVec4 status_color = inst.Loaded ? ImVec4(0.45f, 0.8f, 0.45f, 1.0f) : ImVec4(0.86f, 0.45f, 0.45f, 1.0f);
+					ImGui::TextColored(status_color, inst.Loaded ? "Loaded" : "Pending");
+
+					ImGui::PushID(static_cast<int>(idx));
+
+					ImGui::TableSetColumnIndex(1);
+					if (has_sources) {
+						xresource::full_guid full{ inst.ScriptGuid, EngineFramework::AssetManagerSystem::SCRIPT_GUID };
+						std::string picker_label = "##LuaScriptPicker" + std::to_string(idx);
+						if (draw_asset_guid_picker(picker_label.c_str(), full, AssetPickerKind::Script, descriptor.none_label, descriptor.sources, descriptor.formatter)) {
+							if (inst.ScriptGuid != full.m_Instance) {
+								inst.ScriptGuid = full.m_Instance;
+								inst.Loaded = false;
+							}
+						}
+					}
+					else {
+						ImGui::TextDisabled("No script assets available.");
+					}
+
+					ImGui::TableSetColumnIndex(2);
+					if (ImGui::SmallButton("Remove")) {
+						to_remove.push_back(idx);
+					}
+
+					ImGui::PopID();
+				}
+			}
+
+			ImGui::EndTable();
+		}
+
+		for (auto it = to_remove.rbegin(); it != to_remove.rend(); ++it) {
+			component.Scripts.erase(component.Scripts.begin() + static_cast<long long>(*it));
+		}
+
+		if (ImGui::Button("Add Script")) {
+			component.Scripts.emplace_back();
+			component.Scripts.back().Loaded = false;
+		}
+
+		ImGui::Spacing();
+
+		ImVec2 drop_size(ImGui::GetContentRegionAvail().x, ImGui::GetFrameHeight() * 2.0f);
+		if (drop_size.x <= 0.0f) {
+			drop_size.x = 200.0f;
+		}
+		if (drop_size.y <= 0.0f) {
+			drop_size.y = ImGui::GetFrameHeight() * 2.0f;
+		}
+
+		ImGui::PushID("LuaScriptDropZone");
+		if (ImGui::BeginChild("DropZone", drop_size, true, ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::TextWrapped("Drag and drop Lua script assets here to attach them.");
+			if (ImGui::BeginDragDropTarget()) {
+				xresource::instance_guid new_guid{};
+				if (accept_script_payload(new_guid)) {
+					const bool already_present = std::any_of(component.Scripts.begin(), component.Scripts.end(),
+						[&](const Engine::LuaScriptComponent::LuaInstance& existing) {
+							return existing.ScriptGuid == new_guid;
+						});
+					if (!already_present) {
+						Engine::LuaScriptComponent::LuaInstance inst{};
+						inst.ScriptGuid = new_guid;
+						inst.Loaded = false;
+						component.Scripts.emplace_back(std::move(inst));
+					}
+				}
+				ImGui::EndDragDropTarget();
+			}
+		}
+		ImGui::EndChild();
+		ImGui::PopID();
+	}
+#endif
+
 	template<typename T>
 	static std::vector<std::pair<xresource::instance_guid, std::string>> build_asset_entries(const std::vector<std::pair<xresource::full_guid, std::shared_ptr<T>>>& list) {
 		std::vector<std::pair<xresource::instance_guid, std::string>> out;
@@ -306,12 +441,24 @@ namespace EditorFeatures {
 					AssetManagerSystem::AUDIO_GUID));
 			return { "No Audio", { { AssetManagerSystem::AUDIO_GUID, {}, std::move(sounds) } }, {} };
 		}
+#if defined(ENGINE_ENABLE_LUA)
+		case AssetPickerKind::Script: {
+			auto scripts =
+				build_asset_entries(AssetManagerSystem::GetAllResourceOfType<ScriptAsset>(
+					AssetManagerSystem::SCRIPT_GUID));
+			return { "No Script", { { AssetManagerSystem::SCRIPT_GUID, {}, std::move(scripts) } }, {} };
+		}
+#else
+		case AssetPickerKind::Script: {
+			return { "No Script", {}, {} };
+		}
+#endif
 		}
 		return { "None", {}, {} };
 	}
 
 	// To render the inspector widget used for asset-back fields
-	static bool draw_asset_guid_picker(const char* label, xresource::full_guid& guid, AssetPickerKind kind, std::string_view none_label, const std::vector<AssetPickerOptions>& sources, AssetDisplayFormatter formatter = {}) {
+	static bool draw_asset_guid_picker(const char* label, xresource::full_guid& guid, AssetPickerKind kind, std::string_view none_label, const std::vector<AssetPickerOptions>& sources, AssetDisplayFormatter formatter) {
 		using EngineFramework::AssetManagerSystem;
 
 		std::string current;
@@ -486,6 +633,16 @@ namespace EditorFeatures {
 		//const char* typeName = mt.name();
 
 		auto t = obj.type();
+
+#if defined(ENGINE_ENABLE_LUA)
+		if (mt == entt::resolve<Engine::LuaScriptComponent>()) {
+			if (obj.allow_cast<Engine::LuaScriptComponent&>()) {
+				auto& component = obj.cast<Engine::LuaScriptComponent&>();
+				draw_lua_script_component(component);
+			}
+			return;
+		}
+#endif
 		
 		// Each entry is pair<entt::id_type, entt::meta_data> - for self reference
 		for (auto&& pair : mt.data()) {

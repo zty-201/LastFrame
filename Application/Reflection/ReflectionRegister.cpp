@@ -461,6 +461,7 @@ namespace EngineFramework
 		entt::meta_factory<Engine::LuaScriptComponent::LuaInstance>()
 			.type("LuaInstance")
 			.data<&Engine::LuaScriptComponent::LuaInstance::ScriptGuid>("ScriptGuid")
+			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Script })
 			.data<&Engine::LuaScriptComponent::LuaInstance::Loaded>("Loaded");
 
 		// Then register the main LuaScriptComponent
@@ -468,9 +469,6 @@ namespace EngineFramework
 			.type("LuaScriptComponent")
 			.data<&Engine::LuaScriptComponent::Enabled>("Enabled")
 			.data<&Engine::LuaScriptComponent::Scripts>("Scripts")
-			.custom<EditorFeatures::AssetPickerTag>(
-				EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Script }
-			)
 			.func<&Emplacer<Engine::LuaScriptComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<Engine::LuaScriptComponent>::RemoveComponent>("remove")
 			.func<&Getter<Engine::LuaScriptComponent>::GetComponent>("get")
