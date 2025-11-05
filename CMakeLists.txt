@@ -196,8 +196,9 @@ endif()
 set(USE_STATIC_MSVC_RUNTIME_LIBRARY OFF CACHE BOOL "" FORCE)
 
 # Make sure Debug builds don’t enable the MSVC “checked iterators” level that conflicts with Jolt
-# (You’ve already added this globally; keeping it here makes intent explicit for Jolt’s configure step.)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
+if(MSVC)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
+endif()
 
 # Optional Jolt feature toggles (safe defaults for your engine)
 # Turn off exceptions/RTTI for smaller, faster Jolt (unless your code needs them)

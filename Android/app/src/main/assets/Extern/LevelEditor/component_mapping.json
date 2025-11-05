@@ -1,6 +1,13 @@
 {
     "component_mapping": [
         {
+            "component": "LuaScriptComponent",
+            "tags": [
+                ".lua"
+            ],
+            "variable": "Scripts"
+        },
+        {
             "component": "MeshComponent",
             "tags": [
                 ".jpeg"
