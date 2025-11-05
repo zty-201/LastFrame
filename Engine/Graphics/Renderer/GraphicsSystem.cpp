@@ -203,13 +203,16 @@ namespace EngineFramework
 	{
 		glEnable(GL_DEPTH_TEST);
 
-		auto camera_view = registry.view<CameraComponent>();
-		if (camera_view.empty()) return;
-		CameraComponent& active_camera = camera_view.get<CameraComponent>(camera_view.front());
-
-		glm::mat4 V = Camera::getLookAt(active_camera);
+		// Get camera information first
+		auto active_camera_entity = GetFirstActiveCamera();
+		if (active_camera_entity == entt::null) {
+			LOGI("No cameras in registry yet, skipping render");
+			return;
+		}
+		CameraComponent* active_camera = &registry.get<CameraComponent>(active_camera_entity);
+		glm::mat4 V = Camera::getLookAt(*active_camera);
 		float aspect = (screen.y > 0) ? (float)screen.x / screen.y : 1.0f;
-		glm::mat4 P = Camera::getPerspective(active_camera, aspect);
+		glm::mat4 P = Camera::getPerspective(*active_camera, aspect);
 
 		// instancing temporary disabled, needs upgrade
 		//m_instancingSystem->PrepareBatches();

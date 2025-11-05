@@ -26,6 +26,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <sstream>
 
 //Entt reflection system
 #include <entt/meta/meta.hpp>
@@ -49,9 +50,13 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 // /Debug
 #include "Profiler.hpp"
 
-// Property
 #include "PropertyManager.hpp"
 #include "GameplayKeyManager.hpp"
+
+namespace
+{
+constexpr const char* kDefaultLayoutRelativePath = "Extern/LevelEditor/imgui_default.ini";
+}
 
 namespace EngineFramework
 {
@@ -110,13 +115,108 @@ namespace EngineFramework
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigWindowsResizeFromEdges = true; // allow resize from any edge
-
-		//Enable docking of imgui windows.
-		ImGui::LoadIniSettingsFromMemory(""); //reset any docking layout from memory, please comment this out to enable docking config memory
 		ImGui::GetIO().ConfigDockingTransparentPayload = false;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 		io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+		//Enable docking of imgui windows.
+		std::filesystem::path ini_path;
+		auto try_candidate = [&ini_path](const std::filesystem::path& candidate)
+		{
+			if (ini_path.empty() && std::filesystem::exists(candidate))
+			{
+				ini_path = std::filesystem::weakly_canonical(candidate);
+			}
+		};
+
+		const auto cwd = std::filesystem::current_path();
+		LOGI("LevelEditor current working directory: %s", cwd.string().c_str());
+		try_candidate(cwd / "imgui.ini");
+		try_candidate(cwd / "build/VisualStudio/imgui.ini");
+		try_candidate(cwd / "build/imgui.ini");
+		try_candidate(cwd / "../build/VisualStudio/imgui.ini");
+
+		for (auto path = cwd; ini_path.empty(); )
+		{
+			try_candidate(path / "imgui.ini");
+			try_candidate(path / "build/VisualStudio/imgui.ini");
+
+			if (!path.has_parent_path() || path == path.parent_path())
+			{
+				break;
+			}
+			path = path.parent_path();
+		}
+
+		if (ini_path.empty())
+		{
+			ini_path = (cwd / "imgui.ini").lexically_normal();
+		}
+
+		static std::string ini_path_string = ini_path.string(); // persist for ImGui lifetime
+		io.IniFilename = ini_path_string.c_str();
+
+		if (std::filesystem::exists(ini_path))
+		{
+			ImGui::LoadIniSettingsFromDisk(io.IniFilename);
+			LOGI("Loaded ImGui layout from: %s", io.IniFilename);
+		}
+		else
+		{
+			std::filesystem::path default_ini_path;
+			auto try_default = [&default_ini_path](const std::filesystem::path& base)
+			{
+				if (default_ini_path.empty())
+				{
+					const auto candidate = base / kDefaultLayoutRelativePath;
+					if (std::filesystem::exists(candidate))
+					{
+						default_ini_path = std::filesystem::weakly_canonical(candidate);
+					}
+				}
+			};
+
+			try_default(cwd);
+			for (auto path = cwd; default_ini_path.empty(); )
+			{
+				try_default(path);
+				if (!path.has_parent_path() || path == path.parent_path())
+				{
+					break;
+				}
+				path = path.parent_path();
+			}
+
+			if (!default_ini_path.empty())
+			{
+				std::ifstream default_file(default_ini_path, std::ios::binary);
+				if (default_file)
+				{
+					std::ostringstream buffer;
+					buffer << default_file.rdbuf();
+					const std::string contents = buffer.str();
+					if (!contents.empty())
+					{
+						ImGui::LoadIniSettingsFromMemory(contents.c_str(), contents.size());
+						ImGui::SaveIniSettingsToDisk(io.IniFilename);
+						LOGI("Created default ImGui layout at: %s (template: %s)", io.IniFilename, default_ini_path.string().c_str());
+					}
+					else
+					{
+						LOGE("Default ImGui layout template was empty: %s", default_ini_path.string().c_str());
+					}
+				}
+				else
+				{
+					LOGE("Failed to read default ImGui layout template: %s", default_ini_path.string().c_str());
+				}
+			}
+			else
+			{
+				LOGE("Default ImGui layout template not found relative to working directory; expected path %s", kDefaultLayoutRelativePath);
+			}
+		}
 		
 		// Register reflection (TESTING PURPOSES)
 		EngineFramework::RegisterReflection();
@@ -162,16 +262,16 @@ namespace EngineFramework
 		//FEATURES ===============================================================
 
 		/*add the following submenu here*/
-		addFeature("ObjectManager", std::make_unique<ObjectManager>());
+		addFeature("ObjectManager", std::make_unique<ObjectManager>(), true);
 		addFeature("Save", std::make_unique<Save>());
-		addFeature("Screen", std::make_unique<Screen>());
-		addFeature("Profiler", std::make_unique<LFeature_DebugProfiler>()); // Add profiler feature (testing purpose)
+		addFeature("Screen", std::make_unique<Screen>(), true);
+		addFeature("Profiler", std::make_unique<LFeature_DebugProfiler>(), true); // Add profiler feature (testing purpose)
 		
 		addFeature("SceneManager", std::make_unique<SceneManager>()); //
-		addFeature("AssetWindow", std::make_unique<AssetWindow>());//
+		addFeature("AssetWindow", std::make_unique<AssetWindow>(), true);//
 		addFeature("ModelManager", std::make_unique<ModelManager>());//
 		addFeature("Gameplay_KeyManager", std::make_unique<Gameplay_KeyManager>());
-		addFeature("PropertyManager", std::make_unique<LFeature_PropertyManager>());
+		addFeature("PropertyManager", std::make_unique<LFeature_PropertyManager>(), true);
 		
 
 		SceneManager::GetInstance().ScanScenes(AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scenes");//
