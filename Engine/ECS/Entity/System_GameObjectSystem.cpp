@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <cstddef>
 
 //Entt reflection system
 #include <entt/meta/meta.hpp>
@@ -159,8 +160,13 @@ namespace EngineFramework
 		*/
 		nlohmann::json save_data{};
 		int id{}; //Basic id to prevent duplicate keys in json. Does not represent entity id.
-		// Iterate over all entities
-		for (auto entity : registry.view<entt::entity>()) {
+		// Iterate over all entities in the registry.
+		auto &entity_storage = registry.storage<entt::entity>();
+		for (entt::entity entity : entity_storage)
+		{
+			if (!registry.valid(entity)) {
+				continue;
+			}
 			nlohmann::json entity_save_data{};
 			static std::vector<entt::meta_type> archtype_components{};
 			archtype_components.clear();
