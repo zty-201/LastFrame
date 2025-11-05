@@ -471,6 +471,7 @@ namespace EngineFramework
 			.data<&CameraComponent::proj_matrix>("proj_matrix")
 			.data<&CameraComponent::oldx>("oldx")
 			.data<&CameraComponent::oldy>("oldy")
+			.data<&CameraComponent::is_active>("is_active")
 			.func<&Emplacer<CameraComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<CameraComponent>::RemoveComponent>("remove")
 			.func<&Getter<CameraComponent>::GetComponent>("get")

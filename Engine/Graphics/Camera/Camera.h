@@ -15,8 +15,18 @@
 #include "ShaderProgram.h"
 
 namespace Camera {
+    //Returns the position in front of the camera, where it is looking.
+    inline glm::vec3 GetFowardLookPosition(const CameraComponent& cam, float dist)
+    {
+        glm::vec3 look_vector = cam.target - cam.position;
+        //potential edge case where camera look direction may be 0. 
+        if (look_vector.length() <= 0.01) return cam.position;
+        dist /= look_vector.length();
+        return cam.position + dist * look_vector;
+    }
     inline void Move_Cam_and_Target(CameraComponent& cam, glm::vec3 offset) {
 
+        LOGD("Camera Target: %f, %f, %f", cam.target.x, cam.target.y, cam.target.z);
         const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
         glm::vec3 front = glm::normalize(cam.target - cam.position);      // view direction

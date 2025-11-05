@@ -12,7 +12,7 @@
 #include "ISystem.hpp"
 #include "entt/entity/registry.hpp"
 #include "Archtype.hpp"
-
+#include "TransformComponent.h"
 namespace EngineFramework
 {
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
@@ -83,6 +83,12 @@ namespace EngineFramework
 			Creates a single entity with the same component data (copied) from archtype
 		*/
 		entt::entity CreateInstance(std::string archtype);
+
+		/*
+			Creates a single entity with the same component data (copied) from archtype,
+			and sets its transform
+		*/
+		entt::entity CreateInstance(std::string archtype, const TransformComponent& transform);
 
 		// Getter for registry
 		static entt::registry& GetRegistry() { return registry; }

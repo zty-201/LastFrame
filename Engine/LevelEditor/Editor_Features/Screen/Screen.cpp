@@ -45,6 +45,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "CameraComponent.h"
 #include "Camera.h"
 
+//Creation of instances
+#include "System_GameObjectSystem.hpp"
 namespace EngineFramework
 {
     bool Screen::is_control_open = false;
@@ -182,7 +184,6 @@ namespace EngineFramework
             display_screen();
             gizmos();
             drop_target();
-
             if (bool hovered = ImGui::IsItemHovered()) {
                 camera_controls_in_screen_only();
             }
@@ -611,6 +612,7 @@ namespace EngineFramework
             //auto& first_obj = objects.get<TransformComponent>(objects.front());
 
             // Create a copy of the model matrix to work with
+            GraphicsSystem::GetInstance().CalculateModelMatrix(object, object.modelMatrix);
             glm::mat4 model = object.modelMatrix;
             ImGuizmo::SetOrthographic(false); //because we have perspective
 
@@ -666,19 +668,38 @@ namespace EngineFramework
 
         if (ImGui::BeginDragDropTarget())
         {
-            // Accept path payload (null-terminated string)
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Models"))
-            {
-                //const char* path = (const char*)payload->Data;
+            CALL_AT_END(imgui_enddragdrop, ImGui::EndDragDropTarget(););
 
-                //std::cout << "Drop successful: " << path << std::endl;
+            // Create instance with default transform at camera forward position. 
+            // Accept path payload (std::string*)
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SELECTED_MODEL_NAME"))
+            {
+                if (payload->DataSize == 0) return;
+                std::string archtype_name = static_cast<const char*>(payload->Data);
+                if (archtype_name.empty())
+                {
+                    LOGD("%s","Empty Archtype Name provided by Drag-Drop Payload");
+                    return;
+                }
+                TransformComponent instance_transform{};
+
+                //Find the position in front of where the camera is looking.
+                entt::entity camera = GraphicsSystem::GetInstance().GetFirstActiveCamera();
+                if (camera != entt::null) 
+                {
+                    CameraComponent& cam_comp = registry.get<CameraComponent>(camera);
+                    instance_transform.position = Camera::GetFowardLookPosition(cam_comp, 0.5f);
+
+                }//Otherwise if no active camera found then use default position at 0,0,0.
+                else
+                {
+                    LOGD("%s", "No Active Camera Found, creating entity at(0, 0, 0)");
+                }
+                GameObjectSystem::GetInstance().CreateInstance(archtype_name, instance_transform);
             }
 
-            ImGui::EndDragDropTarget();
         }
-
-
     }
-
+    
 }
 #endif
