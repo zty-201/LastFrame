@@ -62,6 +62,10 @@ void main()
     FS_IN_Tangent   = normalize(mat3(model) * VS_IN_Tangent.xyz);
     FS_IN_Bitangent = cross(FS_IN_Normal, FS_IN_Tangent) * VS_IN_Tangent.w;
 
+    if (length(VS_IN_Tangent.xyz) < 0.01) {
+        // Output a debug color (magenta) so you can see which meshes have bad tangents
+        FS_IN_Tangent = vec3(1.0, 0.0, 1.0);
+    }
     // ----------------------------------------------
 
     gl_Position = view_proj * world_pos;

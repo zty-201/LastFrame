@@ -130,6 +130,26 @@ namespace EngineFramework
 		//m_instancingSystem = std::make_unique<InstancingSystem>();
 		//m_instancingSystem->Initialize(10000);
 
+
+		// === CREATE DEFAULT TEXTURES ===
+		glGenTextures(1, &m_defaultWhiteTexture);
+		glBindTexture(GL_TEXTURE_2D, m_defaultWhiteTexture);
+		unsigned char white[] = { 255, 255, 255, 255 };
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, white);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		LOGI("Created default white texture: %u", m_defaultWhiteTexture);
+
+		glGenTextures(1, &m_defaultNormalTexture);
+		glBindTexture(GL_TEXTURE_2D, m_defaultNormalTexture);
+		unsigned char normal[] = { 128, 128, 255, 255 }; // RGB = (0, 0, 1) in tangent space
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, normal);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		LOGI("Created default normal texture: %u", m_defaultNormalTexture);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+
 		// === UBO SETUP ===
 		glGenBuffers(1, &m_volumetricUBO);
 		glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBO);
@@ -227,7 +247,7 @@ namespace EngineFramework
 		auto& main_light = light_view.get<LightComponent>(light_view.front());
 
 		float near_plane = 1.0f, far_plane = 200.0f; // Increased far plane
-		glm::mat4 lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
+		glm::mat4 lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
 		glm::mat4 lightView = glm::lookAt(main_light.position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 		m_lightSpaceMatrix = lightProjection * lightView;
 
@@ -256,10 +276,11 @@ namespace EngineFramework
 		{
 			if (meshComp.meshName == "SkyBox") continue;
 
-			if (meshCache.find(meshComp.meshName) == meshCache.end()) {
-				LoadAndCacheMesh(meshComp.meshName);
-			}
-			auto meshData = meshCache[meshComp.meshName];
+			// 1. Get the GUID for the mesh by its name.
+			xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp.meshName);
+
+			// 2. Get the mesh resource using the GUID.
+			auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
 			if (!meshData || meshData->vao == 0) continue;
 
 			// For shadows, we don't care about materials, we just draw all geometry.
@@ -422,11 +443,14 @@ namespace EngineFramework
 		{
 			if (meshComp.meshName == "SkyBox") continue;
 
-			// Load mesh if not in cache
-			if (meshCache.find(meshComp.meshName) == meshCache.end()) {
-				LoadAndCacheMesh(meshComp.meshName);
-			}
-			auto meshData = meshCache[meshComp.meshName];
+			// --- THIS IS THE NEW LOGIC ---
+			// 1. Get the GUID for the mesh by its name.
+			xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp.meshName);
+
+			// 2. Get the mesh resource using the GUID.
+			auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
+			// --- END NEW LOGIC ---
+
 			if (!meshData || meshData->vao == 0) continue;
 
 			// Set the per-object model matrix
@@ -443,25 +467,24 @@ namespace EngineFramework
 				if (subMesh.materialIndex < 0 || subMesh.materialIndex >= meshData->materials.size()) continue;
 				const auto& material = meshData->materials[subMesh.materialIndex];
 
+				
+
 				// --- SET MATERIAL FACTOR UNIFORMS ---
 				shader->setUniform("u_AlbedoFactor", material.albedoFactor);
 				shader->setUniform("u_RoughnessFactor", material.roughnessFactor);
 				shader->setUniform("u_MetallicFactor", material.metallicFactor);
 
-				// Bind the textures for THIS material
+				// Albedo
 				auto albedoTex = AssetManagerSystem::GetResource<Scene::Texture>(material.albedoMap);
-				if (albedoTex && albedoTex->id != 0) {
-					glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_ALBEDO_UNIT);
-					glBindTexture(GL_TEXTURE_2D, albedoTex->id);
-					shader->setUniform("s_Albedo", TextureUnits::MESH_ALBEDO_UNIT);
-				}
+				glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_ALBEDO_UNIT);
+				glBindTexture(GL_TEXTURE_2D, (albedoTex && albedoTex->id != 0) ? albedoTex->id : m_defaultWhiteTexture);
+				shader->setUniform("s_Albedo", TextureUnits::MESH_ALBEDO_UNIT);
 
+				// Normal
 				auto normalTex = AssetManagerSystem::GetResource<Scene::Texture>(material.normalMap);
-				if (normalTex && normalTex->id != 0) {
-					glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_NORMAL_UNIT);
-					glBindTexture(GL_TEXTURE_2D, normalTex->id);
-					shader->setUniform("s_Normal", TextureUnits::MESH_NORMAL_UNIT);
-				}
+				glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_NORMAL_UNIT);
+				glBindTexture(GL_TEXTURE_2D, (normalTex && normalTex->id != 0) ? normalTex->id : m_defaultNormalTexture);
+				shader->setUniform("s_Normal", TextureUnits::MESH_NORMAL_UNIT);
 
 				// Roughness
 				auto roughTex = AssetManagerSystem::GetResource<Scene::Texture>(material.roughnessMap);
@@ -475,6 +498,30 @@ namespace EngineFramework
 				glBindTexture(GL_TEXTURE_2D, (metalTex && metalTex->id != 0) ? metalTex->id : m_defaultWhiteTexture);
 				shader->setUniform("s_Metallic", TextureUnits::MESH_METALLIC_UNIT);
 
+				static bool logged_first = false;
+				if (!logged_first) {
+					LOGI("=== First Submesh Render Debug ===");
+					LOGI("Submesh: %s", subMesh.name.c_str());
+					LOGI("Material: %s", material.name.c_str());
+					LOGI("  - Albedo: ptr=%p, id=%u, using_fallback=%d",
+						(void*)albedoTex.get(),
+						albedoTex ? albedoTex->id : 0,
+						!(albedoTex && albedoTex->id != 0));
+					LOGI("  - Normal: ptr=%p, id=%u, using_fallback=%d",
+						(void*)normalTex.get(),
+						normalTex ? normalTex->id : 0,
+						!(normalTex && normalTex->id != 0));
+					LOGI("  - Roughness: ptr=%p, id=%u, factor=%.2f",
+						(void*)roughTex.get(),
+						roughTex ? roughTex->id : 0,
+						material.roughnessFactor);
+					LOGI("  - Metallic: ptr=%p, id=%u, factor=%.2f",
+						(void*)metalTex.get(),
+						metalTex ? metalTex->id : 0,
+						material.metallicFactor);
+					LOGI("Default textures: white=%u, normal=%u", m_defaultWhiteTexture, m_defaultNormalTexture);
+					logged_first = true;
+				}
 
 				// Draw ONLY this part of the mesh
 				glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * subMesh.baseIndex));

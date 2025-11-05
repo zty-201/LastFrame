@@ -14,6 +14,16 @@ add_subdirectory(Shared/stb_image)
 add_subdirectory(Shared/xresource)
 add_subdirectory(Shared/lua)
 add_subdirectory(Shared/sol)
+
+# --- Assimp ---
+# Turn off parts we don't need
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable Assimp tests" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Disable Assimp tools" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "Don't create install targets" FORCE)
+
+# === THIS IS THE FIX ===
+# Force Assimp to build as a static library (.lib) instead of a shared one (.dll)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build Assimp as a static library" FORCE)
 add_subdirectory(Shared/assimp)
 add_subdirectory(Shared/JoltPhysics/Build)
 

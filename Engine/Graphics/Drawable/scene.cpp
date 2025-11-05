@@ -31,12 +31,11 @@
 	// const char* filename: This parameter takes a string representing the file path 
 	//          of the image from which the texture is to be loaded.
 	//
-GLuint setupTexture(const char* filename)
+GLuint setupTexture(const char* filename, bool isSRGB = true)
 {
 	int width, height, bytesPerPix;
 	stbi_set_flip_vertically_on_load(true);
 
-	//Load using cross-platform compatible function.
 	std::vector<unsigned char> texture_data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path(filename));
 	unsigned char* data = stbi_load_from_memory(
 		texture_data.data(),
@@ -49,27 +48,26 @@ GLuint setupTexture(const char* filename)
 
 	GLuint texID = 0;
 	glGenTextures(1, &texID);
-	glBindTexture(GL_TEXTURE_2D, texID);  // Bind temporarily for setup
+	glBindTexture(GL_TEXTURE_2D, texID);
 
-	// Allocate storage
-	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+	int mipLevels = 1 + static_cast<int>(floor(log2(std::max(width, height))));
 
-	// Upload data
+	// === Use SRGB for color textures, LINEAR for data textures ===
+	GLenum internalFormat = isSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+	glTexStorage2D(GL_TEXTURE_2D, mipLevels, internalFormat, width, height);
+
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-	// Set parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-	// Generate mipmaps
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	// Unbind after creation
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(data);
 
-	return texID;  // Return unbound texture ID
+	return texID;
 
 }
 
@@ -128,7 +126,12 @@ GLuint setupHdrCubeMap(const std::array<std::string, 6>& filenames)
 Scene::Texture::Texture(const std::string& file, GLuint channel)
 	: id{ 0 }, channel{ channel }, target{ 0 }
 {
-	id = setupTexture(file.c_str());
+	if (file.find("Albedo") != std::string::npos){
+		id = setupTexture(file.c_str(), true);
+	}
+	else {
+		id = setupTexture(file.c_str(), false);
+	}
 	target = GL_TEXTURE_2D;
 }
 

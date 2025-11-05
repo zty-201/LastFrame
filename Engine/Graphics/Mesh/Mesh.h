@@ -60,8 +60,8 @@ namespace Mesh {
         MeshData() = default;
 
         // Constructor for loading a mesh from a file via Assimp.
-        explicit MeshData(const std::string& fileName) {
-            loadWithAssimp(fileName);
+        explicit MeshData(const std::string& filePath) {
+            loadWithAssimp(filePath);
         }
 
         // Constructor for manually creating a mesh from code (for primitives).
@@ -83,13 +83,13 @@ namespace Mesh {
 
     private:
         // The core Assimp loading function.
-        void loadWithAssimp(const std::string& fileName) {
+        void loadWithAssimp(const std::string& filePath) {
+			LOGI("Loading mesh from file: %s", filePath.c_str());
             Assimp::Importer importer;
-            const aiScene* scene = importer.ReadFile(fileName,
+            const aiScene* scene = importer.ReadFile(filePath,
                 aiProcess_Triangulate |
                 aiProcess_GenSmoothNormals |
-                aiProcess_CalcTangentSpace | // Ask Assimp to calculate tangents
-                aiProcess_FlipUVs);
+                aiProcess_CalcTangentSpace);
 
             if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
                 throw std::runtime_error("Assimp Error: " + std::string(importer.GetErrorString()));
@@ -113,14 +113,21 @@ namespace Mesh {
 
                 using AssetMgr = EngineFramework::AssetManagerSystem;
 
+                // === SET REALISTIC DEFAULTS FOR NON-PBR MODELS ===
+                newMat.albedoFactor = glm::vec3(1.0f);  // White tint (let texture shine through)
+                newMat.roughnessFactor = 0.8f;           // Slightly rough (most surfaces aren't mirrors)
+                newMat.metallicFactor = 0.0f;            // Non-metallic (Sponza is stone/fabric, not metal!)
+
                 // Albedo
                 if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &path_str) == AI_SUCCESS) {
                     std::filesystem::path texture_path(path_str.C_Str());
+                    LOGI("Found albedo texture: %s", texture_path.stem().string().c_str());
                     newMat.albedoMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
                 }
                 else {
                     aiColor3D color;
                     if (mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
+                        LOGI("Albedo Texture not found, falling back to color");
                         newMat.albedoFactor = { color.r, color.g, color.b };
                     }
                 }
@@ -128,7 +135,16 @@ namespace Mesh {
                 // Normal
                 if (mat->GetTexture(aiTextureType_NORMALS, 0, &path_str) == AI_SUCCESS) {
                     std::filesystem::path texture_path(path_str.C_Str());
+                    LOGI("Found normal texture: %s", texture_path.stem().string().c_str());
                     newMat.normalMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
+                }
+                else if (mat->GetTexture(aiTextureType_HEIGHT, 0, &path_str) == AI_SUCCESS) {  // <-- TRY HEIGHT TOO
+                    std::filesystem::path texture_path(path_str.C_Str());
+                    LOGI("Found normal texture (as HEIGHT): %s", texture_path.stem().string().c_str());
+                    newMat.normalMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
+                }
+                else {
+                    LOGI("Normal map not found for material: %s", newMat.name.c_str());
                 }
 
                 // --- NEW: Load Metallic Texture ---
@@ -202,6 +218,14 @@ namespace Mesh {
                     float handedness = (glm::dot(glm::cross(vertex.Normal, t), b) < 0.0f) ? -1.0f : 1.0f;
                     vertex.Tangent = glm::vec4(t, handedness);
                 }
+                else {
+                    // === FALLBACK: Generate tangent if Assimp didn't provide one ===
+                    glm::vec3 c1 = glm::cross(vertex.Normal, glm::vec3(0.0f, 0.0f, 1.0f));
+                    glm::vec3 c2 = glm::cross(vertex.Normal, glm::vec3(0.0f, 1.0f, 0.0f));
+                    glm::vec3 t = glm::length(c1) > glm::length(c2) ? c1 : c2;
+                    vertex.Tangent = glm::vec4(glm::normalize(t), 1.0f);
+                    LOGE("Mesh '%s' missing tangents, using generated fallback", mesh->mName.C_Str());
+                }
                 m_temp_vertices.push_back(vertex);
             }
 
@@ -228,13 +252,16 @@ namespace Mesh {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
 
-            glEnableVertexAttribArray(0); // Position
+            glEnableVertexAttribArray(0); // Position (location 0)
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
-            glEnableVertexAttribArray(1); // Normal
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-            glEnableVertexAttribArray(2); // TexCoords
-            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
-            glEnableVertexAttribArray(3); // Tangent (now a vec4)
+
+            glEnableVertexAttribArray(1); // TexCoords (location 1)
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+
+            glEnableVertexAttribArray(2); // Normal (location 2)
+            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+
+            glEnableVertexAttribArray(3); // Tangent (location 3)
             glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
 
             glBindVertexArray(0);

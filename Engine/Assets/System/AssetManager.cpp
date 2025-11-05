@@ -433,24 +433,26 @@ namespace EngineFramework {
 
 			//TODO: Multithreading for asset loading here. Ensure no race conditions(like writing to the resource map) and multi-threaded safety within the function loaders too. (e.g. accessing the same file, writing to the same resource map).
 		*/
-		for (auto& [resource_type, folderpath_string] : config_json.items())
+		for (const auto& task : config_json)
 		{
-			std::filesystem::path folder_path{ folderpath_string.get<std::string>() };
-			type_folderpath_map[resource_type] = folder_path;
-			
+			std::string resource_type = task["type"];
+			std::filesystem::path folder_path = task["path"].get<std::string>();
 
+			// The rest of your logic remains the same...
+			type_folderpath_map[resource_type] = folder_path;
 			//Unable to find resource type in map, it might not have been added yet.
 			if (asset_loader_map.find(resource_type) == asset_loader_map.end())
 			{
-				throw std::runtime_error((std::string("No Function Loader for resource type: ") + resource_type + ". Ensure it is spelt correctly, and asset loader has been added to asset_loader_map.").c_str());
+				throw std::runtime_error((std::string("No Function Loader for resource type: ") + resource_type +
+					". Ensure it is spelt correctly, and asset loader has been added to asset_loader_map.").c_str());
 			}
-
 			//Call the asset loader for that respective asset type, and pass in the folderpath.
 			if (!asset_loader_map[resource_type](folder_path))
 			{
 				throw std::runtime_error((std::string("Unable to load asset of type: ") + resource_type).c_str());
 			}
 		}
+
 	}
 
 
@@ -548,6 +550,7 @@ namespace EngineFramework {
 
 			// Try catch guard for loading mesh
 			try {
+				LOGI("Loading Mesh: %s", path.string().c_str());
 				loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
 				asset_names.emplace_back(name); // Done if resource loading is a success.
 			}

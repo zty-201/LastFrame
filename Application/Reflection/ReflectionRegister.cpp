@@ -407,6 +407,7 @@ namespace EngineFramework
 		entt::meta_factory<TextureComponent>()
 			.type("TextureComponent")
 			.data<&TextureComponent::texture_guid>("texture_guid")
+			.data<&TextureComponent::name>("name")
 			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture }) // Need to add tags like that for certain components
 			.func<&Emplacer<TextureComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<TextureComponent>::RemoveComponent>("remove")

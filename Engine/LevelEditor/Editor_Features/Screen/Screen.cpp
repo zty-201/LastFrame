@@ -238,7 +238,7 @@ namespace EngineFramework
 
     void Screen::camera_controls_outside_screen() {
 
-        float speed = 0.05f;
+        float speed = 0.5f;
 
         if (ImGui::IsKeyDown(ImGuiKey_W)) {
             auto camera_view = registry.view<CameraComponent>();
@@ -399,141 +399,86 @@ namespace EngineFramework
             }
 
             // -------- Texture tab --------
-            if (ImGui::BeginTabItem("Texture")) {
+            if (ImGui::BeginTabItem("Material Inspector")) {
 
+                // First, check if an object is actually selected.
                 if (editor_ptr->selected_objectID == entt::null) {
-                    
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));      // Black text
-                    ImGui::TextUnformatted("* no object is being selected");
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+                    ImGui::TextUnformatted("\n* No object selected. Select an object in the scene to inspect its material. *\n");
                     ImGui::PopStyleColor();
-
                 }
                 else {
-
-                    /*
-                       get the material component of the object
-                   */
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    ImGui::SeparatorText("Material");
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    ImGui::TextUnformatted("Assign a material to the object: ");
-
                     entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
 
+                    // Check if the selected entity has a MaterialComponent.
                     if (registry.all_of<MaterialComponent>(id)) {
+                        auto& material = registry.get<MaterialComponent>(id);
 
-                        auto& object = registry.get<MaterialComponent>(id);
+                        ImGui::Dummy(ImVec2(0.0f, 10.f));
+                        ImGui::SeparatorText("Material Properties");
+                        ImGui::Dummy(ImVec2(0.0f, 10.f));
 
-                        ImGui::SameLine();
-                        static const char* material_type[] = { "Checkerboard", "PBR", "Discard", "Cartoon" };
-                        static int index = 0; // index into items
-
-                        if (object == MATERIAL_CHECKERBOARD) {
-                            index = 0;
-                        }
-                        else if (object == MATERIAL_PBR_PHONG) {
-                            index = 1;
-                        }
-                        else if (object == MATERIAL_DISCARD) {
-                            index = 2;
-                        }
-                        else if (object == MATERIAL_CARTOON) {
-                            index = 3;
-                        }
-
-                        ImGui::SetNextItemWidth(300.f);
-                        if (ImGui::Combo("##material_type", &index, material_type, IM_ARRAYSIZE(material_type))) {
-
-                            if (index == 0) {
-                                object = MATERIAL_CHECKERBOARD;
+                        // --- Albedo Section ---
+                        ImGui::Text("Albedo Map:");
+                        std::string albedoName = AssetManagerSystem::GetInstance().GetName(material.albedoMap);
+                        ImGui::Button(albedoName.empty() ? "None (Drop Texture)" : albedoName.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 25.0f));
+                        // Create a drag-drop target for the Albedo map
+                        if (ImGui::BeginDragDropTarget()) {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Textures")) {
+                                std::filesystem::path p = (const char*)payload->Data;
+                                material.albedoMap = AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, p.stem().string());
                             }
-                            else if (index == 1) {
-                                object = MATERIAL_PBR_PHONG;
-                            }
-                            else if (index == 2) {
-                                object = MATERIAL_DISCARD;
-                            }
-                            else if (index == 3) {
-                                object = MATERIAL_CARTOON;
-                            }
-
+                            ImGui::EndDragDropTarget();
                         }
+                        ImGui::ColorEdit3("Albedo Factor", &material.albedoFactor[0]);
+                        ImGui::Separator();
 
-                    }
-
-                    /*
-                       get the texture component of the object
-                   */
-
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    ImGui::SeparatorText("Custom Texture");
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-
-                    ImGui::TextUnformatted("Texture Loaded: ");
-
-                    
-                    if (registry.all_of<TextureComponent>(id)) {
-
-                        auto& object = registry.get<TextureComponent>(id);
-                        std::string name = AssetManagerSystem::GetInstance().GetName(object.texture_guid);             
-                        ImGui::SameLine();
-                        
-                        ImGui::TextUnformatted(name.c_str());
-
-                        if (ImGui::Button("Remove Custom Texture", ImVec2(300, 0))) {
-                            registry.remove<TextureComponent>(id);
-                            if (registry.all_of<MaterialComponent>(id)) {
-
-                                auto& object_M = registry.get<MaterialComponent>(id);
-                                object_M = MATERIAL_PBR_PHONG;
+                        // --- Normal Section ---
+                        ImGui::Text("Normal Map:");
+                        std::string normalName = AssetManagerSystem::GetInstance().GetName(material.normalMap);
+                        ImGui::Button(normalName.empty() ? "None (Drop Texture)" : normalName.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 25.0f));
+                        if (ImGui::BeginDragDropTarget()) {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Textures")) {
+                                std::filesystem::path p = (const char*)payload->Data;
+                                material.normalMap = AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, p.stem().string());
                             }
+                            ImGui::EndDragDropTarget();
                         }
+                        ImGui::Separator();
+
+                        // --- Roughness Section ---
+                        ImGui::Text("Roughness Map:");
+                        std::string roughName = AssetManagerSystem::GetInstance().GetName(material.roughnessMap);
+                        ImGui::Button(roughName.empty() ? "None (Drop Texture)" : roughName.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 25.0f));
+                        if (ImGui::BeginDragDropTarget()) {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Textures")) {
+                                std::filesystem::path p = (const char*)payload->Data;
+                                material.roughnessMap = AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, p.stem().string());
+                            }
+                            ImGui::EndDragDropTarget();
+                        }
+                        ImGui::SliderFloat("Roughness Factor", &material.roughnessFactor, 0.0f, 1.0f);
+                        ImGui::Separator();
+
+                        // --- Metallic Section ---
+                        ImGui::Text("Metallic Map:");
+                        std::string metalName = AssetManagerSystem::GetInstance().GetName(material.metallicMap);
+                        ImGui::Button(metalName.empty() ? "None (Drop Texture)" : metalName.c_str(), ImVec2(ImGui::GetContentRegionAvail().x, 25.0f));
+                        if (ImGui::BeginDragDropTarget()) {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Textures")) {
+                                std::filesystem::path p = (const char*)payload->Data;
+                                material.metallicMap = AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, p.stem().string());
+                            }
+                            ImGui::EndDragDropTarget();
+                        }
+                        ImGui::SliderFloat("Metallic Factor", &material.metallicFactor, 0.0f, 1.0f);
+                        ImGui::Separator();
 
                     }
                     else {
-                        ImGui::SameLine();
-                        ImGui::TextUnformatted(" Not chosen");
+                        ImGui::Text("\nSelected object does not have a MaterialComponent.\n");
                     }
-
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    
-                    ImVec2 size(ImGui::GetContentRegionAvail().x, 160.0f);
-                    ImGui::Button("Drop new Texture from Asset Browser to attach to object", size);
-
-
-                    if (ImGui::BeginDragDropTarget())
-                    {
-                        // Accept path payload (null-terminated string)
-                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Textures"))
-                        {
-                            droppedPath = (const char*)payload->Data;
-
-                            //only returning the filename, remove all dir and extension (for asset manager)
-                            std::filesystem::path p = std::filesystem::path(droppedPath).lexically_normal();
-                            droppedPath = p.stem().string();
-                            
-                            //std::cout << droppedPath << std::endl;
-
-                            if (registry.all_of<TextureComponent>(id)) {
-
-                                /* if the texture already exists, just swap texture*/
-                                auto& object = registry.get<TextureComponent>(id);
-                                object.texture_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, droppedPath);
-
-                            }
-                            else {                             
-                                /* if the texture do not exists, just init as texture component*/
-                                registry.emplace<TextureComponent>(id, AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, droppedPath));
-                                
-                            }
-
-                        }
-                        ImGui::EndDragDropTarget();
-                    }
-
                 }
-
-
                 ImGui::EndTabItem();
             }
 

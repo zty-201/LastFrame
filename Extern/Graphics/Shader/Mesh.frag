@@ -274,31 +274,69 @@ vec3 add_inscattered_light(vec3 color, vec3 world_pos)
 
     return color * transmittance + scattered_light.rgb;
 }
-
 // ------------------------------------------------------------------
 // MAIN -------------------------------------------------------------
 // ------------------------------------------------------------------
 
 void main()
 {
-    // Combine texture and factor for each property
+    // Sample material properties
     vec3  albedo    = texture(s_Albedo, FS_IN_TexCoord).rgb * u_AlbedoFactor;
     float roughness = texture(s_Roughness, FS_IN_TexCoord).r * u_RoughnessFactor;
     float metallic  = texture(s_Metallic, FS_IN_TexCoord).r * u_MetallicFactor;
     
-    vec3  N  = get_normal_from_map(FS_IN_Tangent, FS_IN_Bitangent, FS_IN_Normal, FS_IN_TexCoord, s_Normal);
+    // Clamp to safe ranges
+    roughness = clamp(roughness, 0.04, 1.0);
+    metallic  = clamp(metallic, 0.0, 1.0);
+    
+    vec3 N  = get_normal_from_map(FS_IN_Tangent, FS_IN_Bitangent, FS_IN_Normal, FS_IN_TexCoord, s_Normal);
     vec3 Wo = normalize(camera_position.xyz - FS_IN_WorldPos);
-    vec3 F0 = mix(vec3(0.04f), albedo, metallic);
-
-    vec3 color = direct_lighting(Wo, N, FS_IN_WorldPos, F0, albedo, roughness);
-
+    vec3 F0 = mix(vec3(0.04), albedo, metallic);
+    vec3 diffuse_color = albedo * (1.0 - metallic);
+    
+    // Direct lighting
+    vec3 color = direct_lighting(Wo, N, FS_IN_WorldPos, F0, diffuse_color, roughness);
+    
     // Ambient
-    color += albedo * light_color.w;
-
-    // Volumetric Light & Tonemapping (unchanged)
+    color += diffuse_color * light_color.w;
+    
+    // Volumetric fog
     color = add_inscattered_light(color, FS_IN_WorldPos);
-    color = color / (color + vec3(1.0));
+    
+    // Exposure control (adjust this value to fix brightness!)
+    float exposure = 0.25;  // <-- Start here, adjust until it looks right
+    color = color * exposure;
+    
+    // Clamp
+    color = max(color, vec3(0.0));
+    
+    // ACES tone mapping (better than Reinhard)
+    float a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14;
+    color = clamp((color * (a * color + b)) / (color * (c * color + d) + e), 0.0, 1.0);
+    
+    // Gamma correction
     color = pow(color, vec3(1.0 / 2.2));
-
+    
     FS_OUT_Color = vec4(color, 1.0);
+
+
+    // Raw albedo
+    //vec3 albedo = texture(s_Albedo, FS_IN_TexCoord).rgb * u_AlbedoFactor;
+    //FS_OUT_Color = vec4(pow(albedo, vec3(1.0/2.2)), 1.0);
+
+    // Visualize mesh normals (should be smooth)
+    //vec3 n = normalize(FS_IN_Normal) * 0.5 + 0.5;
+    //FS_OUT_Color = vec4(n, 1.0);
+
+    // Visualize tangents (should be smooth)
+    //vec3 t = normalize(FS_IN_Tangent) * 0.5 + 0.5;
+    //FS_OUT_Color = vec4(t, 1.0);
+
+    // Visualize UVs (should show color gradient)
+    //FS_OUT_Color = vec4(FS_IN_TexCoord, 0.0, 1.0);
+
+    // Visualize normal map texture (should show blue-ish colors)
+    //vec3 nm = texture(s_Normal, FS_IN_TexCoord).rgb;
+    //FS_OUT_Color = vec4(nm, 1.0);
+
 }

@@ -15,6 +15,7 @@
 #define TEXTURE_COMPONENT
 struct TextureComponent
     {
+		std::string name;
 	    xresource::full_guid texture_guid; // Full GUID for the texture resource
     };
 #endif // !TEXTURE_COMPONENT
