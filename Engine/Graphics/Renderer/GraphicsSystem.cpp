@@ -221,7 +221,7 @@ namespace EngineFramework
 		// 1. Create shadow map
 		ShadowPass();
 		// 2. Update all uniforms now that shadow pass is done
-		UpdateUBOs(active_camera, V, P);
+		UpdateUBOs(*active_camera, V, P);
 		// 3. Inject shadowed light into the volume
 		VolumetricLightInjectionPass();
 		// 4. Integrate the light through the volume
@@ -595,6 +595,27 @@ namespace EngineFramework
 			// Insert a null pointer to prevent trying to load it again.
 			meshCache[meshName] = nullptr;
 		}
+	}
+
+	void GraphicsSystem::CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix)
+	{
+
+		// Create translation matrix
+		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), transform.position);
+
+		// Create rotation matrices (assuming rotation is in degrees)
+		// Order: Y (yaw) -> X (pitch) -> Z (roll) for typical right-handed coordinate system
+		glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4 rotationMatrix = rotationY * rotationX * rotationZ;
+
+		// Create scale matrix
+		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), transform.scale);
+
+		// Combine: Translation * Rotation * Scale
+		modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+
 	}
 
 	void GraphicsSystem::LoadBlueNoiseTextures()

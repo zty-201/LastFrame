@@ -143,8 +143,8 @@ namespace EngineFramework
             LOGD("Screen Opened");*/
 
         auto camera_view = registry.view<CameraComponent>();
-        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-        Camera::setType(camera, CameraComponent::WALKING);
+        //auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+        //Camera::setType(camera, CameraComponent::ORBITING);
 
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
         ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500

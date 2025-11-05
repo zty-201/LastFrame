@@ -106,6 +106,7 @@ namespace EngineFramework
             registry.get<CameraComponent>(view.front()).is_active = true;
             return view.front();
         }
+
         void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
 
     private:
