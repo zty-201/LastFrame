@@ -20,6 +20,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "FileDialog.hpp"
 //#include <stb_image.h>
 //#include <glad/glad.h>
+#include "HistorySystem.hpp"
 
 namespace EngineFramework
 {
@@ -60,7 +61,9 @@ namespace EngineFramework
 
 	void AssetWindow::Run()
 	{
-        
+        //HistorySystem::GetInstance().start_track(LevelEditor::GetInstance().variables.selected_objectID, "MaterialComponent", Record_Type::COMP_ADDED);
+        //HistorySystem::GetInstance().start_track(LevelEditor::GetInstance().variables.selected_objectID, "MaterialComponent", "rough");
+        //HistorySystem::GetInstance().start_track(LevelEditor::GetInstance().variables.selected_objectID, Record_Type::ENTITY_ADDED);
 
         if (!is_enabled) return;
 

@@ -57,6 +57,8 @@ namespace EngineFramework
 		GLuint GetSceneTextureID() const { return sceneTextureID; }
         std::pair<int, int> GetWindowSize() const { return std::pair<int, int>(static_cast<int>(screen.x), static_cast<int>(screen.y)); }
 
+        void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
+
     private:
 
 #ifdef PLATFORM_WINDOWS
@@ -97,7 +99,7 @@ namespace EngineFramework
 		void LightingPass(glm::mat4& V);
 		void ForwardRenderPass(glm::mat4& V, glm::mat4& P, GLuint targetFBO);
         void InitializeFullscreenQuad();
-		void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
+		
 
         //==Event Handlers, one for each type of event.
 

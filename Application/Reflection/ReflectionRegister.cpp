@@ -355,6 +355,7 @@ namespace EngineFramework
 		// === Register MaterialComponent ===
 		entt::meta_factory<MaterialComponent>()
 			.type("MaterialComponent")
+			//.type(entt::type_id<MeshComponent>().hash())
 			.data<&MaterialComponent::rough>("rough")
 			.data<&MaterialComponent::metal>("metal")
 			.data<&MaterialComponent::color>("color")
