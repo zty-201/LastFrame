@@ -57,6 +57,29 @@ namespace EngineFramework
 		GLuint GetSceneTextureID() const { return sceneTextureID; }
         std::pair<int, int> GetWindowSize() const { return std::pair<int, int>(static_cast<int>(screen.x), static_cast<int>(screen.y)); }
 
+        //==Camera Manipulation
+
+        //Returns the active camera, or sets a random camera as active if none are. Returns entt::null if no camera found.
+        entt::entity GetFirstActiveCamera()
+        {
+            auto view = registry.view<CameraComponent>();
+            if (view.begin() == view.end()) //No camera component in scene
+            {
+                return entt::null;
+            }
+            for (entt::entity camera : view)
+            {
+                if(registry.get<CameraComponent>(camera).is_active)
+                {
+                    return camera;
+                }
+            }
+            //None of the cameras are active, set the first one as active.
+            registry.get<CameraComponent>(view.front()).is_active = true;
+            return view.front();
+        }
+        void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
+
     private:
 
 #ifdef PLATFORM_WINDOWS
@@ -97,7 +120,6 @@ namespace EngineFramework
 		void LightingPass(glm::mat4& V);
 		void ForwardRenderPass(glm::mat4& V, glm::mat4& P, GLuint targetFBO);
         void InitializeFullscreenQuad();
-		void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
 
         //==Event Handlers, one for each type of event.
 

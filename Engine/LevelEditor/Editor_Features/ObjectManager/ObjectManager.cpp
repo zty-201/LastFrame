@@ -32,6 +32,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "ObjectManager.hpp"
 
+//For creation of instance where camera is looking.
+#include "GraphicsSystem.h"
+#include "CameraComponent.h"
+#include "TransformComponent.h"
 
 namespace EngineFramework
 {
@@ -63,6 +67,8 @@ namespace EngineFramework
         ImGui::SetNextWindowSize(ImVec2(420, 260), ImGuiCond_FirstUseEver);
 
         if (ImGui::Begin("Object Manager", &is_enabled)) {
+            //Buttons at the top
+            top_buttons();
             ImGui::Text("Scene Hierarchy");
 
             static entt::entity selected_entity = entt::null;
@@ -95,5 +101,32 @@ namespace EngineFramework
         LOGI("object manager closed");
     }
 
+    void ObjectManager::top_buttons()
+    {
+        if (ImGui::Button("Create Empty Object"))
+        {
+            entt::entity instance = registry.create();
+            UNREFERENCED_PARAMETER(instance);
+        }
+        if (ImGui::Button("Create Empty Object At Camera"))
+        {
+            entt::entity instance = registry.create();
+            TransformComponent instance_transform{};
+
+            //Find the position in front of where the camera is looking.
+            entt::entity camera = GraphicsSystem::GetInstance().GetFirstActiveCamera();
+            if (camera != entt::null)
+            {
+                CameraComponent& cam_comp = registry.get<CameraComponent>(camera);
+                instance_transform.position = Camera::GetFowardLookPosition(cam_comp, 0.5f);
+
+            }//Otherwise if no active camera found then use default position at 0,0,0.
+            else
+            {
+                LOGD("%s", "No Active Camera Found, creating entity at(0, 0, 0)");
+            }
+            registry.emplace<TransformComponent>(instance, instance_transform);
+        }
+    }
 }
 #endif

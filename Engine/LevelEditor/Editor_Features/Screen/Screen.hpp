@@ -55,6 +55,7 @@ namespace EngineFramework
         void camera_controls_in_screen_only();
         void control_window();
         void drop_target();
+
         
         static inline Screen* this_instance{};
     };

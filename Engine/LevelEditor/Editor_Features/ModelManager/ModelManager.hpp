@@ -72,11 +72,12 @@ namespace EngineFramework
         {
             enum Event
             {
-                CREATE,
-                COPY,
-                RENAME,
-                DELETE,
-                CHANGE_MODEL_TYPE,
+                CREATE, //new_name
+                COPY,   //new_name, ptr
+                RENAME, //old_name, new_name
+                DELETE, //old_name
+                CHANGE_MODEL_TYPE, //new_name, ptr
+                CREATE_INSTANCE,   //old_name
                 NONE
             };
             ArchtypeEvent() { event = Event::NONE; }

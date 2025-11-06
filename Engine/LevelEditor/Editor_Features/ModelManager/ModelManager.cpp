@@ -115,7 +115,7 @@ namespace EngineFramework
 		const float avail = ImGui::GetContentRegionAvail().x;
 		CALL_AT_END(imgui_child_left_pane, ImGui::EndChild(););
 		//Based on current window size, make the left pane 1/3 width by default.
-		ImGui::BeginChild("Child_LeftPane", ImVec2(avail / 3.f, 0), true, ImGuiChildFlags_ResizeX);
+		ImGui::BeginChild("Child_LeftPane", ImVec2(avail / 3.f, 0), true, ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY);
 		//Display selectable list, based on model types.
 		for (auto it = selected_types.begin(); it != selected_types.end();)
 		{
@@ -162,6 +162,11 @@ namespace EngineFramework
 			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::DELETE, archtype_name);
 		}
 
+		//==Creation of instance gameobject
+		if (ImGui::MenuItem("Create Instance As Is"))
+		{
+			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::CREATE_INSTANCE, archtype_name);
+		}
 	}
 
 	namespace
@@ -212,10 +217,9 @@ namespace EngineFramework
 	{
 
 		//==ImGui formatting
-		const float avail = ImGui::GetContentRegionAvail().x;
 		//Based on current window size, make the right pane 2/3 width by default.
 		CALL_AT_END(imgui_child_right_pane, ImGui::EndChild(););
-		ImGui::BeginChild("Child_RightPane", ImVec2(2 * avail / 3.f, 0), true, ImGuiChildFlags_ResizeX);
+		ImGui::BeginChild("Child_RightPane", ImVec2(0, 0), true, ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY);
 		//==Create child button, on top of the table.
 		//==Table Menu, appears when right clicking on the table (instead of archtype element).
 		//Open a popup menu if right clicking the table.
@@ -289,8 +293,9 @@ namespace EngineFramework
 				//==Set drag and drop payload for the archtype, to allow scene to receive selected archtype name for instantiation.
 				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 				{
-					selected_drag_drop_archtype = archtype_name;
-					ImGui::SetDragDropPayload("SELECTED_MODEL_NAME", &selected_drag_drop_archtype, selected_drag_drop_archtype.size());
+					selected_drag_drop_archtype = archtype_name; 
+					//Passing in ptr, so use the size of ptr (may or may not always be 8 bytes)
+					ImGui::SetDragDropPayload("SELECTED_MODEL_NAME", selected_drag_drop_archtype.c_str(), selected_drag_drop_archtype.size() + 1);
 
 					ImGui::TextUnformatted(selected_drag_drop_archtype.c_str());
 					ImGui::Image((ImTextureID)archtype_texture, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
@@ -559,6 +564,19 @@ namespace EngineFramework
 			case ArchtypeEvent::ArchtypeEvent::CHANGE_MODEL_TYPE:
 				ImGui::OpenPopup("Change Model Type");
 				break;
+			case ArchtypeEvent::ArchtypeEvent::CREATE_INSTANCE: // No need for popup modal as no input or confirmation needed.
+				// Create the instance by copying the archtype as is, without adding transform component or other.
+				// To render the entity, need to attach TransformComponent, MeshComponent, MaterialComponent and SceneRenderPass before it shows up
+				if (!delayed_archtype_event.current_name.empty())
+				{
+					entt::entity created_entity = GameObjectSystem::GetInstance().CreateInstance(delayed_archtype_event.current_name);
+					if (created_entity != entt::null)
+					{
+						LevelEditor::GetInstance().variables.selected_objectID = created_entity;
+					}
+				}
+				delayed_archtype_event = {};
+				break;
 			}
 		}
 
@@ -727,7 +745,6 @@ namespace EngineFramework
 			}
 			return;
 		}
-
 	}
 
 

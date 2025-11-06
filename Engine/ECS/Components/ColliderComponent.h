@@ -1,8 +1,9 @@
 #pragma once
-#include <glm/glm.hpp>
 
 #ifndef COLLIDER_COMPONENT
 #define COLLIDER_COMPONENT
+
+#include <glm/glm.hpp>
 
 enum class ColliderShapeType
 {

@@ -14,6 +14,7 @@
 #include "TextureComponent.h"
 #include "NormalMapComponent.h"
 #include "AudioComponent.h"
+#include "ColliderComponent.h"
 #include "Scripting/Script.hpp"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 #include "MetaInspector.hpp"
@@ -55,6 +56,16 @@ struct adl_serializer<std::vector<glm::vec3>> {
 };
 
 template<>
+struct adl_serializer<ColliderType> {
+	static void to_json(nlohmann::json& j, const ColliderType& t) {
+		j = static_cast<int>(t);       // store as int (0=Box, 1=Sphere)
+	}
+	static void from_json(const nlohmann::json& j, ColliderType& t) {
+		t = static_cast<ColliderType>(j.get<int>());
+	}
+};
+
+template<>
 struct adl_serializer<glm::mat4> {
 	static void to_json(json& j, const glm::mat4& m) {
 
@@ -92,6 +103,44 @@ struct adl_serializer<xresource::full_guid> {
 		guid.m_Type = j[1].get<uint64_t>();
 	}
 };
+
+template<>
+struct adl_serializer<xresource::instance_guid> {
+	static void to_json(json& j, const xresource::instance_guid& guid) {
+		j = guid.m_Value;
+	}
+
+	static void from_json(const json& j, xresource::instance_guid& guid) {
+		guid.m_Value = j.get<uint64_t>();
+	}
+};
+
+#if defined(ENGINE_ENABLE_LUA)
+template<>
+struct adl_serializer<Engine::LuaScriptComponent::LuaInstance> {
+	static void to_json(json& j, const Engine::LuaScriptComponent::LuaInstance& inst) {
+		j = json::object();
+		j["ScriptGuid"] = inst.ScriptGuid;
+		j["Loaded"] = inst.Loaded;
+	}
+
+	static void from_json(const json& j, Engine::LuaScriptComponent::LuaInstance& inst) {
+		if (j.contains("ScriptGuid") && !j["ScriptGuid"].is_null()) {
+			inst.ScriptGuid = j["ScriptGuid"].get<xresource::instance_guid>();
+		}
+		else {
+			inst.ScriptGuid.clear();
+		}
+
+		inst.Loaded = j.value("Loaded", false);
+		inst.Env = sol::nil;
+		inst.Self = sol::nil;
+		inst.FnOnCreate = sol::nil;
+		inst.FnOnUpdate = sol::nil;
+		inst.FnOnDestroy = sol::nil;
+	}
+};
+#endif
 
 template<>
 struct adl_serializer<CameraComponent::CameraType> {
@@ -171,7 +220,14 @@ namespace EngineFramework
 		SetMeta(std::vector<std::string>),
 		SetMeta(std::vector<glm::vec3>),
 		SetMeta(CameraComponent::CameraType),
-		SetMeta(std::filesystem::path)
+		SetMeta(std::filesystem::path),
+		SetMeta(ColliderType),
+		SetMeta(xresource::instance_guid)
+#if defined(ENGINE_ENABLE_LUA)
+		,
+		SetMeta(Engine::LuaScriptComponent::LuaInstance),
+		SetMeta(std::vector<Engine::LuaScriptComponent::LuaInstance>)
+#endif
 	};
 #define SetJson(T) {entt::resolve<T>().id(), SetJsonWithMetaAny<T>}
 	static std::unordered_map<entt::id_type, std::function<void(nlohmann::json&, const std::string&, const entt::meta_any&)>> set_json_with_meta_map
@@ -205,7 +261,14 @@ namespace EngineFramework
 		SetJson(std::vector<std::string>),
 		SetJson(std::vector<glm::vec3>),
 		SetJson(CameraComponent::CameraType),
-		SetJson(std::filesystem::path)
+		SetJson(std::filesystem::path),
+		SetJson(ColliderType),
+		SetJson(xresource::instance_guid)
+#if defined(ENGINE_ENABLE_LUA)
+		,
+		SetJson(Engine::LuaScriptComponent::LuaInstance),
+		SetJson(std::vector<Engine::LuaScriptComponent::LuaInstance>)
+#endif
 	};
 
 
@@ -323,9 +386,16 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(glm::vec3);
 		REGISTER_ARBITRARY_TYPE(glm::mat4);
 		REGISTER_ARBITRARY_TYPE(xresource::full_guid);
+		REGISTER_ARBITRARY_TYPE(xresource::instance_guid);
 		REGISTER_ARBITRARY_TYPE(std::vector<glm::vec3>);
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
 		REGISTER_ARBITRARY_TYPE(std::filesystem::path);
+		REGISTER_ARBITRARY_TYPE(ColliderType);
+#if defined(ENGINE_ENABLE_LUA)
+		REGISTER_ARBITRARY_TYPE(Engine::LuaScriptComponent::LuaInstance);
+		REGISTER_ARBITRARY_TYPE(std::vector<Engine::LuaScriptComponent::LuaInstance>);
+#endif
+
 		// Helper function to return a meta_any wrapping a reference
 
 		// TODO - Register additional components (script, audio etc) and remember to tag them when registering (refer to TextureComponent)
@@ -401,6 +471,7 @@ namespace EngineFramework
 			.data<&CameraComponent::proj_matrix>("proj_matrix")
 			.data<&CameraComponent::oldx>("oldx")
 			.data<&CameraComponent::oldy>("oldy")
+			.data<&CameraComponent::is_active>("is_active")
 			.func<&Emplacer<CameraComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<CameraComponent>::RemoveComponent>("remove")
 			.func<&Getter<CameraComponent>::GetComponent>("get")
@@ -426,12 +497,27 @@ namespace EngineFramework
 			.func<&Getter<AudioComponent>::GetComponent>("get")
 			.func<&GetRef<AudioComponent>>("get_ref");
 
+		// === Register ColliderComponent ===
+		entt::meta_factory<ColliderComponent>()
+			.type("ColliderComponent")
+			.data<&ColliderComponent::type>("type")
+			.data<&ColliderComponent::offset>("offset")
+			.data<&ColliderComponent::half_extents>("half_extents")
+			.data<&ColliderComponent::radius>("radius")
+			.data<&ColliderComponent::dirty>("dirty")
+			// don’t expose _has_body – runtime only
+			.func<&Emplacer<ColliderComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<ColliderComponent>::RemoveComponent>("remove")
+			.func<&Getter<ColliderComponent>::GetComponent>("get")
+			.func<&GetRef<ColliderComponent>>("get_ref");
+
 		// === Register LuaScriptComponent and nested LuaInstance ===
 
 		// First, register the inner LuaInstance struct
 		entt::meta_factory<Engine::LuaScriptComponent::LuaInstance>()
 			.type("LuaInstance")
 			.data<&Engine::LuaScriptComponent::LuaInstance::ScriptGuid>("ScriptGuid")
+			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Script })
 			.data<&Engine::LuaScriptComponent::LuaInstance::Loaded>("Loaded");
 
 		// Then register the main LuaScriptComponent
@@ -439,9 +525,6 @@ namespace EngineFramework
 			.type("LuaScriptComponent")
 			.data<&Engine::LuaScriptComponent::Enabled>("Enabled")
 			.data<&Engine::LuaScriptComponent::Scripts>("Scripts")
-			.custom<EditorFeatures::AssetPickerTag>(
-				EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Script }
-			)
 			.func<&Emplacer<Engine::LuaScriptComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<Engine::LuaScriptComponent>::RemoveComponent>("remove")
 			.func<&Getter<Engine::LuaScriptComponent>::GetComponent>("get")
@@ -518,7 +601,7 @@ namespace EngineFramework
 
 
 
-	//Helper function to cast meta_any member_data to the correct json data type, and set comp_json.
+	// Helper function to cast meta_any member_data to the correct json data type, and set comp_json.
 	void SetJsonWithMetaAny(nlohmann::json& comp_json, const entt::meta_data& data_type, const entt::meta_any& data)
 	{
 		if (!data_type) return; //Not a valid data member, it could be a function etc.
@@ -528,16 +611,16 @@ namespace EngineFramework
 		{
 			throw std::runtime_error("Meta Data does not have a name, was likely registered with a _hs hashed string instead of a string.");
 		}
-		//Compare types
+		// Compare types
 		entt::id_type type = data_type.type().id();
 
-		//Call the respective template function if successful matching.
+		// Call the respective template function if successful matching.
 		if (set_json_with_meta_map.find(type) != set_json_with_meta_map.end())
 		{
 			set_json_with_meta_map[type](comp_json, name, data);
 			return;
 		}
-		//Else throw an assertion.
+		// Else throw an assertion.
 		assert(false && "Type is not supported by SetJsonWithMetaAny function. Please add to map.");
 
 	}

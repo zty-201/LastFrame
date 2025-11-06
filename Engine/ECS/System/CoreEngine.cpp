@@ -6,6 +6,7 @@
 #include "pch.hpp"
 #include <algorithm>
 #include "CoreEngine.hpp"
+#include "Physics/System/System_Physics.hpp"
 #include "Diagnostics/ProfilerEngine.hpp" // To auto-profile every system from one place
 
 namespace EngineFramework
