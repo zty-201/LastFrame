@@ -59,9 +59,11 @@ namespace EngineFramework
         void control_window();
         void drop_target();
 
+
         void play_simulation();
         void stop_simulation();
         std::string simulation_buffer;
+
         static inline Screen* this_instance{};
     };
 

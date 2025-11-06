@@ -47,6 +47,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "CameraComponent.h"
 #include "Camera.h"
 
+//Creation of instances
+#include "System_GameObjectSystem.hpp"
+#include "SceneManager.hpp"
 
 namespace EngineFramework
 {
@@ -82,6 +85,7 @@ namespace EngineFramework
     }
     Screen::~Screen() {
 
+        current_record.reset();
     }
 
     Screen& Screen::GetInstance()
@@ -162,10 +166,7 @@ namespace EngineFramework
             if (ImGui::BeginMenuBar()) {
 
                 if (ImGui::MenuItem("Run Simulator")) {
-                    //std::cout << "Run Simulator\n";
-                    /*auto entity_view = registry.view<SceneRenderPass>();
-                    int size = (int)entity_view.size();*/
-
+                    
                     if (!is_simulator_running) play_simulation();
                     else stop_simulation();
 
@@ -192,14 +193,16 @@ namespace EngineFramework
 
             ImGui::PopStyleColor();
 
-            display_screen();
-            gizmos();
-            drop_target();
+            if (SceneManager::GetInstance().is_file_loaded) {
 
-            if (bool hovered = ImGui::IsItemHovered()) {
-                camera_controls_in_screen_only();
+                display_screen();
+                gizmos();
+                drop_target();
+                if (bool hovered = ImGui::IsItemHovered()) {
+                    camera_controls_in_screen_only();
+                }
+                camera_controls_outside_screen();
             }
-            camera_controls_outside_screen();
 
         }
 
@@ -346,68 +349,61 @@ namespace EngineFramework
                 if (ImGui::RadioButton("World", mode == ImGuizmo::WORLD))  mode = ImGuizmo::WORLD;
                 ImGui::Dummy(ImVec2(0.0f, 200.f));
 
+                //only if selected object have transform component
+                entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+                if (registry.all_of<TransformComponent>(id)) {
 
+                    auto& object = registry.get<TransformComponent>(id);
 
-                //if any object is being selected
-                //if (true) { // if any object is being selected
-                //    static bool transformation_changed = false;
+                    float T[3] = { object.position.x, object.position.y, object.position.z };
+                    float R[3] = { object.rotation.x, object.rotation.y, object.rotation.z };
+                    float S[3] = { object.scale.x, object.scale.y, object.scale.z };
 
-                //    ImGui::SeparatorText("Object's Transformation");
-                //    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                //    ImGui::TextUnformatted("Object Selected (ID): ");
-                //    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    static std::unique_ptr<Record> record_pos = nullptr;
+                    static std::unique_ptr<Record> record_scale = nullptr;
+                    static std::unique_ptr<Record> record_rot = nullptr;
 
-                //    auto* scene = GraphicsSystem::GetInstance().GetScene().get();
-                //    if (!scene) return;
-                //    auto objects = registry.view<TransformComponent>();
-                //    auto& first_obj = objects.get<TransformComponent>(objects.front());
+                    if (ImGui::InputFloat3("Translation", T, "%.3f")) {
+                        if (!record_pos) {
+                            record_pos = history->start_track(id, "TransformComponent", "position");
+                        }
+                    }
+                    if (record_pos && ImGui::IsItemDeactivatedAfterEdit()) {
+                        history->end_track(record_pos, object.position);
+                        record_pos.reset();
+                    }
+                    
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
 
-                //    // Work directly with the component values instead of the matrix
-                //    float T[3] = { first_obj.position.x, first_obj.position.y, first_obj.position.z };
-                //    float R[3] = { first_obj.rotation.x, first_obj.rotation.y, first_obj.rotation.z };
-                //    float S[3] = { first_obj.scale.x, first_obj.scale.y, first_obj.scale.z };
+                    if (ImGui::InputFloat3("Scale", S, "%.3f")) {
+                        if (!record_scale) {
+                            record_scale = history->start_track(id, "TransformComponent", "scale");
+                        }
+                    }
+                    if (record_scale && ImGui::IsItemDeactivatedAfterEdit()) {
+                        history->end_track(record_scale, object.scale);
+                        record_scale.reset();
+                    }
+                    
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
 
-                //    ImGui::Separator();
+                    if (ImGui::InputFloat3("Rotation (deg)", R, "%.3f")) {
+                        if (!record_rot) {
+                            record_rot = history->start_track(id, "TransformComponent", "rotation");
+                        }
+                    }
+                    if (record_rot && ImGui::IsItemDeactivatedAfterEdit()) {
+                        history->end_track(record_rot, object.rotation);
+                        record_rot.reset();
+                    }
 
-                //    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                //    transformation_changed |= ImGui::InputFloat3("Translation", T, "%.3f");
-                //    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    object.position = glm::vec3(T[0], T[1], T[2]);
+                    object.scale = glm::vec3(S[0], S[1], S[2]);
+                    object.rotation = glm::vec3(R[0], R[1], R[2]);
 
-                //    ImGui::Separator();
+                }
 
-                //    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                //    transformation_changed |= ImGui::InputFloat3("Scale", S, "%.3f");
-
-                //    ImGui::Dummy(ImVec2(0.0f, 20.f));
-
-                //    ImGui::Separator();
-
-                //    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                //    transformation_changed |= ImGui::InputFloat3("Rotation (deg)", R, "%.3f");
-                //    ImGui::Dummy(ImVec2(0.0f, 20.f));
-
-                //    ImGui::Separator();
-                //    ImGui::Dummy(ImVec2(0.0f, 20.f));
-
-                //    if (ImGui::Button("Reset", ImVec2(120, 0))) {
-                //        R[0] = R[1] = R[2] = 0.0f;
-                //        S[0] = S[1] = S[2] = 1.0f;
-                //        transformation_changed = true;
-                //    }
-                //    ImGui::SameLine();
-                //    ImGui::Text(" *only affects scale and rotation");
-
-                //    // Apply changes directly to the transform component
-                //    if (transformation_changed) {
-                //        first_obj.position = glm::vec3(T[0], T[1], T[2]);
-                //        first_obj.rotation = glm::vec3(R[0], R[1], R[2]);
-                //        first_obj.scale = glm::vec3(S[0], S[1], S[2]);
-
-                //        // Reset the flag after applying changes
-                //        transformation_changed = false;
-                //    }
-                //}
-
+              
                 ImGui::EndTabItem();
             }
 
@@ -482,19 +478,17 @@ namespace EngineFramework
             gizmos_IS_hovering = ImGuizmo::IsOver();
             gizmos_IS_dragged = ImGuizmo::IsUsing();
             
-
-            //auto& first_obj = objects.get<TransformComponent>(objects.front());
-
-            // Create a copy of the model matrix to work with
-
-            TransformComponent transform{};
+            /*TransformComponent transform{};
             transform.position = object.position;
             transform.rotation = object.rotation;
             transform.scale = object.scale;
             glm::mat4 model{};
 
-            GraphicsSystem::GetInstance().CalculateModelMatrix(transform, model);
-            
+            GraphicsSystem::GetInstance().CalculateModelMatrix(transform, model);*/
+
+            GraphicsSystem::GetInstance().CalculateModelMatrix(object, object.modelMatrix);
+            glm::mat4 model = object.modelMatrix;
+
             ImGuizmo::SetOrthographic(false); //because we have perspective
 
             //set this for gizmos
@@ -587,22 +581,44 @@ namespace EngineFramework
 
         if (ImGui::BeginDragDropTarget())
         {
-            // Accept path payload (null-terminated string)
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Models"))
-            {
-                //const char* path = (const char*)payload->Data;
+            CALL_AT_END(imgui_enddragdrop, ImGui::EndDragDropTarget(););
 
-                //std::cout << "Drop successful: " << path << std::endl;
+            // Create instance with default transform at camera forward position. 
+            // Accept path payload (std::string*)
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SELECTED_MODEL_NAME"))
+            {
+                if (payload->DataSize == 0) return;
+                std::string archtype_name = static_cast<const char*>(payload->Data);
+                if (archtype_name.empty())
+                {
+                    LOGD("%s","Empty Archtype Name provided by Drag-Drop Payload");
+                    return;
+                }
+                TransformComponent instance_transform{};
+
+                //Find the position in front of where the camera is looking.
+                entt::entity camera = GraphicsSystem::GetInstance().GetFirstActiveCamera();
+                if (camera != entt::null) 
+                {
+                    CameraComponent& cam_comp = registry.get<CameraComponent>(camera);
+                    instance_transform.position = Camera::GetFowardLookPosition(cam_comp, 0.5f);
+
+                }//Otherwise if no active camera found then use default position at 0,0,0.
+                else
+                {
+                    LOGD("%s", "No Active Camera Found, creating entity at(0, 0, 0)");
+                }
+
+                // Store the entity returned by createinstance so as to assign the selection to the new entity and that the property manager updates right after an archtype is dropped in to viewport
+                entt::entity created_entity = GameObjectSystem::GetInstance().CreateInstance(archtype_name, instance_transform);
+                if (created_entity != entt::null)
+                {
+                    LevelEditor::GetInstance().variables.selected_objectID = created_entity;
+                }
             }
 
-            ImGui::EndDragDropTarget();
         }
-
-
     }
-
-
-    
 
     void Screen::play_simulation() {
 

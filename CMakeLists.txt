@@ -18,6 +18,15 @@ cmake_minimum_required(VERSION 3.20)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project("LastFrame" VERSION 1.0 LANGUAGES C CXX)
 
+# -------------------------------------------------------------------------------------
+# Global compile setting: align all Debug iterator levels with Jolt (Release-like)
+# This ensures the precompiled header (cmake_pch.obj) and all TUs agree with Jolt.lib.
+# -------------------------------------------------------------------------------------
+if(WIN32)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /D_ITERATOR_DEBUG_LEVEL=0")
+endif()
+
 # Set the directory where custom CMake modules are stored
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -40,28 +49,33 @@ if(WIN32)
   target_compile_definitions(engine_library PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG> ENGINE_ENABLE_LUA )  # <--- ADD THIS LINE 
 
 
+  # Ensure the default ImGui dock layout exists in the build tree
+  set(IMGUI_DEFAULT_LAYOUT_SRC "${CMAKE_SOURCE_DIR}/Extern/LevelEditor/imgui_default.ini")
+  set(IMGUI_DEFAULT_LAYOUT_BIN "${CMAKE_BINARY_DIR}/imgui.ini")
+  configure_file(${IMGUI_DEFAULT_LAYOUT_SRC} ${IMGUI_DEFAULT_LAYOUT_BIN} COPYONLY)
+
   #Compiler Flags, use a high warning level and treat warnings as errors.
 #Note: In Debug mode, ASAN and UBSAN can incur alot of performance slowdown. Only toggle in debug mode.
 #Note: To enable mem leak checks, temporarily disable (remb to enable back) /fsanitize=address for the bottom target (after else())
 
 if(NOT CODE_ANALYSIS_ON_BUILD)
 target_compile_options(engine_library PUBLIC 
-    # MSVC (Windows) specific warnings
-    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-    # GCC/Clang specific warnings
-    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
-    $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
+	# MSVC (Windows) specific warnings
+	$<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+	# GCC/Clang specific warnings
+	$<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+	$<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
 )
 message("ASAN is off")
 else() 
 target_compile_options(engine_library PUBLIC 
-    # MSVC (Windows) specific warnings
-    $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-    # /fsanitize=address is enabled for ASAN. 
-    $<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address>>
-    # GCC/Clang specific warnings
-    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
-    $<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
+	# MSVC (Windows) specific warnings
+	$<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+	# /fsanitize=address is enabled for ASAN. 
+	$<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address>>
+	# GCC/Clang specific warnings
+	$<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+	$<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
 )
 endif()
 
@@ -69,20 +83,20 @@ endif()
 #Enable VS code analysis for faster checks.
 #Enable clang tidy code analysis for more checks.
 set_target_properties(engine_library PROPERTIES
-    VS_GLOBAL_RunCodeAnalysis ${CODE_ANALYSIS_ON_BUILD}
-    # Do not use visual studio core guidelines if clang tidy is enabled.
-    VS_GLOBAL_EnableMicrosoftCodeAnalysis true
-    # Use clangtidy
-    VS_GLOBAL_EnableClangTidyCodeAnalysis false
-    VS_GLOBAL_ClangTidyChecks -checks=-*,clang-analyzer-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type
+	VS_GLOBAL_RunCodeAnalysis ${CODE_ANALYSIS_ON_BUILD}
+	# Do not use visual studio core guidelines if clang tidy is enabled.
+	VS_GLOBAL_EnableMicrosoftCodeAnalysis true
+	# Use clangtidy
+	VS_GLOBAL_EnableClangTidyCodeAnalysis false
+	VS_GLOBAL_ClangTidyChecks -checks=-*,clang-analyzer-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type
 )
 set_target_properties(application_executable PROPERTIES
-    VS_GLOBAL_RunCodeAnalysis ${CODE_ANALYSIS_ON_BUILD}
-    # Do not use visual studio core guidelines if clang tidy is enabled.
-    VS_GLOBAL_EnableMicrosoftCodeAnalysis true
-    # Use clangtidy
-    VS_GLOBAL_EnableClangTidyCodeAnalysis false
-    VS_GLOBAL_ClangTidyChecks -checks=-*,clang-analyzer-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type
+	VS_GLOBAL_RunCodeAnalysis ${CODE_ANALYSIS_ON_BUILD}
+	# Do not use visual studio core guidelines if clang tidy is enabled.
+	VS_GLOBAL_EnableMicrosoftCodeAnalysis true
+	# Use clangtidy
+	VS_GLOBAL_EnableClangTidyCodeAnalysis false
+	VS_GLOBAL_ClangTidyChecks -checks=-*,clang-analyzer-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type
 )
 
 #Output Names
@@ -117,12 +131,12 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT a
 
 #Set windows or Console Subsystem
 set_target_properties(application_executable PROPERTIES
-    WIN32_EXECUTABLE "$<$<CONFIG:Debug>:FALSE> $<$<CONFIG:Release>:TRUE>"
+	WIN32_EXECUTABLE "$<$<CONFIG:Debug>:FALSE> $<$<CONFIG:Release>:TRUE>"
 )
 target_link_options(application_executable PRIVATE
-        "$<$<CONFIG:Debug>:/SUBSYSTEM:CONSOLE>"
-        "$<$<CONFIG:Release>:/SUBSYSTEM:WINDOWS>"
-    )
+		"$<$<CONFIG:Debug>:/SUBSYSTEM:CONSOLE>"
+		"$<$<CONFIG:Release>:/SUBSYSTEM:WINDOWS>"
+	)
 #==============WINDOWS END==================
 
 #==============ANDROID====================
@@ -145,15 +159,15 @@ set(ASSETS_DST "${CMAKE_CURRENT_LIST_DIR}/Android/app/src/main/assets/Extern")
 
 #So remove directory does not throw an error.
 if(NOT EXISTS "${ASSETS_DST}")
-    file(MAKE_DIRECTORY "${ASSETS_DST}")
+	file(MAKE_DIRECTORY "${ASSETS_DST}")
 endif()
 # Custom target to copy assets
 add_custom_target(copy_assets ALL
-    COMMAND ${CMAKE_COMMAND} -E echo "Cleaning old assets..."
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "${ASSETS_DST}"
-    COMMAND ${CMAKE_COMMAND} -E echo "Copying Extern/ to assets..."
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${EXTERN_SRC}" "${ASSETS_DST}"
-    COMMENT "Copying Extern/ folder to src/main/assets"
+	COMMAND ${CMAKE_COMMAND} -E echo "Cleaning old assets..."
+	COMMAND ${CMAKE_COMMAND} -E remove_directory "${ASSETS_DST}"
+	COMMAND ${CMAKE_COMMAND} -E echo "Copying Extern/ to assets..."
+	COMMAND ${CMAKE_COMMAND} -E copy_directory "${EXTERN_SRC}" "${ASSETS_DST}"
+	COMMENT "Copying Extern/ folder to src/main/assets"
 )
 add_dependencies(jnicpp copy_assets)
 endif()
@@ -167,36 +181,54 @@ endif()
 #NOTE: importDependencies is failing and I don't know how to debug it, so Vendoring will be used instead.
 #importDependencies()
 
-# Make CMAKE_MSVC_RUNTIME_LIBRARY effective everywhere (CMake >= 3.15)
-cmake_policy(SET CMP0091 NEW)
+# -----------------------------------------------------------------------------
+# Jolt overrides (must be set **before** add_subdirectory(Lib))
+# Keep Jolt aligned with our toolchain and avoid CRT/iterator mismatches.
+# -----------------------------------------------------------------------------
 
+# Ensure we use dynamic CRT (/MD, /MDd) everywhere
+cmake_policy(SET CMP0091 NEW)
 if(MSVC)
-  # Pick ONE runtime for all targets. Recommended: DLL CRT (/MD, /MDd)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-  # If you truly want static CRT instead, use:
-  # set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
-
-# ---- MSVC: force /MD (Release) and /MDd (Debug) for everything
-cmake_policy(SET CMP0091 NEW)
-if (MSVC)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
-# ---- Jolt: do not override flags; do not use static CRT
-set(OVERRIDE_CXX_FLAGS OFF CACHE BOOL "" FORCE)   # stop Jolt from rewriting CXX flags
-set(JPH_USE_STATIC_VCRT OFF CACHE BOOL "" FORCE)  # OFF => /MD(/MDd), ON => /MT(/MTd)
+# Tell Jolt explicitly to use dynamic CRT too (matching the line we fixed above)
+set(USE_STATIC_MSVC_RUNTIME_LIBRARY OFF CACHE BOOL "" FORCE)
+
+# Make sure Debug builds don’t enable the MSVC “checked iterators” level that conflicts with Jolt
+if(WIN32)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
+endif()
+
+# Optional Jolt feature toggles (safe defaults for your engine)
+# Turn off exceptions/RTTI for smaller, faster Jolt (unless your code needs them)
+set(CPP_EXCEPTIONS_ENABLED OFF CACHE BOOL "" FORCE)
+set(CPP_RTTI_ENABLED OFF CACHE BOOL "" FORCE)
+
+# Keep platform CPU feature requirements conservative
+# (You can bump these if you’re targeting only your dev machine.)
+set(USE_SSE4_1 ON  CACHE BOOL "" FORCE)
+set(USE_SSE4_2 ON  CACHE BOOL "" FORCE)
+set(USE_AVX     OFF CACHE BOOL "" FORCE)
+set(USE_AVX2    OFF CACHE BOOL "" FORCE)
+set(USE_AVX512  OFF CACHE BOOL "" FORCE)
+set(USE_LZCNT   ON  CACHE BOOL "" FORCE)
+set(USE_TZCNT   ON  CACHE BOOL "" FORCE)
+set(USE_F16C    ON  CACHE BOOL "" FORCE)
+set(USE_FMADD   ON  CACHE BOOL "" FORCE)
+
+# Leave IPO/LTO off unless you plan to enable it for **your** targets too
+# (mismatched LTO between app/lib can cause linker issues or lost benefits).
+set(INTERPROCEDURAL_OPTIMIZATION OFF CACHE BOOL "" FORCE)
 
 #Build external dependencies ( Jolt lives here )
 add_subdirectory(Lib)
 
-# ---- (optional) sanity print + last-resort enforcement
+# Safety: enforce CRT on Jolt target
 if (TARGET Jolt)
-  get_target_property(_rt Jolt MSVC_RUNTIME_LIBRARY)
-  message(STATUS "✅ Jolt present. Runtime = ${_rt}")
-  # Usually unnecessary, but safe if cache was sticky:
   set_property(TARGET Jolt PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
+
 
 # Set variables for cmake to easily use.
 set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol CACHE INTERNAL "")
@@ -212,17 +244,17 @@ set(ANDROID_LIBRARIES android log GLESv3 EGL CACHE INTERNAL "")
 foreach(extern_dependency IN LISTS SHARED_LIBRARIES WINDOWS_SHARED_LIBRARIES WINDOWS_DEBUG_LIBRARIES WINDOWS_RELEASE_LIBRARIES ANDROID_LIBRARIES)
   #Check if target is valid, or if it is empty/not defined.
   if(TARGET ${extern_dependency})
-    #Can only set compile options on what is compiled. Avoid interface or imported libs.
-    get_target_property(target_type ${extern_dependency} TYPE)
-    get_target_property(is_imported ${extern_dependency} IMPORTED)
-    if(NOT (is_imported) AND NOT (target_type STREQUAL "INTERFACE_LIBRARY"))
-      target_compile_options(${extern_dependency} PRIVATE
-        $<$<CXX_COMPILER_ID:MSVC>:/analyze->
-        $<$<CXX_COMPILER_ID:GNU>:-fno-analyzer>
-        $<$<CXX_COMPILER_ID:Clang>:-Wno-analyzer>
-      )
-      message("${extern_dependency} analysis off")
-    endif()
+	#Can only set compile options on what is compiled. Avoid interface or imported libs.
+	get_target_property(target_type ${extern_dependency} TYPE)
+	get_target_property(is_imported ${extern_dependency} IMPORTED)
+	if(NOT (is_imported) AND NOT (target_type STREQUAL "INTERFACE_LIBRARY"))
+	  target_compile_options(${extern_dependency} PRIVATE
+		$<$<CXX_COMPILER_ID:MSVC>:/analyze->
+		$<$<CXX_COMPILER_ID:GNU>:-fno-analyzer>
+		$<$<CXX_COMPILER_ID:Clang>:-Wno-analyzer>
+	  )
+	  message("${extern_dependency} analysis off")
+	endif()
 
   endif()
 endforeach()
@@ -242,6 +274,7 @@ if(WIN32)
 target_link_libraries(engine_library PUBLIC ${EXTERNAL_LIBRARY_DEPENDENCIES})
 target_link_libraries(application_executable PUBLIC engine_library)
 target_compile_definitions(engine_library PUBLIC USE_JOLT)
+
 #Android==============
 elseif(ANDROID)
 	list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES ${ANDROID_LIBRARIES})
@@ -262,15 +295,15 @@ file(GLOB_RECURSE APPLICATION_SOURCE "Application/*.cpp" "Application/*.c" "Appl
 
 #Set folder properties on each file so visual studio knows how to set up filters.
 foreach(file IN LISTS ENGINE_SOURCE APPLICATION_SOURCE)
-    #get the folder path of the file.
-    file(RELATIVE_PATH relative_path "${CMAKE_SOURCE_DIR}" "${file}")
-    get_filename_component(folder_path "${relative_path}" PATH)
-    #Account for different filepath slash on windows.
-    if(WIN32)
-      string(REPLACE "/" "\\" file_path_msvc "${folder_path}")
-      set(folder_path "${file_path_msvc}")
-    endif()
-    source_group("${folder_path}" FILES "${file}")
+	#get the folder path of the file.
+	file(RELATIVE_PATH relative_path "${CMAKE_SOURCE_DIR}" "${file}")
+	get_filename_component(folder_path "${relative_path}" PATH)
+	#Account for different filepath slash on windows.
+	if(WIN32)
+	  string(REPLACE "/" "\\" file_path_msvc "${folder_path}")
+	  set(folder_path "${file_path_msvc}")
+	endif()
+	source_group("${folder_path}" FILES "${file}")
 endforeach()
 
 #Get the combined Include Directories of Engine and Application.
@@ -314,12 +347,21 @@ endif()
 #Copies fmod dll to executable path
 if(WIN32)
   add_custom_command(
-    TARGET application_executable
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-            $<TARGET_FILE:fmod>
-            $<TARGET_FILE_DIR:application_executable>
-    COMMENT "Copying fmod dll to executable directory"
+	TARGET application_executable
+	PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			${IMGUI_DEFAULT_LAYOUT_BIN}
+			$<TARGET_FILE_DIR:application_executable>/imgui.ini
+	COMMENT "Copying default ImGui layout to executable directory"
+  )
+
+  add_custom_command(
+	TARGET application_executable
+	POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+			$<TARGET_FILE:fmod>
+			$<TARGET_FILE_DIR:application_executable>
+	COMMENT "Copying fmod dll to executable directory"
   )
 endif()
 

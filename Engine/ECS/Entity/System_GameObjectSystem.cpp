@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <cstddef>
 
 //Entt reflection system
 #include <entt/meta/meta.hpp>
@@ -89,7 +90,6 @@ namespace EngineFramework
 		// Load a Scene
 		std::string start_scene = AssetManagerSystem::GetStringFromFile("Extern/Scenes/Dummy1.json");
 		LoadScene(start_scene);
-		
 	}
 	void GameObjectSystem::Update(float delta_time)
 	{
@@ -159,8 +159,13 @@ namespace EngineFramework
 		*/
 		nlohmann::json save_data{};
 		int id{}; //Basic id to prevent duplicate keys in json. Does not represent entity id.
-		// Iterate over all entities
-		for (auto entity : registry.view<entt::entity>()) {
+		// Iterate over all entities in the registry.
+		auto &entity_storage = registry.storage<entt::entity>();
+		for (entt::entity entity : entity_storage)
+		{
+			if (!registry.valid(entity)) {
+				continue;
+			}
 			nlohmann::json entity_save_data{};
 			static std::vector<entt::meta_type> archtype_components{};
 			archtype_components.clear();
@@ -362,5 +367,16 @@ namespace EngineFramework
 		}
 		//Create instance from archtype component data.
 		return Instantiate(archtype, archtype_guid.m_Instance);
+	}
+
+	/*
+			Creates a single entity with the same component data (copied) from archtype,
+			and sets its transform.
+		*/
+	entt::entity GameObjectSystem::CreateInstance(std::string archtype, const TransformComponent& transform)
+	{
+		entt::entity entity = CreateInstance(archtype);
+		registry.emplace_or_replace<TransformComponent>(entity, transform);
+		return entity;
 	}
 }
