@@ -15,9 +15,11 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
         if (PhysicsWorld::Get().HasBody(ent))
             continue;
 
-        switch (collider.shape)
+        ColliderShape shape = static_cast<ColliderShape>(collider.shape);
+
+        switch (shape)
         {
-        case ColliderComponent::Shape::Box:
+        case ColliderShape::Box:
         {
             glm::vec3 half = collider.size * 0.5f;
             PhysicsWorld::Get().CreateBoxBody(
@@ -28,7 +30,7 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
             );
             break;
         }
-        case ColliderComponent::Shape::Sphere:
+        case ColliderShape::Sphere:
             PhysicsWorld::Get().CreateSphereBody(
                 ent,
                 transform.position,
@@ -36,7 +38,7 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
                 collider.isStatic
             );
             break;
-        case ColliderComponent::Shape::Capsule:
+        case ColliderShape::Capsule:
             PhysicsWorld::Get().CreateCapsuleBody(
                 ent,
                 transform.position,

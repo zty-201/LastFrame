@@ -5,17 +5,17 @@
 
 #include <glm/glm.hpp>
 
+enum class ColliderShape
+{
+    Box = 0,
+    Sphere = 1,
+    Capsule = 2
+};
+
 struct ColliderComponent
 {
-    // what shape to create in Jolt
-    enum class Shape
-    {
-        Box,
-        Sphere,
-        Capsule
-    };
-
-    Shape shape = Shape::Box;
+    // expose as plain int so your editor shows it
+    int shape = static_cast<int>(ColliderShape::Box);
 
     // -------- shape data --------
     // Box: use full extents (easier to reason about in editor)

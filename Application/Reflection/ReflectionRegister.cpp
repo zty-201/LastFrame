@@ -57,20 +57,6 @@ struct adl_serializer<std::vector<glm::vec3>> {
 };
 
 template<>
-struct nlohmann::adl_serializer<ColliderComponent::Shape>
-{
-	static void to_json(nlohmann::json& j, const ColliderComponent::Shape& s)
-	{
-		j = static_cast<int>(s);
-	}
-
-	static void from_json(const nlohmann::json& j, ColliderComponent::Shape& s)
-	{
-		s = static_cast<ColliderComponent::Shape>(j.get<int>());
-	}
-};
-
-template<>
 struct adl_serializer<glm::mat4> {
 	static void to_json(json& j, const glm::mat4& m) {
 
@@ -226,7 +212,7 @@ namespace EngineFramework
 		SetMeta(std::vector<glm::vec3>),
 		SetMeta(CameraComponent::CameraType),
 		SetMeta(std::filesystem::path),
-		SetMeta(ColliderComponent::Shape),
+		SetMeta(ColliderShape),
 		SetMeta(xresource::instance_guid)
 #if defined(ENGINE_ENABLE_LUA)
 		,
@@ -267,7 +253,7 @@ namespace EngineFramework
 		SetJson(std::vector<glm::vec3>),
 		SetJson(CameraComponent::CameraType),
 		SetJson(std::filesystem::path),
-		SetJson(ColliderComponent::Shape),
+		SetJson(ColliderShape),
 		SetJson(xresource::instance_guid)
 #if defined(ENGINE_ENABLE_LUA)
 		,
@@ -395,7 +381,7 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(std::vector<glm::vec3>);
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
 		REGISTER_ARBITRARY_TYPE(std::filesystem::path);
-		REGISTER_ARBITRARY_TYPE(ColliderComponent::Shape);
+		REGISTER_ARBITRARY_TYPE(ColliderShape);
 #if defined(ENGINE_ENABLE_LUA)
 		REGISTER_ARBITRARY_TYPE(Engine::LuaScriptComponent::LuaInstance);
 		REGISTER_ARBITRARY_TYPE(std::vector<Engine::LuaScriptComponent::LuaInstance>);
