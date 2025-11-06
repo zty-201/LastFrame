@@ -14,7 +14,11 @@ namespace EngineFramework
     {
     public:
         PhysicsRuntimeSystem() = default;
-        ~PhysicsRuntimeSystem() override = default;
+        ~PhysicsRuntimeSystem()
+        {
+            PhysicsWorld::Get().Shutdown();
+        }
+
 
     private:
         void Initialize() override
