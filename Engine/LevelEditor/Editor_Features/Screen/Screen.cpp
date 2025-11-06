@@ -556,6 +556,55 @@ namespace EngineFramework
                 ImGui::EndTabItem();
             }
 
+            // -------- Environment / Lighting tab --------
+            if (ImGui::BeginTabItem("Environment")) {
+                ImGui::Spacing();
+
+				// Start Fog settings
+                ImGui::SeparatorText("Fog Settings");
+                ImGui::Spacing();
+                ImGui::EndTabItem();
+
+				// Get the scene pointer to from graphics system
+				auto* scene = GraphicsSystem::GetInstance().GetScene().get();
+
+                // Check if scene is valid (Modify Fog)
+                if (scene) {
+                    // Fog color of scene
+                    float fogCol[3] = { scene->fogColor.r, scene->fogColor.g, scene->fogColor.b };
+
+					// ImGui Color Edit with drop down for color picker
+                    if (ImGui::ColorEdit3("Fog Color", fogCol,
+                        ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB)) {
+                        scene->fogColor = glm::vec3(fogCol[0], fogCol[1], fogCol[2]);
+                    }
+
+                    // Set for Fog distances for scene
+					float fogMinDist = scene->fogMinDist;
+					float fogMaxDist = scene->fogMaxDist;
+                    
+					// Set value for Fog Min Distance
+                    if(ImGui::InputFloat("Fog Min Distance", &fogMinDist)) {
+                        scene->fogMinDist = fogMinDist;
+					}
+
+                    // Set value for Fog Max Distance
+                    if (ImGui::InputFloat("Fog Max Distance", &fogMaxDist)) {
+                        scene->fogMaxDist = fogMaxDist;
+                    }
+                }
+                // Fall through if scene not active
+                else {
+					ImGui::TextDisabled("Scene not active. Cannot modify fog settings.");
+                }
+
+                ImGui::Spacing();
+                ImGui::Separator();
+
+				// Start Light settings
+                ImGui::SeparatorText("Lights");
+                ImGui::Spacing();
+            }
 
             ImGui::EndTabBar();
         }
