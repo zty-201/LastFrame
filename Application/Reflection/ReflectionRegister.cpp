@@ -15,6 +15,7 @@
 #include "NormalMapComponent.h"
 #include "AudioComponent.h"
 #include "ColliderComponent.h"
+#include "PhysicsComponent.h"
 #include "Scripting/Script.hpp"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 #include "MetaInspector.hpp"
@@ -519,6 +520,18 @@ namespace EngineFramework
 			.func<&Remover<ColliderComponent>::RemoveComponent>("remove")
 			.func<&Getter<ColliderComponent>::GetComponent>("get")
 			.func<&GetRef<ColliderComponent>>("get_ref");
+
+		entt::meta_factory<PhysicsComponent>()
+			.type("PhysicsComponent")
+			.data<&PhysicsComponent::isStatic>("isStatic")
+			.data<&PhysicsComponent::velocity>("velocity")
+			.data<&PhysicsComponent::acceleration>("acceleration")
+			.data<&PhysicsComponent::friction>("friction")
+			.data<&PhysicsComponent::mass>("mass")
+			.func<&Emplacer<PhysicsComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<PhysicsComponent>::RemoveComponent>("remove")
+			.func<&Getter<PhysicsComponent>::GetComponent>("get")
+			.func<&GetRef<PhysicsComponent>>("get_ref");
 
 		// === Register LuaScriptComponent and nested LuaInstance ===
 
