@@ -36,13 +36,14 @@ namespace EngineFramework
 
 	void SceneManager::Initialize()
 	{
+		//need to remove this in later build, files should not be loaded as default
 		ScanScenes(AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern/Scenes/");
 
 		std::string sceneString = AssetManagerSystem::GetStringFromFile("Extern/Scenes/" + defaultScene);
 		GameObjectSystem::GetInstance().LoadScene(sceneString);
 		currentScene = defaultScene;
 		Screen::GetInstance().is_enabled = true;
-		//is_file_loaded = true;
+		is_file_loaded = true;
 	}
 
 	SceneManager& SceneManager::GetInstance()
