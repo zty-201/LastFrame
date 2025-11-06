@@ -695,7 +695,13 @@ namespace EngineFramework
                 {
                     LOGD("%s", "No Active Camera Found, creating entity at(0, 0, 0)");
                 }
-                GameObjectSystem::GetInstance().CreateInstance(archtype_name, instance_transform);
+
+                // Store the entity returned by createinstance so as to assign the selection to the new entity and that the property manager updates right after an archtype is dropped in to viewport
+                entt::entity created_entity = GameObjectSystem::GetInstance().CreateInstance(archtype_name, instance_transform);
+                if (created_entity != entt::null)
+                {
+                    LevelEditor::GetInstance().variables.selected_objectID = created_entity;
+                }
             }
 
         }
