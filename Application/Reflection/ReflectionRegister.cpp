@@ -523,7 +523,6 @@ namespace EngineFramework
 
 		entt::meta_factory<PhysicsComponent>()
 			.type("PhysicsComponent")
-			.data<&PhysicsComponent::isStatic>("isStatic")
 			.data<&PhysicsComponent::velocity>("velocity")
 			.data<&PhysicsComponent::acceleration>("acceleration")
 			.data<&PhysicsComponent::friction>("friction")
