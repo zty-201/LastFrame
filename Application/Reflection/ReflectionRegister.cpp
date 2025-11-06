@@ -56,12 +56,16 @@ struct adl_serializer<std::vector<glm::vec3>> {
 };
 
 template<>
-struct adl_serializer<ColliderType> {
-	static void to_json(nlohmann::json& j, const ColliderType& t) {
-		j = static_cast<int>(t);       // store as int (0=Box, 1=Sphere)
+struct nlohmann::adl_serializer<ColliderComponent::Shape>
+{
+	static void to_json(nlohmann::json& j, const ColliderComponent::Shape& s)
+	{
+		j = static_cast<int>(s);
 	}
-	static void from_json(const nlohmann::json& j, ColliderType& t) {
-		t = static_cast<ColliderType>(j.get<int>());
+
+	static void from_json(const nlohmann::json& j, ColliderComponent::Shape& s)
+	{
+		s = static_cast<ColliderComponent::Shape>(j.get<int>());
 	}
 };
 
@@ -221,7 +225,7 @@ namespace EngineFramework
 		SetMeta(std::vector<glm::vec3>),
 		SetMeta(CameraComponent::CameraType),
 		SetMeta(std::filesystem::path),
-		SetMeta(ColliderType),
+		SetMeta(ColliderComponent::Shape),
 		SetMeta(xresource::instance_guid)
 #if defined(ENGINE_ENABLE_LUA)
 		,
@@ -262,7 +266,7 @@ namespace EngineFramework
 		SetJson(std::vector<glm::vec3>),
 		SetJson(CameraComponent::CameraType),
 		SetJson(std::filesystem::path),
-		SetJson(ColliderType),
+		SetJson(ColliderComponent::Shape),
 		SetJson(xresource::instance_guid)
 #if defined(ENGINE_ENABLE_LUA)
 		,
@@ -390,7 +394,7 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(std::vector<glm::vec3>);
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
 		REGISTER_ARBITRARY_TYPE(std::filesystem::path);
-		REGISTER_ARBITRARY_TYPE(ColliderType);
+		REGISTER_ARBITRARY_TYPE(ColliderComponent::Shape);
 #if defined(ENGINE_ENABLE_LUA)
 		REGISTER_ARBITRARY_TYPE(Engine::LuaScriptComponent::LuaInstance);
 		REGISTER_ARBITRARY_TYPE(std::vector<Engine::LuaScriptComponent::LuaInstance>);
@@ -500,12 +504,17 @@ namespace EngineFramework
 		// === Register ColliderComponent ===
 		entt::meta_factory<ColliderComponent>()
 			.type("ColliderComponent")
-			.data<&ColliderComponent::type>("type")
-			.data<&ColliderComponent::offset>("offset")
-			.data<&ColliderComponent::half_extents>("half_extents")
+			.data<&ColliderComponent::shape>("shape")
+			.data<&ColliderComponent::size>("size")
 			.data<&ColliderComponent::radius>("radius")
-			.data<&ColliderComponent::dirty>("dirty")
-			// don’t expose _has_body – runtime only
+			.data<&ColliderComponent::height>("height")
+			.data<&ColliderComponent::capRadius>("capRadius")
+			.data<&ColliderComponent::isStatic>("isStatic")
+			.data<&ColliderComponent::isTrigger>("isTrigger")
+			.data<&ColliderComponent::friction>("friction")
+			.data<&ColliderComponent::restitution>("restitution")
+			.data<&ColliderComponent::density>("density")
+			.data<&ColliderComponent::layer>("layer")
 			.func<&Emplacer<ColliderComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<ColliderComponent>::RemoveComponent>("remove")
 			.func<&Getter<ColliderComponent>::GetComponent>("get")

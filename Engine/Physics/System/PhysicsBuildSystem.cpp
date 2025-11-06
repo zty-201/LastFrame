@@ -1,58 +1,49 @@
 #include "PhysicsBuildSystem.hpp"
 #include <entt/entt.hpp>
+
+#include "PhysicsWorld.hpp"
 #include "TransformComponent.h"
 #include "PhysicsComponent.h"
 #include "ColliderComponent.h"
-#include "PhysicsWorld.hpp"
 
-void PhysicsBuildSystem::Update()
+void PhysicsBuildSystem::Update(entt::registry& ecs)
 {
-    // Use the global registry defined elsewhere in the engine
-    extern entt::registry registry;
+    auto view = ecs.view<TransformComponent, PhysicsComponent, ColliderComponent>();
 
-    auto view = registry.view<TransformComponent, PhysicsComponent, ColliderComponent>();
-
-    for (auto entity : view)
+    for (auto&& [ent, transform, physics, collider] : view.each())
     {
-        auto& transform = view.get<TransformComponent>(entity);
-        auto& physics = view.get<PhysicsComponent>(entity);
-        auto& collider = view.get<ColliderComponent>(entity);
-
-        // If this entity already has a physics body in Jolt, skip
-        if (PhysicsWorld::Get().HasBody(entity))
+        if (PhysicsWorld::Get().HasBody(ent))
             continue;
 
-        switch (collider.shapeType)
+        switch (collider.shape)
         {
-        case ColliderShapeType::Box:
+        case ColliderComponent::Shape::Box:
+        {
+            glm::vec3 half = collider.size * 0.5f;
             PhysicsWorld::Get().CreateBoxBody(
-                entity,
+                ent,
                 transform.position,
-                collider.halfExtents * 2.0f, // we store half extents, Jolt create wants full size
-                physics.isStatic
+                half * 2.0f,
+                collider.isStatic
             );
             break;
-
-        case ColliderShapeType::Sphere:
+        }
+        case ColliderComponent::Shape::Sphere:
             PhysicsWorld::Get().CreateSphereBody(
-                entity,
+                ent,
                 transform.position,
                 collider.radius,
-                physics.isStatic
+                collider.isStatic
             );
             break;
-
-        case ColliderShapeType::Capsule:
+        case ColliderComponent::Shape::Capsule:
             PhysicsWorld::Get().CreateCapsuleBody(
-                entity,
+                ent,
                 transform.position,
-                collider.capsuleHalfHeight * 2.0f,
-                collider.capsuleRadius,
-                physics.isStatic
+                collider.height,
+                collider.capRadius,
+                collider.isStatic
             );
-            break;
-
-        default:
             break;
         }
     }

@@ -1,36 +1,27 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "PhysicsSyncSystem.hpp"
-#include <glm/gtx/quaternion.hpp>  // for glm::eulerAngles
+
+#include <glm/gtx/quaternion.hpp>
 #include <entt/entt.hpp>
+
 #include "TransformComponent.h"
 #include "PhysicsComponent.h"
 #include "PhysicsWorld.hpp"
 
-void PhysicsSyncSystem::Update()
+void PhysicsSyncSystem::Update(entt::registry& ecs)
 {
-    extern entt::registry registry;
+    auto view = ecs.view<TransformComponent, PhysicsComponent>();
 
-    auto view = registry.view<TransformComponent, PhysicsComponent>();
-
-    for (auto entity : view)
+    for (auto&& [ent, transform, physics] : view.each())
     {
-        auto& transform = view.get<TransformComponent>(entity);
-        auto& physics = view.get<PhysicsComponent>(entity);
-
-        if (!PhysicsWorld::Get().HasBody(entity))
+        if (!PhysicsWorld::Get().HasBody(ent))
             continue;
 
-        // Position straight from physics
-        transform.position = PhysicsWorld::Get().GetBodyPosition(entity);
+        transform.position = PhysicsWorld::Get().GetBodyPosition(ent);
 
-        // Rotation from physics (quat -> euler vec3)
-        {
-            glm::quat q = PhysicsWorld::Get().GetBodyRotation(entity);
-            glm::vec3 eulerRadians = glm::eulerAngles(q); // returns pitch/yaw/roll in radians
-            transform.rotation = eulerRadians;            // assumes your TransformComponent.rotation is vec3
-        }
+        glm::quat q = PhysicsWorld::Get().GetBodyRotation(ent);
+        transform.rotation = glm::eulerAngles(q);
 
-        // Velocity from physics
-        physics.velocity = PhysicsWorld::Get().GetBodyVelocity(entity);
+        physics.velocity = PhysicsWorld::Get().GetBodyVelocity(ent);
     }
 }

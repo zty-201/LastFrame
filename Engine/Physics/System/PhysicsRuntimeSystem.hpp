@@ -2,9 +2,11 @@
 
 #include "ISystem.hpp"
 #include <entt/entt.hpp>
+
 #include "PhysicsWorld.hpp"
 #include "PhysicsBuildSystem.hpp"
 #include "PhysicsSyncSystem.hpp"
+#include "CoreEngine.hpp"
 
 namespace EngineFramework
 {
@@ -15,29 +17,35 @@ namespace EngineFramework
         ~PhysicsRuntimeSystem() override = default;
 
     private:
-        // Called by CoreEngine at startup
         void Initialize() override
         {
+            // init Jolt
             PhysicsWorld::Get().Initialize();
         }
 
-        // Called every frame by CoreEngine
         void Update(float delta_time) override
         {
-            // 1. Make sure ECS entities have physics bodies in Jolt
-            PhysicsBuildSystem::Update();
+            // 1) get ECS registry from the engine singleton
+            // name it ecs, not registry, to avoid shadowing the global
+            entt::registry& ecs = CoreEngine::GetInstance().GetRegistry();
 
-            // 2. Step the physics world forward
+            // 2) make sure ECS entities have Jolt bodies
+            m_buildSystem.Update(ecs);
+
+            // 3) step physics
             PhysicsWorld::Get().StepSimulation(delta_time);
 
-            // 3. Sync physics results (pos/rot/vel) back into ECS
-            PhysicsSyncSystem::Update();
+            // 4) sync physics back to ECS
+            m_syncSystem.Update(ecs);
         }
 
-        // Called after all systems update
-        void PostUpdate(float /*delta_time*/) override
+        void PostUpdate(float) override
         {
-            // (Optional future: physics debug draw, etc.)
+            // optional: physics debug draw
         }
+
+    private:
+        PhysicsBuildSystem m_buildSystem;
+        PhysicsSyncSystem  m_syncSystem;
     };
 }

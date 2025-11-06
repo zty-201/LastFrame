@@ -5,25 +5,38 @@
 
 #include <glm/glm.hpp>
 
-enum class ColliderShapeType
-{
-    Box,
-    Sphere,
-    Capsule
-};
-
 struct ColliderComponent
 {
-    ColliderShapeType shapeType = ColliderShapeType::Box;
+    // what shape to create in Jolt
+    enum class Shape
+    {
+        Box,
+        Sphere,
+        Capsule
+    };
 
-    // Box data
-    glm::vec3 halfExtents{ 0.5f, 0.5f, 0.5f }; // x,y,z half sizes
+    Shape shape = Shape::Box;
 
-    // Sphere data
+    // -------- shape data --------
+    // Box: use full extents (easier to reason about in editor)
+    glm::vec3 size{ 1.0f, 1.0f, 1.0f };    // width, height, depth
+
+    // Sphere:
     float radius = 0.5f;
 
-    // Capsule data
-    float capsuleHalfHeight = 0.5f; // half-height of the center cylinder
-    float capsuleRadius = 0.25f;
+    // Capsule:
+    float height = 1.0f;      // full capsule height (cylinder + 2 hemispheres)
+    float capRadius = 0.25f;
+
+    // -------- physics flags / material --------
+    bool  isStatic = false;   // create static vs dynamic body
+    bool  isTrigger = false;   // for later when you do sensor bodies
+    float friction = 0.5f;
+    float restitution = 0.0f;
+    float density = 1.0f;
+
+    // collision filtering (for later)
+    int   layer = 1;
 };
+
 #endif // COLLIDER_COMPONENT

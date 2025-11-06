@@ -8,5 +8,5 @@
 class PhysicsBuildSystem
 {
 public:
-    static void Update();
+    static void Update(entt::registry& registry);
 };
