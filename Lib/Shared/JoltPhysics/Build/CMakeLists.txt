@@ -15,7 +15,7 @@ option(GENERATE_DEBUG_SYMBOLS "Generate debug symbols" ON)
 set(JPH_DEBUG_SYMBOL_FORMAT "" CACHE STRING "Which type of debug symbols to generate")
 
 # When turning this option on, the library will override the default CMAKE_CXX_FLAGS_DEBUG/RELEASE values, otherwise they will use the platform defaults
-option(OVERRIDE_CXX_FLAGS "Override CMAKE_CXX_FLAGS_DEBUG/RELEASE" ON)
+option(OVERRIDE_CXX_FLAGS "Override CMAKE_CXX_FLAGS_DEBUG/RELEASE" OFF)
 
 # When turning this option on, the library will be compiled in such a way to attempt to keep the simulation deterministic across platforms
 option(CROSS_PLATFORM_DETERMINISTIC "Cross platform deterministic" OFF)
@@ -113,7 +113,7 @@ include(CMakeDependentOption)
 
 # Ability to toggle between the static and DLL versions of the MSVC runtime library
 # Windows Store only supports the DLL version
-cmake_dependent_option(USE_STATIC_MSVC_RUNTIME_LIBRARY "Use the static MSVC runtime library" ON "MSVC;NOT WINDOWS_STORE" OFF)
+cmake_dependent_option(USE_STATIC_MSVC_RUNTIME_LIBRARY "Use the static MSVC runtime library" ON "MSVC;NOT WINDOWS_STORE" ON)
 
 # Enable Vulkan instead of DirectX
 cmake_dependent_option(JPH_ENABLE_VULKAN "Enable Vulkan" ON "LINUX" OFF)

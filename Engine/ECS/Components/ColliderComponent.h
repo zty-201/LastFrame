@@ -1,27 +1,42 @@
-#ifndef COLLIDING_COMPONENT
-#define COLLIDING_COMPONENT
+#pragma once
 
-#include <glm/vec3.hpp>
+#ifndef COLLIDER_COMPONENT
+#define COLLIDER_COMPONENT
 
-enum class ColliderType : unsigned char {
-    Box,
-    Sphere
+#include <glm/glm.hpp>
+
+struct ColliderComponent
+{
+    // what shape to create in Jolt
+    enum class Shape
+    {
+        Box,
+        Sphere,
+        Capsule
+    };
+
+    Shape shape = Shape::Box;
+
+    // -------- shape data --------
+    // Box: use full extents (easier to reason about in editor)
+    glm::vec3 size{ 1.0f, 1.0f, 1.0f };    // width, height, depth
+
+    // Sphere:
+    float radius = 0.5f;
+
+    // Capsule:
+    float height = 1.0f;      // full capsule height (cylinder + 2 hemispheres)
+    float capRadius = 0.25f;
+
+    // -------- physics flags / material --------
+    bool  isStatic = false;   // create static vs dynamic body
+    bool  isTrigger = false;   // for later when you do sensor bodies
+    float friction = 0.5f;
+    float restitution = 0.0f;
+    float density = 1.0f;
+
+    // collision filtering (for later)
+    int   layer = 1;
 };
 
-struct ColliderComponent {
-    ColliderType type = ColliderType::Box;
-
-    // Local offset from the entity transform
-    glm::vec3 offset{ 0.0f, 0.0f, 0.0f };
-
-    // Box: if any <= 0, we’ll derive from Transform.scale * 0.5f
-    glm::vec3 half_extents{ 0.0f, 0.0f, 0.0f };
-
-    // Sphere: if <= 0, we’ll derive from max(Transform.scale) * 0.5f
-    float radius = 0.0f;
-
-    bool dirty = true;     // mark true when edited so physics rebuilds
-    bool _has_body = false;// set by PhysicsSystem; don’t touch in gameplay
-};
-
-#endif
+#endif // COLLIDER_COMPONENT

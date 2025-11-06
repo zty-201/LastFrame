@@ -14,6 +14,9 @@
  *
  * @date Sept 2025
  */
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+
 #ifndef TRANSFORM_COMPONENT
 #define TRANSFORM_COMPONENT
 

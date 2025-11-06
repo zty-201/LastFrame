@@ -564,9 +564,17 @@ namespace EngineFramework
 			case ArchtypeEvent::ArchtypeEvent::CHANGE_MODEL_TYPE:
 				ImGui::OpenPopup("Change Model Type");
 				break;
-			case ArchtypeEvent::ArchtypeEvent::CREATE_INSTANCE: //No need for popup modal as no input or confirmation needed.
-				//Create the instance by copying the archtype as is, without adding transform component or other.
-				GameObjectSystem::GetInstance().CreateInstance(delayed_archtype_event.current_name);
+			case ArchtypeEvent::ArchtypeEvent::CREATE_INSTANCE: // No need for popup modal as no input or confirmation needed.
+				// Create the instance by copying the archtype as is, without adding transform component or other.
+				// To render the entity, need to attach TransformComponent, MeshComponent, MaterialComponent and SceneRenderPass before it shows up
+				if (!delayed_archtype_event.current_name.empty())
+				{
+					entt::entity created_entity = GameObjectSystem::GetInstance().CreateInstance(delayed_archtype_event.current_name);
+					if (created_entity != entt::null)
+					{
+						LevelEditor::GetInstance().variables.selected_objectID = created_entity;
+					}
+				}
 				delayed_archtype_event = {};
 				break;
 			}
