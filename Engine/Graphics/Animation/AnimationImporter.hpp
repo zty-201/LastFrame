@@ -1,8 +1,20 @@
 #ifndef ANIMATION_IMPORTER_HPP
 #define ANIMATION_IMPORTER_HPP
 
+#include "ofbx.h"
+
 namespace EngineFramework
 {
+	// Animation flags
+	ofbx::u64 animFlags =
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_BLEND_SHAPES |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_CAMERAS |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_LIGHTS |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_TEXTURES |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_MATERIALS |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_VIDEOS |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_POSES;
+
 	// Helper functions for FBX processing
 	inline std::vector<uint8_t> ReadFBXFile(const std::string& path);
 
@@ -23,7 +35,7 @@ namespace EngineFramework
 	}
 
 	// Convert FBX matrix to glm mat4
-	inline glm::mat4 mat4Converter(const ofbx::Matrix& m) {
+	inline glm::mat4 mat4Converter(const ofbx::DMatrix& m) {
 		glm::mat4 result;
 		for (int row = 0; row < 4; row++) {
 			for (int col = 0; col < 4; col++) {
