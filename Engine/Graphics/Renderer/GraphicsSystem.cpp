@@ -37,6 +37,26 @@
 class LevelEditor; //forward declaration
 #endif
 
+#if defined(__ANDROID__)
+// On Android, we must use clock_gettime
+#include <time.h>
+
+static inline double get_native_time() {
+	struct timespec now;
+	clock_gettime(CLOCK_MONOTONIC, &now);
+	return (double)now.tv_sec + (double)now.tv_nsec / 1e9;
+}
+
+#else
+// On other platforms (Windows, Linux), we can use GLFW
+#include <GLFW/glfw3.h> // Make sure you have this include
+
+static inline double get_native_time() {
+	return glfwGetTime();
+}
+
+#endif
+
 namespace EngineFramework
 {
 	
@@ -325,7 +345,7 @@ namespace EngineFramework
 		ubo->camera_position = glm::vec4(camera.position, 1.0f);
 		ubo->bias_near_far_pow = glm::vec4(m_shadow_bias, camera.nearPlane, camera.farPlane, m_depth_power);
 		ubo->aniso_density_scattering_absorption = glm::vec4(m_anisotropy, m_density, m_scattering, m_absorption);
-		ubo->time = glm::vec4(static_cast<float>(glfwGetTime()), 0, 0, 0);
+		ubo->time = glm::vec4(static_cast<float>(get_native_time()), 0, 0, 0);
 		ubo->width_height = glm::ivec4(screen.x, screen.y, 0, 0);
 
 		glUnmapBuffer(GL_UNIFORM_BUFFER);

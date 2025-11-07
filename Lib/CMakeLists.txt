@@ -20,6 +20,7 @@ add_subdirectory(Shared/sol)
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable Assimp tests" FORCE)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Disable Assimp tools" FORCE)
 set(ASSIMP_INSTALL OFF CACHE BOOL "Don't create install targets" FORCE)
+set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "Disable warnings as errors for assimp" FORCE)
 
 # === THIS IS THE FIX ===
 # Force Assimp to build as a static library (.lib) instead of a shared one (.dll)
