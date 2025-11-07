@@ -521,47 +521,54 @@ namespace EngineFramework
                             light.position = glm::vec3(pos[0], pos[1], pos[2]);
 						}
 
+                        // Intensity
+                        float intensity = light.intensity;
+                        if (ImGui::InputFloat("Light Intensity", &intensity)) {
+                            light.intensity = intensity;
+                        }
+
+
 						// Drop down to adjust the light intensities, in case there isn't enough intensities
-                        for (int i = 0; i < light.L.size(); i++) {
-							// If there is 1 intensity, it is ambient
-                            std::string title;
-                            if (i == 0) {
-								title = "Ambient Intensity";
-                            }
-							// If there are 2 intensities, the second is diffuse
-                            else if (i == 1) {
-								title = "Diffuse Intensity";
-                            }
-							// If there are 3 intensities, the third is specular
-                            else if (i == 2) {
-								title = "Specular Intensity";
-                            }
-							// Anything more than 3, just call it component i
-                            else {
-                                std::stringstream ss;
-                                ss << "Component " << i;
-                                title = ss.str();
-                            }
+       //                 for (int i = 0; i < light.L.size(); i++) {
+							//// If there is 1 intensity, it is ambient
+       //                     std::string title;
+       //                     if (i == 0) {
+							//	title = "Ambient Intensity";
+       //                     }
+							//// If there are 2 intensities, the second is diffuse
+       //                     else if (i == 1) {
+							//	title = "Diffuse Intensity";
+       //                     }
+							//// If there are 3 intensities, the third is specular
+       //                     else if (i == 2) {
+							//	title = "Specular Intensity";
+       //                     }
+							//// Anything more than 3, just call it component i
+       //                     else {
+       //                         std::stringstream ss;
+       //                         ss << "Component " << i;
+       //                         title = ss.str();
+       //                     }
 
-                            // Obtain current intensity
-                            float intensity[3] = { light.L[i].x, light.L[i].y, light.L[i].z };
-                            if (ImGui::ColorEdit3(title.c_str(), intensity)) {
-								light.L[i] = glm::vec3(intensity[0], intensity[1], intensity[2]);
-                            }
-                        }
+       //                     // Obtain current intensity
+       //                     float intensity[3] = { light.L[i].x, light.L[i].y, light.L[i].z };
+       //                     if (ImGui::ColorEdit3(title.c_str(), intensity)) {
+							//	light.L[i] = glm::vec3(intensity[0], intensity[1], intensity[2]);
+       //                     }
+       //                 }
 
-                        ImGui::Spacing();
+       //                 ImGui::Spacing();
 
-                        // Additional features
-                        // Add/Remove intensity components
-                        if (ImGui::Button("Add Intensity Component")) {
-                            light.L.push_back(glm::vec3(1.0f));
-                        }
+       //                 // Additional features
+       //                 // Add/Remove intensity components
+       //                 if (ImGui::Button("Add Intensity Component")) {
+       //                     light.L.push_back(glm::vec3(1.0f));
+       //                 }
 
-                        ImGui::SameLine();
-                        if (ImGui::Button("Remove Last Component")) {
-                            if (!light.L.empty()) light.L.pop_back();
-                        }
+       //                 ImGui::SameLine();
+       //                 if (ImGui::Button("Remove Last Component")) {
+       //                     if (!light.L.empty()) light.L.pop_back();
+       //                 }
                     }
                     else {
                         ImGui::TextDisabled("Selected Light entity is invalid or no LightComponent attached.");
@@ -569,25 +576,25 @@ namespace EngineFramework
                 }
 
                 // If you want to add new lights
-                if(ImGui::Button("Add New Light")) {
-					// Create a new entity with LightComponent
-                    entt::entity new_light_entity = registry.create();
-                    LightComponent lightComp{};
+    //            if(ImGui::Button("Add New Light")) {
+				//	// Create a new entity with LightComponent
+    //                entt::entity new_light_entity = registry.create();
+    //                LightComponent lightComp{};
 
-					// Set default values
-                    // Position
-                    lightComp.position = glm::vec3(0.0f, 0.0f, 0.0f);
+				//	// Set default values
+    //                // Position
+    //                lightComp.position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-                    // Ambient Intensity
-                    lightComp.L.push_back(glm::vec3(1.0f)); 
+    //                // Ambient Intensity
+    //                lightComp.intensity = 1.0f; 
 
-					// Diffuse Intensity
-                    lightComp.L.push_back(glm::vec3(1.0f));
+				//	//// Diffuse Intensity
+    // //               lightComp.L.push_back(glm::vec3(1.0f));
 
-					// Specular Intensity
-                    lightComp.L.push_back(glm::vec3(1.0f));
-                    registry.emplace<LightComponent>(new_light_entity, lightComp);
-				}
+				//	//// Specular Intensity
+    // //               lightComp.L.push_back(glm::vec3(1.0f));
+    //                registry.emplace<LightComponent>(new_light_entity, lightComp);
+				//}
             }
 
             ImGui::EndTabBar();
