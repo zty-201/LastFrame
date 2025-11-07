@@ -474,6 +474,12 @@ namespace EngineFramework
 			auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
 			// --- END NEW LOGIC ---
 
+			// If mesh is not found look for it in the cache
+			if (!meshData || meshData->vao == 0) {
+				meshData = meshCache[meshComp.meshName];
+			} 
+
+			// If still not found, skip rendering this mesh
 			if (!meshData || meshData->vao == 0) continue;
 
 			// Set the per-object model matrix

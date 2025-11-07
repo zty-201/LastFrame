@@ -521,32 +521,6 @@ namespace EngineFramework
 			.func<&Getter<SkyboxRenderPass>::GetComponent>("get");
 
 
-		entt::meta_factory<EngineFramework::TODELETE>()
-			.type("TestClass")
-			.data<&TODELETE::a>("player_health")
-			.data<&TODELETE::b>("b")
-			.data<&TODELETE::c>("c")
-			.func<&Emplacer<TODELETE>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE>::RemoveComponent>("remove")
-			.func<&Getter<TODELETE>::GetComponent>("get");
-
-		//If necessary, may want to add a set method too.
-		entt::meta_factory<EngineFramework::TODELETE2>()
-			.type("TestClass2")
-			.data<&TODELETE2::d>("player_damage")
-			.data<&TODELETE2::e>("e")
-			.data<&TODELETE2::c>("c")
-			.func<&Emplacer<TODELETE2>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE2>::RemoveComponent>("remove")
-			.func<&Getter<TODELETE2>::GetComponent>("get");
-
-		entt::meta_factory<EngineFramework::TODELETE3>()
-			.type("TestClass3")
-			.data<&TODELETE3::pos>("player_pos")
-			.func<&Emplacer<TODELETE3>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE3>::RemoveComponent>("remove")
-			.func<&Getter<TODELETE3>::GetComponent>("get");
-
 	}
 
 

@@ -39,6 +39,68 @@
 			"rotation": [ 0.0, 0.0, 0.0 ],
 			"scale": [ 0.05, 0.05, 0.05 ]
 		}
-	}
+	},
+	"4": {
+    "LuaScriptComponent": {
+        "Enabled": true,
+        "Scripts": [
+            {
+                "Loaded": true,
+                "ScriptGuid": 4974199829356445697
+            }
+        ]
+    },
+    "MaterialComponent": {
+        "name": "RedMetalSphere",
+        "albedoMap": [
+            7230819861274968067,
+            3711223656383638553
+        ],
+        "normalMap": [
+            0,
+            0
+        ],
+        "metallicMap": [
+            0,
+            0
+        ],
+        "roughnessMap": [
+            0,
+            0
+        ],
+        "ambientOcclusionMap": [
+            0,
+            0
+        ],
+        "albedoFactor": [
+            1.0,
+            0.10000000894069672,
+            0.10000000149011612
+        ],
+        "metallicFactor": 0.20000000298023224,
+        "roughnessFactor": 0.800000011920929
+    },
+    "MeshComponent": {
+        "meshName": "Sphere"
+    },
+    "SceneRenderPass": null,
+    "TransformComponent": {
+        "position": [
+            -3.0,
+            0.0,
+            0.0
+        ],
+        "rotation": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "scale": [
+            1.0,
+            1.0,
+            1.0
+        ]
+    }
+}
 	
 }
