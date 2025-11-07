@@ -237,6 +237,11 @@ namespace EngineFramework
 		// instancing temporary disabled, needs upgrade
 		//m_instancingSystem->PrepareBatches();
 
+		auto transform_view = registry.view<TransformComponent>();
+		for (auto [entity, transform] : transform_view.each()) {
+			CalculateModelMatrix(transform, transform.modelMatrix);
+		}
+
 		// NEW RENDER LOOP
 		// 1. Create shadow map
 		ShadowPass();
@@ -626,22 +631,19 @@ namespace EngineFramework
 	void GraphicsSystem::CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix)
 	{
 
-		// Create translation matrix
-		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), transform.position);
+		// Translation
+		glm::mat4 T = glm::translate(glm::mat4(1.0f), transform.position);
 
-		// Create rotation matrices (assuming rotation is in degrees)
-		// Order: Y (yaw) -> X (pitch) -> Z (roll) for typical right-handed coordinate system
-		glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		glm::mat4 rotationMatrix = rotationY * rotationX * rotationZ;
+		// Rotation (Euler - Quaternion - Matrix)
+		glm::vec3 rotationRadians = glm::radians(transform.rotation);
+		glm::quat Q = glm::quat(rotationRadians);
+		glm::mat4 R = glm::mat4_cast(Q);
 
-		// Create scale matrix
-		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), transform.scale);
+		// Scale
+		glm::mat4 S = glm::scale(glm::mat4(1.0f), transform.scale);
 
-		// Combine: Translation * Rotation * Scale
-		modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
-
+		// Combine: TRS
+		modelMatrix = T * R * S;
 	}
 
 	void GraphicsSystem::LoadBlueNoiseTextures()

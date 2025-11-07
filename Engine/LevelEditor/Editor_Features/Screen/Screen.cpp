@@ -486,7 +486,6 @@ namespace EngineFramework
 
             GraphicsSystem::GetInstance().CalculateModelMatrix(transform, model);*/
 
-            GraphicsSystem::GetInstance().CalculateModelMatrix(object, object.modelMatrix);
             glm::mat4 model = object.modelMatrix;
 
             ImGuizmo::SetOrthographic(false); //because we have perspective
