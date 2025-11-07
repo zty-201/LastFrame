@@ -24,6 +24,7 @@
 #include <assimp/postprocess.h>
 #include "MaterialComponent.h"
 #include "global.hpp" // For AssetManagerSystem, etc.
+#include "AssimpWrapper.h"
 
 namespace Mesh {
 
@@ -84,12 +85,19 @@ namespace Mesh {
     private:
         // The core Assimp loading function.
         void loadWithAssimp(const std::string& filePath) {
-			LOGI("Loading mesh from file: %s", filePath.c_str());
+            LOGI("Loading mesh from file: %s", filePath.c_str());
             Assimp::Importer importer;
-            const aiScene* scene = importer.ReadFile(filePath,
-                aiProcess_Triangulate |
-                aiProcess_GenSmoothNormals |
-                aiProcess_CalcTangentSpace);
+
+            // Create custom IO system that can load files from Android assets
+            auto ioSystem = new AssetIOSystem(filePath);
+            importer.SetIOHandler(ioSystem);
+
+            // Now we can use ReadFile() instead of ReadFileFromMemory()!
+            // Assimp will use our custom IOSystem to load both .obj AND .mtl
+            const aiScene* scene = importer.ReadFile(
+                filePath,
+                aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace
+            );
 
             if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
                 throw std::runtime_error("Assimp Error: " + std::string(importer.GetErrorString()));
@@ -109,75 +117,99 @@ namespace Mesh {
                 aiMaterial* mat = scene->mMaterials[i];
                 MaterialComponent newMat;
                 newMat.name = mat->GetName().C_Str();
-                aiString path_str;
 
                 using AssetMgr = EngineFramework::AssetManagerSystem;
 
-                // === SET REALISTIC DEFAULTS FOR NON-PBR MODELS ===
-                newMat.albedoFactor = glm::vec3(1.0f);  // White tint (let texture shine through)
-                newMat.roughnessFactor = 0.8f;           // Slightly rough (most surfaces aren't mirrors)
-                newMat.metallicFactor = 0.0f;            // Non-metallic (Sponza is stone/fabric, not metal!)
+                newMat.albedoFactor = glm::vec3(1.0f);
+                newMat.roughnessFactor = 0.8f;
+                newMat.metallicFactor = 0.0f;
 
-                // Albedo
-                if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &path_str) == AI_SUCCESS) {
-                    std::filesystem::path texture_path(path_str.C_Str());
-                    LOGI("Found albedo texture: %s", texture_path.stem().string().c_str());
-                    newMat.albedoMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
+                //  HELPER: Extract texture name from Assimp material
+                auto tryLoadTexture = [&](aiTextureType type) -> std::string {
+                    aiString path;
+                    if (mat->GetTexture(type, 0, &path) == AI_SUCCESS && path.length > 0) {
+                        std::string pathStr(path.C_Str());
+
+                        // Replace backslashes with forward slashes
+                        std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+
+                        // Now std::filesystem will work correctly on all platforms
+                        std::filesystem::path p(pathStr);
+                        std::string texName = p.stem().string();
+
+                        LOGI("[%s] Found texture path: '%s' -> normalized: '%s' -> stem: '%s'",
+                            newMat.name.c_str(), path.C_Str(), pathStr.c_str(), texName.c_str());
+
+                        return texName;
+                    }
+                    return "";
+                    };
+
+                // === ALBEDO ===
+                std::string albedoName = tryLoadTexture(aiTextureType_DIFFUSE);
+                if (!albedoName.empty()) {
+                    try {
+                        newMat.albedoMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, albedoName);
+                        LOGI(" Loaded albedo: %s", albedoName.c_str());
+                    }
+                    catch (const std::exception& e) {
+                        LOGE(" Albedo texture not found in AssetManager: %s (error: %s)",
+                            albedoName.c_str(), e.what());
+                    }
                 }
-                else {
+
+                // Fallback to color if no texture
+                if (newMat.albedoMap.m_Instance.m_Value == 0) {
                     aiColor3D color;
                     if (mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
-                        LOGI("Albedo Texture not found, falling back to color");
                         newMat.albedoFactor = { color.r, color.g, color.b };
+                        LOGI("Using albedo color fallback: (%.2f, %.2f, %.2f)",
+                            color.r, color.g, color.b);
                     }
                 }
 
-                // Normal
-                if (mat->GetTexture(aiTextureType_NORMALS, 0, &path_str) == AI_SUCCESS) {
-                    std::filesystem::path texture_path(path_str.C_Str());
-                    LOGI("Found normal texture: %s", texture_path.stem().string().c_str());
-                    newMat.normalMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
+                // === NORMAL (try NORMALS first, then HEIGHT) ===
+                std::string normalName = tryLoadTexture(aiTextureType_NORMALS);
+                if (normalName.empty()) {
+                    normalName = tryLoadTexture(aiTextureType_HEIGHT);
                 }
-                else if (mat->GetTexture(aiTextureType_HEIGHT, 0, &path_str) == AI_SUCCESS) {  // <-- TRY HEIGHT TOO
-                    std::filesystem::path texture_path(path_str.C_Str());
-                    LOGI("Found normal texture (as HEIGHT): %s", texture_path.stem().string().c_str());
-                    newMat.normalMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
-                }
-                else {
-                    LOGI("Normal map not found for material: %s", newMat.name.c_str());
-                }
-
-                // --- NEW: Load Metallic Texture ---
-                // Assimp often uses SPECULAR for glTF metallic maps or defines it explicitly.
-                if (mat->GetTexture(aiTextureType_METALNESS, 0, &path_str) == AI_SUCCESS) {
-                    std::filesystem::path texture_path(path_str.C_Str());
-                    newMat.metallicMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
-                }
-                else if (mat->GetTexture(aiTextureType_SPECULAR, 0, &path_str) == AI_SUCCESS) { // Fallback for some formats
-                    std::filesystem::path texture_path(path_str.C_Str());
-                    newMat.metallicMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
-                }
-                else {
-                    float metallic;
-                    if (mat->Get(AI_MATKEY_METALLIC_FACTOR, metallic) == AI_SUCCESS) {
-                        newMat.metallicFactor = metallic;
+                if (!normalName.empty()) {
+                    try {
+                        newMat.normalMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, normalName);
+                        LOGI(" Loaded normal: %s", normalName.c_str());
+                    }
+                    catch (...) {
+                        LOGE(" Normal texture not found: %s", normalName.c_str());
                     }
                 }
 
-                // --- NEW: Load Roughness Texture ---
-                if (mat->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &path_str) == AI_SUCCESS) {
-                    std::filesystem::path texture_path(path_str.C_Str());
-                    newMat.roughnessMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, texture_path.stem().string());
+                // === ROUGHNESS ===
+                std::string roughnessName = tryLoadTexture(aiTextureType_DIFFUSE_ROUGHNESS);
+                if (!roughnessName.empty()) {
+                    try {
+                        newMat.roughnessMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, roughnessName);
+                        LOGI(" Loaded roughness: %s", roughnessName.c_str());
+                    }
+                    catch (...) {}
                 }
                 else {
                     float roughness;
                     if (mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness) == AI_SUCCESS) {
                         newMat.roughnessFactor = roughness;
                     }
-                    else if (mat->Get(AI_MATKEY_SHININESS, roughness) == AI_SUCCESS) {
-                        // Old formats use "shininess". We can convert it to roughness.
-                        newMat.roughnessFactor = 1.0f - (roughness / 1000.0f); // Approximate conversion
+                }
+
+                // === METALLIC (try METALNESS first, then SPECULAR) ===
+                std::string metallicName = tryLoadTexture(aiTextureType_METALNESS);
+                if (metallicName.empty()) {
+                    metallicName = tryLoadTexture(aiTextureType_SPECULAR);
+                }
+                if (!metallicName.empty()) {
+                    try {
+                        newMat.metallicMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, metallicName);
+                        LOGI(" Loaded metallic: %s", metallicName.c_str());
                     }
+                    catch (...) {}
                 }
 
                 materials.push_back(newMat);

@@ -221,16 +221,6 @@ set(USE_FMADD   ON  CACHE BOOL "" FORCE)
 # (mismatched LTO between app/lib can cause linker issues or lost benefits).
 set(INTERPROCEDURAL_OPTIMIZATION OFF CACHE BOOL "" FORCE)
 
-# ====================================================================
-# NEW: Configure Assimp Build Options BEFORE adding the subdirectory
-# ====================================================================
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable Assimp's tests")
-set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Disable Assimp's command-line tools")
-set(ASSIMP_NO_EXPORT ON CACHE BOOL "Disable Assimp's exporting feature")
-set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE BOOL "Disable all importers by default")
-set(ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "Enable ONLY the OBJ importer")
-# ====================================================================
-
 #Build external dependencies ( Jolt lives here )
 add_subdirectory(Lib)
 
@@ -287,10 +277,16 @@ target_compile_definitions(engine_library PUBLIC USE_JOLT)
 
 #Android==============
 elseif(ANDROID)
-	list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES ${ANDROID_LIBRARIES})
-  target_link_libraries(jnicpp PUBLIC ${EXTERNAL_LIBRARY_DEPENDENCIES})
+    list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES ${ANDROID_LIBRARIES})
+    
+    # DEBUG: Print all libraries
+    message(STATUS "=== ANDROID LIBRARIES ===")
+    foreach(lib IN LISTS EXTERNAL_LIBRARY_DEPENDENCIES)
+        message(STATUS "  Linking: ${lib}")
+    endforeach()
+    
+    target_link_libraries(jnicpp PUBLIC ${EXTERNAL_LIBRARY_DEPENDENCIES})
 endif()
-
 
 #=====Building of Engine Library and Executable, or Android Shared library======#
 

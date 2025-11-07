@@ -26,13 +26,6 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
             } else {
                 System.loadLibrary("fmod");   // Release / Optimized version
             }
-            // assimp lib
-            if (BuildConfig.DEBUG) {
-                System.loadLibrary("assimpd");
-            } else {
-                System.loadLibrary("assimp");
-            }
-
             System.loadLibrary("jnicpp");
             Log.d(TAG, "Native library loaded successfully");
         } catch (UnsatisfiedLinkError e) {
