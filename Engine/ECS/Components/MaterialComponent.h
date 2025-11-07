@@ -17,40 +17,35 @@
 #define MATERIAL_COMPONENT
 struct MaterialComponent
 {
-    float rough;
-    float metal;
-    glm::vec3 color;
-    glm::vec3 Ka;
-    glm::vec3 Kd;
-    glm::vec3 Ks;
-    float shininess;
-    float effect; 
-	std::string materialName;
+    std::string name;
+
+    xresource::full_guid albedoMap{};
+    xresource::full_guid normalMap{};
+    xresource::full_guid metallicMap{};
+    xresource::full_guid roughnessMap{};
+    xresource::full_guid ambientOcclusionMap{};
+
+    glm::vec3 albedoFactor = { 1.0f, 1.0f, 1.0f };
+    float metallicFactor = 1.0f;
+    float roughnessFactor = 1.0f;
 };
 
 inline bool operator==(const MaterialComponent& a, const MaterialComponent& b)
 {
-    return  a.rough == b.rough
-        && a.metal == b.metal
-        && a.shininess == b.shininess
-        && a.effect == b.effect
-        && a.color == b.color
-        && a.Ka == b.Ka
-        && a.Kd == b.Kd
-        && a.Ks == b.Ks;
+    return  a.roughnessFactor == b.roughnessFactor
+        && a.metallicFactor == b.metallicFactor
+        && a.albedoFactor == b.albedoFactor
+        && a.albedoMap == b.albedoMap
+        && a.normalMap == b.normalMap
+        && a.metallicMap == b.metallicMap
+        && a.roughnessMap == b.roughnessMap
+        && a.ambientOcclusionMap == b.ambientOcclusionMap;
 }
 
 inline bool operator!=(const MaterialComponent& a, const MaterialComponent& b)
 {
     return !(a == b);
 }
-
-
-// Define some default materials using the new structure (to be deleted later)
-const MaterialComponent MATERIAL_PBR_PHONG({ 0.8f, 0.2f, {1.0f, 0.8f, 0.2f}, {0.1f, 0.1f, 0.1f}, {0.7f, 0.7f, 0.7f}, {1.0f, 1.0f, 1.0f}, 128.0f, 0.0f, "PBR"});
-const MaterialComponent MATERIAL_DISCARD({ 0.5f, 0.0f, {0.2f, 0.8f, 0.2f}, {0.1f, 0.1f, 0.1f}, {0.7f, 0.7f, 0.7f}, {1.0f, 1.0f, 1.0f}, 32.0f, 1.0f, "Discard"});
-const MaterialComponent MATERIAL_CARTOON({ 0.5f, 0.0f, {0.8f, 0.2f, 0.8f}, {0.1f, 0.1f, 0.1f}, {0.7f, 0.7f, 0.7f}, {1.0f, 1.0f, 1.0f}, 32.0f, 2.0f, "Cartoon"});
-const MaterialComponent MATERIAL_CHECKERBOARD({ 0.9f, 0.0f, {1.0f, 1.0f, 1.0f}, {0.1f, 0.1f, 0.1f}, {0.7f, 0.7f, 0.7f}, {1.0f, 1.0f, 1.0f}, 32.0f, 3.0f, "Checkerboard"});
 
 // --- Other Scene Entity Components ---
 #endif

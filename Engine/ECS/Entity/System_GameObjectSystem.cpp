@@ -29,9 +29,6 @@
 #include "MeshComponent.h"
 #include "MaterialComponent.h"
 #include "LightComponent.h"
-#include "CameraComponent.h"
-#include "TextureComponent.h"
-#include "NormalMapComponent.h"
 #include "AssetManager.hpp"
 
 //For printing instance/type_guids in error messages

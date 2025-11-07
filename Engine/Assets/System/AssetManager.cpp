@@ -394,8 +394,6 @@ namespace EngineFramework {
 		asset_loader_map[SCRIPT] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadScript);
 		asset_loader_map[ARCHTYPE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadArchtype);
 		//=====================================//
-		compilers[TEXTURE] = std::make_unique<TextureCompiler>();
-		compilers[MESH] = std::make_unique<MeshCompiler>();
 
 		//Set AAsetManager for android, in audio system.
 #ifdef PLATFORM_ANDROID
@@ -413,51 +411,7 @@ namespace EngineFramework {
 
 	}
 
-	void AssetManagerSystem::CompileIfNeeded(
-		const std::filesystem::path& srcFolder,
-		const std::filesystem::path& outFolder,
-		IAssetCompiler* compiler)
-	{
-#ifdef PLATFORM_WINDOWS
-		std::filesystem::path srcPath = GetAssetFolderPrefix() / srcFolder;
-		std::filesystem::path outPath = GetAssetFolderPrefix() / outFolder;
-
-		if (!std::filesystem::exists(srcPath))
-			return;
-
-		std::filesystem::create_directories(outPath);
-
-		// Copy guid.meta
-		std::filesystem::path srcGuid = srcPath / "guid.meta";
-		std::filesystem::path outGuid = outPath / "guid.meta";
-		if (std::filesystem::exists(srcGuid) && !std::filesystem::exists(outGuid)) {
-			std::filesystem::copy(srcGuid, outGuid);
-		}
-
-		// Compile each file
-		std::string srcExt = compiler->GetSourceExt();
-		for (auto& entry : std::filesystem::directory_iterator(srcPath))
-		{
-			if (!entry.is_regular_file()) continue;
-			if (entry.path().extension() != srcExt) continue;
-
-			std::filesystem::path outFile = outPath /
-				(entry.path().stem().string() + compiler->GetOutputExt());
-
-			if (compiler->NeedsCompilation(entry.path(), outFile))
-			{
-				if (!compiler->Compile(entry.path(), outFile))
-				{
-					LOGE("Failed to compile: %s", entry.path().string().c_str());
-				}
-			}
-		}
-#else
-		UNREFERENCED_PARAMETER(srcFolder);
-		UNREFERENCED_PARAMETER(outFolder);
-		UNREFERENCED_PARAMETER(compiler);
-#endif
-	}
+	
 	/*
 		Reads the config file located at ASSET_CONFIG_FILE, and calls the respective asset function loaders for each folder/config path.
 		Will write into the resource maps.
@@ -479,35 +433,26 @@ namespace EngineFramework {
 
 			//TODO: Multithreading for asset loading here. Ensure no race conditions(like writing to the resource map) and multi-threaded safety within the function loaders too. (e.g. accessing the same file, writing to the same resource map).
 		*/
-		for (auto& [resource_type, folderpath_string] : config_json.items())
+		for (const auto& task : config_json)
 		{
-			std::filesystem::path folder_path{ folderpath_string.get<std::string>() };
+			std::string resource_type = task["type"];
+			std::filesystem::path folder_path = task["path"].get<std::string>();
+
+			// The rest of your logic remains the same...
 			type_folderpath_map[resource_type] = folder_path;
-			//Compile if needed, then load from compiled folder.
-			if (compilers.find(resource_type) != compilers.end())
-			{
-				std::filesystem::path compiledFolder =
-					folder_path.parent_path() /
-					(folder_path.filename().string() + "_Compiled");
-
-				CompileIfNeeded(folder_path, compiledFolder, compilers[resource_type].get());
-
-				// Load from compiled folder
-				folder_path = compiledFolder;
-			}
-
 			//Unable to find resource type in map, it might not have been added yet.
 			if (asset_loader_map.find(resource_type) == asset_loader_map.end())
 			{
-				throw std::runtime_error((std::string("No Function Loader for resource type: ") + resource_type + ". Ensure it is spelt correctly, and asset loader has been added to asset_loader_map.").c_str());
+				throw std::runtime_error((std::string("No Function Loader for resource type: ") + resource_type +
+					". Ensure it is spelt correctly, and asset loader has been added to asset_loader_map.").c_str());
 			}
-
 			//Call the asset loader for that respective asset type, and pass in the folderpath.
 			if (!asset_loader_map[resource_type](folder_path))
 			{
 				throw std::runtime_error((std::string("Unable to load asset of type: ") + resource_type).c_str());
 			}
 		}
+
 	}
 
 
@@ -516,7 +461,7 @@ namespace EngineFramework {
 	{
 		LOGD("Loading Texture");
 		//Acceptable files that can be loaded as a texture.
-		std::vector<std::string> texture_extensions{ ".png", ".compiled" };
+		std::vector<std::string> texture_extensions{ ".png" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, texture_extensions);
 
 		/*
@@ -524,7 +469,7 @@ namespace EngineFramework {
 			Resources are kept in an array until guid mappings are read.
 		*/
 		std::vector<std::string> asset_names{};
-		std::vector< std::shared_ptr<Scene::Texture>> loaded_resources{};
+		std::vector<std::shared_ptr<Scene::Texture>> loaded_resources{};
 
 		//Iterate through all texture files
 		for (const std::filesystem::path& path : files)
@@ -588,7 +533,7 @@ namespace EngineFramework {
 		LOGI("Loading Mesh");
 
 		// Acceptable files that can be loaded as a mesh.
-		std::vector<std::string> mesh_extensions{ ".obj", ".compiled" };
+		std::vector<std::string> mesh_extensions{ ".obj" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, mesh_extensions);
 
 		/*
@@ -605,17 +550,8 @@ namespace EngineFramework {
 
 			// Try catch guard for loading mesh
 			try {
-				if (path.extension() == ".obj")
-				{
-					loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
-				}
-				else if (path.extension() == ".compiled")
-				{
-					std::string data = GetStringFromFile(path);
-					nlohmann::json json_data{};
-					json_data = json_data.parse(data);
-					loaded_resources.emplace_back(new Mesh::MeshData(json_data));
-				}
+				LOGI("Loading Mesh: %s", path.string().c_str());
+				loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
 				asset_names.emplace_back(name); // Done if resource loading is a success.
 			}
 			catch (std::exception& e) {
@@ -627,6 +563,53 @@ namespace EngineFramework {
 		SetMappings(MESH_GUID, asset_names, loaded_resources, folder_path);
 
 		return true;
+	}
+
+	/**
+	 * @brief Loads a shader source file and recursively processes all #include directives.
+	 * @param filepath The path to the shader file to load.
+	 * @return A string containing the full, combined shader source code.
+	*/
+	static std::string LoadShaderSourceWithIncludes(const std::filesystem::path& filepath) {
+		// Use the AssetManager's own file reading utility to be platform-agnostic
+		std::string full_source = AssetManagerSystem::GetStringFromFile(filepath);
+		std::stringstream final_source;
+		std::stringstream file_stream(full_source);
+
+		std::string line;
+		while (getline(file_stream, line)) {
+			// Check for the #include directive
+			if (line.rfind("#include", 0) == 0) {
+				// Found an include, parse the filename (e.g., <common.glsl>)
+				size_t start = line.find('<');
+				size_t end = line.rfind('>');
+				if (start == std::string::npos || end == std::string::npos || start >= end) {
+					final_source << line << "\n"; // Malformed include, pass it along
+					continue;
+				}
+
+				std::string include_path_str = line.substr(start + 1, end - start - 1);
+
+				// Assume the included file is in the same directory as the parent shader
+				std::filesystem::path include_filepath = filepath.parent_path() / include_path_str;
+
+				// Recursively call this function to load the included file's source
+				std::string include_source = LoadShaderSourceWithIncludes(include_filepath);
+
+				if (!include_source.empty()) {
+					final_source << include_source << "\n";
+				}
+				else {
+					LOGE("Failed to include shader file: %s", include_filepath.string().c_str());
+				}
+			}
+			else {
+				// Not an include line, just append it to the final source
+				final_source << line << "\n";
+			}
+		}
+
+		return final_source.str();
 	}
 
 	bool AssetManagerSystem::LoadShader(const std::filesystem::path& config_file)
@@ -648,22 +631,37 @@ namespace EngineFramework {
 		{
 			//Read vertex and fragment shader filepaths.
 			//Always throw an error if not present, as these are critical for a shader program (unlike geometry or tesselation).
-			if (!shader_filepaths.contains("vertex"))
-			{
-				LOGE("%s %s %s", "No vertex filepath in config file for shader program", shader_name.c_str(), ", did you mispell it ?");
-				continue;
-			}
-			if (!shader_filepaths.contains("fragment"))
-			{
-				LOGE("%s %s %s", "No fragment filepath in config file for shader program", shader_name.c_str(), ", did you mispell it ?");
-				continue;
-			}
-			std::string vertex_shader = shader_filepaths["vertex"];
-			std::string fragment_shader = shader_filepaths["fragment"];
 			try
 			{
-				loaded_resources.emplace_back(new ShaderProgram(vertex_shader.c_str(), fragment_shader.c_str()));
-				asset_names.emplace_back(shader_name); //Done if resource loading is a success.
+				// Case 1: Compute Shader (has a "compute" key)
+				if (shader_filepaths.contains("compute"))
+				{
+					std::string compute_shader_path = shader_filepaths["compute"];
+					std::string compute_source = LoadShaderSourceWithIncludes(compute_shader_path);
+					if (compute_source.empty()) throw std::runtime_error("Failed to load compute shader.");
+
+					loaded_resources.emplace_back(new ShaderProgram(compute_source.c_str()));
+					asset_names.emplace_back(shader_name);
+				}
+				// Case 2: Graphics Shader (has "vertex" and "fragment" keys)
+				else if (shader_filepaths.contains("vertex") && shader_filepaths.contains("fragment"))
+				{
+					std::string vertex_shader_path = shader_filepaths["vertex"];
+					std::string fragment_shader_path = shader_filepaths["fragment"];
+
+					std::string vertex_source = LoadShaderSourceWithIncludes(vertex_shader_path);
+					std::string fragment_source = LoadShaderSourceWithIncludes(fragment_shader_path);
+					if (vertex_source.empty() || fragment_source.empty()) throw std::runtime_error("Failed to load graphics shaders.");
+
+					// Call the new constructor that takes source code
+					loaded_resources.emplace_back(new ShaderProgram(vertex_source.c_str(), fragment_source.c_str(), true));
+					asset_names.emplace_back(shader_name);
+				}
+				else
+				{
+					LOGE("Shader '%s' in config is missing required keys. Expected 'compute' or both 'vertex' and 'fragment'.", shader_name.c_str());
+					continue;
+				}
 			}
 			catch (std::exception& e)
 			{
@@ -932,18 +930,7 @@ namespace EngineFramework {
 		//==Load again.
 		std::filesystem::path folder_path{ folderpath_string };
 
-		//Compile if needed, then load from compiled folder.
-		if (compilers.find(type) != compilers.end())
-		{
-			std::filesystem::path compiledFolder =
-				folder_path.parent_path() /
-				(folder_path.filename().string() + "_Compiled");
-
-			CompileIfNeeded(folder_path, compiledFolder, compilers[type].get());
-
-			// Load from compiled folder
-			folder_path = compiledFolder;
-		}
+		
 
 		//Call the asset loader for that respective asset type, and pass in the folderpath.
 		if (!asset_loader_map[type](folder_path))

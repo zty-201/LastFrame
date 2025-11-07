@@ -69,6 +69,42 @@ ShaderProgram::ShaderProgram(const char* sv, const char* sf)
         link();  // Link the shaders into a program.
     }
 }
+// Takes source code and calls compileShaderString
+ShaderProgram::ShaderProgram(const char* vertexSource, const char* fragmentSource, bool isSourceCode)
+    : handle(0), linked(false)
+{
+    // The boolean is just for constructor overloading, it isn't used.
+    (void)isSourceCode;
+
+    if (vertexSource && fragmentSource)
+    {
+        handle = glCreateProgram();
+        if (!handle)
+            throw std::runtime_error("Unable to create shader program.");
+
+        LOGD("Compiling Vertex Shader from source string...");
+        compileShaderString(vertexSource, GL_VERTEX_SHADER);
+        LOGD("Compiling Fragment Shader from source string...");
+        compileShaderString(fragmentSource, GL_FRAGMENT_SHADER);
+        link();
+    }
+}
+
+// Takes source code and calls compileShaderString
+ShaderProgram::ShaderProgram(const char* cs)
+    : handle(0), linked(false)
+{
+    if (cs)
+    {
+        handle = glCreateProgram();
+        if (!handle)
+            throw std::runtime_error("Unable to create shader program.");
+
+        LOGD("Compiling Compute Shader from source string...");
+        compileShaderString(cs, GL_COMPUTE_SHADER);
+        link();
+    }
+}
 
 // Destructor: cleans up by detaching and deleting shader objects, and deleting the program.
 ShaderProgram::~ShaderProgram()
@@ -105,7 +141,7 @@ void ShaderProgram::compileShaderFile(const char* fileName, GLenum type)
     }
     try
     {
-        compileShader(file_data.c_str(), type);  // Compile the shader using the code read from the file.
+        compileShaderString(file_data.c_str(), type);  // Compile the shader using the code read from the file.
     }
     //Rethrow with additional debug info.
     catch (std::runtime_error& e)
@@ -115,7 +151,7 @@ void ShaderProgram::compileShaderFile(const char* fileName, GLenum type)
 }
 
 // Compile a shader from source code.
-void ShaderProgram::compileShader(const char* code, GLenum type)
+void ShaderProgram::compileShaderString(const char* code, GLenum type)
 {
     if (!handle)  // If no valid program handle, create a new program.
     {

@@ -17,8 +17,9 @@
 
 struct LightComponent
 {
-    glm::vec3 position{};       // The position of the light in 3D space
-    std::vector<glm::vec3> L{}; // Intensity values for ambient, diffuse, and specular components
+    glm::vec3 position{};
+    glm::vec3 color{ 1.0f, 1.0f, 1.0f }; // The actual color of the light (e.g., white)
+    float intensity{ 1.0f };
 };
 
 #endif

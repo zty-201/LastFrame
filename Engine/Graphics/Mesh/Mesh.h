@@ -4,962 +4,417 @@
  *
  * This file defines the `Mesh` namespace, which includes structures and functions
  * for creating, parsing, and manipulating 3D mesh data. It supports loading meshes
- * from OBJ files, generating common 3D primitives (e.g., quads, planes, cubes, spheres,
- * and skyboxes), and calculating tangents for advanced rendering techniques.
+ * from files using Assimp, generating common 3D primitives (e.g., quads, cubes, spheres),
+ * and calculating tangents for advanced rendering techniques.
  *
  * Key components:
- * - `Mesh::Vertex`: Represents a vertex with position, normal, and texture coordinate indices.
- * - `Mesh::MeshData`: Stores vertex data, normals, texture coordinates, tangents, and indices.
+ * - `Mesh::Vertex`: Represents a vertex with position, normal, UVs, and tangent.
+ * - `Mesh::MeshData`: Stores vertex data, sub-mesh info, materials, and OpenGL handles.
  * - Utility functions for generating 3D primitives and calculating tangents.
  *
- * @author Zhang TongYan
- * @date October, 2025
+ * @author zty-201
+ * @date 2025-11-03
  */
 #ifndef MESH_H
 #define MESH_H
+
 #include "nlohmann/json.hpp"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include "MaterialComponent.h"
+#include "global.hpp" // For AssetManagerSystem, etc.
+#include "AssimpWrapper.h"
+
 namespace Mesh {
 
-	// The Vertex struct.
-	// This class is useful for parsing vertex data from OBJ files and converting them into 
-	// indices suitable for OpenGL-based rendering or other 3D graphics workflows.
-	//
-	struct Vertex
-	{
-		int pIdx;   // Index for the vertex position in the points array.
-		int nIdx;   // Index for the vertex normal in the normals array.
-		int tcIdx;  // Index for the texture coordinate in the texCoords array.
-
-		// Constructs a Vertex object by parsing a vertex definition string.
-		// This constructor extracts indices for position, texture coordinate, and normal
-		// from a vertex definition string in the format typically found in Wavefront OBJ
-		// files.
-		Vertex(std::string& vertString)
-			: pIdx(-1), nIdx(-1), tcIdx(-1)
-		{
-			size_t slash1, slash2;
-			slash1 = vertString.find("/");
-			pIdx = std::stoi(vertString.substr(0, slash1)) - 1;
-			if (slash1 != std::string::npos)
-			{
-				slash2 = vertString.find("/", slash1 + 1);
-				if (slash2 > slash1 + 1)
-					tcIdx = std::stoi(vertString.substr(slash1 + 1, slash2 - slash1 - 1)) - 1;
-				nIdx = std::stoi(vertString.substr(slash2 + 1)) - 1;
-			}
-		}
-	};
-
-	// The MeshData struct.
-	struct MeshData {
-		std::vector<GLfloat> points;     // Vertex positions (x, y, z)
-		std::vector<GLfloat> normals;    // Vertex normals (x, y, z)
-		std::vector<GLfloat> texCoords;  // Texture coordinates (u, v)
-		std::vector<GLfloat> tangents;   // Tangent vectors (x, y, z)
-		std::vector<GLuint> indices;     // Indices for indexed drawing
-
-		MeshData() = default;
-
-		// Constructor that reads from an OBJ file
-		explicit MeshData(const std::string& fileName, bool genTangents = false)
-		{
-			generate(fileName.c_str(), genTangents);
-		}
-
-		// Constructor that reads precompiled data from json obj
-		explicit MeshData(const nlohmann::json& json_data)
-		{
-			if (json_data.contains("points")) points = json_data["points"].get<std::vector<GLfloat>>();
-			if (json_data.contains("normals")) normals = json_data["normals"].get<std::vector<GLfloat>>();
-			if (json_data.contains("texCoords")) texCoords = json_data["texCoords"].get<std::vector<GLfloat>>();
-			if (json_data.contains("tangents")) tangents = json_data["tangents"].get<std::vector<GLfloat>>();
-			if (json_data.contains("indices")) indices = json_data["indices"].get<std::vector<GLuint>>();
-		}
-	public:
-		//Returns the precompiled file as a json object.
-		inline nlohmann::json PrecompileFile(const char* fileName, bool genTangent = false)
-		{
-			//Precompiles the file and stores in current data.
-			generate(fileName, genTangent);
-			//Return current precompiled data as json.
-			nlohmann::json json_data{};
-			json_data["points"] = points;
-			json_data["normals"] = normals;
-			json_data["texCoords"] = texCoords;
-			json_data["tangents"] = tangents;
-			json_data["indices"] = indices;
-
-			return json_data;
-		}
-
-	private:
-		inline void generate(const char* fileName, bool genTangent /*= false*/)
-		{
-
-			struct MeshData {
-				std::vector <glm::vec3> points;
-				std::vector <glm::vec3> normals;
-				std::vector <glm::vec2> texCoords;
-				std::vector <Vertex> faces;
-				std::vector <glm::vec4> tangents;
-			} meshData;
-
-			// Load data
-			std::string file_data = EngineFramework::AssetManagerSystem::GetStringFromFile(fileName);
-			if (file_data.empty())
-				throw std::runtime_error(std::string("file ") + fileName + " not found.");
-
-			std::stringstream objStream{ std::move(file_data) };
-			//objStream.write(reinterpret_cast<const char*>(file_data.data()), file_data.size());
-
-			std::string line, token;
-			getline(objStream, line);
-			while (!objStream.eof())
-			{
-				// Remove comment if it exists
-				size_t pos = line.find_first_of("#");
-				if (pos != std::string::npos)
-					line = line.substr(0, pos);
-
-				// Trim string
-				const char* whiteSpace = " \t\n\r";
-				size_t location;
-				location = line.find_first_not_of(whiteSpace);
-				line.erase(0, location);
-				location = line.find_last_not_of(whiteSpace);
-				line.erase(location + 1);
-
-				if (line.length() > 0) {
-					std::istringstream lineStream(line);
-
-					lineStream >> token;
-
-					if (token == "v") {
-						float x, y, z;
-						lineStream >> x >> y >> z;
-						glm::vec3 p(x, y, z);
-						meshData.points.push_back(p);
-					}
-					else if (token == "vt") {
-						// Process texture coordinate
-						float s, t;
-						lineStream >> s >> t;
-						meshData.texCoords.push_back(glm::vec2(s, t));
-					}
-					else if (token == "vn") {
-						float x, y, z;
-						lineStream >> x >> y >> z;
-						meshData.normals.push_back(glm::vec3(x, y, z));
-					}
-					else if (token == "f") {
-						static std::vector<std::string> parts;
-						parts.clear();
-						while (lineStream.good()) {
-							std::string s;
-							lineStream >> s;
-							parts.push_back(s);
-						}
-
-						// Triangulate as a triangle fan
-						if (parts.size() > 2) {
-							Vertex firstVert(parts[0]);
-							for (int i = 2; i < parts.size(); i++) {
-								meshData.faces.push_back(firstVert);
-								meshData.faces.push_back(Vertex(parts[i - 1]));
-								meshData.faces.push_back(Vertex(parts[i]));
-							}
-						}
-					}
-				}
-				getline(objStream, line);
-			}
-
-			// Generate normals if needed
-			if (meshData.normals.size() == 0)
-			{
-				meshData.normals.resize(meshData.points.size());
-
-				for (GLuint i = 0; i < meshData.faces.size(); i += 3)
-				{
-					const glm::vec3& p1 = meshData.points[meshData.faces[i].pIdx];
-					const glm::vec3& p2 = meshData.points[meshData.faces[i + 1].pIdx];
-					const glm::vec3& p3 = meshData.points[meshData.faces[i + 2].pIdx];
-
-					glm::vec3 a = p2 - p1;
-					glm::vec3 b = p3 - p1;
-					glm::vec3 n = glm::normalize(glm::cross(a, b));
-
-					meshData.normals[meshData.faces[i].pIdx] += n;
-					meshData.normals[meshData.faces[i + 1].pIdx] += n;
-					meshData.normals[meshData.faces[i + 2].pIdx] += n;
-
-					// Set the normal index to be the same as the point index
-					meshData.faces[i].nIdx = meshData.faces[i].pIdx;
-					meshData.faces[i + 1].nIdx = meshData.faces[i + 1].pIdx;
-					meshData.faces[i + 2].nIdx = meshData.faces[i + 2].pIdx;
-				}
-
-				for (GLuint i = 0; i < meshData.normals.size(); i++)
-					meshData.normals[i] = glm::normalize(meshData.normals[i]);
-			}
-
-			// Generate tangents if needed
-			if (genTangent)
-			{
-				std::vector<glm::vec3> tan1Accum(meshData.points.size());
-				std::vector<glm::vec3> tan2Accum(meshData.points.size());
-				meshData.tangents.resize(meshData.points.size());
-
-				// Compute the tangent std::vector
-				for (GLuint i = 0; i < meshData.faces.size(); i += 3)
-				{
-					const glm::vec3& p1 = meshData.points[meshData.faces[i].pIdx];
-					const glm::vec3& p2 = meshData.points[meshData.faces[i + 1].pIdx];
-					const glm::vec3& p3 = meshData.points[meshData.faces[i + 2].pIdx];
-
-					const glm::vec2& tc1 = meshData.texCoords[meshData.faces[i].tcIdx];
-					const glm::vec2& tc2 = meshData.texCoords[meshData.faces[i + 1].tcIdx];
-					const glm::vec2& tc3 = meshData.texCoords[meshData.faces[i + 2].tcIdx];
-
-					glm::vec3 q1 = p2 - p1;
-					glm::vec3 q2 = p3 - p1;
-					float s1 = tc2.x - tc1.x, s2 = tc3.x - tc1.x;
-					float t1 = tc2.y - tc1.y, t2 = tc3.y - tc1.y;
-					float r = 1.0f / (s1 * t2 - s2 * t1);
-					glm::vec3 tan1((t2 * q1.x - t1 * q2.x) * r,
-						(t2 * q1.y - t1 * q2.y) * r,
-						(t2 * q1.z - t1 * q2.z) * r);
-					glm::vec3 tan2((s1 * q2.x - s2 * q1.x) * r,
-						(s1 * q2.y - s2 * q1.y) * r,
-						(s1 * q2.z - s2 * q1.z) * r);
-					tan1Accum[meshData.faces[i].pIdx] += tan1;
-					tan1Accum[meshData.faces[i + 1].pIdx] += tan1;
-					tan1Accum[meshData.faces[i + 2].pIdx] += tan1;
-					tan2Accum[meshData.faces[i].pIdx] += tan2;
-					tan2Accum[meshData.faces[i + 1].pIdx] += tan2;
-					tan2Accum[meshData.faces[i + 2].pIdx] += tan2;
-				}
-
-				for (GLuint i = 0; i < meshData.points.size(); ++i)
-				{
-					const glm::vec3& n = meshData.normals[i];
-					glm::vec3& t1 = tan1Accum[i];
-					glm::vec3& t2 = tan2Accum[i];
-
-					// Gram-Schmidt orthogonalize
-					meshData.tangents[i] = glm::vec4(glm::normalize(t1 - (glm::dot(n, t1) * n)), 0.0f);
-					// Store handedness in w
-					meshData.tangents[i].w = (glm::dot(glm::cross(n, t1), t2) < 0.0f) ? -1.0f : 1.0f;
-				}
-			}
-
-			// Convert to GL format
-			std::map<std::string, GLuint> vertexMap;
-			for (auto& vert : meshData.faces)
-			{
-				std::string vertStr = std::to_string(vert.pIdx) + "/" +
-					std::to_string(vert.tcIdx) + "/" +
-					std::to_string(vert.nIdx);
-				auto it = vertexMap.find(vertStr);
-				if (it == vertexMap.end()) {
-					auto vIdx = points.size() / 3;
-
-					auto& pt = meshData.points[vert.pIdx];
-					points.push_back(pt.x);
-					points.push_back(pt.y);
-					points.push_back(pt.z);
-
-					auto& n = meshData.normals[vert.nIdx];
-					normals.push_back(n.x);
-					normals.push_back(n.y);
-					normals.push_back(n.z);
-
-					if (!meshData.texCoords.empty()) {
-						auto& tc = meshData.texCoords[vert.tcIdx];
-						texCoords.push_back(tc.x);
-						texCoords.push_back(tc.y);
-					}
-
-					if (!meshData.tangents.empty()) {
-						// We use the point index for tangents
-						auto& tang = meshData.tangents[vert.pIdx];
-						tangents.push_back(tang.x);
-						tangents.push_back(tang.y);
-						tangents.push_back(tang.z);
-						tangents.push_back(tang.w);
-					}
-
-					indices.push_back((GLuint)vIdx);
-					vertexMap[vertStr] = (GLuint)vIdx;
-				}
-				else
-					indices.push_back(it->second);
-			}
-		}
-	};
-
-	inline void calculateTangents(MeshData& mesh)
-	{
-		if (mesh.indices.empty() || mesh.points.empty() ||
-			mesh.normals.empty() || mesh.texCoords.empty())
-			return;
-
-		// Resize tangent array to match vertices
-		size_t vertexCount = mesh.points.size() / 3;
-		mesh.tangents.resize(vertexCount * 4, 0.0f); // vec4 per vertex
-
-		std::vector<glm::vec3> tan1(vertexCount, glm::vec3(0.0f));
-		std::vector<glm::vec3> tan2(vertexCount, glm::vec3(0.0f));
-
-		// Calculate tangent and bitangent for each triangle
-		for (size_t i = 0; i < mesh.indices.size(); i += 3)
-		{
-			GLuint i0 = mesh.indices[i];
-			GLuint i1 = mesh.indices[i + 1];
-			GLuint i2 = mesh.indices[i + 2];
-
-			// Get positions
-			glm::vec3 v0(mesh.points[i0 * 3], mesh.points[i0 * 3 + 1], mesh.points[i0 * 3 + 2]);
-			glm::vec3 v1(mesh.points[i1 * 3], mesh.points[i1 * 3 + 1], mesh.points[i1 * 3 + 2]);
-			glm::vec3 v2(mesh.points[i2 * 3], mesh.points[i2 * 3 + 1], mesh.points[i2 * 3 + 2]);
-
-			// Get texture coordinates
-			glm::vec2 uv0(mesh.texCoords[i0 * 2], mesh.texCoords[i0 * 2 + 1]);
-			glm::vec2 uv1(mesh.texCoords[i1 * 2], mesh.texCoords[i1 * 2 + 1]);
-			glm::vec2 uv2(mesh.texCoords[i2 * 2], mesh.texCoords[i2 * 2 + 1]);
-
-			// Calculate edges
-			glm::vec3 edge1 = v1 - v0;
-			glm::vec3 edge2 = v2 - v0;
-			glm::vec2 deltaUV1 = uv1 - uv0;
-			glm::vec2 deltaUV2 = uv2 - uv0;
-
-			// Calculate tangent
-			float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-			glm::vec3 tangent, bitangent;
-
-			tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-			tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-			tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-
-			bitangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-			bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-			bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-
-			// Accumulate for each vertex
-			tan1[i0] += tangent;
-			tan1[i1] += tangent;
-			tan1[i2] += tangent;
-
-			tan2[i0] += bitangent;
-			tan2[i1] += bitangent;
-			tan2[i2] += bitangent;
-		}
-
-		// Orthogonalize and store tangents
-		for (size_t i = 0; i < vertexCount; ++i)
-		{
-			glm::vec3 n(mesh.normals[i * 3], mesh.normals[i * 3 + 1], mesh.normals[i * 3 + 2]);
-			glm::vec3 t = tan1[i];
-
-			// Gram-Schmidt orthogonalize
-			t = glm::normalize(t - n * glm::dot(n, t));
-
-			// Calculate handedness
-			float handedness = (glm::dot(glm::cross(n, t), tan2[i]) < 0.0f) ? -1.0f : 1.0f;
-
-			// Store as vec4 (xyz = tangent, w = handedness)
-			mesh.tangents[i * 4 + 0] = t.x;
-			mesh.tangents[i * 4 + 1] = t.y;
-			mesh.tangents[i * 4 + 2] = t.z;
-			mesh.tangents[i * 4 + 3] = handedness;
-		}
-	}
-
-	// Generates a single quad (square plane) centered at the origin.
-	// The quad lies in the XY plane with a normal pointing along the positive Z-axis.
-	inline void generateQuad(MeshData& mesh, GLfloat side = 2.0f)                           // Optional parameter specifying the length of each side. Default is 2.0f.
-	{
-		const GLfloat side2 = side / 2.0f; // Calculate half the side length for positioning the vertices.
-
-		// Define the vertex positions of the quad (counterclockwise order).
-		mesh.points = {
-			-side2, -side2, 0.0f, // Bottom-left vertex
-			 side2, -side2, 0.0f, // Bottom-right vertex
-			 side2,  side2, 0.0f, // Top-right vertex
-			-side2,  side2, 0.0f  // Top-left vertex
-		};
-
-		// Define the normal vectors for the quad (all pointing along the positive Z-axis).
-		mesh.normals = {
-			0.0f, 0.0f, 1.0f, // Bottom-left vertex
-			0.0f, 0.0f, 1.0f, // Bottom-right vertex
-			0.0f, 0.0f, 1.0f, // Top-right vertex
-			0.0f, 0.0f, 1.0f  // Top-left vertex
-		};
-
-		// Define the texture coordinates for the quad.
-		mesh.texCoords = {
-			0.0f, 0.0f, // Bottom-left vertex
-			1.0f, 0.0f, // Bottom-right vertex
-			1.0f, 1.0f, // Top-right vertex
-			0.0f, 1.0f  // Top-left vertex
-		};
-
-		// Define the vertex indices for two triangles forming the quad.
-		mesh.indices = {
-			0, 1, 2, // First triangle (bottom-left, bottom-right, top-right)
-			0, 2, 3  // Second triangle (bottom-left, top-right, top-left)
-		};
-		calculateTangents(mesh);
-	}
-
-
-	// Generates a plane composed of 9 vertices arranged in a 3x3 grid.
-	// The plane lies in the XZ plane with its normal pointing along the positive Y-axis.
-	inline void generatePlane(MeshData& mesh)     // Output vector to store tangent vectors.
-	{
-		const GLfloat side = 4.0f; // Define the side length of the grid spacing in both X and Z directions.
-
-		// Define vertex positions for the plane (3x3 grid of vertices in the XZ plane, with Y=0).
-		mesh.points = {
-		   -side,  0.0f,   -side,  // Bottom-left
-			   0,  0.0f,   -side,  // Bottom-center
-			side,  0.0f,   -side,  // Bottom-right
-		   -side,  0.0f,    0.0f,  // Middle-left
-			   0,  0.0f,    0.0f,  // Center
-			side,  0.0f,    0.0f,  // Middle-right
-		   -side,  0.0f,    side,  // Top-left
-			   0,  0.0f,    side,  // Top-center
-			side,  0.0f,    side   // Top-right
-		};
-
-		// Define the normal vectors for each vertex (all pointing up along the Y-axis).
-		mesh.normals = {
-			0.0f, 1.0f, 0.0f,  // Bottom-left
-			0.0f, 1.0f, 0.0f,  // Bottom-center
-			0.0f, 1.0f, 0.0f,  // Bottom-right
-			0.0f, 1.0f, 0.0f,  // Middle-left
-			0.0f, 1.0f, 0.0f,  // Center
-			0.0f, 1.0f, 0.0f,  // Middle-right
-			0.0f, 1.0f, 0.0f,  // Top-left
-			0.0f, 1.0f, 0.0f,  // Top-center
-			0.0f, 1.0f, 0.0f   // Top-right
-		};
-
-		// Define the texture coordinates for each vertex (spanning the range [0, 1] in the UV space).
-		mesh.texCoords = {
-			0.0f, 0.0f,  // Bottom-left
-			0.5f, 0.0f,  // Bottom-center
-			1.0f, 0.0f,  // Bottom-right
-			0.0f, 0.5f,  // Middle-left
-			0.5f, 0.5f,  // Center
-			1.0f, 0.5f,  // Middle-right
-			0.0f, 1.0f,  // Top-left
-			0.5f, 1.0f,  // Top-center
-			1.0f, 1.0f   // Top-right
-		};
-
-		// Define the vertex indices to form the plane using 8 triangles (in counterclockwise order).
-		// The grid layout is as follows (vertex indices):
-		// 6 7 8
-		// 3 4 5
-		// 0 1 2
-		mesh.indices = {
-			0, 1, 3,  // Bottom-left triangle
-			3, 1, 4,  // Middle-left triangle
-			4, 1, 2,  // Bottom-center triangle
-			2, 5, 4,  // Bottom-right triangle
-			3, 4, 6,  // Top-left triangle
-			6, 4, 7,  // Middle-left triangle
-			7, 4, 5,  // Top-center triangle
-			5, 8, 7   // Top-right triangle
-		};
-		calculateTangents(mesh);
-	}
-
-
-	// Generates a cube with specified side length.
-	// The cube is centered at the origin, with each face consisting of 2 triangles.
-	// Each face has unique normals and texture coordinates.
-	inline void generateCube(MeshData& mesh, GLfloat side = 1.0f)           // Length of each side of the cube.
-	{
-		// Define vertex positions for each face of the cube.
-		// Each face is defined by four vertices in counter-clockwise order.
-		mesh.points = {
-			// Front face
-		   -side, -side,  side,   // Bottom-left
-			side, -side,  side,   // Bottom-right
-			side,  side,  side,   // Top-right
-		   -side,  side,  side,   // Top-left
-		   // Right face
-		   side, -side,  side,   // Bottom-left
-		   side, -side, -side,   // Bottom-right
-		   side,  side, -side,   // Top-right
-		   side,  side,  side,   // Top-left
-		   // Back face
-		  -side, -side, -side,   // Bottom-left
-		  -side,  side, -side,   // Top-left
-		   side,  side, -side,   // Top-right
-		   side, -side, -side,   // Bottom-right
-		   // Left face
-		  -side, -side,  side,   // Bottom-right
-		  -side,  side,  side,   // Top-right
-		  -side,  side, -side,   // Top-left
-		  -side, -side, -side,   // Bottom-left
-		  // Bottom face
-		 -side, -side,  side,   // Front-left
-		 -side, -side, -side,   // Back-left
-		  side, -side, -side,   // Back-right
-		  side, -side,  side,   // Front-right
-		  // Top face
-		 -side,  side,  side,   // Front-left
-		  side,  side,  side,   // Front-right
-		  side,  side, -side,   // Back-right
-		 -side,  side, -side    // Back-left
-		};
-
-		// Define normal vectors for each face of the cube.
-		// Each face has its own unique normal direction.
-		mesh.normals = {
-			// Front face
-			0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f,
-			// Right face
-			1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f,
-			// Back face
-			0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,
-			// Left face
-		   -1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  0.0f,
-		   // Bottom face
-		   0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-		   // Top face
-		   0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f
-		};
-
-		// Define texture coordinates for each face.
-		// The same UV mapping is used for all six faces.
-		mesh.texCoords = {
-			// Front face
-			0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f,
-			// Right face
-			0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f,
-			// Back face
-			0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f,
-			// Left face
-			0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f,
-			// Bottom face
-			0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f,
-			// Top face
-			0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f
-		};
-
-		// Define vertex indices for each face of the cube.
-		// Each face is formed by two triangles (6 indices per face).
-		mesh.indices = {
-			0, 1, 2,  0, 2, 3,  // Front face
-			4, 5, 6,  4, 6, 7,  // Right face
-			8, 9, 10, 8, 10,11, // Back face
-			12,13,14, 12,14,15, // Left face
-			16,17,18, 16,18,19, // Bottom face
-			20,21,22, 20,22,23  // Top face
-		};
-		calculateTangents(mesh);
-	}
-
-
-	// Generates a sphere mesh with specified parameters.
-	// The sphere is constructed as a mesh of triangles.
-	inline void generateSphere(MeshData& mesh,     // Output mesh.
-		float radius = 1.0f,           // Radius of the sphere.
-		GLuint nSlices = 20,           // Number of slices (longitudinal divisions).
-		GLuint nStacks = 20)           // Number of stacks (latitudinal divisions).
-	{
-		// Calculate the total number of vertices and faces.
-		const int nVerts = (nSlices + 1) * (nStacks + 1);    // Total number of vertices (include duplicate for seamless wrapping).
-		const int nFaces = (nSlices * 2 * (nStacks - 1)) * 3; // Total number of face indices (triangles).
-
-		// Resize the output vectors to hold the required data.
-		mesh.points.resize(3 * nVerts);                           // Each vertex has 3 coordinates (x, y, z).
-		mesh.normals.resize(3 * nVerts);                          // Each vertex has 3 normal components (x, y, z).
-		mesh.texCoords.resize(2 * nVerts);                        // Each vertex has 2 texture coordinates (u, v).
-		mesh.indices.resize(nFaces);                              // Total number of indices for the faces.
-
-		// Factors to calculate angles for slices (longitude) and stacks (latitude).
-		GLfloat thetaFac = glm::two_pi<float>() / nSlices;   // Increment for theta (longitude angle).
-		GLfloat phiFac = glm::pi<float>() / nStacks;         // Increment for phi (latitude angle).
-
-		// Variables for position, normal, and texture coordinate calculations.
-		GLfloat theta, phi;                                  // Longitude and latitude angles.
-		GLfloat nx, ny, nz;                                  // Components of the normal vector.
-		GLfloat s, t;                                        // Texture coordinates.
-		GLuint idx = 0, tIdx = 0;                            // Indices for vertex and texture data.
-
-		// Generate vertex data.
-		for (GLuint i = 0; i <= nSlices; i++) {              // Iterate through slices (longitude).
-			theta = i * thetaFac;                            // Calculate current longitude angle.
-			s = (GLfloat)i / nSlices;                        // Texture coordinate (s).
-
-			for (GLuint j = 0; j <= nStacks; j++) {          // Iterate through stacks (latitude).
-				phi = j * phiFac;                            // Calculate current latitude angle.
-				t = (GLfloat)j / nStacks;                    // Texture coordinate (t).
-
-				// Calculate the normal vector.
-				nx = sinf(phi) * cosf(theta);                // Normal x-component.
-				ny = sinf(phi) * sinf(theta);                // Normal y-component.
-				nz = cosf(phi);                              // Normal z-component.
-
-				// Calculate vertex position by scaling the normal by the radius.
-				mesh.points[idx] = radius * nx;                   // x-coordinate.
-				mesh.points[idx + 1] = radius * ny;               // y-coordinate.
-				mesh.points[idx + 2] = radius * nz;               // z-coordinate.
-
-				// Store the normalized normal vector.
-				mesh.normals[idx] = nx;                           // Normal x-component.
-				mesh.normals[idx + 1] = ny;                       // Normal y-component.
-				mesh.normals[idx + 2] = nz;                       // Normal z-component.
-
-				idx += 3;                                    // Advance vertex index.
-
-				// Store texture coordinates.
-				mesh.texCoords[tIdx] = s;                         // u-coordinate.
-				mesh.texCoords[tIdx + 1] = t;                     // v-coordinate.
-
-				tIdx += 2;                                   // Advance texture coordinate index.
-			}
-		}
-
-		// Generate element (index) list for faces.
-		idx = 0;
-		for (GLuint i = 0; i < nSlices; i++) {               // Iterate through slices (longitude).
-			GLuint stackStart = i * (nStacks + 1);           // Starting index of the current stack.
-			GLuint nextStackStart = (i + 1) * (nStacks + 1); // Starting index of the next stack.
-
-			for (GLuint j = 0; j < nStacks; j++) {           // Iterate through stacks (latitude).
-
-				// Handle the first stack (triangles at the pole).
-				if (j == 0) {
-					mesh.indices[idx] = stackStart;               // Vertex at the pole.
-					mesh.indices[idx + 1] = stackStart + 1;       // First vertex of the triangle.
-					mesh.indices[idx + 2] = nextStackStart + 1;   // Second vertex of the triangle.
-					idx += 3;                                // Advance index count.
-				}
-				// Handle the last stack (triangles near the pole).
-				else if (j == nStacks - 1) {
-					mesh.indices[idx] = stackStart + j;           // First vertex of the triangle.
-					mesh.indices[idx + 1] = stackStart + j + 1;   // Second vertex of the triangle.
-					mesh.indices[idx + 2] = nextStackStart + j;   // Vertex at the pole.
-					idx += 3;                                // Advance index count.
-				}
-				// Handle the middle stacks (quads split into two triangles).
-				else {
-					// First triangle of the quad.
-					mesh.indices[idx] = stackStart + j;
-					mesh.indices[idx + 1] = stackStart + j + 1;
-					mesh.indices[idx + 2] = nextStackStart + j + 1;
-
-					// Second triangle of the quad.
-					mesh.indices[idx + 3] = nextStackStart + j;
-					mesh.indices[idx + 4] = stackStart + j;
-					mesh.indices[idx + 5] = nextStackStart + j + 1;
-
-					idx += 6;                                // Advance index count.
-				}
-			}
-		}
-		calculateTangents(mesh);
-	}
-
-
-	// Generates a cube-shaped skybox with specified side length.
-	// The skybox is constructed as a set of 6 faces (quads) and rendered using triangles.
-	inline void generateSkyBox(MeshData& mesh,     // Output mesh
-		GLfloat side = 50.0f)           // Length of a side of the cube.
-	{
-		// Half the length of the side, used to center the cube at the origin.
-		const GLfloat side2 = side / 2.0f;
-
-		// Define the vertex positions for the 6 faces of the cube.
-		// Each face is defined as a quad made of 4 vertices.
-		mesh.points = {
-			// Front face
-		   -side2, -side2,  side2,   // Bottom-left
-			side2, -side2,  side2,   // Bottom-right
-			side2,  side2,  side2,   // Top-right
-		   -side2,  side2,  side2,   // Top-left
-
-		   // Right face
-		   side2, -side2,  side2,   // Bottom-front
-		   side2, -side2, -side2,   // Bottom-back
-		   side2,  side2, -side2,   // Top-back
-		   side2,  side2,  side2,   // Top-front
-
-		   // Back face
-		  -side2, -side2, -side2,   // Bottom-right
-		  -side2,  side2, -side2,   // Top-right
-		   side2,  side2, -side2,   // Top-left
-		   side2, -side2, -side2,   // Bottom-left
-
-		   // Left face
-		  -side2, -side2,  side2,   // Bottom-front
-		  -side2,  side2,  side2,   // Top-front
-		  -side2,  side2, -side2,   // Top-back
-		  -side2, -side2, -side2,   // Bottom-back
-
-		  // Bottom face
-		 -side2, -side2,  side2,   // Front-left
-		 -side2, -side2, -side2,   // Back-left
-		  side2, -side2, -side2,   // Back-right
-		  side2, -side2,  side2,   // Front-right
-
-		  // Top face
-		 -side2,  side2,  side2,   // Front-left
-		  side2,  side2,  side2,   // Front-right
-		  side2,  side2, -side2,   // Back-right
-		 -side2,  side2, -side2    // Back-left
-		};
-
-		// Normals are not used for a skybox as it is typically rendered without shading.
-		// Fill the normals vector with zeroes (placeholder).
-		mesh.normals.resize(mesh.points.size(), 0.0f);
-
-		// Define the indices for rendering each face of the cube using two triangles.
-		// Each face consists of 6 indices (2 triangles per face).
-		mesh.indices = {
-			// Front face
-			0, 2, 1,    // Triangle 1
-			0, 3, 2,    // Triangle 2
-
-			// Right face
-			4, 6, 5,    // Triangle 1
-			4, 7, 6,    // Triangle 2
-
-			// Back face
-			8, 10, 9,   // Triangle 1
-			8, 11, 10,  // Triangle 2
-
-			// Left face
-			12, 14, 13, // Triangle 1
-			12, 15, 14, // Triangle 2
-
-			// Bottom face
-			16, 18, 17, // Triangle 1
-			16, 19, 18, // Triangle 2
-
-			// Top face
-			20, 22, 21, // Triangle 1
-			20, 23, 22  // Triangle 2
-		};
-
-	}
-
-	//void generate(const char* fileName,
-	//    std::vector<GLuint>& indices,
-	//    std::vector<GLfloat>& points,
-	//    std::vector<GLfloat>& normals,
-	//    std::vector<GLfloat>& texCoords,
-	//    std::vector<GLfloat>& tangents,
-	//    bool genTangents /*= false*/)
-	//{
-
-	//    struct MeshData {
-	//        std::vector <glm::vec3> points;
-	//        std::vector <glm::vec3> normals;
-	//        std::vector <glm::vec2> texCoords;
-	//        std::vector <Vertex> faces;
-	//        std::vector <glm::vec4> tangents;
-	//    } meshData;
-
-	//    // Load data
-	//    std::ifstream objStream(fileName, std::ios::in);
-
-	//    if (!objStream)
-	//        throw std::runtime_error(std::string("file ") + fileName + " not found.");
-
-	//    std::string line, token;
-	//    getline(objStream, line);
-	//    while (!objStream.eof())
-	//    {
-	//        // Remove comment if it exists
-	//        size_t pos = line.find_first_of("#");
-	//        if (pos != std::string::npos)
-	//            line = line.substr(0, pos);
-
-	//        // Trim string
-	//        const char* whiteSpace = " \t\n\r";
-	//        size_t location;
-	//        location = line.find_first_not_of(whiteSpace);
-	//        line.erase(0, location);
-	//        location = line.find_last_not_of(whiteSpace);
-	//        line.erase(location + 1);
-
-	//        if (line.length() > 0) {
-	//            std::istringstream lineStream(line);
-
-	//            lineStream >> token;
-
-	//            if (token == "v") {
-	//                float x, y, z;
-	//                lineStream >> x >> y >> z;
-	//                glm::vec3 p(x, y, z);
-	//                meshData.points.push_back(p);
-	//            }
-	//            else if (token == "vt") {
-	//                // Process texture coordinate
-	//                float s, t;
-	//                lineStream >> s >> t;
-	//                meshData.texCoords.push_back(glm::vec2(s, t));
-	//            }
-	//            else if (token == "vn") {
-	//                float x, y, z;
-	//                lineStream >> x >> y >> z;
-	//                meshData.normals.push_back(glm::vec3(x, y, z));
-	//            }
-	//            else if (token == "f") {
-	//                std::vector<std::string> parts;
-	//                while (lineStream.good()) {
-	//                    std::string s;
-	//                    lineStream >> s;
-	//                    parts.push_back(s);
-	//                }
-
-	//                // Triangulate as a triangle fan
-	//                if (parts.size() > 2) {
-	//                    Vertex firstVert(parts[0]);
-	//                    for (int i = 2; i < parts.size(); i++) {
-	//                        meshData.faces.push_back(firstVert);
-	//                        meshData.faces.push_back(Vertex(parts[i - 1]));
-	//                        meshData.faces.push_back(Vertex(parts[i]));
-	//                    }
-	//                }
-	//            }
-	//        }
-	//        getline(objStream, line);
-	//    }
-	//    objStream.close();
-
-	//    // Generate normals if needed
-	//    if (meshData.normals.size() == 0)
-	//    {
-	//        meshData.normals.resize(meshData.points.size());
-
-	//        for (GLuint i = 0; i < meshData.faces.size(); i += 3)
-	//        {
-	//            const glm::vec3& p1 = meshData.points[meshData.faces[i].pIdx];
-	//            const glm::vec3& p2 = meshData.points[meshData.faces[i + 1].pIdx];
-	//            const glm::vec3& p3 = meshData.points[meshData.faces[i + 2].pIdx];
-
-	//            glm::vec3 a = p2 - p1;
-	//            glm::vec3 b = p3 - p1;
-	//            glm::vec3 n = glm::normalize(glm::cross(a, b));
-
-	//            meshData.normals[meshData.faces[i].pIdx] += n;
-	//            meshData.normals[meshData.faces[i + 1].pIdx] += n;
-	//            meshData.normals[meshData.faces[i + 2].pIdx] += n;
-
-	//            // Set the normal index to be the same as the point index
-	//            meshData.faces[i].nIdx = meshData.faces[i].pIdx;
-	//            meshData.faces[i + 1].nIdx = meshData.faces[i + 1].pIdx;
-	//            meshData.faces[i + 2].nIdx = meshData.faces[i + 2].pIdx;
-	//        }
-
-	//        for (GLuint i = 0; i < meshData.normals.size(); i++)
-	//            meshData.normals[i] = glm::normalize(meshData.normals[i]);
-	//    }
-
-	//    // Generate tangents if needed
-	//    if (genTangents)
-	//    {
-	//        std::vector<glm::vec3> tan1Accum(meshData.points.size());
-	//        std::vector<glm::vec3> tan2Accum(meshData.points.size());
-	//        meshData.tangents.resize(meshData.points.size());
-
-	//        // Compute the tangent std::vector
-	//        for (GLuint i = 0; i < meshData.faces.size(); i += 3)
-	//        {
-	//            const glm::vec3& p1 = meshData.points[meshData.faces[i].pIdx];
-	//            const glm::vec3& p2 = meshData.points[meshData.faces[i + 1].pIdx];
-	//            const glm::vec3& p3 = meshData.points[meshData.faces[i + 2].pIdx];
-
-	//            const glm::vec2& tc1 = meshData.texCoords[meshData.faces[i].tcIdx];
-	//            const glm::vec2& tc2 = meshData.texCoords[meshData.faces[i + 1].tcIdx];
-	//            const glm::vec2& tc3 = meshData.texCoords[meshData.faces[i + 2].tcIdx];
-
-	//            glm::vec3 q1 = p2 - p1;
-	//            glm::vec3 q2 = p3 - p1;
-	//            float s1 = tc2.x - tc1.x, s2 = tc3.x - tc1.x;
-	//            float t1 = tc2.y - tc1.y, t2 = tc3.y - tc1.y;
-	//            float r = 1.0f / (s1 * t2 - s2 * t1);
-	//            glm::vec3 tan1((t2 * q1.x - t1 * q2.x) * r,
-	//                (t2 * q1.y - t1 * q2.y) * r,
-	//                (t2 * q1.z - t1 * q2.z) * r);
-	//            glm::vec3 tan2((s1 * q2.x - s2 * q1.x) * r,
-	//                (s1 * q2.y - s2 * q1.y) * r,
-	//                (s1 * q2.z - s2 * q1.z) * r);
-	//            tan1Accum[meshData.faces[i].pIdx] += tan1;
-	//            tan1Accum[meshData.faces[i + 1].pIdx] += tan1;
-	//            tan1Accum[meshData.faces[i + 2].pIdx] += tan1;
-	//            tan2Accum[meshData.faces[i].pIdx] += tan2;
-	//            tan2Accum[meshData.faces[i + 1].pIdx] += tan2;
-	//            tan2Accum[meshData.faces[i + 2].pIdx] += tan2;
-	//        }
-
-	//        for (GLuint i = 0; i < meshData.points.size(); ++i)
-	//        {
-	//            const glm::vec3& n = meshData.normals[i];
-	//            glm::vec3& t1 = tan1Accum[i];
-	//            glm::vec3& t2 = tan2Accum[i];
-
-	//            // Gram-Schmidt orthogonalize
-	//            meshData.tangents[i] = glm::vec4(glm::normalize(t1 - (glm::dot(n, t1) * n)), 0.0f);
-	//            // Store handedness in w
-	//            meshData.tangents[i].w = (glm::dot(glm::cross(n, t1), t2) < 0.0f) ? -1.0f : 1.0f;
-	//        }
-	//    }
-
-	//    // Convert to GL format
-	//    std::map<std::string, GLuint> vertexMap;
-	//    for (auto& vert : meshData.faces)
-	//    {
-	//        std::string vertStr = std::to_string(vert.pIdx) + "/" +
-	//            std::to_string(vert.tcIdx) + "/" +
-	//            std::to_string(vert.nIdx);
-	//        auto it = vertexMap.find(vertStr);
-	//        if (it == vertexMap.end()) {
-	//            auto vIdx = points.size() / 3;
-
-	//            auto& pt = meshData.points[vert.pIdx];
-	//            points.push_back(pt.x);
-	//            points.push_back(pt.y);
-	//            points.push_back(pt.z);
-
-	//            auto& n = meshData.normals[vert.nIdx];
-	//            normals.push_back(n.x);
-	//            normals.push_back(n.y);
-	//            normals.push_back(n.z);
-
-	//            if (!meshData.texCoords.empty()) {
-	//                auto& tc = meshData.texCoords[vert.tcIdx];
-	//                texCoords.push_back(tc.x);
-	//                texCoords.push_back(tc.y);
-	//            }
-
-	//            if (!meshData.tangents.empty()) {
-	//                // We use the point index for tangents
-	//                auto& tang = meshData.tangents[vert.pIdx];
-	//                tangents.push_back(tang.x);
-	//                tangents.push_back(tang.y);
-	//                tangents.push_back(tang.z);
-	//                tangents.push_back(tang.w);
-	//            }
-
-	//            indices.push_back((GLuint)vIdx);
-	//            vertexMap[vertStr] = (GLuint)vIdx;
-	//        }
-	//        else
-	//            indices.push_back(it->second);
-	//    }
-
-	//}
-}
-
-#endif // MESHGENERATOR_H
+    // Represents a single drawable part (mesh group) of a larger model.
+    struct SubMesh {
+        std::string name;
+        int materialIndex = -1; // Index into the parent MeshData's materials vector.
+        GLuint indexCount = 0;
+        GLuint baseIndex = 0;
+        GLuint baseVertex = 0;
+    };
+
+    // A flexible vertex struct for loading any kind of mesh.
+    struct Vertex {
+        glm::vec3 Position;
+        glm::vec3 Normal;
+        glm::vec2 TexCoords;
+        glm::vec4 Tangent; // Using vec4 to include handedness (w component)
+    };
+
+    // The main MeshData class, handling both loaded and generated meshes.
+    class MeshData {
+    public:
+        // OpenGL handles for the entire model's geometry.
+        GLuint vao = 0;
+        GLuint vertexBuffer = 0;
+        GLuint indexBuffer = 0;
+
+        // A mesh is a collection of sub-meshes and their materials.
+        std::vector<SubMesh> subMeshes;
+        std::vector<MaterialComponent> materials;
+
+        // Default constructor.
+        MeshData() = default;
+
+        // Constructor for loading a mesh from a file via Assimp.
+        explicit MeshData(const std::string& filePath) {
+            loadWithAssimp(filePath);
+        }
+
+        // Constructor for manually creating a mesh from code (for primitives).
+        explicit MeshData(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
+            SubMesh primitiveSubMesh;
+            primitiveSubMesh.name = "default";
+            primitiveSubMesh.materialIndex = 0;
+            primitiveSubMesh.baseIndex = 0;
+            primitiveSubMesh.baseVertex = 0;
+            primitiveSubMesh.indexCount = static_cast<GLuint>(indices.size());
+            subMeshes.push_back(primitiveSubMesh);
+
+            MaterialComponent defaultMaterial;
+            defaultMaterial.name = "default_material";
+            materials.push_back(defaultMaterial);
+
+            createGLBuffers(vertices, indices);
+        }
+
+    private:
+        // The core Assimp loading function.
+        void loadWithAssimp(const std::string& filePath) {
+            LOGI("Loading mesh from file: %s", filePath.c_str());
+            Assimp::Importer importer;
+
+            // Create custom IO system that can load files from Android assets
+            auto ioSystem = new AssetIOSystem(filePath);
+            importer.SetIOHandler(ioSystem);
+
+            // Now we can use ReadFile() instead of ReadFileFromMemory()!
+            // Assimp will use our custom IOSystem to load both .obj AND .mtl
+            const aiScene* scene = importer.ReadFile(
+                filePath,
+                aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace
+            );
+
+            if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+                throw std::runtime_error("Assimp Error: " + std::string(importer.GetErrorString()));
+            }
+
+            processMaterials(scene);
+            processNode(scene->mRootNode, scene);
+            createGLBuffers(m_temp_vertices, m_temp_indices);
+
+            m_temp_vertices.clear();
+            m_temp_indices.clear();
+        }
+
+        // Extracts materials from the Assimp scene.
+        void processMaterials(const aiScene* scene) {
+            for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
+                aiMaterial* mat = scene->mMaterials[i];
+                MaterialComponent newMat;
+                newMat.name = mat->GetName().C_Str();
+
+                using AssetMgr = EngineFramework::AssetManagerSystem;
+
+                newMat.albedoFactor = glm::vec3(1.0f);
+                newMat.roughnessFactor = 0.8f;
+                newMat.metallicFactor = 0.0f;
+
+                //  HELPER: Extract texture name from Assimp material
+                auto tryLoadTexture = [&](aiTextureType type) -> std::string {
+                    aiString path;
+                    if (mat->GetTexture(type, 0, &path) == AI_SUCCESS && path.length > 0) {
+                        std::string pathStr(path.C_Str());
+
+                        // Replace backslashes with forward slashes
+                        std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+
+                        // Now std::filesystem will work correctly on all platforms
+                        std::filesystem::path p(pathStr);
+                        std::string texName = p.stem().string();
+
+                        LOGI("[%s] Found texture path: '%s' -> normalized: '%s' -> stem: '%s'",
+                            newMat.name.c_str(), path.C_Str(), pathStr.c_str(), texName.c_str());
+
+                        return texName;
+                    }
+                    return "";
+                    };
+
+                // === ALBEDO ===
+                std::string albedoName = tryLoadTexture(aiTextureType_DIFFUSE);
+                if (!albedoName.empty()) {
+                    try {
+                        newMat.albedoMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, albedoName);
+                        LOGI(" Loaded albedo: %s", albedoName.c_str());
+                    }
+                    catch (const std::exception& e) {
+                        LOGE(" Albedo texture not found in AssetManager: %s (error: %s)",
+                            albedoName.c_str(), e.what());
+                    }
+                }
+
+                // Fallback to color if no texture
+                if (newMat.albedoMap.m_Instance.m_Value == 0) {
+                    aiColor3D color;
+                    if (mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
+                        newMat.albedoFactor = { color.r, color.g, color.b };
+                        LOGI("Using albedo color fallback: (%.2f, %.2f, %.2f)",
+                            color.r, color.g, color.b);
+                    }
+                }
+
+                // === NORMAL (try NORMALS first, then HEIGHT) ===
+                std::string normalName = tryLoadTexture(aiTextureType_NORMALS);
+                if (normalName.empty()) {
+                    normalName = tryLoadTexture(aiTextureType_HEIGHT);
+                }
+                if (!normalName.empty()) {
+                    try {
+                        newMat.normalMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, normalName);
+                        LOGI(" Loaded normal: %s", normalName.c_str());
+                    }
+                    catch (...) {
+                        LOGE(" Normal texture not found: %s", normalName.c_str());
+                    }
+                }
+
+                // === ROUGHNESS ===
+                std::string roughnessName = tryLoadTexture(aiTextureType_DIFFUSE_ROUGHNESS);
+                if (!roughnessName.empty()) {
+                    try {
+                        newMat.roughnessMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, roughnessName);
+                        LOGI(" Loaded roughness: %s", roughnessName.c_str());
+                    }
+                    catch (...) {}
+                }
+                else {
+                    float roughness;
+                    if (mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness) == AI_SUCCESS) {
+                        newMat.roughnessFactor = roughness;
+                    }
+                }
+
+                // === METALLIC (try METALNESS first, then SPECULAR) ===
+                std::string metallicName = tryLoadTexture(aiTextureType_METALNESS);
+                if (metallicName.empty()) {
+                    metallicName = tryLoadTexture(aiTextureType_SPECULAR);
+                }
+                if (!metallicName.empty()) {
+                    try {
+                        newMat.metallicMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, metallicName);
+                        LOGI(" Loaded metallic: %s", metallicName.c_str());
+                    }
+                    catch (...) {}
+                }
+
+                materials.push_back(newMat);
+            }
+        }
+
+        // Recursively processes Assimp nodes.
+        void processNode(aiNode* node, const aiScene* scene) {
+            for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+                processSubMesh(scene->mMeshes[node->mMeshes[i]], scene);
+            }
+            for (unsigned int i = 0; i < node->mNumChildren; i++) {
+                processNode(node->mChildren[i], scene);
+            }
+        }
+
+        // Extracts vertex data from a single Assimp mesh.
+        void processSubMesh(aiMesh* mesh, const aiScene* scene) {
+            UNREFERENCED_PARAMETER(scene);
+            SubMesh subMesh;
+            subMesh.name = mesh->mName.C_Str();
+            subMesh.materialIndex = mesh->mMaterialIndex;
+            subMesh.baseVertex = static_cast<GLuint>(m_temp_vertices.size());
+            subMesh.baseIndex = static_cast<GLuint>(m_temp_indices.size());
+            subMesh.indexCount = 0;
+
+            for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+                Vertex vertex{};
+                vertex.Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+                vertex.Normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+                if (mesh->mTextureCoords[0]) {
+                    vertex.TexCoords = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+                }
+                if (mesh->mTangents) {
+                    // Assimp provides the tangent and bitangent, we use them to calculate the w component
+                    glm::vec3 t = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+                    glm::vec3 b = { mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z };
+                    float handedness = (glm::dot(glm::cross(vertex.Normal, t), b) < 0.0f) ? -1.0f : 1.0f;
+                    vertex.Tangent = glm::vec4(t, handedness);
+                }
+                else {
+                    // === FALLBACK: Generate tangent if Assimp didn't provide one ===
+                    glm::vec3 c1 = glm::cross(vertex.Normal, glm::vec3(0.0f, 0.0f, 1.0f));
+                    glm::vec3 c2 = glm::cross(vertex.Normal, glm::vec3(0.0f, 1.0f, 0.0f));
+                    glm::vec3 t = glm::length(c1) > glm::length(c2) ? c1 : c2;
+                    vertex.Tangent = glm::vec4(glm::normalize(t), 1.0f);
+                    LOGE("Mesh '%s' missing tangents, using generated fallback", mesh->mName.C_Str());
+                }
+                m_temp_vertices.push_back(vertex);
+            }
+
+            for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+                aiFace face = mesh->mFaces[i];
+                for (unsigned int j = 0; j < face.mNumIndices; j++) {
+                    m_temp_indices.push_back(subMesh.baseVertex + face.mIndices[j]);
+                }
+                subMesh.indexCount += face.mNumIndices;
+            }
+            subMeshes.push_back(subMesh);
+        }
+
+        // Creates the final OpenGL VAO and buffers.
+        void createGLBuffers(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
+            glGenVertexArrays(1, &vao);
+            glBindVertexArray(vao);
+
+            glGenBuffers(1, &vertexBuffer);
+            glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+            glGenBuffers(1, &indexBuffer);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
+
+            glEnableVertexAttribArray(0); // Position (location 0)
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
+
+            glEnableVertexAttribArray(1); // TexCoords (location 1)
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+
+            glEnableVertexAttribArray(2); // Normal (location 2)
+            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+
+            glEnableVertexAttribArray(3); // Tangent (location 3)
+            glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+
+            glBindVertexArray(0);
+        }
+
+    private:
+        std::vector<Vertex> m_temp_vertices;
+        std::vector<GLuint> m_temp_indices;
+    };
+
+    // =========================================================================
+    // Functions to generate primitive meshes from code    
+    // =========================================================================
+
+    // Generic helper function to calculate tangents for any manually created mesh
+    inline void calculateTangents(std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
+        if (indices.empty() || vertices.empty()) return;
+
+        std::vector<glm::vec3> tan1(vertices.size(), glm::vec3(0.0f));
+        std::vector<glm::vec3> tan2(vertices.size(), glm::vec3(0.0f));
+
+        for (size_t i = 0; i < indices.size(); i += 3) {
+            Vertex& v0 = vertices[indices[i]];
+            Vertex& v1 = vertices[indices[i + 1]];
+            Vertex& v2 = vertices[indices[i + 2]];
+            glm::vec3 edge1 = v1.Position - v0.Position;
+            glm::vec3 edge2 = v2.Position - v0.Position;
+            glm::vec2 deltaUV1 = v1.TexCoords - v0.TexCoords;
+            glm::vec2 deltaUV2 = v2.TexCoords - v0.TexCoords;
+            float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+            glm::vec3 tangent, bitangent;
+            tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+            tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+            tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+            bitangent.x = f * (-deltaUV1.x * edge2.x + deltaUV2.x * edge1.x);
+            bitangent.y = f * (-deltaUV1.x * edge2.y + deltaUV2.x * edge1.y);
+            bitangent.z = f * (-deltaUV1.x * edge2.z + deltaUV2.x * edge1.z);
+            tan1[indices[i]] += tangent;
+            tan1[indices[i + 1]] += tangent;
+            tan1[indices[i + 2]] += tangent;
+            tan2[indices[i]] += bitangent;
+            tan2[indices[i + 1]] += bitangent;
+            tan2[indices[i + 2]] += bitangent;
+        }
+
+        for (size_t i = 0; i < vertices.size(); ++i) {
+            const glm::vec3& n = vertices[i].Normal;
+            const glm::vec3& t = tan1[i];
+            glm::vec3 tangent = glm::normalize(t - n * glm::dot(n, t));
+            float handedness = (glm::dot(glm::cross(n, t), tan2[i]) < 0.0f) ? -1.0f : 1.0f;
+            vertices[i].Tangent = glm::vec4(tangent, handedness);
+        }
+    }
+
+    // Generates a standard cube
+    inline std::shared_ptr<MeshData> generateCube() {
+        std::vector<Vertex> vertices = {
+            // Positions, Normals, UVs
+            {{-0.5f, -0.5f, -0.5f}, {0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}}, {{0.5f,  0.5f, -0.5f}, {0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}}, {{0.5f, -0.5f, -0.5f}, {0.0f,  0.0f, -1.0f}, {1.0f, 0.0f}}, {{-0.5f,  0.5f, -0.5f}, {0.0f,  0.0f, -1.0f}, {0.0f, 1.0f}},
+            {{-0.5f, -0.5f,  0.5f}, {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}}, {{0.5f, -0.5f,  0.5f}, {0.0f,  0.0f,  1.0f}, {1.0f, 0.0f}}, {{0.5f,  0.5f,  0.5f}, {0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}}, {{-0.5f,  0.5f,  0.5f}, {0.0f,  0.0f,  1.0f}, {0.0f, 1.0f}},
+            {{-0.5f,  0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}}, {{-0.5f,  0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}}, {{-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}}, {{-0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}},
+            {{0.5f,  0.5f,  0.5f}, {1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}}, {{0.5f, -0.5f, -0.5f}, {1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}}, {{0.5f,  0.5f, -0.5f}, {1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}}, {{0.5f, -0.5f,  0.5f}, {1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}},
+            {{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}}, {{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f,  0.0f}, {1.0f, 1.0f}}, {{0.5f, -0.5f,  0.5f}, {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}}, {{-0.5f, -0.5f,  0.5f}, {0.0f, -1.0f,  0.0f}, {0.0f, 0.0f}},
+            {{-0.5f,  0.5f, -0.5f}, {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}}, {{0.5f,  0.5f,  0.5f}, {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}}, {{0.5f,  0.5f, -0.5f}, {0.0f,  1.0f,  0.0f}, {1.0f, 1.0f}}, {{-0.5f,  0.5f,  0.5f}, {0.0f,  1.0f,  0.0f}, {0.0f, 0.0f}}
+        };
+        std::vector<GLuint> indices = { 0, 1, 2, 0, 3, 1, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 15, 13, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 23, 21 };
+        calculateTangents(vertices, indices);
+        return std::make_shared<MeshData>(vertices, indices);
+    }
+
+    // Generates a UV sphere
+    inline std::shared_ptr<MeshData> generateSphere(int xSegments = 64, int ySegments = 64) {
+        std::vector<Vertex> vertices;
+        std::vector<GLuint> indices;
+        for (int y = 0; y <= ySegments; ++y) {
+            for (int x = 0; x <= xSegments; ++x) {
+                float xSegment = (float)x / (float)xSegments;
+                float ySegment = (float)y / (float)ySegments;
+                float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+                float yPos = std::cos(ySegment * PI);
+                float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+                vertices.push_back({ {xPos, yPos, zPos}, {xPos, yPos, zPos}, {xSegment, ySegment} });
+            }
+        }
+        for (int y = 0; y < ySegments; ++y) {
+            for (int x = 0; x < xSegments; ++x) {
+                indices.push_back((y + 1) * (xSegments + 1) + x);
+                indices.push_back(y * (xSegments + 1) + x);
+                indices.push_back(y * (xSegments + 1) + x + 1);
+                indices.push_back((y + 1) * (xSegments + 1) + x);
+                indices.push_back(y * (xSegments + 1) + x + 1);
+                indices.push_back((y + 1) * (xSegments + 1) + x + 1);
+            }
+        }
+        calculateTangents(vertices, indices);
+        return std::make_shared<MeshData>(vertices, indices);
+    }
+
+    // Generates a simple quad
+    inline std::shared_ptr<MeshData> generateQuad() {
+        std::vector<Vertex> vertices = {
+            {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+            {{ 1.0f, -1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
+            {{ 1.0f,  1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+            {{-1.0f,  1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}}
+        };
+        std::vector<GLuint> indices = { 0, 1, 2, 2, 3, 0 };
+        calculateTangents(vertices, indices);
+        return std::make_shared<MeshData>(vertices, indices);
+    }
+
+    // Generates a cube for skybox rendering (no normals, UVs, or tangents needed)
+    inline std::shared_ptr<MeshData> generateSkyBox() {
+        std::vector<Vertex> vertices = {
+            {{-1.0f,  1.0f, -1.0f}}, {{-1.0f, -1.0f, -1.0f}}, {{1.0f, -1.0f, -1.0f}}, {{1.0f,  1.0f, -1.0f}},
+            {{-1.0f, -1.0f,  1.0f}}, {{-1.0f,  1.0f,  1.0f}}, {{1.0f, -1.0f,  1.0f}}, {{1.0f,  1.0f,  1.0f}}
+        };
+        std::vector<GLuint> indices = { 0, 1, 2, 0, 2, 3, 1, 4, 6, 1, 6, 2, 4, 5, 7, 4, 7, 6, 5, 0, 3, 5, 3, 7, 3, 2, 6, 3, 6, 7, 0, 5, 4, 0, 4, 1 };
+        return std::make_shared<MeshData>(vertices, indices);
+    }
+
+} // namespace Mesh
+
+#endif // MESH_H

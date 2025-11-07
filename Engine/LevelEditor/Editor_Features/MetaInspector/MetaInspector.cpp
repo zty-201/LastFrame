@@ -22,7 +22,6 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "LightComponent.h"
 #include "TransformComponent.h"
 #include "MaterialComponent.h"
-#include "TextureComponent.h"
 #include "AssetManager.hpp"
 #include "SoundAsset.hpp"
 #include "scene.h"
@@ -45,10 +44,7 @@ namespace EditorFeatures {
 	static const std::unordered_map<std::string_view, std::unordered_set<std::string_view>> hidden_fields = {
 		{"CameraComponent", {"view_vector", "proj_matrix", "oldx", "oldy"}},
 		{"MeshComponent", {"vao", "indexCount"}},
-		{"LightComponent", {"L"}},
-		{"TransformComponent", {"modelMatrix"}},
-		{"MaterialComponent", {"Ka", "Kd", "Ks", "shininess", "effect", "materialName"}},
-		{"NormalMapComponent", {"normalmap_guid"}} // Hidden for now - testing purposes
+		{"TransformComponent", {"modelMatrix"}}// Hidden for now - testing purposes
 	};
 
 	static constexpr entt::id_type asset_picker_prop = entt::hashed_string{ "editor.asset_picker" }.value();

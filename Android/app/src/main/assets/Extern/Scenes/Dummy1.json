@@ -1,205 +1,5 @@
 {
 	"0": {
-		"CameraComponent": {
-			"camType": 1,
-			"farPlane": 100.0,
-			"fieldOfView": 75.0,
-			"is_active": true,
-			"nearPlane": 0.10000000149011612,
-			"oldx": 0.0,
-			"oldy": 0.0,
-			"position": [
-				-0.08863432705402374,
-				1.5287790298461914,
-				6.967558860778809
-			],
-			"proj_matrix": [
-				[
-					0.8928804397583008,
-					0.0,
-					0.0,
-					0.0
-				],
-				[
-					0.0,
-					1.3032253980636597,
-					0.0,
-					0.0
-				],
-				[
-					0.0,
-					0.0,
-					-1.0020020008087158,
-					-1.0
-				],
-				[
-					0.0,
-					0.0,
-					-0.20020020008087158,
-					0.0
-				]
-			],
-			"target": [
-				0.022693756967782974,
-				0.6515710353851318,
-				0.2662065029144287
-			],
-			"view_vector": [
-				[
-					0.9998620748519897,
-					0.0021556306164711714,
-					-0.01647001877427101,
-					0.0
-				],
-				[
-					-0.0,
-					0.9915434122085571,
-					0.129775270819664,
-					0.0
-				],
-				[
-					0.016610488295555115,
-					-0.1297573745250702,
-					0.9914065599441528,
-					0.0
-				],
-				[
-					-0.027112454175949097,
-					-0.6115675568580627,
-					-7.107541084289551,
-					1.0
-				]
-			]
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 4974199829356445697
-				}
-			]
-		}
-	},
-	"1": {
-		"LightComponent": {
-			"L": [
-				[
-					0.4000000059604645,
-					0.4000000059604645,
-					0.4000000059604645
-				],
-				[
-					1.0,
-					1.0,
-					1.0
-				],
-				[
-					1.0,
-					1.0,
-					1.0
-				]
-			],
-			"position": [
-				0.0,
-				5.0,
-				2.0
-			]
-		}
-	},
-	"2": {
-		"MeshComponent": {
-			"indexCount": 0,
-			"meshName": "SkyBox",
-			"vao": 0
-		},
-		"SkyboxRenderPass": null,
-		"TextureComponent": {
-			"texture_guid": [
-				8652294881921892357,
-				4431689612682600001
-			]
-		}
-	},
-	"3": {
-		"MaterialComponent": {
-			"Ka": [
-				0.10000000149011612,
-				0.10000000149011612,
-				0.10000000149011612
-			],
-			"Kd": [
-				0.699999988079071,
-				0.699999988079071,
-				0.699999988079071
-			],
-			"Ks": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"effect": 3.0,
-			"materialName": "Checkerboard",
-			"metal": 0.0,
-			"rough": 0.8999999761581421,
-			"shininess": 32.0
-		},
-		"MeshComponent": {
-			"indexCount": 0,
-			"meshName": "Plane",
-			"vao": 0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"modelMatrix": [
-				[
-					10.0,
-					0.0,
-					0.0,
-					0.0
-				],
-				[
-					0.0,
-					1.0,
-					0.0,
-					0.0
-				],
-				[
-					0.0,
-					0.0,
-					10.0,
-					0.0
-				],
-				[
-					0.0,
-					-1.0099999904632568,
-					0.0,
-					1.0
-				]
-			],
-			"position": [
-				0.0,
-				-1.0099999904632568,
-				0.0
-			],
-			"rotation": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"scale": [
-				10.0,
-				1.0,
-				10.0
-			]
-		}
-	},
-	"4": {
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -210,73 +10,65 @@
 			]
 		},
 		"MaterialComponent": {
-			"Ka": [
-				0.10000000149011612,
-				0.10000000149011612,
-				0.10000000149011612
-			],
-			"Kd": [
-				0.699999988079071,
-				0.699999988079071,
-				0.699999988079071
-			],
-			"Ks": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"color": [
+			"albedoFactor": [
 				1.0,
 				0.10000000894069672,
 				0.10000000149011612
 			],
-			"effect": 0.0,
-			"materialName": "PBR",
-			"metal": 0.20000000298023224,
-			"rough": 0.800000011920929,
-			"shininess": 128.0
-		},
-		"MeshComponent": {
-			"indexCount": 0,
-			"meshName": "Sphere",
-			"vao": 0
-		},
-		"SceneRenderPass": null,
-		"TextureComponent": {
-			"texture_guid": [
+			"albedoMap": [
 				7230819861274968067,
 				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 0.20000000298023224,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "RedMetalSphere",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 0.800000011920929,
+			"roughnessMap": [
+				0,
+				0
 			]
 		},
+		"MeshComponent": {
+			"meshName": "Sphere"
+		},
+		"SceneRenderPass": null,
 		"TransformComponent": {
-			"modelMatrix": [
-				[
-					1.0,
-					0.0,
-					0.0,
-					0.0
-				],
-				[
-					0.0,
-					1.0,
-					0.0,
-					0.0
-				],
-				[
-					0.0,
-					0.0,
-					1.0,
-					0.0
-				],
-				[
-					-3.0,
-					0.0,
-					0.0,
-					1.0
-				]
-			],
 			"position": [
 				-3.0,
+				50.0,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				50.0,
+				50.0,
+				50.0
+			]
+		}
+	},
+	"1": {
+		"MeshComponent": {
+			"meshName": "sponza"
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				0.0,
 				0.0,
 				0.0
 			],
@@ -292,93 +84,82 @@
 			]
 		}
 	},
-	"5": {
+	"2": {
 		"MaterialComponent": {
-			"Ka": [
-				0.10000000149011612,
-				0.10000000149011612,
-				0.10000000149011612
-			],
-			"Kd": [
-				0.699999988079071,
-				0.699999988079071,
-				0.699999988079071
-			],
-			"Ks": [
+			"albedoFactor": [
 				1.0,
 				1.0,
 				1.0
 			],
-			"color": [
-				0.8999999761581421,
-				0.800000011920929,
-				0.20000000298023224
+			"albedoMap": [
+				8652294881921892357,
+				4431689612682600001
 			],
-			"effect": 1.0,
-			"materialName": "Discard",
-			"metal": 0.0,
-			"rough": 0.5,
-			"shininess": 32.0
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Skybox",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
 		},
 		"MeshComponent": {
-			"indexCount": 0,
-			"meshName": "Cube",
-			"vao": 0
+			"meshName": "SkyBox"
 		},
-		"NormalMapComponent": {
-			"normalmap_guid": [
-				12778480549089984513,
-				3711223656383638553
-			]
-		},
-		"SceneRenderPass": null,
-		"TextureComponent": {
-			"texture_guid": [
-				574965809472389121,
-				3711223656383638553
-			]
-		},
-		"TransformComponent": {
-			"modelMatrix": [
-				[
-					0.8313313722610474,
-					0.0,
-					-0.555776834487915,
-					0.0
-				],
-				[
-					0.0,
-					1.0,
-					0.0,
-					0.0
-				],
-				[
-					0.555776834487915,
-					0.0,
-					0.8313313722610474,
-					0.0
-				],
-				[
-					3.0,
-					0.0,
-					0.0,
-					1.0
-				]
-			],
-			"position": [
-				3.0,
-				0.0,
-				0.0
-			],
-			"rotation": [
-				0.0,
-				33.76424026489258,
-				0.0
-			],
-			"scale": [
-				0.9999998807907104,
+		"SkyboxRenderPass": null
+	},
+	"3": {
+		"LightComponent": {
+			"color": [
 				1.0,
-				0.9999998807907104
+				0.9200000166893005,
+				0.8500000238418579
+			],
+			"intensity": 14.0,
+			"position": [
+				-50.0,
+				120.0,
+				50.0
+			]
+		}
+	},
+	"4": {
+		"CameraComponent": {
+			"camType": 1,
+			"farPlane": 3000.0,
+			"fieldOfView": 75.0,
+			"is_active": true,
+			"nearPlane": 1.5,
+			"position": [
+				188.077880859375,
+				142.2860565185547,
+				-41.7188606262207
+			],
+			"target": [
+				172.32861328125,
+				140.9950714111328,
+				-41.179874420166016
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 4974199829356445697
+				}
 			]
 		}
 	}

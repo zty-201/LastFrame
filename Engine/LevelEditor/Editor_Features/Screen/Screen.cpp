@@ -155,8 +155,8 @@ namespace EngineFramework
             LOGD("Screen Opened");*/
 
         auto camera_view = registry.view<CameraComponent>();
-        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-        Camera::setType(camera, CameraComponent::WALKING);
+        //auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+        //Camera::setType(camera, CameraComponent::ORBITING);
 
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
         ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500
@@ -254,7 +254,7 @@ namespace EngineFramework
 
     void Screen::camera_controls_outside_screen() {
 
-        float speed = 0.05f;
+        float speed = 0.5f;
 
         if (ImGui::IsKeyDown(ImGuiKey_W)) {
             auto camera_view = registry.view<CameraComponent>();
@@ -648,7 +648,6 @@ namespace EngineFramework
 
             GraphicsSystem::GetInstance().CalculateModelMatrix(transform, model);*/
 
-            GraphicsSystem::GetInstance().CalculateModelMatrix(object, object.modelMatrix);
             glm::mat4 model = object.modelMatrix;
 
             ImGuizmo::SetOrthographic(false); //because we have perspective

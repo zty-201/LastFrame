@@ -85,11 +85,6 @@
 #include "entt/meta/meta.hpp"
 #include "entt/meta/resolve.hpp"
 
-//Asset compilers
-#include "AssetCompiler.h"
-#include "TextureCompiler.h"
-#include "MeshCompiler.h"
-
 #ifdef PLATFORM_ANDROID
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
@@ -302,11 +297,6 @@ namespace EngineFramework {
 		static bool LoadScript(const std::filesystem::path&);
 		static bool LoadArchtype(const std::filesystem::path&);
 
-		static void CompileIfNeeded(
-			const std::filesystem::path& srcFolder,
-			const std::filesystem::path& outFolder,
-			IAssetCompiler* compiler);
-
 		static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer
 #ifdef PLATFORM_ANDROID
 		static inline AAssetManager* android_asset_manager = nullptr;
@@ -321,8 +311,6 @@ namespace EngineFramework {
 		static inline std::unordered_map<std::string, std::filesystem::path> type_folderpath_map;
 		// <resource_type, func> that maps a resource type to a function. The function loads all assets within the directory, and sets guid_name_map and name_guid_map as well.
 		static inline std::unordered_map<std::string, std::function<bool(const std::filesystem::path&)>> asset_loader_map{};
-		//For precompiling assets
-		static inline std::unordered_map<std::string, std::unique_ptr<IAssetCompiler>> compilers;
 
 		//==Asset storage and reference maps
 		// <full_guid, resource_type> that maps a guid to a resource.

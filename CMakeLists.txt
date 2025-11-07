@@ -231,7 +231,7 @@ endif()
 
 
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp CACHE INTERNAL "")
 
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
@@ -277,10 +277,16 @@ target_compile_definitions(engine_library PUBLIC USE_JOLT)
 
 #Android==============
 elseif(ANDROID)
-	list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES ${ANDROID_LIBRARIES})
-  target_link_libraries(jnicpp PUBLIC ${EXTERNAL_LIBRARY_DEPENDENCIES})
+    list(APPEND EXTERNAL_LIBRARY_DEPENDENCIES ${ANDROID_LIBRARIES})
+    
+    # DEBUG: Print all libraries
+    message(STATUS "=== ANDROID LIBRARIES ===")
+    foreach(lib IN LISTS EXTERNAL_LIBRARY_DEPENDENCIES)
+        message(STATUS "  Linking: ${lib}")
+    endforeach()
+    
+    target_link_libraries(jnicpp PUBLIC ${EXTERNAL_LIBRARY_DEPENDENCIES})
 endif()
-
 
 #=====Building of Engine Library and Executable, or Android Shared library======#
 

@@ -11,8 +11,6 @@
 #include "MaterialComponent.h"
 #include "MeshComponent.h"
 #include "TransformComponent.h"
-#include "TextureComponent.h"
-#include "NormalMapComponent.h"
 #include "AudioComponent.h"
 #include "ColliderComponent.h"
 #include "PhysicsComponent.h"
@@ -36,23 +34,6 @@ struct adl_serializer<glm::vec3> {
 		p.x = j[0];
 		p.y = j[1];
 		p.z = j[2];
-	}
-};
-
-template<>
-struct adl_serializer<std::vector<glm::vec3>> {
-	static void to_json(json& j, const std::vector<glm::vec3>& vec) {
-		j = json::array();
-		for (const auto& v : vec) {
-			j.push_back(json::array({ v.x, v.y, v.z }));
-		}
-	}
-
-	static void from_json(const json& j, std::vector<glm::vec3>& vec) {
-		vec.clear();
-		for (const auto& item : j) {
-			vec.push_back(glm::vec3{ item[0], item[1], item[2] });
-		}
 	}
 };
 
@@ -209,7 +190,6 @@ namespace EngineFramework
 		SetMeta(std::vector<int>),
 		SetMeta(std::vector<float>),
 		SetMeta(std::vector<std::string>),
-		SetMeta(std::vector<glm::vec3>),
 		SetMeta(CameraComponent::CameraType),
 		SetMeta(std::filesystem::path),
 		SetMeta(ColliderShape),
@@ -250,7 +230,6 @@ namespace EngineFramework
 		SetJson(std::vector<int>),
 		SetJson(std::vector<float>),
 		SetJson(std::vector<std::string>),
-		SetJson(std::vector<glm::vec3>),
 		SetJson(CameraComponent::CameraType),
 		SetJson(std::filesystem::path),
 		SetJson(ColliderShape),
@@ -396,7 +375,6 @@ namespace EngineFramework
 			.data<&TransformComponent::position>("position")
 			.data<&TransformComponent::rotation>("rotation")
 			.data<&TransformComponent::scale>("scale")
-			.data<&TransformComponent::modelMatrix>("modelMatrix")
 			.func<&Emplacer<TransformComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<TransformComponent>::RemoveComponent>("remove")
 			.func<&Getter<TransformComponent>::GetComponent>("get")
@@ -406,8 +384,6 @@ namespace EngineFramework
 		entt::meta_factory<MeshComponent>()
 			.type("MeshComponent")
 			.data<&MeshComponent::meshName>("meshName")
-			.data<&MeshComponent::vao>("vao")
-			.data<&MeshComponent::indexCount>("indexCount")
 			.func<&Emplacer<MeshComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<MeshComponent>::RemoveComponent>("remove")
 			.func<&Getter<MeshComponent>::GetComponent>("get")
@@ -416,16 +392,15 @@ namespace EngineFramework
 		// === Register MaterialComponent ===
 		entt::meta_factory<MaterialComponent>()
 			.type("MaterialComponent")
-			//.type(entt::type_id<MeshComponent>().hash())
-			.data<&MaterialComponent::rough>("rough")
-			.data<&MaterialComponent::metal>("metal")
-			.data<&MaterialComponent::color>("color")
-			.data<&MaterialComponent::Ka>("Ka")
-			.data<&MaterialComponent::Kd>("Kd")
-			.data<&MaterialComponent::Ks>("Ks")
-			.data<&MaterialComponent::shininess>("shininess")
-			.data<&MaterialComponent::effect>("effect")
-			.data<&MaterialComponent::materialName>("materialName")
+			.data<&MaterialComponent::name>("name")
+			.data<&MaterialComponent::albedoMap>("albedoMap")
+			.data<&MaterialComponent::normalMap>("normalMap")
+			.data<&MaterialComponent::metallicMap>("metallicMap")
+			.data<&MaterialComponent::roughnessMap>("roughnessMap")
+			.data<&MaterialComponent::ambientOcclusionMap>("ambientOcclusionMap")
+			.data<&MaterialComponent::albedoFactor>("albedoFactor")
+			.data<&MaterialComponent::metallicFactor>("metallicFactor")
+			.data<&MaterialComponent::roughnessFactor>("roughnessFactor")
 			.func<&Emplacer<MaterialComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<MaterialComponent>::RemoveComponent>("remove")
 			.func<&Getter<MaterialComponent>::GetComponent>("get")
@@ -435,7 +410,8 @@ namespace EngineFramework
 		entt::meta_factory<LightComponent>()
 			.type("LightComponent")
 			.data<&LightComponent::position>("position")
-			.data<&LightComponent::L>("L")
+			.data<&LightComponent::color>("color")
+			.data<&LightComponent::intensity>("intensity")
 			.func<&Emplacer<LightComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<LightComponent>::RemoveComponent>("remove")
 			.func<&Getter<LightComponent>::GetComponent>("get")
@@ -459,25 +435,11 @@ namespace EngineFramework
 			.data<&CameraComponent::fieldOfView>("fieldOfView")
 			.data<&CameraComponent::nearPlane>("nearPlane")
 			.data<&CameraComponent::farPlane>("farPlane")
-			.data<&CameraComponent::view_vector>("view_vector")
-			.data<&CameraComponent::proj_matrix>("proj_matrix")
-			.data<&CameraComponent::oldx>("oldx")
-			.data<&CameraComponent::oldy>("oldy")
 			.data<&CameraComponent::is_active>("is_active")
 			.func<&Emplacer<CameraComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<CameraComponent>::RemoveComponent>("remove")
 			.func<&Getter<CameraComponent>::GetComponent>("get")
 			.func<&GetRef<CameraComponent>>("get_ref");
-
-		// === Register TextureComponent ===
-		entt::meta_factory<TextureComponent>()
-			.type("TextureComponent")
-			.data<&TextureComponent::texture_guid>("texture_guid")
-			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture }) // Need to add tags like that for certain components
-			.func<&Emplacer<TextureComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<TextureComponent>::RemoveComponent>("remove")
-			.func<&Getter<TextureComponent>::GetComponent>("get")
-			.func<&GetRef<TextureComponent>>("get_ref");
 
 		// === Register AudioComponent ===
 		entt::meta_factory<AudioComponent>()
@@ -538,16 +500,6 @@ namespace EngineFramework
 			.func<&Getter<Engine::LuaScriptComponent>::GetComponent>("get")
 			.func<&GetRef<Engine::LuaScriptComponent>>("get_ref");
 
-
-		// === Register NormalMapComponent ===
-		entt::meta_factory<NormalMapComponent>()
-			.type("NormalMapComponent")
-			.data<&NormalMapComponent::normalmap_guid>("normalmap_guid")
-			.func<&Emplacer<NormalMapComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<NormalMapComponent>::RemoveComponent>("remove")
-			.func<&Getter<NormalMapComponent>::GetComponent>("get")
-			.func<&GetRef<NormalMapComponent>>("get_ref");
-
 		// Tag components (if you need them for serialization)
 		entt::meta_factory<SceneRenderPass>()
 			.type("SceneRenderPass")
@@ -561,32 +513,6 @@ namespace EngineFramework
 			.func<&Remover<SkyboxRenderPass>::RemoveComponent>("remove")
 			.func<&Getter<SkyboxRenderPass>::GetComponent>("get");
 
-
-		entt::meta_factory<EngineFramework::TODELETE>()
-			.type("TestClass")
-			.data<&TODELETE::a>("player_health")
-			.data<&TODELETE::b>("b")
-			.data<&TODELETE::c>("c")
-			.func<&Emplacer<TODELETE>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE>::RemoveComponent>("remove")
-			.func<&Getter<TODELETE>::GetComponent>("get");
-
-		//If necessary, may want to add a set method too.
-		entt::meta_factory<EngineFramework::TODELETE2>()
-			.type("TestClass2")
-			.data<&TODELETE2::d>("player_damage")
-			.data<&TODELETE2::e>("e")
-			.data<&TODELETE2::c>("c")
-			.func<&Emplacer<TODELETE2>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE2>::RemoveComponent>("remove")
-			.func<&Getter<TODELETE2>::GetComponent>("get");
-
-		entt::meta_factory<EngineFramework::TODELETE3>()
-			.type("TestClass3")
-			.data<&TODELETE3::pos>("player_pos")
-			.func<&Emplacer<TODELETE3>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE3>::RemoveComponent>("remove")
-			.func<&Getter<TODELETE3>::GetComponent>("get");
 
 	}
 
