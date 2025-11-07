@@ -38,7 +38,6 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "imgui.h"
 
 //For display of model image
-#include "TextureComponent.h"
 #include "scene.h"
 //#include <iostream>
 namespace EngineFramework
@@ -172,7 +171,7 @@ namespace EngineFramework
 	namespace
 	{
 		//Helper function that draws an archtype image button. 
-		GLuint DrawArchtypeElement(const std::string& archtype_name, const std::shared_ptr<Archtype> archtype, float cell_w, entt::id_type texture_comp_id)
+		GLuint DrawArchtypeElement(const std::string& archtype_name, const std::shared_ptr<Archtype> archtype, float cell_w, entt::id_type material_comp_id)
 		{
 			std::vector<entt::meta_any> component_arr = archtype->component_arr;
 			GLuint texture_id{};
@@ -184,10 +183,10 @@ namespace EngineFramework
 			{
 				for (const entt::meta_any& comp : component_arr)
 				{
-					if (comp.type().id() != texture_comp_id) continue;
+					if (comp.type().id() != material_comp_id) continue;
 
 					//Get the texture asset for drawing
-					xresource::full_guid texture_guid = comp.cast<TextureComponent>().texture_guid;
+					xresource::full_guid texture_guid = comp.cast<MaterialComponent>().albedoMap;
 					std::shared_ptr<Scene::Texture> texture = AssetManagerSystem::GetResource<Scene::Texture>(texture_guid);
 					if (texture) texture_id = texture->id;
 					break;
@@ -250,7 +249,7 @@ namespace EngineFramework
 		- Texture image if possible
 		*/
 
-		entt::id_type texture_comp_id = entt::resolve<TextureComponent>().id();
+		entt::id_type material_comp_id = entt::resolve<MaterialComponent>().id();
 		if (!ImGui::BeginTable("model-grid", per_row, ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_NoBordersInBody)) return;
 		CALL_AT_END(imgui_endtable, ImGui::EndTable(););
 
@@ -288,7 +287,7 @@ namespace EngineFramework
 				ImGui::BeginGroup();
 
 				//==Draw Archtype element (image button)
-				GLuint archtype_texture = DrawArchtypeElement(archtype_name, archtype, cell_w, texture_comp_id);
+				GLuint archtype_texture = DrawArchtypeElement(archtype_name, archtype, cell_w, material_comp_id);
 
 				//==Set drag and drop payload for the archtype, to allow scene to receive selected archtype name for instantiation.
 				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))

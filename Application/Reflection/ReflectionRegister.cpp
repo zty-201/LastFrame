@@ -11,8 +11,6 @@
 #include "MaterialComponent.h"
 #include "MeshComponent.h"
 #include "TransformComponent.h"
-#include "TextureComponent.h"
-#include "NormalMapComponent.h"
 #include "AudioComponent.h"
 #include "ColliderComponent.h"
 #include "PhysicsComponent.h"
@@ -36,20 +34,6 @@ struct adl_serializer<glm::vec3> {
 		p.x = j[0];
 		p.y = j[1];
 		p.z = j[2];
-	}
-};
-
-template<>
-struct nlohmann::adl_serializer<ColliderComponent::Shape>
-{
-	static void to_json(nlohmann::json& j, const ColliderComponent::Shape& s)
-	{
-		j = static_cast<int>(s);
-	}
-
-	static void from_json(const nlohmann::json& j, ColliderComponent::Shape& s)
-	{
-		s = static_cast<ColliderComponent::Shape>(j.get<int>());
 	}
 };
 
@@ -464,17 +448,6 @@ namespace EngineFramework
 			.func<&Getter<CameraComponent>::GetComponent>("get")
 			.func<&GetRef<CameraComponent>>("get_ref");
 
-		// === Register TextureComponent ===
-		entt::meta_factory<TextureComponent>()
-			.type("TextureComponent")
-			.data<&TextureComponent::texture_guid>("texture_guid")
-			.data<&TextureComponent::name>("name")
-			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture }) // Need to add tags like that for certain components
-			.func<&Emplacer<TextureComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<TextureComponent>::RemoveComponent>("remove")
-			.func<&Getter<TextureComponent>::GetComponent>("get")
-			.func<&GetRef<TextureComponent>>("get_ref");
-
 		// === Register AudioComponent ===
 		entt::meta_factory<AudioComponent>()
 			.type("AudioComponent")
@@ -533,16 +506,6 @@ namespace EngineFramework
 			.func<&Remover<Engine::LuaScriptComponent>::RemoveComponent>("remove")
 			.func<&Getter<Engine::LuaScriptComponent>::GetComponent>("get")
 			.func<&GetRef<Engine::LuaScriptComponent>>("get_ref");
-
-
-		// === Register NormalMapComponent ===
-		entt::meta_factory<NormalMapComponent>()
-			.type("NormalMapComponent")
-			.data<&NormalMapComponent::normalmap_guid>("normalmap_guid")
-			.func<&Emplacer<NormalMapComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<NormalMapComponent>::RemoveComponent>("remove")
-			.func<&Getter<NormalMapComponent>::GetComponent>("get")
-			.func<&GetRef<NormalMapComponent>>("get_ref");
 
 		// Tag components (if you need them for serialization)
 		entt::meta_factory<SceneRenderPass>()
