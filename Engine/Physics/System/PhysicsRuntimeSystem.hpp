@@ -31,16 +31,16 @@ namespace EngineFramework
         {
             // 1) get ECS registry from the engine singleton
             // name it ecs, not registry, to avoid shadowing the global
-            entt::registry& ecs = CoreEngine::GetInstance().GetRegistry();
+            //entt::registry& ecs = CoreEngine::GetInstance().GetRegistry();
 
             // 2) make sure ECS entities have Jolt bodies
-            m_buildSystem.Update(ecs);
+            m_buildSystem.Update(registry);
 
             // 3) step physics
             PhysicsWorld::Get().StepSimulation(delta_time);
 
             // 4) sync physics back to ECS
-            m_syncSystem.Update(ecs);
+            m_syncSystem.Update(registry);
         }
 
         void PostUpdate(float) override
