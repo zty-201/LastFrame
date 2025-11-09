@@ -8,12 +8,24 @@
 
 void PhysicsBuildSystem::Update(entt::registry& ecs)
 {
+    //LOGI("[PhysicsBuild] Update called");
+
+    //LOGI("[PhysicsBuild] transforms = %zu", ecs.storage<TransformComponent>().size());
+    //LOGI("[PhysicsBuild] physics    = %zu", ecs.storage<PhysicsComponent>().size());
+    //LOGI("[PhysicsBuild] colliders  = %zu", ecs.storage<ColliderComponent>().size());
+
     auto view = ecs.view<TransformComponent, PhysicsComponent, ColliderComponent>();
+    //LOGI("[PhysicsBuild] view size = %zu", view.size_hint());
 
     for (auto&& [ent, transform, physics, collider] : view.each())
     {
+        //LOGI("[PhysicsBuild] found entity %u", (unsigned)ent);
+
         if (PhysicsWorld::Get().HasBody(ent))
+        {
+            //LOGI("This object has a body");
             continue;
+        }
 
         ColliderShape shape = static_cast<ColliderShape>(collider.shape);
 
@@ -28,6 +40,7 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
                 half * 2.0f,
                 collider.isStatic
             );
+            LOGI("Created a Box Body");
             break;
         }
         case ColliderShape::Sphere:
@@ -37,6 +50,7 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
                 collider.radius,
                 collider.isStatic
             );
+            LOGI("Created a Sphere Body");
             break;
         case ColliderShape::Capsule:
             PhysicsWorld::Get().CreateCapsuleBody(
@@ -46,6 +60,7 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
                 collider.capRadius,
                 collider.isStatic
             );
+            LOGI("Created a Capsule Body");
             break;
         }
     }

@@ -161,6 +161,8 @@ private:
     std::unique_ptr<ObjectVsBroadPhaseLayerFilterImpl> m_objectVsBroadPhaseLayerFilter;
     std::unique_ptr<ObjectLayerPairFilterImpl> m_objectLayerPairFilter;
 
+    std::unique_ptr<JPH::TempAllocatorImpl> m_tempAllocator;
+
     std::unordered_map<entt::entity, JPH::BodyID> m_entityToBody;
     std::unordered_map<JPH::BodyID, entt::entity> m_bodyToEntity;
 

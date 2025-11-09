@@ -427,6 +427,240 @@ namespace EngineFramework
                 ImGui::EndTabItem();
             }
 
+            // -------- Environment / Lighting tab --------
+            if (ImGui::BeginTabItem("Environment")) {
+                ImGui::Spacing();
+
+                // Start Fog settings
+                ImGui::SeparatorText("Fog Settings");
+                ImGui::Spacing();
+                ImGui::EndTabItem();
+
+                // Get the scene pointer to from graphics system
+                auto* scene = GraphicsSystem::GetInstance().GetScene().get();
+
+                // Check if scene is valid (Modify Fog)
+                if (scene) {
+                    // Fog color of scene
+                    float fogCol[3] = { scene->fogColor.r, scene->fogColor.g, scene->fogColor.b };
+
+                    // ImGui Color Edit with drop down for color picker
+                    if (ImGui::ColorEdit3("Fog Color", fogCol,
+                        ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB)) {
+                        scene->fogColor = glm::vec3(fogCol[0], fogCol[1], fogCol[2]);
+                    }
+
+                    // Set for Fog distances for scene
+                    float fogMinDist = scene->fogMinDist;
+                    float fogMaxDist = scene->fogMaxDist;
+
+                    // Set value for Fog Min Distance
+                    if (ImGui::InputFloat("Fog Min Distance", &fogMinDist)) {
+                        scene->fogMinDist = fogMinDist;
+                    }
+
+                    // Set value for Fog Max Distance
+                    if (ImGui::InputFloat("Fog Max Distance", &fogMaxDist)) {
+                        scene->fogMaxDist = fogMaxDist;
+                    }
+                }
+                // Fall through if scene not active
+                else {
+                    ImGui::TextDisabled("Scene not active. Cannot modify fog settings.");
+                }
+
+                ImGui::Spacing();
+                ImGui::Separator();
+
+                // Fog control parameters
+                ImGui::SeparatorText("Fog Control Parameters");
+                ImGui::Spacing();
+
+				// Get the graphics system reference
+                auto& gfx = GraphicsSystem::GetInstance();
+
+                // Anisotropy
+				float aniso = gfx.GetAnisotrophy();
+                if(ImGui::InputFloat("Anisotropy", &aniso, 0.f, 0.f, "%.4f")) {
+                    gfx.SetAnisotrophy(aniso);
+				}
+
+				// Density
+				float density = gfx.GetDensity();
+                if (ImGui::InputFloat("Density", &density, 0.f, 0.f, "%.4f")) {
+                    gfx.SetDensity(density);
+                }
+
+                // Scattering
+				float scattering = gfx.GetScattering();
+                if (ImGui::InputFloat("Scattering", &scattering, 0.f, 0.f, "%.4f")) {
+                    gfx.SetScattering(scattering);
+				}
+
+				// Absorption
+				float absorption = gfx.GetAbsorption();
+                if (ImGui::InputFloat("Absorption", &absorption, 0.f, 0.f, "%.4f")) {
+                    gfx.SetAbsorption(absorption);
+                }
+
+				// Shadow Bias
+				float shadow_bias = gfx.GetShadowBias();
+                if (ImGui::InputFloat("Shadow Bias", &shadow_bias, 0.f, 0.f, "%.4f")) {
+                    gfx.SetShadowBias(shadow_bias);
+				}
+
+				// Depth Power
+				float depth_power = gfx.GetDepthPower();
+                if (ImGui::InputFloat("Depth Power", &depth_power, 0.f, 0.f, "%.4f")) {
+                    gfx.SetDepthPower(depth_power);
+                }
+
+
+				// Ambient Light settings
+				float ambient_intensity = gfx.GetAmbientLightIntensity();
+                if (ImGui::InputFloat("Ambient Light Intensity", &ambient_intensity, 0.f, 0.f, "%.4f")) {
+                    gfx.SetAmbientLightIntensity(ambient_intensity);
+                }
+
+				// Temporal accumulation
+				//bool temporal_accumulation = gfx.GetTemporalAccumulation();
+    //            if (ImGui::Checkbox("Temporal Accumulation", &temporal_accumulation)) {
+    //                gfx.SetTemporalAccumulation(temporal_accumulation);
+    //            }
+
+				//// Tricubic Filtering
+				//bool tricubic_filtering = gfx.GetTricubicFiltering();
+    //            if (ImGui::Checkbox("Tricubic Filtering", &tricubic_filtering)) {
+    //                gfx.SetTricubicFiltering(tricubic_filtering);
+				//}
+
+                ImGui::Spacing();
+                ImGui::Separator();
+
+                // Start Light settings
+                ImGui::SeparatorText("Lights");
+                ImGui::Spacing();
+
+                // Gather lights from registry
+                std::vector<std::string> lightNames;
+                std::vector<entt::entity> lightEntities;
+                for (auto entity : registry.view<LightComponent>()) {
+                    std::stringstream ss;
+                    ss << "Light " << lightNames.size() << " (ent " << static_cast<uint32_t>(entity) << ")";
+                    lightNames.push_back(ss.str());
+                    lightEntities.push_back(entity);
+                }
+
+                static int selected_light_idx = 0;
+
+                // Check for lights and adjust the lights if needed
+                if (!lightNames.empty()) {
+                    // Create a drop down to select the specific light
+					// First create a char* array for ImGui to read the names
+					std::vector<const char*> lightNamePtrs;
+					lightNamePtrs.reserve(lightNames.size());
+
+					// Loop through to get the char* pointers
+                    for (const auto& name : lightNames) {
+						lightNamePtrs.push_back(name.c_str());
+                    }
+
+					// Check if an overflow (in index) occurs
+                    if(selected_light_idx >= static_cast<int>(lightNames.size())) {
+                        selected_light_idx = 0;
+					}
+
+                    ImGui::Combo("Select Light", &selected_light_idx,
+						lightNamePtrs.data(), static_cast<int>(lightNamePtrs.size()));
+
+					// Obtain the selected light entity to adjust values
+					entt::entity selected_light_entity = lightEntities[selected_light_idx];
+
+					// Check if the entity is valid and has LightComponent
+                    if (registry.valid(selected_light_entity) && registry.all_of<LightComponent>(selected_light_entity)) {
+						auto& light = registry.get<LightComponent>(selected_light_entity);
+
+                        // Drop down to adjust the light position
+						float pos[3] = { light.position.x, light.position.y, light.position.z };
+                        if(ImGui::InputFloat3("Light Position", pos, "%.3f")) {
+                            light.position = glm::vec3(pos[0], pos[1], pos[2]);
+						}
+
+                        // Intensity
+                        float intensity = light.intensity;
+                        if (ImGui::InputFloat("Light Intensity", &intensity)) {
+                            light.intensity = intensity;
+                        }
+
+
+						// Drop down to adjust the light intensities, in case there isn't enough intensities
+       //                 for (int i = 0; i < light.L.size(); i++) {
+							//// If there is 1 intensity, it is ambient
+       //                     std::string title;
+       //                     if (i == 0) {
+							//	title = "Ambient Intensity";
+       //                     }
+							//// If there are 2 intensities, the second is diffuse
+       //                     else if (i == 1) {
+							//	title = "Diffuse Intensity";
+       //                     }
+							//// If there are 3 intensities, the third is specular
+       //                     else if (i == 2) {
+							//	title = "Specular Intensity";
+       //                     }
+							//// Anything more than 3, just call it component i
+       //                     else {
+       //                         std::stringstream ss;
+       //                         ss << "Component " << i;
+       //                         title = ss.str();
+       //                     }
+
+       //                     // Obtain current intensity
+       //                     float intensity[3] = { light.L[i].x, light.L[i].y, light.L[i].z };
+       //                     if (ImGui::ColorEdit3(title.c_str(), intensity)) {
+							//	light.L[i] = glm::vec3(intensity[0], intensity[1], intensity[2]);
+       //                     }
+       //                 }
+
+       //                 ImGui::Spacing();
+
+       //                 // Additional features
+       //                 // Add/Remove intensity components
+       //                 if (ImGui::Button("Add Intensity Component")) {
+       //                     light.L.push_back(glm::vec3(1.0f));
+       //                 }
+
+       //                 ImGui::SameLine();
+       //                 if (ImGui::Button("Remove Last Component")) {
+       //                     if (!light.L.empty()) light.L.pop_back();
+       //                 }
+                    }
+                    else {
+                        ImGui::TextDisabled("Selected Light entity is invalid or no LightComponent attached.");
+                    }
+                }
+
+                // If you want to add new lights
+    //            if(ImGui::Button("Add New Light")) {
+				//	// Create a new entity with LightComponent
+    //                entt::entity new_light_entity = registry.create();
+    //                LightComponent lightComp{};
+
+				//	// Set default values
+    //                // Position
+    //                lightComp.position = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    //                // Ambient Intensity
+    //                lightComp.intensity = 1.0f; 
+
+				//	//// Diffuse Intensity
+    // //               lightComp.L.push_back(glm::vec3(1.0f));
+
+				//	//// Specular Intensity
+    // //               lightComp.L.push_back(glm::vec3(1.0f));
+    //                registry.emplace<LightComponent>(new_light_entity, lightComp);
+				//}
+            }
 
             ImGui::EndTabBar();
         }

@@ -41,6 +41,8 @@ void PhysicsWorld::Initialize()
         4
     );
 
+    m_tempAllocator = std::make_unique<JPH::TempAllocatorImpl>(10 * 1024 * 1024);
+
     // 6.3 Create filter objects
     m_broadPhaseLayerInterface = std::make_unique<BroadPhaseLayerInterfaceImpl>();
     m_objectVsBroadPhaseLayerFilter = std::make_unique<ObjectVsBroadPhaseLayerFilterImpl>();
@@ -78,41 +80,42 @@ void PhysicsWorld::Initialize()
 // ------------------------------------------------------------
 void PhysicsWorld::Shutdown()
 {
-    // Destroy physics system
-    if (m_physicsSystem)
-    {
-        // The safest method is to use the map's own iterator and destroy everything in one go.
-
-        if (!m_entityToBody.empty())
-        {
-            JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
-
-            // Create a vector of BodyIDs to safely tell Jolt what to remove.
-            std::vector<JPH::BodyID> bodies_to_destroy;
-            for (auto const& pair : m_entityToBody)
-            {
-                bodies_to_destroy.push_back(pair.second);
-            }
-
-            // Remove and destroy all bodies in Jolt at once.
-            bodyInterface.RemoveBodies(bodies_to_destroy.data(), (int)bodies_to_destroy.size());
-            bodyInterface.DestroyBodies(bodies_to_destroy.data(), (int)bodies_to_destroy.size());
-
-            // Clear the local maps entirely.
-            m_entityToBody.clear();
-            m_bodyToEntity.clear();
-        }
-
-        delete m_physicsSystem;
-        m_physicsSystem = nullptr;
-    }
-
     // Destroy job system
     if (m_jobSystem)
     {
         delete m_jobSystem;
         m_jobSystem = nullptr;
     }
+
+    // Destroy physics system
+    if (m_physicsSystem)
+    {
+        //JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
+
+        //// 1a. Copy entity IDs and get Jolt BodyIDs
+        //std::vector<JPH::BodyID> bodies_to_destroy;
+        //for (auto const& pair : m_entityToBody)
+        //{
+        //    bodies_to_destroy.push_back(pair.second);
+        //}
+
+        //if (!bodies_to_destroy.empty())
+        //{
+        //    // 1b. Destroy all remaining bodies in Jolt
+        //    bodyInterface.RemoveBodies(bodies_to_destroy.data(), (int)bodies_to_destroy.size());
+        //    bodyInterface.DestroyBodies(bodies_to_destroy.data(), (int)bodies_to_destroy.size());
+        //}
+
+        //// 1c. Clear local maps (Now empty in Jolt)
+        //m_entityToBody.clear();
+        //m_bodyToEntity.clear();
+
+        // 2. DELETE THE JOLT WORLD
+        delete m_physicsSystem;
+        m_physicsSystem = nullptr;
+    }
+
+    JPH::UnregisterTypes();
 
     // Unregister types / factory
     if (JPH::Factory::sInstance)
@@ -140,7 +143,7 @@ void PhysicsWorld::StepSimulation(float dt)
         {
             // Create a temporary allocator for this step.
             // 10 * 1024 is 10 KB scratch. You can tune this if needed.
-            JPH::TempAllocatorImpl temp_allocator(10 * 1024);
+            //JPH::TempAllocatorImpl temp_allocator(10 * 1024);
 
             // Advance the simulation by one fixed tick.
             // collisionSteps = 1 is fine for now.
@@ -148,7 +151,7 @@ void PhysicsWorld::StepSimulation(float dt)
             (void)m_physicsSystem->Update(
                 m_fixedDt,
                 1,                  // collision steps
-                &temp_allocator,    // temp allocator for this step
+                m_tempAllocator.get(),    // temp allocator for this step
                 m_jobSystem         // job system you created in Initialize()
             );
         }
