@@ -38,6 +38,8 @@ namespace EngineFramework
         void Initialize() override;
         void Run() override;
         void Close() override;
+        //Handles buttons at the top
+        void top_buttons();
 
         static bool feature_enabled;
     };

@@ -89,7 +89,7 @@ namespace EngineFramework {
         // Initial size the first time the profiler window appears
         ImGui::SetNextWindowSize(ImVec2(900, 480), ImGuiCond_FirstUseEver);
 
-        constexpr ImGuiWindowFlags kProfilerFlags = ImGuiWindowFlags_NoSavedSettings;
+        constexpr ImGuiWindowFlags kProfilerFlags = 0;
         ImGuiWindowGuard win(kProfilerWin, &is_enabled, kProfilerFlags);
         if (!win) {
             return;

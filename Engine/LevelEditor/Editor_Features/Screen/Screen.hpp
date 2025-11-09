@@ -24,7 +24,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "System_LevelEditor.hpp"
 #include "LFeature.hpp"
-
+#include "HistorySystem.hpp"
 
 namespace EngineFramework
 {
@@ -47,15 +47,23 @@ namespace EngineFramework
         static bool is_simulator_running;
         static bool gizmos_IS_hovering;
         static bool gizmos_IS_dragged;
+        
 
     private:
+
+        std::unique_ptr<HistorySystem> history;
         void display_screen();
         void gizmos();
         void camera_controls_outside_screen();
         void camera_controls_in_screen_only();
         void control_window();
         void drop_target();
-        
+
+
+        void play_simulation();
+        void stop_simulation();
+        std::string simulation_buffer;
+
         static inline Screen* this_instance{};
     };
 

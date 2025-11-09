@@ -11,9 +11,9 @@
 #include "MaterialComponent.h"
 #include "MeshComponent.h"
 #include "TransformComponent.h"
-#include "TextureComponent.h"
-#include "NormalMapComponent.h"
 #include "AudioComponent.h"
+#include "ColliderComponent.h"
+#include "PhysicsComponent.h"
 #include "Scripting/Script.hpp"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 #include "MetaInspector.hpp"
@@ -34,23 +34,6 @@ struct adl_serializer<glm::vec3> {
 		p.x = j[0];
 		p.y = j[1];
 		p.z = j[2];
-	}
-};
-
-template<>
-struct adl_serializer<std::vector<glm::vec3>> {
-	static void to_json(json& j, const std::vector<glm::vec3>& vec) {
-		j = json::array();
-		for (const auto& v : vec) {
-			j.push_back(json::array({ v.x, v.y, v.z }));
-		}
-	}
-
-	static void from_json(const json& j, std::vector<glm::vec3>& vec) {
-		vec.clear();
-		for (const auto& item : j) {
-			vec.push_back(glm::vec3{ item[0], item[1], item[2] });
-		}
 	}
 };
 
@@ -92,6 +75,44 @@ struct adl_serializer<xresource::full_guid> {
 		guid.m_Type = j[1].get<uint64_t>();
 	}
 };
+
+template<>
+struct adl_serializer<xresource::instance_guid> {
+	static void to_json(json& j, const xresource::instance_guid& guid) {
+		j = guid.m_Value;
+	}
+
+	static void from_json(const json& j, xresource::instance_guid& guid) {
+		guid.m_Value = j.get<uint64_t>();
+	}
+};
+
+#if defined(ENGINE_ENABLE_LUA)
+template<>
+struct adl_serializer<Engine::LuaScriptComponent::LuaInstance> {
+	static void to_json(json& j, const Engine::LuaScriptComponent::LuaInstance& inst) {
+		j = json::object();
+		j["ScriptGuid"] = inst.ScriptGuid;
+		j["Loaded"] = inst.Loaded;
+	}
+
+	static void from_json(const json& j, Engine::LuaScriptComponent::LuaInstance& inst) {
+		if (j.contains("ScriptGuid") && !j["ScriptGuid"].is_null()) {
+			inst.ScriptGuid = j["ScriptGuid"].get<xresource::instance_guid>();
+		}
+		else {
+			inst.ScriptGuid.clear();
+		}
+
+		inst.Loaded = j.value("Loaded", false);
+		inst.Env = sol::nil;
+		inst.Self = sol::nil;
+		inst.FnOnCreate = sol::nil;
+		inst.FnOnUpdate = sol::nil;
+		inst.FnOnDestroy = sol::nil;
+	}
+};
+#endif
 
 template<>
 struct adl_serializer<CameraComponent::CameraType> {
@@ -169,9 +190,15 @@ namespace EngineFramework
 		SetMeta(std::vector<int>),
 		SetMeta(std::vector<float>),
 		SetMeta(std::vector<std::string>),
-		SetMeta(std::vector<glm::vec3>),
 		SetMeta(CameraComponent::CameraType),
-		SetMeta(std::filesystem::path)
+		SetMeta(std::filesystem::path),
+		SetMeta(ColliderShape),
+		SetMeta(xresource::instance_guid)
+#if defined(ENGINE_ENABLE_LUA)
+		,
+		SetMeta(Engine::LuaScriptComponent::LuaInstance),
+		SetMeta(std::vector<Engine::LuaScriptComponent::LuaInstance>)
+#endif
 	};
 #define SetJson(T) {entt::resolve<T>().id(), SetJsonWithMetaAny<T>}
 	static std::unordered_map<entt::id_type, std::function<void(nlohmann::json&, const std::string&, const entt::meta_any&)>> set_json_with_meta_map
@@ -203,9 +230,15 @@ namespace EngineFramework
 		SetJson(std::vector<int>),
 		SetJson(std::vector<float>),
 		SetJson(std::vector<std::string>),
-		SetJson(std::vector<glm::vec3>),
 		SetJson(CameraComponent::CameraType),
-		SetJson(std::filesystem::path)
+		SetJson(std::filesystem::path),
+		SetJson(ColliderShape),
+		SetJson(xresource::instance_guid)
+#if defined(ENGINE_ENABLE_LUA)
+		,
+		SetJson(Engine::LuaScriptComponent::LuaInstance),
+		SetJson(std::vector<Engine::LuaScriptComponent::LuaInstance>)
+#endif
 	};
 
 
@@ -323,9 +356,16 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(glm::vec3);
 		REGISTER_ARBITRARY_TYPE(glm::mat4);
 		REGISTER_ARBITRARY_TYPE(xresource::full_guid);
+		REGISTER_ARBITRARY_TYPE(xresource::instance_guid);
 		REGISTER_ARBITRARY_TYPE(std::vector<glm::vec3>);
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
 		REGISTER_ARBITRARY_TYPE(std::filesystem::path);
+		REGISTER_ARBITRARY_TYPE(ColliderShape);
+#if defined(ENGINE_ENABLE_LUA)
+		REGISTER_ARBITRARY_TYPE(Engine::LuaScriptComponent::LuaInstance);
+		REGISTER_ARBITRARY_TYPE(std::vector<Engine::LuaScriptComponent::LuaInstance>);
+#endif
+
 		// Helper function to return a meta_any wrapping a reference
 
 		// TODO - Register additional components (script, audio etc) and remember to tag them when registering (refer to TextureComponent)
@@ -335,7 +375,6 @@ namespace EngineFramework
 			.data<&TransformComponent::position>("position")
 			.data<&TransformComponent::rotation>("rotation")
 			.data<&TransformComponent::scale>("scale")
-			.data<&TransformComponent::modelMatrix>("modelMatrix")
 			.func<&Emplacer<TransformComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<TransformComponent>::RemoveComponent>("remove")
 			.func<&Getter<TransformComponent>::GetComponent>("get")
@@ -345,8 +384,6 @@ namespace EngineFramework
 		entt::meta_factory<MeshComponent>()
 			.type("MeshComponent")
 			.data<&MeshComponent::meshName>("meshName")
-			.data<&MeshComponent::vao>("vao")
-			.data<&MeshComponent::indexCount>("indexCount")
 			.func<&Emplacer<MeshComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<MeshComponent>::RemoveComponent>("remove")
 			.func<&Getter<MeshComponent>::GetComponent>("get")
@@ -355,15 +392,15 @@ namespace EngineFramework
 		// === Register MaterialComponent ===
 		entt::meta_factory<MaterialComponent>()
 			.type("MaterialComponent")
-			.data<&MaterialComponent::rough>("rough")
-			.data<&MaterialComponent::metal>("metal")
-			.data<&MaterialComponent::color>("color")
-			.data<&MaterialComponent::Ka>("Ka")
-			.data<&MaterialComponent::Kd>("Kd")
-			.data<&MaterialComponent::Ks>("Ks")
-			.data<&MaterialComponent::shininess>("shininess")
-			.data<&MaterialComponent::effect>("effect")
-			.data<&MaterialComponent::materialName>("materialName")
+			.data<&MaterialComponent::name>("name")
+			.data<&MaterialComponent::albedoMap>("albedoMap")
+			.data<&MaterialComponent::normalMap>("normalMap")
+			.data<&MaterialComponent::metallicMap>("metallicMap")
+			.data<&MaterialComponent::roughnessMap>("roughnessMap")
+			.data<&MaterialComponent::ambientOcclusionMap>("ambientOcclusionMap")
+			.data<&MaterialComponent::albedoFactor>("albedoFactor")
+			.data<&MaterialComponent::metallicFactor>("metallicFactor")
+			.data<&MaterialComponent::roughnessFactor>("roughnessFactor")
 			.func<&Emplacer<MaterialComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<MaterialComponent>::RemoveComponent>("remove")
 			.func<&Getter<MaterialComponent>::GetComponent>("get")
@@ -373,7 +410,8 @@ namespace EngineFramework
 		entt::meta_factory<LightComponent>()
 			.type("LightComponent")
 			.data<&LightComponent::position>("position")
-			.data<&LightComponent::L>("L")
+			.data<&LightComponent::color>("color")
+			.data<&LightComponent::intensity>("intensity")
 			.func<&Emplacer<LightComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<LightComponent>::RemoveComponent>("remove")
 			.func<&Getter<LightComponent>::GetComponent>("get")
@@ -397,24 +435,11 @@ namespace EngineFramework
 			.data<&CameraComponent::fieldOfView>("fieldOfView")
 			.data<&CameraComponent::nearPlane>("nearPlane")
 			.data<&CameraComponent::farPlane>("farPlane")
-			.data<&CameraComponent::view_vector>("view_vector")
-			.data<&CameraComponent::proj_matrix>("proj_matrix")
-			.data<&CameraComponent::oldx>("oldx")
-			.data<&CameraComponent::oldy>("oldy")
+			.data<&CameraComponent::is_active>("is_active")
 			.func<&Emplacer<CameraComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<CameraComponent>::RemoveComponent>("remove")
 			.func<&Getter<CameraComponent>::GetComponent>("get")
 			.func<&GetRef<CameraComponent>>("get_ref");
-
-		// === Register TextureComponent ===
-		entt::meta_factory<TextureComponent>()
-			.type("TextureComponent")
-			.data<&TextureComponent::texture_guid>("texture_guid")
-			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture }) // Need to add tags like that for certain components
-			.func<&Emplacer<TextureComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<TextureComponent>::RemoveComponent>("remove")
-			.func<&Getter<TextureComponent>::GetComponent>("get")
-			.func<&GetRef<TextureComponent>>("get_ref");
 
 		// === Register AudioComponent ===
 		entt::meta_factory<AudioComponent>()
@@ -426,25 +451,54 @@ namespace EngineFramework
 			.func<&Getter<AudioComponent>::GetComponent>("get")
 			.func<&GetRef<AudioComponent>>("get_ref");
 
-		// === Register LuaScriptComponent ===
+		// === Register ColliderComponent ===
+		entt::meta_factory<ColliderComponent>()
+			.type("ColliderComponent")
+			.data<&ColliderComponent::shape>("shape")
+			.data<&ColliderComponent::size>("size")
+			.data<&ColliderComponent::radius>("radius")
+			.data<&ColliderComponent::height>("height")
+			.data<&ColliderComponent::capRadius>("capRadius")
+			.data<&ColliderComponent::isStatic>("isStatic")
+			.data<&ColliderComponent::isTrigger>("isTrigger")
+			.data<&ColliderComponent::friction>("friction")
+			.data<&ColliderComponent::restitution>("restitution")
+			.data<&ColliderComponent::density>("density")
+			.data<&ColliderComponent::layer>("layer")
+			.func<&Emplacer<ColliderComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<ColliderComponent>::RemoveComponent>("remove")
+			.func<&Getter<ColliderComponent>::GetComponent>("get")
+			.func<&GetRef<ColliderComponent>>("get_ref");
+
+		entt::meta_factory<PhysicsComponent>()
+			.type("PhysicsComponent")
+			.data<&PhysicsComponent::velocity>("velocity")
+			.data<&PhysicsComponent::acceleration>("acceleration")
+			.data<&PhysicsComponent::friction>("friction")
+			.data<&PhysicsComponent::mass>("mass")
+			.func<&Emplacer<PhysicsComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<PhysicsComponent>::RemoveComponent>("remove")
+			.func<&Getter<PhysicsComponent>::GetComponent>("get")
+			.func<&GetRef<PhysicsComponent>>("get_ref");
+
+		// === Register LuaScriptComponent and nested LuaInstance ===
+
+		// First, register the inner LuaInstance struct
+		entt::meta_factory<Engine::LuaScriptComponent::LuaInstance>()
+			.type("LuaInstance")
+			.data<&Engine::LuaScriptComponent::LuaInstance::ScriptGuid>("ScriptGuid")
+			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Script })
+			.data<&Engine::LuaScriptComponent::LuaInstance::Loaded>("Loaded");
+
+		// Then register the main LuaScriptComponent
 		entt::meta_factory<Engine::LuaScriptComponent>()
 			.type("LuaScriptComponent")
-			.data<&Engine::LuaScriptComponent::ScriptPath>("ScriptPath")
-			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Script })
 			.data<&Engine::LuaScriptComponent::Enabled>("Enabled")
+			.data<&Engine::LuaScriptComponent::Scripts>("Scripts")
 			.func<&Emplacer<Engine::LuaScriptComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<Engine::LuaScriptComponent>::RemoveComponent>("remove")
 			.func<&Getter<Engine::LuaScriptComponent>::GetComponent>("get")
 			.func<&GetRef<Engine::LuaScriptComponent>>("get_ref");
-
-		// === Register NormalMapComponent ===
-		entt::meta_factory<NormalMapComponent>()
-			.type("NormalMapComponent")
-			.data<&NormalMapComponent::normalmap_guid>("normalmap_guid")
-			.func<&Emplacer<NormalMapComponent>::EmplaceComponent>("emplace")
-			.func<&Remover<NormalMapComponent>::RemoveComponent>("remove")
-			.func<&Getter<NormalMapComponent>::GetComponent>("get")
-			.func<&GetRef<NormalMapComponent>>("get_ref");
 
 		// Tag components (if you need them for serialization)
 		entt::meta_factory<SceneRenderPass>()
@@ -459,32 +513,6 @@ namespace EngineFramework
 			.func<&Remover<SkyboxRenderPass>::RemoveComponent>("remove")
 			.func<&Getter<SkyboxRenderPass>::GetComponent>("get");
 
-
-		entt::meta_factory<EngineFramework::TODELETE>()
-			.type("TestClass")
-			.data<&TODELETE::a>("player_health")
-			.data<&TODELETE::b>("b")
-			.data<&TODELETE::c>("c")
-			.func<&Emplacer<TODELETE>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE>::RemoveComponent>("remove")
-			.func<&Getter<TODELETE>::GetComponent>("get");
-
-		//If necessary, may want to add a set method too.
-		entt::meta_factory<EngineFramework::TODELETE2>()
-			.type("TestClass2")
-			.data<&TODELETE2::d>("player_damage")
-			.data<&TODELETE2::e>("e")
-			.data<&TODELETE2::c>("c")
-			.func<&Emplacer<TODELETE2>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE2>::RemoveComponent>("remove")
-			.func<&Getter<TODELETE2>::GetComponent>("get");
-
-		entt::meta_factory<EngineFramework::TODELETE3>()
-			.type("TestClass3")
-			.data<&TODELETE3::pos>("player_pos")
-			.func<&Emplacer<TODELETE3>::EmplaceComponent>("emplace")
-			.func<&Remover<TODELETE3>::RemoveComponent>("remove")
-			.func<&Getter<TODELETE3>::GetComponent>("get");
 
 	}
 
@@ -507,7 +535,7 @@ namespace EngineFramework
 
 
 
-	//Helper function to cast meta_any member_data to the correct json data type, and set comp_json.
+	// Helper function to cast meta_any member_data to the correct json data type, and set comp_json.
 	void SetJsonWithMetaAny(nlohmann::json& comp_json, const entt::meta_data& data_type, const entt::meta_any& data)
 	{
 		if (!data_type) return; //Not a valid data member, it could be a function etc.
@@ -517,16 +545,16 @@ namespace EngineFramework
 		{
 			throw std::runtime_error("Meta Data does not have a name, was likely registered with a _hs hashed string instead of a string.");
 		}
-		//Compare types
+		// Compare types
 		entt::id_type type = data_type.type().id();
 
-		//Call the respective template function if successful matching.
+		// Call the respective template function if successful matching.
 		if (set_json_with_meta_map.find(type) != set_json_with_meta_map.end())
 		{
 			set_json_with_meta_map[type](comp_json, name, data);
 			return;
 		}
-		//Else throw an assertion.
+		// Else throw an assertion.
 		assert(false && "Type is not supported by SetJsonWithMetaAny function. Please add to map.");
 
 	}

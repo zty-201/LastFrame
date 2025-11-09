@@ -24,8 +24,6 @@
 #include "MaterialComponent.h"
 #include "MeshComponent.h"
 #include "TransformComponent.h"
-#include "TextureComponent.h"
-#include "NormalMapComponent.h"
 
 #include "FBO.h"
 #include "Light.h"
@@ -107,7 +105,6 @@ struct Scene
     glm::vec3 fogColor;
     float fogMinDist;
     float fogMaxDist;
-    int shadingModel;
 
    
 };

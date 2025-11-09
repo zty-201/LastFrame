@@ -22,9 +22,41 @@
 
 #include "ISystem.hpp"
 #include "scene.h"
+#include "InstancingSystem.h"
+
+struct VolumetricUBO
+{
+    glm::mat4 view;
+    glm::mat4 projection;
+    glm::mat4 view_proj;
+    glm::mat4 prev_view_proj;
+    glm::mat4 light_view_proj;
+    glm::mat4 inv_view_proj;
+    glm::vec4 light_direction;
+    glm::vec4 light_color;
+    glm::vec4 camera_position;
+    glm::vec4 bias_near_far_pow; // x: bias, y: near, z: far, w: power
+    glm::vec4 aniso_density_scattering_absorption;
+    glm::vec4 time; // x: current time
+    glm::ivec4 width_height;
+};
 
 namespace EngineFramework
 {
+    namespace TextureUnits
+    {
+        // Define texture units for the new shader bindings
+        const int MESH_ALBEDO_UNIT = 0;
+        const int MESH_NORMAL_UNIT = 1;
+        const int MESH_METALLIC_UNIT = 2;
+        const int MESH_ROUGHNESS_UNIT = 3;
+        const int SHADOW_MAP_UNIT = 4;
+        const int VOLUMETRIC_VOXEL_GRID_UNIT = 5;
+        const int SKYBOX_CUBEMAP_UNIT = 6;
+        const int VOLUMETRIC_BLUE_NOISE_UNIT = 7;
+        const int VOLUMETRIC_HISTORY_UNIT = 8;
+    }
+
     class GraphicsSystem : public ISystem
     {
     public:
@@ -38,12 +70,8 @@ namespace EngineFramework
 
         void RenderScene(); 
         void LoadAndCacheMesh(const std::string& meshName);
-        void ApplyPendingResize();
 
-        static GraphicsSystem& GetInstance()
-        {
-            return *this_graphics_ptr;
-        }
+        static GraphicsSystem& GetInstance(){ return *this_graphics_ptr; }
 
         // Mutator for boolean
         void SetDebugStatus(bool enable) { show_debugDraw = enable; }
@@ -57,53 +85,140 @@ namespace EngineFramework
 		GLuint GetSceneTextureID() const { return sceneTextureID; }
         std::pair<int, int> GetWindowSize() const { return std::pair<int, int>(static_cast<int>(screen.x), static_cast<int>(screen.y)); }
 
+        //==Camera Manipulation
+
+        //Returns the active camera, or sets a random camera as active if none are. Returns entt::null if no camera found.
+        entt::entity GetFirstActiveCamera()
+        {
+            auto view = registry.view<CameraComponent>();
+            if (view.begin() == view.end()) //No camera component in scene
+            {
+                return entt::null;
+            }
+            for (entt::entity camera : view)
+            {
+                if(registry.get<CameraComponent>(camera).is_active)
+                {
+                    return camera;
+                }
+            }
+            //None of the cameras are active, set the first one as active.
+            registry.get<CameraComponent>(view.front()).is_active = true;
+            return view.front();
+        }
+
+        void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
+
+        // Simple get and set functions for Fog Control Parameters
+        // Anisotrophy
+        void SetAnisotrophy(float value) { m_anisotropy = value; }
+        float GetAnisotrophy() const { return m_anisotropy; }
+
+		// Density
+        void SetDensity(float value) { m_density = value; }
+        float GetDensity() const { return m_density; }
+
+
+        // Scattering
+        void SetScattering(float value) { m_scattering = value; }
+        float GetScattering() const { return m_scattering; }
+
+		// Absorption
+        void SetAbsorption(float value) { m_absorption = value; }
+        float GetAbsorption() const { return m_absorption; }
+
+		// Shadow Bias
+        void SetShadowBias(float value) { m_shadow_bias = value; }
+        float GetShadowBias() const { return m_shadow_bias; }
+
+		// Depth Power
+        void SetDepthPower(float value) { m_depth_power = value; }
+        float GetDepthPower() const { return m_depth_power; }
+
+		// Ambient Light Intensity
+        void SetAmbientLightIntensity(float value) { m_ambient_light_intensity = value; }
+        float GetAmbientLightIntensity() const { return m_ambient_light_intensity; }
+
+		// Temporal Accumulation
+        bool GetTemporalAccumulation() const { return m_temporal_accumulation; }
+        void SetTemporalAccumulation(bool value) { m_temporal_accumulation = value; }
+
+		// Tricubic Filtering
+        bool GetTricubicFiltering() const { return m_tricubic_filtering; }
+        void SetTricubicFiltering(bool value) { m_tricubic_filtering = value; }
+
     private:
 
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* pWindow = nullptr;
 #endif
+
+        //std::unique_ptr<InstancingSystem> m_instancingSystem;
         // A map to cache loaded mesh data (VAO, index count)
-        xresource::full_guid geometric_shader_guid;
-        xresource::full_guid lighting_shader_guid;
-		xresource::full_guid shader_guid;
+        xresource::full_guid mesh_shader_guid;
+        xresource::full_guid skybox_shader_guid;
+        xresource::full_guid shadow_shader_guid;
+        xresource::full_guid light_injection_shader_guid;
+        xresource::full_guid ray_march_shader_guid;
 
-        // For fullscreen quad in lighting pass
-        GLuint fullscreenQuadVAO = 0;
-        GLuint fullscreenQuadVBO = 0;
+        GLuint m_volumetricUBO = 0;
 
-        std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCache;
+        std::unordered_map<std::string, std::shared_ptr<Mesh::MeshData>> meshCache;
         std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCacheWire;
 
         std::unique_ptr<Scene> pScene;
 
         FBO mainFBO;
-        FBO gBufferFBO;
+        FBO m_shadowFBO;
 
         GLuint sceneTextureID;
+        GLuint m_shadowMapTextureID;
+        
+        // 3D textures for volumetric fog passes
+        GLuint m_ray_march_voxel_grid = 0;
+        GLuint m_temporal_integration_voxel_grid[2] = { 0, 0 };
 
+        GLuint m_defaultWhiteTexture = 0;
+        GLuint m_defaultNormalTexture = 0;
+        std::vector<GLuint> m_blue_noise_textures;
+        
+        // Fog control parameters
+        float m_anisotropy = 0.8f;
+        float m_density = 0.15f;
+        float m_scattering = 0.12f;
+        float m_absorption = 0.005f; // Corresponds to the 0.01 in ray_march_cs
+        float m_shadow_bias = 0.005f;
+        float m_depth_power = 1.0f; // For exponential depth mapping
+        float m_ambient_light_intensity = 0.01f;
+        bool m_temporal_accumulation = true;
+        bool m_tricubic_filtering = false;
+        int m_frame_idx = 0;
+        bool m_ping_pong = false;
+        glm::mat4 m_prev_view_projection;
+        glm::mat4 m_lightSpaceMatrix;
+
+        // === END VOLUMETRIC FOG RESOURCES ===
         glm::vec2 screen = { WIDTH,HEIGHT };
         
         bool show_debugDraw = false;
-
-        bool m_hasPendingResize = false;
         bool m_isRenderingToFBO = false;
-        int m_pendingWidth = 0;
-        int m_pendingHeight = 0;
 
         // Setup methods
         void SetupGLFW();
         void SetupGraphics();
-		void GeometryPass(glm::mat4& V, glm::mat4& P);
-		void LightingPass(glm::mat4& V);
-		void ForwardRenderPass(glm::mat4& V, glm::mat4& P, GLuint targetFBO);
-        void InitializeFullscreenQuad();
-		void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
+
+		// Rendering passes
+        void ShadowPass();
+        void MeshPass();
+        void SkyboxPass();
+        void VolumetricLightInjectionPass();
+        void VolumetricRayMarchPass();
+        void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
+        void PreGeneratePrimitives();
+        void LoadBlueNoiseTextures();
 
         //==Event Handlers, one for each type of event.
-
-        //When level editor is toggled on/off.
         void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
-        //When drawing area should be resized.
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);
 
         static inline GraphicsSystem* this_graphics_ptr = nullptr;

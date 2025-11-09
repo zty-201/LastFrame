@@ -39,7 +39,7 @@ namespace EngineFramework
 
         static SceneManager& GetInstance();
 
-        static bool feature_enabled;
+        static bool is_file_loaded;
 
         const std::vector<std::string>& GetSceneList() const;
         void ScanScenes(const std::string& dir);

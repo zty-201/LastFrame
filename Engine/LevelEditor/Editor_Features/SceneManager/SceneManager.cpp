@@ -23,6 +23,11 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 namespace EngineFramework
 {
+	//defualt scene to load
+	std::string defaultScene = "Dummy1.json";
+	bool SceneManager::is_file_loaded = false;
+
+
 	SceneManager::SceneManager() {
 		this_system = this;
 		LOGI("Lfeature: SceneManager CREATED");
@@ -31,7 +36,14 @@ namespace EngineFramework
 
 	void SceneManager::Initialize()
 	{
+		//need to remove this in later build, files should not be loaded as default
 		ScanScenes(AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern/Scenes/");
+
+		std::string sceneString = AssetManagerSystem::GetStringFromFile("Extern/Scenes/" + defaultScene);
+		GameObjectSystem::GetInstance().LoadScene(sceneString);
+		currentScene = defaultScene;
+		Screen::GetInstance().is_enabled = true;
+		is_file_loaded = true;
 	}
 
 	SceneManager& SceneManager::GetInstance()
@@ -83,6 +95,7 @@ namespace EngineFramework
 					currentScene = scene;
 
 					Screen::GetInstance().is_enabled = true;
+					is_file_loaded = true;
 				}
 			}
 		}

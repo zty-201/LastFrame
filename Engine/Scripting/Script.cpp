@@ -23,6 +23,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "CameraComponent.h"
 #include "Camera.h"
 
+//For platform android vs windows
+#include "Platform.h"
+
 namespace Engine {
 
 #if defined(ENGINE_ENABLE_LUA)
@@ -68,6 +71,19 @@ namespace Engine {
 #if defined(ENGINE_ENABLE_LUA)
         s_Lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math,
             sol::lib::table, sol::lib::string, sol::lib::io);
+
+    // ===============================================================
+    // Platform constant exposed to Lua
+    // ===============================================================
+#if defined(PLATFORM_ANDROID)
+        s_Lua["PLATFORM"] = "android";
+#elif defined(PLATFORM_WINDOWS)
+        s_Lua["PLATFORM"] = "windows";
+#else
+        s_Lua["PLATFORM"] = "unknown";
+#endif
+        LOGI("[ScriptSystem] PLATFORM exposed to Lua: %s", s_Lua["PLATFORM"].get<std::string>().c_str());
+
 
         BindLuaPrintToEngine(s_Lua);
         
@@ -135,12 +151,13 @@ namespace Engine {
             static_cast<bool(*)(int)>(&EngineFramework::InputManager::GetKeyUp),
             static_cast<bool(*)(EngineFramework::Key_Actions)>(&EngineFramework::InputManager::GetKeyUp)
         ));
-        inputTable.set_function("GetGyroRotationRate", []() {
-            glm::vec3 rate = EngineFramework::InputManager::GetGyroscopeRotationRate();
+        inputTable.set_function("GetGyroscopeRotatioRate", []() {
+            glm::vec3 rate = EngineFramework::InputManager::GetGyroscopeRotatioRate();
             return std::make_tuple(rate.x, rate.y, rate.z);
             });
 
         LOGI("[ScriptSystem] InputManager bindings complete (static table approach)");
+
         // ===============================================================
         // CameraComponent bindings //alot of extras lol
         // ===============================================================
@@ -199,7 +216,7 @@ namespace Engine {
         // Quick sanity check that camera_touch_control.lua is loaded
         auto guid = EngineFramework::AssetManagerSystem::GetFullGuid(
             EngineFramework::AssetManagerSystem::SCRIPT_GUID, "camera_touch_control");
-        LOGI("[Check] camera_touch_control full GUID = %llu", guid.m_Instance.m_Value);
+        LOGI("[Check] camera_touch_control full GUID = %llu", guid.m_Instance.m_Value); //Error here
 
         auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(guid);
         if (!scriptAsset)
@@ -215,7 +232,57 @@ namespace Engine {
     // Runtime start/stop
     // ------------------------------------------------------------------
     void ScriptSystem::OnRuntimeStart(entt::registry& reg) {
-        reg.view<LuaScriptComponent>().each([](auto& lsc) { lsc.Loaded = false; });
+#if defined(ENGINE_ENABLE_LUA)
+        LOGI("[ScriptSystem] OnRuntimeStart called — initializing Lua scripts...");
+
+        // Reset load state for all LuaScriptComponents
+        reg.view<LuaScriptComponent>().each([](auto& comp) {
+            for (auto& inst : comp.Scripts)
+                inst.Loaded = false;
+            });
+
+        // Attach camera_touch_control.lua to main camera (for Android + Windows)
+        auto cameraView = reg.view<CameraComponent>();
+        if (!cameraView.empty()) {
+            auto cameraEntity = cameraView.front();
+
+            LOGI("[ScriptSystem] Attaching script to camera entity (%u) with registry %p",
+                static_cast<unsigned>(cameraEntity), (void*)&reg);
+
+            if (!reg.all_of<LuaScriptComponent>(cameraEntity)) {
+                reg.emplace<LuaScriptComponent>(cameraEntity);
+            }
+
+            auto& lsc = reg.get<LuaScriptComponent>(cameraEntity);
+            lsc.Enabled = true;
+
+            Engine::LuaScriptComponent::LuaInstance inst;
+            inst.ScriptGuid = EngineFramework::AssetManagerSystem::GetFullGuid(
+                EngineFramework::AssetManagerSystem::SCRIPT_GUID,
+                "player_pov_camera"
+            ).m_Instance;
+
+            bool alreadyAttached = false;
+            for (auto& s : lsc.Scripts) {
+                if (s.ScriptGuid == inst.ScriptGuid) {
+                    alreadyAttached = true;
+                    LOGE("[ScriptSystem] camera_touch_control already attached to camera, skipping reattach.");
+                    break;
+                }
+            }
+
+            if (!alreadyAttached) {
+                lsc.Scripts.push_back(inst);
+                LOGI("[ScriptSystem] camera_touch_control successfully attached to camera entity (%u).",
+                    static_cast<unsigned>(cameraEntity));
+
+                Engine::ScriptSystem::ReloadScript(reg, cameraEntity);
+            }
+        }
+        else {
+            LOGE("[ScriptSystem] No camera entity found! Skipping camera_touch_control attachment.");
+        }
+#endif
     }
 
     void ScriptSystem::OnRuntimeStop(entt::registry& reg) {
@@ -305,6 +372,13 @@ namespace Engine {
     // Lua helpers
     // ------------------------------------------------------------------
 #if defined(ENGINE_ENABLE_LUA)
+
+    //static std::string ReadTextFromAssets(const std::filesystem::path& relPath) {
+    //    // relPath should be relative to your Assets root, e.g. "Extern/Scripts/hello.lua"
+    //    auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
+    //    return AM.GetStringFromFile(relPath);
+    //}
+
     void ScriptSystem::LoadLuaFor(entt::registry& reg,
         entt::entity e,
         LuaScriptComponent::LuaInstance& inst)
@@ -340,6 +414,11 @@ namespace Engine {
         }
 
         try {
+            full_guid = xresource::full_guid(
+                inst.ScriptGuid,
+                EngineFramework::AssetManagerSystem::SCRIPT_GUID
+            );
+
             LOGI("[LuaRuntime] Loading script '%s' (GUID %llu) for entity %u",
                 EngineFramework::AssetManagerSystem::GetName(full_guid).c_str(),
                 inst.ScriptGuid.m_Value, static_cast<unsigned>(e));

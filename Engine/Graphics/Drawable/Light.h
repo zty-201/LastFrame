@@ -23,52 +23,14 @@
 namespace Light
 {
 
-    // Sets the light's uniform variables in the given shader program.
-    inline void setUniforms(LightComponent& light, std::shared_ptr<ShaderProgram> pProgram, int i = 0)
-    {
-
-        std::stringstream s;
-
-        // Set the position of the light
-        s << "light[" << i << "].position";
-        pProgram->setUniform(s.str(), light.position);
-
-        // Set ambient light intensity
-        if (light.L.size() > 0)
-        {
-            s.str("");
-            s << "light[" << i << "].L";
-            pProgram->setUniform(s.str(), light.L[0]);
-
-            s.str("");
-            s << "light[" << i << "].La";
-            pProgram->setUniform(s.str(), light.L[0]);
-        }
-
-        // Set diffuse light intensity
-        if (light.L.size() > 1)
-        {
-            s.str("");
-            s << "light[" << i << "].Ld";
-            pProgram->setUniform(s.str(), light.L[1]);
-        }
-
-        // Set specular light intensity
-        if (light.L.size() > 2)
-        {
-            s.str("");
-            s << "light[" << i << "].Ls";
-            pProgram->setUniform(s.str(), light.L[2]);
-        }
-
-    }
-
-    // Handles cursor movement events to adjust the light's position.
-    inline void onCursor(LightComponent& light, double xoffset, double yoffset, std::shared_ptr<ShaderProgram> pProgram = nullptr, int i = 0)
+    inline void onCursor(LightComponent& light, double xoffset, double yoffset)
     {
         const float PI05 = glm::pi<float>() / 2.0f;
-        const float r = glm::sqrt(light.position.x * light.position.x +
-            light.position.y * light.position.y + light.position.z * light.position.z); // Calculate radial distance
+        const float r = glm::length(light.position); // Calculate radial distance
+
+        // If radius is zero, we can't calculate angles, so just return.
+        if (r < 0.001f) return;
+
         float alpha = glm::asin(light.position.y / r); // Calculate elevation angle
         float betta = std::atan2f(light.position.x, light.position.z); // Calculate azimuth angle
 
@@ -83,34 +45,23 @@ namespace Light
         light.position.x = r * glm::cos(alpha) * glm::sin(betta);
         light.position.y = r * glm::sin(alpha);
         light.position.z = r * glm::cos(alpha) * glm::cos(betta);
-
-        // Update uniforms in the shader if provided
-        if (pProgram)
-            Light::setUniforms(light, pProgram, i);
     }
 
-    // Handles scroll events to zoom the light in/out by adjusting its radial distance.
-    inline void onScroll(LightComponent& light, double xoffset, double yoffset, std::shared_ptr<ShaderProgram> pProgram = nullptr, int i = 0)
+    /**
+     * @brief Handles scroll events to zoom the light in/out by adjusting its radial distance.
+     * @param light The LightComponent to modify.
+     * @param yoffset The change in the scroll wheel's Y position.
+     */
+    inline void onScroll(LightComponent& light, double yoffset)
     {
-        UNREFERENCED_PARAMETER(xoffset);
-        float r = glm::sqrt(light.position.x * light.position.x +
-            light.position.y * light.position.y +
-            light.position.z * light.position.z); // Calculate radial distance
-        const float alpha = glm::asin(light.position.y / r); // Elevation angle
-        const float betta = std::atan2f(light.position.x, light.position.z); // Azimuth angle
+        float r = glm::length(light.position);
 
         // Adjust radial distance based on scroll direction
         r += yoffset > 0.0 ? -1.0f : 1.0f;
-        if (r < 1.0f) r = 1.0f; // Clamp minimum radius to avoid collapsing the position
+        if (r < 1.0f) r = 1.0f; // Clamp minimum radius
 
-        // Recalculate position based on the new radial distance
-        light.position.x = r * glm::cos(alpha) * glm::sin(betta);
-        light.position.y = r * glm::sin(alpha);
-        light.position.z = r * glm::cos(alpha) * glm::cos(betta);
-
-        // Update uniforms in the shader if provided
-        if (pProgram)
-            setUniforms(light, pProgram, i);
+        // Recalculate position by normalizing the old position and scaling by the new radius
+        light.position = glm::normalize(light.position) * r;
     }
 }
 

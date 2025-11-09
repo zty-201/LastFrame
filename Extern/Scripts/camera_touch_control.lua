@@ -9,6 +9,7 @@
 
 -- Simple camera control configuration
 local sensitivity = 0.25   -- rotation speed multiplier
+local gyroSensitivity = 5000.0
 local pitchLimit = 89.0    -- to prevent flipping
 local yaw = 0.0
 local pitch = 0.0
@@ -39,10 +40,24 @@ end
 
 local counter = 0
 function on_update(self, dt)
+    print(string.format("[Lua] Current dt: %.6f", dt))
     counter = counter + 1
     
     if not camera then return end
 
+    if not camera then 
+        if counter % 60 == 0 then
+            print("[Lua] ERROR: Camera is nil, skipping update")
+        end
+        return 
+    end
+
+    -- ---Input Accumulation Initialization ---
+    local deltaYaw = 0.0
+    local deltaPitch = 0.0
+
+    -- Use the Input table directly (NOT Input())
+    local mouseDown = Input.GetMouseButtonDown(0)
     local mx, my = Input.GetMousePosition()
     local dx, dy = Input.GetMouseDelta()
     
@@ -86,45 +101,89 @@ function on_update(self, dt)
         print("[Lua] Started dragging")
     end
     
-    if dragging and isDraggingTouch then
-        local deltaX = mx - lastX
-        local deltaY = my - lastY
-        
-        if deltaX ~= 0 or deltaY ~= 0 then
-            -- Accumulate rotation based on pixel delta and touch sensitivity
-            yaw = yaw + deltaX * sensitivity
-            pitch = pitch - deltaY * sensitivity
-            
-            print(string.format("[Lua] Touch rotation: yaw=%.2f pitch=%.2f", yaw, pitch))
-        end
-        
-        lastX, lastY = mx, my
+-- Handle drag motion
+if dragging and Input.GetMouseButton(0) then
+    local deltaX = mx - lastX
+    local deltaY = my - lastY
+
+    if deltaX ~= 0 or deltaY ~= 0 then
+        -- Invert rotation direction here 👇
+        yaw = yaw - deltaX * sensitivity
+        pitch = pitch + deltaY * sensitivity
+
+        -- Clamp pitch
+        if pitch > pitchLimit then pitch = pitchLimit end
+        if pitch < -pitchLimit then pitch = -pitchLimit end
+
+        print(string.format("[Lua] Camera rotation: yaw=%.2f pitch=%.2f", yaw, pitch))
+
+        -- Update camera position (spherical to Cartesian)
+        local radYaw = math.rad(yaw)
+        local radPitch = math.rad(pitch)
+
+        local x = target.x + distance * math.cos(radPitch) * math.sin(radYaw)
+        local y = target.y + distance * math.sin(radPitch)
+        local z = target.z + distance * math.cos(radPitch) * math.cos(radYaw)
+
+        camera:SetPosition(x, y, z)
+        camera:LookAt(target.x, target.y, target.z)
     end
+
+    lastX, lastY = mx, my
+end
+
     
     -- Handle release
     if dragging and not isDraggingTouch then
         dragging = false
         print("[Lua] Stopped dragging")
     end
-    
-    -- ============================================================
-    -- 3. FINAL CAMERA UPDATE
-    -- ============================================================
 
-    -- Clamp pitch (Necessary after both touch and gyro updates)
-    if pitch > pitchLimit then pitch = pitchLimit end
-    if pitch < -pitchLimit then pitch = -pitchLimit end
+    -- --- GYROSCOPE CONTROL ---
+    -- Only apply gyroscope movement if the user is not dragging the screen
+    if not dragging then
+        local gyroX, gyroY, gyroZ = Input.GetGyroscopeRotatioRate()
+        
+        -- Log the raw gyro data that Lua sees (must match C++ logs)
+        print(string.format("[Lua] RAW Gyro: X=%.4f Y=%.4f", gyroX, gyroY))
 
-    -- Apply rotation: Convert spherical coordinates to Cartesian
-    local radYaw = math.rad(yaw)
-    local radPitch = math.rad(pitch)
-    
-    local x = target.x + distance * math.cos(radPitch) * math.sin(radYaw)
-    local y = target.y + distance * math.sin(radPitch)
-    local z = target.z + distance * math.cos(radPitch) * math.cos(radYaw)
-    
-    camera:SetPosition(x, y, z)
-    camera:LookAt(target.x, target.y, target.z)
+        -- Calculate intermediate deltas
+        local tempYaw = -math.deg(gyroY) * dt * gyroSensitivity 
+        local tempPitch = -math.deg(gyroX) * dt * gyroSensitivity
+        
+        -- Log the calculated rotation from the gyroscope
+        print(string.format("[Lua] Gyro Delta Calc: dY=%.6f dP=%.6f", tempYaw, tempPitch))
+        
+        deltaYaw = deltaYaw + tempYaw
+        deltaPitch = deltaPitch + tempPitch
+    end
+
+    -- --- APPLY ROTATION (UNIFIED) ---
+    if deltaYaw ~= 0 or deltaPitch ~= 0 then
+        -- Log the calculated rotation from both touch/mouse AND gyro
+        print(string.format("[Lua] Final Delta Applied: dY=%.4f dP=%.4f", deltaYaw, deltaPitch))
+        
+        -- 🌟 Apply accumulated local change to the GLOBAL variables 🌟
+        yaw = yaw + deltaYaw
+        pitch = pitch + deltaPitch
+        -- -----------------------------------------------------------
+        
+        -- Clamp pitch
+        if pitch > pitchLimit then pitch = pitchLimit end
+        if pitch < -pitchLimit then pitch = -pitchLimit end
+        
+        -- Update camera position (Convert spherical coordinates to Cartesian)
+        local radYaw = math.rad(yaw)
+        local radPitch = math.rad(pitch)
+        
+        local cosPitch = math.cos(radPitch)
+        local x = target.x + distance * cosPitch * math.sin(radYaw)
+        local y = target.y + distance * math.sin(radPitch)
+        local z = target.z + distance * cosPitch * math.cos(radYaw)
+        
+        camera:SetPosition(x, y, z)
+        camera:LookAt(target.x, target.y, target.z)
+    end
 end
 
 function on_destroy()

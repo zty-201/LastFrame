@@ -38,7 +38,6 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "imgui.h"
 
 //For display of model image
-#include "TextureComponent.h"
 #include "scene.h"
 //#include <iostream>
 namespace EngineFramework
@@ -115,7 +114,7 @@ namespace EngineFramework
 		const float avail = ImGui::GetContentRegionAvail().x;
 		CALL_AT_END(imgui_child_left_pane, ImGui::EndChild(););
 		//Based on current window size, make the left pane 1/3 width by default.
-		ImGui::BeginChild("Child_LeftPane", ImVec2(avail / 3.f, 0), true, ImGuiChildFlags_ResizeX);
+		ImGui::BeginChild("Child_LeftPane", ImVec2(avail / 3.f, 0), true, ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY);
 		//Display selectable list, based on model types.
 		for (auto it = selected_types.begin(); it != selected_types.end();)
 		{
@@ -162,12 +161,17 @@ namespace EngineFramework
 			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::DELETE, archtype_name);
 		}
 
+		//==Creation of instance gameobject
+		if (ImGui::MenuItem("Create Instance As Is"))
+		{
+			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::CREATE_INSTANCE, archtype_name);
+		}
 	}
 
 	namespace
 	{
 		//Helper function that draws an archtype image button. 
-		GLuint DrawArchtypeElement(const std::string& archtype_name, const std::shared_ptr<Archtype> archtype, float cell_w, entt::id_type texture_comp_id)
+		GLuint DrawArchtypeElement(const std::string& archtype_name, const std::shared_ptr<Archtype> archtype, float cell_w, entt::id_type material_comp_id)
 		{
 			std::vector<entt::meta_any> component_arr = archtype->component_arr;
 			GLuint texture_id{};
@@ -179,10 +183,10 @@ namespace EngineFramework
 			{
 				for (const entt::meta_any& comp : component_arr)
 				{
-					if (comp.type().id() != texture_comp_id) continue;
+					if (comp.type().id() != material_comp_id) continue;
 
 					//Get the texture asset for drawing
-					xresource::full_guid texture_guid = comp.cast<TextureComponent>().texture_guid;
+					xresource::full_guid texture_guid = comp.cast<MaterialComponent>().albedoMap;
 					std::shared_ptr<Scene::Texture> texture = AssetManagerSystem::GetResource<Scene::Texture>(texture_guid);
 					if (texture) texture_id = texture->id;
 					break;
@@ -212,10 +216,9 @@ namespace EngineFramework
 	{
 
 		//==ImGui formatting
-		const float avail = ImGui::GetContentRegionAvail().x;
 		//Based on current window size, make the right pane 2/3 width by default.
 		CALL_AT_END(imgui_child_right_pane, ImGui::EndChild(););
-		ImGui::BeginChild("Child_RightPane", ImVec2(2 * avail / 3.f, 0), true, ImGuiChildFlags_ResizeX);
+		ImGui::BeginChild("Child_RightPane", ImVec2(0, 0), true, ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY);
 		//==Create child button, on top of the table.
 		//==Table Menu, appears when right clicking on the table (instead of archtype element).
 		//Open a popup menu if right clicking the table.
@@ -246,7 +249,7 @@ namespace EngineFramework
 		- Texture image if possible
 		*/
 
-		entt::id_type texture_comp_id = entt::resolve<TextureComponent>().id();
+		entt::id_type material_comp_id = entt::resolve<MaterialComponent>().id();
 		if (!ImGui::BeginTable("model-grid", per_row, ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_NoBordersInBody)) return;
 		CALL_AT_END(imgui_endtable, ImGui::EndTable(););
 
@@ -284,13 +287,14 @@ namespace EngineFramework
 				ImGui::BeginGroup();
 
 				//==Draw Archtype element (image button)
-				GLuint archtype_texture = DrawArchtypeElement(archtype_name, archtype, cell_w, texture_comp_id);
+				GLuint archtype_texture = DrawArchtypeElement(archtype_name, archtype, cell_w, material_comp_id);
 
 				//==Set drag and drop payload for the archtype, to allow scene to receive selected archtype name for instantiation.
 				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 				{
-					selected_drag_drop_archtype = archtype_name;
-					ImGui::SetDragDropPayload("SELECTED_MODEL_NAME", &selected_drag_drop_archtype, selected_drag_drop_archtype.size());
+					selected_drag_drop_archtype = archtype_name; 
+					//Passing in ptr, so use the size of ptr (may or may not always be 8 bytes)
+					ImGui::SetDragDropPayload("SELECTED_MODEL_NAME", selected_drag_drop_archtype.c_str(), selected_drag_drop_archtype.size() + 1);
 
 					ImGui::TextUnformatted(selected_drag_drop_archtype.c_str());
 					ImGui::Image((ImTextureID)archtype_texture, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
@@ -559,6 +563,19 @@ namespace EngineFramework
 			case ArchtypeEvent::ArchtypeEvent::CHANGE_MODEL_TYPE:
 				ImGui::OpenPopup("Change Model Type");
 				break;
+			case ArchtypeEvent::ArchtypeEvent::CREATE_INSTANCE: // No need for popup modal as no input or confirmation needed.
+				// Create the instance by copying the archtype as is, without adding transform component or other.
+				// To render the entity, need to attach TransformComponent, MeshComponent, MaterialComponent and SceneRenderPass before it shows up
+				if (!delayed_archtype_event.current_name.empty())
+				{
+					entt::entity created_entity = GameObjectSystem::GetInstance().CreateInstance(delayed_archtype_event.current_name);
+					if (created_entity != entt::null)
+					{
+						LevelEditor::GetInstance().variables.selected_objectID = created_entity;
+					}
+				}
+				delayed_archtype_event = {};
+				break;
 			}
 		}
 
@@ -727,7 +744,6 @@ namespace EngineFramework
 			}
 			return;
 		}
-
 	}
 
 

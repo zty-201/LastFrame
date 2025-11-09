@@ -15,6 +15,40 @@ add_subdirectory(Shared/xresource)
 add_subdirectory(Shared/lua)
 add_subdirectory(Shared/sol)
 
+# --- Assimp ---
+# Turn off parts we don't need
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable Assimp tests" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Disable Assimp tools" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "Don't create install targets" FORCE)
+set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "Disable warnings as errors for assimp" FORCE)
+set(ASSIMP_NO_EXPORT ON CACHE BOOL "Disable Assimp's exporting feature" FORCE)
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE BOOL "Disable all importers by default" FORCE)
+set(ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "Enable ONLY the OBJ importer" FORCE)
+
+# Force static library build
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build Assimp as a static library" FORCE)
+
+if(ANDROID)
+
+    set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "Build zlib for Android" FORCE)
+    
+    # Disable Android-problematic features
+    set(ASSIMP_ANDROID_JNIIOSYSTEM OFF CACHE BOOL "Disable Android JNI IO (not needed)" FORCE)
+    set(ASSIMP_BUILD_MINIZIP OFF CACHE BOOL "Don't build minizip on Android" FORCE)
+    set(ASSIMP_BUILD_DRACO OFF CACHE BOOL "Don't build Draco on Android" FORCE)
+endif()
+
+add_subdirectory(Shared/assimp)
+
+# DEBUG (temporary):
+if(ANDROID)
+    get_directory_property(assimp_targets DIRECTORY Shared/assimp BUILDSYSTEM_TARGETS)
+    message(STATUS "=== ASSIMP TARGETS ===")
+    foreach(target IN LISTS assimp_targets)
+        message(STATUS "  ${target}")
+    endforeach()
+endif()
+
 add_subdirectory(Shared/JoltPhysics/Build)
 
 # Windowsx64 Shared

@@ -27,6 +27,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <entt/meta/resolve.hpp>
 //Entt ECS system
 #include <entt/entity/registry.hpp>
+#include <entt/entt.hpp>
+//#include <entt/entity/snapshot.hpp>
 #include "System_LevelEditor.hpp"
 
 //Casting meta data to type.
@@ -45,12 +47,21 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "CameraComponent.h"
 #include "Camera.h"
 
+//Creation of instances
+#include "System_GameObjectSystem.hpp"
+#include "SceneManager.hpp"
+
 namespace EngineFramework
 {
     bool Screen::is_control_open = false;
     bool Screen::is_simulator_running = false;
     bool Screen::gizmos_IS_hovering = false;
     bool Screen::gizmos_IS_dragged = false;
+   
+
+    bool gizmos_started_drag = false;
+    std::unique_ptr<Record> current_record = nullptr;
+
 
     //set these to default first
     static ImGuizmo::OPERATION operation = ImGuizmo::TRANSLATE;
@@ -67,12 +78,14 @@ namespace EngineFramework
         0.f, 0.f, 1.f, 0.f,
         0.f, 0.f, 0.f, 1.f };
 
-    Screen::Screen() {
+    Screen::Screen(){
         this_instance = this;
         LOGI("Lfeature: Screen CREATED");
+        
     }
     Screen::~Screen() {
 
+        current_record.reset();
     }
 
     Screen& Screen::GetInstance()
@@ -94,6 +107,7 @@ namespace EngineFramework
         auto cameraEntity = camera_view.front();
         auto& camera = camera_view.get<CameraComponent>(cameraEntity);
         Camera::setType(camera, CameraComponent::WALKING);
+        history = std::make_unique<HistorySystem>(5);
 
 #if defined(ENGINE_ENABLE_LUA)
         // Attach Lua orbit/drag camera control script
@@ -141,8 +155,8 @@ namespace EngineFramework
             LOGD("Screen Opened");*/
 
         auto camera_view = registry.view<CameraComponent>();
-        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-        Camera::setType(camera, CameraComponent::WALKING);
+        //auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+        //Camera::setType(camera, CameraComponent::ORBITING);
 
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
         ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500
@@ -151,18 +165,10 @@ namespace EngineFramework
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
             if (ImGui::BeginMenuBar()) {
 
-                if (ImGui::MenuItem("Run Simulator", NULL, &is_simulator_running)) {
-                    //std::cout << "Run Simulator\n";
-                    auto entity_view = registry.view<SceneRenderPass>();
-                    int size = (int)entity_view.size();
-
-                    //std::cout<< "pass 0 object size: "<<GraphicsSystem::GetInstance().GetScene().get()->passes[0].objects.size() <<std::endl;
-
-                    for (int i = 0; i < size; i++) {
-
-                        //std::cout << "object " << i << " | size = " << GraphicsSystem::GetInstance().GetScene().get()->passes[0].objects[i].instances.size() << std::endl;
-
-                    }
+                if (ImGui::MenuItem("Run Simulator")) {
+                    
+                    if (!is_simulator_running) play_simulation();
+                    else stop_simulation();
 
                 }
 
@@ -173,20 +179,30 @@ namespace EngineFramework
                     //std::cout << "Controls\n";                   
                 }
 
+                ImGui::SameLine(0, 50.0f); // The second argument controls the spacing in pixels
+
+
+                if (ImGui::MenuItem("Undo")) {
+                    std::cout << "undo is clicked\n";
+                    history->undo();
+                }
+
                 ImGui::EndMenuBar();
 
             }
 
             ImGui::PopStyleColor();
 
-            display_screen();
-            gizmos();
-            drop_target();
+            if (SceneManager::GetInstance().is_file_loaded) {
 
-            if (bool hovered = ImGui::IsItemHovered()) {
-                camera_controls_in_screen_only();
+                display_screen();
+                gizmos();
+                drop_target();
+                if (bool hovered = ImGui::IsItemHovered()) {
+                    camera_controls_in_screen_only();
+                }
+                camera_controls_outside_screen();
             }
-            camera_controls_outside_screen();
 
         }
 
@@ -238,7 +254,7 @@ namespace EngineFramework
 
     void Screen::camera_controls_outside_screen() {
 
-        float speed = 0.05f;
+        float speed = 0.5f;
 
         if (ImGui::IsKeyDown(ImGuiKey_W)) {
             auto camera_view = registry.view<CameraComponent>();
@@ -333,209 +349,65 @@ namespace EngineFramework
                 if (ImGui::RadioButton("World", mode == ImGuizmo::WORLD))  mode = ImGuizmo::WORLD;
                 ImGui::Dummy(ImVec2(0.0f, 200.f));
 
+                //only if selected object have transform component
+                entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+                if (registry.all_of<TransformComponent>(id)) {
 
+                    auto& object = registry.get<TransformComponent>(id);
 
-                //if any object is being selected
-                if (true) { // if any object is being selected
-                    static bool transformation_changed = false;
+                    float T[3] = { object.position.x, object.position.y, object.position.z };
+                    float R[3] = { object.rotation.x, object.rotation.y, object.rotation.z };
+                    float S[3] = { object.scale.x, object.scale.y, object.scale.z };
 
-                    ImGui::SeparatorText("Object's Transformation");
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    ImGui::TextUnformatted("Object Selected (ID): ");
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+                    static std::unique_ptr<Record> record_pos = nullptr;
+                    static std::unique_ptr<Record> record_scale = nullptr;
+                    static std::unique_ptr<Record> record_rot = nullptr;
 
-                    auto* scene = GraphicsSystem::GetInstance().GetScene().get();
-                    if (!scene) return;
-                    auto objects = registry.view<TransformComponent>();
-                    auto& first_obj = objects.get<TransformComponent>(objects.front());
-
-                    // Work directly with the component values instead of the matrix
-                    float T[3] = { first_obj.position.x, first_obj.position.y, first_obj.position.z };
-                    float R[3] = { first_obj.rotation.x, first_obj.rotation.y, first_obj.rotation.z };
-                    float S[3] = { first_obj.scale.x, first_obj.scale.y, first_obj.scale.z };
-
-                    ImGui::Separator();
-
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    transformation_changed |= ImGui::InputFloat3("Translation", T, "%.3f");
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-
-                    ImGui::Separator();
-
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    transformation_changed |= ImGui::InputFloat3("Scale", S, "%.3f");
-
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-
-                    ImGui::Separator();
-
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    transformation_changed |= ImGui::InputFloat3("Rotation (deg)", R, "%.3f");
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-
-                    ImGui::Separator();
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-
-                    if (ImGui::Button("Reset", ImVec2(120, 0))) {
-                        R[0] = R[1] = R[2] = 0.0f;
-                        S[0] = S[1] = S[2] = 1.0f;
-                        transformation_changed = true;
+                    if (ImGui::InputFloat3("Translation", T, "%.3f")) {
+                        if (!record_pos) {
+                            record_pos = history->start_track(id, "TransformComponent", "position");
+                        }
                     }
-                    ImGui::SameLine();
-                    ImGui::Text(" *only affects scale and rotation");
-
-                    // Apply changes directly to the transform component
-                    if (transformation_changed) {
-                        first_obj.position = glm::vec3(T[0], T[1], T[2]);
-                        first_obj.rotation = glm::vec3(R[0], R[1], R[2]);
-                        first_obj.scale = glm::vec3(S[0], S[1], S[2]);
-
-                        // Reset the flag after applying changes
-                        transformation_changed = false;
+                    if (record_pos && ImGui::IsItemDeactivatedAfterEdit()) {
+                        history->end_track(record_pos, object.position);
+                        record_pos.reset();
                     }
+                    
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+
+                    if (ImGui::InputFloat3("Scale", S, "%.3f")) {
+                        if (!record_scale) {
+                            record_scale = history->start_track(id, "TransformComponent", "scale");
+                        }
+                    }
+                    if (record_scale && ImGui::IsItemDeactivatedAfterEdit()) {
+                        history->end_track(record_scale, object.scale);
+                        record_scale.reset();
+                    }
+                    
+                    ImGui::Dummy(ImVec2(0.0f, 20.f));
+
+                    if (ImGui::InputFloat3("Rotation (deg)", R, "%.3f")) {
+                        if (!record_rot) {
+                            record_rot = history->start_track(id, "TransformComponent", "rotation");
+                        }
+                    }
+                    if (record_rot && ImGui::IsItemDeactivatedAfterEdit()) {
+                        history->end_track(record_rot, object.rotation);
+                        record_rot.reset();
+                    }
+
+                    object.position = glm::vec3(T[0], T[1], T[2]);
+                    object.scale = glm::vec3(S[0], S[1], S[2]);
+                    object.rotation = glm::vec3(R[0], R[1], R[2]);
+
                 }
 
+              
                 ImGui::EndTabItem();
             }
 
-            // -------- Texture tab --------
-            if (ImGui::BeginTabItem("Texture")) {
-
-                if (editor_ptr->selected_objectID == entt::null) {
-                    
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));      // Black text
-                    ImGui::TextUnformatted("* no object is being selected");
-                    ImGui::PopStyleColor();
-
-                }
-                else {
-
-                    /*
-                       get the material component of the object
-                   */
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    ImGui::SeparatorText("Material");
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    ImGui::TextUnformatted("Assign a material to the object: ");
-
-                    entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
-
-                    if (registry.all_of<MaterialComponent>(id)) {
-
-                        auto& object = registry.get<MaterialComponent>(id);
-
-                        ImGui::SameLine();
-                        static const char* material_type[] = { "Checkerboard", "PBR", "Discard", "Cartoon" };
-                        static int index = 0; // index into items
-
-                        if (object == MATERIAL_CHECKERBOARD) {
-                            index = 0;
-                        }
-                        else if (object == MATERIAL_PBR_PHONG) {
-                            index = 1;
-                        }
-                        else if (object == MATERIAL_DISCARD) {
-                            index = 2;
-                        }
-                        else if (object == MATERIAL_CARTOON) {
-                            index = 3;
-                        }
-
-                        ImGui::SetNextItemWidth(300.f);
-                        if (ImGui::Combo("##material_type", &index, material_type, IM_ARRAYSIZE(material_type))) {
-
-                            if (index == 0) {
-                                object = MATERIAL_CHECKERBOARD;
-                            }
-                            else if (index == 1) {
-                                object = MATERIAL_PBR_PHONG;
-                            }
-                            else if (index == 2) {
-                                object = MATERIAL_DISCARD;
-                            }
-                            else if (index == 3) {
-                                object = MATERIAL_CARTOON;
-                            }
-
-                        }
-
-                    }
-
-                    /*
-                       get the texture component of the object
-                   */
-
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    ImGui::SeparatorText("Custom Texture");
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-
-                    ImGui::TextUnformatted("Texture Loaded: ");
-
-                    
-                    if (registry.all_of<TextureComponent>(id)) {
-
-                        auto& object = registry.get<TextureComponent>(id);
-                        std::string name = AssetManagerSystem::GetInstance().GetName(object.texture_guid);             
-                        ImGui::SameLine();
-                        
-                        ImGui::TextUnformatted(name.c_str());
-
-                        if (ImGui::Button("Remove Custom Texture", ImVec2(300, 0))) {
-                            registry.remove<TextureComponent>(id);
-                            if (registry.all_of<MaterialComponent>(id)) {
-
-                                auto& object_M = registry.get<MaterialComponent>(id);
-                                object_M = MATERIAL_PBR_PHONG;
-                            }
-                        }
-
-                    }
-                    else {
-                        ImGui::SameLine();
-                        ImGui::TextUnformatted(" Not chosen");
-                    }
-
-                    ImGui::Dummy(ImVec2(0.0f, 20.f));
-                    
-                    ImVec2 size(ImGui::GetContentRegionAvail().x, 160.0f);
-                    ImGui::Button("Drop new Texture from Asset Browser to attach to object", size);
-
-
-                    if (ImGui::BeginDragDropTarget())
-                    {
-                        // Accept path payload (null-terminated string)
-                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Textures"))
-                        {
-                            droppedPath = (const char*)payload->Data;
-
-                            //only returning the filename, remove all dir and extension (for asset manager)
-                            std::filesystem::path p = std::filesystem::path(droppedPath).lexically_normal();
-                            droppedPath = p.stem().string();
-                            
-                            //std::cout << droppedPath << std::endl;
-
-                            if (registry.all_of<TextureComponent>(id)) {
-
-                                /* if the texture already exists, just swap texture*/
-                                auto& object = registry.get<TextureComponent>(id);
-                                object.texture_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, droppedPath);
-
-                            }
-                            else {                             
-                                /* if the texture do not exists, just init as texture component*/
-                                registry.emplace<TextureComponent>(id, AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, droppedPath));
-                                
-                            }
-
-                        }
-                        ImGui::EndDragDropTarget();
-                    }
-
-                }
-
-
-                ImGui::EndTabItem();
-            }
+            
 
             if (ImGui::BeginTabItem("Camera Navigation")) {
                 ImGui::Spacing();
@@ -555,6 +427,240 @@ namespace EngineFramework
                 ImGui::EndTabItem();
             }
 
+            // -------- Environment / Lighting tab --------
+            if (ImGui::BeginTabItem("Environment")) {
+                ImGui::Spacing();
+
+                // Start Fog settings
+                ImGui::SeparatorText("Fog Settings");
+                ImGui::Spacing();
+                ImGui::EndTabItem();
+
+                // Get the scene pointer to from graphics system
+                auto* scene = GraphicsSystem::GetInstance().GetScene().get();
+
+                // Check if scene is valid (Modify Fog)
+                if (scene) {
+                    // Fog color of scene
+                    float fogCol[3] = { scene->fogColor.r, scene->fogColor.g, scene->fogColor.b };
+
+                    // ImGui Color Edit with drop down for color picker
+                    if (ImGui::ColorEdit3("Fog Color", fogCol,
+                        ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB)) {
+                        scene->fogColor = glm::vec3(fogCol[0], fogCol[1], fogCol[2]);
+                    }
+
+                    // Set for Fog distances for scene
+                    float fogMinDist = scene->fogMinDist;
+                    float fogMaxDist = scene->fogMaxDist;
+
+                    // Set value for Fog Min Distance
+                    if (ImGui::InputFloat("Fog Min Distance", &fogMinDist)) {
+                        scene->fogMinDist = fogMinDist;
+                    }
+
+                    // Set value for Fog Max Distance
+                    if (ImGui::InputFloat("Fog Max Distance", &fogMaxDist)) {
+                        scene->fogMaxDist = fogMaxDist;
+                    }
+                }
+                // Fall through if scene not active
+                else {
+                    ImGui::TextDisabled("Scene not active. Cannot modify fog settings.");
+                }
+
+                ImGui::Spacing();
+                ImGui::Separator();
+
+                // Fog control parameters
+                ImGui::SeparatorText("Fog Control Parameters");
+                ImGui::Spacing();
+
+				// Get the graphics system reference
+                auto& gfx = GraphicsSystem::GetInstance();
+
+                // Anisotropy
+				float aniso = gfx.GetAnisotrophy();
+                if(ImGui::InputFloat("Anisotropy", &aniso, 0.f, 0.f, "%.4f")) {
+                    gfx.SetAnisotrophy(aniso);
+				}
+
+				// Density
+				float density = gfx.GetDensity();
+                if (ImGui::InputFloat("Density", &density, 0.f, 0.f, "%.4f")) {
+                    gfx.SetDensity(density);
+                }
+
+                // Scattering
+				float scattering = gfx.GetScattering();
+                if (ImGui::InputFloat("Scattering", &scattering, 0.f, 0.f, "%.4f")) {
+                    gfx.SetScattering(scattering);
+				}
+
+				// Absorption
+				float absorption = gfx.GetAbsorption();
+                if (ImGui::InputFloat("Absorption", &absorption, 0.f, 0.f, "%.4f")) {
+                    gfx.SetAbsorption(absorption);
+                }
+
+				// Shadow Bias
+				float shadow_bias = gfx.GetShadowBias();
+                if (ImGui::InputFloat("Shadow Bias", &shadow_bias, 0.f, 0.f, "%.4f")) {
+                    gfx.SetShadowBias(shadow_bias);
+				}
+
+				// Depth Power
+				float depth_power = gfx.GetDepthPower();
+                if (ImGui::InputFloat("Depth Power", &depth_power, 0.f, 0.f, "%.4f")) {
+                    gfx.SetDepthPower(depth_power);
+                }
+
+
+				// Ambient Light settings
+				float ambient_intensity = gfx.GetAmbientLightIntensity();
+                if (ImGui::InputFloat("Ambient Light Intensity", &ambient_intensity, 0.f, 0.f, "%.4f")) {
+                    gfx.SetAmbientLightIntensity(ambient_intensity);
+                }
+
+				// Temporal accumulation
+				//bool temporal_accumulation = gfx.GetTemporalAccumulation();
+    //            if (ImGui::Checkbox("Temporal Accumulation", &temporal_accumulation)) {
+    //                gfx.SetTemporalAccumulation(temporal_accumulation);
+    //            }
+
+				//// Tricubic Filtering
+				//bool tricubic_filtering = gfx.GetTricubicFiltering();
+    //            if (ImGui::Checkbox("Tricubic Filtering", &tricubic_filtering)) {
+    //                gfx.SetTricubicFiltering(tricubic_filtering);
+				//}
+
+                ImGui::Spacing();
+                ImGui::Separator();
+
+                // Start Light settings
+                ImGui::SeparatorText("Lights");
+                ImGui::Spacing();
+
+                // Gather lights from registry
+                std::vector<std::string> lightNames;
+                std::vector<entt::entity> lightEntities;
+                for (auto entity : registry.view<LightComponent>()) {
+                    std::stringstream ss;
+                    ss << "Light " << lightNames.size() << " (ent " << static_cast<uint32_t>(entity) << ")";
+                    lightNames.push_back(ss.str());
+                    lightEntities.push_back(entity);
+                }
+
+                static int selected_light_idx = 0;
+
+                // Check for lights and adjust the lights if needed
+                if (!lightNames.empty()) {
+                    // Create a drop down to select the specific light
+					// First create a char* array for ImGui to read the names
+					std::vector<const char*> lightNamePtrs;
+					lightNamePtrs.reserve(lightNames.size());
+
+					// Loop through to get the char* pointers
+                    for (const auto& name : lightNames) {
+						lightNamePtrs.push_back(name.c_str());
+                    }
+
+					// Check if an overflow (in index) occurs
+                    if(selected_light_idx >= static_cast<int>(lightNames.size())) {
+                        selected_light_idx = 0;
+					}
+
+                    ImGui::Combo("Select Light", &selected_light_idx,
+						lightNamePtrs.data(), static_cast<int>(lightNamePtrs.size()));
+
+					// Obtain the selected light entity to adjust values
+					entt::entity selected_light_entity = lightEntities[selected_light_idx];
+
+					// Check if the entity is valid and has LightComponent
+                    if (registry.valid(selected_light_entity) && registry.all_of<LightComponent>(selected_light_entity)) {
+						auto& light = registry.get<LightComponent>(selected_light_entity);
+
+                        // Drop down to adjust the light position
+						float pos[3] = { light.position.x, light.position.y, light.position.z };
+                        if(ImGui::InputFloat3("Light Position", pos, "%.3f")) {
+                            light.position = glm::vec3(pos[0], pos[1], pos[2]);
+						}
+
+                        // Intensity
+                        float intensity = light.intensity;
+                        if (ImGui::InputFloat("Light Intensity", &intensity)) {
+                            light.intensity = intensity;
+                        }
+
+
+						// Drop down to adjust the light intensities, in case there isn't enough intensities
+       //                 for (int i = 0; i < light.L.size(); i++) {
+							//// If there is 1 intensity, it is ambient
+       //                     std::string title;
+       //                     if (i == 0) {
+							//	title = "Ambient Intensity";
+       //                     }
+							//// If there are 2 intensities, the second is diffuse
+       //                     else if (i == 1) {
+							//	title = "Diffuse Intensity";
+       //                     }
+							//// If there are 3 intensities, the third is specular
+       //                     else if (i == 2) {
+							//	title = "Specular Intensity";
+       //                     }
+							//// Anything more than 3, just call it component i
+       //                     else {
+       //                         std::stringstream ss;
+       //                         ss << "Component " << i;
+       //                         title = ss.str();
+       //                     }
+
+       //                     // Obtain current intensity
+       //                     float intensity[3] = { light.L[i].x, light.L[i].y, light.L[i].z };
+       //                     if (ImGui::ColorEdit3(title.c_str(), intensity)) {
+							//	light.L[i] = glm::vec3(intensity[0], intensity[1], intensity[2]);
+       //                     }
+       //                 }
+
+       //                 ImGui::Spacing();
+
+       //                 // Additional features
+       //                 // Add/Remove intensity components
+       //                 if (ImGui::Button("Add Intensity Component")) {
+       //                     light.L.push_back(glm::vec3(1.0f));
+       //                 }
+
+       //                 ImGui::SameLine();
+       //                 if (ImGui::Button("Remove Last Component")) {
+       //                     if (!light.L.empty()) light.L.pop_back();
+       //                 }
+                    }
+                    else {
+                        ImGui::TextDisabled("Selected Light entity is invalid or no LightComponent attached.");
+                    }
+                }
+
+                // If you want to add new lights
+    //            if(ImGui::Button("Add New Light")) {
+				//	// Create a new entity with LightComponent
+    //                entt::entity new_light_entity = registry.create();
+    //                LightComponent lightComp{};
+
+				//	// Set default values
+    //                // Position
+    //                lightComp.position = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    //                // Ambient Intensity
+    //                lightComp.intensity = 1.0f; 
+
+				//	//// Diffuse Intensity
+    // //               lightComp.L.push_back(glm::vec3(1.0f));
+
+				//	//// Specular Intensity
+    // //               lightComp.L.push_back(glm::vec3(1.0f));
+    //                registry.emplace<LightComponent>(new_light_entity, lightComp);
+				//}
+            }
 
             ImGui::EndTabBar();
         }
@@ -605,13 +711,17 @@ namespace EngineFramework
             ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
             gizmos_IS_hovering = ImGuizmo::IsOver();
             gizmos_IS_dragged = ImGuizmo::IsUsing();
+            
+            /*TransformComponent transform{};
+            transform.position = object.position;
+            transform.rotation = object.rotation;
+            transform.scale = object.scale;
+            glm::mat4 model{};
 
+            GraphicsSystem::GetInstance().CalculateModelMatrix(transform, model);*/
 
-
-            //auto& first_obj = objects.get<TransformComponent>(objects.front());
-
-            // Create a copy of the model matrix to work with
             glm::mat4 model = object.modelMatrix;
+
             ImGuizmo::SetOrthographic(false); //because we have perspective
 
             //set this for gizmos
@@ -656,6 +766,44 @@ namespace EngineFramework
                 // based on the updated position, rotation, and scale values
             }
 
+            /*
+            * History Tracking            
+            */
+
+            if (!gizmos_started_drag && gizmos_IS_dragged) {
+
+                if (operation == ImGuizmo::TRANSLATE) {
+                    current_record = history->start_track(id, "TransformComponent", "position");
+                }else if (operation == ImGuizmo::SCALE) {
+                    current_record = history->start_track(id, "TransformComponent", "scale");
+                }else if (operation == ImGuizmo::ROTATE) {
+                    current_record = history->start_track(id, "TransformComponent", "rotation");
+                }
+
+                std::cout << "Begin track\n";
+            }
+
+            if (gizmos_started_drag && !gizmos_IS_dragged) {
+
+                if (operation == ImGuizmo::TRANSLATE) {
+                    history->end_track(current_record, object.position);
+                }
+                else if (operation == ImGuizmo::SCALE) {
+                    history->end_track(current_record, object.scale);
+                }
+                else if (operation == ImGuizmo::ROTATE) {
+                    history->end_track(current_record, object.rotation);
+                }
+               
+                current_record = nullptr;
+                std::cout << "End track\n";
+            }
+
+
+
+
+            gizmos_started_drag = gizmos_IS_dragged;
+
 
         }
 
@@ -666,17 +814,62 @@ namespace EngineFramework
 
         if (ImGui::BeginDragDropTarget())
         {
-            // Accept path payload (null-terminated string)
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Models"))
-            {
-                //const char* path = (const char*)payload->Data;
+            CALL_AT_END(imgui_enddragdrop, ImGui::EndDragDropTarget(););
 
-                //std::cout << "Drop successful: " << path << std::endl;
+            // Create instance with default transform at camera forward position. 
+            // Accept path payload (std::string*)
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SELECTED_MODEL_NAME"))
+            {
+                if (payload->DataSize == 0) return;
+                std::string archtype_name = static_cast<const char*>(payload->Data);
+                if (archtype_name.empty())
+                {
+                    LOGD("%s","Empty Archtype Name provided by Drag-Drop Payload");
+                    return;
+                }
+                TransformComponent instance_transform{};
+
+                //Find the position in front of where the camera is looking.
+                entt::entity camera = GraphicsSystem::GetInstance().GetFirstActiveCamera();
+                if (camera != entt::null) 
+                {
+                    CameraComponent& cam_comp = registry.get<CameraComponent>(camera);
+                    instance_transform.position = Camera::GetFowardLookPosition(cam_comp, 0.5f);
+
+                }//Otherwise if no active camera found then use default position at 0,0,0.
+                else
+                {
+                    LOGD("%s", "No Active Camera Found, creating entity at(0, 0, 0)");
+                }
+
+                // Store the entity returned by createinstance so as to assign the selection to the new entity and that the property manager updates right after an archtype is dropped in to viewport
+                entt::entity created_entity = GameObjectSystem::GetInstance().CreateInstance(archtype_name, instance_transform);
+                if (created_entity != entt::null)
+                {
+                    LevelEditor::GetInstance().variables.selected_objectID = created_entity;
+                }
             }
 
-            ImGui::EndDragDropTarget();
         }
+    }
 
+    void Screen::play_simulation() {
+
+        if (is_simulator_running) return;
+        std::cout << "play_simulation\n";
+        is_simulator_running = true;
+
+
+    }
+    void Screen::stop_simulation() {
+
+        if (!is_simulator_running) return;
+        std::cout << "stop_simulation\n";
+        registry.clear();
+
+        
+
+        is_simulator_running = false;
 
     }
 

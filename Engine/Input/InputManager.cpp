@@ -62,6 +62,9 @@ namespace EngineFramework
     int InputManager::windowWidth = 0;
     int InputManager::windowHeight = 0;
 
+    glm::vec3 InputManager::currentGyroRate{};
+    long long InputManager::lastGyroTimestamp{};
+
 #ifdef PLATFORM_WINDOWS
     void InputManager::RegisterCallbacks(GLFWwindow* window)
     {
@@ -266,6 +269,7 @@ namespace EngineFramework
         currentGyroRate.y = y;
         currentGyroRate.z = z;
         lastGyroTimestamp = timestamp;
+        LOGI("Gyro Update: X=%.4f, Y=%.4f, Z=%.4f", x, y, z);
     }
 #endif
     void InputManager::ErrorCallback(int error, const char* description)
