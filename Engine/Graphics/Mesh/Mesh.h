@@ -124,7 +124,7 @@ namespace Mesh {
                 newMat.roughnessFactor = 0.8f;
                 newMat.metallicFactor = 0.0f;
 
-                //  HELPER: Extract texture name from Assimp material
+                // Extract texture name from Assimp material
                 auto tryLoadTexture = [&](aiTextureType type) -> std::string {
                     aiString path;
                     if (mat->GetTexture(type, 0, &path) == AI_SUCCESS && path.length > 0) {
@@ -133,7 +133,6 @@ namespace Mesh {
                         // Replace backslashes with forward slashes
                         std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
 
-                        // Now std::filesystem will work correctly on all platforms
                         std::filesystem::path p(pathStr);
                         std::string texName = p.stem().string();
 
@@ -168,7 +167,7 @@ namespace Mesh {
                     }
                 }
 
-                // === NORMAL (try NORMALS first, then HEIGHT) ===
+                // === NORMAL ===
                 std::string normalName = tryLoadTexture(aiTextureType_NORMALS);
                 if (normalName.empty()) {
                     normalName = tryLoadTexture(aiTextureType_HEIGHT);
@@ -199,7 +198,7 @@ namespace Mesh {
                     }
                 }
 
-                // === METALLIC (try METALNESS first, then SPECULAR) ===
+                // === METALLIC  ===
                 std::string metallicName = tryLoadTexture(aiTextureType_METALNESS);
                 if (metallicName.empty()) {
                     metallicName = tryLoadTexture(aiTextureType_SPECULAR);
@@ -251,7 +250,7 @@ namespace Mesh {
                     vertex.Tangent = glm::vec4(t, handedness);
                 }
                 else {
-                    // === FALLBACK: Generate tangent if Assimp didn't provide one ===
+                    // === Generate tangent if Assimp didn't provide one ===
                     glm::vec3 c1 = glm::cross(vertex.Normal, glm::vec3(0.0f, 0.0f, 1.0f));
                     glm::vec3 c2 = glm::cross(vertex.Normal, glm::vec3(0.0f, 1.0f, 0.0f));
                     glm::vec3 t = glm::length(c1) > glm::length(c2) ? c1 : c2;

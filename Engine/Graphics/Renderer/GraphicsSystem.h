@@ -186,7 +186,7 @@ namespace EngineFramework
         float m_anisotropy = 0.8f;
         float m_density = 0.15f;
         float m_scattering = 0.12f;
-        float m_absorption = 0.005f; // Corresponds to the 0.01 in ray_march_cs
+        float m_absorption = 0.005f; 
         float m_shadow_bias = 0.005f;
         float m_depth_power = 1.0f; // For exponential depth mapping
         float m_ambient_light_intensity = 0.01f;
@@ -197,7 +197,6 @@ namespace EngineFramework
         glm::mat4 m_prev_view_projection;
         glm::mat4 m_lightSpaceMatrix;
 
-        // === END VOLUMETRIC FOG RESOURCES ===
         glm::vec2 screen = { WIDTH,HEIGHT };
         
         bool show_debugDraw = false;

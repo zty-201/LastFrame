@@ -150,7 +150,6 @@ namespace EngineFramework
 		//m_instancingSystem = std::make_unique<InstancingSystem>();
 		//m_instancingSystem->Initialize(10000);
 
-
 		// === CREATE DEFAULT TEXTURES ===
 		glGenTextures(1, &m_defaultWhiteTexture);
 		glBindTexture(GL_TEXTURE_2D, m_defaultWhiteTexture);
@@ -242,7 +241,6 @@ namespace EngineFramework
 			CalculateModelMatrix(transform, transform.modelMatrix);
 		}
 
-		// NEW RENDER LOOP
 		// 1. Create shadow map
 		ShadowPass();
 		// 2. Update all uniforms now that shadow pass is done
@@ -312,8 +310,6 @@ namespace EngineFramework
 			if (!meshData || meshData->vao == 0) continue;
 
 			// For shadows, we don't care about materials, we just draw all geometry.
-			// Note: Your ShadowMap.vert needs to be updated to use u_Model instead of SSBO.
-			// For now, let's assume it has `uniform mat4 u_Model;`
 			shader->setUniform("u_Model", transformComp.modelMatrix);
 
 			glBindVertexArray(meshData->vao);
@@ -322,7 +318,6 @@ namespace EngineFramework
 				glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * subMesh.baseIndex));
 			}
 		}
-		// ===============================================
 
 		glCullFace(GL_BACK);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -463,21 +458,16 @@ namespace EngineFramework
 		glCullFace(GL_BACK);
 		glDepthFunc(GL_LESS);
 
-		// NOTE: This part needs a major refactor. The new `mesh_fs` expects multiple PBR textures
-		// per object, not just one diffuse map. The SSBO material needs to be replaced with
-		// individual texture bindings.
 		auto view = registry.view<MeshComponent, TransformComponent>();
 		for (auto [entity, meshComp, transformComp] : view.each())
 		{
 			if (meshComp.meshName == "SkyBox") continue;
 
-			// --- THIS IS THE NEW LOGIC ---
 			// 1. Get the GUID for the mesh by its name.
 			xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp.meshName);
 
 			// 2. Get the mesh resource using the GUID.
 			auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-			// --- END NEW LOGIC ---
 
 			// If mesh is not found look for it in the cache
 			if (!meshData || meshData->vao == 0) {
@@ -488,8 +478,6 @@ namespace EngineFramework
 			if (!meshData || meshData->vao == 0) continue;
 
 			// Set the per-object model matrix
-			// Note: Your Mesh.vert needs to be updated to use a `uniform mat4 u_Model`
-			// instead of the SSBO for instance data.
 			shader->setUniform("u_Model", transformComp.modelMatrix);
 
 			glBindVertexArray(meshData->vao);
@@ -500,8 +488,6 @@ namespace EngineFramework
 				// Get the material for this specific sub-mesh
 				if (subMesh.materialIndex < 0 || subMesh.materialIndex >= meshData->materials.size()) continue;
 				const auto& material = meshData->materials[subMesh.materialIndex];
-
-				
 
 				// --- SET MATERIAL FACTOR UNIFORMS ---
 				shader->setUniform("u_AlbedoFactor", material.albedoFactor);
@@ -592,8 +578,6 @@ namespace EngineFramework
 			auto& meshData = meshCache[meshComp.meshName];
 			if (!meshData || meshData->vao == 0) continue;
 
-			// ... (get texture from TextureComponent, bind cubemap, etc.) ...
-
 			glBindVertexArray(meshData->vao);
 			// The Skybox should just be one submesh
 			if (!meshData->subMeshes.empty()) {
@@ -609,9 +593,7 @@ namespace EngineFramework
 	{
 		if (meshName == "Quad" || meshName == "Plane" || meshName == "Cube" || meshName == "Sphere" || meshName == "SkyBox")
 		{
-			// TODO: You'll need a separate function to generate and cache these primitives
-			// using the new MeshData structure. For now, we'll let it fail silently
-			// if they are not pre-loaded.
+			// primitives meshes doesnt seem to be read by level editor side, so not really in use now
 			LOGE("Attempted to load primitive '%s' via file loader. Primitives should be pre-generated.", meshName.c_str());
 			return;
 		}
