@@ -7,7 +7,7 @@
 local moveSpeed       = 50.0
 local deadZone        = 20.0
 local yaw, pitch      = 0.0, 0.0
-local gyroSensitivity = 10.0
+local gyroSensitivity = 5.0
 local mouseSensitivity = 0.2
 local pitchLimit      = 89.0
 local gyroEnabled     = true
