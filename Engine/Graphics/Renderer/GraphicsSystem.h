@@ -109,6 +109,44 @@ namespace EngineFramework
 
         void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
 
+        // Simple get and set functions for Fog Control Parameters
+        // Anisotrophy
+        void SetAnisotrophy(float value) { m_anisotropy = value; }
+        float GetAnisotrophy() const { return m_anisotropy; }
+
+		// Density
+        void SetDensity(float value) { m_density = value; }
+        float GetDensity() const { return m_density; }
+
+
+        // Scattering
+        void SetScattering(float value) { m_scattering = value; }
+        float GetScattering() const { return m_scattering; }
+
+		// Absorption
+        void SetAbsorption(float value) { m_absorption = value; }
+        float GetAbsorption() const { return m_absorption; }
+
+		// Shadow Bias
+        void SetShadowBias(float value) { m_shadow_bias = value; }
+        float GetShadowBias() const { return m_shadow_bias; }
+
+		// Depth Power
+        void SetDepthPower(float value) { m_depth_power = value; }
+        float GetDepthPower() const { return m_depth_power; }
+
+		// Ambient Light Intensity
+        void SetAmbientLightIntensity(float value) { m_ambient_light_intensity = value; }
+        float GetAmbientLightIntensity() const { return m_ambient_light_intensity; }
+
+		// Temporal Accumulation
+        bool GetTemporalAccumulation() const { return m_temporal_accumulation; }
+        void SetTemporalAccumulation(bool value) { m_temporal_accumulation = value; }
+
+		// Tricubic Filtering
+        bool GetTricubicFiltering() const { return m_tricubic_filtering; }
+        void SetTricubicFiltering(bool value) { m_tricubic_filtering = value; }
+
     private:
 
 #ifdef PLATFORM_WINDOWS

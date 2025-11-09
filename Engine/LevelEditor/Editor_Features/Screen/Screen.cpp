@@ -472,6 +472,71 @@ namespace EngineFramework
                 ImGui::Spacing();
                 ImGui::Separator();
 
+                // Fog control parameters
+                ImGui::SeparatorText("Fog Control Parameters");
+                ImGui::Spacing();
+
+				// Get the graphics system reference
+                auto& gfx = GraphicsSystem::GetInstance();
+
+                // Anisotropy
+				float aniso = gfx.GetAnisotrophy();
+                if(ImGui::InputFloat("Anisotropy", &aniso, 0.f, 0.f, "%.4f")) {
+                    gfx.SetAnisotrophy(aniso);
+				}
+
+				// Density
+				float density = gfx.GetDensity();
+                if (ImGui::InputFloat("Density", &density, 0.f, 0.f, "%.4f")) {
+                    gfx.SetDensity(density);
+                }
+
+                // Scattering
+				float scattering = gfx.GetScattering();
+                if (ImGui::InputFloat("Scattering", &scattering, 0.f, 0.f, "%.4f")) {
+                    gfx.SetScattering(scattering);
+				}
+
+				// Absorption
+				float absorption = gfx.GetAbsorption();
+                if (ImGui::InputFloat("Absorption", &absorption, 0.f, 0.f, "%.4f")) {
+                    gfx.SetAbsorption(absorption);
+                }
+
+				// Shadow Bias
+				float shadow_bias = gfx.GetShadowBias();
+                if (ImGui::InputFloat("Shadow Bias", &shadow_bias, 0.f, 0.f, "%.4f")) {
+                    gfx.SetShadowBias(shadow_bias);
+				}
+
+				// Depth Power
+				float depth_power = gfx.GetDepthPower();
+                if (ImGui::InputFloat("Depth Power", &depth_power, 0.f, 0.f, "%.4f")) {
+                    gfx.SetDepthPower(depth_power);
+                }
+
+
+				// Ambient Light settings
+				float ambient_intensity = gfx.GetAmbientLightIntensity();
+                if (ImGui::InputFloat("Ambient Light Intensity", &ambient_intensity, 0.f, 0.f, "%.4f")) {
+                    gfx.SetAmbientLightIntensity(ambient_intensity);
+                }
+
+				// Temporal accumulation
+				//bool temporal_accumulation = gfx.GetTemporalAccumulation();
+    //            if (ImGui::Checkbox("Temporal Accumulation", &temporal_accumulation)) {
+    //                gfx.SetTemporalAccumulation(temporal_accumulation);
+    //            }
+
+				//// Tricubic Filtering
+				//bool tricubic_filtering = gfx.GetTricubicFiltering();
+    //            if (ImGui::Checkbox("Tricubic Filtering", &tricubic_filtering)) {
+    //                gfx.SetTricubicFiltering(tricubic_filtering);
+				//}
+
+                ImGui::Spacing();
+                ImGui::Separator();
+
                 // Start Light settings
                 ImGui::SeparatorText("Lights");
                 ImGui::Spacing();
