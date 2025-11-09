@@ -8,22 +8,22 @@
 
 void PhysicsBuildSystem::Update(entt::registry& ecs)
 {
-    LOGI("[PhysicsBuild] Update called");
+    //LOGI("[PhysicsBuild] Update called");
 
-    LOGI("[PhysicsBuild] transforms = %zu", ecs.storage<TransformComponent>().size());
-    LOGI("[PhysicsBuild] physics    = %zu", ecs.storage<PhysicsComponent>().size());
-    LOGI("[PhysicsBuild] colliders  = %zu", ecs.storage<ColliderComponent>().size());
+    //LOGI("[PhysicsBuild] transforms = %zu", ecs.storage<TransformComponent>().size());
+    //LOGI("[PhysicsBuild] physics    = %zu", ecs.storage<PhysicsComponent>().size());
+    //LOGI("[PhysicsBuild] colliders  = %zu", ecs.storage<ColliderComponent>().size());
 
     auto view = ecs.view<TransformComponent, PhysicsComponent, ColliderComponent>();
-    LOGI("[PhysicsBuild] view size = %zu", view.size_hint());
+    //LOGI("[PhysicsBuild] view size = %zu", view.size_hint());
 
     for (auto&& [ent, transform, physics, collider] : view.each())
     {
-        LOGI("[PhysicsBuild] found entity %u", (unsigned)ent);
+        //LOGI("[PhysicsBuild] found entity %u", (unsigned)ent);
 
         if (PhysicsWorld::Get().HasBody(ent))
         {
-            LOGI("This object has a body");
+            //LOGI("This object has a body");
             continue;
         }
 
