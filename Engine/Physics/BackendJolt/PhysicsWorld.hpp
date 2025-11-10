@@ -136,10 +136,28 @@ public:
     void StepSimulation(float dt);
 
     // Body management
-    void CreateBoxBody(entt::entity entity, const glm::vec3& position, const glm::vec3& size, bool isStatic);
-    void CreateSphereBody(entt::entity entity, const glm::vec3& position, float radius, bool isStatic);
-    void CreateCapsuleBody(entt::entity entity, const glm::vec3& position, float height, float radius, bool isStatic);
+    void CreateBoxBody(entt::entity entity,
+        const glm::vec3& position,
+        const glm::vec3& size,
+        bool isStatic,
+        bool isTrigger = false);
+
+    void CreateSphereBody(entt::entity entity,
+        const glm::vec3& position,
+        float radius,
+        bool isStatic,
+        bool isTrigger = false);
+
+    void CreateCapsuleBody(entt::entity entity,
+        const glm::vec3& position,
+        float height,
+        float radius,
+        bool isStatic,
+        bool isTrigger = false);
+
     void RemoveBody(entt::entity entity);
+
+    void SetGravityFactor(entt::entity entity, float factor);
 
     // Body state access
     bool HasBody(entt::entity entity) const;

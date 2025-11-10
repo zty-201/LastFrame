@@ -23,5 +23,9 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
         transform.rotation = glm::eulerAngles(q);
 
         physics.velocity = PhysicsWorld::Get().GetBodyVelocity(ent);
+
+        PhysicsWorld::Get().SetGravityFactor(
+            ent, physics.useGravity ? physics.gravityFactor : 0.0f
+        );
     }
 }

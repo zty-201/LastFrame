@@ -31,14 +31,14 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
 
         switch (shape)
         {
-        case ColliderShape::Box:
-        {
-            glm::vec3 half = collider.size * 0.5f;
-            PhysicsWorld::Get().CreateBoxBody(
-                ent,
-                transform.position,
-                half * 2.0f,
-                collider.isStatic
+            case ColliderShape::Box:
+            {
+                PhysicsWorld::Get().CreateBoxBody(
+                    ent,
+                    transform.position,
+                    collider.size,
+                    collider.isStatic,
+                    collider.isTrigger
             );
             LOGI("Created a Box Body");
             break;
@@ -48,7 +48,8 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
                 ent,
                 transform.position,
                 collider.radius,
-                collider.isStatic
+                collider.isStatic,
+                collider.isTrigger
             );
             LOGI("Created a Sphere Body");
             break;
@@ -58,10 +59,15 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
                 transform.position,
                 collider.height,
                 collider.capRadius,
-                collider.isStatic
+                collider.isStatic,
+                collider.isTrigger
             );
             LOGI("Created a Capsule Body");
             break;
         }
+
+        auto& phys = ecs.get<PhysicsComponent>(ent);  
+        PhysicsWorld::Get().SetGravityFactor(ent, phys.useGravity ? phys.gravityFactor : 0.0f);
+
     }
 }
