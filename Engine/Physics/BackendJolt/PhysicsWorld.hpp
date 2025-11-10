@@ -159,6 +159,11 @@ public:
 
     void SetGravityFactor(entt::entity entity, float factor);
 
+    void SetPosition(entt::entity e, const glm::vec3& p, bool activate = true);
+    void SetRotation(entt::entity e, const glm::quat& q, bool activate = true);
+    void SetPositionRotation(entt::entity e, const glm::vec3& p, const glm::quat& q, bool activate = true);
+    void ActivateBody(entt::entity e);
+
     // Body state access
     bool HasBody(entt::entity entity) const;
     glm::vec3 GetBodyPosition(entt::entity entity) const;
