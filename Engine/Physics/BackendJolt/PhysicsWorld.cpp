@@ -166,135 +166,129 @@ void PhysicsWorld::StepSimulation(float dt)
 //    We'll implement these in the next stage (BuildSystem).
 // ------------------------------------------------------------
 
+// ------------------------------
+// Box
+// ------------------------------
 void PhysicsWorld::CreateBoxBody(entt::entity entity,
     const glm::vec3& position,
-    const glm::vec3& size,
-    bool isStatic)
+    const glm::vec3& size,   // FULL extents from your ColliderComponent
+    bool isStatic,
+    bool isTrigger)
 {
-    // Don't recreate if it already exists
-    if (HasBody(entity))
-        return;
+    if (HasBody(entity)) return;
 
-    // Half extents for Jolt box shape.
-    // Our ColliderComponent stores half extents, but the BuildSystem may pass full size
-    // or half size depending on how we wire it. For safety we'll treat `size` here
-    // as FULL size and divide by 2.0f. You can adjust later if needed.
-    JPH::Vec3 halfExtent(
-        0.5f * size.x,
-        0.5f * size.y,
-        0.5f * size.z
-    );
-
+    // Jolt wants half extents
+    const JPH::Vec3 halfExtent(0.5f * size.x, 0.5f * size.y, 0.5f * size.z);
     JPH::Ref<JPH::BoxShape> shape = new JPH::BoxShape(halfExtent);
 
-    // start transform
-    JPH::Vec3 jPos(position.x, position.y, position.z);
-    JPH::Quat jRot = JPH::Quat::sIdentity();
+    const JPH::Vec3 jPos(position.x, position.y, position.z);
+    const JPH::Quat jRot = JPH::Quat::sIdentity();
 
-    JPH::EMotionType motionType = isStatic
+    const JPH::EMotionType motionType = isStatic
         ? JPH::EMotionType::Static
         : JPH::EMotionType::Dynamic;
 
-    // Create body settings
     JPH::BodyCreationSettings bodySettings(
-        shape,
-        jPos,
-        jRot,
-        motionType,
-        GetObjectLayerForIsStatic(isStatic)
+        shape, jPos, jRot, motionType, GetObjectLayerForIsStatic(isStatic)
     );
+    bodySettings.mIsSensor = isTrigger; // <— make it a trigger/sensor if requested
 
-    // Create body
     JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
     JPH::Body* body = bodyInterface.CreateBody(bodySettings);
+    if (!body) return;
 
-    if (!body)
-        return; // failed to create (out of capacity etc.)
+    bodyInterface.AddBody(
+        body->GetID(),
+        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate
+    );
 
-    // Add to physics world (activate if dynamic so it simulates immediately)
-    bodyInterface.AddBody(body->GetID(),
-        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate);
-
-    // Track mapping
     m_entityToBody[entity] = body->GetID();
     m_bodyToEntity[body->GetID()] = entity;
 }
 
+// ------------------------------
+// Sphere
+// ------------------------------
 void PhysicsWorld::CreateSphereBody(entt::entity entity,
     const glm::vec3& position,
     float radius,
-    bool isStatic)
+    bool isStatic,
+    bool isTrigger)
 {
-    if (HasBody(entity))
-        return;
+    if (HasBody(entity)) return;
 
     JPH::Ref<JPH::SphereShape> shape = new JPH::SphereShape(radius);
 
-    JPH::Vec3 jPos(position.x, position.y, position.z);
-    JPH::Quat jRot = JPH::Quat::sIdentity();
+    const JPH::Vec3 jPos(position.x, position.y, position.z);
+    const JPH::Quat jRot = JPH::Quat::sIdentity();
 
-    JPH::EMotionType motionType = isStatic
+    const JPH::EMotionType motionType = isStatic
         ? JPH::EMotionType::Static
         : JPH::EMotionType::Dynamic;
 
     JPH::BodyCreationSettings bodySettings(
-        shape,
-        jPos,
-        jRot,
-        motionType,
-        GetObjectLayerForIsStatic(isStatic)
+        shape, jPos, jRot, motionType, GetObjectLayerForIsStatic(isStatic)
     );
+    bodySettings.mIsSensor = isTrigger;
 
     JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
     JPH::Body* body = bodyInterface.CreateBody(bodySettings);
-    if (!body)
-        return;
+    if (!body) return;
 
-    bodyInterface.AddBody(body->GetID(),
-        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate);
+    bodyInterface.AddBody(
+        body->GetID(),
+        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate
+    );
 
     m_entityToBody[entity] = body->GetID();
     m_bodyToEntity[body->GetID()] = entity;
 }
 
+// ------------------------------
+// Capsule
+// ------------------------------
 void PhysicsWorld::CreateCapsuleBody(entt::entity entity,
     const glm::vec3& position,
-    float height,
+    float height,   // your ColliderComponent stores full height
     float radius,
-    bool isStatic)
+    bool isStatic,
+    bool isTrigger)
 {
-    if (HasBody(entity))
-        return;
+    if (HasBody(entity)) return;
 
-    // In Jolt, capsule height is the cylinder part, not including the hemispheres.
-    // We'll assume caller already passes the "usable" capsule height.
-    JPH::Ref<JPH::CapsuleShape> shape = new JPH::CapsuleShape(height * 0.5f, radius);
+    // Jolt's CapsuleShape ctor takes half-height of the cylinder part
+    JPH::Ref<JPH::CapsuleShape> shape = new JPH::CapsuleShape(0.5f * height, radius);
 
-    JPH::Vec3 jPos(position.x, position.y, position.z);
-    JPH::Quat jRot = JPH::Quat::sIdentity();
+    const JPH::Vec3 jPos(position.x, position.y, position.z);
+    const JPH::Quat jRot = JPH::Quat::sIdentity();
 
-    JPH::EMotionType motionType = isStatic
+    const JPH::EMotionType motionType = isStatic
         ? JPH::EMotionType::Static
         : JPH::EMotionType::Dynamic;
 
     JPH::BodyCreationSettings bodySettings(
-        shape,
-        jPos,
-        jRot,
-        motionType,
-        GetObjectLayerForIsStatic(isStatic)
+        shape, jPos, jRot, motionType, GetObjectLayerForIsStatic(isStatic)
     );
+    bodySettings.mIsSensor = isTrigger;
 
     JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
     JPH::Body* body = bodyInterface.CreateBody(bodySettings);
-    if (!body)
-        return;
+    if (!body) return;
 
-    bodyInterface.AddBody(body->GetID(),
-        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate);
+    bodyInterface.AddBody(
+        body->GetID(),
+        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate
+    );
 
     m_entityToBody[entity] = body->GetID();
     m_bodyToEntity[body->GetID()] = entity;
+}
+
+void PhysicsWorld::SetGravityFactor(entt::entity entity, float factor)
+{
+    auto it = m_entityToBody.find(entity);
+    if (it == m_entityToBody.end()) return;
+    m_physicsSystem->GetBodyInterfaceNoLock().SetGravityFactor(it->second, factor);
 }
 
 void PhysicsWorld::RemoveBody(entt::entity entity)

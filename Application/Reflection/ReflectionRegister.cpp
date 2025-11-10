@@ -476,6 +476,8 @@ namespace EngineFramework
 			.data<&PhysicsComponent::acceleration>("acceleration")
 			.data<&PhysicsComponent::friction>("friction")
 			.data<&PhysicsComponent::mass>("mass")
+			.data<&PhysicsComponent::useGravity>("useGravity")
+			.data<&PhysicsComponent::gravityFactor>("gravityFactor")
 			.func<&Emplacer<PhysicsComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<PhysicsComponent>::RemoveComponent>("remove")
 			.func<&Getter<PhysicsComponent>::GetComponent>("get")
