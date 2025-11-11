@@ -141,6 +141,7 @@ namespace EngineFramework
         if (ImGui::Button("Create Empty Object"))
         {
             entt::entity instance = registry.create();
+            registry.emplace<TransformComponent>(instance);
             UNREFERENCED_PARAMETER(instance);
         }
         if (ImGui::Button("Create Empty Object At Camera"))
