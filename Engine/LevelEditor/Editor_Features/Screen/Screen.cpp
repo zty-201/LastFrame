@@ -35,6 +35,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "ReflectionRegister.hpp"
 #include "GraphicsSystem.h"
 #include "Screen.hpp"
+#include "imgui.h"
 #include "ImGuizmo.h"
 //#include <iostream>
 
@@ -161,7 +162,9 @@ namespace EngineFramework
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
         ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500
 
-        if (ImGui::Begin("level loaded: <name>", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse)) {
+        std::string levelLoaded = "Level Loaded: " + SceneManager::GetInstance().GetCurrentScene();
+
+        if (ImGui::Begin(levelLoaded.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse)) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
             if (ImGui::BeginMenuBar()) {
 
