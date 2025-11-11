@@ -17,6 +17,16 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
         if (!PhysicsWorld::Get().HasBody(ent))
             continue;
 
+        if (physics.useGravity && !physics._prevUseGravity)
+        {
+            // Push ECS transform to Jolt so the body starts where you placed it
+            glm::quat q = glm::quat(transform.rotation); // your Transform stores Euler
+            PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q, /*activate=*/true);
+
+            // Clear old motion so it doesn't “remember” a velocity from before
+            PhysicsWorld::Get().SetLinearVelocity(ent, glm::vec3(0.0f));
+        }
+
         transform.position = PhysicsWorld::Get().GetBodyPosition(ent);
 
         glm::quat q = PhysicsWorld::Get().GetBodyRotation(ent);
@@ -27,5 +37,18 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
         PhysicsWorld::Get().SetGravityFactor(
             ent, physics.useGravity ? physics.gravityFactor : 0.0f
         );
+
+        if (physics.useGravity) {
+            PhysicsWorld::Get().ActivateBody(ent);      
+        }
+        else {
+            auto v = PhysicsWorld::Get().GetBodyVelocity(ent);
+            if (v.y != 0.0f) {                          
+                v.y = 0.0f;
+                PhysicsWorld::Get().SetLinearVelocity(ent, v);
+            }
+        }
+
+        physics._prevUseGravity = physics.useGravity;
     }
 }

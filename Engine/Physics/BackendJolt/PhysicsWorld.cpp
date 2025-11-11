@@ -291,6 +291,36 @@ void PhysicsWorld::SetGravityFactor(entt::entity entity, float factor)
     m_physicsSystem->GetBodyInterfaceNoLock().SetGravityFactor(it->second, factor);
 }
 
+void PhysicsWorld::SetPosition(entt::entity e, const glm::vec3& p, bool activate) {
+    auto it = m_entityToBody.find(e); if (it == m_entityToBody.end()) return;
+    m_physicsSystem->GetBodyInterfaceNoLock()
+        .SetPosition(it->second, JPH::Vec3(p.x, p.y, p.z),
+            activate ? JPH::EActivation::Activate : JPH::EActivation::DontActivate);
+}
+
+void PhysicsWorld::SetRotation(entt::entity e, const glm::quat& q, bool activate) {
+    auto it = m_entityToBody.find(e); if (it == m_entityToBody.end()) return;
+    JPH::Quat jq(q.x, q.y, q.z, q.w); // glm(w,x,y,z) vs Jolt(x,y,z,w)
+    m_physicsSystem->GetBodyInterfaceNoLock()
+        .SetRotation(it->second, jq,
+            activate ? JPH::EActivation::Activate : JPH::EActivation::DontActivate);
+}
+
+void PhysicsWorld::SetPositionRotation(entt::entity e, const glm::vec3& p, const glm::quat& q, bool activate) {
+    auto it = m_entityToBody.find(e); if (it == m_entityToBody.end()) return;
+    JPH::Quat jq(q.x, q.y, q.z, q.w);
+    m_physicsSystem->GetBodyInterfaceNoLock()
+        .SetPositionAndRotation(it->second, JPH::Vec3(p.x, p.y, p.z), jq,
+            activate ? JPH::EActivation::Activate : JPH::EActivation::DontActivate);
+}
+
+void PhysicsWorld::ActivateBody(entt::entity e)
+{
+    auto it = m_entityToBody.find(e);
+    if (it == m_entityToBody.end()) return;
+    m_physicsSystem->GetBodyInterfaceNoLock().ActivateBody(it->second);
+}
+
 void PhysicsWorld::RemoveBody(entt::entity entity)
 {
     auto it = m_entityToBody.find(entity);
