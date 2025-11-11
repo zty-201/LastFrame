@@ -87,6 +87,41 @@ namespace EngineFramework
                     LOGI(("Selected Entity: " + std::to_string((uint32_t)selected_entity)).c_str());
                 }
 
+                // Check for right-click while the item is hovered/active
+                if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+                    // Open the popup menu attached to this item
+                    ImGui::OpenPopup("EntityContextMenu");
+                }
+
+                std::string popupID = "EntityContextMenu##" + std::to_string((uint32_t)entity);
+
+                // Check for right-click on the selectable item AND start the menu
+                if (ImGui::BeginPopupContextItem(popupID.c_str())) { // <-- Use the unique ID here!
+
+                    // This is safe: sets the context to the currently right-clicked entity
+                    selected_entity = entity;
+
+                    // --- 2. UNIQUE MENU ITEM LABEL ---
+                    // Optional: Ensure the delete text itself is unique for clarity, though not mandatory
+                    std::string deleteLabel = "Delete Entity##" + std::to_string((uint32_t)entity);
+
+                    if (ImGui::MenuItem(deleteLabel.c_str())) {
+
+                        // 1. Destroy the entity
+                        registry.destroy(entity);
+
+                        // 2. Clear selection
+                        if (LevelEditor::GetInstance().variables.selected_objectID == entity) {
+                            LevelEditor::GetInstance().variables.selected_objectID = entt::null;
+                        }
+
+                        ImGui::EndPopup();
+                        break; // Exit the loop safely
+                    }
+
+                    ImGui::EndPopup();
+                }
+
                 // Optional: hover highlight (ImGui automatically applies a default hover style)
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Entity ID: %u", (uint32_t)entity);
