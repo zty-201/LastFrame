@@ -31,12 +31,14 @@ struct ColliderComponent
     // -------- physics flags / material --------
     bool  isStatic = false;   // create static vs dynamic body
     bool  isTrigger = false;   // for later when you do sensor bodies
+
     float friction = 0.5f;
     float restitution = 0.0f;
     float density = 1.0f;
-
     // collision filtering (for later)
     int   layer = 1;
+
+    bool _prevIsStatic = false;
 };
 
 #endif // COLLIDER_COMPONENT

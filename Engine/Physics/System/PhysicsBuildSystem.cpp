@@ -20,30 +20,37 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
     for (auto&& [ent, transform, physics, collider] : view.each())
     {
         //LOGI("[PhysicsBuild] found entity %u", (unsigned)ent);
+        const bool has = PhysicsWorld::Get().HasBody(ent);
+        const bool tagChanged = (collider.isStatic != collider._prevIsStatic);
 
-        if (PhysicsWorld::Get().HasBody(ent))
+        if (has && !tagChanged)
         {
-            //LOGI("This object has a body");
+            // keep existing body as-is
             continue;
         }
 
-        ColliderShape shape = static_cast<ColliderShape>(collider.shape);
-
-        switch (shape)
+        if (has && tagChanged)
         {
-            case ColliderShape::Box:
-            {
-                PhysicsWorld::Get().CreateBoxBody(
-                    ent,
-                    transform.position,
-                    collider.size,
-                    collider.isStatic,
-                    collider.isTrigger
+            PhysicsWorld::Get().RemoveBody(ent);
+        }
+
+       
+        switch (static_cast<ColliderShape>(collider.shape))
+        {
+        case ColliderShape::Box:
+        {
+            PhysicsWorld::Get().CreateBoxBody(
+                ent,
+                transform.position,
+                collider.size,
+                collider.isStatic,
+                collider.isTrigger
             );
             LOGI("Created a Box Body");
             break;
         }
         case ColliderShape::Sphere:
+        {
             PhysicsWorld::Get().CreateSphereBody(
                 ent,
                 transform.position,
@@ -53,7 +60,9 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
             );
             LOGI("Created a Sphere Body");
             break;
+        }
         case ColliderShape::Capsule:
+        {
             PhysicsWorld::Get().CreateCapsuleBody(
                 ent,
                 transform.position,
@@ -65,9 +74,15 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
             LOGI("Created a Capsule Body");
             break;
         }
+        }
 
-        auto& phys = ecs.get<PhysicsComponent>(ent);  
-        PhysicsWorld::Get().SetGravityFactor(ent, phys.useGravity ? phys.gravityFactor : 0.0f);
+        PhysicsWorld::Get().SetGravityFactor(
+            ent, physics.useGravity ? physics.gravityFactor : 0.0f
+        );
+        if (physics.useGravity) {
+            PhysicsWorld::Get().ActivateBody(ent);
+        }
 
+        collider._prevIsStatic = collider.isStatic;
     }
 }
