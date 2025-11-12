@@ -14,6 +14,7 @@
 #include "AudioComponent.h"
 #include "ColliderComponent.h"
 #include "PhysicsComponent.h"
+#include "TriggerBoxComponent.h"
 #include "Scripting/Script.hpp"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 #include "MetaInspector.hpp"
@@ -126,6 +127,16 @@ struct adl_serializer<CameraComponent::CameraType> {
 };
 
 template<>
+struct adl_serializer<TriggerShapeType> {
+	static void to_json(nlohmann::json& j, const TriggerShapeType& v) {
+		j = static_cast<int>(v);
+	}
+	static void from_json(const nlohmann::json& j, TriggerShapeType& v) {
+		v = static_cast<TriggerShapeType>(j.get<int>());
+	}
+};
+
+template<>
 struct adl_serializer<std::filesystem::path> {
 	static void to_json(json& j, const std::filesystem::path& p) {
 		j = p.generic_string();
@@ -193,6 +204,7 @@ namespace EngineFramework
 		SetMeta(CameraComponent::CameraType),
 		SetMeta(std::filesystem::path),
 		SetMeta(ColliderShape),
+		SetMeta(TriggerShapeType),
 		SetMeta(xresource::instance_guid)
 #if defined(ENGINE_ENABLE_LUA)
 		,
@@ -233,6 +245,7 @@ namespace EngineFramework
 		SetJson(CameraComponent::CameraType),
 		SetJson(std::filesystem::path),
 		SetJson(ColliderShape),
+		SetJson(TriggerShapeType),
 		SetJson(xresource::instance_guid)
 #if defined(ENGINE_ENABLE_LUA)
 		,
@@ -361,6 +374,7 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
 		REGISTER_ARBITRARY_TYPE(std::filesystem::path);
 		REGISTER_ARBITRARY_TYPE(ColliderShape);
+		REGISTER_ARBITRARY_TYPE(TriggerShapeType);
 #if defined(ENGINE_ENABLE_LUA)
 		REGISTER_ARBITRARY_TYPE(Engine::LuaScriptComponent::LuaInstance);
 		REGISTER_ARBITRARY_TYPE(std::vector<Engine::LuaScriptComponent::LuaInstance>);
@@ -515,7 +529,24 @@ namespace EngineFramework
 			.func<&Remover<SkyboxRenderPass>::RemoveComponent>("remove")
 			.func<&Getter<SkyboxRenderPass>::GetComponent>("get");
 
-
+		entt::meta_factory<TriggerBoxComponent>()
+			.type("TriggerBoxComponent")
+			.data<&TriggerBoxComponent::enabled>("enabled")
+			.data<&TriggerBoxComponent::type>("type")
+			.data<&TriggerBoxComponent::halfExtents>("halfExtents")
+			.data<&TriggerBoxComponent::radius>("radius")
+			.data<&TriggerBoxComponent::capHalfHeight>("capHalfHeight")
+			.data<&TriggerBoxComponent::capRadius>("capRadius")
+			.data<&TriggerBoxComponent::localPosition>("localPosition")
+			.data<&TriggerBoxComponent::localEulerDeg>("localEulerDeg")
+			.data<&TriggerBoxComponent::debugColor>("debugColor")
+			// runtime fields are typically NOT serialized; omit if you don’t want them saved:
+			//.data<&TriggerBoxComponent::bodyId>("bodyId")
+			//.data<&TriggerBoxComponent::isRegistered>("isRegistered")
+			.func<&Emplacer<TriggerBoxComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<TriggerBoxComponent>::RemoveComponent>("remove")
+			.func<&Getter<TriggerBoxComponent>::GetComponent>("get")
+			.func<&GetRef<TriggerBoxComponent>>("get_ref");
 	}
 
 

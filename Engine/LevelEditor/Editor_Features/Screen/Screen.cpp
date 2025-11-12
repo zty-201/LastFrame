@@ -37,6 +37,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Screen.hpp"
 #include "imgui.h"
 #include "ImGuizmo.h"
+#include "TriggerBoxComponent.h"
+#include "MeshComponent.h"
+
 //#include <iostream>
 
 //Scripting related
@@ -92,6 +95,38 @@ namespace EngineFramework
     Screen& Screen::GetInstance()
     {
         return *this_instance;
+    }
+
+    static inline glm::mat4 TRS(const glm::vec3& t, const glm::quat& q, const glm::vec3& s) {
+        glm::mat4 M(1.0f);
+        M = glm::translate(M, t);
+        M *= glm::mat4_cast(q);
+        M = glm::scale(M, s);
+        return M;
+    }
+
+    static inline glm::quat EulerDegToQuat(const glm::vec3& deg) { 
+        return glm::quat(glm::radians(deg)); 
+    }
+
+    static inline bool ProjectToScreen(const glm::mat4& V, const glm::mat4& P, const glm::vec3& p,
+        ImVec2 pos, ImVec2 size, ImVec2& out) {
+        glm::vec4 clip = P * V * glm::vec4(p, 1.0f);
+        if (clip.w == 0.0f) return false;
+        glm::vec3 ndc = glm::vec3(clip) / clip.w;
+        if (ndc.z < -1.0f || ndc.z > 1.0f) return false;
+        out.x = (ndc.x * 0.5f + 0.5f) * size.x + pos.x;
+        out.y = (ndc.y * -0.5f + 0.5f) * size.y + pos.y;
+        return true;
+    }
+    static void DrawWireOBB(const glm::mat4& M, const glm::mat4& V, const glm::mat4& P,
+        ImVec2 pos, ImVec2 size, ImU32 color = IM_COL32(0, 255, 0, 255), float thick = 1.6f) {
+        static const glm::vec3 C[8] = { {-0.5,-0.5,-0.5},{0.5,-0.5,-0.5},{0.5,0.5,-0.5},{-0.5,0.5,-0.5},
+                                     {-0.5,-0.5,0.5},{0.5,-0.5,0.5},{0.5,0.5,0.5},{-0.5,0.5,0.5} };
+        static const int E[12][2] = { {0,1},{1,2},{2,3},{3,0},{4,5},{5,6},{6,7},{7,4},{0,4},{1,5},{2,6},{3,7} };
+        ImDrawList* dl = ImGui::GetWindowDrawList(); ImVec2 pts[8]; bool ok[8];
+        for (int i = 0;i < 8;++i) { glm::vec3 w = glm::vec3(M * glm::vec4(C[i], 1)); ok[i] = ProjectToScreen(V, P, w, pos, size, pts[i]); }
+        for (auto& e : E) if (ok[e[0]] && ok[e[1]]) dl->AddLine(pts[e[0]], pts[e[1]], color, thick);
     }
 
     void Screen::Initialize() {
@@ -200,6 +235,7 @@ namespace EngineFramework
 
                 display_screen();
                 gizmos();
+                triggerbox();
                 drop_target();
                 if (bool hovered = ImGui::IsItemHovered()) {
                     camera_controls_in_screen_only();
@@ -812,6 +848,80 @@ namespace EngineFramework
 
 
     }
+
+    void EngineFramework::Screen::triggerbox()
+    {
+        // Use same camera math as gizmos()
+        auto camera_view = registry.view<CameraComponent>();
+        if (camera_view.empty()) return;
+        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+
+        float aspect = (GraphicsSystem::GetInstance().GetWindowSize().second > 0)
+            ? (float)GraphicsSystem::GetInstance().GetWindowSize().first /
+            (float)GraphicsSystem::GetInstance().GetWindowSize().second
+            : 1.0f;
+
+        glm::mat4 view = Camera::getLookAt(camera);
+        glm::mat4 proj = Camera::getPerspective(camera, aspect);
+
+        // Same ImGuizmo setup rectangle that gizmos() uses
+        ImGuizmo::BeginFrame();
+        ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
+
+        // Draw a wire box for every entity that has a TriggerBoxComponent
+        auto v = registry.view<TransformComponent, TriggerBoxComponent>();
+        v.each([&](entt::entity e,
+            const TransformComponent& tf,
+            const TriggerBoxComponent& trg)
+            {
+                if (!trg.enabled) return;
+
+                // Base transform from the entity (already T*R*S)
+                const glm::mat4 model = tf.modelMatrix;
+
+                // Auto-fit around WHOLE object if it has a mesh (local AABB -> OBB in world)
+                glm::vec3 centerLocal(0.0f);
+                glm::vec3 sizeLocal(1.0f);
+
+                if (auto mesh = registry.try_get<MeshComponent>(e)) {
+                    glm::vec3 localMin(mesh->localMin[0], mesh->localMin[1], mesh->localMin[2]);
+                    glm::vec3 localMax(mesh->localMax[0], mesh->localMax[1], mesh->localMax[2]);
+                    centerLocal = 0.5f * (localMin + localMax);
+                    sizeLocal = (localMax - localMin);     // full extents
+                }
+                else {
+                    // Fallback: use the authoring numbers on the trigger itself
+                    switch (trg.type) {
+                    case TriggerShapeType::Box:
+                        centerLocal = trg.localPosition;
+                        sizeLocal = 2.0f * trg.halfExtents;
+                        break;
+                    case TriggerShapeType::Sphere:
+                        centerLocal = trg.localPosition;
+                        sizeLocal = glm::vec3(2.0f * trg.radius);
+                        break;
+                    case TriggerShapeType::Capsule:
+                        centerLocal = trg.localPosition;
+                        sizeLocal = glm::vec3(2.0f * trg.capRadius,
+                            2.0f * (trg.capHalfHeight + trg.capRadius),
+                            2.0f * trg.capRadius);
+                        break;
+                    }
+                }
+
+                // Optional local offset/rotation for the trigger
+                const glm::quat qLocal = EulerDegToQuat(trg.localEulerDeg);
+
+                // Final OBB transform: model * localCenter/rot * scale(size)
+                const glm::mat4 triggerM = model * TRS(centerLocal, qLocal, sizeLocal);
+
+                // make ImGuizmo cube fully transparent but keep green wire overlay 
+                DrawWireOBB(triggerM, view, proj, screen_pos, available_size, IM_COL32(0, 255, 0, 255), 1.6f);
+            });
+    }
+
 
     void Screen::drop_target() {
 
