@@ -39,6 +39,11 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
         {
         case ColliderShape::Box:
         {
+            LOGI("[BUILD] Creating body for entity %u (shape=%d, static=%d)",
+                (uint32_t)ent,
+                (int)collider.shape,
+                collider.isStatic);
+
             PhysicsWorld::Get().CreateBoxBody(
                 ent,
                 transform.position,
