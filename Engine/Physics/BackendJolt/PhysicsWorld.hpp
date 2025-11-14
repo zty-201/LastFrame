@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <memory>
+#include <Jolt/Physics/Collision/ContactListener.h>
 
 using uint = unsigned int;
 
@@ -173,6 +174,7 @@ public:
     void SetLinearVelocity(entt::entity entity, const glm::vec3& velocity);
     void AddForce(entt::entity entity, const glm::vec3& force);
 
+
 private:
     PhysicsWorld() = default;
     ~PhysicsWorld() = default;
@@ -188,6 +190,53 @@ private:
 
     std::unordered_map<entt::entity, JPH::BodyID> m_entityToBody;
     std::unordered_map<JPH::BodyID, entt::entity> m_bodyToEntity;
+
+    class ContactListenerImpl final : public JPH::ContactListener {
+    public:
+        ContactListenerImpl() = default;
+
+        // Non-sensor contacts
+        void OnContactAdded(const JPH::Body& b1,
+            const JPH::Body& b2,
+            const JPH::ContactManifold&,
+            JPH::ContactSettings&) override
+        {
+            const uint32_t a = (uint32_t)b1.GetUserData();
+            const uint32_t b = (uint32_t)b2.GetUserData();
+            LOGI("[Physics] Collision Enter: %u <-> %u", a, b);
+        }
+
+        void OnContactRemoved(const JPH::SubShapeIDPair& p) override
+        {
+            // We only have BodyIDs here; avoid BodyInterface to keep things lock-safe.
+            // You can still log something useful:
+            uint32_t id1 = p.GetBody1ID().GetIndexAndSequenceNumber();
+            uint32_t id2 = p.GetBody2ID().GetIndexAndSequenceNumber();
+            LOGI("[Physics] Collision Exit (BodyID): %u <-> %u", id1, id2);
+        }
+
+        // Optional: sensor hooks, keep them simple & not using BodyInterface
+        void OnSensorContactAdded(const JPH::BodyID& sensor,
+            const JPH::BodyID& other,
+            const JPH::SubShapeIDPair&)
+        {
+            uint32_t s = sensor.GetIndexAndSequenceNumber();
+            uint32_t o = other.GetIndexAndSequenceNumber();
+            LOGI("[Physics] Trigger Enter (BodyID): %u <-> %u", s, o);
+        }
+
+        void OnSensorContactRemoved(const JPH::BodyID& sensor,
+            const JPH::BodyID& other,
+            const JPH::SubShapeIDPair&)
+        {
+            uint32_t s = sensor.GetIndexAndSequenceNumber();
+            uint32_t o = other.GetIndexAndSequenceNumber();
+            LOGI("[Physics] Trigger Exit (BodyID): %u <-> %u", s, o);
+        }
+    };
+
+    // Listener instance (note: declared AFTER m_bodyToEntity so we can pass its address)
+    ContactListenerImpl m_contactListener;
 
     float m_accumulator = 0.0f;
     const float m_fixedDt = 1.0f / 60.0f;
