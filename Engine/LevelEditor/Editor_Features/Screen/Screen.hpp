@@ -54,6 +54,7 @@ namespace EngineFramework
         std::unique_ptr<HistorySystem> history;
         void display_screen();
         void gizmos();
+        void triggerbox();
         void camera_controls_outside_screen();
         void camera_controls_in_screen_only();
         void control_window();

@@ -16,27 +16,34 @@
 #ifndef CAM_COMPONENT
 #define CAM_COMPONENT
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 struct CameraComponent
 {
-    enum CameraType { ORBITING, WALKING };
+    // Nested enum so Camera.h can use CameraComponent::CameraType
+    enum CameraType { ORBITING = 0, WALKING = 1 };
 
-    CameraType camType; // Stores the type of camera (ORBITING or WALKING)
-    glm::vec3 position; // Current position of the camera in 3D space
-    glm::vec3 target;   // Target point that the camera is looking at
-    float fieldOfView;  // Field of view angle in degrees
-    float nearPlane;         // Near clipping plane
-    float farPlane;          // Far clipping plane
+    // --- Mode / identity ---
+    CameraType camType{ WALKING };
+    bool       is_active{ true };   // optional scene toggle
 
-    glm::mat4 view_vector;
-    glm::mat4 proj_matrix;
+    // --- Frustum ---
+    float fieldOfView{ 75.0f };     // degrees
+    float nearPlane{ 0.1f };
+    float farPlane{ 100.0f };
 
-    double oldx; // Previous x-coordinate for cursor handling
-    double oldy; // Previous y-coordinate for cursor handling
+    // --- Pose helpers (Camera.h manipulates these) ---
+    glm::vec3 position{ 0.0f, 1.8f, 0.0f };
+    glm::vec3 target{ 0.0f, 1.8f, -1.0f };
 
-    bool is_active{}; //Represents if the camera is being used to draw the current scene.
+    // --- Cached matrices (Camera.h writes/reads these) ---
+    glm::mat4 view_vector{ 1.0f };  // keep exact name for compatibility
+    glm::mat4 proj_matrix{ 1.0f };
+
+    // --- Input state used by Camera.h handlers ---
+    double oldx{ 0.0 };
+    double oldy{ 0.0 };
 };
-// --- Other Scene Entity Components ---
 
-// Component to tag the primary/active camera for a scene
-//struct ActiveCamera {};
 #endif

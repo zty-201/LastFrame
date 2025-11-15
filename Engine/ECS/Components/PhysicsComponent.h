@@ -17,5 +17,7 @@ struct PhysicsComponent
     bool  useGravity = false;
     float gravityFactor = 1.0f;
     bool _prevUseGravity = false;
+
+    bool editorOverride = false;
 };
 #endif // PHYSICS_COMPONENT

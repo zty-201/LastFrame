@@ -18,6 +18,14 @@
 #ifndef MESH_H
 #define MESH_H
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#include <limits>
+#include <memory>
+#include <cfloat>
+
 #include "nlohmann/json.hpp"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -26,8 +34,14 @@
 #include "global.hpp" // For AssetManagerSystem, etc.
 #include "AssimpWrapper.h"
 
-namespace Mesh {
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
 
+namespace Mesh {
     // Represents a single drawable part (mesh group) of a larger model.
     struct SubMesh {
         std::string name;
@@ -44,6 +58,28 @@ namespace Mesh {
         glm::vec2 TexCoords;
         glm::vec4 Tangent; // Using vec4 to include handedness (w component)
     };
+
+    struct AABB {
+        glm::vec3 minV;
+        glm::vec3 maxV;
+
+        AABB()
+            : minV(glm::vec3(FLT_MAX)),
+            maxV(glm::vec3(-FLT_MAX)) {
+        }
+
+        glm::vec3 center() const { return 0.5f * (minV + maxV); }
+        glm::vec3 halfExtents() const { return 0.5f * (maxV - minV); }
+
+        void expand(const glm::vec3& p) {
+            // safe now that macros are gone
+            minV = glm::min(minV, p);
+            maxV = glm::max(maxV, p);
+        }
+    };
+
+    using IndexType = GLuint;
+    using IndexBuffer = std::vector<IndexType>;
 
     // The main MeshData class, handling both loaded and generated meshes.
     class MeshData {
@@ -64,6 +100,9 @@ namespace Mesh {
         explicit MeshData(const std::string& filePath) {
             loadWithAssimp(filePath);
         }
+        
+        const AABB& GetAABB() const { return m_aabb; }
+        const std::vector<AABB>& GetSubmeshAABBs() const { return m_submeshAABBs; }
 
         // Constructor for manually creating a mesh from code (for primitives).
         explicit MeshData(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
@@ -79,10 +118,20 @@ namespace Mesh {
             defaultMaterial.name = "default_material";
             materials.push_back(defaultMaterial);
 
+            AABB subBox;
+            for (const auto& v : vertices) {
+                subBox.expand(v.Position);
+                m_aabb.expand(v.Position);
+            }
+            m_submeshAABBs = { subBox };
+
             createGLBuffers(vertices, indices);
         }
 
     private:
+        AABB m_aabb;                     // whole-mesh AABB (object space)
+        std::vector<AABB> m_submeshAABBs; // per-submesh AABBs
+
         // The core Assimp loading function.
         void loadWithAssimp(const std::string& filePath) {
             LOGI("Loading mesh from file: %s", filePath.c_str());
@@ -235,6 +284,8 @@ namespace Mesh {
             subMesh.baseIndex = static_cast<GLuint>(m_temp_indices.size());
             subMesh.indexCount = 0;
 
+            AABB subBox;
+
             for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
                 Vertex vertex{};
                 vertex.Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
@@ -257,6 +308,10 @@ namespace Mesh {
                     vertex.Tangent = glm::vec4(glm::normalize(t), 1.0f);
                     LOGE("Mesh '%s' missing tangents, using generated fallback", mesh->mName.C_Str());
                 }
+
+                subBox.expand(vertex.Position);
+                m_aabb.expand(vertex.Position);
+
                 m_temp_vertices.push_back(vertex);
             }
 
@@ -268,6 +323,7 @@ namespace Mesh {
                 subMesh.indexCount += face.mNumIndices;
             }
             subMeshes.push_back(subMesh);
+            m_submeshAABBs.push_back(subBox);
         }
 
         // Creates the final OpenGL VAO and buffers.

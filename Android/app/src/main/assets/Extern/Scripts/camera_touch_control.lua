@@ -29,25 +29,25 @@ local dragging = false
 local lastX, lastY = 0.0, 0.0
 
 function on_create()
-    print("[camera_touch_control.lua] Initialized")
+    --print("[camera_touch_control.lua] Initialized")
     camera = GetMainCamera()
     if camera then
-        print("[Lua] Camera successfully retrieved")
+        --print("[Lua] Camera successfully retrieved")
     else
-        print("[Lua] ERROR: GetMainCamera() returned nil!")
+        --print("[Lua] ERROR: GetMainCamera() returned nil!")
     end
 end
 
 local counter = 0
 function on_update(self, dt)
-    print(string.format("[Lua] Current dt: %.6f", dt))
+    --print(string.format("[Lua] Current dt: %.6f", dt))
     counter = counter + 1
     
     if not camera then return end
 
     if not camera then 
         if counter % 60 == 0 then
-            print("[Lua] ERROR: Camera is nil, skipping update")
+            --print("[Lua] ERROR: Camera is nil, skipping update")
         end
         return 
     end
@@ -61,8 +61,11 @@ function on_update(self, dt)
     local mx, my = Input.GetMousePosition()
     local dx, dy = Input.GetMouseDelta()
     
-    local isDraggingTouch = Input.GetMouseButton(0)
-    local mouseDown = Input.GetMouseButtonDown(0)
+    -- Only log when there's actual input
+    if mouseDown or (dx ~= 0 or dy ~= 0) then
+        --print(string.format("[Lua] Input: mouseDown=%s Pos=(%.1f, %.1f) Delta=(%.3f, %.3f)", 
+            --tostring(mouseDown), mx, my, dx, dy))
+    end
 
     -- ============================================================
     -- 1. GYROSCOPE CONTROL (Runs only on Android AND when NOT dragging)
@@ -98,7 +101,7 @@ function on_update(self, dt)
     if mouseDown then
         dragging = true
         lastX, lastY = mx, my
-        print("[Lua] Started dragging")
+        --print("[Lua] Started dragging")
     end
     
 -- Handle drag motion
@@ -115,7 +118,7 @@ if dragging and Input.GetMouseButton(0) then
         if pitch > pitchLimit then pitch = pitchLimit end
         if pitch < -pitchLimit then pitch = -pitchLimit end
 
-        print(string.format("[Lua] Camera rotation: yaw=%.2f pitch=%.2f", yaw, pitch))
+        --print(string.format("[Lua] Camera rotation: yaw=%.2f pitch=%.2f", yaw, pitch))
 
         -- Update camera position (spherical to Cartesian)
         local radYaw = math.rad(yaw)
@@ -136,7 +139,7 @@ end
     -- Handle release
     if dragging and not isDraggingTouch then
         dragging = false
-        print("[Lua] Stopped dragging")
+        --print("[Lua] Stopped dragging")
     end
 
     -- --- GYROSCOPE CONTROL ---
@@ -145,14 +148,14 @@ end
         local gyroX, gyroY, gyroZ = Input.GetGyroscopeRotatioRate()
         
         -- Log the raw gyro data that Lua sees (must match C++ logs)
-        print(string.format("[Lua] RAW Gyro: X=%.4f Y=%.4f", gyroX, gyroY))
+       -- print(string.format("[Lua] RAW Gyro: X=%.4f Y=%.4f", gyroX, gyroY))
 
         -- Calculate intermediate deltas
         local tempYaw = -math.deg(gyroY) * dt * gyroSensitivity 
         local tempPitch = -math.deg(gyroX) * dt * gyroSensitivity
         
         -- Log the calculated rotation from the gyroscope
-        print(string.format("[Lua] Gyro Delta Calc: dY=%.6f dP=%.6f", tempYaw, tempPitch))
+        --print(string.format("[Lua] Gyro Delta Calc: dY=%.6f dP=%.6f", tempYaw, tempPitch))
         
         deltaYaw = deltaYaw + tempYaw
         deltaPitch = deltaPitch + tempPitch
@@ -161,7 +164,7 @@ end
     -- --- APPLY ROTATION (UNIFIED) ---
     if deltaYaw ~= 0 or deltaPitch ~= 0 then
         -- Log the calculated rotation from both touch/mouse AND gyro
-        print(string.format("[Lua] Final Delta Applied: dY=%.4f dP=%.4f", deltaYaw, deltaPitch))
+        --print(string.format("[Lua] Final Delta Applied: dY=%.4f dP=%.4f", deltaYaw, deltaPitch))
         
         -- 🌟 Apply accumulated local change to the GLOBAL variables 🌟
         yaw = yaw + deltaYaw
@@ -187,5 +190,5 @@ end
 end
 
 function on_destroy()
-    print("[camera_touch_control.lua] Destroyed")
+    --print("[camera_touch_control.lua] Destroyed")
 end
