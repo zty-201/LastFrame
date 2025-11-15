@@ -16,6 +16,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "pch.hpp"
 #include "InspectorPanel.hpp"
+#include "HistorySystem.hpp"
 #include "MetaInspector/MetaInspector.hpp"
 #include "System_GameObjectSystem.hpp"
 #include "Assets/System/AssetManager.hpp"
@@ -29,12 +30,15 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <vector>
 #include <utility>
 #include <cstdint>
+#include <memory>
 
 namespace EditorFeatures {
 
 	namespace {
 
 		using namespace entt::literals;
+		using EngineFramework::HistorySystem;
+		using EngineFramework::Record_Type;
 
 		struct ComponentDropMatch {
 			entt::meta_type type;
@@ -110,7 +114,7 @@ namespace EditorFeatures {
 						}
 
 						tag = to_lower_copy(tag);
-						ctx.by_extension[tag].push_back(ComponentDropMatch{meta, variable, component_key, std::string{ field_name }});
+						ctx.by_extension[tag].push_back(ComponentDropMatch{ meta, variable, component_key, std::string{ field_name } });
 
 						register_payload(tag);
 					}
@@ -273,6 +277,25 @@ namespace EditorFeatures {
 			return components;
 		}
 
+		static std::unique_ptr<EngineFramework::Record> start_component_history(entt::entity entity, const std::string& component_name, Record_Type type) {
+			if (!HistorySystem::this_class) {
+				return nullptr;
+			}
+			return HistorySystem::GetInstance().start_track(entity, component_name, type);
+		}
+
+		static void commit_component_history(std::unique_ptr<EngineFramework::Record>& record) {
+			if (!record) {
+				return;
+			}
+			HistorySystem::GetInstance().end_track(record);
+		}
+
+		static void record_component_added(entt::entity entity, const std::string& component_name) {
+			auto record = start_component_history(entity, component_name, Record_Type::COMP_ADDED);
+			commit_component_history(record);
+		}
+
 	} // namespace
 
 	void DrawInspector(entt::registry& reg, entt::entity e) {
@@ -318,6 +341,27 @@ namespace EditorFeatures {
 		ComponentDropContext drop_context{};
 		if (asset_window_ptr) {
 			drop_context = build_drop_context(*asset_window_ptr);
+		}
+
+		// If history system singleton exists then create the two buttons for the undo/redo
+		// Undo only enabled when it can be undo (under history singleton)
+		// Redo only enabled when it can be redo (under history singleton also)
+		if (HistorySystem::this_class) {
+			HistorySystem& history = HistorySystem::GetInstance();
+			ImGui::BeginGroup();
+			ImGui::BeginDisabled(!history.can_undo());
+			if (ImGui::Button("Undo##InspectorPanelUndo")) {
+				history.undo();
+			}
+			ImGui::EndDisabled();
+			ImGui::SameLine();
+			ImGui::BeginDisabled(!history.can_redo());
+			if (ImGui::Button("Redo##InspectorPanelRedo")) {
+				history.redo();
+			}
+			ImGui::EndDisabled();
+			ImGui::EndGroup();
+			ImGui::Separator();
 		}
 
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12.0f, 6.0f));
@@ -372,10 +416,11 @@ namespace EditorFeatures {
 								if (!result || !result.cast<bool>()) {
 									continue;
 								}
+								record_component_added(e, match.component_name);
 								newly_added_names.insert(match.component_name);
 							}
 
-					if (entt::meta_any component_ref = get_component_ref(e, match.type)) {
+							if (entt::meta_any component_ref = get_component_ref(e, match.type)) {
 								if (assign_field_from_path(component_ref, match.field, dropped_path)) {
 									updated_any_field = true;
 								}
@@ -482,7 +527,10 @@ namespace EditorFeatures {
 						}
 					}
 
+					// If component is added - important for tracking here for undo purposes
 					if (added) {
+						record_component_added(e, display);
+
 						if (asset_window_ptr) {
 							drop_context = build_drop_context(*asset_window_ptr);
 						}
@@ -523,7 +571,7 @@ namespace EditorFeatures {
 
 			bool component_visible = true;
 			if (ImGui::CollapsingHeader(header, &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
-				EditorFeatures::DrawMetaObject(component.meta, component.instance);
+				EditorFeatures::DrawMetaObject(e, header, component.meta, component.instance);
 			}
 
 			if (!component_visible) {
@@ -538,10 +586,12 @@ namespace EditorFeatures {
 			for (const auto& [meta, name] : components_to_remove) {
 				auto remove = meta.func("remove"_hs);
 				bool removed = false;
+				std::unique_ptr<EngineFramework::Record> removal_record = start_component_history(e, name, Record_Type::COMP_REMOVED);
 				if (remove) {
 					entt::meta_any result = remove.invoke({}, e);
 					if (result && result.cast<bool>()) {
 						removed = true;
+						commit_component_history(removal_record);
 					}
 				}
 				if (removed) {

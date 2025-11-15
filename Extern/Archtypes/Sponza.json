@@ -1,24 +1,24 @@
 {
-    "model_type": "Background",
-    "MeshComponent": {
-        "meshName": "sponza"
-    },
-    "SceneRenderPass": null,
-    "TransformComponent": {
-        "position": [
-            0.0,
-            0.0,
-            0.0
-        ],
-        "rotation": [
-            0.0,
-            0.0,
-            0.0
-        ],
-        "scale": [
-            1.0,
-            1.0,
-            1.0
-        ]
-    }
+	"MeshComponent": {
+		"meshName": "sponza"
+	},
+	"SceneRenderPass": null,
+	"TransformComponent": {
+		"position": [
+			0.0,
+			0.0,
+			0.0
+		],
+		"rotation": [
+			0.0,
+			0.0,
+			0.0
+		],
+		"scale": [
+			1.0,
+			1.0,
+			1.0
+		]
+	},
+	"model_type": "Background"
 }

@@ -25,10 +25,13 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetManager.hpp"
 #include "SoundAsset.hpp"
 #include "scene.h"
+#include "HistorySystem.hpp"
 #if defined(ENGINE_ENABLE_LUA)
 #include "Scripting/Script.hpp"
 #include "Scripting/ScriptAsset.hpp"
 #endif
+#include <unordered_map>
+#include <unordered_set>
 #include <string_view>
 #include <imgui.h>
 #include <array>
@@ -36,6 +39,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <sstream>
 #include <filesystem>
 #include <cstring>
+#include <memory>
+#include <utility>
 
 // FILE TO HANDLE THE META DATA OF THE ENTITIY
 namespace EditorFeatures {
@@ -52,6 +57,76 @@ namespace EditorFeatures {
 	static std::string to_lower(std::string s) {
 		std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 		return s;
+	}
+
+	static std::unordered_map<ImGuiID, std::unique_ptr<EngineFramework::Record>> active_field_records;
+
+	static void update_field_history(entt::entity entity, const char* component_name, const entt::meta_data& data, entt::meta_any& obj) {
+		if (!EngineFramework::HistorySystem::this_class) {
+			return;
+		}
+		const char* field_name = data.name();
+		if (!field_name || field_name[0] == '\0') {
+			return;
+		}
+
+		ImGuiID item_id = ImGui::GetItemID();
+		if (item_id == 0) {
+			return;
+		}
+
+		auto& history = EngineFramework::HistorySystem::GetInstance();
+
+		if (ImGui::IsItemActivated()) {
+			if (active_field_records.find(item_id) == active_field_records.end()) {
+				const char* component_label = (component_name && component_name[0]) ? component_name : "";
+				auto record = history.start_track(entity, component_label, field_name);
+				if (record) {
+					active_field_records.emplace(item_id, std::move(record));
+				}
+			}
+		}
+
+		const auto it = active_field_records.find(item_id);
+		if (it == active_field_records.end()) {
+			return;
+		}
+
+		if (ImGui::IsItemDeactivatedAfterEdit()) {
+			entt::meta_any latest_value = data.get(obj);
+			history.end_track(it->second, latest_value);
+			active_field_records.erase(it);
+		}
+		else if (ImGui::IsItemDeactivated()) {
+			active_field_records.erase(it);
+		}
+	}
+
+	template<typename ApplyFunc>
+	static void commit_instant_history(entt::entity entity, const char* component_name, const entt::meta_data& data, entt::meta_any& obj, ApplyFunc&& apply) {
+		const char* field_name = data.name();
+		if (!field_name || field_name[0] == '\0') {
+			return;
+		}
+
+		const bool history_available = (EngineFramework::HistorySystem::this_class != nullptr);
+		std::unique_ptr<EngineFramework::Record> record{};
+		if (history_available) {
+			auto& history = EngineFramework::HistorySystem::GetInstance();
+			const char* component_label = (component_name && component_name[0]) ? component_name : "";
+			record = history.start_track(entity, component_label, field_name);
+			if (record && record->Type == EngineFramework::Record_Type::INVALID) {
+				record.reset();
+			}
+		}
+
+		apply();
+
+		if (record) {
+			auto& history = EngineFramework::HistorySystem::GetInstance();
+			entt::meta_any latest_value = data.get(obj);
+			history.end_track(record, latest_value);
+		}
 	}
 
 
@@ -625,7 +700,7 @@ namespace EditorFeatures {
 	
 	// Main function to view/edit property
 	// Takes a mneta type and the corresponding instance and writes the edited values back through entt::meta_data::set
-	void DrawMetaObject(entt::meta_type& mt, entt::meta_any& obj) {
+	void DrawMetaObject(entt::entity entity, const char* component_name, entt::meta_type& mt, entt::meta_any& obj) {
 		//const char* typeName = mt.name();
 
 		auto t = obj.type();
@@ -662,7 +737,9 @@ namespace EditorFeatures {
 
 			if (field.type() == entt::resolve<int>()) {
 				int& v = field.cast<int&>();
-				if (ImGui::DragInt(label.c_str(), &v, 1.0f)) {
+				const bool interacted = ImGui::DragInt(label.c_str(), &v, 1.0f);
+				update_field_history(entity, component_name, data, obj);
+				if (interacted) {
 					data.set(obj, v);
 				}
 			}
@@ -688,8 +765,11 @@ namespace EditorFeatures {
 					}
 
 					if (static_cast<int>(value) != current) {
-						value = static_cast<CameraComponent::CameraType>(current);
-						data.set(obj, value);
+						const auto new_value = static_cast<CameraComponent::CameraType>(current);
+						commit_instant_history(entity, component_name, data, obj, [&]() {
+							value = new_value;
+							data.set(obj, value);
+						});
 					}
 				}
 
@@ -709,21 +789,28 @@ namespace EditorFeatures {
 				constexpr const char* options[] = { "Orbiting", "Walking" };
 
 				if (ImGui::Combo(label.c_str(), &current, options, IM_ARRAYSIZE(options))) {
-					value = static_cast<CameraComponent::CameraType>(current);
-					data.set(obj, value);
+					const auto new_value = static_cast<CameraComponent::CameraType>(current);
+					commit_instant_history(entity, component_name, data, obj, [&]() {
+						value = new_value;
+						data.set(obj, value);
+					});
 				}
 			}
 
 			else if (field.type() == entt::resolve<float>()) {
 				float& v = field.cast<float&>();
-				if (ImGui::DragFloat(label.c_str(), &v, 0.01f)) {
+				const bool interacted = ImGui::DragFloat(label.c_str(), &v, 0.01f);
+				update_field_history(entity, component_name, data, obj);
+				if (interacted) {
 					data.set(obj, v);
 				}
 			}
 
 			else if (field.type() == entt::resolve<double>()) {
 				double& v = field.cast<double&>();
-				if (ImGui::InputDouble(label.c_str(), &v)) {
+				const bool interacted = ImGui::InputDouble(label.c_str(), &v);
+				update_field_history(entity, component_name, data, obj);
+				if (interacted) {
 					data.set(obj, v);
 				}
 			}
@@ -731,7 +818,9 @@ namespace EditorFeatures {
 			else if (field.type() == entt::resolve<bool>()) {
 				bool& v = field.cast<bool&>();
 				if (ImGui::Checkbox(label.c_str(), &v)) {
-					data.set(obj, v);
+					commit_instant_history(entity, component_name, data, obj, [&]() {
+						data.set(obj, v);
+					});
 				}
 			}
 
@@ -739,7 +828,9 @@ namespace EditorFeatures {
 				std::string& s = field.cast<std::string&>();
 				char buffer[512];
 				std::snprintf(buffer, sizeof(buffer), "%s", s.c_str());
-				if (ImGui::InputText(label.c_str(), buffer, sizeof(buffer))) {
+				const bool interacted = ImGui::InputText(label.c_str(), buffer, sizeof(buffer));
+				update_field_history(entity, component_name, data, obj);
+				if (interacted) {
 					data.set(obj, std::string{ buffer });
 				}
 			}
@@ -763,9 +854,11 @@ namespace EditorFeatures {
 						const bool is_none_selected = normalized.empty();
 						if (ImGui::Selectable("No Script", is_none_selected)) {
 							if (!is_none_selected) {
-								path.clear();
-								data.set(obj, path);
-								normalized.clear();
+								commit_instant_history(entity, component_name, data, obj, [&]() {
+									path.clear();
+									data.set(obj, path);
+									normalized.clear();
+								});
 							}
 						}
 
@@ -781,10 +874,12 @@ namespace EditorFeatures {
 							const bool selected = (!current_value.empty() && current_value == script_rel_str);
 							if (ImGui::Selectable(row_label.c_str(), selected)) {
 								if (!selected) {
-									path = script_rel;
-									path = path.lexically_normal();
-									data.set(obj, path);
-									normalized = path;
+									commit_instant_history(entity, component_name, data, obj, [&]() {
+										path = script_rel;
+										path = path.lexically_normal();
+										data.set(obj, path);
+										normalized = path;
+									});
 								}
 							}
 							if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort) && !script_rel_str.empty()) {
@@ -817,9 +912,11 @@ namespace EditorFeatures {
 							if (ext == ".lua") {
 								std::filesystem::path relative = make_relative_to_assets(dropped_path);
 								if (!relative.empty()) {
-									path = relative.lexically_normal();
-									data.set(obj, path);
-									normalized = path;
+									commit_instant_history(entity, component_name, data, obj, [&]() {
+										path = relative.lexically_normal();
+										data.set(obj, path);
+										normalized = path;
+									});
 								}
 							}
 						}
@@ -827,14 +924,16 @@ namespace EditorFeatures {
 					}
 				}
 				else {
-					std::string current = path.generic_string();
-					char buffer[512];
-					std::snprintf(buffer, sizeof(buffer), "%s", current.c_str());
-					if (ImGui::InputText(label.c_str(), buffer, sizeof(buffer))) {
-						path = std::filesystem::path{ buffer };
-						data.set(obj, path);
-					}
+				std::string current = path.generic_string();
+				char buffer[512];
+				std::snprintf(buffer, sizeof(buffer), "%s", current.c_str());
+				const bool interacted = ImGui::InputText(label.c_str(), buffer, sizeof(buffer));
+				update_field_history(entity, component_name, data, obj);
+				if (interacted) {
+					path = std::filesystem::path{ buffer };
+					data.set(obj, path);
 				}
+			}
 			}
 
 			else if (field.type() == entt::resolve<glm::vec3>()) {
@@ -846,13 +945,16 @@ namespace EditorFeatures {
 
 				if (colorish) {
 					float color[3]{ v.x, v.y, v.z };
-					if (ImGui::ColorEdit3(label.c_str(), color)) {
+					const bool interacted = ImGui::ColorEdit3(label.c_str(), color);
+					update_field_history(entity, component_name, data, obj);
+					if (interacted) {
 						v = { color[0], color[1], color[2] };
 						data.set(obj, v);
 					}
 				}
 				else {
 					draw_vec3_drag(label.c_str(), v);
+					update_field_history(entity, component_name, data, obj);
 					data.set(obj, v);
 				}
 			}
@@ -864,13 +966,16 @@ namespace EditorFeatures {
 
 				if (colorish) {
 					float color[4]{ v.x, v.y, v.z, v.w };
-					if (ImGui::ColorEdit4(label.c_str(), color)) {
+					const bool interacted = ImGui::ColorEdit4(label.c_str(), color);
+					update_field_history(entity, component_name, data, obj);
+					if (interacted) {
 						v = { color[0], color[1], color[2], color[3] };
 						data.set(obj, v);
 					}
 				}
 				else {
 					draw_vec4_drag(label.c_str(), v);
+					update_field_history(entity, component_name, data, obj);
 					data.set(obj, v);
 				}
 			}
@@ -880,7 +985,9 @@ namespace EditorFeatures {
 					if (const auto tag = static_cast<const AssetPickerTag*>(data.custom())) {
 						const auto descriptor = make_asset_picker_descriptor(tag->kind);
 						if (!descriptor.sources.empty() && draw_asset_guid_picker(label.c_str(), guid, tag->kind, descriptor.none_label, descriptor.sources, descriptor.formatter)) {
-							data.set(obj, guid);
+							commit_instant_history(entity, component_name, data, obj, [&]() {
+								data.set(obj, guid);
+							});
 						}
 					}
 				else {
@@ -892,7 +999,7 @@ namespace EditorFeatures {
 				// Nested struct: recurse
 				if (ImGui::TreeNode(label.c_str())) {
 					auto f = field.type();
-					DrawMetaObject(f, field);
+					DrawMetaObject(entity, component_name, f, field);
 					ImGui::TreePop();
 				}
 			}

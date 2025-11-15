@@ -135,8 +135,6 @@ struct adl_serializer<std::filesystem::path> {
 	}
 };
 
-
-
 NLOHMANN_JSON_NAMESPACE_END
 
 using namespace entt::literals;
@@ -294,14 +292,16 @@ namespace EngineFramework
 		}
 	};
 
-	// To return a meta_any that references the component in the registry
-	template <typename T>
-	static entt::meta_any GetRef(entt::entity e) {
-		// Registry used here (same as emplacer/getter)
-		auto& reg = EngineFramework::GameObjectSystem::GetRegistry();
-		//return entt::meta_any{ std::ref(reg.get<T>(e)) };
-		return entt::forward_as_meta(reg.get<T>(e));
-	}
+		// To return a meta_any that references the component in the registry
+		template <typename T>
+		static entt::meta_any GetRef(entt::entity e) {
+			auto& reg = EngineFramework::GameObjectSystem::GetRegistry();
+			if constexpr (std::is_empty_v<T>) {
+				return entt::meta_any(std::in_place_type<T>);
+			} else {
+				return entt::forward_as_meta(reg.get<T>(e));
+			}
+		}
 	/*
 		Called during program startup: Will register all components into Entt reflection system.
 	*/
@@ -394,10 +394,15 @@ namespace EngineFramework
 			.type("MaterialComponent")
 			.data<&MaterialComponent::name>("name")
 			.data<&MaterialComponent::albedoMap>("albedoMap")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&MaterialComponent::normalMap>("normalMap")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&MaterialComponent::metallicMap>("metallicMap")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&MaterialComponent::roughnessMap>("roughnessMap")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&MaterialComponent::ambientOcclusionMap>("ambientOcclusionMap")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&MaterialComponent::albedoFactor>("albedoFactor")
 			.data<&MaterialComponent::metallicFactor>("metallicFactor")
 			.data<&MaterialComponent::roughnessFactor>("roughnessFactor")
@@ -503,17 +508,23 @@ namespace EngineFramework
 			.func<&GetRef<Engine::LuaScriptComponent>>("get_ref");
 
 		// Tag components (if you need them for serialization)
+		// Register SceneRenderPass
 		entt::meta_factory<SceneRenderPass>()
 			.type("SceneRenderPass")
 			.func<&Emplacer<SceneRenderPass>::EmplaceComponent>("emplace")
 			.func<&Remover<SceneRenderPass>::RemoveComponent>("remove")
-			.func<&Getter<SceneRenderPass>::GetComponent>("get");
+			.func<&Getter<SceneRenderPass>::GetComponent>("get")
+			.func<&GetRef<SceneRenderPass>>("get_ref")
+			.custom<RequiresSerializedHistoryTag>(RequiresSerializedHistoryTag{});
 
+		// Register SkyboxRenderPass
 		entt::meta_factory<SkyboxRenderPass>()
 			.type("SkyboxRenderPass")
 			.func<&Emplacer<SkyboxRenderPass>::EmplaceComponent>("emplace")
 			.func<&Remover<SkyboxRenderPass>::RemoveComponent>("remove")
-			.func<&Getter<SkyboxRenderPass>::GetComponent>("get");
+			.func<&Getter<SkyboxRenderPass>::GetComponent>("get")
+			.func<&GetRef<SkyboxRenderPass>>("get_ref")
+			.custom<RequiresSerializedHistoryTag>(RequiresSerializedHistoryTag{});
 
 
 	}

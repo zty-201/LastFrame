@@ -23,6 +23,7 @@
 #include "GraphicsSystem.h"
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
+#include "MaterialComponent.h"
 
 #include "stb_image.h"
 #define VOXEL_GRID_SIZE_X 160
@@ -482,12 +483,14 @@ namespace EngineFramework
 
 			glBindVertexArray(meshData->vao);
 
+			const MaterialComponent* override_material = registry.try_get<MaterialComponent>(entity);
+
 			// Loop through each sub-mesh of this model
 			for (const auto& subMesh : meshData->subMeshes)
 			{
 				// Get the material for this specific sub-mesh
 				if (subMesh.materialIndex < 0 || subMesh.materialIndex >= meshData->materials.size()) continue;
-				const auto& material = meshData->materials[subMesh.materialIndex];
+				const MaterialComponent& material = override_material ? *override_material : meshData->materials[subMesh.materialIndex];
 
 				// --- SET MATERIAL FACTOR UNIFORMS ---
 				shader->setUniform("u_AlbedoFactor", material.albedoFactor);

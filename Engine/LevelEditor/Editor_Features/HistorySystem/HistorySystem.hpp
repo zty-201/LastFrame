@@ -17,6 +17,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #ifndef HISTORYSYSTEM_LFEATURE_HPP
 #define HISTORYSYSTEM_LFEATURE_HPP
 #include <unordered_map>
+#include <map>
 #include <string>
 #include <sstream>
 #include "ISystem.hpp"
@@ -46,6 +47,7 @@ namespace EngineFramework
         Record_Type Type;
         entt::entity entity;
         virtual void pop() = 0;
+        virtual void invert() = 0;
     };
 
     /*
@@ -58,6 +60,7 @@ namespace EngineFramework
         std::string component;
         std::map<std::string, entt::meta_any> variables;
         virtual void pop() override;
+        virtual void invert() override;
         virtual ~Record_Component_Whole() override;
     };
 
@@ -69,8 +72,11 @@ namespace EngineFramework
     {
     public:
         std::string component;
-        std::pair<std::string, entt::meta_any> variable;
+        std::string variable_name;
+        entt::meta_any before_value;
+        entt::meta_any after_value;
         virtual void pop() override;
+        virtual void invert() override;
         virtual ~Record_Component_Single() override;
     };
 
@@ -82,13 +88,30 @@ namespace EngineFramework
     public:
         std::map<std::string, std::map<std::string, entt::meta_any>> components_variables;
         virtual void pop() override;
+        virtual void invert() override;
         virtual ~Record_Entity() override;
     };
 
+    class Record_Component_Serialized : public Record 
+    {
+    public:
+        std::string component;
+        std::string json_payload; // Serialized component
+        void pop() override;
+        void invert() override;
+
+    };
 
     class HistorySystem
     {
     public:
+
+        // TESTING 
+        bool can_undo() const { return !undo_stack.empty(); }
+        bool can_redo() const { return !redo_stack.empty(); }
+        void undo();
+        void redo();
+        
 
         bool is_meta_component(const entt::meta_type& meta) {
             if (!meta || !meta.is_class()) {
@@ -110,12 +133,12 @@ namespace EngineFramework
         
         void end_track(std::unique_ptr<Record>& rec, const entt::meta_any& new_value); //case 3
         void end_track(std::unique_ptr<Record>& rec); //case 1,2,4,5
-        void undo(); 
 
     private:
 
         void push(std::unique_ptr<Record> rec);
         std::deque<std::unique_ptr<Record>> undo_stack;
+        std::deque<std::unique_ptr<Record>> redo_stack;
         size_t max_capacity;
 
 
