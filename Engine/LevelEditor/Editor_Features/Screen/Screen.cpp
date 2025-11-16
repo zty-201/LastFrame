@@ -39,6 +39,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "ImGuizmo.h"
 #include "TriggerBoxComponent.h"
 #include "MeshComponent.h"
+#include "Editor_Features/CameraController/EditorCameraController.hpp"
 
 //#include <iostream>
 
@@ -291,7 +292,7 @@ namespace EngineFramework
         available_size_old = available_size;
     }
 
-    void Screen::camera_controls_outside_screen() {
+    /*void Screen::camera_controls_outside_screen() {
 
         float speed = 0.5f;
 
@@ -328,8 +329,10 @@ namespace EngineFramework
             Camera::Move_Cam_and_Target(camera, glm::vec3(speed, 0, 0));
         }
 
-    }
-    void Screen::camera_controls_in_screen_only() {
+    }*/
+
+
+    /*void Screen::camera_controls_in_screen_only() {
 
         ImGuiIO& io = ImGui::GetIO();
         ImVec2 Mouse_delta = io.MouseDelta;
@@ -349,6 +352,81 @@ namespace EngineFramework
             Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, Mouse_Scroll));
         }
 
+    }*/
+
+    /* ---------------------------
+    *    Updated camera controls
+    ------------------------------*/
+
+    void Screen::camera_controls_outside_screen()
+    {
+        // Only keyboard movement when mouse is NOT over the viewport.
+        EditorCameraInput input{};
+
+        // You can tune this per-frame if you want.
+        m_editorCamera.moveSpeed = 0.5f;
+
+        // WASD + arrows
+        input.keyW = ImGui::IsKeyDown(ImGuiKey_W);
+        input.keyA = ImGui::IsKeyDown(ImGuiKey_A);
+        input.keyS = ImGui::IsKeyDown(ImGuiKey_S);
+        input.keyD = ImGui::IsKeyDown(ImGuiKey_D);
+        input.keyQ = ImGui::IsKeyDown(ImGuiKey_Q) || ImGui::IsKeyDown(ImGuiKey_UpArrow);
+        input.keyE = ImGui::IsKeyDown(ImGuiKey_E) || ImGui::IsKeyDown(ImGuiKey_DownArrow);
+        input.keyLeft = ImGui::IsKeyDown(ImGuiKey_LeftArrow);
+        input.keyRight = ImGui::IsKeyDown(ImGuiKey_RightArrow);
+
+        auto camera_view = registry.view<CameraComponent>();
+        if (camera_view.empty())
+            return;
+
+        entt::entity camEnt = camera_view.front();
+        auto& cam = camera_view.get<CameraComponent>(camEnt);
+
+        // We don’t use mouse or focus here (outside viewport).
+        entt::entity selected = static_cast<entt::entity>(editor_ptr->selected_objectID);
+
+        m_editorCamera.Update(cam, input, registry, selected);
+    }
+
+    void Screen::camera_controls_in_screen_only()
+    {
+        ImGuiIO& io = ImGui::GetIO();
+
+        EditorCameraInput input{};
+
+        // Mouse buttons
+        input.rightMouseDown = io.MouseDown[1];   // RMB = orbit / look
+        input.middleMouseDown = io.MouseDown[2];   // MMB = pan
+
+        // Mouse movement & scroll
+        input.mouseDeltaX = io.MouseDelta.x;
+        input.mouseDeltaY = io.MouseDelta.y;
+        input.mouseScroll = io.MouseWheel;
+
+        // Keyboard while hovering over the viewport
+        input.keyW = ImGui::IsKeyDown(ImGuiKey_W);
+        input.keyA = ImGui::IsKeyDown(ImGuiKey_A);
+        input.keyS = ImGui::IsKeyDown(ImGuiKey_S);
+        input.keyD = ImGui::IsKeyDown(ImGuiKey_D);
+        input.keyQ = ImGui::IsKeyDown(ImGuiKey_Q) || ImGui::IsKeyDown(ImGuiKey_UpArrow);
+        input.keyE = ImGui::IsKeyDown(ImGuiKey_E) || ImGui::IsKeyDown(ImGuiKey_DownArrow);
+        input.keyLeft = ImGui::IsKeyDown(ImGuiKey_LeftArrow);
+        input.keyRight = ImGui::IsKeyDown(ImGuiKey_RightArrow);
+
+        // Focus / frame selected (e.g. F key)
+        input.keyFocus = ImGui::IsKeyPressed(ImGuiKey_F);
+
+        auto camera_view = registry.view<CameraComponent>();
+        if (camera_view.empty())
+            return;
+
+        entt::entity camEnt = camera_view.front();
+        auto& cam = camera_view.get<CameraComponent>(camEnt);
+
+        entt::entity selected = static_cast<entt::entity>(editor_ptr->selected_objectID);
+
+        m_editorCamera.Update(cam, input, registry, selected);
     }
 
     void Screen::control_window() {

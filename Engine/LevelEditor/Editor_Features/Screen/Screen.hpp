@@ -25,6 +25,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "System_LevelEditor.hpp"
 #include "LFeature.hpp"
 #include "HistorySystem.hpp"
+#include "Editor_Features/CameraController/EditorCameraController.hpp"
 
 namespace EngineFramework
 {
@@ -64,6 +65,8 @@ namespace EngineFramework
         void play_simulation();
         void stop_simulation();
         std::string simulation_buffer;
+
+        EditorCameraController m_editorCamera;
 
         static inline Screen* this_instance{};
     };
