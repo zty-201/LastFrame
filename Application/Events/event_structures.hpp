@@ -16,5 +16,10 @@ struct Event_Level_Editor_Toggled
 	bool is_enabled{};
 };
 
+struct Event_Level_Editor_Simulation
+{
+	bool is_enabled{};
+};
+
 
 #endif

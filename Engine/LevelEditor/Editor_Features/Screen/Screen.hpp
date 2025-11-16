@@ -31,9 +31,22 @@ namespace EngineFramework
 {
     struct iEditorView; //forward declaration
 
+    /*struct Entity_Info {
+        xresource::instance_guid archtype_guid{};
+        std::map <std::string, std::map<std::string, entt::meta_any>> components_variables;
+    };*/
+
     class Screen : public LFeature
     {
     public:
+
+        //bool is_meta_component(const entt::meta_type& meta) {
+        //    if (!meta || !meta.is_class()) {
+        //        return false;
+        //    }
+        //    using namespace entt::literals;
+        //    return meta.func("emplace"_hs) && (/*meta.func("get_ref"_hs) ||*/ meta.func("get"_hs));
+        //}
 
         Screen();
         ~Screen() override;
@@ -48,7 +61,7 @@ namespace EngineFramework
         static bool is_simulator_running;
         static bool gizmos_IS_hovering;
         static bool gizmos_IS_dragged;
-        
+        static bool is_adjusting_lights;
 
     private:
 
@@ -61,13 +74,18 @@ namespace EngineFramework
         void control_window();
         void drop_target();
 
+        float camera_speed;
+        float scrolling_speed;
+
 
         void play_simulation();
         void stop_simulation();
         std::string simulation_buffer;
-
         EditorCameraController m_editorCamera;
+        /* std::map<entt::entity, Entity_Info> backup_before_simulation;*/
 
+        void clear_backup();
+        static std::string json_backup;
         static inline Screen* this_instance{};
     };
 

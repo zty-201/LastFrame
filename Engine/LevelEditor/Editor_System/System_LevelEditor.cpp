@@ -53,6 +53,10 @@ namespace EngineFramework
 		//application->Initialize();
 		//application->Open();
 		LOGI("level editor system ONLINE!");
+
+		Event_Level_Editor_Toggled editor_toggled{};
+		editor_toggled.is_enabled = false;
+		event_dispatcher.trigger<Event_Level_Editor_Toggled>(std::move(editor_toggled));
 	}
 	void LevelEditorSystem::Update(float delta_time)
 	{
@@ -62,7 +66,7 @@ namespace EngineFramework
 		if (!application->Get_Editor_State()) {
 			//std::cout << "yo\n";
 
-			
+
 
 			if (InputManager::GetInstance().GetKeyDown(Key_Actions::OPEN_EDITOR)) {
 
@@ -75,6 +79,7 @@ namespace EngineFramework
 				Event_Level_Editor_Toggled editor_toggled{};
 				editor_toggled.is_enabled = true;
 				event_dispatcher.trigger<Event_Level_Editor_Toggled>(std::move(editor_toggled));
+
 			}
 		}
 		else {

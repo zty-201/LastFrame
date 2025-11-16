@@ -99,17 +99,25 @@ void EditorCameraController::HandleOrbitAndZoom(CameraComponent& cam,
     // Scroll wheel -> dolly towards/away from target
     if (in.mouseScroll != 0.0f)
     {
-        glm::vec3 dir = cam.target - cam.position;
-        float distance = glm::length(dir);
-        if (distance > 0.000001f)
-        {
-            dir /= distance;
+        Camera::Move_Cam_and_Target(cam, glm::vec3(0, 0, in.mouseScroll* zoomSpeed));
 
-            float distanceFactor = distance * 0.1f; // faster when far away
-            float step = in.mouseScroll * zoomSpeed * distanceFactor;
+        /*
+            Abit wrong, so i commented out. pressing W = scrolling forward
+        */
 
-            cam.position += dir * step;
-        }
+        //glm::vec3 dir = cam.target - cam.position;
+        //float distance = glm::length(dir);
+        //if (distance > 0.000001f)
+        //{
+        //    dir /= distance;
+
+        //    float distanceFactor = distance * 0.1f; // faster when far away
+        //    float step = in.mouseScroll * zoomSpeed * distanceFactor;
+
+        //    //cam.position += dir * step;
+
+        //    
+        //}
     }
     /*if (in.mouseScroll != 0.0f)
     {
