@@ -92,13 +92,19 @@ namespace EngineFramework
 
 		// Getter for registry
 		static entt::registry& GetRegistry() { return registry; }
+		//Clears all entities in the scene
+		void ClearAllInstances();
+		/*
+			Write gameobject instances to a json string using reflection.
+			Returns a json string that can be written to a scene file.
+		*/
+		std::string SerializeAllEntityInstances();
 
 	private:
 		void Initialize() override;
 		void Update(float delta_time) override;
 		
-		//Clears all entities in the scene
-		void ClearAllInstances();
+		
 		
 		/*
 		 	Write to json strings using reflection.
@@ -107,11 +113,7 @@ namespace EngineFramework
 		*/
 		std::vector<std::pair<std::string, std::string>> SerializeAllEntityArchtypes();
 
-		/*
-			Write gameobject instances to a json string using reflection.
-			Returns a json string that can be written to a scene file.
-		*/
-		std::string SerializeAllEntityInstances();
+		
 
 		/*
 			Read gameobject instances from json string using reflection.

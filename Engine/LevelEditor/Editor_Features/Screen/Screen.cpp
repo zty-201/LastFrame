@@ -39,6 +39,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "ImGuizmo.h"
 #include "TriggerBoxComponent.h"
 #include "MeshComponent.h"
+#include "Editor_Features/CameraController/EditorCameraController.hpp"
 
 //#include <iostream>
 
@@ -55,18 +56,23 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "System_GameObjectSystem.hpp"
 #include "SceneManager.hpp"
 
+
+
 namespace EngineFramework
 {
+    using namespace entt::literals;
+
     bool Screen::is_control_open = false;
     bool Screen::is_simulator_running = false;
     bool Screen::gizmos_IS_hovering = false;
     bool Screen::gizmos_IS_dragged = false;
-   
+    bool Screen::is_adjusting_lights = false;
+    //
+    std::string Screen::json_backup{};
 
     bool gizmos_started_drag = false;
     std::unique_ptr<Record> current_record = nullptr;
-
-
+    
     //set these to default first
     static ImGuizmo::OPERATION operation = ImGuizmo::TRANSLATE;
     static ImGuizmo::MODE mode = ImGuizmo::WORLD;
@@ -82,10 +88,10 @@ namespace EngineFramework
         0.f, 0.f, 1.f, 0.f,
         0.f, 0.f, 0.f, 1.f };
 
-    Screen::Screen(){
+    Screen::Screen() {
         this_instance = this;
         LOGI("Lfeature: Screen CREATED");
-        
+
     }
     Screen::~Screen() {
 
@@ -105,8 +111,8 @@ namespace EngineFramework
         return M;
     }
 
-    static inline glm::quat EulerDegToQuat(const glm::vec3& deg) { 
-        return glm::quat(glm::radians(deg)); 
+    static inline glm::quat EulerDegToQuat(const glm::vec3& deg) {
+        return glm::quat(glm::radians(deg));
     }
 
     static inline bool ProjectToScreen(const glm::mat4& V, const glm::mat4& P, const glm::vec3& p,
@@ -125,7 +131,7 @@ namespace EngineFramework
                                      {-0.5,-0.5,0.5},{0.5,-0.5,0.5},{0.5,0.5,0.5},{-0.5,0.5,0.5} };
         static const int E[12][2] = { {0,1},{1,2},{2,3},{3,0},{4,5},{5,6},{6,7},{7,4},{0,4},{1,5},{2,6},{3,7} };
         ImDrawList* dl = ImGui::GetWindowDrawList(); ImVec2 pts[8]; bool ok[8];
-        for (int i = 0;i < 8;++i) { glm::vec3 w = glm::vec3(M * glm::vec4(C[i], 1)); ok[i] = ProjectToScreen(V, P, w, pos, size, pts[i]); }
+        for (int i = 0; i < 8; ++i) { glm::vec3 w = glm::vec3(M * glm::vec4(C[i], 1)); ok[i] = ProjectToScreen(V, P, w, pos, size, pts[i]); }
         for (auto& e : E) if (ok[e[0]] && ok[e[1]]) dl->AddLine(pts[e[0]], pts[e[1]], color, thick);
     }
 
@@ -138,12 +144,20 @@ namespace EngineFramework
             return;
         }
         else
-			LOGI("[Screen] CameraComponent found in registry, proceeding to attach Lua script.");
+            LOGI("[Screen] CameraComponent found in registry, proceeding to attach Lua script.");
 
         auto cameraEntity = camera_view.front();
         auto& camera = camera_view.get<CameraComponent>(cameraEntity);
         Camera::setType(camera, CameraComponent::WALKING);
         history = std::make_unique<HistorySystem>(5);
+        is_simulator_running = false;
+        camera_speed = 1.f; // as default
+        scrolling_speed = 10.f; // default
+
+        Event_Level_Editor_Simulation editor_toggled{};
+        editor_toggled.is_enabled = false;
+        event_dispatcher.trigger<Event_Level_Editor_Simulation>(std::move(editor_toggled));
+
 
 #if defined(ENGINE_ENABLE_LUA)
         // Attach Lua orbit/drag camera control script
@@ -187,8 +201,8 @@ namespace EngineFramework
 
     void Screen::Run() {
 
-       /* if (this_instance->is_enabled)
-            LOGD("Screen Opened");*/
+        /* if (this_instance->is_enabled)
+             LOGD("Screen Opened");*/
 
         auto camera_view = registry.view<CameraComponent>();
         //auto& camera = camera_view.get<CameraComponent>(camera_view.front());
@@ -203,27 +217,40 @@ namespace EngineFramework
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
             if (ImGui::BeginMenuBar()) {
 
-                if (ImGui::MenuItem("Run Simulator")) {
-                    
+                static std::string caption = "Run Simulator";
+                if (is_simulator_running) {
+                    caption = "Stop Simulator";
+                }
+                else {
+                    caption = "Run Simulator";
+                }
+
+                if (ImGui::MenuItem(caption.c_str())) {
+
                     if (!is_simulator_running) play_simulation();
                     else stop_simulation();
 
                 }
 
-                ImGui::SameLine(0, 50.0f); // The second argument controls the spacing in pixels
+                if (!is_simulator_running) {
+
+                    ImGui::SameLine(0, 50.0f); // The second argument controls the spacing in pixels
 
 
-                if (ImGui::MenuItem("Interface Controls", NULL, &is_control_open)) {
-                    //std::cout << "Controls\n";                   
+                    if (ImGui::MenuItem("Interface Controls", NULL, &is_control_open)) {
+                        //std::cout << "Controls\n";                   
+                    }
+
+                    ImGui::SameLine(0, 50.0f); // The second argument controls the spacing in pixels
+
+
+                    if (ImGui::MenuItem("Undo")) {
+                        //std::cout << "undo is clicked\n";
+                        history->undo();
+                    }
                 }
 
-                ImGui::SameLine(0, 50.0f); // The second argument controls the spacing in pixels
 
-
-                if (ImGui::MenuItem("Undo")) {
-                    std::cout << "undo is clicked\n";
-                    history->undo();
-                }
 
                 ImGui::EndMenuBar();
 
@@ -254,6 +281,7 @@ namespace EngineFramework
 
     }
     void Screen::Close() {
+        clear_backup();
         LOGI("Screen closed");
     }
 
@@ -291,55 +319,73 @@ namespace EngineFramework
         available_size_old = available_size;
     }
 
-    void Screen::camera_controls_outside_screen() {
+    /*void Screen::camera_controls_outside_screen() {
 
-        float speed = 0.5f;
+        if (is_simulator_running) return;
 
         if (ImGui::IsKeyDown(ImGuiKey_W)) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-            Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, speed));
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, camera_speed));
         }
 
         if (ImGui::IsKeyDown(ImGuiKey_S)) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-            Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, -speed));
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, -camera_speed));
         }
 
         if (ImGui::IsKeyDown(ImGuiKey_Q) || ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-            Camera::Move_Cam_and_Target(camera, glm::vec3(0, speed, 0));
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, camera_speed, 0));
         }
         if (ImGui::IsKeyDown(ImGuiKey_E) || ImGui::IsKeyDown(ImGuiKey_DownArrow)) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-            Camera::Move_Cam_and_Target(camera, glm::vec3(0, -speed, 0));
+            Camera::Move_Cam_and_Target(camera, glm::vec3(0, -camera_speed, 0));
         }
         if (ImGui::IsKeyDown(ImGuiKey_A) || ImGui::IsKeyDown(ImGuiKey_LeftArrow)) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-            Camera::Move_Cam_and_Target(camera, glm::vec3(-speed, 0, 0));
+            Camera::Move_Cam_and_Target(camera, glm::vec3(-camera_speed, 0, 0));
         }
         if (ImGui::IsKeyDown(ImGuiKey_D) || ImGui::IsKeyDown(ImGuiKey_RightArrow)) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-            Camera::Move_Cam_and_Target(camera, glm::vec3(speed, 0, 0));
+            Camera::Move_Cam_and_Target(camera, glm::vec3(camera_speed, 0, 0));
         }
 
-    }
-    void Screen::camera_controls_in_screen_only() {
+    }*/
+
+
+    /*void Screen::camera_controls_in_screen_only() {
+
+        if (is_simulator_running) return;
 
         ImGuiIO& io = ImGui::GetIO();
         ImVec2 Mouse_delta = io.MouseDelta;
-        float Mouse_Scroll = io.MouseWheel;
+        float Mouse_Scroll = io.MouseWheel * scrolling_speed;
+
+        if (is_adjusting_lights) {
+            
+            if (io.MouseDown[0]) {
+                auto light_view = registry.view<LightComponent>();
+                auto& light = light_view.get<LightComponent>(light_view.front());
+
+                if (Mouse_delta.x > 0.0 || Mouse_delta.y > 0.0) {
+                    Light::onCursor(light, Mouse_delta.x, Mouse_delta.y);
+                    //std::cout << "Mouse_delta.x: " << Mouse_delta.x << " | Mouse_delta.y: " << Mouse_delta.y << std::endl;
+                }
+                
+            }
+        }
 
         //right mouse is down means = i am dragging the screen
         if (io.MouseDown[1]) {
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-            Camera::onCursor(camera, Mouse_delta.x, Mouse_delta.y);
+            Camera::onCursor(camera, camera_speed * Mouse_delta.x, camera_speed * Mouse_delta.y);
         }
 
         //moving forward/backwards
@@ -349,14 +395,114 @@ namespace EngineFramework
             Camera::Move_Cam_and_Target(camera, glm::vec3(0, 0, Mouse_Scroll));
         }
 
+    }*/
+
+    /* ---------------------------
+    *    Updated camera controls
+    ------------------------------*/
+
+    void Screen::camera_controls_outside_screen()
+    {
+        if (is_simulator_running) return;
+        
+        // Only keyboard movement when mouse is NOT over the viewport.
+        EditorCameraInput input{};
+
+        // You can tune this per-frame if you want.
+        m_editorCamera.moveSpeed = camera_speed;
+
+        // WASD + arrows
+        input.keyW = ImGui::IsKeyDown(ImGuiKey_W);
+        input.keyA = ImGui::IsKeyDown(ImGuiKey_A);
+        input.keyS = ImGui::IsKeyDown(ImGuiKey_S);
+        input.keyD = ImGui::IsKeyDown(ImGuiKey_D);
+        input.keyQ = ImGui::IsKeyDown(ImGuiKey_Q) || ImGui::IsKeyDown(ImGuiKey_UpArrow);
+        input.keyE = ImGui::IsKeyDown(ImGuiKey_E) || ImGui::IsKeyDown(ImGuiKey_DownArrow);
+        input.keyLeft = ImGui::IsKeyDown(ImGuiKey_LeftArrow);
+        input.keyRight = ImGui::IsKeyDown(ImGuiKey_RightArrow);
+
+        auto camera_view = registry.view<CameraComponent>();
+        if (camera_view.empty())
+            return;
+
+        entt::entity camEnt = camera_view.front();
+        auto& cam = camera_view.get<CameraComponent>(camEnt);
+
+        // We don’t use mouse or focus here (outside viewport).
+        entt::entity selected = static_cast<entt::entity>(editor_ptr->selected_objectID);
+
+        m_editorCamera.Update(cam, input, registry, selected);
+    }
+
+    void Screen::camera_controls_in_screen_only()
+    {
+        if (is_simulator_running) return;
+       
+        ImGuiIO& io = ImGui::GetIO();
+
+        EditorCameraInput input{};
+
+        m_editorCamera.zoomSpeed = scrolling_speed;
+
+        // Mouse buttons
+        input.rightMouseDown = io.MouseDown[1];   // RMB = orbit / look
+        input.middleMouseDown = io.MouseDown[2];   // MMB = pan
+
+        // Mouse movement & scroll
+        input.mouseDeltaX = io.MouseDelta.x;
+        input.mouseDeltaY = io.MouseDelta.y;
+        input.mouseScroll = io.MouseWheel;
+
+        // Keyboard while hovering over the viewport
+        input.keyW = ImGui::IsKeyDown(ImGuiKey_W);
+        input.keyA = ImGui::IsKeyDown(ImGuiKey_A);
+        input.keyS = ImGui::IsKeyDown(ImGuiKey_S);
+        input.keyD = ImGui::IsKeyDown(ImGuiKey_D);
+        input.keyQ = ImGui::IsKeyDown(ImGuiKey_Q) || ImGui::IsKeyDown(ImGuiKey_UpArrow);
+        input.keyE = ImGui::IsKeyDown(ImGuiKey_E) || ImGui::IsKeyDown(ImGuiKey_DownArrow);
+        input.keyLeft = ImGui::IsKeyDown(ImGuiKey_LeftArrow);
+        input.keyRight = ImGui::IsKeyDown(ImGuiKey_RightArrow);
+
+        // Focus / frame selected (e.g. F key)
+        input.keyFocus = ImGui::IsKeyPressed(ImGuiKey_F);
+
+        auto camera_view = registry.view<CameraComponent>();
+        if (camera_view.empty())
+            return;
+
+        entt::entity camEnt = camera_view.front();
+        auto& cam = camera_view.get<CameraComponent>(camEnt);
+
+        entt::entity selected = static_cast<entt::entity>(editor_ptr->selected_objectID);
+
+        m_editorCamera.Update(cam, input, registry, selected);
+
+        /*
+            for adjusting the lighting 
+        */
+        if (is_adjusting_lights) {
+
+            if (io.MouseDown[0]) {
+                auto light_view = registry.view<LightComponent>();
+                auto& light = light_view.get<LightComponent>(light_view.front());
+
+                if (io.MouseDelta.x > 0.0 || io.MouseDelta.y > 0.0) {
+                    Light::onCursor(light, io.MouseDelta.x, io.MouseDelta.y);
+                    //std::cout << "Mouse_delta.x: " << Mouse_delta.x << " | Mouse_delta.y: " << Mouse_delta.y << std::endl;
+                }
+
+            }
+        }
+
     }
 
     void Screen::control_window() {
 
         if (!is_control_open) return; //if it is not enabled, return
-
+        if (is_simulator_running) return;
 
         ImGui::SetNextWindowSize(ImVec2(620, 260), ImGuiCond_FirstUseEver);
+
 
         // No flags that block move/resize
         ImGui::Begin("Control Panel", &is_control_open);
@@ -411,7 +557,7 @@ namespace EngineFramework
                         history->end_track(record_pos, object.position);
                         record_pos.reset();
                     }
-                    
+
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
 
                     if (ImGui::InputFloat3("Scale", S, "%.3f")) {
@@ -423,7 +569,7 @@ namespace EngineFramework
                         history->end_track(record_scale, object.scale);
                         record_scale.reset();
                     }
-                    
+
                     ImGui::Dummy(ImVec2(0.0f, 20.f));
 
                     if (ImGui::InputFloat3("Rotation (deg)", R, "%.3f")) {
@@ -442,11 +588,11 @@ namespace EngineFramework
 
                 }
 
-              
+
                 ImGui::EndTabItem();
             }
 
-            
+
 
             if (ImGui::BeginTabItem("Camera Navigation")) {
                 ImGui::Spacing();
@@ -463,6 +609,35 @@ namespace EngineFramework
                 ImGui::TextUnformatted("Scroll Forward   or    W_key   :   Move Forwards");
                 ImGui::Separator();
                 ImGui::TextUnformatted("Mouse Right Dragged            :   Look around");
+
+                static float camera_temp = camera_speed;  // current value
+                
+                ImGui::InputFloat("Camera Movement Speed", &camera_temp);
+                if (ImGui::IsItemDeactivatedAfterEdit())
+                {
+                    
+                    if (camera_temp >= 0.0f)
+                    {
+                        camera_speed = camera_temp;       
+                    }
+                    
+                }
+
+                static float scroll_temp = scrolling_speed;  // current value
+
+                ImGui::InputFloat("Mouse Scroll Speed", &scroll_temp);
+                if (ImGui::IsItemDeactivatedAfterEdit())
+                {
+                    
+                    if (scroll_temp >= 0.0f)
+                    {
+                        scrolling_speed = scroll_temp;      
+                    }
+
+                }
+
+
+
                 ImGui::EndTabItem();
             }
 
@@ -515,63 +690,63 @@ namespace EngineFramework
                 ImGui::SeparatorText("Fog Control Parameters");
                 ImGui::Spacing();
 
-				// Get the graphics system reference
+                // Get the graphics system reference
                 auto& gfx = GraphicsSystem::GetInstance();
 
                 // Anisotropy
-				float aniso = gfx.GetAnisotrophy();
-                if(ImGui::InputFloat("Anisotropy", &aniso, 0.f, 0.f, "%.4f")) {
+                float aniso = gfx.GetAnisotrophy();
+                if (ImGui::InputFloat("Anisotropy", &aniso, 0.f, 0.f, "%.4f")) {
                     gfx.SetAnisotrophy(aniso);
-				}
+                }
 
-				// Density
-				float density = gfx.GetDensity();
+                // Density
+                float density = gfx.GetDensity();
                 if (ImGui::InputFloat("Density", &density, 0.f, 0.f, "%.4f")) {
                     gfx.SetDensity(density);
                 }
 
                 // Scattering
-				float scattering = gfx.GetScattering();
+                float scattering = gfx.GetScattering();
                 if (ImGui::InputFloat("Scattering", &scattering, 0.f, 0.f, "%.4f")) {
                     gfx.SetScattering(scattering);
-				}
+                }
 
-				// Absorption
-				float absorption = gfx.GetAbsorption();
+                // Absorption
+                float absorption = gfx.GetAbsorption();
                 if (ImGui::InputFloat("Absorption", &absorption, 0.f, 0.f, "%.4f")) {
                     gfx.SetAbsorption(absorption);
                 }
 
-				// Shadow Bias
-				float shadow_bias = gfx.GetShadowBias();
+                // Shadow Bias
+                float shadow_bias = gfx.GetShadowBias();
                 if (ImGui::InputFloat("Shadow Bias", &shadow_bias, 0.f, 0.f, "%.4f")) {
                     gfx.SetShadowBias(shadow_bias);
-				}
+                }
 
-				// Depth Power
-				float depth_power = gfx.GetDepthPower();
+                // Depth Power
+                float depth_power = gfx.GetDepthPower();
                 if (ImGui::InputFloat("Depth Power", &depth_power, 0.f, 0.f, "%.4f")) {
                     gfx.SetDepthPower(depth_power);
                 }
 
 
-				// Ambient Light settings
-				float ambient_intensity = gfx.GetAmbientLightIntensity();
+                // Ambient Light settings
+                float ambient_intensity = gfx.GetAmbientLightIntensity();
                 if (ImGui::InputFloat("Ambient Light Intensity", &ambient_intensity, 0.f, 0.f, "%.4f")) {
                     gfx.SetAmbientLightIntensity(ambient_intensity);
                 }
 
-				// Temporal accumulation
-				//bool temporal_accumulation = gfx.GetTemporalAccumulation();
+                // Temporal accumulation
+                //bool temporal_accumulation = gfx.GetTemporalAccumulation();
     //            if (ImGui::Checkbox("Temporal Accumulation", &temporal_accumulation)) {
     //                gfx.SetTemporalAccumulation(temporal_accumulation);
     //            }
 
-				//// Tricubic Filtering
-				//bool tricubic_filtering = gfx.GetTricubicFiltering();
+                //// Tricubic Filtering
+                //bool tricubic_filtering = gfx.GetTricubicFiltering();
     //            if (ImGui::Checkbox("Tricubic Filtering", &tricubic_filtering)) {
     //                gfx.SetTricubicFiltering(tricubic_filtering);
-				//}
+                //}
 
                 ImGui::Spacing();
                 ImGui::Separator();
@@ -595,35 +770,35 @@ namespace EngineFramework
                 // Check for lights and adjust the lights if needed
                 if (!lightNames.empty()) {
                     // Create a drop down to select the specific light
-					// First create a char* array for ImGui to read the names
-					std::vector<const char*> lightNamePtrs;
-					lightNamePtrs.reserve(lightNames.size());
+                    // First create a char* array for ImGui to read the names
+                    std::vector<const char*> lightNamePtrs;
+                    lightNamePtrs.reserve(lightNames.size());
 
-					// Loop through to get the char* pointers
+                    // Loop through to get the char* pointers
                     for (const auto& name : lightNames) {
-						lightNamePtrs.push_back(name.c_str());
+                        lightNamePtrs.push_back(name.c_str());
                     }
 
-					// Check if an overflow (in index) occurs
-                    if(selected_light_idx >= static_cast<int>(lightNames.size())) {
+                    // Check if an overflow (in index) occurs
+                    if (selected_light_idx >= static_cast<int>(lightNames.size())) {
                         selected_light_idx = 0;
-					}
+                    }
 
                     ImGui::Combo("Select Light", &selected_light_idx,
-						lightNamePtrs.data(), static_cast<int>(lightNamePtrs.size()));
+                        lightNamePtrs.data(), static_cast<int>(lightNamePtrs.size()));
 
-					// Obtain the selected light entity to adjust values
-					entt::entity selected_light_entity = lightEntities[selected_light_idx];
+                    // Obtain the selected light entity to adjust values
+                    entt::entity selected_light_entity = lightEntities[selected_light_idx];
 
-					// Check if the entity is valid and has LightComponent
+                    // Check if the entity is valid and has LightComponent
                     if (registry.valid(selected_light_entity) && registry.all_of<LightComponent>(selected_light_entity)) {
-						auto& light = registry.get<LightComponent>(selected_light_entity);
+                        auto& light = registry.get<LightComponent>(selected_light_entity);
 
                         // Drop down to adjust the light position
-						float pos[3] = { light.position.x, light.position.y, light.position.z };
-                        if(ImGui::InputFloat3("Light Position", pos, "%.3f")) {
+                        float pos[3] = { light.position.x, light.position.y, light.position.z };
+                        if (ImGui::InputFloat3("Light Position", pos, "%.3f")) {
                             light.position = glm::vec3(pos[0], pos[1], pos[2]);
-						}
+                        }
 
                         // Intensity
                         float intensity = light.intensity;
@@ -632,22 +807,22 @@ namespace EngineFramework
                         }
 
 
-						// Drop down to adjust the light intensities, in case there isn't enough intensities
+                        // Drop down to adjust the light intensities, in case there isn't enough intensities
        //                 for (int i = 0; i < light.L.size(); i++) {
-							//// If there is 1 intensity, it is ambient
+                            //// If there is 1 intensity, it is ambient
        //                     std::string title;
        //                     if (i == 0) {
-							//	title = "Ambient Intensity";
+                            //	title = "Ambient Intensity";
        //                     }
-							//// If there are 2 intensities, the second is diffuse
+                            //// If there are 2 intensities, the second is diffuse
        //                     else if (i == 1) {
-							//	title = "Diffuse Intensity";
+                            //	title = "Diffuse Intensity";
        //                     }
-							//// If there are 3 intensities, the third is specular
+                            //// If there are 3 intensities, the third is specular
        //                     else if (i == 2) {
-							//	title = "Specular Intensity";
+                            //	title = "Specular Intensity";
        //                     }
-							//// Anything more than 3, just call it component i
+                            //// Anything more than 3, just call it component i
        //                     else {
        //                         std::stringstream ss;
        //                         ss << "Component " << i;
@@ -657,7 +832,7 @@ namespace EngineFramework
        //                     // Obtain current intensity
        //                     float intensity[3] = { light.L[i].x, light.L[i].y, light.L[i].z };
        //                     if (ImGui::ColorEdit3(title.c_str(), intensity)) {
-							//	light.L[i] = glm::vec3(intensity[0], intensity[1], intensity[2]);
+                            //	light.L[i] = glm::vec3(intensity[0], intensity[1], intensity[2]);
        //                     }
        //                 }
 
@@ -679,26 +854,42 @@ namespace EngineFramework
                     }
                 }
 
+                static std::string button_text = "Adjust Light with Mouse";
+
+                if (is_adjusting_lights) {
+                    button_text = "Stop Adjusting Lights";
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.3f, 0.3f, 1.0f)); // red    
+                }else {
+                    button_text = "Adjust Light with Mouse";
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.7f, 0.3f, 1.0f)); // green
+                }
+
+                if (ImGui::Button(button_text.c_str())) {
+                    is_adjusting_lights = !is_adjusting_lights;
+                }
+
+                ImGui::PopStyleColor();
+
                 // If you want to add new lights
     //            if(ImGui::Button("Add New Light")) {
-				//	// Create a new entity with LightComponent
+                //	// Create a new entity with LightComponent
     //                entt::entity new_light_entity = registry.create();
     //                LightComponent lightComp{};
 
-				//	// Set default values
+                //	// Set default values
     //                // Position
     //                lightComp.position = glm::vec3(0.0f, 0.0f, 0.0f);
 
     //                // Ambient Intensity
     //                lightComp.intensity = 1.0f; 
 
-				//	//// Diffuse Intensity
+                //	//// Diffuse Intensity
     // //               lightComp.L.push_back(glm::vec3(1.0f));
 
-				//	//// Specular Intensity
+                //	//// Specular Intensity
     // //               lightComp.L.push_back(glm::vec3(1.0f));
     //                registry.emplace<LightComponent>(new_light_entity, lightComp);
-				//}
+                //}
             }
 
             ImGui::EndTabBar();
@@ -723,6 +914,9 @@ namespace EngineFramework
     }
 
     void Screen::gizmos() {
+
+        if (is_simulator_running) return;
+        if (is_adjusting_lights) return; //when adjusting lights, gizmos should be disabled
 
         //do not use gizmos if nothing is being selected, because what are you referrring to?
         if (editor_ptr->selected_objectID == entt::null) {
@@ -750,7 +944,7 @@ namespace EngineFramework
             ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
             gizmos_IS_hovering = ImGuizmo::IsOver();
             gizmos_IS_dragged = ImGuizmo::IsUsing();
-            
+
             /*TransformComponent transform{};
             transform.position = object.position;
             transform.rotation = object.rotation;
@@ -806,20 +1000,22 @@ namespace EngineFramework
             }
 
             /*
-            * History Tracking            
+            * History Tracking
             */
 
             if (!gizmos_started_drag && gizmos_IS_dragged) {
 
                 if (operation == ImGuizmo::TRANSLATE) {
                     current_record = history->start_track(id, "TransformComponent", "position");
-                }else if (operation == ImGuizmo::SCALE) {
+                }
+                else if (operation == ImGuizmo::SCALE) {
                     current_record = history->start_track(id, "TransformComponent", "scale");
-                }else if (operation == ImGuizmo::ROTATE) {
+                }
+                else if (operation == ImGuizmo::ROTATE) {
                     current_record = history->start_track(id, "TransformComponent", "rotation");
                 }
 
-                std::cout << "Begin track\n";
+                //std::cout << "Begin track\n";
             }
 
             if (gizmos_started_drag && !gizmos_IS_dragged) {
@@ -833,9 +1029,9 @@ namespace EngineFramework
                 else if (operation == ImGuizmo::ROTATE) {
                     history->end_track(current_record, object.rotation);
                 }
-               
+
                 current_record = nullptr;
-                std::cout << "End track\n";
+                //std::cout << "End track\n";
             }
 
 
@@ -851,6 +1047,8 @@ namespace EngineFramework
 
     void EngineFramework::Screen::triggerbox()
     {
+        if (is_adjusting_lights) return;
+
         // Use same camera math as gizmos()
         auto camera_view = registry.view<CameraComponent>();
         if (camera_view.empty()) return;
@@ -925,6 +1123,9 @@ namespace EngineFramework
 
     void Screen::drop_target() {
 
+        if (is_simulator_running) return;
+        if (is_adjusting_lights) return;
+
         if (ImGui::BeginDragDropTarget())
         {
             CALL_AT_END(imgui_enddragdrop, ImGui::EndDragDropTarget(););
@@ -937,14 +1138,14 @@ namespace EngineFramework
                 std::string archtype_name = static_cast<const char*>(payload->Data);
                 if (archtype_name.empty())
                 {
-                    LOGD("%s","Empty Archtype Name provided by Drag-Drop Payload");
+                    LOGD("%s", "Empty Archtype Name provided by Drag-Drop Payload");
                     return;
                 }
                 TransformComponent instance_transform{};
 
                 //Find the position in front of where the camera is looking.
                 entt::entity camera = GraphicsSystem::GetInstance().GetFirstActiveCamera();
-                if (camera != entt::null) 
+                if (camera != entt::null)
                 {
                     CameraComponent& cam_comp = registry.get<CameraComponent>(camera);
                     instance_transform.position = Camera::GetFowardLookPosition(cam_comp, 0.5f);
@@ -966,23 +1167,169 @@ namespace EngineFramework
         }
     }
 
+
     void Screen::play_simulation() {
 
         if (is_simulator_running) return;
-        std::cout << "play_simulation\n";
+        //std::cout << "play_simulation\n";
         is_simulator_running = true;
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoKeyboard;
+        Event_Level_Editor_Simulation editor_toggled{};
+        editor_toggled.is_enabled = true;
+        event_dispatcher.trigger<Event_Level_Editor_Simulation>(std::move(editor_toggled));
+
+
+        json_backup = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances();
+
+        //get all entity
+        //std::vector<entt::entity> entities;
+
+        //// Iterate through the sparse set (all alive entities)
+        //for (auto entity : registry.view<entt::entity>()) {
+        //    entities.push_back(entity);
+        //}
+
+        //for (auto e : entities) {
+
+        //    Entity_Info e_info{};
+
+
+        //    for (auto&& storage : GameObjectSystem::GetInstance().GetRegistry().storage())
+        //    {
+        //        if (!storage.second.contains(e))
+        //            continue;
+
+        //        entt::meta_type meta = entt::resolve(storage.second.info());
+        //        if (!meta)
+        //            continue;
+
+        //        std::string compName = meta.name();
+        //        if (compName.empty())
+        //            continue;
+
+        //        std::cout << "compName " << compName << std::endl;
+        //        
+        //        // Save normal component with fields
+        //        entt::meta_any comp_ref =
+        //            meta.func("get"_hs).invoke({}, e);
+
+        //        bool hasData = false;
+
+        //        for (auto&& [id, member] : meta.data())
+        //        {
+        //            hasData = true;
+        //            std::string varName = member.name();
+        //            entt::meta_any value = member.get(comp_ref);
+        //            e_info.components_variables[compName][varName] = value;
+        //        }
+
+        //        if (!hasData) {
+        //            e_info.components_variables[compName] ={};
+        //        }
+        //    }
+
+        //    backup_before_simulation[e] = e_info;
+        //}
 
 
     }
     void Screen::stop_simulation() {
 
         if (!is_simulator_running) return;
-        std::cout << "stop_simulation\n";
-        registry.clear();
+        //std::cout << "stop_simulation\n";
 
-        
+        ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoKeyboard;
+        GameObjectSystem::GetInstance().ClearAllInstances();
+
+        GameObjectSystem::GetInstance().LoadScene(json_backup);
+
+        json_backup = {};
+
+        Event_Level_Editor_Simulation editor_toggled{};
+        editor_toggled.is_enabled = false;
+        event_dispatcher.trigger<Event_Level_Editor_Simulation>(std::move(editor_toggled));
+
+        //for (std::map<entt::entity, Entity_Info>::iterator it = backup_before_simulation.begin(); it != backup_before_simulation.end(); it++) {
+        //    entt::entity e = it->first;
+        //    Entity_Info comp = it->second;
+
+        //    if (!GameObjectSystem::GetRegistry().valid(e)) {
+        //        entt::entity en = GameObjectSystem::GetRegistry().create(e);
+        //        UNREFERENCED_PARAMETER(en);
+
+        //       
+        //    }
+        //    else {
+        //        continue;
+        //    }
+
+        //    for (std::map<std::string, std::map<std::string, entt::meta_any>>::iterator comp_it = comp.components_variables.begin();comp_it != comp.components_variables.end(); comp_it++){
+        //        const std::string& component_name = comp_it->first;
+        //        std::map<std::string, entt::meta_any>& variables = comp_it->second;
+
+        //        if (component_name == "archtype") continue;
+
+        //        if (component_name == "SceneRenderPass") {
+        //            std::cout << "component_name: " << component_name << std::endl;
+        //        }
+        //        
+        //       
+        //        //if (component_name == "archtype") continue;
+        //        auto meta = entt::resolve(entt::hashed_string{ component_name.c_str() }.value());
+
+        //        if (!is_meta_component(meta))
+        //            continue;
+
+        //        if (variables.empty())
+        //        {
+        //            // Just emplace it into the entity.
+        //            auto emplace = meta.func("emplace"_hs);
+        //            if (emplace) {
+        //                emplace.invoke({}, e, nullptr);
+        //            }
+
+        //            continue;
+        //        }
+
+        //        entt::meta_any instance = meta.construct();
+
+        //        for (std::map<std::string, entt::meta_any>::iterator var_it = variables.begin(); var_it != variables.end(); var_it++)
+        //        {
+        //            const std::string& var_name = var_it->first;
+        //            entt::meta_any& saved_value = var_it->second;
+
+        //            auto data = meta.data(entt::hashed_string{ var_name.c_str() }.value());
+        //            if (!data)continue;
+        //            data.set(instance, saved_value);
+        //        }
+
+        //        auto emplace = meta.func("emplace"_hs);
+        //        if (emplace) {
+        //            entt::meta_any result = emplace.invoke({}, e, static_cast<const void*>(&instance));
+        //        }
+        //        
+        //    }
+        //}
+
 
         is_simulator_running = false;
+
+    }
+
+    void Screen::clear_backup() {
+
+        /*for (auto& [e, info] : backup_before_simulation) {
+
+            for (auto& [comp, vars] : info.components_variables) {
+                for (auto& [var, val] : vars) {
+                    val.reset();
+                }
+            }
+
+            info.components_variables.clear();
+        }
+
+        backup_before_simulation.clear();*/
 
     }
 

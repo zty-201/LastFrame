@@ -7,7 +7,7 @@
 \date   September 2025
 \brief
 This file contains the declarations of the functions that are needed for
-handling the inputs in the system. 
+handling the inputs in the system.
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
@@ -21,16 +21,17 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Key_Action.hpp"
 
 #ifdef PLATFORM_WINDOWS
-    #include "GLFW/glfw3.h"
+#include "GLFW/glfw3.h"
 #endif
 
 #if defined(DEBUG)
-    #include "KeyMapping.hpp"
+#include "KeyMapping.hpp"
+#include "event_structures.hpp"
 #endif
 
 #ifdef PLATFORM_ANDROID
-    #include <android/native_activity.h>
-    #include <android/input.h>
+#include <android/native_activity.h>
+#include <android/input.h>
 #endif
 
 namespace EngineFramework
@@ -53,7 +54,7 @@ namespace EngineFramework
 
         InputManager() { this_class = this; }
         static InputManager& GetInstance() { return *this_class; }
-        static inline InputManager *this_class = nullptr;
+        static inline InputManager* this_class = nullptr;
 
         // --- Keyboard API ---
         static bool GetKey(int key);       // true while held
@@ -102,19 +103,19 @@ namespace EngineFramework
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         static std::map <std::string, int> key_mapping_data; //json file data
-        
+
         void seralise();
         void codegen_deseralise();
         void key_mapping_codegen(); //write to initialise_keymapping
 #endif
         void initialise_keymapping();
-        
-        
+
+
 
 
     private:
 #ifdef PLATFORM_WINDOWS
-// --- GLFW Callbacks ---
+        // --- GLFW Callbacks ---
         static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
         static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
@@ -124,16 +125,39 @@ namespace EngineFramework
         static void ErrorCallback(int error, const char* description);
 
         // --- State storage ---
-        
+
         static std::unordered_map<int, KeyState> mouseButtonStates;
 
         static double mouseX, mouseY;
         static double lastMouseX, lastMouseY;
         static double scrollX, scrollY;
+        static double offset_MouseX, offset_MouseY;
         static int windowWidth, windowHeight;
 
         static glm::vec3 currentGyroRate; //Store angular velocity (rad/s)
         static long long lastGyroTimestamp;
+
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
+
+        bool editor_simulation_running;
+        bool editor_running;
+
+    public:
+        void HANDLE_EVENT_LevelEditor_Simulation(Event_Level_Editor_Simulation& play)
+        {
+            //Only draw the scene to the framebuffer if in level editor.
+            editor_simulation_running = play.is_enabled;
+        }
+
+        void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled& editor_toggled)
+        {
+            //Only draw the scene to the framebuffer if in level editor.
+            editor_running = editor_toggled.is_enabled;
+        }
+#endif
+
+
     };
 
 }

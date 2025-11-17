@@ -20,10 +20,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-    #include "System_LevelEditor.hpp"
-    #include <nlohmann/json.hpp>
-    #include <fstream>
-    #include <iostream>
+#include "System_LevelEditor.hpp"
+#include <nlohmann/json.hpp>
+#include <fstream>
+#include <iostream>
 
 #endif
 
@@ -40,10 +40,11 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 namespace EngineFramework
 {
-    
+
     // Static member definitions
     std::unordered_map<int, KeyState> InputManager::keyStates;
     std::unordered_map<Key_Actions, int> InputManager::key_mapping;
+
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
     std::map <std::string, int> InputManager::key_mapping_data;
@@ -58,6 +59,9 @@ namespace EngineFramework
 
     double InputManager::scrollX = 0.0;
     double InputManager::scrollY = 0.0;
+
+    double InputManager::offset_MouseX = 0.0;
+    double InputManager::offset_MouseY = 0.0;
 
     int InputManager::windowWidth = 0;
     int InputManager::windowHeight = 0;
@@ -81,7 +85,7 @@ namespace EngineFramework
         (void)window;
         (void)scancode;
         (void)mods;
-        
+
         //auto& pScene = GraphicsSystem::GetInstance().GetScene();
         //std::shared_ptr<ShaderProgram> shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(pScene->shader_guid);
         switch (action)
@@ -89,28 +93,6 @@ namespace EngineFramework
         case GLFW_PRESS:
             // Transition to Pressed (this frame only)
             keyStates[key] = KeyState::Pressed;
-            if (key == 'W') {
-                auto camera_view = registry.view<CameraComponent>();
-                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-                Camera::setType(camera, CameraComponent::CameraType::WALKING);
-            }
-                
-            else if (key == 'O') {
-                auto camera_view = registry.view<CameraComponent>();
-                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-                Camera::setType(camera, CameraComponent::CameraType::ORBITING);
-            }
-				
-            else if (key == GLFW_KEY_1)
-            {
-                //shader->use();
-                //shader->setUniform("materialType", 0); // PBR
-            }
-            else if (key == GLFW_KEY_2)
-            {
-                //shader->use();
-                //shader->setUniform("materialType", 1); // Blinn-Phong
-            }
             break;
         case GLFW_RELEASE:
             // Transition to Released (this frame only)
@@ -128,45 +110,40 @@ namespace EngineFramework
         (void)window;
         (void)mods;
 
-        if (action == GLFW_PRESS) { 
-            mouseButtonStates[button] = KeyState::Pressed; }
+        if (action == GLFW_PRESS) {
+            mouseButtonStates[button] = KeyState::Pressed;
+        }
         else if (action == GLFW_RELEASE) { mouseButtonStates[button] = KeyState::Released; }
     }
 
     void InputManager::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     {
-		UNREFERENCED_PARAMETER(window);
+        UNREFERENCED_PARAMETER(window);
         static double oldxpos = xpos;
         static double oldypos = ypos;
         double xoffset = xpos - oldxpos;
         double yoffset = ypos - oldypos;
+        offset_MouseX = xoffset;
+        offset_MouseY = yoffset;
         oldxpos = xpos;
         oldypos = ypos;
-        
-        if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed 
+
+        if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed
             || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down))
         {
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-            if (!LevelEditorSystem::Get_Enable()) {
-                auto camera_view = registry.view<CameraComponent>();
-                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-				Camera::onCursor(camera, xoffset, yoffset);
-            }
+
 #else   
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
             Camera::onCursor(camera, xoffset, yoffset);
 #endif
         }
-        else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed)
+        else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed || (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Down))
         {
-            
+
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-            if (!LevelEditorSystem::Get_Enable()) {
-                auto light_view = registry.view<LightComponent>();
-                auto& light = light_view.get<LightComponent>(light_view.front());
-				Light::onCursor(light, xoffset, yoffset);
-            }
+
 #else
             auto light_view = registry.view<LightComponent>();
             auto& light = light_view.get<LightComponent>(light_view.front());
@@ -184,7 +161,7 @@ namespace EngineFramework
         scrollY = yoffset;
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         if (!LevelEditorSystem::Get_Enable()) {
-			Camera::onScroll(camera, xoffset, yoffset);
+            Camera::onScroll(camera, xoffset, yoffset);
         }
 #else
         Camera::onScroll(camera, xoffset, yoffset);
@@ -193,7 +170,7 @@ namespace EngineFramework
 
     void InputManager::WindowSizeCallback(GLFWwindow* window, int width, int height)
     {
-		UNREFERENCED_PARAMETER(window);
+        UNREFERENCED_PARAMETER(window);
         Event_Window_Resized window_resize;
         windowWidth = width;
         windowHeight = height;
@@ -280,18 +257,41 @@ namespace EngineFramework
 
     bool InputManager::GetKey(int key)
     {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
+
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) {
+            return false;
+        }
+#endif
+
         auto it = keyStates.find(key);
         return it != keyStates.end() && (it->second == KeyState::Pressed || it->second == KeyState::Down);
+
     }
 
     bool InputManager::GetKeyDown(int key)
     {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
+
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) {
+            return false;
+        }
+
+
+
+#endif
         auto it = keyStates.find(key);
         return it != keyStates.end() && it->second == KeyState::Pressed;
     }
 
     bool InputManager::GetKeyUp(int key)
     {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
+
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) {
+            return false;
+        }
+#endif
         auto it = keyStates.find(key);
         return it != keyStates.end() && it->second == KeyState::Released;
     }
@@ -301,17 +301,37 @@ namespace EngineFramework
 
     bool InputManager::GetKey(Key_Actions action) {
 
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
+
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) {
+            return false;
+        }
+#endif
+
         auto it = key_mapping.find(action);
         return it != key_mapping.end() && GetKey(it->second);
-        
+
     }
     bool InputManager::GetKeyDown(Key_Actions action) {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
+
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) {
+            return false;
+        }
+#endif
 
         auto it = key_mapping.find(action);
         return it != key_mapping.end() && GetKeyDown(it->second);
 
     }
     bool InputManager::GetKeyUp(Key_Actions action) {
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
+
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) {
+            return false;
+        }
+#endif
 
         auto it = key_mapping.find(action);
         return it != key_mapping.end() && GetKeyUp(it->second);
@@ -362,7 +382,12 @@ namespace EngineFramework
         windowHeight = GraphicsSystem::GetInstance().GetWindowSize().second;
         initialise_keymapping();
 
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)       
+
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
+
+        event_dispatcher.sink<Event_Level_Editor_Simulation>().connect<&InputManager::HANDLE_EVENT_LevelEditor_Simulation>(this);
+        event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&InputManager::HANDLE_EVENT_LevelEditorToggled>(this);
         codegen_deseralise();
         seralise();
 #endif        
@@ -371,6 +396,84 @@ namespace EngineFramework
     void InputManager::Update(float deltaTime)
     {
         (void)deltaTime;
+
+        /*
+            Level Editor Inputs and Core Engine inputs are seperated.
+
+        */
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
+
+        if (!editor_running || editor_simulation_running) {
+
+
+            if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down)) {
+
+                //std::cout << "left pressed\n";
+
+                auto camera_view = registry.view<CameraComponent>();
+                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+                Camera::onCursor(camera, offset_MouseX, offset_MouseY);
+            }
+
+            if (GetKeyDown(GLFW_KEY_W)) {
+                auto camera_view = registry.view<CameraComponent>();
+                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+                Camera::setType(camera, CameraComponent::CameraType::WALKING);
+            }
+
+            else if (GetKeyDown(GLFW_KEY_O)) {
+                auto camera_view = registry.view<CameraComponent>();
+                auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+                Camera::setType(camera, CameraComponent::CameraType::ORBITING);
+            }
+
+            else if (GetKeyDown(GLFW_KEY_1))
+            {
+                //std::cout << "1 is clicked\n";
+                //shader->use();
+                //shader->setUniform("materialType", 0); // PBR
+            }
+            else if (GetKeyDown(GLFW_KEY_2))
+            {
+                //shader->use();
+                //shader->setUniform("materialType", 1); // Blinn-Phong
+            }
+        }
+#else
+
+        /*
+            FOR GAMEPLAY IF NEEDED
+        */
+
+        /*if (GetKeyDown(GLFW_KEY_W)) {
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+            Camera::setType(camera, CameraComponent::CameraType::WALKING);
+        }
+
+        else if (GetKeyDown(GLFW_KEY_O)) {
+            auto camera_view = registry.view<CameraComponent>();
+            auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+            Camera::setType(camera, CameraComponent::CameraType::ORBITING);
+        }*/
+
+        //else if (GetKeyDown(GLFW_KEY_1))
+        //{
+        //    //shader->use();
+        //    //shader->setUniform("materialType", 0); // PBR
+        //}
+        //else if (GetKeyDown(GLFW_KEY_2))
+        //{
+        //    //shader->use();
+        //    //shader->setUniform("materialType", 1); // Blinn-Phong
+        //}
+
+
+#endif
+
+
+
+
 
 //#ifdef PLATFORM_ANDROID
 //        // Note: You must ensure your LOGI macro is defined/accessible
@@ -441,7 +544,8 @@ namespace EngineFramework
         // Reset scroll deltas every frame
         scrollX = 0.0;
         scrollY = 0.0;
-
+        offset_MouseX = 0;
+        offset_MouseY = 0;
         // Update last mouse position
         lastMouseX = mouseX;
         lastMouseY = mouseY;
@@ -451,16 +555,7 @@ namespace EngineFramework
     {
         return currentGyroRate;
     }
-    /*void InputManager::initialise_keymapping() {
 
-        key_mapping[Key_Actions::MOVE_LEFT] = GLFW_KEY_A;
-        key_mapping[Key_Actions::MOVE_RIGHT] = GLFW_KEY_D;
-        key_mapping[Key_Actions::MOVE_FORWARD] = GLFW_KEY_W;
-        key_mapping[Key_Actions::MOVE_BACK] = GLFW_KEY_S;
-        key_mapping[Key_Actions::JUMP] = GLFW_KEY_SPACE;
-        key_mapping[Key_Actions::OPEN_EDITOR] = GLFW_KEY_9;
-
-    }*/
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
     /*ONLY AVAILABLE IN DEBUG WHERE LEVEL EDITOR IS OPENED*/
@@ -470,7 +565,7 @@ namespace EngineFramework
         //STORE DATA FROM KEY_MAPPING_DATA TO JSON FILE
         //logging purpose, does not key data
         nlohmann::json data; // root JSON object
-        data["gameplay_keys"] = nlohmann::json::array(); 
+        data["gameplay_keys"] = nlohmann::json::array();
 
         // Loop through your map and build JSON entries
         for (const auto& [key_action, glfw_key] : key_mapping_data)
@@ -514,17 +609,17 @@ namespace EngineFramework
         file << "\nnamespace EngineFramework\n{\n\tvoid InputManager::initialise_keymapping() {";
 
         for (auto const& KEYS : key_mapping_data)
-        {     
+        {
             std::stringstream ss;
             //key_mapping[Key_Actions::MOVE_LEFT] = GLFW_KEY_A;
             ss << "\n\t\tkey_mapping[Key_Actions::" << KEYS.first << "] = " << KEYS.second << ";";
-            file << ss.str();         
+            file << ss.str();
         }
         file << "\n\t}\n}\n";
 
         file.close();
 
-        
+
         path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Engine/Input/Key_Action.hpp";
 
         std::ofstream file_2(path);
@@ -601,14 +696,14 @@ namespace EngineFramework
             }
 
             // Print results
-            std::cout << "Extracted enum tags:\n";
+            /*std::cout << "Extracted enum tags:\n";
             for (const auto& tag : enums)
-                std::cout << tag << std::endl;
+                std::cout << tag << std::endl;*/
 
-        
+
         }
 
-        
+
 
         //=========================================================================================================
         //deseralise codegen to keymapping data
@@ -679,14 +774,14 @@ namespace EngineFramework
                 }
             }
 
-            
+
             /*for (const auto& [key, value] : key_mapping_data)
                 std::cout << key << " = " << value << std::endl;*/
-        
+
         }
 
     }
-    
+
 #endif
 
 }
