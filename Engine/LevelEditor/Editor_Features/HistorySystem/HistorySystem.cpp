@@ -6,7 +6,11 @@
 \par    yeetong.t\@digipen.edu
 \date   September 2025
 \brief
-This file runs the Entity based history system of the level editor
+This file runs the Entity based history system of the level editor.
+The undo/redo of components and its' respective fields work universally for all components so long as they are
+registered properly. For example the data members are to be exposed via the reflectionregister.cpp so that it can be copied and replays etc.
+Components without data members or components that are tagged with RequiresSerializedHistoryTag will fall back to the JSON capture path (Record_Component_Serialized).
+Only cases that it cannot cover are components that have not been reflected at all for example no meta entry or fields whose types are not wired into reflection serialization helpers.
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
@@ -324,25 +328,34 @@ namespace EngineFramework
     void HistorySystem::end_track(std::unique_ptr<Record>& rec) {
         push(std::move(rec));        
     }
- 
+    
+    // To replay the stored action when undoing or redoing a component add/remove actions
     void Record_Component_Whole::pop() {
 
+        // When a component is removed, in order to replay it, reconstruct the meta any then pass the pointer to the instance back into the registered emplace function
         if (Type == Record_Type::COMP_REMOVED){
 
             auto new_component = entt::resolve(entt::hashed_string{ component.c_str() });
-            if (!new_component) return;
+            if (!new_component) {
+                return;
+            }
 
             entt::meta_any instance = new_component.construct();
             auto emplace = new_component.func("emplace"_hs);
             if (emplace) {
-                emplace.invoke({}, entity, instance);
+                // Clone the captured instance back in to the registry when undoing a component that has been removed
+                emplace.invoke({}, entity, static_cast<const void*>(&instance));
             }
 
             auto getref = new_component.func(entt::hashed_string{ "get_ref" }.value());
-            if (!getref) return;
+            if (!getref) {
+                return;
+            }
 
             entt::meta_any comp_ref = getref.invoke({}, entity);
-            if (!comp_ref) return;
+            if (!comp_ref) {
+                return;
+            }
 
             for (auto&& [id, data] : new_component.data())
             {
@@ -353,7 +366,9 @@ namespace EngineFramework
             }
 
 
-        }else if (Type == Record_Type::COMP_ADDED){
+        }
+        // If component is added, the opposite would be to call for the registered remove function so the component will disappears
+        else if (Type == Record_Type::COMP_ADDED){
 
             auto component_to_remove = entt::resolve(entt::hashed_string{ component.c_str() });
             if (!component_to_remove) return;
@@ -366,6 +381,7 @@ namespace EngineFramework
 
     }
 
+    // Used to flip the recorded action so the same record can travel between undo and redo stacks
     void Record_Component_Whole::invert() {
         if (Type == Record_Type::COMP_ADDED) {
             Type = Record_Type::COMP_REMOVED;
@@ -373,7 +389,8 @@ namespace EngineFramework
             Type = Record_Type::COMP_ADDED;
         }
     }
-  
+    
+    // To handle single field editing undo/redo
     void Record_Component_Single::pop() {
 
         if(Type != Record_Type::COMP_EDITED) return;
@@ -388,8 +405,13 @@ namespace EngineFramework
         if (!comp_ref) return;
 
         auto data = meta.data(entt::hashed_string{ variable_name.c_str() }.value());
-        if (!data) return;
-        if (!before_value) return;
+        if (!data) {
+            return;
+        }
+
+        if (!before_value) {
+            return;
+        }
 
         data.set(comp_ref, before_value);
         
