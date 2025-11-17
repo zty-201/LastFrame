@@ -1,0 +1,20 @@
+{
+  "SkyBox" : {
+    "vertex":   "Extern/Graphics/Shader/SkyBox.vert",
+    "fragment": "Extern/Graphics/Shader/SkyBox.frag"
+  },
+  "Mesh" : {
+    "vertex":   "Extern/Graphics/Shader/Mesh.vert",
+    "fragment": "Extern/Graphics/Shader/Mesh.frag"
+  },
+  "Shadow" : {
+    "vertex":   "Extern/Graphics/Shader/ShadowMap.vert",
+    "fragment": "Extern/Graphics/Shader/ShadowMap.frag"
+  },
+  "LightInjection" : {
+    "compute":   "Extern/Graphics/Shader/LightInjection.comp"
+  },
+  "RayMarch" : {
+    "compute":   "Extern/Graphics/Shader/RayMarch.comp"
+  }
+}
