@@ -32,6 +32,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "ObjectManager.hpp"
 
+//Getting entity archtype name
+#include "System_GameObjectSystem.hpp"
+
 //For creation of instance where camera is looking.
 #include "GraphicsSystem.h"
 #include "CameraComponent.h"
@@ -88,9 +91,11 @@ namespace EngineFramework
             ImGui::Text("Scene Hierarchy");
 
             static entt::entity selected_entity = entt::null;
-
+            int incrementing_imgui_id{};
             for (auto entity : entities) {
-                std::string label = "Entity " + std::to_string((uint32_t)entity);
+                ImGui::PushID(incrementing_imgui_id++);
+                CALL_AT_END(imgui_popid, ImGui::PopID(););
+                std::string label = GameObjectSystem::GetEntityName(entity);
                 //ImGui::Text("%s", label.c_str());
 
                 // Determine if this entity is selected
@@ -190,7 +195,6 @@ namespace EngineFramework
         if (ImGui::Button("Create Empty Object"))
         {
             entt::entity instance = registry.create();
-            registry.emplace<TransformComponent>(instance);
             UNREFERENCED_PARAMETER(instance);
         }
         if (ImGui::Button("Create Empty Object At Camera"))

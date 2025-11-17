@@ -39,6 +39,7 @@
 #include "entt/meta/factory.hpp" 
 #include "entt/core/hashed_string.hpp"
 #include "entt/signal/dispatcher.hpp"
+#include <entt/core/type_traits.hpp>
 
 
 //Json parser

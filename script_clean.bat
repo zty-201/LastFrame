@@ -9,13 +9,30 @@ echo   Cleaning Build Directory - Windows
 echo ===============================================
 echo.
 
-REM Clean build directory
-if exist build (
-    echo Removing build directory...
-    rmdir /s /q build
-    echo Build directory removed successfully!
-) else (
-    echo No build directory found - nothing to clean.
+echo Deleting windows build folder, android build/cxx/extern folder (since they're all temporary).
+if exist "build" (
+    echo Removing build...
+    rmdir /s /q "build"
+)
+
+if exist "Android\build" (
+    echo Removing Android\build...
+    rmdir /s /q "Android\build"
+)
+
+if exist "Android\app\build" (
+    echo Removing Android\app\build...
+    rmdir /s /q "Android\app\build"
+)
+
+if exist "Android\app\.cxx" (
+    echo Removing Android\app\.cxx...
+    rmdir /s /q "Android\app\.cxx"
+)
+
+if exist "Android\app\src\main\assets\Extern" (
+    echo Removing Android\app\src\main\assets\Extern...
+    rmdir /s /q "Android\app\src\main\assets\Extern"
 )
 
 echo.

@@ -128,7 +128,7 @@ namespace EngineFramework
 			Creates an entt::entity instance with an archtype.
 			entity_id is the id to instantiate with.
 		*/
-		static entt::entity Instantiate(std::shared_ptr<Archtype> archtype, const xresource::instance_guid& archtype_instance_guid);
+		static entt::entity Instantiate(std::shared_ptr<Archtype> archtype, const xresource::instance_guid& archtype_instance_guid, entt::entity entity);
 
 		//<entity_id, archtype_instance_guid> mapping, used when serializing instances back to scene file.
 		static inline std::unordered_map<entt::entity, xresource::instance_guid> entity_archtype_map{};
