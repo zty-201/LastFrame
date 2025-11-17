@@ -278,7 +278,7 @@ vec3 add_inscattered_light(vec3 color, vec3 world_pos)
 void main()
 {
 
-    //// Add this debug code temporarily in main()
+    //// debug code temporarily in main()
     //vec4 light_space_pos = light_view_proj * vec4(FS_IN_WorldPos, 1.0);
     //vec3 proj_coords = light_space_pos.xyz / light_space_pos.w;
     //proj_coords = proj_coords * 0.5 + 0.5;
@@ -325,7 +325,7 @@ void main()
     // Volumetric fog
     color = add_inscattered_light(color, FS_IN_WorldPos);
     
-    // ACES tone mapping (better than Reinhard)
+    // tone mapping
     vec3 toneMapped = ((color * (0.15 * color + 0.05) + 0.004) / 
                    (color * (0.15 * color + 0.50) + 0.06)) - 0.02 / 0.30;
     color = toneMapped;
