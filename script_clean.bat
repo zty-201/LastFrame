@@ -30,11 +30,6 @@ if exist "Android\app\.cxx" (
     rmdir /s /q "Android\app\.cxx"
 )
 
-if exist "Android\app\src\main\assets\Extern" (
-    echo Removing Android\app\src\main\assets\Extern...
-    rmdir /s /q "Android\app\src\main\assets\Extern"
-)
-
 echo.
 echo Clean completed!
 pause
