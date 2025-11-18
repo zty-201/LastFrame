@@ -358,8 +358,44 @@ namespace EditorFeatures {
 		return false;
 	}
 
-	static void draw_lua_script_component(Engine::LuaScriptComponent& component) {
-		ImGui::Checkbox("Enabled", &component.Enabled);
+	static void draw_lua_script_component(entt::entity entity, const char* component_name, entt::meta_any& obj) {
+		auto& component = obj.cast<Engine::LuaScriptComponent&>();
+		const char* component_label = (component_name && component_name[0]) ? component_name : "LuaScriptComponent";
+
+		const entt::meta_type component_meta = entt::resolve<Engine::LuaScriptComponent>();
+		const entt::meta_data enabled_data = component_meta.data(entt::hashed_string{ "Enabled" }.value());
+		const entt::meta_data scripts_data = component_meta.data(entt::hashed_string{ "Scripts" }.value());
+
+		auto apply_enabled_edit = [&](auto&& fn) {
+			if (enabled_data) {
+				commit_instant_history(entity, component_label, enabled_data, obj, [&]() {
+					fn();
+					enabled_data.set(obj, component.Enabled);
+				});
+			}
+			else {
+				fn();
+			}
+		};
+
+		auto apply_scripts_edit = [&](auto&& fn) {
+			if (scripts_data) {
+				commit_instant_history(entity, component_label, scripts_data, obj, [&]() {
+					fn();
+					scripts_data.set(obj, component.Scripts);
+				});
+			}
+			else {
+				fn();
+			}
+		};
+
+		bool enabled = component.Enabled;
+		if (ImGui::Checkbox("Enabled", &enabled)) {
+			apply_enabled_edit([&]() {
+				component.Enabled = enabled;
+			});
+		}
 		ImGui::Spacing();
 
 		const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Script);
@@ -401,8 +437,11 @@ namespace EditorFeatures {
 						std::string picker_label = "##LuaScriptPicker" + std::to_string(idx);
 						if (draw_asset_guid_picker(picker_label.c_str(), full, AssetPickerKind::Script, descriptor.none_label, descriptor.sources, descriptor.formatter)) {
 							if (inst.ScriptGuid != full.m_Instance) {
-								inst.ScriptGuid = full.m_Instance;
-								inst.Loaded = false;
+								const xresource::instance_guid new_guid = full.m_Instance;
+								apply_scripts_edit([&]() {
+									inst.ScriptGuid = new_guid;
+									inst.Loaded = false;
+								});
 							}
 						}
 					}
@@ -423,12 +462,17 @@ namespace EditorFeatures {
 		}
 
 		for (auto it = to_remove.rbegin(); it != to_remove.rend(); ++it) {
-			component.Scripts.erase(component.Scripts.begin() + static_cast<long long>(*it));
+			const std::size_t remove_index = *it;
+			apply_scripts_edit([&]() {
+				component.Scripts.erase(component.Scripts.begin() + static_cast<long long>(remove_index));
+			});
 		}
 
 		if (ImGui::Button("Add Script")) {
-			component.Scripts.emplace_back();
-			component.Scripts.back().Loaded = false;
+			apply_scripts_edit([&]() {
+				auto& inst = component.Scripts.emplace_back();
+				inst.Loaded = false;
+			});
 		}
 
 		ImGui::Spacing();
@@ -452,10 +496,12 @@ namespace EditorFeatures {
 							return existing.ScriptGuid == new_guid;
 						});
 					if (!already_present) {
-						Engine::LuaScriptComponent::LuaInstance inst{};
-						inst.ScriptGuid = new_guid;
-						inst.Loaded = false;
-						component.Scripts.emplace_back(std::move(inst));
+						apply_scripts_edit([&]() {
+							Engine::LuaScriptComponent::LuaInstance inst{};
+							inst.ScriptGuid = new_guid;
+							inst.Loaded = false;
+							component.Scripts.emplace_back(std::move(inst));
+						});
 					}
 				}
 				ImGui::EndDragDropTarget();
@@ -709,8 +755,7 @@ namespace EditorFeatures {
 #if defined(ENGINE_ENABLE_LUA)
 		if (mt == entt::resolve<Engine::LuaScriptComponent>()) {
 			if (obj.allow_cast<Engine::LuaScriptComponent&>()) {
-				auto& component = obj.cast<Engine::LuaScriptComponent&>();
-				draw_lua_script_component(component);
+				draw_lua_script_component(entity, component_name, obj);
 			}
 			return;
 		}
