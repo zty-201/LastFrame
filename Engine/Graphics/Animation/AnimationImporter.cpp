@@ -47,10 +47,11 @@ namespace EngineFramework
 		// Obtain the times and values
 		const auto* times = curve->getKeyTime();
 		const auto* values = curve->getKeyValue();
+		const ofbx::i64 T = (ofbx::i64)llround(t * 46186158000.0); // FBX time unit is 1/46186158000 seconds
 
 		while (low < high) {
 			int mid = (low + high + 1) >> 1;
-			if(static_cast<double>(times[mid]) <= t) {
+			if(static_cast<double>(times[mid]) <= T) {
 				low = mid;
 			} else {
 				high = mid - 1;
@@ -69,7 +70,7 @@ namespace EngineFramework
 		const float v0 = values[i0];
 		const float v1 = values[i1];
 
-		double u = (t1 > t0) ? (t - t0) / (t1 - t0) : 0.0;
+		double u = (t1 > t0) ? (T - t0) / (t1 - t0) : 0.0;
 		u = std::clamp(u, 0.0, 1.0);
 
 		return { true, static_cast<float>(v0 * (1.0 - u) + v1 * u) };
@@ -113,6 +114,21 @@ namespace EngineFramework
 		}
 
 		return out;
+	}
+
+	// Get the animation curve node
+	const ofbx::AnimationCurveNode* GetPropNode(const ofbx::Object* obj, const ofbx::AnimationLayer* layer, const char* prop)
+	{
+		// Verify if the obj is valid
+		if (!obj) {
+			return nullptr;
+		}
+		// Check if layer exists before getting the Curve Node
+		if (layer) {
+			if (auto* n = layer->getCurveNode(*obj, prop)) return n;
+		}
+
+		return static_cast<const ofbx::AnimationCurveNode*>(obj->resolveObjectLink(ofbx::Object::Type::ANIMATION_CURVE_NODE, prop, 0));
 	}
 
 	void BuildParentFirstSkeleton(const std::vector<const ofbx::Object*>& boneObjs, std::vector<int>& outOrder, const std::unordered_map<const ofbx::Object*, int>& indexOf) {
@@ -266,7 +282,7 @@ namespace EngineFramework
 
 			// inverse the bone bind
 			bone.invBind = glm::inverse(globalB);
-			skeleton->bones[i] = std::move(bone);
+			skeleton->bones[index] = std::move(bone);
 		}
 
 		// 5) return bundle (Animation Package)
@@ -322,9 +338,9 @@ namespace EngineFramework
 
 						// Check for highest and lowest
 						for (int l = 0; l < keyCount; l++) {
-							double ts = static_cast<double>(t0[i]) / 46186158000LL;
-							if (ts < tMin) tMin = ts;
-							if (ts > tMax) tMax = ts;
+							double ts = static_cast<double>(t0[l]) / 46186158000LL;
+							tMin = std::min(tMin, ts);
+							tMax = std::max(tMax, ts);
 						}
 					}
 				};

@@ -4,6 +4,7 @@
 #include "MetaInspector.hpp"
 #include "CameraComponent.h" // Testing purposes of property manager
 #include "MeshComponent.h"
+#include "AnimationComponent.h"
 #include "LightComponent.h"
 #include "TransformComponent.h"
 #include "MaterialComponent.h"

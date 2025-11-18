@@ -75,16 +75,6 @@ namespace EngineFramework
 
 	inline void BuildParentFirstSkeleton(const std::vector<const ofbx::Object*>& boneObjs, std::vector<int>& outOrder, const std::unordered_map<const ofbx::Object*, int>& indexOf);
 
-	// Get the animation curve node
-	inline const ofbx::AnimationCurveNode* GetPropertyNode(const ofbx::Object* obj, const ofbx::AnimationLayer* layer, const char* propName) {
-		if (!obj) return nullptr;
-
-		// Check if layer exists before getting the Curve Node
-		if (layer) {
-			return layer ? layer->getCurveNode(*obj, "Lcl Translation") : nullptr;
-		}
-	}
-
 	// To hold each animation 
 	struct animImport {
 		std::unique_ptr<Skeleton> skeleton;

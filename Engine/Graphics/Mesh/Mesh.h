@@ -57,6 +57,8 @@ namespace Mesh {
         std::vector<GLfloat> texCoords;  // Texture coordinates (u, v)
         std::vector<GLfloat> tangents;   // Tangent vectors (x, y, z)
 		std::vector<GLuint> indices;     // Indices for indexed drawing
+		std::vector<uint8_t> boneWeights; // Bone weights for skinning
+		std::vector<uint8_t> boneIndices; // Bone indices for skinning
 
 		MeshData() = default;
 

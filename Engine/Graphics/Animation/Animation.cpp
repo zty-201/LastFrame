@@ -62,7 +62,6 @@ namespace EngineFramework
 
 		// Build local matrices to blend frame0 and frame1
 		std::vector<glm::mat4> locals(skeleton.count());
-		locals.reserve(skeleton.count());
 
 		// Loop through and get the blending from frame0 to frame1 of each bones
 		for (int i = 0; i < skeleton.count(); ++i) {

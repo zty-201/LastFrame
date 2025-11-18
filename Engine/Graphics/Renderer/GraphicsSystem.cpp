@@ -118,6 +118,13 @@ namespace EngineFramework
 		// Initialize the fullscreen quad for the lighting pass
 		InitializeFullscreenQuad();
 
+		// Initialize skinning UBO
+		glGenBuffers(1, &skinningUBO);
+		glBindBuffer(GL_UNIFORM_BUFFER, skinningUBO);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * maxBones, nullptr, GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, skinningUBO); // binding = 0 in your shader
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 		// Other setup code...
 		pScene = std::make_unique<Scene>();
 		pScene->fogColor = { 0.0f, 0.0f, 0.0f };
@@ -630,6 +637,26 @@ namespace EngineFramework
 			glEnableVertexAttribArray(3);
 		}
 
+		GLuint animBuf = 0;
+		if (!meshData.boneWeights.empty()) {
+			glGenBuffers(1, &animBuf);
+			buffers.push_back(animBuf);
+			glBindBuffer(GL_ARRAY_BUFFER, animBuf);
+			glBufferData(GL_ARRAY_BUFFER, meshData.boneWeights.size() * sizeof(uint8_t), meshData.boneWeights.data(), GL_STATIC_DRAW);
+			glEnableVertexAttribArray(4);
+			glVertexAttribPointer(4, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
+		}
+
+		GLuint indiBuf = 0;
+		if (!meshData.boneIndices.empty()) {
+			glGenBuffers(1, &indiBuf);
+			buffers.push_back(indiBuf);
+			glBindBuffer(GL_ARRAY_BUFFER, indiBuf);
+			glBufferData(GL_ARRAY_BUFFER, meshData.boneIndices.size() * sizeof(uint8_t), meshData.boneIndices.data(), GL_STATIC_DRAW);
+			glEnableVertexAttribArray(5);
+			glVertexAttribIPointer(5, 4, GL_UNSIGNED_BYTE, GL_FALSE, 0, 0);
+		}
+
 		glBindVertexArray(0);
 
 		// Store the VAO and index count in the cache
@@ -661,6 +688,13 @@ namespace EngineFramework
 
 		// Store in wire cache
 		meshCacheWire[meshName] = { wireVAO, wireIdx.size() };
+	}
+
+	void GraphicsSystem::UploadBonePalettes(const std::vector<glm::mat4>& boneMatrices)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, skinningUBO);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, boneMatrices.size() * sizeof(glm::mat4), boneMatrices.data());
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 	//==Event Handlers==//
