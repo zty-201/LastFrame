@@ -70,9 +70,9 @@ namespace EngineFramework
 		//to_open = false;
 		to_close = false;
 
-		variables.selected_modelID = entt::null; //zero means none selected
+		variables.selected_modelID = {}; //zero means none selected
 		variables.selected_objectID = entt::null; //zero means none selected
-
+		variables.latest_selected = iEditorView::Latest_Selected::NONE;
 		LOGI("LevelEditor() constructor");
 	}
 	LevelEditor::~LevelEditor() {
