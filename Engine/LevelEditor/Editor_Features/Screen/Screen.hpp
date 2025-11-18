@@ -63,6 +63,10 @@ namespace EngineFramework
         static bool gizmos_IS_dragged;
         static bool is_adjusting_lights;
 
+        glm::vec3 saved_cam_pos_before_sim{};
+        glm::vec3 saved_cam_target_before_sim{};
+        bool has_saved_cam_before_sim = false;
+
     private:
 
         std::unique_ptr<HistorySystem> history;
@@ -77,7 +81,7 @@ namespace EngineFramework
         float camera_speed;
         float scrolling_speed;
 
-
+		entt::entity FindPlayerEntity();
         void play_simulation();
         void stop_simulation();
         std::string simulation_buffer;

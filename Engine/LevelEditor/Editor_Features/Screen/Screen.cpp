@@ -1167,12 +1167,93 @@ namespace EngineFramework
         }
     }
 
+    entt::entity Screen::FindPlayerEntity()
+    {
+        auto view = registry.view<Engine::LuaScriptComponent>();
+
+        for (auto [e, lsc] : view.each())
+        {
+            for (auto& inst : lsc.Scripts)
+            {
+                if (inst.ScriptGuid.m_Value == 0)
+                    continue;
+
+                // Convert instance GUID to full GUID
+                auto full_guid = xresource::full_guid(
+                    inst.ScriptGuid,
+                    EngineFramework::AssetManagerSystem::SCRIPT_GUID
+                );
+
+                // Get the script name from Asset Manager
+                std::string scriptName = EngineFramework::AssetManagerSystem::GetName(full_guid);
+
+                // Match with your player script name
+                if (scriptName == "player_pov_camera")
+                {
+                    // Found the player entity!
+                    return e;
+                }
+            }
+        }
+
+        return entt::null;
+    }
 
     void Screen::play_simulation() {
 
         if (is_simulator_running) return;
         //std::cout << "play_simulation\n";
         is_simulator_running = true;
+
+        // ============================
+        // SAVE CURRENT CAMERA POSITION
+        // ============================
+        auto camera_view = registry.view<CameraComponent>();
+        if (!camera_view.empty())
+        {
+            entt::entity camEnt = camera_view.front();
+            auto& cam = registry.get<CameraComponent>(camEnt);
+
+            // Save original position
+            saved_cam_pos_before_sim = cam.position;
+
+            // Save original target (look-at point)
+            saved_cam_target_before_sim = cam.target;
+
+            has_saved_cam_before_sim = true;
+        }
+
+        // ===============================================================
+        // Teleport Editor Camera to Player Position
+        // ===============================================================
+        entt::entity player = FindPlayerEntity();
+
+        if (player != entt::null && registry.all_of<TransformComponent>(player))
+        {
+            auto& playerTF = registry.get<TransformComponent>(player);
+
+            //auto camera_view = registry.view<CameraComponent>();
+            if (!camera_view.empty())
+            {
+                entt::entity camEnt = camera_view.front();
+                auto& cam = registry.get<CameraComponent>(camEnt);
+
+                // Set camera position = player position
+                Camera::set_Cam_Pos(cam, playerTF.position);
+
+                // Point camera forward (optional)
+                glm::vec3 target = playerTF.position + glm::vec3(0, 0, 1);
+                Camera::set_Target_Pos(cam, target);
+
+                LOGI("[Simulation] Camera teleported to Player entity %u",
+                    static_cast<unsigned>(player));
+            }
+        }
+        else
+        {
+            LOGE("[Simulation] Player entity not found — ensure player_pov_camera.lua is attached!");
+        }
+
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoKeyboard;
         Event_Level_Editor_Simulation editor_toggled{};
         editor_toggled.is_enabled = true;
@@ -1311,6 +1392,25 @@ namespace EngineFramework
         //    }
         //}
 
+        // ============================
+        // RESTORE PREVIOUS CAMERA POSE
+        // ============================
+        if (has_saved_cam_before_sim)
+        {
+            auto camera_view = registry.view<CameraComponent>();
+            if (!camera_view.empty())
+            {
+                entt::entity camEnt = camera_view.front();
+                auto& cam = registry.get<CameraComponent>(camEnt);
+
+                Camera::set_Cam_Pos(cam, saved_cam_pos_before_sim);
+                Camera::set_Target_Pos(cam, saved_cam_target_before_sim);
+
+                LOGI("[Simulation] Camera restored to original editor position.");
+            }
+
+            has_saved_cam_before_sim = false;
+        }
 
         is_simulator_running = false;
 
