@@ -26,7 +26,7 @@ namespace Camera {
     }
     inline void Move_Cam_and_Target(CameraComponent& cam, glm::vec3 offset) {
 
-        LOGD("Camera Target: %f, %f, %f", cam.target.x, cam.target.y, cam.target.z);
+        //LOGD("Camera Target: %f, %f, %f", cam.target.x, cam.target.y, cam.target.z);
         const glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
 
         glm::vec3 front = glm::normalize(cam.target - cam.position);      // view direction
