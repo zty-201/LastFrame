@@ -246,7 +246,7 @@ namespace EngineFramework
         currentGyroRate.y = y;
         currentGyroRate.z = z;
         lastGyroTimestamp = timestamp;
-        LOGI("Gyro Update: X=%.4f, Y=%.4f, Z=%.4f", x, y, z);
+        //LOGI("Gyro Update: X=%.4f, Y=%.4f, Z=%.4f", x, y, z);
     }
 #endif
     void InputManager::ErrorCallback(int error, const char* description)
@@ -403,7 +403,7 @@ namespace EngineFramework
         */
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
 
-        if (!editor_running || editor_simulation_running) {
+        if (!editor_running && !editor_simulation_running) {  // Changed condition
 
 
             if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down)) {

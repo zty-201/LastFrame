@@ -153,7 +153,12 @@ namespace EngineFramework
         auto& camera = camera_view.get<CameraComponent>(cameraEntity);
         Camera::setType(camera, CameraComponent::WALKING);
         history = std::make_unique<HistorySystem>(5);
-        is_simulator_running = false;
+#if defined(PLATFORM_ANDROID) 
+		is_simulator_running = true;
+#endif
+#if defined(PLATFORM_WINDOWS)
+		is_simulator_running = false;
+#endif
         camera_speed = 1.f; // as default
         scrolling_speed = 10.f; // default
 
