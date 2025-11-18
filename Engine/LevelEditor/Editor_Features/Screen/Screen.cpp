@@ -158,45 +158,45 @@ namespace EngineFramework
         editor_toggled.is_enabled = false;
         event_dispatcher.trigger<Event_Level_Editor_Simulation>(std::move(editor_toggled));
 
-
-#if defined(ENGINE_ENABLE_LUA)
-        // Attach Lua orbit/drag camera control script
-        LOGI("[Screen] Attaching Lua script 'camera_touch_control' to camera entity...");
-
-        // Check if it already has a LuaScriptComponent
-        if (!registry.all_of<Engine::LuaScriptComponent>(cameraEntity)) {
-            registry.emplace<Engine::LuaScriptComponent>(cameraEntity);
-        }
-
-        auto& lsc = registry.get<Engine::LuaScriptComponent>(cameraEntity);
-        lsc.Enabled = true;
-
-        // Build a LuaInstance for the camera script
-        Engine::LuaScriptComponent::LuaInstance inst;
-        inst.ScriptGuid = EngineFramework::AssetManagerSystem::GetFullGuid(
-            EngineFramework::AssetManagerSystem::SCRIPT_GUID,
-            "camera_touch_control"
-        ).m_Instance;
-
-        // Avoid duplicates (in case of reload)
-        bool alreadyAttached = false;
-        for (auto& s : lsc.Scripts) {
-            if (s.ScriptGuid == inst.ScriptGuid) {
-                alreadyAttached = true;
-                LOGE("[Screen] camera_touch_control already attached to camera, skipping reattach.");
-                break;
-            }
-        }
-
-        if (!alreadyAttached) {
-            lsc.Scripts.push_back(inst);
-            LOGI("[Screen] camera_touch_control successfully attached to camera entity (%u).",
-                static_cast<unsigned>(cameraEntity));
-
-            // Load and run immediately
-            Engine::ScriptSystem::ReloadScript(registry, cameraEntity);
-        }
-#endif
+		//No longer auto attach Lua camera script here
+//#if defined(ENGINE_ENABLE_LUA)
+//        // Attach Lua orbit/drag camera control script
+//        LOGI("[Screen] Attaching Lua script 'camera_touch_control' to camera entity...");
+//
+//        // Check if it already has a LuaScriptComponent
+//        if (!registry.all_of<Engine::LuaScriptComponent>(cameraEntity)) {
+//            registry.emplace<Engine::LuaScriptComponent>(cameraEntity);
+//        }
+//
+//        auto& lsc = registry.get<Engine::LuaScriptComponent>(cameraEntity);
+//        lsc.Enabled = true;
+//
+//        // Build a LuaInstance for the camera script
+//        Engine::LuaScriptComponent::LuaInstance inst;
+//        inst.ScriptGuid = EngineFramework::AssetManagerSystem::GetFullGuid(
+//            EngineFramework::AssetManagerSystem::SCRIPT_GUID,
+//            "camera_touch_control"
+//        ).m_Instance;
+//
+//        // Avoid duplicates (in case of reload)
+//        bool alreadyAttached = false;
+//        for (auto& s : lsc.Scripts) {
+//            if (s.ScriptGuid == inst.ScriptGuid) {
+//                alreadyAttached = true;
+//                LOGE("[Screen] camera_touch_control already attached to camera, skipping reattach.");
+//                break;
+//            }
+//        }
+//
+//        if (!alreadyAttached) {
+//            lsc.Scripts.push_back(inst);
+//            LOGI("[Screen] camera_touch_control successfully attached to camera entity (%u).",
+//                static_cast<unsigned>(cameraEntity));
+//
+//            // Load and run immediately
+//            Engine::ScriptSystem::ReloadScript(registry, cameraEntity);
+//        }
+//#endif
     }
 
     void Screen::Run() {
