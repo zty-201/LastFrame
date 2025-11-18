@@ -213,16 +213,17 @@ namespace Engine {
 
         LOGI("[ScriptSystem] Lua bindings initialized successfully.");
 
-        // Quick sanity check that camera_touch_control.lua is loaded
-        auto guid = EngineFramework::AssetManagerSystem::GetFullGuid(
-            EngineFramework::AssetManagerSystem::SCRIPT_GUID, "camera_touch_control");
-        LOGI("[Check] camera_touch_control full GUID = %llu", guid.m_Instance.m_Value); //Error here
+		//No longer needed to sanity check here (Debugging)
+        //// Quick sanity check that camera_touch_control.lua is loaded
+        //auto guid = EngineFramework::AssetManagerSystem::GetFullGuid(
+        //    EngineFramework::AssetManagerSystem::SCRIPT_GUID, "camera_touch_control");
+        //LOGI("[Check] camera_touch_control full GUID = %llu", guid.m_Instance.m_Value); //Error here
 
-        auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(guid);
-        if (!scriptAsset)
-            LOGE("[Check] ScriptAsset 'camera_touch_control' not found!");
-        else
-            LOGI("[Check] ScriptAsset found. Code length: %zu", scriptAsset->code.size());
+        //auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(guid);
+        //if (!scriptAsset)
+        //    LOGE("[Check] ScriptAsset 'camera_touch_control' not found!");
+        //else
+        //    LOGI("[Check] ScriptAsset found. Code length: %zu", scriptAsset->code.size());
 #endif
     }
 
