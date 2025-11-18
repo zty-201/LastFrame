@@ -82,6 +82,9 @@ namespace EngineFramework
         float scrolling_speed;
 
 		entt::entity FindPlayerEntity();
+        bool m_snapEnabled = false;
+        float m_snapStep = 1.0f;
+
         void play_simulation();
         void stop_simulation();
         std::string simulation_buffer;
