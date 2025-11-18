@@ -7,15 +7,26 @@
 #include "TransformComponent.h"
 #include "PhysicsComponent.h"
 #include "PhysicsWorld.hpp"
+#include "ColliderComponent.h"
 
 void PhysicsSyncSystem::Update(entt::registry& ecs)
 {
-    auto view = ecs.view<TransformComponent, PhysicsComponent>();
+    auto view = ecs.view<TransformComponent, PhysicsComponent, ColliderComponent>();
 
-    for (auto&& [ent, transform, physics] : view.each())
+    for (auto&& [ent, transform, physics, collider] : view.each())
     {
         if (!PhysicsWorld::Get().HasBody(ent))
             continue;
+
+        if (collider.isStatic)
+        {
+            const glm::quat q_editor = glm::quat(transform.rotation); // Transform stores Euler
+            PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q_editor, /*activate=*/false);
+            PhysicsWorld::Get().SetLinearVelocity(ent, glm::vec3(0.0f)); // ensure no drift
+            // no gravity for static bodies; skip the rest
+            physics._prevUseGravity = physics.useGravity;
+            continue;
+        }
 
         if (physics.useGravity && !physics._prevUseGravity)
         {
@@ -27,10 +38,19 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
             PhysicsWorld::Get().SetLinearVelocity(ent, glm::vec3(0.0f));
         }
 
+        if (physics.editorOverride)
+        {
+            glm::quat q = glm::quat(transform.rotation);
+            PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q, true);
+            PhysicsWorld::Get().SetLinearVelocity(ent, glm::vec3(0.0f));
+            physics.editorOverride = false; // consume flag so it only happens once
+            continue; // skip normal Jolt -> ECS pull this frame
+        }
+
         transform.position = PhysicsWorld::Get().GetBodyPosition(ent);
 
-        glm::quat q = PhysicsWorld::Get().GetBodyRotation(ent);
-        transform.rotation = glm::eulerAngles(q);
+        const glm::quat jq = PhysicsWorld::Get().GetBodyRotation(ent);
+        transform.rotation = glm::eulerAngles(jq);
 
         physics.velocity = PhysicsWorld::Get().GetBodyVelocity(ent);
 
@@ -38,12 +58,14 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
             ent, physics.useGravity ? physics.gravityFactor : 0.0f
         );
 
-        if (physics.useGravity) {
+        if (physics.useGravity) 
+        {
             PhysicsWorld::Get().ActivateBody(ent);      
         }
         else {
             auto v = PhysicsWorld::Get().GetBodyVelocity(ent);
-            if (v.y != 0.0f) {                          
+            if (v.y != 0.0f) 
+            {                          
                 v.y = 0.0f;
                 PhysicsWorld::Get().SetLinearVelocity(ent, v);
             }

@@ -30,8 +30,8 @@
 #define VOXEL_GRID_SIZE_Y 90
 #define VOXEL_GRID_SIZE_Z 128
 #define NUM_BLUE_NOISE_TEXTURES 16
-#define SHADOW_WIDTH 1024
-#define SHADOW_HEIGHT 1024
+#define SHADOW_WIDTH 4096
+#define SHADOW_HEIGHT 4096
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
@@ -253,7 +253,7 @@ namespace EngineFramework
 		// 5. Render all meshes
 		MeshPass();
 		// 6. Render the skybox last
-		SkyboxPass();
+		//SkyboxPass();
 
 		// 7. Copy to screen if needed
 		if (!m_isRenderingToFBO) {
@@ -273,9 +273,15 @@ namespace EngineFramework
 		if (light_view.empty()) return;
 		auto& main_light = light_view.get<LightComponent>(light_view.front());
 
-		float near_plane = 1.0f, far_plane = 200.0f; // Increased far plane
-		glm::mat4 lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
-		glm::mat4 lightView = glm::lookAt(main_light.position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		float orthoSize = 1000.0f;  // Increased from 100
+		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize,
+			-orthoSize, orthoSize,
+			-500.0f, 1000.0f);
+		
+		glm::vec3 lightPos = main_light.position;
+		glm::vec3 lightTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::mat4 lightView = glm::lookAt(lightPos, lightTarget, glm::vec3(0.0, 1.0, 0.0));
+
 		m_lightSpaceMatrix = lightProjection * lightView;
 
 		std::shared_ptr<ShaderProgram> shader{};
@@ -291,6 +297,8 @@ namespace EngineFramework
 		}
 
 		shader->use();
+
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
 
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
@@ -585,6 +593,9 @@ namespace EngineFramework
 			// The Skybox should just be one submesh
 			if (!meshData->subMeshes.empty()) {
 				glDrawElements(GL_TRIANGLES, meshData->subMeshes[0].indexCount, GL_UNSIGNED_INT, 0);
+			}
+			else {
+				LOGE("Skybox mesh '%s' has no submeshes!", meshComp.meshName.c_str());
 			}
 		}
 

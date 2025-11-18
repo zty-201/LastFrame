@@ -183,13 +183,13 @@ namespace EngineFramework
         std::vector<GLuint> m_blue_noise_textures;
         
         // Fog control parameters
-        float m_anisotropy = 0.8f;
-        float m_density = 0.15f;
-        float m_scattering = 0.12f;
-        float m_absorption = 0.005f; 
-        float m_shadow_bias = 0.005f;
+        float m_anisotropy = 0.6f;      // Slightly forward scattering
+        float m_density = 1.0f;         // Much lower density (was 0.15)
+        float m_scattering = 0.0f;
+        float m_absorption = 0.0f; 
+        float m_shadow_bias = 0.002f;
         float m_depth_power = 1.0f; // For exponential depth mapping
-        float m_ambient_light_intensity = 0.01f;
+        float m_ambient_light_intensity = 0.001f;
         bool m_temporal_accumulation = true;
         bool m_tricubic_filtering = false;
         int m_frame_idx = 0;

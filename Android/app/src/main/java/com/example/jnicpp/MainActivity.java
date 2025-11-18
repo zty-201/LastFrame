@@ -21,12 +21,23 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     // Used to load the 'jnicpp' library on application startup.
     static {
         try {
+            //Try to load both jnicpp and jnicppd libraries.
             if (BuildConfig.IS_DEBUG_BUILD) {
                 System.loadLibrary("fmodL");  // Debug / Logging version
-                System.loadLibrary("jnicppd");
+                try {
+                    System.loadLibrary("jnicppd");
+                }
+                catch(UnsatisfiedLinkError e) {
+                    System.loadLibrary("jnicpp");
+                }
             } else {
                 System.loadLibrary("fmod");   // Release / Optimized version
-                System.loadLibrary("jnicpp");
+                try {
+                    System.loadLibrary("jnicpp");
+                }
+                catch(UnsatisfiedLinkError e) {
+                    System.loadLibrary("jnicppd");
+                }
             }
             Log.d(TAG, "Native library loaded successfully");
         } catch (UnsatisfiedLinkError e) {

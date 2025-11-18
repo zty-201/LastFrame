@@ -336,8 +336,8 @@ endforeach()
 
 #Adding include directories and sources
 if(WIN32)
-  target_sources(engine_library PRIVATE ${ENGINE_SOURCE})
-  target_sources(application_executable PRIVATE ${APPLICATION_SOURCE})
+  target_sources(engine_library PRIVATE ${ENGINE_SOURCE} "Engine/ECS/Components/TriggerBoxComponent.h")
+  target_sources(application_executable PRIVATE ${APPLICATION_SOURCE} "Engine/ECS/Components/TriggerBoxComponent.h")
   #TODO: By right, the engine shouldn't need to include application headers? Need to research more on this.
   target_include_directories(engine_library PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
   target_include_directories(application_executable PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})

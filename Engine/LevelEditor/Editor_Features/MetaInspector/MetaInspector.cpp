@@ -26,6 +26,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "SoundAsset.hpp"
 #include "scene.h"
 #include "HistorySystem.hpp"
+#include "AudioComponent.h"
 #if defined(ENGINE_ENABLE_LUA)
 #include "Scripting/Script.hpp"
 #include "Scripting/ScriptAsset.hpp"
@@ -714,6 +715,59 @@ namespace EditorFeatures {
 			return;
 		}
 #endif
+
+		// ------- CUSTOM UI FOR AUDIO COMPONENT -------
+		if (mt == entt::resolve<AudioComponent>())
+		{
+			auto& comp = obj.cast<AudioComponent&>();
+
+			using EF_AM = EngineFramework::AssetManagerSystem;
+			using EF_AUD = EngineFramework::AudioSystem;
+
+			// comp.audio_guid is already full guid
+			xresource::full_guid full = comp.audio_guid;
+
+			// Load audio
+			std::shared_ptr<SoundAsset> sound = nullptr;
+			if (!full.empty())
+				sound = EF_AM::GetResource<SoundAsset>(full);
+
+			//---------------------
+			// Volume (clamped)
+			//---------------------
+			comp.volume = std::clamp(comp.volume, 0.0f, 1.0f);
+
+			if (ImGui::SliderFloat("Volume", &comp.volume, 0.0f, 1.0f))
+			{
+				// If audio is playing, update volume in real time here if your AudioSystem supports it
+			}
+
+			//---------------------
+			// Buttons
+			//---------------------
+			if (ImGui::Button("Play"))
+			{
+				if (sound)
+				{
+					EF_AUD::GetInstance().Play(sound, comp.volume, comp.loop,
+						EngineFramework::AudioGroup::Music);
+				}
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Stop"))
+			{
+				EF_AUD::GetInstance().StopAll();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Pause"))
+			{
+				EF_AUD::GetInstance().PauseAll(true);
+			}
+
+			ImGui::Separator();
+		}
 		
 		// Each entry is pair<entt::id_type, entt::meta_data> - for self reference
 		for (auto&& pair : mt.data()) {

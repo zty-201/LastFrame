@@ -69,10 +69,27 @@ void PhysicsWorld::Initialize()
     // 6.6 Set gravity (Y down)
     m_physicsSystem->SetGravity(JPH::Vec3(0.0f, -9.81f, 0.0f));
 
+    m_physicsSystem->SetContactListener(&m_contactListener);
+   
     // Reset step accumulator
     m_accumulator = 0.0f;
 
     LOGI("[PhysicsWorld] Initialized Jolt Physics");
+
+    // --------------------------------------------------
+    // TEMP: debug bodies to verify contact listener
+    // --------------------------------------------------
+    {
+        entt::entity eA = (entt::entity)1;
+        entt::entity eB = (entt::entity)2;
+
+        glm::vec3 pos(0.0f, 0.0f, 0.0f);
+        glm::vec3 size(1.0f, 1.0f, 1.0f);
+
+        // A = dynamic, B = static
+        CreateBoxBody(eA, pos, size, /*isStatic=*/false, /*isTrigger=*/false);
+        CreateBoxBody(eB, pos, size, /*isStatic=*/true,  /*isTrigger=*/false);
+    }
 }
 
 // ------------------------------------------------------------
@@ -197,6 +214,8 @@ void PhysicsWorld::CreateBoxBody(entt::entity entity,
     JPH::Body* body = bodyInterface.CreateBody(bodySettings);
     if (!body) return;
 
+    body->SetUserData(static_cast<uint64_t>(static_cast<uint32_t>(entity)));
+
     bodyInterface.AddBody(
         body->GetID(),
         isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate
@@ -234,6 +253,8 @@ void PhysicsWorld::CreateSphereBody(entt::entity entity,
     JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
     JPH::Body* body = bodyInterface.CreateBody(bodySettings);
     if (!body) return;
+
+    body->SetUserData(static_cast<uint64_t>(static_cast<uint32_t>(entity)));
 
     bodyInterface.AddBody(
         body->GetID(),
@@ -274,6 +295,8 @@ void PhysicsWorld::CreateCapsuleBody(entt::entity entity,
     JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
     JPH::Body* body = bodyInterface.CreateBody(bodySettings);
     if (!body) return;
+
+    body->SetUserData(static_cast<uint64_t>(static_cast<uint32_t>(entity)));
 
     bodyInterface.AddBody(
         body->GetID(),
