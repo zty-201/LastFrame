@@ -28,7 +28,7 @@ local moveAreaBottom  = screenHeight * 0.5
 
 -- ============================================================
 function on_create()
-    print(string.format("[player_touch_gyro_camera.lua] Initialized (%s)", PLATFORM or "unknown"))
+    print(string.format("[player_pov_camera.lua] Initialized (%s)", PLATFORM or "unknown"))
     camera = GetMainCamera()
     if not camera then
         print("[Lua] ERROR: No camera found!")
@@ -175,5 +175,5 @@ end
 
 -- ============================================================
 function on_destroy()
-    print("[player_touch_gyro_camera.lua] Destroyed")
+    print("[player_pov_camera.lua] Destroyed")
 end
