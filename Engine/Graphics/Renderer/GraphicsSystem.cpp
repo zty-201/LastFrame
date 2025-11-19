@@ -199,7 +199,6 @@ namespace EngineFramework
 		glBindTexture(GL_TEXTURE_3D, 0);
 		LoadBlueNoiseTextures();
 		PreGeneratePrimitives();
-		pScene = std::make_unique<Scene>();
 	}
 
 	void GraphicsSystem::Update(float deltaTime)

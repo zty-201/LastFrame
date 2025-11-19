@@ -52,9 +52,9 @@ layout(std140, binding = 0) uniform VolumetricUBO
     ivec4 width_height;
 };
 
-layout(binding = 4) uniform sampler2DShadow s_ShadowMap;
-layout(binding = 7) uniform sampler2D s_BlueNoise;
-layout(binding = 8) uniform sampler3D s_History;
+uniform sampler2DShadow s_ShadowMap;
+uniform sampler2D s_BlueNoise;
+uniform sampler3D s_History;
 
 uniform bool u_Accumulation;
 

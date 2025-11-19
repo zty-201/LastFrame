@@ -50,11 +50,12 @@ namespace EngineFramework
         const int MESH_NORMAL_UNIT = 1;
         const int MESH_METALLIC_UNIT = 2;
         const int MESH_ROUGHNESS_UNIT = 3;
-        const int SHADOW_MAP_UNIT = 4;
-        const int VOLUMETRIC_VOXEL_GRID_UNIT = 5;
-        const int SKYBOX_CUBEMAP_UNIT = 6;
-        const int VOLUMETRIC_BLUE_NOISE_UNIT = 7;
-        const int VOLUMETRIC_HISTORY_UNIT = 8;
+        const int VOLUMETRIC_VOXEL_GRID_UNIT = 4;
+        const int SKYBOX_CUBEMAP_UNIT = 5;
+        const int VOLUMETRIC_BLUE_NOISE_UNIT = 6;
+        const int VOLUMETRIC_HISTORY_UNIT = 7;
+		const int SHADOW_MAP_UNIT = 8;
+		const int POINT_SHADOW_MAP_UNIT = 9;
     }
 
     class GraphicsSystem : public ISystem
@@ -81,7 +82,6 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* GetGLFWwindow() { return pWindow; }
 #endif
-		std::unique_ptr<Scene>& GetScene() { return pScene; }
 		GLuint GetSceneTextureID() const { return sceneTextureID; }
         std::pair<int, int> GetWindowSize() const { return std::pair<int, int>(static_cast<int>(screen.x), static_cast<int>(screen.y)); }
 
@@ -165,8 +165,6 @@ namespace EngineFramework
 
         std::unordered_map<std::string, std::shared_ptr<Mesh::MeshData>> meshCache;
         std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCacheWire;
-
-        std::unique_ptr<Scene> pScene;
 
         FBO mainFBO;
         FBO m_shadowFBO;

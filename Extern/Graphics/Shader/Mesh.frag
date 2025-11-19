@@ -62,8 +62,8 @@ uniform vec3  u_AlbedoFactor;
 uniform float u_RoughnessFactor;
 uniform float u_MetallicFactor;
 
-layout(binding = 4) uniform sampler2DShadow s_ShadowMap;
-layout(binding = 5) uniform sampler3D       s_VoxelGrid;
+uniform sampler2DShadow s_ShadowMap;
+uniform sampler3D       s_VoxelGrid;
 
 uniform bool u_Tricubic;
 
