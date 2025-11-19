@@ -92,6 +92,9 @@ namespace EngineFramework
         this_instance = this;
         LOGI("Lfeature: Screen CREATED");
 
+        m_snapEnabled = false;
+        m_snapStep = 1.0f;
+
     }
     Screen::~Screen() {
 
@@ -533,6 +536,23 @@ namespace EngineFramework
                 ImGui::SameLine();
                 if (ImGui::RadioButton("World", mode == ImGuizmo::WORLD))  mode = ImGuizmo::WORLD;
                 ImGui::Dummy(ImVec2(0.0f, 200.f));
+
+                ImGui::Dummy(ImVec2(0.0f, 10.f));
+                ImGui::SeparatorText("Snapping");
+
+                ImGui::Checkbox("Enable Object Snap", &m_snapEnabled);
+
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(200.0f);
+                if (ImGui::InputFloat("Step", &m_snapStep, 1.f, 5.0f, "%.3f"))
+                {
+                    if (m_snapStep <= 0.0f)
+                    {
+                        m_snapStep = 0.1f;  // Prevent zero/negative value
+                    }
+                }
+
+                ImGui::Dummy(ImVec2(0.0f, 10.f));
 
                 //only if selected object have transform component
                 entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
@@ -990,6 +1010,23 @@ namespace EngineFramework
                 float translation[3], rotation[3], scale[3];
                 ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), translation, rotation, scale);
 
+                // Snapping translation
+                bool ctrlDown = ImGui::GetIO().KeyCtrl; // While CTRL is held down
+
+                if ((m_snapEnabled || ctrlDown) && operation == ImGuizmo::TRANSLATE)
+                {
+                    float step = (m_snapStep > 0.0f) ? m_snapStep : 1.0f;
+
+                    auto snap = [step](float v)
+                        {
+                            return std::round(v / step) * step;
+                        };
+
+                    translation[0] = snap(translation[0]);
+                    translation[1] = snap(translation[1]);
+                    translation[2] = snap(translation[2]);
+                }
+
                 // Update the TransformComponent values
                 object.position = glm::vec3(translation[0], translation[1], translation[2]);
                 object.rotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
@@ -1161,6 +1198,7 @@ namespace EngineFramework
                 if (created_entity != entt::null)
                 {
                     LevelEditor::GetInstance().variables.selected_objectID = created_entity;
+                    LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
                 }
             }
 

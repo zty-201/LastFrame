@@ -5,7 +5,7 @@
 \par    neo.h\@digipen.edu
 \date   October 2025
 \brief
-This file contains the definitions of the functions that are needed to 
+This file contains the definitions of the functions that are needed to
 set up the window and fetches the components meta references.
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
@@ -29,7 +29,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <vector>
 #include <utility>
 #include <cstdint>
-
+//For scopeguard CALL_AT_END.
+#include "Level_Editor.hpp"
 namespace EditorFeatures {
 
 	namespace {
@@ -58,7 +59,7 @@ namespace EditorFeatures {
 		// To check the entt meta registry down to actual components by requiring the emplace function so that user can only add components that can be instantiated
 		static bool is_component_meta_type(const entt::meta_type& meta) {
 			if (!meta || !meta.is_class()) {
-					return false;
+				return false;
 			}
 			return static_cast<bool>(meta.func("emplace"_hs));
 		}
@@ -74,7 +75,7 @@ namespace EditorFeatures {
 				if (seen_payloads.insert(payload).second) {
 					ctx.payload_types.push_back(payload);
 				}
-			};
+				};
 
 			// Accept known payload types from the asset browser by default.
 			register_payload("GENERAL");
@@ -110,7 +111,7 @@ namespace EditorFeatures {
 						}
 
 						tag = to_lower_copy(tag);
-						ctx.by_extension[tag].push_back(ComponentDropMatch{meta, variable, component_key, std::string{ field_name }});
+						ctx.by_extension[tag].push_back(ComponentDropMatch{ meta, variable, component_key, std::string{ field_name } });
 
 						register_payload(tag);
 					}
@@ -174,7 +175,7 @@ namespace EditorFeatures {
 
 				const auto to_guid = [&](const xresource::type_guid& type_guid) -> xresource::full_guid {
 					return AssetManagerSystem::GetFullGuid(type_guid, asset_name);
-				};
+					};
 
 				const auto tag = static_cast<const AssetPickerTag*>(field.custom());
 				xresource::full_guid resolved{};
@@ -184,15 +185,15 @@ namespace EditorFeatures {
 					if (resolved.empty()) {
 						resolved = to_guid(AssetManagerSystem::CUBEMAP_GUID);
 					}
-				};
+					};
 
 				auto try_audio = [&]() {
 					resolved = to_guid(AssetManagerSystem::AUDIO_GUID);
-				};
+					};
 
 				auto try_script = [&]() {
 					resolved = to_guid(AssetManagerSystem::SCRIPT_GUID);
-				};
+					};
 
 				if (tag) {
 					switch (tag->kind) {
@@ -239,6 +240,17 @@ namespace EditorFeatures {
 			return get_ref.invoke({}, entity);
 		}
 
+		//Return live component instance from archtype without hardcoding component types.
+		static entt::meta_any get_component_ref(std::shared_ptr<EngineFramework::Archtype> archtype_ptr, const entt::meta_type& type) {
+			for (auto& comp : archtype_ptr->component_arr)
+			{
+				//Return the matching component.
+				if (type != comp.type()) continue;
+				return entt::forward_as_meta(comp);
+			}
+			return {};
+		}
+
 		struct EntityComponentEntry {
 			entt::id_type type_id{};
 			entt::meta_type meta{};
@@ -247,7 +259,7 @@ namespace EditorFeatures {
 
 		// Walk through the entt::registry, keeps only those that contain the entity, resolve the meta type and fetches the component reference
 		// Then, store the trio in a struct (id_type, meta_type, meta_any) defined above
-		static std::vector<EntityComponentEntry> collect_entity_components(entt::registry& reg, entt::entity entity) {
+		static std::vector<EntityComponentEntry> collect_components(entt::registry& reg, entt::entity entity) {
 			std::vector<EntityComponentEntry> components{};
 			for (auto&& [type_id, storage] : reg.storage()) {
 				if (!storage.contains(entity)) {
@@ -273,11 +285,19 @@ namespace EditorFeatures {
 			return components;
 		}
 
+		
+
 	} // namespace
 
-	void DrawInspector(entt::registry& reg, entt::entity e) {
-		ImGui::Begin("Inspector");
+	void DrawInspector(entt::registry& reg, entt::entity entity_selected, xresource::full_guid model_selected, bool is_display_entity) {
 
+		//For scopeguard CALL_AT_END.
+		using namespace EngineFramework;
+
+
+
+		ImGui::Begin("Inspector");
+		CALL_AT_END(imgui_callend, ImGui::End(););
 		// Diagnostics at the top
 		//ImGui::Text("Entity: 0x%08X  valid:%d  selected:%s",
 		//    (unsigned)entt::to_integral(e),
@@ -295,22 +315,46 @@ namespace EditorFeatures {
 		//ImGui::Text("storages:%d  owned:%d  meta:%d  get_ref:%d", stor, owned, meta, withGetRef);
 		//ImGui::Separator();
 
-		if (e == entt::null || !reg.valid(e)) {
+		//No entity to display, no valid selected model to fallback to either.
+		if (is_display_entity && (entity_selected == entt::null || !reg.valid(entity_selected))) {
 			ImGui::TextDisabled("No entity selected.");
-			ImGui::End();
 			return;
 		}
 
-		std::string entity_name = EngineFramework::GameObjectSystem::GetEntityName(e);
-		if (entity_name.empty()) {
-			std::ostringstream label;
-			label << "Entity 0x" << std::uppercase << std::setw(8) << std::setfill('0') << static_cast<unsigned>(entt::to_integral(e));
-			entity_name = label.str();
+		//Get the archtype if displaying model.		
+		//Nullptr if displaying entity.
+		std::shared_ptr<Archtype> archtype_ptr{};
+		if (!is_display_entity)
+		{
+			archtype_ptr = AssetManagerSystem::GetResource<Archtype>(model_selected);
+			/*
+				ERROR!
+				model_guid was verified earlier before calling this function (is_display_entity is false),
+				but unable to get the archtype asset.
+				Exit silently and hopefully the user can select another entity/model.
+			*/
+			if (!archtype_ptr)
+			{
+				LOGE("[InspectorPanel] DrawInspector Unable to find archtype asset, even though its guid is valid.");
+				return;
+			}
 		}
 
-		ImGui::TextUnformatted(entity_name.c_str());
+
+		/*
+			Display either the entity or the model based on is_display_entity.
+			The entity or model id/ptr is guaranteed to be valid (based on checks done before this function is called).
+		*/
+
+		// --- Display Name ---
+		std::string display_obj_name{};
+		if (!is_display_entity) display_obj_name = AssetManagerSystem::GetName(model_selected);
+		else display_obj_name = EngineFramework::GameObjectSystem::GetEntityName(entity_selected);
+		ImGui::TextUnformatted(display_obj_name.c_str());
 		ImGui::Separator();
 
+		// --- Drag and Drop from AssetBrowser into Inspector ---
+		// This allows automatic creation of components from say textures or audio, or drag drop into fields like guid.
 		static std::string last_drop_feedback{};
 		static float feedback_timer = 0.0f;
 
@@ -356,26 +400,49 @@ namespace EditorFeatures {
 					const auto match_it = drop_context.by_extension.find(extension);
 					if (match_it != drop_context.by_extension.end()) {
 						for (const ComponentDropMatch& match : match_it->second) {
-							const entt::id_type type_id = match.type.id();
 							bool has_component = false;
-							if (auto* storage = reg.storage(type_id)) {
-								has_component = storage->contains(e);
+							if (is_display_entity) { //entity
+								if (auto* storage = reg.storage(match.type.id())) {
+									has_component = storage->contains(entity_selected);
+								}
+							}
+							else  //Model
+							{
+								//Check if any archtype component matches the same id.
+								for (const entt::meta_any& archtype_comp : archtype_ptr->component_arr)
+								{
+									if (match.type == archtype_comp.type())
+									{
+										has_component = true;
+										break;
+									}
+								}
 							}
 
 							if (!has_component) {
 								entt::meta_any instance = match.type.construct();
-								auto emplace = match.type.func("emplace"_hs);
-								if (!emplace) {
-									continue;
+								if (is_display_entity)
+								{ //Entity, need to use attached emplace function to add to entity in registry.
+									auto emplace = match.type.func("emplace"_hs);
+									if (!emplace) {
+										continue;
+									}
+									entt::meta_any result = emplace.invoke({}, entity_selected, static_cast<const void*>(&instance));
+									if (!result || !result.cast<bool>()) {
+										continue;
+									}
 								}
-								entt::meta_any result = emplace.invoke({}, e, static_cast<const void*>(&instance));
-								if (!result || !result.cast<bool>()) {
-									continue;
+								else //Archtype, just add to array.
+								{
+									archtype_ptr->component_arr.push_back(instance);
 								}
 								newly_added_names.insert(match.component_name);
 							}
 
-					if (entt::meta_any component_ref = get_component_ref(e, match.type)) {
+							entt::meta_any component_ref;
+							if (is_display_entity) component_ref = get_component_ref(entity_selected, match.type);
+							else component_ref = get_component_ref(archtype_ptr, match.type);
+							if (component_ref) {
 								if (assign_field_from_path(component_ref, match.field, dropped_path)) {
 									updated_any_field = true;
 								}
@@ -418,6 +485,7 @@ namespace EditorFeatures {
 			ImGui::EndDragDropTarget();
 		}
 
+		// --- Adding Component ---
 		if (ImGui::BeginPopup("InspectorAddComponentPopup")) {
 			ImGui::TextUnformatted("Select a component to add");
 			ImGui::Separator();
@@ -443,10 +511,28 @@ namespace EditorFeatures {
 					continue;
 				}
 
-				auto* storage = reg.storage(type_id);
-				if (storage && storage->contains(e)) {
-					continue;
+				if (is_display_entity)
+				{	//Entity
+					auto* storage = reg.storage(type_id);
+					if (storage && storage->contains(entity_selected)) {
+						continue;
+					}
 				}
+				else
+				{
+					//Model check if component is inside already.
+					bool is_present{};
+					for (auto& comp : archtype_ptr->component_arr)
+					{
+						if (meta == comp.type())
+						{
+							is_present = true;
+							break;
+						}
+					}
+					if (is_present) continue;
+				}
+
 
 				ComponentListEntry entry{};
 				entry.type = meta;
@@ -476,8 +562,17 @@ namespace EditorFeatures {
 					auto emplace = meta.func("emplace"_hs);
 					if (emplace) {
 						entt::meta_any instance = meta.construct();
-						entt::meta_any result = emplace.invoke({}, e, static_cast<const void*>(&instance));
-						if (result && result.cast<bool>()) {
+
+						if (is_display_entity)
+						{	//Entity
+							entt::meta_any result = emplace.invoke({}, entity_selected, static_cast<const void*>(&instance));
+							if (result && result.cast<bool>()) {
+								added = true;
+							}
+						}
+						else
+						{	//Model
+							archtype_ptr->component_arr.push_back(instance);
 							added = true;
 						}
 					}
@@ -511,39 +606,81 @@ namespace EditorFeatures {
 
 		ImGui::Separator();
 
-		// Actual draw
+		// --- Draw Components and their Data in object ---
 		std::vector<std::pair<entt::meta_type, std::string>> components_to_remove{};
-		std::vector<EntityComponentEntry> components = collect_entity_components(reg, e);
+		if (is_display_entity)
+		{
+			std::vector<EntityComponentEntry> components = collect_components(reg, entity_selected);
+			for (auto& component : components) {
+				const char* header = component.meta.name();
+				if (!header || !*header) header = "Component";
 
-		for (auto& component : components) {
-			const char* header = component.meta.name();
-			if (!header || !*header) header = "Component";
+				ImGui::PushID(reinterpret_cast<void*>(static_cast<uintptr_t>(component.type_id)));
 
-			ImGui::PushID(reinterpret_cast<void*>(static_cast<uintptr_t>(component.type_id)));
+				bool component_visible = true;
+				if (ImGui::CollapsingHeader(header, &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
+					EditorFeatures::DrawMetaObject(component.meta, component.instance);
+				}
 
-			bool component_visible = true;
-			if (ImGui::CollapsingHeader(header, &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
-				EditorFeatures::DrawMetaObject(component.meta, component.instance);
+				if (!component_visible) {
+					components_to_remove.emplace_back(component.meta, std::string{ header });
+				}
+
+				ImGui::PopID();
 			}
-
-			if (!component_visible) {
-				components_to_remove.emplace_back(component.meta, std::string{ header });
-			}
-
-			ImGui::PopID();
 		}
+		else
+		{
+			for (auto& comp : archtype_ptr->component_arr) {
+				entt::meta_type meta = comp.type();
+				const char* header = meta.name();
+				if (!header || !*header) header = "Component";
+				ImGui::PushID(reinterpret_cast<void*>(static_cast<uintptr_t>(meta.id())));
+
+				bool component_visible = true;
+				if (ImGui::CollapsingHeader(header, &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
+					EditorFeatures::DrawMetaObject(meta, comp);
+				}
+
+				if (!component_visible) {
+					components_to_remove.emplace_back(meta, std::string{header});
+				}
+
+				ImGui::PopID();
+			}
+		}
+
+		
 
 		// To remove the components
 		if (!components_to_remove.empty()) {
 			for (const auto& [meta, name] : components_to_remove) {
-				auto remove = meta.func("remove"_hs);
 				bool removed = false;
-				if (remove) {
-					entt::meta_any result = remove.invoke({}, e);
-					if (result && result.cast<bool>()) {
-						removed = true;
+				if (is_display_entity)
+				{
+					auto remove = meta.func("remove"_hs);
+					if (remove)
+					{
+						entt::meta_any result = remove.invoke({}, entity_selected);
+						if (result && result.cast<bool>()) {
+							removed = true;
+						}
 					}
 				}
+				else
+				{	//Model
+					for (auto it = archtype_ptr->component_arr.begin(); it != archtype_ptr->component_arr.end();)
+					{
+						if (it->type() != meta)
+						{
+							it++;
+							continue;
+						}
+						archtype_ptr->component_arr.erase(it);
+						break;
+					}
+				}
+
 				if (removed) {
 					last_drop_feedback = "Removed component: " + name;
 				}
@@ -554,7 +691,6 @@ namespace EditorFeatures {
 			}
 		}
 
-		ImGui::End();
 	}
 }
 

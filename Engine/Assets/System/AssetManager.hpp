@@ -97,6 +97,7 @@ namespace EngineFramework {
 
 	class AssetWindow;//forward declaration
 	class ModelManager;
+	class ObjectManager;
 #endif
 
 	/*
@@ -195,7 +196,6 @@ namespace EngineFramework {
 
 		/*
 			Return full guid of an asset given its name and type_guid.
-			Also adds <guid, name> mapping if not already done.
 		*/
 		static xresource::full_guid GetFullGuid(const xresource::type_guid& type_guid, std::string asset_name);
 
@@ -233,6 +233,7 @@ namespace EngineFramework {
 
 		friend AssetWindow;
 		friend ModelManager;
+		friend ObjectManager;
 #endif
 		
 		//== Functions that Level Editor can use.

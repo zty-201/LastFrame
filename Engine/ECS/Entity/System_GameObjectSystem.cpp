@@ -127,6 +127,65 @@ namespace EngineFramework
 		return save_data;
 	}
 
+
+	Archtype GameObjectSystem::CreateArchtypeFromInstance(entt::entity entity, const std::string& model_type)
+	{
+		//Serialize the instance component data into a json string, then construct an archtype from that json.
+		//Note: This is similar to SerializeAllEntityInstances().
+		if (!registry.valid(entity)) 
+		{
+			throw std::invalid_argument(std::string("Entity not valid: ") + std::to_string((unsigned long)entity));
+		}
+
+		nlohmann::json archtype_data{};
+		/*
+		* 	Iterate over all components that this entity has.
+			To do so, iterate over all possible component types and see which does the entity have.
+
+			<type_id, sparse_set> where type_id represents the component type.
+
+			Note: Cannot simply iterate over all components for an entity, as components are not
+			stored in the entity but rather stored in their own pools based on type.
+		*/
+		//Iterate over all types stored in registry.
+		for (auto&& comp_storage : registry.storage())
+		{
+			//If an entity does not contain this specific component type, continue to the next type.
+			if (!comp_storage.second.contains(entity)) continue;
+			//Check if it's a registered component
+			entt::meta_type component_type = entt::resolve(comp_storage.second.info());
+			if (!component_type) continue; //Not a valid registered component.
+			//Only serialize components. Registered types which aren't components (like glm::vec3) shouldn't be stored.
+			if (component_type.traits<REGISTERED_TYPE>() == REGISTERED_TYPE::NON_COMPONENT) continue;
+
+			//Save the component as a json object.
+			nlohmann::json component_save_data{};
+			/*
+				Component name
+				->Name of data member, value
+			*/
+			entt::meta_any component_data = component_type.func("get"_hs).invoke({}, entity);
+			//==Iterate over each data type in the component. Only store data, not functions or ptrs.
+			for (auto&& member : component_type.data())
+			{
+				//Get the data value as meta_any.
+				SetJsonWithMetaAny(component_save_data, member.second, component_data.get(member.first));
+			}
+
+			//Add the component object as part of the entity json object.
+			archtype_data[component_type.name()] = component_save_data;
+		}
+		archtype_data["model_type"] = model_type;
+
+		return Archtype(archtype_data.dump());
+	}
+
+	void GameObjectSystem::AssignArchtypeToInstance(entt::entity entity, xresource::instance_guid archtype_guid)
+	{
+		entity_archtype_map[entity] = archtype_guid;
+	}
+
+
 	/*
 		Save gameobject instances to a specified level file using reflection.
 	*/
