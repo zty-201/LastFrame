@@ -126,8 +126,8 @@ function on_update(self, dt)
             if math.abs(dx) < deadZone then dx = 0 end
             if math.abs(dy) < deadZone then dy = 0 end
 
-            local moveX = dx / (screenWidth * 0.4)
-            local moveZ = -dy / (screenHeight * 0.55)
+            local moveX = dx / (screenWidth * 0.25)
+            local moveZ = -dy / (screenHeight * 0.25)
 
             print(string.format("[player_movement] Normalized moveX=%0.3f moveZ=%0.3f", moveX, moveZ))
 
