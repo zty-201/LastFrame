@@ -19,7 +19,7 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
 
     for (auto&& [ent, transform, material, collider, physics] : view.each())
     {
-        if (collider.mode == ColliderComponent::Mode::LEVEL_EDITOR)
+        if (static_cast<ColliderComponent::Mode>(collider.mode) == ColliderComponent::Mode::LEVEL_EDITOR)
         {
             if (PhysicsWorld::Get().HasBody(ent))
             {

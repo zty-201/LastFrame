@@ -15,7 +15,7 @@ enum class ColliderShape
 
 struct ColliderData
 {
-    ColliderShape type = ColliderShape::Box;
+    int type = 0;
 
     //Shape Dimensions
     glm::vec3 boxHalfExtents = { 0.5f, 0.5f, 0.5f };
@@ -37,7 +37,7 @@ struct ColliderComponent
         LEVEL_EDITOR        //Editor selection
     };
 
-    Mode mode = Mode::SOLID_COLLIDER;
+    int mode = 0;
 
     //Array of shapes
     std::vector<ColliderData> shapes;
@@ -50,6 +50,8 @@ struct ColliderComponent
     {
         shapes.emplace_back(); //Add one box by default
     }
+
+    Mode GetMode() const { return static_cast<Mode>(mode); }
 };
 
 #endif // COLLIDER_COMPONENT

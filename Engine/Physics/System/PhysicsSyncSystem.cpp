@@ -21,7 +21,7 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
 
         if (material.isStatic)
         {
-            const glm::quat q_editor = glm::quat(transform.rotation); // Transform stores Euler
+            const glm::quat q_editor = glm::quat(glm::radians(transform.rotation));
             PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q_editor, /*activate=*/false);
             PhysicsWorld::Get().SetLinearVelocity(ent, glm::vec3(0.0f)); // ensure no drift
             // no gravity for static bodies; skip the rest
@@ -32,7 +32,7 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
         if (physics.useGravity && !physics._prevUseGravity)
         {
             // Push ECS transform to Jolt so the body starts where you placed it
-            glm::quat q = glm::quat(transform.rotation); // your Transform stores Euler
+            glm::quat q = glm::quat(glm::radians(transform.rotation));
             PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q, /*activate=*/true);
 
             // Clear old motion so it doesn't “remember” a velocity from before
@@ -41,7 +41,7 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
 
         if (physics.editorOverride)
         {
-            glm::quat q = glm::quat(transform.rotation);
+            glm::quat q = glm::quat(glm::radians(transform.rotation));
             PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q, true);
             PhysicsWorld::Get().SetLinearVelocity(ent, glm::vec3(0.0f));
             physics.editorOverride = false; // consume flag so it only happens once
@@ -51,7 +51,7 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
         transform.position = PhysicsWorld::Get().GetBodyPosition(ent);
 
         const glm::quat jq = PhysicsWorld::Get().GetBodyRotation(ent);
-        transform.rotation = glm::eulerAngles(jq);
+        transform.rotation = glm::degrees(glm::eulerAngles(jq));
 
         physics.velocity = PhysicsWorld::Get().GetBodyVelocity(ent);
 

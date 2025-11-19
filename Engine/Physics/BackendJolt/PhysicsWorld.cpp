@@ -213,24 +213,37 @@ JPH::ShapeRefC CreateJoltShapeFromCollider(const ColliderComponent& collider, co
     {
         JPH::ShapeRefC singleShape;
 
-        switch (shapeData.type)
+        switch (static_cast<ColliderShape>(shapeData.type))
         {
             case ColliderShape::Box:
             {
                 const glm::vec3 halfExt = shapeData.boxHalfExtents;
-                singleShape = new JPH::BoxShape(JPH::Vec3(halfExt.x, halfExt.y, halfExt.z));
+                glm::vec3 safeHalfExt = glm::max(halfExt, glm::vec3(0.01f));
+                singleShape = new JPH::BoxShape(JPH::Vec3(safeHalfExt.x, safeHalfExt.y, safeHalfExt.z));
                 break;
             }
             case ColliderShape::Sphere:
             {
-                singleShape = new JPH::SphereShape(shapeData.sphereRadius);
+                float maxScale = std::max({ absScale.x, absScale.y, absScale.z });
+                float finalRadius = std::max(shapeData.sphereRadius * maxScale, 0.01f);
+
+                singleShape = new JPH::SphereShape(finalRadius);
                 break;
             }
             case ColliderShape::Capsule:
             {
-                float halfCylinderHeight = 0.5f * (shapeData.capsuleHeight - 2.0f * shapeData.capsuleRadius);
-                if (halfCylinderHeight < 0.0f) halfCylinderHeight = 0.0f;
-                singleShape = new JPH::CapsuleShape(halfCylinderHeight, shapeData.capsuleRadius);
+                float scaleY = absScale.y;
+                float scaleXZ = std::max(absScale.x, absScale.z);
+
+                float finalHeight = shapeData.capsuleHeight * scaleY;
+                float finalRadius = std::max(shapeData.capsuleRadius * scaleXZ, 0.01f);
+
+                // Recalculate cylinder half-height (Total Height - 2 * Radius) / 2
+                float halfCylinderHeight = 0.5f * (finalHeight - 2.0f * finalRadius);
+                if (halfCylinderHeight < 0.0f) halfCylinderHeight = 0.01f; // Ensure valid geometry
+
+                singleShape = new JPH::CapsuleShape(halfCylinderHeight, finalRadius);
+                break;
                 break;
             }
         }
@@ -264,7 +277,7 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
 {
     if (HasBody(entity)) return;
 
-    if (collider.mode == ColliderComponent::Mode::LEVEL_EDITOR) {
+    if (static_cast<ColliderComponent::Mode>(collider.mode) == ColliderComponent::Mode::LEVEL_EDITOR) {
         return;
     }
 
@@ -277,7 +290,7 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
     if (!finalShape) return;
 
     const JPH::EMotionType motionType = material.isStatic ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic;
-    const bool isTrigger = collider.mode == ColliderComponent::Mode::TRIGGER_SENSOR;
+    const bool isTrigger = static_cast<ColliderComponent::Mode>(collider.mode) == ColliderComponent::Mode::TRIGGER_SENSOR;
 
     glm::quat qRot = glm::quat(glm::radians(rot));
 

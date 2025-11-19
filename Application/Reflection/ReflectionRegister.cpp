@@ -147,55 +147,45 @@ struct adl_serializer<std::filesystem::path> {
 	}
 };
 
-template<>
-struct adl_serializer<ColliderData> {
-
-	// Function to deserialize (JSON -> C++ struct)
-	static void from_json(const nlohmann::json& j, ColliderData& c)
-	{
-		// 1. Convert the ColliderShape enum (requires casting the integer value)
-		c.type = static_cast<ColliderShape>(j.at("type").get<int>());
-
-		// 2. Deserialize value types (glm::vec3, float)
-		// NOTE: We assume these primitive types (glm::vec3, float) already have working serializers.
-		c.boxHalfExtents = j.at("boxHalfExtents").get<glm::vec3>();
-		c.sphereRadius = j.at("sphereRadius").get<float>();
-		c.capsuleHeight = j.at("capsuleHeight").get<float>();
-		c.capsuleRadius = j.at("capsuleRadius").get<float>();
-		c.offsetPosition = j.at("offsetPosition").get<glm::vec3>();
-		c.offsetRotation = j.at("offsetRotation").get<glm::vec3>();
-	}
-
-	// Function to serialize (C++ struct -> JSON)
-	static void to_json(nlohmann::json& j, const ColliderData& c)
-	{
-		j = nlohmann::json{
-			{"type", static_cast<int>(c.type)},
-			{"boxHalfExtents", c.boxHalfExtents},
-			{"sphereRadius", c.sphereRadius},
-			{"capsuleHeight", c.capsuleHeight},
-			{"capsuleRadius", c.capsuleRadius},
-			{"offsetPosition", c.offsetPosition},
-			{"offsetRotation", c.offsetRotation}
-		};
-	}
-};
-
-template<>
-struct adl_serializer<ColliderComponent::Mode> {
-	static void to_json(json& j, const ColliderComponent::Mode& m) {
-		// C++ -> JSON: Write the enum as its integer value
-		j = static_cast<int>(m);
-	}
-
-	static void from_json(const json& j, ColliderComponent::Mode& m) {
-		// JSON -> C++: Read the integer value and cast it back to the enum type
-		m = static_cast<ColliderComponent::Mode>(j.get<int>());
-	}
-};
-
 
 NLOHMANN_JSON_NAMESPACE_END
+
+// ColliderShape Enum
+inline void to_json(nlohmann::json& j, const ::ColliderShape& s) {
+	j = static_cast<int>(s);
+}
+inline void from_json(const nlohmann::json& j, ::ColliderShape& s) {
+	s = static_cast<::ColliderShape>(j.get<int>());
+}
+
+// ColliderComponent::Mode Enum (Global Scope)
+inline void to_json(nlohmann::json& j, const ::ColliderComponent::Mode& m) {
+	j = static_cast<int>(m);
+}
+inline void from_json(const nlohmann::json& j, ::ColliderComponent::Mode& m) {
+	m = static_cast<::ColliderComponent::Mode>(j.get<int>());
+}
+
+inline void to_json(nlohmann::json& j, const ::ColliderData& c) {
+	j = nlohmann::json{
+		{"type", c.type}, // It's already an int!
+		{"boxHalfExtents", c.boxHalfExtents},
+		{"sphereRadius", c.sphereRadius},
+		{"capsuleHeight", c.capsuleHeight},
+		{"capsuleRadius", c.capsuleRadius},
+		{"offsetPosition", c.offsetPosition},
+		{"offsetRotation", c.offsetRotation}
+	};
+}
+inline void from_json(const nlohmann::json& j, ::ColliderData& c) {
+	if (j.contains("type")) c.type = static_cast<int>(j.at("type").get<int>()); // Direct int read
+	if (j.contains("boxHalfExtents")) c.boxHalfExtents = j.at("boxHalfExtents").get<glm::vec3>();
+	if (j.contains("sphereRadius")) c.sphereRadius = j.at("sphereRadius").get<float>();
+	if (j.contains("capsuleHeight")) c.capsuleHeight = j.at("capsuleHeight").get<float>();
+	if (j.contains("capsuleRadius")) c.capsuleRadius = j.at("capsuleRadius").get<float>();
+	if (j.contains("offsetPosition")) c.offsetPosition = j.at("offsetPosition").get<glm::vec3>();
+	if (j.contains("offsetRotation")) c.offsetRotation = j.at("offsetRotation").get<glm::vec3>();
+}
 
 using namespace entt::literals;
 namespace EngineFramework
@@ -250,8 +240,12 @@ namespace EngineFramework
 		SetMeta(std::vector<std::string>),
 		SetMeta(CameraComponent::CameraType),
 		SetMeta(std::filesystem::path),
-		SetMeta(ColliderShape),
 		SetMeta(TriggerShapeType),
+		SetMeta(::ColliderShape),
+		SetMeta(::ColliderData),
+		SetMeta(std::vector<::ColliderData>),
+		SetMeta(::ColliderComponent::Mode),
+		SetMeta(ColliderShape),
 		SetMeta(ColliderData),
 		SetMeta(std::vector<ColliderData>),
 		SetMeta(ColliderComponent::Mode),
@@ -294,8 +288,12 @@ namespace EngineFramework
 		SetJson(std::vector<std::string>),
 		SetJson(CameraComponent::CameraType),
 		SetJson(std::filesystem::path),
-		SetJson(ColliderShape),
 		SetJson(TriggerShapeType),
+		SetJson(::ColliderShape),
+		SetJson(::ColliderData),
+		SetJson(std::vector<::ColliderData>),
+		SetJson(::ColliderComponent::Mode),
+		SetJson(ColliderShape),
 		SetJson(ColliderData),
 		SetJson(std::vector<ColliderData>),
 		SetJson(ColliderComponent::Mode),
@@ -306,8 +304,6 @@ namespace EngineFramework
 		SetJson(std::vector<Engine::LuaScriptComponent::LuaInstance>)
 #endif
 	};
-
-
 
 	// Templated class, to provide different function overloads for each type that all do the same thing
 	template <typename T>
@@ -426,11 +422,15 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(std::vector<glm::vec3>);
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
 		REGISTER_ARBITRARY_TYPE(std::filesystem::path);
-		REGISTER_ARBITRARY_TYPE(ColliderShape);
 		REGISTER_ARBITRARY_TYPE(TriggerShapeType);
+		REGISTER_ARBITRARY_TYPE(::ColliderShape);
+		REGISTER_ARBITRARY_TYPE(ColliderShape);
+		REGISTER_ARBITRARY_TYPE(::ColliderData);
 		REGISTER_ARBITRARY_TYPE(ColliderData);
+		REGISTER_ARBITRARY_TYPE(std::vector<::ColliderData>);
 		REGISTER_ARBITRARY_TYPE(std::vector<ColliderData>);
-		REGISTER_ARBITRARY_TYPE(ColliderComponent::Mode),
+		REGISTER_ARBITRARY_TYPE(::ColliderComponent::Mode);
+		REGISTER_ARBITRARY_TYPE(ColliderComponent::Mode);
 #if defined(ENGINE_ENABLE_LUA)
 		REGISTER_ARBITRARY_TYPE(Engine::LuaScriptComponent::LuaInstance);
 		REGISTER_ARBITRARY_TYPE(std::vector<Engine::LuaScriptComponent::LuaInstance>);
@@ -538,17 +538,17 @@ namespace EngineFramework
 			.func<&Getter<AudioComponent>::GetComponent>("get")
 			.func<&GetRef<AudioComponent>>("get_ref");
 
-		entt::meta_factory<ColliderShape>()
+		entt::meta_factory<::ColliderShape>()
 			.type("ColliderShape") // Arbitrary name for the type
-			.data<ColliderShape::Box>("Box"_hs)
+			/*.data<ColliderShape::Box>("Box"_hs)
 			.data<ColliderShape::Sphere>("Sphere"_hs)
-			.data<ColliderShape::Capsule>("Capsule"_hs)
-			.conv<std::underlying_type_t<ColliderShape>>();
+			.data<ColliderShape::Capsule>("Capsule"_hs)*/
+			.conv<std::underlying_type_t<::ColliderShape>>();
 
-		entt::meta_factory<ColliderData>()
+		entt::meta_factory<::ColliderData>()
 			.type("ColliderData")
 			// Dimensions
-			.data<&ColliderData::type>("type") // The enum type for dropdown
+			.data<&::ColliderData::type>("type")
 			.data<&ColliderData::boxHalfExtents>("boxHalfExtents")
 			.data<&ColliderData::sphereRadius>("sphereRadius")
 			.data<&ColliderData::capsuleHeight>("capsuleHeight")
@@ -557,19 +557,18 @@ namespace EngineFramework
 			.data<&ColliderData::offsetPosition>("offsetPosition")
 			.data<&ColliderData::offsetRotation>("offsetRotation");
 
-		entt::meta_factory<ColliderComponent::Mode>()
+		entt::meta_factory<::ColliderComponent::Mode>()
 			.type("ColliderMode")
-			.data<ColliderComponent::Mode::SOLID_COLLIDER>("SOLID_COLLIDER"_hs)
+			/*.data<ColliderComponent::Mode::SOLID_COLLIDER>("SOLID_COLLIDER"_hs)
 			.data<ColliderComponent::Mode::TRIGGER_SENSOR>("TRIGGER_SENSOR"_hs)
-			.data<ColliderComponent::Mode::LEVEL_EDITOR>("LEVEL_EDITOR"_hs)
-			.conv<std::underlying_type_t<ColliderComponent::Mode>>();
+			.data<ColliderComponent::Mode::LEVEL_EDITOR>("LEVEL_EDITOR"_hs)*/
+			.conv<std::underlying_type_t<::ColliderComponent::Mode>>();
 
 		// === Register ColliderComponent ===
 		entt::meta_factory<ColliderComponent>()
 			.type("ColliderComponent")
-			// NOTE: Old single-shape data (shape, size, radius, etc.) is REMOVED
-			.data<&ColliderComponent::mode>("mode")       // The new component flag (Solid, Trigger, Editor Only)
-			.data<&ColliderComponent::shapes>("shapes")   // CRITICAL: The vector of OBBCollider structs
+			.data<&::ColliderComponent::mode>("mode")
+			.data<&ColliderComponent::shapes>("shapes")
 			.data<&ColliderComponent::minBounds>("minBounds") // AABB
 			.data<&ColliderComponent::maxBounds>("maxBounds") // AABB
 			.func<&Emplacer<ColliderComponent>::EmplaceComponent>("emplace")
@@ -581,6 +580,7 @@ namespace EngineFramework
 			.type("PhysicsComponent")
 			.data<&PhysicsComponent::velocity>("velocity")
 			.data<&PhysicsComponent::acceleration>("acceleration")
+			.data<&PhysicsComponent::mass>("mass")
 			// Keep runtime-specific gravity control
 			.data<&PhysicsComponent::useGravity>("useGravity")
 			.data<&PhysicsComponent::gravityFactor>("gravityFactor")
@@ -660,8 +660,6 @@ namespace EngineFramework
 		assert(false && "Type is not supported by SetMetaAnyWithJson function. Please add to map.");
 	}
 
-
-
 	// Helper function to cast meta_any member_data to the correct json data type, and set comp_json.
 	void SetJsonWithMetaAny(nlohmann::json& comp_json, const entt::meta_data& data_type, const entt::meta_any& data)
 	{
@@ -681,12 +679,25 @@ namespace EngineFramework
 			set_json_with_meta_map[type](comp_json, name, data);
 			return;
 		}
+		if (set_json_with_meta_map.find(type) == set_json_with_meta_map.end())
+		{
+			// 1. Print the ID we are looking for
+			std::cout << "CRASH: Looking for Type ID: " << type << " (" << name << ")" << std::endl;
+
+			// 2. Print all IDs currently inside the map to check for mismatches
+			std::cout << "--- Dumping Available Map IDs ---" << std::endl;
+			for (const auto& pair : set_json_with_meta_map) {
+				std::cout << "Map has ID: " << pair.first << std::endl;
+				// If you want to check if one matches, you can try resolving it here
+				if (pair.first == entt::resolve<::ColliderComponent::Mode>().id()) {
+					std::cout << "   (This matches ColliderComponent::Mode!)" << std::endl;
+				}
+			}
+			std::cout << "---------------------------------" << std::endl;
+		}
 		// Else throw an assertion.
 		assert(false && "Type is not supported by SetJsonWithMetaAny function. Please add to map.");
-
 	}
-
-
 }
 
 //if (type.is_integral())
