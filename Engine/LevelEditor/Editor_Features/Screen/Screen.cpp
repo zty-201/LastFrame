@@ -1146,6 +1146,9 @@ namespace EngineFramework
 
     void Screen::entity_shortcut_menu() {
 
+        if (is_simulator_running) return;
+        if (is_adjusting_lights) return;
+
         if (ImGui::BeginPopup("Entity_Shortcut_Menu"))
         {
             if (ImGui::MenuItem("Delete")) {
@@ -1158,13 +1161,22 @@ namespace EngineFramework
             /*
             * Adjusting trigger box
             */
-            std::string caption = "Adjust Trigger Box";
-            if(is_adjusting_triggerbox) caption = "Stop Adjusting";
-            else caption = "Adjust Trigger Box";
+            entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
 
-            if (ImGui::MenuItem(caption.c_str())) {
-                is_adjusting_triggerbox = !is_adjusting_triggerbox;
+            //TriggerBoxComponent
+
+            if (registry.all_of<TransformComponent, TriggerBoxComponent>(id))
+            {
+                std::string caption = "Adjust Trigger Box";
+                if (is_adjusting_triggerbox) caption = "Stop Adjusting";
+                else caption = "Adjust Trigger Box";
+
+                if (ImGui::MenuItem(caption.c_str())) {
+                    is_adjusting_triggerbox = !is_adjusting_triggerbox;
+                }
             }
+
+
             ImGui::EndPopup();
         }
 
@@ -1175,7 +1187,8 @@ namespace EngineFramework
         /*
             adjusting trigger box using gizmos
         */
-
+        if (is_simulator_running) return;
+        if (is_adjusting_lights) return; //when adjusting lights, gizmos should be disabled
         if (!is_adjusting_triggerbox) return;
 
         if (editor_ptr->selected_objectID == entt::null) {
@@ -1305,6 +1318,8 @@ namespace EngineFramework
     {
         
         if (is_adjusting_lights) return;
+        if (is_simulator_running) return;
+        
 
         // Use same camera math as gizmos()
         auto camera_view = registry.view<CameraComponent>();
