@@ -137,15 +137,28 @@ public:
     void StepSimulation(float dt);
 
     // Body management
-    void CreateBoxBody(entt::entity entity,
+    void CreatePhysicsBody(
+        entt::entity entity,
+        const glm::vec3& pos,
+        const glm::vec3& rot,
+        const glm::vec3& scale,
+        const struct ColliderComponent& collider,
+        const struct PhysicsMaterialComponent& material,
+        const float gravityFactor
+    );
+    /*void CreateBoxBody(entt::entity entity,
         const glm::vec3& position,
         const glm::vec3& size,
+        const float density,
+        const float gravityFactor,
         bool isStatic,
         bool isTrigger = false);
 
     void CreateSphereBody(entt::entity entity,
         const glm::vec3& position,
         float radius,
+        const float density,
+        const float gravityFactor,
         bool isStatic,
         bool isTrigger = false);
 
@@ -153,8 +166,10 @@ public:
         const glm::vec3& position,
         float height,
         float radius,
+        const float density,
+        const float gravityFactor,
         bool isStatic,
-        bool isTrigger = false);
+        bool isTrigger = false);*/
 
     void RemoveBody(entt::entity entity);
 

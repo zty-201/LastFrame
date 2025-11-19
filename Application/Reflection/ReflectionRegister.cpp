@@ -13,6 +13,7 @@
 #include "TransformComponent.h"
 #include "AudioComponent.h"
 #include "ColliderComponent.h"
+#include "PhysicsMaterialComponent.h"
 #include "PhysicsComponent.h"
 #include "TriggerBoxComponent.h"
 #include "Scripting/Script.hpp"
@@ -146,6 +147,52 @@ struct adl_serializer<std::filesystem::path> {
 	}
 };
 
+template<>
+struct adl_serializer<ColliderData> {
+
+	// Function to deserialize (JSON -> C++ struct)
+	static void from_json(const nlohmann::json& j, ColliderData& c)
+	{
+		// 1. Convert the ColliderShape enum (requires casting the integer value)
+		c.type = static_cast<ColliderShape>(j.at("type").get<int>());
+
+		// 2. Deserialize value types (glm::vec3, float)
+		// NOTE: We assume these primitive types (glm::vec3, float) already have working serializers.
+		c.boxHalfExtents = j.at("boxHalfExtents").get<glm::vec3>();
+		c.sphereRadius = j.at("sphereRadius").get<float>();
+		c.capsuleHeight = j.at("capsuleHeight").get<float>();
+		c.capsuleRadius = j.at("capsuleRadius").get<float>();
+		c.offsetPosition = j.at("offsetPosition").get<glm::vec3>();
+		c.offsetRotation = j.at("offsetRotation").get<glm::vec3>();
+	}
+
+	// Function to serialize (C++ struct -> JSON)
+	static void to_json(nlohmann::json& j, const ColliderData& c)
+	{
+		j = nlohmann::json{
+			{"type", static_cast<int>(c.type)},
+			{"boxHalfExtents", c.boxHalfExtents},
+			{"sphereRadius", c.sphereRadius},
+			{"capsuleHeight", c.capsuleHeight},
+			{"capsuleRadius", c.capsuleRadius},
+			{"offsetPosition", c.offsetPosition},
+			{"offsetRotation", c.offsetRotation}
+		};
+	}
+};
+
+template<>
+struct adl_serializer<ColliderComponent::Mode> {
+	static void to_json(json& j, const ColliderComponent::Mode& m) {
+		// C++ -> JSON: Write the enum as its integer value
+		j = static_cast<int>(m);
+	}
+
+	static void from_json(const json& j, ColliderComponent::Mode& m) {
+		// JSON -> C++: Read the integer value and cast it back to the enum type
+		m = static_cast<ColliderComponent::Mode>(j.get<int>());
+	}
+};
 
 
 NLOHMANN_JSON_NAMESPACE_END
@@ -205,6 +252,9 @@ namespace EngineFramework
 		SetMeta(std::filesystem::path),
 		SetMeta(ColliderShape),
 		SetMeta(TriggerShapeType),
+		SetMeta(ColliderData),
+		SetMeta(std::vector<ColliderData>),
+		SetMeta(ColliderComponent::Mode),
 		SetMeta(xresource::instance_guid)
 #if defined(ENGINE_ENABLE_LUA)
 		,
@@ -246,6 +296,9 @@ namespace EngineFramework
 		SetJson(std::filesystem::path),
 		SetJson(ColliderShape),
 		SetJson(TriggerShapeType),
+		SetJson(ColliderData),
+		SetJson(std::vector<ColliderData>),
+		SetJson(ColliderComponent::Mode),
 		SetJson(xresource::instance_guid)
 #if defined(ENGINE_ENABLE_LUA)
 		,
@@ -375,6 +428,9 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(std::filesystem::path);
 		REGISTER_ARBITRARY_TYPE(ColliderShape);
 		REGISTER_ARBITRARY_TYPE(TriggerShapeType);
+		REGISTER_ARBITRARY_TYPE(ColliderData);
+		REGISTER_ARBITRARY_TYPE(std::vector<ColliderData>);
+		REGISTER_ARBITRARY_TYPE(ColliderComponent::Mode),
 #if defined(ENGINE_ENABLE_LUA)
 		REGISTER_ARBITRARY_TYPE(Engine::LuaScriptComponent::LuaInstance);
 		REGISTER_ARBITRARY_TYPE(std::vector<Engine::LuaScriptComponent::LuaInstance>);
@@ -419,6 +475,20 @@ namespace EngineFramework
 			.func<&Remover<MaterialComponent>::RemoveComponent>("remove")
 			.func<&Getter<MaterialComponent>::GetComponent>("get")
 			.func<&GetRef<MaterialComponent>>("get_ref");
+
+		// === Register PhysicsMaterialComponent ===
+		entt::meta_factory<PhysicsMaterialComponent>()
+			.type("PhysicsMaterialComponent")
+			.data<&PhysicsMaterialComponent::friction>("friction")
+			.data<&PhysicsMaterialComponent::restitution>("restitution")
+			.data<&PhysicsMaterialComponent::density>("density")
+			.data<&PhysicsMaterialComponent::isStatic>("isStatic")
+			.data<&PhysicsMaterialComponent::_prevIsStatic>("_prevIsStatic") // Expose internal tracking for now
+			.data<&PhysicsMaterialComponent::layer>("layer")
+			.func<&Emplacer<PhysicsMaterialComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<PhysicsMaterialComponent>::RemoveComponent>("remove")
+			.func<&Getter<PhysicsMaterialComponent>::GetComponent>("get")
+			.func<&GetRef<PhysicsMaterialComponent>>("get_ref");
 
 		// === Register LightComponent ===
 		entt::meta_factory<LightComponent>()
@@ -468,20 +538,40 @@ namespace EngineFramework
 			.func<&Getter<AudioComponent>::GetComponent>("get")
 			.func<&GetRef<AudioComponent>>("get_ref");
 
+		entt::meta_factory<ColliderShape>()
+			.type("ColliderShape") // Arbitrary name for the type
+			.data<ColliderShape::Box>("Box"_hs)
+			.data<ColliderShape::Sphere>("Sphere"_hs)
+			.data<ColliderShape::Capsule>("Capsule"_hs)
+			.conv<std::underlying_type_t<ColliderShape>>();
+
+		entt::meta_factory<ColliderData>()
+			.type("ColliderData")
+			// Dimensions
+			.data<&ColliderData::type>("type") // The enum type for dropdown
+			.data<&ColliderData::boxHalfExtents>("boxHalfExtents")
+			.data<&ColliderData::sphereRadius>("sphereRadius")
+			.data<&ColliderData::capsuleHeight>("capsuleHeight")
+			.data<&ColliderData::capsuleRadius>("capsuleRadius")
+			// Offsets
+			.data<&ColliderData::offsetPosition>("offsetPosition")
+			.data<&ColliderData::offsetRotation>("offsetRotation");
+
+		entt::meta_factory<ColliderComponent::Mode>()
+			.type("ColliderMode")
+			.data<ColliderComponent::Mode::SOLID_COLLIDER>("SOLID_COLLIDER"_hs)
+			.data<ColliderComponent::Mode::TRIGGER_SENSOR>("TRIGGER_SENSOR"_hs)
+			.data<ColliderComponent::Mode::LEVEL_EDITOR>("LEVEL_EDITOR"_hs)
+			.conv<std::underlying_type_t<ColliderComponent::Mode>>();
+
 		// === Register ColliderComponent ===
 		entt::meta_factory<ColliderComponent>()
 			.type("ColliderComponent")
-			.data<&ColliderComponent::shape>("shape")
-			.data<&ColliderComponent::size>("size")
-			.data<&ColliderComponent::radius>("radius")
-			.data<&ColliderComponent::height>("height")
-			.data<&ColliderComponent::capRadius>("capRadius")
-			.data<&ColliderComponent::isStatic>("isStatic")
-			.data<&ColliderComponent::isTrigger>("isTrigger")
-			.data<&ColliderComponent::friction>("friction")
-			.data<&ColliderComponent::restitution>("restitution")
-			.data<&ColliderComponent::density>("density")
-			.data<&ColliderComponent::layer>("layer")
+			// NOTE: Old single-shape data (shape, size, radius, etc.) is REMOVED
+			.data<&ColliderComponent::mode>("mode")       // The new component flag (Solid, Trigger, Editor Only)
+			.data<&ColliderComponent::shapes>("shapes")   // CRITICAL: The vector of OBBCollider structs
+			.data<&ColliderComponent::minBounds>("minBounds") // AABB
+			.data<&ColliderComponent::maxBounds>("maxBounds") // AABB
 			.func<&Emplacer<ColliderComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<ColliderComponent>::RemoveComponent>("remove")
 			.func<&Getter<ColliderComponent>::GetComponent>("get")
@@ -491,10 +581,11 @@ namespace EngineFramework
 			.type("PhysicsComponent")
 			.data<&PhysicsComponent::velocity>("velocity")
 			.data<&PhysicsComponent::acceleration>("acceleration")
-			.data<&PhysicsComponent::friction>("friction")
-			.data<&PhysicsComponent::mass>("mass")
+			// Keep runtime-specific gravity control
 			.data<&PhysicsComponent::useGravity>("useGravity")
 			.data<&PhysicsComponent::gravityFactor>("gravityFactor")
+			.data<&PhysicsComponent::_prevUseGravity>("_prevUseGravity") // Expose internal tracking
+			.data<&PhysicsComponent::editorOverride>("editorOverride")
 			.func<&Emplacer<PhysicsComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<PhysicsComponent>::RemoveComponent>("remove")
 			.func<&Getter<PhysicsComponent>::GetComponent>("get")

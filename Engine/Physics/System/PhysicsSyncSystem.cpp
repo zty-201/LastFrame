@@ -6,19 +6,20 @@
 
 #include "TransformComponent.h"
 #include "PhysicsComponent.h"
+#include "PhysicsMaterialComponent.h"
 #include "PhysicsWorld.hpp"
 #include "ColliderComponent.h"
 
 void PhysicsSyncSystem::Update(entt::registry& ecs)
 {
-    auto view = ecs.view<TransformComponent, PhysicsComponent, ColliderComponent>();
+    auto view = ecs.view<TransformComponent, PhysicsComponent, PhysicsMaterialComponent, ColliderComponent>();
 
-    for (auto&& [ent, transform, physics, collider] : view.each())
+    for (auto&& [ent, transform, physics, material, collider] : view.each())
     {
         if (!PhysicsWorld::Get().HasBody(ent))
             continue;
 
-        if (collider.isStatic)
+        if (material.isStatic)
         {
             const glm::quat q_editor = glm::quat(transform.rotation); // Transform stores Euler
             PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q_editor, /*activate=*/false);
