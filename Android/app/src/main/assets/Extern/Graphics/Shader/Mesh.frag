@@ -98,7 +98,7 @@ float visibility(vec3 p)
     if (any(greaterThan(proj_coords.xy, vec2(1.0f))) || any(lessThan(proj_coords.xy, vec2(0.0f))))
         return 1.0f;
 
-    float shadow_map_size     = 2048.0f;
+    float shadow_map_size     = 4096.0f;
     float inv_shadow_map_size = 1.0f / shadow_map_size;
 
     vec2 uv = proj_coords.xy * shadow_map_size; // 1 unit - 1 texel
@@ -257,10 +257,7 @@ vec3 direct_lighting(in vec3 Wo, in vec3 N, in vec3 P, in vec3 F0, in vec3 diffu
 
     vec3 Li = light_color.xyz;
 
-    float NdotL = max(dot(N, Wi), 0.0);
-
-    // Multiply the final result by NdotL
-    return brdf * Li * NdotL * visibility(FS_IN_WorldPos);
+    return brdf * Li * visibility(FS_IN_WorldPos);
 }
 
 // ------------------------------------------------------------------
@@ -280,6 +277,31 @@ vec3 add_inscattered_light(vec3 color, vec3 world_pos)
 
 void main()
 {
+
+    //// Add this debug code temporarily in main()
+    //vec4 light_space_pos = light_view_proj * vec4(FS_IN_WorldPos, 1.0);
+    //vec3 proj_coords = light_space_pos.xyz / light_space_pos.w;
+    //proj_coords = proj_coords * 0.5 + 0.5;
+    //
+    //// Color code based on shadow map coverage
+    //if (proj_coords.x < 0.0 || proj_coords.x > 1.0 || 
+    //    proj_coords.y < 0.0 || proj_coords.y > 1.0 ||
+    //    proj_coords.z < 0.0 || proj_coords.z > 1.0) {
+    //    // RED = completely outside frustum
+    //    FS_OUT_Color = vec4(1.0, 0.0, 0.0, 1.0);
+    //    return;
+    //} else if (proj_coords.x < 0.05 || proj_coords.x > 0.95 ||
+    //        proj_coords.y < 0.05 || proj_coords.y > 0.95) {
+    //    // YELLOW = near edge of frustum (within 5% of border)
+    //    FS_OUT_Color = vec4(1.0, 1.0, 0.0, 1.0);
+    //    return;
+    //} else {
+    //    // Show actual shadows
+    //    float vis = visibility(FS_IN_WorldPos);
+    //    FS_OUT_Color = vec4(vec3(vis), 1.0);
+    //    return;
+    //}
+
     // Sample material properties
     vec3  albedo    = texture(s_Albedo, FS_IN_TexCoord).rgb * u_AlbedoFactor;
     float roughness = texture(s_Roughness, FS_IN_TexCoord).r * u_RoughnessFactor;
@@ -303,40 +325,14 @@ void main()
     // Volumetric fog
     color = add_inscattered_light(color, FS_IN_WorldPos);
     
-    // Exposure control (adjust this value to fix brightness!)
-    float exposure = 0.25;  // <-- Start here, adjust until it looks right
-    color = color * exposure;
-    
-    // Clamp
-    color = max(color, vec3(0.0));
-    
     // ACES tone mapping (better than Reinhard)
-    float a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14;
-    color = clamp((color * (a * color + b)) / (color * (c * color + d) + e), 0.0, 1.0);
+    vec3 toneMapped = ((color * (0.15 * color + 0.05) + 0.004) / 
+                   (color * (0.15 * color + 0.50) + 0.06)) - 0.02 / 0.30;
+    color = toneMapped;
     
     // Gamma correction
     color = pow(color, vec3(1.0 / 2.2));
     
     FS_OUT_Color = vec4(color, 1.0);
-
-
-    // Raw albedo
-    //vec3 albedo = texture(s_Albedo, FS_IN_TexCoord).rgb * u_AlbedoFactor;
-    //FS_OUT_Color = vec4(pow(albedo, vec3(1.0/2.2)), 1.0);
-
-    // Visualize mesh normals (should be smooth)
-    //vec3 n = normalize(FS_IN_Normal) * 0.5 + 0.5;
-    //FS_OUT_Color = vec4(n, 1.0);
-
-    // Visualize tangents (should be smooth)
-    //vec3 t = normalize(FS_IN_Tangent) * 0.5 + 0.5;
-    //FS_OUT_Color = vec4(t, 1.0);
-
-    // Visualize UVs (should show color gradient)
-    //FS_OUT_Color = vec4(FS_IN_TexCoord, 0.0, 1.0);
-
-    // Visualize normal map texture (should show blue-ish colors)
-    //vec3 nm = texture(s_Normal, FS_IN_TexCoord).rgb;
-    //FS_OUT_Color = vec4(nm, 1.0);
 
 }

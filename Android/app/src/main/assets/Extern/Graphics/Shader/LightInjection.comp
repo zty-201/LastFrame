@@ -144,13 +144,8 @@ void main()
         float visibility_value = visibility(world_pos);
 
         if (visibility_value > EPSILON)
-        {
-            vec3 Wi = -light_direction.xyz;
-            float NdotL = max(dot(Wo, Wi), 0.0); // Although Wo is view dir, for single scattering this approximates NdotL
+            lighting += visibility_value * light_color.xyz * phase_function(Wo, -light_direction.xyz, aniso_density_scattering_absorption.x);
 
-            float scattering_boost = 8.0;  // boost scattering
-            lighting += visibility_value * light_color.xyz * phase_function(Wo, Wi, aniso_density_scattering_absorption.x) * NdotL * scattering_boost;
-        }
         // RGB = Amount of in-scattered light, A = Density.
         vec4 color_and_density = vec4(lighting * density, density);
 

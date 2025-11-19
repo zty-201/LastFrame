@@ -32,6 +32,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "ObjectManager.hpp"
 
+//Getting entity archtype name
+#include "System_GameObjectSystem.hpp"
+
 //For creation of instance where camera is looking.
 #include "GraphicsSystem.h"
 #include "CameraComponent.h"
@@ -41,177 +44,288 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 namespace EngineFramework
 {
-    ObjectManager::ObjectManager() {
-        LOGI("Lfeature: ObjectManager CREATED");
-    }
-    ObjectManager::~ObjectManager() {
+	ObjectManager::ObjectManager() {
+		LOGI("Lfeature: ObjectManager CREATED");
+	}
+	ObjectManager::~ObjectManager() {
 
-    }
-    void ObjectManager::Initialize() {
+	}
+	void ObjectManager::Initialize() {
 
-    }
+	}
 
-    static inline Mesh::AABB TransformAABB(const Mesh::AABB& box, const glm::mat4& M) {
-        const glm::vec3 c = box.center();
-        const glm::vec3 e = box.halfExtents();
-        const glm::vec3 newC = glm::vec3(M * glm::vec4(c, 1.0f));
-        const glm::mat3 A = glm::mat3(M);
-        const glm::mat3 AbsA = glm::mat3(glm::abs(A[0]), glm::abs(A[1]), glm::abs(A[2]));
-        const glm::vec3 newE = AbsA * e;
-        Mesh::AABB out;
-        out.minV = newC - newE;
-        out.maxV = newC + newE;
-        return out;
-    }
+	static inline Mesh::AABB TransformAABB(const Mesh::AABB& box, const glm::mat4& M) {
+		const glm::vec3 c = box.center();
+		const glm::vec3 e = box.halfExtents();
+		const glm::vec3 newC = glm::vec3(M * glm::vec4(c, 1.0f));
+		const glm::mat3 A = glm::mat3(M);
+		const glm::mat3 AbsA = glm::mat3(glm::abs(A[0]), glm::abs(A[1]), glm::abs(A[2]));
+		const glm::vec3 newE = AbsA * e;
+		Mesh::AABB out;
+		out.minV = newC - newE;
+		out.maxV = newC + newE;
+		return out;
+	}
 
-    void ObjectManager::Run() {
+	void ObjectManager::Run() {
 
-        // Copy entities to a vector to sort
-        std::vector<entt::entity> entities;
+		// Copy entities to a vector to sort
+		std::vector<entt::entity> entities;
 
-        // Iterate through the sparse set (all alive entities)
-        for (auto entity : registry.view<entt::entity>()) {
-            entities.push_back(entity);
-        }
+		// Iterate through the sparse set (all alive entities)
+		for (auto entity : registry.view<entt::entity>()) {
+			entities.push_back(entity);
+		}
 
-        // Sort ascending
-        std::sort(entities.begin(), entities.end(), [](entt::entity a, entt::entity b) {
-            return (uint32_t)a < (uint32_t)b;
-            });
+		// Sort ascending
+		std::sort(entities.begin(), entities.end(), [](entt::entity a, entt::entity b) {
+			return (uint32_t)a < (uint32_t)b;
+			});
 
-        //// Give size once; don't lock it every frame
-        ImGui::SetNextWindowSize(ImVec2(420, 260), ImGuiCond_FirstUseEver);
+		//// Give size once; don't lock it every frame
+		ImGui::SetNextWindowSize(ImVec2(420, 260), ImGuiCond_FirstUseEver);
 
-        if (ImGui::Begin("Object Manager", &is_enabled)) {
-            //Buttons at the top
-            top_buttons();
-            ImGui::Text("Scene Hierarchy");
+		if (ImGui::Begin("Object Manager", &is_enabled)) {
+			//Buttons at the top
+			top_buttons();
+			ImGui::Text("Scene Hierarchy");
+			static bool open_popup_once{};
+			static entt::entity selected_entity = entt::null;
+			int incrementing_imgui_id{};
+			for (auto entity : entities) {
+				ImGui::PushID(incrementing_imgui_id++);
+				CALL_AT_END(imgui_popid, ImGui::PopID(););
+				std::string label = GameObjectSystem::GetEntityName(entity);
+				//ImGui::Text("%s", label.c_str());
 
-            static entt::entity selected_entity = entt::null;
+				// Determine if this entity is selected
+				bool is_selected = (entity == selected_entity);
 
-            for (auto entity : entities) {
-                std::string label = "Entity " + std::to_string((uint32_t)entity);
-                //ImGui::Text("%s", label.c_str());
+				// Make the entity a selectable item
+				if (ImGui::Selectable(label.c_str(), is_selected)) {
+					selected_entity = entity;
+					LevelEditor::GetInstance().variables.selected_objectID = selected_entity;
+					LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+					LOGI(("Selected Entity: " + std::to_string((uint32_t)selected_entity)).c_str());
 
-                // Determine if this entity is selected
-                bool is_selected = (entity == selected_entity);
+					if (registry.all_of<MeshComponent>(selected_entity)) {
+						const auto& mc = registry.get<MeshComponent>(selected_entity);
 
-                // Make the entity a selectable item
-                if (ImGui::Selectable(label.c_str(), is_selected)) {
-                    selected_entity = entity;
-                    LevelEditor::GetInstance().variables.selected_objectID = selected_entity;
-                    LOGI(("Selected Entity: " + std::to_string((uint32_t)selected_entity)).c_str());
+						// Build object-space AABB from MeshComponent authoring values
+						Mesh::AABB obj{};
+						obj.minV = glm::vec3(mc.localMin[0], mc.localMin[1], mc.localMin[2]);
+						obj.maxV = glm::vec3(mc.localMax[0], mc.localMax[1], mc.localMax[2]);
 
-                    if (registry.all_of<MeshComponent>(selected_entity)) {
-                        const auto& mc = registry.get<MeshComponent>(selected_entity);
+						// World-space if we also have a transform
+						if (registry.all_of<TransformComponent>(selected_entity)) {
+							const auto& tf = registry.get<TransformComponent>(selected_entity);
+							const Mesh::AABB world = TransformAABB(obj, tf.modelMatrix);
 
-                        // Build object-space AABB from MeshComponent authoring values
-                        Mesh::AABB obj{};
-                        obj.minV = glm::vec3(mc.localMin[0], mc.localMin[1], mc.localMin[2]);
-                        obj.maxV = glm::vec3(mc.localMax[0], mc.localMax[1], mc.localMax[2]);
+							LOGI("[AABB] ent=%u  "
+								"objMin(%.3f,%.3f,%.3f) objMax(%.3f,%.3f,%.3f)  "
+								"worldMin(%.3f,%.3f,%.3f) worldMax(%.3f,%.3f,%.3f)",
+								(uint32_t)selected_entity,
+								obj.minV.x, obj.minV.y, obj.minV.z,
+								obj.maxV.x, obj.maxV.y, obj.maxV.z,
+								world.minV.x, world.minV.y, world.minV.z,
+								world.maxV.x, world.maxV.y, world.maxV.z);
+						}
+						else {
+							LOGI("[AABB] ent=%u  objMin(%.3f,%.3f,%.3f) objMax(%.3f,%.3f,%.3f)  (no TransformComponent)",
+								(uint32_t)selected_entity,
+								obj.minV.x, obj.minV.y, obj.minV.z,
+								obj.maxV.x, obj.maxV.y, obj.maxV.z);
+						}
+					}
+					else {
+						LOGI("[AABB] ent=%u  (no MeshComponent)", (uint32_t)selected_entity);
+					}
+				}
 
-                        // World-space if we also have a transform
-                        if (registry.all_of<TransformComponent>(selected_entity)) {
-                            const auto& tf = registry.get<TransformComponent>(selected_entity);
-                            const Mesh::AABB world = TransformAABB(obj, tf.modelMatrix);
+				// Check for right-click while the item is hovered/active
+				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+					// Open the popup menu attached to this item
+					ImGui::OpenPopup("EntityContextMenu");
+				}
 
-                            LOGI("[AABB] ent=%u  "
-                                "objMin(%.3f,%.3f,%.3f) objMax(%.3f,%.3f,%.3f)  "
-                                "worldMin(%.3f,%.3f,%.3f) worldMax(%.3f,%.3f,%.3f)",
-                                (uint32_t)selected_entity,
-                                obj.minV.x, obj.minV.y, obj.minV.z,
-                                obj.maxV.x, obj.maxV.y, obj.maxV.z,
-                                world.minV.x, world.minV.y, world.minV.z,
-                                world.maxV.x, world.maxV.y, world.maxV.z);
-                        }
-                        else {
-                            LOGI("[AABB] ent=%u  objMin(%.3f,%.3f,%.3f) objMax(%.3f,%.3f,%.3f)  (no TransformComponent)",
-                                (uint32_t)selected_entity,
-                                obj.minV.x, obj.minV.y, obj.minV.z,
-                                obj.maxV.x, obj.maxV.y, obj.maxV.z);
-                        }
-                    }
-                    else {
-                        LOGI("[AABB] ent=%u  (no MeshComponent)", (uint32_t)selected_entity);
-                    }
-                }
+				std::string popupID = "EntityContextMenu##" + std::to_string((uint32_t)entity);
 
-                // Check for right-click while the item is hovered/active
-                if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-                    // Open the popup menu attached to this item
-                    ImGui::OpenPopup("EntityContextMenu");
-                }
+				// Check for right-click on the selectable item AND start the menu
+				if (ImGui::BeginPopupContextItem(popupID.c_str())) { // <-- Use the unique ID here!
 
-                std::string popupID = "EntityContextMenu##" + std::to_string((uint32_t)entity);
+					// This is safe: sets the context to the currently right-clicked entity
+					selected_entity = entity;
 
-                // Check for right-click on the selectable item AND start the menu
-                if (ImGui::BeginPopupContextItem(popupID.c_str())) { // <-- Use the unique ID here!
+					// --- 2. UNIQUE MENU ITEM LABEL ---
+					// Optional: Ensure the delete text itself is unique for clarity, though not mandatory
+					std::string deleteLabel = "Delete Entity##" + std::to_string((uint32_t)entity);
 
-                    // This is safe: sets the context to the currently right-clicked entity
-                    selected_entity = entity;
+					if (ImGui::MenuItem(deleteLabel.c_str())) {
 
-                    // --- 2. UNIQUE MENU ITEM LABEL ---
-                    // Optional: Ensure the delete text itself is unique for clarity, though not mandatory
-                    std::string deleteLabel = "Delete Entity##" + std::to_string((uint32_t)entity);
+						// 1. Destroy the entity
+						registry.destroy(entity);
 
-                    if (ImGui::MenuItem(deleteLabel.c_str())) {
+						// 2. Clear selection
+						if (LevelEditor::GetInstance().variables.selected_objectID == entity) {
+							LevelEditor::GetInstance().variables.selected_objectID = entt::null;
+						}
 
-                        // 1. Destroy the entity
-                        registry.destroy(entity);
+						ImGui::EndPopup();
+						break; // Exit the loop safely
+					}
+					// --- Create archtype from selected entity ---
+					std::string instance_archtype_label = "Create Archtype From Entity##" + std::to_string((uint32_t)entity);
+					if (ImGui::MenuItem(instance_archtype_label.c_str())) {
 
-                        // 2. Clear selection
-                        if (LevelEditor::GetInstance().variables.selected_objectID == entity) {
-                            LevelEditor::GetInstance().variables.selected_objectID = entt::null;
-                        }
+						instance_to_create_archtype = entity;
+						open_popup_once = true;
+						ImGui::EndPopup();
+						break;
+					}
 
-                        ImGui::EndPopup();
-                        break; // Exit the loop safely
-                    }
+					ImGui::EndPopup();
+				}
 
-                    ImGui::EndPopup();
-                }
+				// Optional: hover highlight (ImGui automatically applies a default hover style)
+				if (ImGui::IsItemHovered()) {
+					ImGui::SetTooltip("Entity ID: %u", (uint32_t)entity);
+				}
 
-                // Optional: hover highlight (ImGui automatically applies a default hover style)
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Entity ID: %u", (uint32_t)entity);
-                }
+			}
 
-            }
-            
-        }
-        ImGui::End();
-    }
-    void ObjectManager::Close() {
-        LOGI("object manager closed");
-    }
+			if (instance_to_create_archtype != entt::null && open_popup_once)
+			{
+				ImGui::OpenPopup("Create Archtype From Instance");
+				open_popup_once = false;
+			}
+			
+			//Create archtype from instance, and assign archtype to that instance.
+			if (ImGui::BeginPopupModal("Create Archtype From Instance"))
+			{
+				CALL_AT_END(imgui_endpopup, ImGui::EndPopup(););
+				constexpr int buffer_size{ 128 };
+				static char name_buffer[buffer_size] = "";
+				static char model_type_buffer[buffer_size] = "";
+				ImGui::InputText("Archtype name", name_buffer, buffer_size);
+				ImGui::InputText("Archtype model_type", model_type_buffer, buffer_size);
+				if (ImGui::Button("Confirm"))
+				{
+					CreateArchtypeFromInstance(instance_to_create_archtype, name_buffer, model_type_buffer);
+					//Clear buffers.
+					instance_to_create_archtype = entt::null;
+					name_buffer[0] = '\0';
+					model_type_buffer[0] = '\0';
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::Button("Close"))
+				{
+					//Ignore event, user has chosen not to give enough information.
+					//Clear buffers.
+					instance_to_create_archtype = entt::null;
+					name_buffer[0] = '\0';
+					model_type_buffer[0] = '\0';
+					ImGui::CloseCurrentPopup();
+				}
+			}
+		}
 
-    void ObjectManager::top_buttons()
-    {
-        if (ImGui::Button("Create Empty Object"))
-        {
-            entt::entity instance = registry.create();
-            registry.emplace<TransformComponent>(instance);
-            UNREFERENCED_PARAMETER(instance);
-        }
-        if (ImGui::Button("Create Empty Object At Camera"))
-        {
-            entt::entity instance = registry.create();
-            TransformComponent instance_transform{};
+		
+		ImGui::End();
 
-            //Find the position in front of where the camera is looking.
-            entt::entity camera = GraphicsSystem::GetInstance().GetFirstActiveCamera();
-            if (camera != entt::null)
-            {
-                CameraComponent& cam_comp = registry.get<CameraComponent>(camera);
-                instance_transform.position = Camera::GetFowardLookPosition(cam_comp, 0.5f);
+	}
+	void ObjectManager::Close() {
+		LOGI("object manager closed");
+	}
 
-            }//Otherwise if no active camera found then use default position at 0,0,0.
-            else
-            {
-                LOGD("%s", "No Active Camera Found, creating entity at(0, 0, 0)");
-            }
-            registry.emplace<TransformComponent>(instance, instance_transform);
-        }
-    }
+	void ObjectManager::top_buttons()
+	{
+		if (ImGui::Button("Create Empty Object"))
+		{
+			entt::entity instance = registry.create();
+			UNREFERENCED_PARAMETER(instance);
+		}
+		if (ImGui::Button("Create Empty Object At Camera"))
+		{
+			entt::entity instance = registry.create();
+			TransformComponent instance_transform{};
+
+			//Find the position in front of where the camera is looking.
+			entt::entity camera = GraphicsSystem::GetInstance().GetFirstActiveCamera();
+			if (camera != entt::null)
+			{
+				CameraComponent& cam_comp = registry.get<CameraComponent>(camera);
+				instance_transform.position = Camera::GetFowardLookPosition(cam_comp, 0.5f);
+
+			}//Otherwise if no active camera found then use default position at 0,0,0.
+			else
+			{
+				LOGD("%s", "No Active Camera Found, creating entity at(0, 0, 0)");
+			}
+			registry.emplace<TransformComponent>(instance, instance_transform);
+		}
+	}
+
+
+	void ObjectManager::CreateArchtypeFromInstance(entt::entity entity, const std::string& name, const std::string& model_type)
+	{
+		/*
+			Validity checks
+			- Whether said archtype already exists
+			- Whether entity is not valid.
+		*/
+		if (!registry.valid(entity))
+		{
+			LOGE("[ObjectManager::CreateArchtypeFromInstance] Entity %lu is not a valid entity!", (unsigned long)entity);
+			return; //Don't do anything.
+		}
+		if (name.empty())
+		{
+			LOGE("%s", "[ObjectManager::CreateArchtypeFromInstance] Cannot create archtype with no name");
+			return; //Don't do anything.
+		}
+		if (AssetManagerSystem::HasResource(AssetManagerSystem::GetFullGuid(AssetManagerSystem::ARCHTYPE_GUID, name)))
+		{
+			LOGE("[ObjectManager::CreateArchtypeFromInstance] Archtype %s already exists!", name.c_str());
+			return; //Don't do anything.
+		}
+
+
+		/*
+			Get the archtype from instance
+		*/
+		Archtype created_archtype = GameObjectSystem::CreateArchtypeFromInstance(entity, model_type);
+
+		/*
+			Create an archtype file from the archtype, then reload to create an archtype asset with guid.
+		*/
+		std::filesystem::path archtype_folder = AssetManagerSystem::GetAssetFolderPrefix() / AssetManagerSystem::GetFolderPath(AssetManagerSystem::ARCHTYPE);
+		std::string archtype_extension = name + ".json";
+		std::filesystem::path archtype_path = archtype_folder / archtype_extension;
+
+		//Ensure the file doesn't already exist.
+		if (std::filesystem::is_regular_file(archtype_path))
+		{
+			LOGE("[ObjectManager::CreateArchtypeFromInstance] Archtype json file for %s already exists!", name.c_str());
+			return;
+		}
+
+		//Serialize the archtype into the created file, thereby copying it.
+		std::ofstream archtype_filestream{ archtype_path };
+		archtype_filestream << created_archtype.Serialize() << std::flush;
+		archtype_filestream.close();
+		//Update archtypes with this new change.
+		AssetManagerSystem::ReloadAllResourcesOfType(AssetManagerSystem::ARCHTYPE, AssetManagerSystem::ARCHTYPE_GUID);
+
+		/*
+			Assign the archtype to the entity that created it.
+		*/
+		xresource::full_guid archtype_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::ARCHTYPE_GUID, name);
+		if (archtype_guid == xresource::full_guid{})
+		{
+			LOGE("[ObjectManager::CreateArchtypeFromInstance] Unable to get guid for Archtype %s", name.c_str());
+			return;
+		}
+		GameObjectSystem::AssignArchtypeToInstance(entity, archtype_guid.m_Instance);
+	}
 }
 #endif

@@ -1,5 +1,107 @@
 {
-	"0": {
+	"1000": {
+		"CameraComponent": {
+			"camType": 1,
+			"farPlane": 3000.0,
+			"fieldOfView": 75.0,
+			"is_active": true,
+			"nearPlane": 1.5,
+			"position": [
+				-225.616943359375,
+				258.0484924316406,
+				-311.1929626464844
+			],
+			"target": [
+				-113.55148315429688,
+				291.3922424316406,
+				-117.27516174316406
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 4974199829356445697
+				}
+			]
+		}
+	},
+	"1": {
+		"LightComponent": {
+			"color": [
+				1.0,
+				0.9200000166893005,
+				0.8500000238418579
+			],
+			"intensity": 50.0,
+			"position": [
+				-10.0,
+				80.0,
+				50.0
+			]
+		}
+	},
+	"2": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				8652294881921892357,
+				4431689612682600001
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Skybox",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "SkyBox"
+		},
+		"SkyboxRenderPass": null
+	},
+	"3": {
+		"MeshComponent": {
+			"meshName": "sponza"
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				0.5,
+				0.5,
+				0.5
+			]
+		}
+	},
+	"4": {
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -45,121 +147,19 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-3.0,
-				50.0,
-				0.0
+				-31.24365234375,
+				260.69805908203125,
+				-221.4196319580078
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
-				50.0,
-				50.0,
-				50.0
-			]
-		}
-	},
-	"1": {
-		"MeshComponent": {
-			"meshName": "sponza"
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"rotation": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
-		}
-	},
-	"2": {
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				8652294881921892357,
-				4431689612682600001
-			],
-			"ambientOcclusionMap": [
-				0,
-				0
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				0,
-				0
-			],
-			"name": "Skybox",
-			"normalMap": [
-				0,
-				0
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "SkyBox"
-		},
-		"SkyboxRenderPass": null
-	},
-	"3": {
-		"LightComponent": {
-			"color": [
-				1.0,
-				0.9200000166893005,
-				0.8500000238418579
-			],
-			"intensity": 14.0,
-			"position": [
-				-50.0,
-				120.0,
-				50.0
-			]
-		}
-	},
-	"4": {
-		"CameraComponent": {
-			"camType": 1,
-			"farPlane": 3000.0,
-			"fieldOfView": 75.0,
-			"is_active": true,
-			"nearPlane": 1.5,
-			"position": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"target": [
-				172.32861328125,
-				140.9950714111328,
-				-41.179874420166016
-			]
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 4974199829356445697
-				}
+				20.0,
+				20.0,
+				20.0
 			]
 		}
 	}

@@ -77,6 +77,8 @@ namespace EngineFramework
         float camera_speed;
         float scrolling_speed;
 
+        bool m_snapEnabled = false;
+        float m_snapStep = 1.0f;
 
         void play_simulation();
         void stop_simulation();

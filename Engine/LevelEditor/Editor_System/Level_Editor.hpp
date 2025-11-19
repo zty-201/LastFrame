@@ -44,9 +44,24 @@ namespace EngineFramework
 
 	//limiting the accessable variables for Lfeature, only able to change certain variables
 	struct iEditorView {
-
+		enum class Latest_Selected
+		{
+			NONE = 0,
+			INSTANCE_SELECTED,
+			MODEL_SELECTED
+		};
+		
+		/*
+			Represents what type was the latest selected.
+			Intended behaviour:
+			- When model is selected, it overrides old instance selection and vice versa.
+			- If a type is selected but its ID is invalid, then the other type is used.
+			- Should be set whenever model or instance is selected.
+		*/
+		Latest_Selected latest_selected = Latest_Selected::NONE;
 		entt::entity selected_objectID;
-		entt::entity selected_modelID;
+		xresource::full_guid selected_modelID;
+		
 	};
 
 	class LevelEditor
@@ -84,6 +99,7 @@ namespace EngineFramework
 		//bool to_open;
 		Imgui_const_Flags imgui_flags;
 		std::map<std::string, std::unique_ptr<LFeature>> featureMap;
+
 
 		void main_window();
 		void docking();

@@ -156,7 +156,7 @@ namespace EngineFramework
 		{
 			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::CHANGE_MODEL_TYPE, {}, {}, archtype);
 		}
-		if (ImGui::MenuItem("Delete ModelType"))
+		if (ImGui::MenuItem("Delete Archtype"))
 		{
 			delayed_archtype_event = ArchtypeEvent(ArchtypeEvent::DELETE, archtype_name);
 		}
@@ -171,7 +171,7 @@ namespace EngineFramework
 	namespace
 	{
 		//Helper function that draws an archtype image button. 
-		GLuint DrawArchtypeElement(const std::string& archtype_name, const std::shared_ptr<Archtype> archtype, float cell_w, entt::id_type material_comp_id)
+		GLuint DrawArchtypeElement(const std::string& archtype_name, const std::shared_ptr<Archtype> archtype, float cell_w, entt::id_type material_comp_id, bool& is_clicked)
 		{
 			std::vector<entt::meta_any> component_arr = archtype->component_arr;
 			GLuint texture_id{};
@@ -200,7 +200,7 @@ namespace EngineFramework
 			//==Drawing of archtype button. Will not draw an image if not available.
 			if (ImGui::ImageButton(archtype_name.c_str(), (ImTextureID)texture_id, ImVec2(cell_w, cell_w), { 0, 1 }, { 1, 0 }))
 			{
-
+				is_clicked = true;
 			}
 			return texture_id;
 		}
@@ -287,7 +287,15 @@ namespace EngineFramework
 				ImGui::BeginGroup();
 
 				//==Draw Archtype element (image button)
-				GLuint archtype_texture = DrawArchtypeElement(archtype_name, archtype, cell_w, material_comp_id);
+				bool is_clicked{};
+				GLuint archtype_texture = DrawArchtypeElement(archtype_name, archtype, cell_w, material_comp_id, is_clicked);
+
+				//If this archtype button is clicked, it means the model was selected.
+				if (is_clicked && editor_ptr)
+				{
+					editor_ptr->selected_modelID = archtype_guid;
+					editor_ptr->latest_selected = iEditorView::Latest_Selected::MODEL_SELECTED;
+				}
 
 				//==Set drag and drop payload for the archtype, to allow scene to receive selected archtype name for instantiation.
 				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
@@ -572,6 +580,7 @@ namespace EngineFramework
 					if (created_entity != entt::null)
 					{
 						LevelEditor::GetInstance().variables.selected_objectID = created_entity;
+						LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
 					}
 				}
 				delayed_archtype_event = {};
