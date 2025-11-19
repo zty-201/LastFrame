@@ -96,19 +96,6 @@
 		}
 	},
 	"4": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 11740093013966520321
-				},
-				{
-					"Loaded": true,
-					"ScriptGuid": 10742246650198540289
-				}
-			]
-		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -145,11 +132,6 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-78.77764129638672,
-				275.20770263671875,
-				-190.9552459716797
-		"TransformComponent": {
-			"position": [
 				-330.47100830078125,
 				323.11920166015625,
 				-300.6734313964844
@@ -166,5 +148,40 @@
 			]
 		},
 		"archtype": 11270566386067177473
+	},
+	"5": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 10742246650198540289
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 11740093013966520321
+				}
+			]
+		},
+		"MeshComponent": {
+			"meshName": "Sphere"
+		},
+		"TransformComponent": {
+			"position": [
+				299.473388671875,
+				272.7515869140625,
+				-188.43060302734375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
 	}
 }
