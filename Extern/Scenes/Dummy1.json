@@ -17,6 +17,25 @@
 			]
 		}
 	},
+	"1000": {
+		"CameraComponent": {
+			"camType": 1,
+			"farPlane": 3000.0,
+			"fieldOfView": 75.0,
+			"is_active": true,
+			"nearPlane": 1.5,
+			"position": [
+				-15.929680824279785,
+				336.05120849609375,
+				0.6462521553039551
+			],
+			"target": [
+				-16.19768714904785,
+				335.7760314941406,
+				-0.2768867015838623
+			]
+		}
+	},
 	"2": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -77,6 +96,40 @@
 		}
 	},
 	"4": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				0.10000000894069672,
+				0.10000000149011612
+			],
+			"albedoMap": [
+				7230819861274968067,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 0.20000000298023224,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "RedMetalSphere",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 0.800000011920929,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "Sphere"
+		},
+		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
 				-330.47100830078125,
@@ -95,5 +148,40 @@
 			]
 		},
 		"archtype": 11270566386067177473
+	},
+	"5": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 10742246650198540289
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 11740093013966520321
+				}
+			]
+		},
+		"MeshComponent": {
+			"meshName": "Sphere"
+		},
+		"TransformComponent": {
+			"position": [
+				299.473388671875,
+				272.7515869140625,
+				-188.43060302734375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
 	}
 }

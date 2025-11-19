@@ -348,8 +348,8 @@ namespace EditorFeatures {
 
 		// --- Display Name ---
 		std::string display_obj_name{};
-		if (!is_display_entity) display_obj_name = AssetManagerSystem::GetName(model_selected);
-		else display_obj_name = EngineFramework::GameObjectSystem::GetEntityName(entity_selected);
+		if (!is_display_entity) display_obj_name = AssetManagerSystem::GetName(model_selected) + " (Model)";
+		else display_obj_name = EngineFramework::GameObjectSystem::GetEntityName(entity_selected) + " (Entity)";
 		ImGui::TextUnformatted(display_obj_name.c_str());
 		ImGui::Separator();
 
@@ -610,20 +610,52 @@ namespace EditorFeatures {
 		std::vector<std::pair<entt::meta_type, std::string>> components_to_remove{};
 		if (is_display_entity)
 		{
+			//Entity components
 			std::vector<EntityComponentEntry> components = collect_components(reg, entity_selected);
+			
+			//Get archtype components if any, to check which entity components belong to archtype.
+			std::vector<entt::id_type> archtype_comp_types{};
+			xresource::instance_guid archtype_guid = GameObjectSystem::GetAttachedArchtype(entity_selected);
+			if (!archtype_guid.empty())
+			{
+				std::shared_ptr<Archtype> archtype_data = AssetManagerSystem::GetResource<Archtype>(xresource::full_guid(archtype_guid, AssetManagerSystem::ARCHTYPE_GUID));
+				if (archtype_data)
+				{
+					for (const auto& comp : archtype_data->component_arr)
+					{
+						archtype_comp_types.push_back(comp.type().id());
+					}
+				}
+			}
+
 			for (auto& component : components) {
-				const char* header = component.meta.name();
-				if (!header || !*header) header = "Component";
+				//Check if it's in archtype array. If it is, then indicate using a label so user knows its temporary/read-only.
+				entt::id_type comp_type_id = component.meta.id();
+				bool is_archtype_component{};
+				if (!archtype_comp_types.empty() && 
+					std::find_if(archtype_comp_types.begin(), archtype_comp_types.end(), [comp_type_id](entt::id_type id) {
+						return comp_type_id == id;
+					}) != archtype_comp_types.end())
+				{
+					is_archtype_component = true;
+				}
+				const char* tmp_str = component.meta.name();
+				if (!tmp_str || !*tmp_str) tmp_str = "Component";
+				std::string header = tmp_str;
+				if (is_archtype_component)
+				{
+					header += " (READONLY)";
+				}
 
 				ImGui::PushID(reinterpret_cast<void*>(static_cast<uintptr_t>(component.type_id)));
 
 				bool component_visible = true;
-				if (ImGui::CollapsingHeader(header, &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
+				if (ImGui::CollapsingHeader(header.c_str(), &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
 					EditorFeatures::DrawMetaObject(component.meta, component.instance);
 				}
 
 				if (!component_visible) {
-					components_to_remove.emplace_back(component.meta, std::string{ header });
+					components_to_remove.emplace_back(component.meta, header);
 				}
 
 				ImGui::PopID();
