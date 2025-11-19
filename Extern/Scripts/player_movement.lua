@@ -1,5 +1,5 @@
 -- ============================================================
--- player_movement.lua  (WITH JOYSTICK DEBUG PRINTS)
+-- player_movement.lua  (FIXED - Corrected direction vectors)
 -- ============================================================
 
 local moveSpeed = 50.0
@@ -53,7 +53,7 @@ local function movePlayer(worldMoveX, worldMoveZ, dt)
     z = z + worldMoveZ * moveSpeed * dt
 
     transform:SetPosition(x, y, z)
-    if camera then camera:SetPosition(x, y, z) end
+    --if camera then camera:SetPosition(x, y, z) end (do not move cam in this script)
 end
 
 -- ============================================================
@@ -67,25 +67,26 @@ function on_update(self, dt)
     end
 
     -- ========================================================
-    -- WINDOWS MOVEMENT
+    -- WINDOWS MOVEMENT (FIXED)
     -- ========================================================
     if PLATFORM == "windows" then
         local moveX, moveZ = 0.0, 0.0
 
         if Input.GetKey(GLFW_KEY_W) then print("[MOVE] W pressed") moveZ = moveZ + 1 end
         if Input.GetKey(GLFW_KEY_S) then print("[MOVE] S pressed") moveZ = moveZ - 1 end
-        if Input.GetKey(GLFW_KEY_A) then print("[MOVE] A pressed") moveX = moveX - 1 end
-        if Input.GetKey(GLFW_KEY_D) then print("[MOVE] D pressed") moveX = moveX + 1 end
+        if Input.GetKey(GLFW_KEY_A) then print("[MOVE] A pressed") moveX = moveX + 1 end
+        if Input.GetKey(GLFW_KEY_D) then print("[MOVE] D pressed") moveX = moveX - 1 end
 
         local len = math.sqrt(moveX*moveX + moveZ*moveZ)
         if len > 0 then
             moveX, moveZ = moveX / len, moveZ / len
 
             local radYaw = math.rad(yaw)
+            -- FIXED: Correct forward and right vector calculations
             local forwardX = math.sin(radYaw)
             local forwardZ = math.cos(radYaw)
-            local rightX   = math.sin(radYaw - math.pi/2)
-            local rightZ   = math.cos(radYaw - math.pi/2)
+            local rightX   = math.cos(radYaw)
+            local rightZ   = -math.sin(radYaw)
 
             movePlayer(
                 rightX * moveX + forwardX * moveZ,
@@ -97,7 +98,7 @@ function on_update(self, dt)
     end
 
     -- ========================================================
-    -- ANDROID JOYSTICK MOVEMENT (WITH DEBUG)
+    -- ANDROID JOYSTICK MOVEMENT (FIXED)
     -- ========================================================
     if PLATFORM == "android" then
         local down = Input.GetMouseButtonDown(0)
@@ -137,10 +138,11 @@ function on_update(self, dt)
             end
 
             local radYaw = math.rad(yaw)
+            -- FIXED: Correct forward and right vector calculations
             local forwardX = math.sin(radYaw)
             local forwardZ = math.cos(radYaw)
-            local rightX   = math.sin(radYaw - math.pi / 2)
-            local rightZ   = math.cos(radYaw - math.pi / 2)
+            local rightX   = math.cos(radYaw)
+            local rightZ   = -math.sin(radYaw)
 
             local worldMoveX = rightX * moveX + forwardX * moveZ
             local worldMoveZ = rightZ * moveX + forwardZ * moveZ
