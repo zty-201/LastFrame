@@ -14,8 +14,7 @@ local transform   = nil
 local yaw, pitch  = 0.0, 0.0
 
 -- ============================================================
--- Access the REAL global SHARED table (not environment-local)
--- Use rawget to bypass the environment and access true globals
+-- Access true global table
 -- ============================================================
 local function getGlobalShared()
     return rawget(_G, "SHARED")
@@ -23,61 +22,53 @@ end
 
 -- ============================================================
 function on_create(self)
-    -- Get components from injected entity data
     transform = EntityTransform
     camera = GetMainCamera()
 
     if not transform then 
-        print("[player_pov_camera ERROR] Transform missing for entity " .. tostring(EntityID))
-    else
-        print("[player_pov_camera] Transform bound successfully for entity " .. tostring(EntityID))
-        local x, y, z = transform:GetPosition()
-        print("[player_pov_camera] Position: " .. tostring(x) .. ", " .. tostring(y) .. ", " .. tostring(z))
+        print("[player_pov_camera ERROR] Transform missing")
     end
-    
     if not camera then 
-        print("[player_pov_camera ERROR] Camera missing") 
-    else
-        print("[player_pov_camera] Camera bound successfully")
+        print("[player_pov_camera ERROR] Camera missing")
     end
 
-    -- Initialize yaw and pitch from current transform rotation
-    local rx, ry, rz = transform:GetRotation()
-    pitch = rx
-    yaw = ry
+    -- Initialize yaw/pitch to zero (or from some initial setting)
+    -- DO NOT read from transform rotation to avoid circular dependencies
+    pitch = 0.0
+    yaw = 0.0
 
-    -- Access the true global SHARED table
+    -- Setup SHARED.POV
     local SHARED = getGlobalShared()
     if not SHARED then
-        print("[player_pov_camera ERROR] Global SHARED table not found!")
+        print("[player_pov_camera ERROR] Missing SHARED global!")
         return
     end
-    
-    -- Initialize POV in the global SHARED table
+
     if not SHARED.POV then
         SHARED.POV = {}
-        print("[player_pov_camera] Created SHARED.POV table")
+        print("[player_pov_camera] Created SHARED.POV")
     end
-    
+
     SHARED.POV.yaw = yaw
     SHARED.POV.pitch = pitch
 
-    print("[player_pov_camera] Look system initialized (yaw=" .. tostring(yaw) .. ", pitch=" .. tostring(pitch) .. ")")
-    print("[player_pov_camera] Global POV table created for other scripts")
+    print("[player_pov_camera] Initialized yaw=", yaw, " pitch=", pitch)
 end
 
+-- ============================================================
+-- Apply rotation + smoothing
 -- ============================================================
 local function applyLook()
     -- Clamp pitch
     if pitch > pitchLimit then pitch = pitchLimit end
     if pitch < -pitchLimit then pitch = -pitchLimit end
 
-    -- Update transform rotation
-    transform:SetRotation(pitch, yaw, 0)
+    -- CRITICAL: DO NOT touch transform rotation!
+    -- Only update camera position and look-at direction
 
     local x, y, z = transform:GetPosition()
 
-    -- Calculate forward vector
+    -- Compute forward vector from yaw/pitch
     local radYaw   = math.rad(yaw)
     local radPitch = math.rad(pitch)
     local cosPitch = math.cos(radPitch)
@@ -86,33 +77,28 @@ local function applyLook()
     local fy = math.sin(radPitch)
     local fz = cosPitch * math.cos(radYaw)
 
-    ------------------------------------------------------------------
-    -- CAMERA SMOOTHING (LERP)
-    ------------------------------------------------------------------
-    local smooth = 0.15 -- Lower = smoother, higher = snappier
+    -- -------------------------------
+    -- Smoothed camera follow
+    -- -------------------------------
+    local smooth = 0.15
 
     local cx, cy, cz = camera:GetPosition()
 
-    -- Smooth camera follow
+    -- new smoothed camera position
     local nx = cx + (x - cx) * smooth
     local ny = cy + (y - cy) * smooth
     local nz = cz + (z - cz) * smooth
+
     camera:SetPosition(nx, ny, nz)
 
-    -- Smooth LookAt target
-    local tx = x + fx
-    local ty = y + fy
-    local tz = z + fz
+    -- NO smoothing on look direction - instant response to mouse/gyro input
+    local tx = nx + fx
+    local ty = ny + fy
+    local tz = nz + fz
 
-    local sx = cx + (tx - cx) * smooth
-    local sy = cy + (ty - cy) * smooth
-    local sz = cz + (tz - cz) * smooth
+    camera:LookAt(tx, ty, tz)
 
-    camera:LookAt(sx, sy, sz)
-    
-    ------------------------------------------------------------------
-
-    -- Update SHARED POV
+    -- Update global yaw/pitch for movement script
     local SHARED = getGlobalShared()
     if SHARED and SHARED.POV then
         SHARED.POV.yaw = yaw
@@ -120,28 +106,30 @@ local function applyLook()
     end
 end
 
-
 -- ============================================================
 function on_update(self, dt)
-    if not camera or not transform then 
-        if math.random() < 0.01 then
-            print("[player_pov_camera] Skipping update - camera or transform is nil")
-        end
-        return 
-    end
+    if not camera or not transform then return end
 
-    -- Rest of your update code stays the same...
+    -- ======================================
+    -- WINDOWS LOOK CONTROL (ALWAYS APPLIES)
+    -- ======================================
     if PLATFORM == "windows" then
         local dx, dy = Input.GetMouseDelta()
-        
-        if math.abs(dx) > 0.001 or math.abs(dy) > 0.001 then
+
+        -- Update yaw/pitch ONLY if mouse moved
+        if dx ~= 0 or dy ~= 0 then
             yaw   = yaw + dx * mouseSensitivity
             pitch = pitch - dy * mouseSensitivity
-            applyLook()
         end
+
+        -- ALWAYS update camera orientation + SHARED.POV
+        applyLook()
         return
     end
 
+    -- ======================================
+    -- ANDROID GYRO LOOK
+    -- ======================================
     if PLATFORM == "android" and gyroEnabled then
         local gx, gy, gz = Input.GetGyroscopeRotatioRate()
 
