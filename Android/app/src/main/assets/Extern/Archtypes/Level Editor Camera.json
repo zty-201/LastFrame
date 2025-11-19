@@ -16,14 +16,5 @@
 			-235.86297607421875
 		]
 	},
-	"LuaScriptComponent": {
-		"Enabled": true,
-		"Scripts": [
-			{
-				"Loaded": true,
-				"ScriptGuid": 4974199829356445697
-			}
-		]
-	},
 	"model_type": "Camera"
 }
