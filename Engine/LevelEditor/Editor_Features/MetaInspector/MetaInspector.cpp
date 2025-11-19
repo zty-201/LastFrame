@@ -942,6 +942,54 @@ namespace EditorFeatures {
 				}
 			}
 
+			else if (field.type().is_sequence_container())
+			{
+				if (ImGui::TreeNode(label.c_str()))
+				{
+					auto view = field.as_sequence_container();
+					int index = 0;
+					for (auto it = view.begin(); it != view.end(); ++it)
+					{
+						ImGui::PushID(index);
+
+						entt::meta_any element = *it;
+						std::string element_label = "Element " + std::to_string(index);
+
+						if (ImGui::TreeNode(element_label.c_str()))
+						{
+							entt::meta_type element_type = element.type();
+							DrawMetaObject(element_type, element);
+							ImGui::TreePop();
+						}
+
+						ImGui::SameLine();
+						if (ImGui::SmallButton("X"))
+						{
+							view.erase(it);
+							ImGui::PopID();
+							break;
+						}
+
+						ImGui::PopID();
+						++index;
+					}
+
+					if (ImGui::Button(" + Add Element "))
+					{
+						entt::meta_type inner_type = view.value_type();
+
+						if (inner_type) {
+							entt::meta_any new_element = inner_type.construct();
+							if (new_element) {
+								view.insert(view.end(), new_element);
+							}
+						}
+					}
+
+					ImGui::TreePop();
+				}
+			}
+
 			else if (field.type().is_class()) {
 				// Nested struct: recurse
 				if (ImGui::TreeNode(label.c_str())) {
