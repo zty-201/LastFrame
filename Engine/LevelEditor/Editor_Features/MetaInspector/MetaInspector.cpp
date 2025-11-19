@@ -698,6 +698,7 @@ namespace EditorFeatures {
 		for (auto&& pair : mt.data()) {
 			const entt::id_type id = pair.first;
 			const entt::meta_data data = pair.second;
+			entt::meta_any field = obj.get(pair.first);
 
 			const std::string label = label_for(data, id);
 			const char* type_name = mt.name();
@@ -710,7 +711,6 @@ namespace EditorFeatures {
 
 			ImGui::PushID(reinterpret_cast<void*>(static_cast<uintptr_t>(id)));
 
-			entt::meta_any field = data.get(obj);
 
 			// Skip the hidden fields
 

@@ -1203,6 +1203,7 @@ namespace EngineFramework
                 if (created_entity != entt::null)
                 {
                     LevelEditor::GetInstance().variables.selected_objectID = created_entity;
+                    LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
                 }
             }
 

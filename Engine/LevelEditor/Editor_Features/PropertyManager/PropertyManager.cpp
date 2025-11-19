@@ -45,16 +45,42 @@ namespace EngineFramework {
 
         auto& reg = GameObjectSystem::GetRegistry();
 
-        // Current selection
-        entt::entity ent = LevelEditor::GetInstance().variables.selected_objectID;
+        /*
+            Choosing whether to display entity or model.
 
-        // Fallback (no duplicate condition)
-        if (ent == entt::null || !reg.valid(ent)) {
-            ent = pick_any_entity(reg);
+            First check if both are invalid or none selected. If so then pick any entity and set instance_selected.
+            else if latest_selected indicates which type was selected recently. Prioritise that type if the ID is valid.
+            Else the id for that type is Invalid (only the other is valid), so
+            - if instance_selected --> use model id and set model_selected.
+            - if model_selected --> use instance id and set instance_selected.
+        */
+        iEditorView& selected_var = LevelEditor::GetInstance().variables;
+        bool isEntityValid = registry.valid(selected_var.selected_objectID);
+        bool isModelValid = AssetManagerSystem::HasResource(selected_var.selected_modelID);
+
+        //Nothing valid is selected.
+        if (selected_var.latest_selected == iEditorView::Latest_Selected::NONE || (!isEntityValid && !isModelValid))
+        {
+            //Pick a random entity.
+            selected_var.selected_objectID = pick_any_entity(reg); //May be null, but let the panel be drawn anyways.
+            selected_var.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
         }
-
+        //For instance_selected, if entity is not valid but model is then default to model.
+        //Same goes for model_selected.
+        else if (selected_var.latest_selected == iEditorView::Latest_Selected::INSTANCE_SELECTED)
+        {
+            //Check if valid or not.
+            if (!isEntityValid) selected_var.latest_selected = iEditorView::Latest_Selected::MODEL_SELECTED;
+        }
+        else //Model Selected
+        {
+            //Check if valid or not.
+            if (!isModelValid) selected_var.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+        }
+        
+        bool is_display_entity_properties = (selected_var.latest_selected == iEditorView::Latest_Selected::INSTANCE_SELECTED);
         // Draw inspector even if ent is still null; the panel handles that message
-        EditorFeatures::DrawInspector(reg, ent);
+        EditorFeatures::DrawInspector(reg, selected_var.selected_objectID, selected_var.selected_modelID, is_display_entity_properties);
     }
 
     void LFeature_PropertyManager::Debug_SpawnTestEntityAndSelect() {
@@ -69,6 +95,7 @@ namespace EngineFramework {
         }
 
         LevelEditor::GetInstance().variables.selected_objectID = ent;
+        LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
     }
 
     void LFeature_PropertyManager::Close() {}
