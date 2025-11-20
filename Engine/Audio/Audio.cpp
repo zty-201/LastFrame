@@ -147,7 +147,8 @@ namespace EngineFramework
 		logFmodError(r, "System::update");
 		
 		//DebugPlayTestSound();
-		DebugMainMenuAutoPlay();
+		DebugStereoPanTest();
+		//DebugMainMenuAutoPlay();
 		DebugMainMenuHandleKeys();
 #endif
 	}
@@ -391,6 +392,68 @@ namespace EngineFramework
 			}
 		}
 	}*/
+
+	void AudioSystem::DebugStereoPanTest()
+	{
+#ifndef DISABLE_FMOD
+		if (!m_initialized)
+			return;
+
+		using EF_AM = AssetManagerSystem;
+
+		// Load asset through the Asset Manager (same as BGM)
+		static std::shared_ptr<SoundAsset> testSound = nullptr;
+
+		// Load once, just like BGM
+		if (!testSound)
+		{
+			testSound = EF_AM::GetResource<SoundAsset>(
+				EF_AM::GetFullGuid(EF_AM::AUDIO_GUID, "lizard")
+			);
+
+			if (!testSound)
+			{
+				LOGI("[AudioSystem] lizard asset not loaded!");
+				return;
+			}
+		}
+
+		// Check input
+		bool leftPressed = EngineFramework::InputManager::GetKeyDown(GLFW_KEY_1);
+		bool rightPressed = EngineFramework::InputManager::GetKeyDown(GLFW_KEY_2);
+
+		if (!leftPressed && !rightPressed)
+			return;
+
+		float pan = 0.0f;
+		if (leftPressed)  pan = -1.0f;
+		if (rightPressed) pan = 1.0f;
+
+		// Play through engine’s Play()
+		bool ok = Play(testSound, 1.0f, /*paused=*/true, AudioGroup::SFX);
+		if (!ok)
+		{
+			LOGI("[AudioSystem] Failed to play test_pan_sound.");
+			return;
+		}
+
+		// Retrieve last SFX channel to set pan
+		FMOD::Channel* ch = nullptr;
+		int numCh = 0;
+		m_groupSFX->getNumChannels(&numCh);
+
+		if (numCh > 0)
+		{
+			m_groupSFX->getChannel(numCh - 1, &ch);
+			if (ch)
+			{
+				ch->setPan(pan);
+				ch->setPaused(false);
+			}
+		}
+#endif
+	}
+
 
 	void AudioSystem::DebugMainMenuAutoPlay()
 	{

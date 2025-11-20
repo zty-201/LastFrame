@@ -205,6 +205,8 @@ namespace EngineFramework
 
         // Testing purpose
         //void DebugPlayTestSound();
+        // 
+        void DebugStereoPanTest();
 
         void DebugMainMenuAutoPlay();
         void DebugMainMenuHandleKeys();
