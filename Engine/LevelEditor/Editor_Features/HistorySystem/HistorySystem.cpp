@@ -424,7 +424,7 @@ namespace EngineFramework
   
     void Record_Entity::pop() {
 
-        if (Type == Record_Type::ENTITY_ADDED) {
+        if (Type == Record_Type::ENTITY_REMOVED) {
 
             if (!GameObjectSystem::GetRegistry().valid(entity)) {
                 entity = GameObjectSystem::GetRegistry().create(entity);
@@ -439,7 +439,7 @@ namespace EngineFramework
 
                 auto emplace = meta_type.func("emplace"_hs);
                 if (emplace) {
-                    emplace.invoke({}, entity, instance);                   
+                    emplace.invoke({}, entity, static_cast<const void*>(&instance));                   
                 }
 
                 auto getref_fn = meta_type.func("get_ref"_hs);
@@ -457,7 +457,7 @@ namespace EngineFramework
                 }
             }           
         }
-        else if (Type == Record_Type::ENTITY_REMOVED) {
+        else if (Type == Record_Type::ENTITY_ADDED) {
            
             if (GameObjectSystem::GetRegistry().valid(entity)) {
                 GameObjectSystem::GetRegistry().destroy(entity);

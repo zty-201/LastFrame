@@ -479,7 +479,9 @@ namespace EditorFeatures {
 								{
 									archtype_ptr->component_arr.push_back(instance);
 								}
-								record_component_added(e, match.component_name);
+								if (is_display_entity) {
+									record_component_added(entity_selected, match.component_name);
+								}
 								newly_added_names.insert(match.component_name);
 							}
 
@@ -623,7 +625,9 @@ namespace EditorFeatures {
 
 					// If component is added - important for tracking here for undo purposes
 					if (added) {
-						record_component_added(e, display);
+						if (is_display_entity) {
+							record_component_added(entity_selected, display);
+						}
 
 						if (asset_window_ptr) {
 							drop_context = build_drop_context(*asset_window_ptr);
@@ -698,7 +702,7 @@ namespace EditorFeatures {
 
 				bool component_visible = true;
 				if (ImGui::CollapsingHeader(header.c_str(), &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
-					EditorFeatures::DrawMetaObject(component.meta, component.instance);
+					EditorFeatures::DrawMetaObject(entity_selected, tmp_str, component.meta, component.instance);
 				}
 
 				if (!component_visible) {
@@ -718,7 +722,7 @@ namespace EditorFeatures {
 
 				bool component_visible = true;
 				if (ImGui::CollapsingHeader(header, &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
-					EditorFeatures::DrawMetaObject(meta, comp);
+					EditorFeatures::DrawMetaObject(entt::null, header, meta, comp);
 				}
 
 				if (!component_visible) {
@@ -735,33 +739,31 @@ namespace EditorFeatures {
 		if (!components_to_remove.empty()) {
 			for (const auto& [meta, name] : components_to_remove) {
 				bool removed = false;
-				std::unique_ptr<EngineFramework::Record> removal_record = start_component_history(e, name, Record_Type::COMP_REMOVED);
-				if (remove) {
-					entt::meta_any result = remove.invoke({}, e);
-					if (result && result.cast<bool>()) {
-						removed = true;
-						commit_component_history(removal_record);
+
 				if (is_display_entity)
 				{
 					auto remove = meta.func("remove"_hs);
 					if (remove)
 					{
+						std::unique_ptr<EngineFramework::Record> removal_record =
+							start_component_history(entity_selected, name, Record_Type::COMP_REMOVED);
 						entt::meta_any result = remove.invoke({}, entity_selected);
 						if (result && result.cast<bool>()) {
 							removed = true;
+							commit_component_history(removal_record);
 						}
 					}
 				}
 				else
 				{	//Model
-					for (auto it = archtype_ptr->component_arr.begin(); it != archtype_ptr->component_arr.end();)
+					for (auto it = archtype_ptr->component_arr.begin(); it != archtype_ptr->component_arr.end(); ++it)
 					{
 						if (it->type() != meta)
 						{
-							it++;
 							continue;
 						}
 						archtype_ptr->component_arr.erase(it);
+						removed = true;
 						break;
 					}
 				}
