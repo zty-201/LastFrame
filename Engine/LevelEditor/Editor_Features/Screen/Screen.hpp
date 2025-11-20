@@ -62,6 +62,11 @@ namespace EngineFramework
         static bool gizmos_IS_hovering;
         static bool gizmos_IS_dragged;
         static bool is_adjusting_lights;
+        static bool is_adjusting_triggerbox;
+
+        glm::vec3 saved_cam_pos_before_sim{};
+        glm::vec3 saved_cam_target_before_sim{};
+        bool has_saved_cam_before_sim = false;
 
     private:
 
@@ -73,10 +78,15 @@ namespace EngineFramework
         void camera_controls_in_screen_only();
         void control_window();
         void drop_target();
+        void adjust_triggerbox();
+        void entity_shortcut_menu();
 
         float camera_speed;
         float scrolling_speed;
 
+		entt::entity FindPlayerEntity();
+        bool m_snapEnabled = false;
+        float m_snapStep = 1.0f;
 
         void play_simulation();
         void stop_simulation();

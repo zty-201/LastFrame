@@ -1,0 +1,54 @@
+{
+	"MaterialComponent": {
+		"albedoFactor": [
+			1.0,
+			0.10000000894069672,
+			0.10000000149011612
+		],
+		"albedoMap": [
+			7230819861274968067,
+			3711223656383638553
+		],
+		"ambientOcclusionMap": [
+			0,
+			0
+		],
+		"metallicFactor": 0.20000000298023224,
+		"metallicMap": [
+			0,
+			0
+		],
+		"name": "RedMetalSphere",
+		"normalMap": [
+			0,
+			0
+		],
+		"roughnessFactor": 0.800000011920929,
+		"roughnessMap": [
+			0,
+			0
+		]
+	},
+	"MeshComponent": {
+		"meshName": "Sphere"
+	},
+	"SceneRenderPass": null,
+	"TransformComponent": {
+		"position": [
+			-31.24365234375,
+			260.69805908203125,
+			-221.4196319580078
+		],
+		"rotation": [
+			0.0,
+			-0.0,
+			0.0
+		],
+		"scale": [
+			20.0,
+			20.0,
+			20.0
+		]
+	},
+	"model_type": "Object"
+}

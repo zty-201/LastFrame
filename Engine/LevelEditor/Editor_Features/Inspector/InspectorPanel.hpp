@@ -16,5 +16,6 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <entt/entt.hpp>
 
 namespace EditorFeatures {
-	void DrawInspector(entt::registry& reg, entt::entity selected);
+	//Draws the inspector panel. is_display_entity is used to decide if the entity or the model properties should be displayed depending on which was selected the latest.
+	void DrawInspector(entt::registry& reg, entt::entity entity_selected, xresource::full_guid model_selected, bool is_display_entity);
 }

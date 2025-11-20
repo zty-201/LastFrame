@@ -119,38 +119,43 @@ namespace EngineFramework
     void InputManager::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     {
         UNREFERENCED_PARAMETER(window);
-        static double oldxpos = xpos;
-        static double oldypos = ypos;
-        double xoffset = xpos - oldxpos;
-        double yoffset = ypos - oldypos;
-        offset_MouseX = xoffset;
-        offset_MouseY = yoffset;
-        oldxpos = xpos;
-        oldypos = ypos;
 
+        // UPDATE ABSOLUTE MOUSE POSITION
+        mouseX = xpos;
+        mouseY = ypos;
+
+        // UPDATE FRAME-TO-FRAME DELTA
+        offset_MouseX = xpos - lastMouseX;
+        offset_MouseY = ypos - lastMouseY;
+
+        lastMouseX = xpos;
+        lastMouseY = ypos;
+
+        // Handle editor / gameplay camera controls
         if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed
-            || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down))
+            || mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down)
         {
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-
-#else   
+            // Editor -- do nothing (editor handles it)
+#else
             auto camera_view = registry.view<CameraComponent>();
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
-            Camera::onCursor(camera, xoffset, yoffset);
+            Camera::onCursor(camera, offset_MouseX, offset_MouseY);
 #endif
         }
-        else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed || (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Down))
+        else if (mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Pressed
+            || mouseButtonStates[GLFW_MOUSE_BUTTON_RIGHT] == KeyState::Down)
         {
-
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-
+            // Editor -- do nothing
 #else
             auto light_view = registry.view<LightComponent>();
             auto& light = light_view.get<LightComponent>(light_view.front());
-            Light::onCursor(light, xoffset, yoffset);
+            Light::onCursor(light, offset_MouseX, offset_MouseY);
 #endif
         }
     }
+
 
     void InputManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     {
@@ -246,7 +251,7 @@ namespace EngineFramework
         currentGyroRate.y = y;
         currentGyroRate.z = z;
         lastGyroTimestamp = timestamp;
-        LOGI("Gyro Update: X=%.4f, Y=%.4f, Z=%.4f", x, y, z);
+        //LOGI("Gyro Update: X=%.4f, Y=%.4f, Z=%.4f", x, y, z);
     }
 #endif
     void InputManager::ErrorCallback(int error, const char* description)
@@ -363,7 +368,7 @@ namespace EngineFramework
 
     std::pair<double, double> InputManager::GetMouseDelta()
     {
-        return { mouseX - lastMouseX, mouseY - lastMouseY };
+        return { offset_MouseX, offset_MouseY };
     }
 
     std::pair<double, double> InputManager::GetScrollDelta()
@@ -403,7 +408,7 @@ namespace EngineFramework
         */
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
 
-        if (!editor_running || editor_simulation_running) {
+        if (!editor_running && !editor_simulation_running) {  // Changed condition
 
 
             if (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Pressed || (mouseButtonStates[GLFW_MOUSE_BUTTON_LEFT] == KeyState::Down)) {
@@ -519,7 +524,7 @@ namespace EngineFramework
                 break;
             }
             if (oldState != state) {
-                std::cout << "Key State Advanced: key=" << key << " " << (int)oldState << " -> " << (int)state << "\n";
+                std::cout << "[InputManager::PostUpdate] Key State Advanced: key=" << key << " " << (int)oldState << " -> " << (int)state << "\n";
             }
         }
 
