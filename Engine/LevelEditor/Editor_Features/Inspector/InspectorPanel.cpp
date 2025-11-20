@@ -16,6 +16,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "pch.hpp"
 #include "InspectorPanel.hpp"
+#include "HistorySystem.hpp"
 #include "MetaInspector/MetaInspector.hpp"
 #include "System_GameObjectSystem.hpp"
 #include "Assets/System/AssetManager.hpp"
@@ -29,6 +30,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <vector>
 #include <utility>
 #include <cstdint>
+#include <memory>
+
 //For scopeguard CALL_AT_END.
 #include "Level_Editor.hpp"
 namespace EditorFeatures {
@@ -36,6 +39,8 @@ namespace EditorFeatures {
 	namespace {
 
 		using namespace entt::literals;
+		using EngineFramework::HistorySystem;
+		using EngineFramework::Record_Type;
 
 		struct ComponentDropMatch {
 			entt::meta_type type;
@@ -285,7 +290,24 @@ namespace EditorFeatures {
 			return components;
 		}
 
-		
+		static std::unique_ptr<EngineFramework::Record> start_component_history(entt::entity entity, const std::string& component_name, Record_Type type) {
+			if (!HistorySystem::this_class) {
+				return nullptr;
+			}
+			return HistorySystem::GetInstance().start_track(entity, component_name, type);
+		}
+
+		static void commit_component_history(std::unique_ptr<EngineFramework::Record>& record) {
+			if (!record) {
+				return;
+			}
+			HistorySystem::GetInstance().end_track(record);
+		}
+
+		static void record_component_added(entt::entity entity, const std::string& component_name) {
+			auto record = start_component_history(entity, component_name, Record_Type::COMP_ADDED);
+			commit_component_history(record);
+		}
 
 	} // namespace
 
@@ -364,6 +386,27 @@ namespace EditorFeatures {
 			drop_context = build_drop_context(*asset_window_ptr);
 		}
 
+		// If history system singleton exists then create the two buttons for the undo/redo
+		// Undo only enabled when it can be undo (under history singleton)
+		// Redo only enabled when it can be redo (under history singleton also)
+		if (HistorySystem::this_class) {
+			HistorySystem& history = HistorySystem::GetInstance();
+			ImGui::BeginGroup();
+			ImGui::BeginDisabled(!history.can_undo());
+			if (ImGui::Button("Undo##InspectorPanelUndo")) {
+				history.undo();
+			}
+			ImGui::EndDisabled();
+			ImGui::SameLine();
+			ImGui::BeginDisabled(!history.can_redo());
+			if (ImGui::Button("Redo##InspectorPanelRedo")) {
+				history.redo();
+			}
+			ImGui::EndDisabled();
+			ImGui::EndGroup();
+			ImGui::Separator();
+		}
+
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12.0f, 6.0f));
 		bool add_component_clicked = ImGui::Button("Add Component##InspectorAddComponentDrop", ImVec2(-1.0f, 0.0f));
 		ImGui::PopStyleVar();
@@ -435,6 +478,9 @@ namespace EditorFeatures {
 								else //Archtype, just add to array.
 								{
 									archtype_ptr->component_arr.push_back(instance);
+								}
+								if (is_display_entity) {
+									record_component_added(entity_selected, match.component_name);
 								}
 								newly_added_names.insert(match.component_name);
 							}
@@ -577,7 +623,12 @@ namespace EditorFeatures {
 						}
 					}
 
+					// If component is added - important for tracking here for undo purposes
 					if (added) {
+						if (is_display_entity) {
+							record_component_added(entity_selected, display);
+						}
+
 						if (asset_window_ptr) {
 							drop_context = build_drop_context(*asset_window_ptr);
 						}
@@ -651,7 +702,7 @@ namespace EditorFeatures {
 
 				bool component_visible = true;
 				if (ImGui::CollapsingHeader(header.c_str(), &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
-					EditorFeatures::DrawMetaObject(component.meta, component.instance);
+					EditorFeatures::DrawMetaObject(entity_selected, tmp_str, component.meta, component.instance);
 				}
 
 				if (!component_visible) {
@@ -671,7 +722,7 @@ namespace EditorFeatures {
 
 				bool component_visible = true;
 				if (ImGui::CollapsingHeader(header, &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
-					EditorFeatures::DrawMetaObject(meta, comp);
+					EditorFeatures::DrawMetaObject(entt::null, header, meta, comp);
 				}
 
 				if (!component_visible) {
@@ -688,27 +739,31 @@ namespace EditorFeatures {
 		if (!components_to_remove.empty()) {
 			for (const auto& [meta, name] : components_to_remove) {
 				bool removed = false;
+
 				if (is_display_entity)
 				{
 					auto remove = meta.func("remove"_hs);
 					if (remove)
 					{
+						std::unique_ptr<EngineFramework::Record> removal_record =
+							start_component_history(entity_selected, name, Record_Type::COMP_REMOVED);
 						entt::meta_any result = remove.invoke({}, entity_selected);
 						if (result && result.cast<bool>()) {
 							removed = true;
+							commit_component_history(removal_record);
 						}
 					}
 				}
 				else
 				{	//Model
-					for (auto it = archtype_ptr->component_arr.begin(); it != archtype_ptr->component_arr.end();)
+					for (auto it = archtype_ptr->component_arr.begin(); it != archtype_ptr->component_arr.end(); ++it)
 					{
 						if (it->type() != meta)
 						{
-							it++;
 							continue;
 						}
 						archtype_ptr->component_arr.erase(it);
+						removed = true;
 						break;
 					}
 				}

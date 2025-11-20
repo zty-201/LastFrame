@@ -67,6 +67,8 @@ namespace EngineFramework
     bool Screen::gizmos_IS_hovering = false;
     bool Screen::gizmos_IS_dragged = false;
     bool Screen::is_adjusting_lights = false;
+    bool Screen::is_adjusting_triggerbox = false;
+    
     //
     std::string Screen::json_backup{};
 
@@ -105,6 +107,18 @@ namespace EngineFramework
     {
         return *this_instance;
     }
+
+    inline int GetDominantScaleAxis(const float oldScale[3], const float newScale[3])
+    {
+        float dx = fabs(newScale[0] - oldScale[0]);
+        float dy = fabs(newScale[1] - oldScale[1]);
+        float dz = fabs(newScale[2] - oldScale[2]);
+
+        if (dx >= dy && dx >= dz) return 0;
+        if (dy >= dx && dy >= dz) return 1;
+        return 2;
+    }
+
 
     static inline glm::mat4 TRS(const glm::vec3& t, const glm::quat& q, const glm::vec3& s) {
         glm::mat4 M(1.0f);
@@ -159,7 +173,7 @@ namespace EngineFramework
 #if defined(PLATFORM_WINDOWS)
 		is_simulator_running = false;
 #endif
-        camera_speed = 1.f; // as default
+        camera_speed = 0.5f; // as default
         scrolling_speed = 10.f; // default
 
         Event_Level_Editor_Simulation editor_toggled{};
@@ -269,13 +283,47 @@ namespace EngineFramework
             if (SceneManager::GetInstance().is_file_loaded) {
 
                 display_screen();
+                bool hovered = ImGui::IsItemHovered();
+
                 gizmos();
-                triggerbox();
+                //triggerbox();
                 drop_target();
-                if (bool hovered = ImGui::IsItemHovered()) {
+
+                if (hovered) {
                     camera_controls_in_screen_only();
                 }
                 camera_controls_outside_screen();
+
+                static bool right_clicked = false;
+                static ImVec2 pressPos;
+                ImGuiIO& io = ImGui::GetIO();
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && hovered)
+                {
+                    right_clicked = true;
+                    pressPos = io.MousePos;
+
+                }
+
+                //open pop up if the clicked is released
+                if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && right_clicked)
+                {
+                    float dx = io.MousePos.x - pressPos.x;
+                    float dy = io.MousePos.y - pressPos.y;
+                    float dist2 = dx * dx + dy * dy;
+
+                    // threshold to ignore orbiting / dragging
+                    const float CLICK_EPSILON = 2.0f;
+
+                    // only open menu if mouse barely moved
+                    if (dist2 < CLICK_EPSILON * CLICK_EPSILON)
+                    {
+                        ImGui::OpenPopup("Entity_Shortcut_Menu");
+                    }
+                    
+                }
+
+                entity_shortcut_menu();
+                adjust_triggerbox();
             }
 
         }
@@ -429,6 +477,9 @@ namespace EngineFramework
         input.keyLeft = ImGui::IsKeyDown(ImGuiKey_LeftArrow);
         input.keyRight = ImGui::IsKeyDown(ImGuiKey_RightArrow);
 
+        // Focus / frame selected (e.g. F key)
+        input.keyFocus = ImGui::IsKeyPressed(ImGuiKey_F);
+
         auto camera_view = registry.view<CameraComponent>();
         if (camera_view.empty())
             return;
@@ -461,18 +512,22 @@ namespace EngineFramework
         input.mouseDeltaY = io.MouseDelta.y;
         input.mouseScroll = io.MouseWheel;
 
-        // Keyboard while hovering over the viewport
-        input.keyW = ImGui::IsKeyDown(ImGuiKey_W);
-        input.keyA = ImGui::IsKeyDown(ImGuiKey_A);
-        input.keyS = ImGui::IsKeyDown(ImGuiKey_S);
-        input.keyD = ImGui::IsKeyDown(ImGuiKey_D);
-        input.keyQ = ImGui::IsKeyDown(ImGuiKey_Q) || ImGui::IsKeyDown(ImGuiKey_UpArrow);
-        input.keyE = ImGui::IsKeyDown(ImGuiKey_E) || ImGui::IsKeyDown(ImGuiKey_DownArrow);
-        input.keyLeft = ImGui::IsKeyDown(ImGuiKey_LeftArrow);
-        input.keyRight = ImGui::IsKeyDown(ImGuiKey_RightArrow);
+        /*
+        * calling twice hence i commented, outside() are called outside and inside, so u do not need this
+        */
 
-        // Focus / frame selected (e.g. F key)
-        input.keyFocus = ImGui::IsKeyPressed(ImGuiKey_F);
+        //Keyboard while hovering over the viewport
+        //input.keyW = ImGui::IsKeyDown(ImGuiKey_W);
+        //input.keyA = ImGui::IsKeyDown(ImGuiKey_A);
+        //input.keyS = ImGui::IsKeyDown(ImGuiKey_S);
+        //input.keyD = ImGui::IsKeyDown(ImGuiKey_D);
+        //input.keyQ = ImGui::IsKeyDown(ImGuiKey_Q) || ImGui::IsKeyDown(ImGuiKey_UpArrow);
+        //input.keyE = ImGui::IsKeyDown(ImGuiKey_E) || ImGui::IsKeyDown(ImGuiKey_DownArrow);
+        //input.keyLeft = ImGui::IsKeyDown(ImGuiKey_LeftArrow);
+        //input.keyRight = ImGui::IsKeyDown(ImGuiKey_RightArrow);
+
+        //// Focus / frame selected (e.g. F key)
+        //input.keyFocus = ImGui::IsKeyPressed(ImGuiKey_F);
 
         auto camera_view = registry.view<CameraComponent>();
         if (camera_view.empty())
@@ -942,6 +997,8 @@ namespace EngineFramework
 
         if (is_simulator_running) return;
         if (is_adjusting_lights) return; //when adjusting lights, gizmos should be disabled
+        if (is_adjusting_triggerbox) return;
+
 
         //do not use gizmos if nothing is being selected, because what are you referrring to?
         if (editor_ptr->selected_objectID == entt::null) {
@@ -1087,9 +1144,182 @@ namespace EngineFramework
 
     }
 
+    void Screen::entity_shortcut_menu() {
+
+        if (is_simulator_running) return;
+        if (is_adjusting_lights) return;
+
+        if (ImGui::BeginPopup("Entity_Shortcut_Menu"))
+        {
+            if (ImGui::MenuItem("Delete")) {
+                // your delete code
+            }
+            if (ImGui::MenuItem("Duplicate")) {
+                // duplicate code
+            }
+
+            /*
+            * Adjusting trigger box
+            */
+            entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+
+            //TriggerBoxComponent
+
+            if (registry.all_of<TransformComponent, TriggerBoxComponent>(id))
+            {
+                std::string caption = "Adjust Trigger Box";
+                if (is_adjusting_triggerbox) caption = "Stop Adjusting";
+                else caption = "Adjust Trigger Box";
+
+                if (ImGui::MenuItem(caption.c_str())) {
+                    is_adjusting_triggerbox = !is_adjusting_triggerbox;
+                }
+            }
+
+
+            ImGui::EndPopup();
+        }
+
+    }
+
+    void Screen::adjust_triggerbox() {
+
+        /*
+            adjusting trigger box using gizmos
+        */
+        if (is_simulator_running) return;
+        if (is_adjusting_lights) return; //when adjusting lights, gizmos should be disabled
+        if (!is_adjusting_triggerbox) return;
+
+        if (editor_ptr->selected_objectID == entt::null) {
+            //std::cout << "nothing is selected\n";
+            return;
+        }
+
+        auto camera_view = registry.view<CameraComponent>();
+        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+        float aspect = (GraphicsSystem::GetInstance().GetWindowSize().second > 0) ?
+            (float)GraphicsSystem::GetInstance().GetWindowSize().first / GraphicsSystem::GetInstance().GetWindowSize().second : 1.0f;
+        glm::mat4 view = Camera::getLookAt(camera);
+        glm::mat4 proj = Camera::getPerspective(camera, aspect);
+
+        /*
+            only usw gizmos if the object have a TransformComponent
+        */
+
+        entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+
+        //TriggerBoxComponent
+
+        if (registry.all_of<TransformComponent, TriggerBoxComponent>(id))
+        {
+            auto& transform = registry.get<TransformComponent>(id);
+            auto& box = registry.get<TriggerBoxComponent>(id);
+
+            glm::mat4 transform_matrix = transform.modelMatrix;
+
+            glm::quat qLocal = EulerDegToQuat(box.localEulerDeg);
+            glm::mat4 localTRS = TRS(box.localPosition, qLocal, box.halfExtents * 2.0f);
+            glm::mat4 triggerMatrix = transform_matrix * localTRS;
+
+            glm::mat4 triggerBefore = triggerMatrix; 
+
+            ImGuizmo::BeginFrame();
+            ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+
+            
+            ImGuizmo::Manipulate(
+                glm::value_ptr(view),
+                glm::value_ptr(proj),
+                operation,
+                mode,
+                glm::value_ptr(triggerMatrix)
+            );
+          
+            static bool scalingStarted = false;
+            static bool shift_start = false;
+            static int Axis = -1;
+            
+
+            //when dragging for scaling stops
+            if (scalingStarted && (!ImGuizmo::IsUsing() || !shift_start))
+            {
+                scalingStarted = false;
+                Axis = -1;
+                //std::cout << "dragging stopped\n";
+                glm::quat qLocalFinal = EulerDegToQuat(box.localEulerDeg);
+                glm::mat4 localTRSFinal = TRS(box.localPosition, qLocalFinal, box.halfExtents * 2.0f);
+
+                triggerMatrix = transform_matrix * localTRSFinal;
+            }
+
+            //--------------------------------------------------------------------
+            // If gizmo changed the matrix this frame
+            //--------------------------------------------------------------------
+            if (Check_Mat4_Diff(triggerMatrix, triggerBefore))
+            {
+                ImGuiIO& io = ImGui::GetIO();
+                static glm::vec3 old_Half;  
+                static glm::vec3 old_Full;  
+
+
+                glm::mat4 newLocal = glm::inverse(transform_matrix) * triggerMatrix;
+
+                float t[3], r[3], s[3];
+                ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(newLocal), t, r, s);
+
+                glm::vec3 new_Full(s[0], s[1], s[2]);
+                glm::vec3 new_Half = new_Full * 0.5f;
+
+                
+                if (!scalingStarted && ImGuizmo::IsUsing() && operation == ImGuizmo::SCALE)
+                {
+                    scalingStarted = true;
+
+                    old_Half = box.halfExtents;
+                    old_Full = glm::vec3(old_Half.x * 2.f, old_Half.y * 2.f, old_Half.z * 2.f);
+
+                    Axis = GetDominantScaleAxis((float*)&old_Full, (float*)&new_Full);
+
+                }
+
+                if (scalingStarted && io.KeyShift && ImGuizmo::IsUsing() && operation == ImGuizmo::SCALE)
+                {
+                    shift_start = true;
+                    
+                    float ratio = new_Half[Axis] / old_Half[Axis];
+                    glm::vec3 scaledHalf = old_Half * ratio;
+
+                    box.halfExtents = scaledHalf;
+                }
+                else
+                {
+                    shift_start = false;                 
+                    box.halfExtents = new_Half;
+                }
+
+                
+                box.localPosition = glm::vec3(t[0], t[1], t[2]);
+                box.localEulerDeg = glm::vec3(r[0], r[1], r[2]);
+
+                qLocal = EulerDegToQuat(box.localEulerDeg);
+                localTRS = TRS(box.localPosition, qLocal, box.halfExtents * 2.0f);
+                triggerMatrix = transform_matrix * localTRS;
+            }
+
+            DrawWireOBB(triggerMatrix, view, proj, screen_pos, available_size,
+                IM_COL32(0, 255, 0, 255), 1.6f);
+        }
+
+
+    }
+
     void EngineFramework::Screen::triggerbox()
     {
+        
         if (is_adjusting_lights) return;
+        if (is_simulator_running) return;
+        
 
         // Use same camera math as gizmos()
         auto camera_view = registry.view<CameraComponent>();

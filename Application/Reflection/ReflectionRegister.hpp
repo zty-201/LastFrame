@@ -83,7 +83,8 @@ namespace EngineFramework
 		COMPONENT = 0,
 		NON_COMPONENT = 1
 	};
-
+	
+	struct RequiresSerializedHistoryTag {};
 
 	//Helper function to cast any meta type.
 	//template <typename Func>
