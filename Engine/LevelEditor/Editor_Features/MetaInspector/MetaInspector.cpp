@@ -1110,7 +1110,7 @@ namespace EditorFeatures {
 						if (ImGui::TreeNode(element_label.c_str()))
 						{
 							entt::meta_type element_type = element.type();
-							DrawMetaObject(element_type, element);
+							DrawMetaObject(entity, component_name, element_type, element);
 							ImGui::TreePop();
 						}
 
