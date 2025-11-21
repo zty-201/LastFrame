@@ -23,15 +23,16 @@ in vec3 FS_IN_WorldPos;
 // ------------------------------------------------------------------
 // UNIFORMS  --------------------------------------------------------
 // ------------------------------------------------------------------
-
 layout(std140, binding = 0) uniform VolumetricUBO
 {
     mat4  view;
     mat4  projection;
     mat4  view_proj;
     mat4  prev_view_proj;
-    mat4  light_view_proj;
     mat4  inv_view_proj;
+    mat4  cascade_view_proj[4];  // Array of cascade matrices
+    vec4  cascade_splits;
+    vec4  cascade_biases;
     vec4  light_direction;
     vec4  light_color;
     vec4  camera_position;

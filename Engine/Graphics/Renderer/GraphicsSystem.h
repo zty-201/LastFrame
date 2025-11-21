@@ -24,22 +24,7 @@
 #include "scene.h"
 #include "InstancingSystem.h"
 
-struct VolumetricUBO
-{
-    glm::mat4 view;
-    glm::mat4 projection;
-    glm::mat4 view_proj;
-    glm::mat4 prev_view_proj;
-    glm::mat4 light_view_proj;
-    glm::mat4 inv_view_proj;
-    glm::vec4 light_direction;
-    glm::vec4 light_color;
-    glm::vec4 camera_position;
-    glm::vec4 bias_near_far_pow; // x: bias, y: near, z: far, w: power
-    glm::vec4 aniso_density_scattering_absorption;
-    glm::vec4 time; // x: current time
-    glm::ivec4 width_height;
-};
+
 
 namespace EngineFramework
 {
@@ -149,15 +134,46 @@ namespace EngineFramework
 
     private:
 
+        int debugMode = 0;
+
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* pWindow = nullptr;
 #endif
+
+        struct VolumetricUBO
+        {
+            glm::mat4 view;
+            glm::mat4 projection;
+            glm::mat4 view_proj;
+            glm::mat4 prev_view_proj;
+            glm::mat4 inv_view_proj;
+            glm::mat4 cascade_view_proj[4];  // Array of cascade matrices
+            glm::vec4 cascade_splits;        // x,y,z,w = split distances
+            glm::vec4 cascade_biases;
+            glm::vec4 light_direction;
+            glm::vec4 light_color;
+            glm::vec4 camera_position;
+            glm::vec4 bias_near_far_pow; // x: bias, y: near, z: far, w: power
+            glm::vec4 aniso_density_scattering_absorption;
+            glm::vec4 time; // x: current time
+            glm::ivec4 width_height;
+        };
+
+        struct PointLightSSBO {
+            glm::vec4 position_radius;
+            glm::vec4 color_intensity;
+            glm::vec4 attenuation;
+            glm::vec4 shadow_index;  // This can store shadowIndex!
+        };
+
+		std::vector<PointLightSSBO> m_pointLightData;
 
         //std::unique_ptr<InstancingSystem> m_instancingSystem;
         // A map to cache loaded mesh data (VAO, index count)
         xresource::full_guid mesh_shader_guid;
         xresource::full_guid skybox_shader_guid;
         xresource::full_guid shadow_shader_guid;
+		xresource::full_guid point_shadow_shader_guid;
         xresource::full_guid light_injection_shader_guid;
         xresource::full_guid ray_march_shader_guid;
 
@@ -166,12 +182,21 @@ namespace EngineFramework
         std::unordered_map<std::string, std::shared_ptr<Mesh::MeshData>> meshCache;
         std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCacheWire;
 
+		// Shadow mapping resources
+        static const int CASCADE_COUNT = 4;
+        GLuint m_csmTextureArray = 0;  // 2D texture array for cascades
+        std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
+        std::array<float, CASCADE_COUNT + 1> m_cascadeSplits;
+		std::array<float, CASCADE_COUNT> m_cascadeBiases;
+
         FBO mainFBO;
         FBO m_shadowFBO;
+		FBO m_pointShadowFBO;
 
         GLuint sceneTextureID;
-        GLuint m_shadowMapTextureID;
-        
+		GLuint m_pointShadowMapTextureID;
+
+		GLuint m_pointLightSSBO = 0;
         // 3D textures for volumetric fog passes
         GLuint m_ray_march_voxel_grid = 0;
         GLuint m_temporal_integration_voxel_grid[2] = { 0, 0 };
@@ -182,10 +207,10 @@ namespace EngineFramework
         
         // Fog control parameters
         float m_anisotropy = 0.6f;      // Slightly forward scattering
-        float m_density = 1.0f;         // Much lower density (was 0.15)
+        float m_density = 0.5f;         // Much lower density (was 0.15)
         float m_scattering = 0.0f;
         float m_absorption = 0.0f; 
-        float m_shadow_bias = 0.002f;
+        float m_shadow_bias = 0.001f;
         float m_depth_power = 1.0f; // For exponential depth mapping
         float m_ambient_light_intensity = 0.001f;
         bool m_temporal_accumulation = true;
@@ -193,8 +218,7 @@ namespace EngineFramework
         int m_frame_idx = 0;
         bool m_ping_pong = false;
         glm::mat4 m_prev_view_projection;
-        glm::mat4 m_lightSpaceMatrix;
-
+        
         glm::vec2 screen = { WIDTH,HEIGHT };
         
         bool show_debugDraw = false;
@@ -211,9 +235,15 @@ namespace EngineFramework
         void VolumetricLightInjectionPass();
         void VolumetricRayMarchPass();
         void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
+		void UpdatePointLightSSBO(const CameraComponent& camera, const glm::mat4& viewProj);
         void PreGeneratePrimitives();
         void LoadBlueNoiseTextures();
-
+		void RenderDirectionalShadow();
+		void RenderPointLightShadows();
+        void RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius);
+        void CalculateCascadeSplits(float nearPlane, float farPlane);
+        bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
+        std::vector<glm::vec3> GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ);
         //==Event Handlers, one for each type of event.
         void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);

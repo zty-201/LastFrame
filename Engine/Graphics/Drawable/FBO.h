@@ -32,6 +32,7 @@ struct FBO
         TextureHDR,        // High Dynamic Range (HDR) texture framebuffer
         TextureDepth,      // Depth-only texture framebuffer
         ShadowCube,
+		CSMTextureArray, // Cascaded Shadow Map texture array framebuffer
         Deferred           // Framebuffer for deferred rendering
 
     } type; // Specifies the type of framebuffer
@@ -40,19 +41,21 @@ struct FBO
     GLuint* pTexture;     // Pointer to the associated texture
     int framebufferWidth;             // Width of the framebuffer
     int framebufferHeight;            // Height of the framebuffer
+	int cascadeCount;
     // Texture handles for deferred rendering
     GLuint gPosition = 0;
     GLuint gNormal = 0;
     GLuint gAlbedoSpec = 0;
 
     // Constructor to initialize the FBO with specific attributes
-    FBO(Type type = Default, int width = 0, int height = 0, GLuint* pTexture = nullptr)
+    FBO(Type type = Default, int width = 0, int height = 0, GLuint* pTexture = nullptr, int cascadeCnt = 4)
         :
         type{ type },
         handle{ 0 },
         pTexture{ pTexture },
         framebufferWidth{ width },
-        framebufferHeight{ height }
+        framebufferHeight{ height },
+        cascadeCount{ cascadeCnt }
     {
         // Resizes the framebuffer to match the specified dimensions
         resize(width, height);
@@ -85,8 +88,10 @@ struct FBO
             resetDeferredAsTarget(width, height); // Setup for deferred rendering
             break;
         case ShadowCube:
-            // Implement shadow cube map setup if needed
             resetShadowMapCubeAsTarget(width, height);
+            break;
+        case CSMTextureArray:
+			resetCSMTextureArrayAsTarget(width, height);
 			break;
         }
     }
@@ -309,6 +314,35 @@ struct FBO
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+
+    void resetCSMTextureArrayAsTarget(int width, int height) {
+        // Delete old FBO if it exists
+        if (handle) {
+            glDeleteFramebuffers(1, &handle);
+        }
+        // Delete old texture if it exists
+        if (pTexture && *pTexture) {
+            glDeleteTextures(1, pTexture);
+        }
+        // Create 2D texture array for cascaded shadow maps
+        glGenTextures(1, pTexture);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, *pTexture);
+        glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT24,
+            width, height, cascadeCount); // Assuming 4 cascades
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+        // Create FBO
+        glGenFramebuffers(1, &handle);
+        glBindFramebuffer(GL_FRAMEBUFFER, handle);
+        // We'll attach layers dynamically during rendering
+        glDrawBuffers(0, nullptr);
+        glReadBuffer(GL_NONE);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
 };
 
 #endif // FBO_H
