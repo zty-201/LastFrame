@@ -16,6 +16,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "pch.hpp"
 #include "InspectorPanel.hpp"
+#include "HistorySystem.hpp"
 #include "MetaInspector/MetaInspector.hpp"
 #include "System_GameObjectSystem.hpp"
 #include "Assets/System/AssetManager.hpp"
@@ -29,6 +30,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <vector>
 #include <utility>
 #include <cstdint>
+#include <memory>
+
 //For scopeguard CALL_AT_END.
 #include "Level_Editor.hpp"
 namespace EditorFeatures {
@@ -36,6 +39,8 @@ namespace EditorFeatures {
 	namespace {
 
 		using namespace entt::literals;
+		using EngineFramework::HistorySystem;
+		using EngineFramework::Record_Type;
 
 		struct ComponentDropMatch {
 			entt::meta_type type;
@@ -285,7 +290,24 @@ namespace EditorFeatures {
 			return components;
 		}
 
-		
+		static std::unique_ptr<EngineFramework::Record> start_component_history(entt::entity entity, const std::string& component_name, Record_Type type) {
+			if (!HistorySystem::this_class) {
+				return nullptr;
+			}
+			return HistorySystem::GetInstance().start_track(entity, component_name, type);
+		}
+
+		static void commit_component_history(std::unique_ptr<EngineFramework::Record>& record) {
+			if (!record) {
+				return;
+			}
+			HistorySystem::GetInstance().end_track(record);
+		}
+
+		static void record_component_added(entt::entity entity, const std::string& component_name) {
+			auto record = start_component_history(entity, component_name, Record_Type::COMP_ADDED);
+			commit_component_history(record);
+		}
 
 	} // namespace
 
@@ -348,8 +370,8 @@ namespace EditorFeatures {
 
 		// --- Display Name ---
 		std::string display_obj_name{};
-		if (!is_display_entity) display_obj_name = AssetManagerSystem::GetName(model_selected);
-		else display_obj_name = EngineFramework::GameObjectSystem::GetEntityName(entity_selected);
+		if (!is_display_entity) display_obj_name = AssetManagerSystem::GetName(model_selected) + " (Model)";
+		else display_obj_name = EngineFramework::GameObjectSystem::GetEntityName(entity_selected) + " (Entity)";
 		ImGui::TextUnformatted(display_obj_name.c_str());
 		ImGui::Separator();
 
@@ -362,6 +384,27 @@ namespace EditorFeatures {
 		ComponentDropContext drop_context{};
 		if (asset_window_ptr) {
 			drop_context = build_drop_context(*asset_window_ptr);
+		}
+
+		// If history system singleton exists then create the two buttons for the undo/redo
+		// Undo only enabled when it can be undo (under history singleton)
+		// Redo only enabled when it can be redo (under history singleton also)
+		if (HistorySystem::this_class) {
+			HistorySystem& history = HistorySystem::GetInstance();
+			ImGui::BeginGroup();
+			ImGui::BeginDisabled(!history.can_undo());
+			if (ImGui::Button("Undo##InspectorPanelUndo")) {
+				history.undo();
+			}
+			ImGui::EndDisabled();
+			ImGui::SameLine();
+			ImGui::BeginDisabled(!history.can_redo());
+			if (ImGui::Button("Redo##InspectorPanelRedo")) {
+				history.redo();
+			}
+			ImGui::EndDisabled();
+			ImGui::EndGroup();
+			ImGui::Separator();
 		}
 
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12.0f, 6.0f));
@@ -435,6 +478,9 @@ namespace EditorFeatures {
 								else //Archtype, just add to array.
 								{
 									archtype_ptr->component_arr.push_back(instance);
+								}
+								if (is_display_entity) {
+									record_component_added(entity_selected, match.component_name);
 								}
 								newly_added_names.insert(match.component_name);
 							}
@@ -577,7 +623,12 @@ namespace EditorFeatures {
 						}
 					}
 
+					// If component is added - important for tracking here for undo purposes
 					if (added) {
+						if (is_display_entity) {
+							record_component_added(entity_selected, display);
+						}
+
 						if (asset_window_ptr) {
 							drop_context = build_drop_context(*asset_window_ptr);
 						}
@@ -610,20 +661,52 @@ namespace EditorFeatures {
 		std::vector<std::pair<entt::meta_type, std::string>> components_to_remove{};
 		if (is_display_entity)
 		{
+			//Entity components
 			std::vector<EntityComponentEntry> components = collect_components(reg, entity_selected);
+			
+			//Get archtype components if any, to check which entity components belong to archtype.
+			std::vector<entt::id_type> archtype_comp_types{};
+			xresource::instance_guid archtype_guid = GameObjectSystem::GetAttachedArchtype(entity_selected);
+			if (!archtype_guid.empty())
+			{
+				std::shared_ptr<Archtype> archtype_data = AssetManagerSystem::GetResource<Archtype>(xresource::full_guid(archtype_guid, AssetManagerSystem::ARCHTYPE_GUID));
+				if (archtype_data)
+				{
+					for (const auto& comp : archtype_data->component_arr)
+					{
+						archtype_comp_types.push_back(comp.type().id());
+					}
+				}
+			}
+
 			for (auto& component : components) {
-				const char* header = component.meta.name();
-				if (!header || !*header) header = "Component";
+				//Check if it's in archtype array. If it is, then indicate using a label so user knows its temporary/read-only.
+				entt::id_type comp_type_id = component.meta.id();
+				bool is_archtype_component{};
+				if (!archtype_comp_types.empty() && 
+					std::find_if(archtype_comp_types.begin(), archtype_comp_types.end(), [comp_type_id](entt::id_type id) {
+						return comp_type_id == id;
+					}) != archtype_comp_types.end())
+				{
+					is_archtype_component = true;
+				}
+				const char* tmp_str = component.meta.name();
+				if (!tmp_str || !*tmp_str) tmp_str = "Component";
+				std::string header = tmp_str;
+				if (is_archtype_component)
+				{
+					header += " (READONLY)";
+				}
 
 				ImGui::PushID(reinterpret_cast<void*>(static_cast<uintptr_t>(component.type_id)));
 
 				bool component_visible = true;
-				if (ImGui::CollapsingHeader(header, &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
-					EditorFeatures::DrawMetaObject(component.meta, component.instance);
+				if (ImGui::CollapsingHeader(header.c_str(), &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
+					EditorFeatures::DrawMetaObject(entity_selected, tmp_str, component.meta, component.instance);
 				}
 
 				if (!component_visible) {
-					components_to_remove.emplace_back(component.meta, std::string{ header });
+					components_to_remove.emplace_back(component.meta, header);
 				}
 
 				ImGui::PopID();
@@ -639,7 +722,7 @@ namespace EditorFeatures {
 
 				bool component_visible = true;
 				if (ImGui::CollapsingHeader(header, &component_visible, ImGuiTreeNodeFlags_DefaultOpen)) {
-					EditorFeatures::DrawMetaObject(meta, comp);
+					EditorFeatures::DrawMetaObject(entt::null, header, meta, comp);
 				}
 
 				if (!component_visible) {
@@ -656,27 +739,31 @@ namespace EditorFeatures {
 		if (!components_to_remove.empty()) {
 			for (const auto& [meta, name] : components_to_remove) {
 				bool removed = false;
+
 				if (is_display_entity)
 				{
 					auto remove = meta.func("remove"_hs);
 					if (remove)
 					{
+						std::unique_ptr<EngineFramework::Record> removal_record =
+							start_component_history(entity_selected, name, Record_Type::COMP_REMOVED);
 						entt::meta_any result = remove.invoke({}, entity_selected);
 						if (result && result.cast<bool>()) {
 							removed = true;
+							commit_component_history(removal_record);
 						}
 					}
 				}
 				else
 				{	//Model
-					for (auto it = archtype_ptr->component_arr.begin(); it != archtype_ptr->component_arr.end();)
+					for (auto it = archtype_ptr->component_arr.begin(); it != archtype_ptr->component_arr.end(); ++it)
 					{
 						if (it->type() != meta)
 						{
-							it++;
 							continue;
 						}
 						archtype_ptr->component_arr.erase(it);
+						removed = true;
 						break;
 					}
 				}

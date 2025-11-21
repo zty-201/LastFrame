@@ -76,6 +76,12 @@ namespace EngineFramework
 
 		static std::string GetEntityName(entt::entity entity);
 
+		static xresource::instance_guid GetAttachedArchtype(entt::entity entity) {
+			auto it = entity_archtype_map.find(entity);
+			if (it == entity_archtype_map.end()) return {};
+			return it->second;
+		}
+
 		//Quick Call function to load scene and destroy current scene.
 		void LoadScene(const std::string& json_input);
 		

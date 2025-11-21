@@ -41,6 +41,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "TransformComponent.h"
 #include "Mesh.h"
 #include "MeshComponent.h"
+#include "HistorySystem.hpp"
 
 namespace EngineFramework
 {
@@ -162,8 +163,18 @@ namespace EngineFramework
 
 					if (ImGui::MenuItem(deleteLabel.c_str())) {
 
+						std::unique_ptr<EngineFramework::Record> entity_history{};
+						HistorySystem* history_system = HistorySystem::this_class ? &HistorySystem::GetInstance() : nullptr;
+						if (history_system) {
+							entity_history = history_system->start_track(entity, Record_Type::ENTITY_REMOVED);
+						}
+
 						// 1. Destroy the entity
 						registry.destroy(entity);
+
+						if (history_system) {
+							history_system->end_track(entity_history);
+						}
 
 						// 2. Clear selection
 						if (LevelEditor::GetInstance().variables.selected_objectID == entity) {

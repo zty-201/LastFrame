@@ -13,6 +13,7 @@
 #include "TransformComponent.h"
 #include "AudioComponent.h"
 #include "ColliderComponent.h"
+#include "PhysicsMaterialComponent.h"
 #include "PhysicsComponent.h"
 #include "TriggerBoxComponent.h"
 #include "Scripting/Script.hpp"
@@ -146,9 +147,44 @@ struct adl_serializer<std::filesystem::path> {
 	}
 };
 
-
-
 NLOHMANN_JSON_NAMESPACE_END
+
+// ColliderShape Enum
+inline void to_json(nlohmann::json& j, const ::ColliderShape& s) {
+	j = static_cast<int>(s);
+}
+inline void from_json(const nlohmann::json& j, ::ColliderShape& s) {
+	s = static_cast<::ColliderShape>(j.get<int>());
+}
+
+// ColliderComponent::Mode Enum (Global Scope)
+inline void to_json(nlohmann::json& j, const ::ColliderComponent::Mode& m) {
+	j = static_cast<int>(m);
+}
+inline void from_json(const nlohmann::json& j, ::ColliderComponent::Mode& m) {
+	m = static_cast<::ColliderComponent::Mode>(j.get<int>());
+}
+
+inline void to_json(nlohmann::json& j, const ::ColliderData& c) {
+	j = nlohmann::json{
+		{"type", c.type}, // It's already an int!
+		{"boxHalfExtents", c.boxHalfExtents},
+		{"sphereRadius", c.sphereRadius},
+		{"capsuleHeight", c.capsuleHeight},
+		{"capsuleRadius", c.capsuleRadius},
+		{"offsetPosition", c.offsetPosition},
+		{"offsetRotation", c.offsetRotation}
+	};
+}
+inline void from_json(const nlohmann::json& j, ::ColliderData& c) {
+	if (j.contains("type")) c.type = static_cast<int>(j.at("type").get<int>()); // Direct int read
+	if (j.contains("boxHalfExtents")) c.boxHalfExtents = j.at("boxHalfExtents").get<glm::vec3>();
+	if (j.contains("sphereRadius")) c.sphereRadius = j.at("sphereRadius").get<float>();
+	if (j.contains("capsuleHeight")) c.capsuleHeight = j.at("capsuleHeight").get<float>();
+	if (j.contains("capsuleRadius")) c.capsuleRadius = j.at("capsuleRadius").get<float>();
+	if (j.contains("offsetPosition")) c.offsetPosition = j.at("offsetPosition").get<glm::vec3>();
+	if (j.contains("offsetRotation")) c.offsetRotation = j.at("offsetRotation").get<glm::vec3>();
+}
 
 using namespace entt::literals;
 namespace EngineFramework
@@ -203,8 +239,15 @@ namespace EngineFramework
 		SetMeta(std::vector<std::string>),
 		SetMeta(CameraComponent::CameraType),
 		SetMeta(std::filesystem::path),
-		SetMeta(ColliderShape),
 		SetMeta(TriggerShapeType),
+		SetMeta(::ColliderShape),
+		SetMeta(::ColliderData),
+		SetMeta(std::vector<::ColliderData>),
+		SetMeta(::ColliderComponent::Mode),
+		SetMeta(ColliderShape),
+		SetMeta(ColliderData),
+		SetMeta(std::vector<ColliderData>),
+		SetMeta(ColliderComponent::Mode),
 		SetMeta(xresource::instance_guid)
 #if defined(ENGINE_ENABLE_LUA)
 		,
@@ -244,8 +287,15 @@ namespace EngineFramework
 		SetJson(std::vector<std::string>),
 		SetJson(CameraComponent::CameraType),
 		SetJson(std::filesystem::path),
-		SetJson(ColliderShape),
 		SetJson(TriggerShapeType),
+		SetJson(::ColliderShape),
+		SetJson(::ColliderData),
+		SetJson(std::vector<::ColliderData>),
+		SetJson(::ColliderComponent::Mode),
+		SetJson(ColliderShape),
+		SetJson(ColliderData),
+		SetJson(std::vector<ColliderData>),
+		SetJson(ColliderComponent::Mode),
 		SetJson(xresource::instance_guid)
 #if defined(ENGINE_ENABLE_LUA)
 		,
@@ -253,8 +303,6 @@ namespace EngineFramework
 		SetJson(std::vector<Engine::LuaScriptComponent::LuaInstance>)
 #endif
 	};
-
-
 
 	// Templated class, to provide different function overloads for each type that all do the same thing
 	template <typename T>
@@ -307,14 +355,16 @@ namespace EngineFramework
 		}
 	};
 
-	// To return a meta_any that references the component in the registry
-	template <typename T>
-	static entt::meta_any GetRef(entt::entity e) {
-		// Registry used here (same as emplacer/getter)
-		auto& reg = EngineFramework::GameObjectSystem::GetRegistry();
-		//return entt::meta_any{ std::ref(reg.get<T>(e)) };
-		return entt::forward_as_meta(reg.get<T>(e));
-	}
+		// To return a meta_any that references the component in the registry
+		template <typename T>
+		static entt::meta_any GetRef(entt::entity e) {
+			auto& reg = EngineFramework::GameObjectSystem::GetRegistry();
+			if constexpr (std::is_empty_v<T>) {
+				return entt::meta_any(std::in_place_type<T>);
+			} else {
+				return entt::forward_as_meta(reg.get<T>(e));
+			}
+		}
 	/*
 		Called during program startup: Will register all components into Entt reflection system.
 	*/
@@ -373,8 +423,15 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(std::vector<glm::vec3>);
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
 		REGISTER_ARBITRARY_TYPE(std::filesystem::path);
-		REGISTER_ARBITRARY_TYPE(ColliderShape);
 		REGISTER_ARBITRARY_TYPE(TriggerShapeType);
+		REGISTER_ARBITRARY_TYPE(::ColliderShape);
+		REGISTER_ARBITRARY_TYPE(ColliderShape);
+		REGISTER_ARBITRARY_TYPE(::ColliderData);
+		REGISTER_ARBITRARY_TYPE(ColliderData);
+		REGISTER_ARBITRARY_TYPE(std::vector<::ColliderData>);
+		REGISTER_ARBITRARY_TYPE(std::vector<ColliderData>);
+		REGISTER_ARBITRARY_TYPE(::ColliderComponent::Mode);
+		REGISTER_ARBITRARY_TYPE(ColliderComponent::Mode);
 #if defined(ENGINE_ENABLE_LUA)
 		REGISTER_ARBITRARY_TYPE(Engine::LuaScriptComponent::LuaInstance);
 		REGISTER_ARBITRARY_TYPE(std::vector<Engine::LuaScriptComponent::LuaInstance>);
@@ -408,10 +465,15 @@ namespace EngineFramework
 			.type("MaterialComponent")
 			.data<&MaterialComponent::name>("name")
 			.data<&MaterialComponent::albedoMap>("albedoMap")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&MaterialComponent::normalMap>("normalMap")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&MaterialComponent::metallicMap>("metallicMap")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&MaterialComponent::roughnessMap>("roughnessMap")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&MaterialComponent::ambientOcclusionMap>("ambientOcclusionMap")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&MaterialComponent::albedoFactor>("albedoFactor")
 			.data<&MaterialComponent::metallicFactor>("metallicFactor")
 			.data<&MaterialComponent::roughnessFactor>("roughnessFactor")
@@ -419,6 +481,20 @@ namespace EngineFramework
 			.func<&Remover<MaterialComponent>::RemoveComponent>("remove")
 			.func<&Getter<MaterialComponent>::GetComponent>("get")
 			.func<&GetRef<MaterialComponent>>("get_ref");
+
+		// === Register PhysicsMaterialComponent ===
+		entt::meta_factory<PhysicsMaterialComponent>()
+			.type("PhysicsMaterialComponent")
+			.data<&PhysicsMaterialComponent::friction>("friction")
+			.data<&PhysicsMaterialComponent::restitution>("restitution")
+			.data<&PhysicsMaterialComponent::density>("density")
+			.data<&PhysicsMaterialComponent::isStatic>("isStatic")
+			.data<&PhysicsMaterialComponent::_prevIsStatic>("_prevIsStatic") // Expose internal tracking for now
+			.data<&PhysicsMaterialComponent::layer>("layer")
+			.func<&Emplacer<PhysicsMaterialComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<PhysicsMaterialComponent>::RemoveComponent>("remove")
+			.func<&Getter<PhysicsMaterialComponent>::GetComponent>("get")
+			.func<&GetRef<PhysicsMaterialComponent>>("get_ref");
 
 		// === Register LightComponent ===
 		entt::meta_factory<LightComponent>()
@@ -474,20 +550,39 @@ namespace EngineFramework
 			.func<&Getter<AudioComponent>::GetComponent>("get")
 			.func<&GetRef<AudioComponent>>("get_ref");
 
+		entt::meta_factory<::ColliderShape>()
+			.type("ColliderShape") // Arbitrary name for the type
+			/*.data<ColliderShape::Box>("Box"_hs)
+			.data<ColliderShape::Sphere>("Sphere"_hs)
+			.data<ColliderShape::Capsule>("Capsule"_hs)*/
+			.conv<std::underlying_type_t<::ColliderShape>>();
+
+		entt::meta_factory<::ColliderData>()
+			.type("ColliderData")
+			// Dimensions
+			.data<&::ColliderData::type>("type")
+			.data<&ColliderData::boxHalfExtents>("boxHalfExtents")
+			.data<&ColliderData::sphereRadius>("sphereRadius")
+			.data<&ColliderData::capsuleHeight>("capsuleHeight")
+			.data<&ColliderData::capsuleRadius>("capsuleRadius")
+			// Offsets
+			.data<&ColliderData::offsetPosition>("offsetPosition")
+			.data<&ColliderData::offsetRotation>("offsetRotation");
+
+		entt::meta_factory<::ColliderComponent::Mode>()
+			.type("ColliderMode")
+			/*.data<ColliderComponent::Mode::SOLID_COLLIDER>("SOLID_COLLIDER"_hs)
+			.data<ColliderComponent::Mode::TRIGGER_SENSOR>("TRIGGER_SENSOR"_hs)
+			.data<ColliderComponent::Mode::LEVEL_EDITOR>("LEVEL_EDITOR"_hs)*/
+			.conv<std::underlying_type_t<::ColliderComponent::Mode>>();
+
 		// === Register ColliderComponent ===
 		entt::meta_factory<ColliderComponent>()
 			.type("ColliderComponent")
-			.data<&ColliderComponent::shape>("shape")
-			.data<&ColliderComponent::size>("size")
-			.data<&ColliderComponent::radius>("radius")
-			.data<&ColliderComponent::height>("height")
-			.data<&ColliderComponent::capRadius>("capRadius")
-			.data<&ColliderComponent::isStatic>("isStatic")
-			.data<&ColliderComponent::isTrigger>("isTrigger")
-			.data<&ColliderComponent::friction>("friction")
-			.data<&ColliderComponent::restitution>("restitution")
-			.data<&ColliderComponent::density>("density")
-			.data<&ColliderComponent::layer>("layer")
+			.data<&::ColliderComponent::mode>("mode")
+			.data<&ColliderComponent::shapes>("shapes")
+			.data<&ColliderComponent::minBounds>("minBounds") // AABB
+			.data<&ColliderComponent::maxBounds>("maxBounds") // AABB
 			.func<&Emplacer<ColliderComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<ColliderComponent>::RemoveComponent>("remove")
 			.func<&Getter<ColliderComponent>::GetComponent>("get")
@@ -497,10 +592,12 @@ namespace EngineFramework
 			.type("PhysicsComponent")
 			.data<&PhysicsComponent::velocity>("velocity")
 			.data<&PhysicsComponent::acceleration>("acceleration")
-			.data<&PhysicsComponent::friction>("friction")
 			.data<&PhysicsComponent::mass>("mass")
+			// Keep runtime-specific gravity control
 			.data<&PhysicsComponent::useGravity>("useGravity")
 			.data<&PhysicsComponent::gravityFactor>("gravityFactor")
+			.data<&PhysicsComponent::_prevUseGravity>("_prevUseGravity") // Expose internal tracking
+			.data<&PhysicsComponent::editorOverride>("editorOverride")
 			.func<&Emplacer<PhysicsComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<PhysicsComponent>::RemoveComponent>("remove")
 			.func<&Getter<PhysicsComponent>::GetComponent>("get")
@@ -526,17 +623,23 @@ namespace EngineFramework
 			.func<&GetRef<Engine::LuaScriptComponent>>("get_ref");
 
 		// Tag components (if you need them for serialization)
+		// Register SceneRenderPass
 		entt::meta_factory<SceneRenderPass>()
 			.type("SceneRenderPass")
 			.func<&Emplacer<SceneRenderPass>::EmplaceComponent>("emplace")
 			.func<&Remover<SceneRenderPass>::RemoveComponent>("remove")
-			.func<&Getter<SceneRenderPass>::GetComponent>("get");
+			.func<&Getter<SceneRenderPass>::GetComponent>("get")
+			.func<&GetRef<SceneRenderPass>>("get_ref")
+			.custom<RequiresSerializedHistoryTag>(RequiresSerializedHistoryTag{});
 
+		// Register SkyboxRenderPass
 		entt::meta_factory<SkyboxRenderPass>()
 			.type("SkyboxRenderPass")
 			.func<&Emplacer<SkyboxRenderPass>::EmplaceComponent>("emplace")
 			.func<&Remover<SkyboxRenderPass>::RemoveComponent>("remove")
-			.func<&Getter<SkyboxRenderPass>::GetComponent>("get");
+			.func<&Getter<SkyboxRenderPass>::GetComponent>("get")
+			.func<&GetRef<SkyboxRenderPass>>("get_ref")
+			.custom<RequiresSerializedHistoryTag>(RequiresSerializedHistoryTag{});
 
 		entt::meta_factory<TriggerBoxComponent>()
 			.type("TriggerBoxComponent")
@@ -549,7 +652,7 @@ namespace EngineFramework
 			.data<&TriggerBoxComponent::localPosition>("localPosition")
 			.data<&TriggerBoxComponent::localEulerDeg>("localEulerDeg")
 			.data<&TriggerBoxComponent::debugColor>("debugColor")
-			// runtime fields are typically NOT serialized; omit if you don’t want them saved:
+			// runtime fields are typically NOT serialized; omit if you donï¿½t want them saved:
 			//.data<&TriggerBoxComponent::bodyId>("bodyId")
 			//.data<&TriggerBoxComponent::isRegistered>("isRegistered")
 			.func<&Emplacer<TriggerBoxComponent>::EmplaceComponent>("emplace")
@@ -575,8 +678,6 @@ namespace EngineFramework
 		assert(false && "Type is not supported by SetMetaAnyWithJson function. Please add to map.");
 	}
 
-
-
 	// Helper function to cast meta_any member_data to the correct json data type, and set comp_json.
 	void SetJsonWithMetaAny(nlohmann::json& comp_json, const entt::meta_data& data_type, const entt::meta_any& data)
 	{
@@ -596,12 +697,25 @@ namespace EngineFramework
 			set_json_with_meta_map[type](comp_json, name, data);
 			return;
 		}
+		if (set_json_with_meta_map.find(type) == set_json_with_meta_map.end())
+		{
+			// 1. Print the ID we are looking for
+			std::cout << "CRASH: Looking for Type ID: " << type << " (" << name << ")" << std::endl;
+
+			// 2. Print all IDs currently inside the map to check for mismatches
+			std::cout << "--- Dumping Available Map IDs ---" << std::endl;
+			for (const auto& pair : set_json_with_meta_map) {
+				std::cout << "Map has ID: " << pair.first << std::endl;
+				// If you want to check if one matches, you can try resolving it here
+				if (pair.first == entt::resolve<::ColliderComponent::Mode>().id()) {
+					std::cout << "   (This matches ColliderComponent::Mode!)" << std::endl;
+				}
+			}
+			std::cout << "---------------------------------" << std::endl;
+		}
 		// Else throw an assertion.
 		assert(false && "Type is not supported by SetJsonWithMetaAny function. Please add to map.");
-
 	}
-
-
 }
 
 //if (type.is_integral())

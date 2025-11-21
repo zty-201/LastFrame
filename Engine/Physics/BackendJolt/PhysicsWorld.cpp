@@ -3,16 +3,31 @@
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/RegisterTypes.h>
-
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Physics/Body/BodyInterface.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
-
+#include <Jolt/Physics/Collision/Shape/CompoundShape.h>
+#include <Jolt/Core/Reference.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h> // Base Shape definition
+#include <Jolt/Physics/Collision/Shape/StaticCompoundShape.h>
+#include <Jolt/Physics/Body/MassProperties.h>
 #include <cassert>
 #include <iostream>
+#include "ColliderComponent.h"
+#include "PhysicsMaterialComponent.h"
+#include "TransformComponent.h"
+
+//TEST VALUES ONLY
+const float TEST_DENSITY = 1000.0f;
+const float FULL_GRAVITY = 1.0f;
+
+namespace JPH
+{
+    const float cPi = 3.14159265358979323846f;
+}
 
 // ------------------------------------------------------------
 // 5. Singleton accessor
@@ -80,15 +95,15 @@ void PhysicsWorld::Initialize()
     // TEMP: debug bodies to verify contact listener
     // --------------------------------------------------
     {
-        entt::entity eA = (entt::entity)1;
+        /*entt::entity eA = (entt::entity)1;
         entt::entity eB = (entt::entity)2;
 
         glm::vec3 pos(0.0f, 0.0f, 0.0f);
-        glm::vec3 size(1.0f, 1.0f, 1.0f);
+        glm::vec3 size(1.0f, 1.0f, 1.0f);*/
 
         // A = dynamic, B = static
-        CreateBoxBody(eA, pos, size, /*isStatic=*/false, /*isTrigger=*/false);
-        CreateBoxBody(eB, pos, size, /*isStatic=*/true,  /*isTrigger=*/false);
+        //CreateBoxBody(eA, pos, size, TEST_DENSITY, FULL_GRAVITY, /*isStatic=*/false, /*isTrigger=*/false);
+        //CreateBoxBody(eB, pos, size, TEST_DENSITY, FULL_GRAVITY, /*isStatic=*/true,  /*isTrigger=*/false);
     }
 }
 
@@ -182,130 +197,313 @@ void PhysicsWorld::StepSimulation(float dt)
 // 9. Body management stubs
 //    We'll implement these in the next stage (BuildSystem).
 // ------------------------------------------------------------
+JPH::ShapeRefC CreateJoltShapeFromCollider(const ColliderComponent& collider, const glm::vec3& scale)
+{
+    if (collider.shapes.empty())
+    {
+        LOGE("[PhysicsWorld] Cannot create shape: ColliderComponent has no sub-shapes.");
+        return JPH::ShapeRefC();
+    }
 
+    JPH::StaticCompoundShapeSettings compoundSettings;
+
+    glm::vec3 absScale = glm::abs(scale);
+
+    for (const auto& shapeData : collider.shapes)
+    {
+        JPH::ShapeRefC singleShape;
+
+        switch (static_cast<ColliderShape>(shapeData.type))
+        {
+            case ColliderShape::Box:
+            {
+                const glm::vec3 halfExt = shapeData.boxHalfExtents;
+                glm::vec3 safeHalfExt = glm::max(halfExt, glm::vec3(0.01f));
+                singleShape = new JPH::BoxShape(JPH::Vec3(safeHalfExt.x, safeHalfExt.y, safeHalfExt.z));
+                break;
+            }
+            case ColliderShape::Sphere:
+            {
+                float maxScale = std::max({ absScale.x, absScale.y, absScale.z });
+                float finalRadius = std::max(shapeData.sphereRadius * maxScale, 0.01f);
+
+                singleShape = new JPH::SphereShape(finalRadius);
+                break;
+            }
+            case ColliderShape::Capsule:
+            {
+                float scaleY = absScale.y;
+                float scaleXZ = std::max(absScale.x, absScale.z);
+
+                float finalHeight = shapeData.capsuleHeight * scaleY;
+                float finalRadius = std::max(shapeData.capsuleRadius * scaleXZ, 0.01f);
+
+                // Recalculate cylinder half-height (Total Height - 2 * Radius) / 2
+                float halfCylinderHeight = 0.5f * (finalHeight - 2.0f * finalRadius);
+                if (halfCylinderHeight < 0.0f) halfCylinderHeight = 0.01f; // Ensure valid geometry
+
+                singleShape = new JPH::CapsuleShape(halfCylinderHeight, finalRadius);
+                break;
+                break;
+            }
+        }
+
+        if (singleShape)
+        {
+            glm::quat glmRotation = glm::quat(glm::radians(shapeData.offsetRotation));
+
+            glm::vec3 scaledOffset = shapeData.offsetPosition * scale;
+
+            compoundSettings.AddShape(
+                JPH::Vec3(scaledOffset.x, scaledOffset.y, scaledOffset.z),
+                JPH::Quat(glmRotation.x, glmRotation.y, glmRotation.z, glmRotation.w),
+                singleShape
+            );
+        }
+    }
+
+    JPH::ShapeSettings::ShapeResult shapeResult = compoundSettings.Create();
+
+    if (shapeResult.HasError()) {
+        LOGE("[JOLT] Failed to finalize compound shape: %s", shapeResult.GetError().c_str());
+        return JPH::ShapeRefC();
+    }
+
+    return shapeResult.Get();
+}
+
+void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos,  const glm::vec3& rot, const glm::vec3& scale,
+    const ColliderComponent& collider, const PhysicsMaterialComponent& material, const float gravityFactor)
+{
+    if (HasBody(entity)) return;
+
+    if (static_cast<ColliderComponent::Mode>(collider.mode) == ColliderComponent::Mode::LEVEL_EDITOR) {
+        return;
+    }
+
+    if (collider.shapes.empty()) {
+        LOGI("[JOLT] Entity %u has ColliderComponent but no shapes defined. Skipping body creation.", (unsigned)entity);
+        return;
+    }
+
+    JPH::ShapeRefC finalShape = CreateJoltShapeFromCollider(collider, scale);
+    if (!finalShape) return;
+
+    const JPH::EMotionType motionType = material.isStatic ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic;
+    const bool isTrigger = static_cast<ColliderComponent::Mode>(collider.mode) == ColliderComponent::Mode::TRIGGER_SENSOR;
+
+    glm::quat qRot = glm::quat(glm::radians(rot));
+
+    JPH::BodyCreationSettings bodySettings(
+        finalShape,
+        JPH::Vec3(pos.x, pos.y, pos.z),
+        JPH::Quat(qRot.x, qRot.y, qRot.z, qRot.w),
+        motionType,
+        GetObjectLayerForIsStatic(material.isStatic)
+    );
+
+    bodySettings.mIsSensor = isTrigger;
+
+    if (!material.isStatic)
+    {
+        JPH::MassProperties massProperties;
+
+        JPH::MassProperties shapeMassProps = finalShape->GetMassProperties();
+
+        float volume = shapeMassProps.mMass;
+        float mass = volume * material.density;
+        float mass_ratio = mass / volume;
+        massProperties.mMass = mass;
+        massProperties.mInertia = shapeMassProps.mInertia * mass_ratio;
+
+        bodySettings.mMassPropertiesOverride = massProperties;
+        bodySettings.mGravityFactor = gravityFactor;
+        bodySettings.mFriction = material.friction;
+        bodySettings.mRestitution = material.restitution;
+    }
+
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
+    JPH::Body* body = bodyInterface.CreateBody(bodySettings);
+    if (!body) return;
+
+    body->SetUserData(static_cast<uint64_t>(static_cast<uint32_t>(entity)));
+    bodyInterface.AddBody(body->GetID(), motionType == JPH::EMotionType::Static ? JPH::EActivation::DontActivate : JPH::EActivation::Activate);
+
+    m_entityToBody[entity] = body->GetID();
+    m_bodyToEntity[body->GetID()] = entity;
+}
 // ------------------------------
 // Box
 // ------------------------------
-void PhysicsWorld::CreateBoxBody(entt::entity entity,
-    const glm::vec3& position,
-    const glm::vec3& size,   // FULL extents from your ColliderComponent
-    bool isStatic,
-    bool isTrigger)
-{
-    if (HasBody(entity)) return;
-
-    // Jolt wants half extents
-    const JPH::Vec3 halfExtent(0.5f * size.x, 0.5f * size.y, 0.5f * size.z);
-    JPH::Ref<JPH::BoxShape> shape = new JPH::BoxShape(halfExtent);
-
-    const JPH::Vec3 jPos(position.x, position.y, position.z);
-    const JPH::Quat jRot = JPH::Quat::sIdentity();
-
-    const JPH::EMotionType motionType = isStatic
-        ? JPH::EMotionType::Static
-        : JPH::EMotionType::Dynamic;
-
-    JPH::BodyCreationSettings bodySettings(
-        shape, jPos, jRot, motionType, GetObjectLayerForIsStatic(isStatic)
-    );
-    bodySettings.mIsSensor = isTrigger; // <— make it a trigger/sensor if requested
-
-    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
-    JPH::Body* body = bodyInterface.CreateBody(bodySettings);
-    if (!body) return;
-
-    body->SetUserData(static_cast<uint64_t>(static_cast<uint32_t>(entity)));
-
-    bodyInterface.AddBody(
-        body->GetID(),
-        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate
-    );
-
-    m_entityToBody[entity] = body->GetID();
-    m_bodyToEntity[body->GetID()] = entity;
-}
-
-// ------------------------------
-// Sphere
-// ------------------------------
-void PhysicsWorld::CreateSphereBody(entt::entity entity,
-    const glm::vec3& position,
-    float radius,
-    bool isStatic,
-    bool isTrigger)
-{
-    if (HasBody(entity)) return;
-
-    JPH::Ref<JPH::SphereShape> shape = new JPH::SphereShape(radius);
-
-    const JPH::Vec3 jPos(position.x, position.y, position.z);
-    const JPH::Quat jRot = JPH::Quat::sIdentity();
-
-    const JPH::EMotionType motionType = isStatic
-        ? JPH::EMotionType::Static
-        : JPH::EMotionType::Dynamic;
-
-    JPH::BodyCreationSettings bodySettings(
-        shape, jPos, jRot, motionType, GetObjectLayerForIsStatic(isStatic)
-    );
-    bodySettings.mIsSensor = isTrigger;
-
-    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
-    JPH::Body* body = bodyInterface.CreateBody(bodySettings);
-    if (!body) return;
-
-    body->SetUserData(static_cast<uint64_t>(static_cast<uint32_t>(entity)));
-
-    bodyInterface.AddBody(
-        body->GetID(),
-        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate
-    );
-
-    m_entityToBody[entity] = body->GetID();
-    m_bodyToEntity[body->GetID()] = entity;
-}
-
-// ------------------------------
-// Capsule
-// ------------------------------
-void PhysicsWorld::CreateCapsuleBody(entt::entity entity,
-    const glm::vec3& position,
-    float height,   // your ColliderComponent stores full height
-    float radius,
-    bool isStatic,
-    bool isTrigger)
-{
-    if (HasBody(entity)) return;
-
-    // Jolt's CapsuleShape ctor takes half-height of the cylinder part
-    JPH::Ref<JPH::CapsuleShape> shape = new JPH::CapsuleShape(0.5f * height, radius);
-
-    const JPH::Vec3 jPos(position.x, position.y, position.z);
-    const JPH::Quat jRot = JPH::Quat::sIdentity();
-
-    const JPH::EMotionType motionType = isStatic
-        ? JPH::EMotionType::Static
-        : JPH::EMotionType::Dynamic;
-
-    JPH::BodyCreationSettings bodySettings(
-        shape, jPos, jRot, motionType, GetObjectLayerForIsStatic(isStatic)
-    );
-    bodySettings.mIsSensor = isTrigger;
-
-    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
-    JPH::Body* body = bodyInterface.CreateBody(bodySettings);
-    if (!body) return;
-
-    body->SetUserData(static_cast<uint64_t>(static_cast<uint32_t>(entity)));
-
-    bodyInterface.AddBody(
-        body->GetID(),
-        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate
-    );
-
-    m_entityToBody[entity] = body->GetID();
-    m_bodyToEntity[body->GetID()] = entity;
-}
+//void PhysicsWorld::CreateBoxBody(entt::entity entity,
+//    const glm::vec3& position,
+//    const glm::vec3& size,   // FULL extents from your ColliderComponent
+//    const float density,
+//    const float gravityFactor,
+//    bool isStatic,
+//    bool isTrigger)
+//{
+//    if (HasBody(entity)) return;
+//
+//    // Jolt wants half extents
+//    const JPH::Vec3 halfExtent(0.5f * size.x, 0.5f * size.y, 0.5f * size.z);
+//    JPH::Ref<JPH::BoxShape> shape = new JPH::BoxShape(halfExtent);
+//
+//    const JPH::Vec3 jPos(position.x, position.y, position.z);
+//    const JPH::Quat jRot = JPH::Quat::sIdentity();
+//
+//    const JPH::EMotionType motionType = isStatic
+//        ? JPH::EMotionType::Static
+//        : JPH::EMotionType::Dynamic;
+//
+//    JPH::BodyCreationSettings bodySettings(
+//        shape, jPos, jRot, motionType, GetObjectLayerForIsStatic(isStatic)
+//    );
+//    bodySettings.mIsSensor = isTrigger; // <— make it a trigger/sensor if requested
+//
+//    if (!isStatic)
+//    {
+//        const float volume = size.x * size.y * size.z;
+//        const float mass = volume * density;
+//
+//        JPH::MassProperties massProperties;
+//        massProperties.SetMassAndInertiaOfSolidBox(halfExtent, mass);
+//
+//        bodySettings.mMassPropertiesOverride = massProperties;
+//        bodySettings.mGravityFactor = gravityFactor;
+//    }
+//
+//    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
+//    JPH::Body* body = bodyInterface.CreateBody(bodySettings);
+//    if (!body) return;
+//
+//    body->SetUserData(static_cast<uint64_t>(static_cast<uint32_t>(entity)));
+//
+//    bodyInterface.AddBody(
+//        body->GetID(),
+//        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate
+//    );
+//
+//    m_entityToBody[entity] = body->GetID();
+//    m_bodyToEntity[body->GetID()] = entity;
+//}
+//
+//// ------------------------------
+//// Sphere
+//// ------------------------------
+//void PhysicsWorld::CreateSphereBody(entt::entity entity,
+//    const glm::vec3& position,
+//    float radius,
+//    const float density,
+//    const float gravityFactor,
+//    bool isStatic,
+//    bool isTrigger)
+//{
+//    if (HasBody(entity)) return;
+//
+//    JPH::Ref<JPH::SphereShape> shape = new JPH::SphereShape(radius);
+//
+//    const JPH::Vec3 jPos(position.x, position.y, position.z);
+//    const JPH::Quat jRot = JPH::Quat::sIdentity();
+//
+//    const JPH::EMotionType motionType = isStatic
+//        ? JPH::EMotionType::Static
+//        : JPH::EMotionType::Dynamic;
+//
+//    JPH::BodyCreationSettings bodySettings(
+//        shape, jPos, jRot, motionType, GetObjectLayerForIsStatic(isStatic)
+//    );
+//    bodySettings.mIsSensor = isTrigger;
+//
+//    if (!isStatic)
+//    {
+//        const float volume = (4.0f / 3.0f) * JPH::cPi * radius * radius * radius; //4/3 * PI * r^3
+//        const float mass = volume * density;
+//
+//        JPH::MassProperties massProperties;
+//        massProperties.mMass = mass;
+//        float moment = 0.4f * mass * radius * radius; //2/5 * mass * r^2
+//        massProperties.mInertia = JPH::Mat44::sScale(moment);
+//
+//        bodySettings.mMassPropertiesOverride = massProperties;
+//        bodySettings.mGravityFactor = gravityFactor;
+//    }
+//
+//    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
+//    JPH::Body* body = bodyInterface.CreateBody(bodySettings);
+//    if (!body) return;
+//
+//    body->SetUserData(static_cast<uint64_t>(static_cast<uint32_t>(entity)));
+//
+//    bodyInterface.AddBody(
+//        body->GetID(),
+//        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate
+//    );
+//
+//    m_entityToBody[entity] = body->GetID();
+//    m_bodyToEntity[body->GetID()] = entity;
+//}
+//
+//// ------------------------------
+//// Capsule
+//// ------------------------------
+//void PhysicsWorld::CreateCapsuleBody(entt::entity entity,
+//    const glm::vec3& position,
+//    float height,   // your ColliderComponent stores full height
+//    float radius,
+//    const float density,
+//    const float gravityFactor,
+//    bool isStatic,
+//    bool isTrigger)
+//{
+//    if (HasBody(entity)) return;
+//
+//    // Jolt's CapsuleShape ctor takes half-height of the cylinder part
+//    JPH::Ref<JPH::CapsuleShape> shape = new JPH::CapsuleShape(0.5f * height, radius);
+//
+//    const JPH::Vec3 jPos(position.x, position.y, position.z);
+//    const JPH::Quat jRot = JPH::Quat::sIdentity();
+//
+//    const JPH::EMotionType motionType = isStatic
+//        ? JPH::EMotionType::Static
+//        : JPH::EMotionType::Dynamic;
+//
+//    JPH::BodyCreationSettings bodySettings(
+//        shape, jPos, jRot, motionType, GetObjectLayerForIsStatic(isStatic)
+//    );
+//    bodySettings.mIsSensor = isTrigger;
+//
+//    if (!isStatic)
+//    {
+//        const float cylinderHalfHeight = 0.5f * (height - 2.0f * radius);
+//
+//        const float sphereVolume = (4.0f / 3.0f) * JPH::cPi * radius * radius * radius;
+//        const float cylinderVolume = JPH::cPi * radius * radius * (2.0f * cylinderHalfHeight);
+//        const float volume = sphereVolume * cylinderVolume;
+//        const float mass = volume * density;
+//
+//        JPH::MassProperties massProperties;
+//        float axialMoment = 0.5f * mass * radius * radius;
+//        massProperties.mInertia = JPH::Mat44::sScale(axialMoment);
+//
+//        bodySettings.mMassPropertiesOverride = massProperties;
+//        bodySettings.mGravityFactor = gravityFactor;
+//    }
+//
+//    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterfaceNoLock();
+//    JPH::Body* body = bodyInterface.CreateBody(bodySettings);
+//    if (!body) return;
+//
+//    body->SetUserData(static_cast<uint64_t>(static_cast<uint32_t>(entity)));
+//
+//    bodyInterface.AddBody(
+//        body->GetID(),
+//        isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate
+//    );
+//
+//    m_entityToBody[entity] = body->GetID();
+//    m_bodyToEntity[body->GetID()] = entity;
+//}
 
 void PhysicsWorld::SetGravityFactor(entt::entity entity, float factor)
 {

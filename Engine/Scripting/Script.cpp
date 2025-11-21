@@ -72,9 +72,15 @@ namespace Engine {
         s_Lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math,
             sol::lib::table, sol::lib::string, sol::lib::io);
 
-    // ===============================================================
-    // Platform constant exposed to Lua
-    // ===============================================================
+        // ===============================================================
+        // Create SHARED table for cross-script communication
+        // ===============================================================
+        s_Lua["SHARED"] = s_Lua.create_table();
+        LOGI("[ScriptSystem] Created SHARED table for cross-script communication");
+
+        // ===============================================================
+        // Platform constant exposed to Lua
+        // ===============================================================
 #if defined(PLATFORM_ANDROID)
         s_Lua["PLATFORM"] = "android";
 #elif defined(PLATFORM_WINDOWS)
@@ -86,8 +92,34 @@ namespace Engine {
 
 
         BindLuaPrintToEngine(s_Lua);
-        
+
         LOGI("[ScriptSystem] Initializing Lua bindings...");
+
+        // ===============================================================
+        // Transform Component bindings
+        // ===============================================================
+        s_Lua.new_usertype<TransformComponent>("TransformComponent",
+            "GetPosition", [](TransformComponent& transform) {
+                return std::make_tuple(transform.position.x, transform.position.y, transform.position.z);
+            },
+            "SetPosition", [](TransformComponent& transform, float x, float y, float z) {
+                transform.position = glm::vec3(x, y, z);
+            },
+            "GetRotation", [](TransformComponent& transform) {
+                return std::make_tuple(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+            },
+            "SetRotation", [](TransformComponent& transform, float x, float y, float z) {
+                transform.rotation = glm::vec3(x, y, z);
+            },
+            "GetScale", [](TransformComponent& transform) {
+                return std::make_tuple(transform.scale.x, transform.scale.y, transform.scale.z);
+            },
+            "SetScale", [](TransformComponent& transform, float x, float y, float z) {
+                transform.scale = glm::vec3(x, y, z);
+            }
+        );
+
+        LOGI("[ScriptSystem] TransformComponent bindings complete.");
 
         // ===============================================================
         // InputManager bindings
@@ -211,18 +243,44 @@ namespace Engine {
             return nullptr;
             });
 
+        // ===============================================================
+        // Global helper: GetEntityTransform(entity)
+        // ===============================================================
+        s_Lua.set_function("GetEntityTransform", [](entt::entity e) -> TransformComponent* {
+            if (registry.all_of<TransformComponent>(e)) {
+                return &registry.get<TransformComponent>(e);
+            }
+            return nullptr;
+            });
+
+        // ===============================================================
+        // GLFW Key Constants (for WASD and other keys)
+        // ===============================================================
+        s_Lua["GLFW_KEY_W"] = 87;
+        s_Lua["GLFW_KEY_A"] = 65;
+        s_Lua["GLFW_KEY_S"] = 83;
+        s_Lua["GLFW_KEY_D"] = 68;
+        s_Lua["GLFW_KEY_SPACE"] = 32;
+        s_Lua["GLFW_KEY_SHIFT"] = 340;
+
+        // Mouse button constants
+        s_Lua["GLFW_MOUSE_BUTTON_LEFT"] = 0;
+        s_Lua["GLFW_MOUSE_BUTTON_RIGHT"] = 1;
+        s_Lua["GLFW_MOUSE_BUTTON_MIDDLE"] = 2;
+
         LOGI("[ScriptSystem] Lua bindings initialized successfully.");
 
-        // Quick sanity check that camera_touch_control.lua is loaded
-        auto guid = EngineFramework::AssetManagerSystem::GetFullGuid(
-            EngineFramework::AssetManagerSystem::SCRIPT_GUID, "camera_touch_control");
-        LOGI("[Check] camera_touch_control full GUID = %llu", guid.m_Instance.m_Value); //Error here
+        //No longer needed to sanity check here (Debugging)
+        //// Quick sanity check that camera_touch_control.lua is loaded
+        //auto guid = EngineFramework::AssetManagerSystem::GetFullGuid(
+        //    EngineFramework::AssetManagerSystem::SCRIPT_GUID, "camera_touch_control");
+        //LOGI("[Check] camera_touch_control full GUID = %llu", guid.m_Instance.m_Value); //Error here
 
-        auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(guid);
-        if (!scriptAsset)
-            LOGE("[Check] ScriptAsset 'camera_touch_control' not found!");
-        else
-            LOGI("[Check] ScriptAsset found. Code length: %zu", scriptAsset->code.size());
+        //auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(guid);
+        //if (!scriptAsset)
+        //    LOGE("[Check] ScriptAsset 'camera_touch_control' not found!");
+        //else
+        //    LOGI("[Check] ScriptAsset found. Code length: %zu", scriptAsset->code.size());
 #endif
     }
 
@@ -241,47 +299,63 @@ namespace Engine {
                 inst.Loaded = false;
             });
 
-        // Attach camera_touch_control.lua to main camera (for Android + Windows)
-        auto cameraView = reg.view<CameraComponent>();
-        if (!cameraView.empty()) {
-            auto cameraEntity = cameraView.front();
-
-            LOGI("[ScriptSystem] Attaching script to camera entity (%u) with registry %p",
-                static_cast<unsigned>(cameraEntity), (void*)&reg);
-
-            if (!reg.all_of<LuaScriptComponent>(cameraEntity)) {
-                reg.emplace<LuaScriptComponent>(cameraEntity);
-            }
-
-            auto& lsc = reg.get<LuaScriptComponent>(cameraEntity);
-            lsc.Enabled = true;
-
-            Engine::LuaScriptComponent::LuaInstance inst;
-            inst.ScriptGuid = EngineFramework::AssetManagerSystem::GetFullGuid(
-                EngineFramework::AssetManagerSystem::SCRIPT_GUID,
-                "player_pov_camera"
-            ).m_Instance;
-
-            bool alreadyAttached = false;
-            for (auto& s : lsc.Scripts) {
-                if (s.ScriptGuid == inst.ScriptGuid) {
-                    alreadyAttached = true;
-                    LOGE("[ScriptSystem] camera_touch_control already attached to camera, skipping reattach.");
-                    break;
-                }
-            }
-
-            if (!alreadyAttached) {
-                lsc.Scripts.push_back(inst);
-                LOGI("[ScriptSystem] camera_touch_control successfully attached to camera entity (%u).",
-                    static_cast<unsigned>(cameraEntity));
-
-                Engine::ScriptSystem::ReloadScript(reg, cameraEntity);
+        // Load camera scripts first to establish POV table
+        auto cameraView = reg.view<CameraComponent, LuaScriptComponent>();
+        for (auto [entity, camera, scripts] : cameraView.each()) {
+            for (auto& inst : scripts.Scripts) {
+                LoadLuaFor(reg, entity, inst);
             }
         }
-        else {
-            LOGE("[ScriptSystem] No camera entity found! Skipping camera_touch_control attachment.");
+
+        // Then load other scripts
+        auto otherView = reg.view<LuaScriptComponent>(entt::exclude<CameraComponent>);
+        for (auto [entity, scripts] : otherView.each()) {
+            for (auto& inst : scripts.Scripts) {
+                LoadLuaFor(reg, entity, inst);
+            }
         }
+        //No longer auto attach camera script here
+        //// Attach camera_touch_control.lua to main camera (for Android + Windows)
+        //auto cameraView = reg.view<CameraComponent>();
+        //if (!cameraView.empty()) {
+        //    auto cameraEntity = cameraView.front();
+
+        //    LOGI("[ScriptSystem] Attaching script to camera entity (%u) with registry %p",
+        //        static_cast<unsigned>(cameraEntity), (void*)&reg);
+
+        //    if (!reg.all_of<LuaScriptComponent>(cameraEntity)) {
+        //        reg.emplace<LuaScriptComponent>(cameraEntity);
+        //    }
+
+        //    auto& lsc = reg.get<LuaScriptComponent>(cameraEntity);
+        //    lsc.Enabled = true;
+
+        //    Engine::LuaScriptComponent::LuaInstance inst;
+        //    inst.ScriptGuid = EngineFramework::AssetManagerSystem::GetFullGuid(
+        //        EngineFramework::AssetManagerSystem::SCRIPT_GUID,
+        //        "player_pov_camera"
+        //    ).m_Instance;
+
+        //    bool alreadyAttached = false;
+        //    for (auto& s : lsc.Scripts) {
+        //        if (s.ScriptGuid == inst.ScriptGuid) {
+        //            alreadyAttached = true;
+        //            LOGE("[ScriptSystem] camera_touch_control already attached to camera, skipping reattach.");
+        //            break;
+        //        }
+        //    }
+
+        //    if (!alreadyAttached) {
+        //        lsc.Scripts.push_back(inst);
+        //        LOGI("[ScriptSystem] camera_touch_control successfully attached to camera entity (%u).",
+        //            static_cast<unsigned>(cameraEntity));
+
+        //        Engine::ScriptSystem::ReloadScript(reg, cameraEntity);
+        //    }
+        //}
+        //else {
+        //    LOGE("[ScriptSystem] No camera entity found! Skipping camera_touch_control attachment.");
+        //}
 #endif
     }
 
@@ -306,7 +380,7 @@ namespace Engine {
     void ScriptSystem::OnUpdate(entt::registry& reg, float dt) {
         {   // Native scripts
             auto view = reg.view<NativeScriptComponent>();
-            for (auto [e, nsc] : view.each()) { 
+            for (auto [e, nsc] : view.each()) {
                 LOGI("ScriptOnupdate is running");
                 if (!nsc.Enabled) continue;
                 EnsureNativeInstance(reg, e, nsc);
@@ -318,9 +392,9 @@ namespace Engine {
         {   // Lua scripts
             auto view = reg.view<LuaScriptComponent>();
             for (auto [e, comp] : view.each()) {
-               //LOGI("[ScriptSystem] OnUpdate running with registry %p", (void*)&reg);
-               //LOGI("[ScriptSystem] LuaScriptComponent.Enabled = %d for entity %u",
-               //     comp.Enabled, static_cast<unsigned>(e));
+                //LOGI("[ScriptSystem] OnUpdate running with registry %p", (void*)&reg);
+                //LOGI("[ScriptSystem] LuaScriptComponent.Enabled = %d for entity %u",
+                //     comp.Enabled, static_cast<unsigned>(e));
                 if (!comp.Enabled) continue;
                 for (auto& inst : comp.Scripts) {
                     if (!inst.Loaded)
@@ -383,7 +457,6 @@ namespace Engine {
         entt::entity e,
         LuaScriptComponent::LuaInstance& inst)
     {
-        (void)reg;
         UnloadLuaFor(inst, /*callOnDestroy*/false);
 
         if (inst.ScriptGuid.m_Value == 0) {
@@ -423,9 +496,35 @@ namespace Engine {
                 EngineFramework::AssetManagerSystem::GetName(full_guid).c_str(),
                 inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
 
+            // ===============================================================
+            // Prepare entity-specific data BEFORE creating environment
+            // ===============================================================
+            TransformComponent* entityTransform = nullptr;
+            if (reg.all_of<TransformComponent>(e)) {
+                entityTransform = &reg.get<TransformComponent>(e);
+                LOGI("[LuaRuntime] Entity %u has TransformComponent at %p",
+                    static_cast<unsigned>(e), (void*)entityTransform);
+            }
+            else {
+                LOGE("[LuaRuntime] Entity %u does NOT have TransformComponent!",
+                    static_cast<unsigned>(e));
+            }
+
+            // Create environment and inject variables
             inst.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
+            inst.Env["EntityID"] = static_cast<uint32_t>(e);
+            inst.Env["EntityTransform"] = entityTransform;
+
+            LOGI("[LuaRuntime] Injected EntityID=%u and EntityTransform=%p into environment",
+                static_cast<unsigned>(e), (void*)entityTransform);
+
             std::string label = EngineFramework::AssetManagerSystem::GetName(full_guid);
-            auto result = s_Lua.load(code, label)(inst.Env);
+
+            // Load and execute script with environment
+            sol::protected_function scriptFunc = s_Lua.load(code, label);
+            sol::set_environment(inst.Env, scriptFunc);
+
+            auto result = scriptFunc();
 
             if (!result.valid()) {
                 sol::error err = result;
