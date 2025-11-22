@@ -134,34 +134,56 @@ namespace EngineFramework
 
     static void FitTriggerToMesh(entt::registry& reg, entt::entity id)
     {
+        LOGI("[TriggerBox] Fitting entity %u", (unsigned)id);
+
         if (!reg.all_of<MeshComponent, TriggerBoxComponent>(id))
             return;
 
         auto& meshComp = reg.get<MeshComponent>(id);
         auto& box = reg.get<TriggerBoxComponent>(id);
 
-        // 1) Get guid from mesh name ("Sphere", etc.)
+        LOGI("[TriggerBox] Fitting for entity %u, meshName='%s'",
+            (unsigned)id, meshComp.meshName.c_str());
+
+        // 1) Get guid from mesh name
         xresource::full_guid meshGuid =
             EngineFramework::AssetManagerSystem::GetFullGuid(
                 EngineFramework::AssetManagerSystem::MESH_GUID,
                 meshComp.meshName);
 
         if (!EngineFramework::AssetManagerSystem::HasResource(meshGuid))
+        {
+            LOGI("[TriggerBox] Mesh resource NOT found for '%s'; using default trigger size.",
+                meshComp.meshName.c_str());
             return;
+        }
 
+        // 2) Get the actual MeshData
         auto meshData =
             EngineFramework::AssetManagerSystem::GetResource<Mesh::MeshData>(meshGuid);
         if (!meshData)
+        {
+            LOGI("[TriggerBox] MeshData is null for '%s'; using default trigger size.",
+                meshComp.meshName.c_str());
             return;
+        }
 
+        // 3) Use MeshData's AABB (from the OBJ vertices)
         const auto& aabb = meshData->GetAABB();
         glm::vec3 center = aabb.center();
         glm::vec3 half = aabb.halfExtents();
+
+        LOGI("[TriggerBox] mesh='%s' center(%.3f, %.3f, %.3f) half(%.3f, %.3f, %.3f)",
+            meshComp.meshName.c_str(),
+            center.x, center.y, center.z,
+            half.x, half.y, half.z);
 
         box.type = TriggerShapeType::Box;
         box.localPosition = center;
         box.halfExtents = half;
     }
+
+
 
 
     static inline bool ProjectToScreen(const glm::mat4& V, const glm::mat4& P, const glm::vec3& p,
@@ -648,6 +670,7 @@ namespace EngineFramework
 
                 //only if selected object have transform component
                 entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+
                 if (registry.all_of<TransformComponent>(id)) {
 
                     auto& object = registry.get<TransformComponent>(id);
@@ -1195,6 +1218,7 @@ namespace EngineFramework
             */
             entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
 
+            LOGI("[Menu] Selected entity = %u", (unsigned)id);
             //TriggerBoxComponent
 
             if (registry.all_of<TransformComponent, TriggerBoxComponent>(id))
@@ -1205,7 +1229,10 @@ namespace EngineFramework
 
                 if (ImGui::MenuItem(caption.c_str())) {
                     is_adjusting_triggerbox = !is_adjusting_triggerbox;
+
                     if (is_adjusting_triggerbox) {
+                        LOGI(">> User clicked Adjust Trigger Box for entity %u", (unsigned)id);
+
                         FitTriggerToMesh(registry, id);
                     }
                 }
