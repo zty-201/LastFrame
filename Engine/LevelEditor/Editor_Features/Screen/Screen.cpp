@@ -132,6 +132,60 @@ namespace EngineFramework
         return glm::quat(glm::radians(deg));
     }
 
+    static void FitTriggerToMesh(entt::registry& reg, entt::entity id)
+    {
+        LOGI("[TriggerBox] Fitting entity %u", (unsigned)id);
+
+        if (!reg.all_of<MeshComponent, TriggerBoxComponent>(id))
+            return;
+
+        auto& meshComp = reg.get<MeshComponent>(id);
+        auto& box = reg.get<TriggerBoxComponent>(id);
+
+        LOGI("[TriggerBox] Fitting for entity %u, meshName='%s'",
+            (unsigned)id, meshComp.meshName.c_str());
+
+        // 1) Get guid from mesh name
+        xresource::full_guid meshGuid =
+            EngineFramework::AssetManagerSystem::GetFullGuid(
+                EngineFramework::AssetManagerSystem::MESH_GUID,
+                meshComp.meshName);
+
+        if (!EngineFramework::AssetManagerSystem::HasResource(meshGuid))
+        {
+            LOGI("[TriggerBox] Mesh resource NOT found for '%s'; using default trigger size.",
+                meshComp.meshName.c_str());
+            return;
+        }
+
+        // 2) Get the actual MeshData
+        auto meshData =
+            EngineFramework::AssetManagerSystem::GetResource<Mesh::MeshData>(meshGuid);
+        if (!meshData)
+        {
+            LOGI("[TriggerBox] MeshData is null for '%s'; using default trigger size.",
+                meshComp.meshName.c_str());
+            return;
+        }
+
+        // 3) Use MeshData's AABB (from the OBJ vertices)
+        const auto& aabb = meshData->GetAABB();
+        glm::vec3 center = aabb.center();
+        glm::vec3 half = aabb.halfExtents();
+
+        LOGI("[TriggerBox] mesh='%s' center(%.3f, %.3f, %.3f) half(%.3f, %.3f, %.3f)",
+            meshComp.meshName.c_str(),
+            center.x, center.y, center.z,
+            half.x, half.y, half.z);
+
+        box.type = TriggerShapeType::Box;
+        box.localPosition = center;
+        box.halfExtents = half;
+    }
+
+
+
+
     static inline bool ProjectToScreen(const glm::mat4& V, const glm::mat4& P, const glm::vec3& p,
         ImVec2 pos, ImVec2 size, ImVec2& out) {
         glm::vec4 clip = P * V * glm::vec4(p, 1.0f);
@@ -616,6 +670,7 @@ namespace EngineFramework
 
                 //only if selected object have transform component
                 entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+
                 if (registry.all_of<TransformComponent>(id)) {
 
                     auto& object = registry.get<TransformComponent>(id);
@@ -1125,6 +1180,7 @@ namespace EngineFramework
             */
             entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
 
+            LOGI("[Menu] Selected entity = %u", (unsigned)id);
             //TriggerBoxComponent
 
             if (registry.all_of<TransformComponent, TriggerBoxComponent>(id))
@@ -1135,6 +1191,12 @@ namespace EngineFramework
 
                 if (ImGui::MenuItem(caption.c_str())) {
                     is_adjusting_triggerbox = !is_adjusting_triggerbox;
+
+                    if (is_adjusting_triggerbox) {
+                        LOGI(">> User clicked Adjust Trigger Box for entity %u", (unsigned)id);
+
+                        FitTriggerToMesh(registry, id);
+                    }
                 }
             }
 
@@ -1304,53 +1366,38 @@ namespace EngineFramework
 
         // Draw a wire box for every entity that has a TriggerBoxComponent
         auto v = registry.view<TransformComponent, TriggerBoxComponent>();
-        v.each([&](entt::entity e,
-            const TransformComponent& tf,
-            const TriggerBoxComponent& trg)
+        v.each([&](const TransformComponent& tf,
+            const TriggerBoxComponent& trg)   // removed entt::entity e (no warning)
             {
                 if (!trg.enabled) return;
 
-                // Base transform from the entity (already T*R*S)
                 const glm::mat4 model = tf.modelMatrix;
 
-                // Auto-fit around WHOLE object if it has a mesh (local AABB -> OBB in world)
-                glm::vec3 centerLocal(0.0f);
+                // Local center & size come from the trigger itself
+                glm::vec3 centerLocal = trg.localPosition;
                 glm::vec3 sizeLocal(1.0f);
 
-                if (auto mesh = registry.try_get<MeshComponent>(e)) {
-                    glm::vec3 localMin(mesh->localMin[0], mesh->localMin[1], mesh->localMin[2]);
-                    glm::vec3 localMax(mesh->localMax[0], mesh->localMax[1], mesh->localMax[2]);
-                    centerLocal = 0.5f * (localMin + localMax);
-                    sizeLocal = (localMax - localMin);     // full extents
-                }
-                else {
-                    // Fallback: use the authoring numbers on the trigger itself
-                    switch (trg.type) {
-                    case TriggerShapeType::Box:
-                        centerLocal = trg.localPosition;
-                        sizeLocal = 2.0f * trg.halfExtents;
-                        break;
-                    case TriggerShapeType::Sphere:
-                        centerLocal = trg.localPosition;
-                        sizeLocal = glm::vec3(2.0f * trg.radius);
-                        break;
-                    case TriggerShapeType::Capsule:
-                        centerLocal = trg.localPosition;
-                        sizeLocal = glm::vec3(2.0f * trg.capRadius,
-                            2.0f * (trg.capHalfHeight + trg.capRadius),
-                            2.0f * trg.capRadius);
-                        break;
-                    }
+                switch (trg.type)
+                {
+                case TriggerShapeType::Box:
+                    sizeLocal = 2.0f * trg.halfExtents;
+                    break;
+                case TriggerShapeType::Sphere:
+                    sizeLocal = glm::vec3(2.0f * trg.radius);
+                    break;
+                case TriggerShapeType::Capsule:
+                    sizeLocal = glm::vec3(2.0f * trg.capRadius,
+                        2.0f * (trg.capHalfHeight + trg.capRadius),
+                        2.0f * trg.capRadius);
+                    break;
                 }
 
-                // Optional local offset/rotation for the trigger
                 const glm::quat qLocal = EulerDegToQuat(trg.localEulerDeg);
 
-                // Final OBB transform: model * localCenter/rot * scale(size)
                 const glm::mat4 triggerM = model * TRS(centerLocal, qLocal, sizeLocal);
 
-                // make ImGuizmo cube fully transparent but keep green wire overlay 
-                DrawWireOBB(triggerM, view, proj, screen_pos, available_size, IM_COL32(0, 255, 0, 255), 1.6f);
+                DrawWireOBB(triggerM, view, proj, screen_pos, available_size,
+                    IM_COL32(0, 255, 0, 255), 1.6f);
             });
     }
 
