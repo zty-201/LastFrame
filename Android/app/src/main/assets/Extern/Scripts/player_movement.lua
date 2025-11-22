@@ -39,6 +39,13 @@ function on_create(self)
     else
         print("[player_movement ERROR] Camera missing!!")
     end
+
+    --[Ben] in order for my flashlight to be binded to the player pos
+    local SHARED = getGlobalShared()
+    if SHARED then
+        SHARED.PLAYER = SHARED.PLAYER or {}
+        SHARED.PLAYER.transform = transform
+    end
 end
 
 -- ============================================================
@@ -54,6 +61,14 @@ local function movePlayer(worldMoveX, worldMoveZ, dt)
 
     transform:SetPosition(x, y, z)
     --if camera then camera:SetPosition(x, y, z) end (do not move cam in this script)
+
+    --[Ben] in order for my flashlight to be binded to the player pos
+    local SHARED = getGlobalShared()
+    if SHARED and SHARED.PLAYER then
+        SHARED.PLAYER.x = x
+        SHARED.PLAYER.y = y
+        SHARED.PLAYER.z = z
+    end
 end
 
 -- ============================================================

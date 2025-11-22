@@ -160,27 +160,11 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 11740093013966520321
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 15968805962367582209
 				}
-			]
-		},
-		"MeshComponent": {
-			"meshName": "Sphere"
-		},
-		"TransformComponent": {
-			"position": [
-				299.473388671875,
-				272.7515869140625,
-				-188.43060302734375
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
 			]
 		},
 		"MaterialComponent": {
