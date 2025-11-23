@@ -25,6 +25,8 @@
 #include "AssetManager.hpp"
 #include "MaterialComponent.h"
 
+#include "SceneManager.hpp"
+
 #include "stb_image.h"
 #define VOXEL_GRID_SIZE_X 160
 #define VOXEL_GRID_SIZE_Y 90
@@ -32,6 +34,9 @@
 #define NUM_BLUE_NOISE_TEXTURES 16
 #define SHADOW_WIDTH 4096
 #define SHADOW_HEIGHT 4096
+#define POINT_SHADOW_SIZE 1024
+#define MAX_POINT_LIGHTS 64
+#define MAX_SHADOW_CASTING_LIGHTS 4
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
@@ -137,19 +142,60 @@ namespace EngineFramework
 		mainFBO = std::move(tempFBO);
 
 		// Create the shadow map framebuffer
-		FBO tempShadowFBO(FBO::TextureDepth, SHADOW_WIDTH, SHADOW_HEIGHT, &m_shadowMapTextureID);
+		FBO tempShadowFBO(FBO::CSMTextureArray, SHADOW_WIDTH, SHADOW_HEIGHT, &m_csmTextureArray, CASCADE_COUNT);
 		m_shadowFBO = std::move(tempShadowFBO);
+
+		// Create the point shadow map framebuffer (we use default and setup manually as we need multiple cube map faces)
+		FBO tempPointShadowFBO(FBO::Default, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE);
+		m_pointShadowFBO = std::move(tempPointShadowFBO);
+
+		glGenFramebuffers(1, &m_pointShadowFBO.handle);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
+
+		// 3. Explicitly tell OpenGL this FBO has no color buffers
+		GLenum drawBuffers[] = { GL_NONE };
+		glDrawBuffers(1, drawBuffers);
+		glReadBuffer(GL_NONE);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// Create point shadow map textures
+		m_pointShadowMapTextures.resize(MAX_SHADOW_CASTING_LIGHTS);
+		glGenTextures(MAX_SHADOW_CASTING_LIGHTS, m_pointShadowMapTextures.data());
+
+		for (int i = 0; i < MAX_SHADOW_CASTING_LIGHTS; i++) {
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointShadowMapTextures[i]);
+			for (unsigned int face = 0; face < 6; ++face) {
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_DEPTH_COMPONENT24,
+					POINT_SHADOW_SIZE, POINT_SHADOW_SIZE, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+			}
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+		}
 
 		// Get shader GUIDs 
 		mesh_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Mesh");
 		skybox_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Skybox");
-		shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "ShadowMap");
+		shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Shadow");
 		light_injection_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "LightInjection");
 		ray_march_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "RayMarch");
+		point_shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "PointShadow");
 
 		// Initialize instancing system
 		//m_instancingSystem = std::make_unique<InstancingSystem>();
 		//m_instancingSystem->Initialize(10000);
+
+		// Create SSBO for point lights
+		glGenBuffers(1, &m_pointLightSSBO);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_pointLightSSBO);
+		glBufferData(GL_SHADER_STORAGE_BUFFER,
+			sizeof(PointLightSSBO) * MAX_POINT_LIGHTS,
+			nullptr, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		// === CREATE DEFAULT TEXTURES ===
 		glGenTextures(1, &m_defaultWhiteTexture);
@@ -200,7 +246,6 @@ namespace EngineFramework
 		glBindTexture(GL_TEXTURE_3D, 0);
 		LoadBlueNoiseTextures();
 		PreGeneratePrimitives();
-		pScene = std::make_unique<Scene>();
 	}
 
 	void GraphicsSystem::Update(float deltaTime)
@@ -242,20 +287,23 @@ namespace EngineFramework
 			CalculateModelMatrix(transform, transform.modelMatrix);
 		}
 
-		// 1. Create shadow map
+		glm::mat4 viewProj = P * V;
+		// 1. Update point light SSBO
+		UpdatePointLightSSBO(*active_camera, viewProj);
+		// 2. Create shadow map
 		ShadowPass();
-		// 2. Update all uniforms now that shadow pass is done
+		// 3. Update all uniforms now that shadow pass is done
 		UpdateUBOs(*active_camera, V, P);
-		// 3. Inject shadowed light into the volume
+		// 4. Inject shadowed light into the volume
 		VolumetricLightInjectionPass();
-		// 4. Integrate the light through the volume
+		// 5. Integrate the light through the volume
 		VolumetricRayMarchPass();
-		// 5. Render all meshes
+		// 6. Render all meshes
 		MeshPass();
-		// 6. Render the skybox last
-		//SkyboxPass();
+		// 7. Render the skybox last
+		SkyboxPass();
 
-		// 7. Copy to screen if needed
+		// 8. Copy to screen if needed
 		if (!m_isRenderingToFBO) {
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -267,22 +315,89 @@ namespace EngineFramework
 		m_frame_idx++;
 	}
 
-	void GraphicsSystem::ShadowPass()
+	void GraphicsSystem::UpdatePointLightSSBO(const CameraComponent& camera, const glm::mat4& viewProj) {
+		m_pointLightData.clear();
+		std::vector<std::pair<int, float>> lightDistances;
+
+		// 1. Collect point and spot lights
+		for (auto [entity, light] : registry.view<LightComponent>().each()) {
+			bool isValidType = (light.type == LightComponent::POINT || light.type == LightComponent::SPOT);
+
+			if (isValidType && m_pointLightData.size() < MAX_POINT_LIGHTS) {
+				PointLightSSBO data;
+				data.position_radius = glm::vec4(light.position, light.radius);
+				data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f);
+
+				// Pack Type into .w
+				float typeVal = (light.type == LightComponent::SPOT) ? 2.0f : 1.0f;
+				data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, typeVal);
+
+				// Pack Direction into .xyz and Default Shadow into .w
+				data.direction_shadow = glm::vec4(light.direction, -1.0f);
+
+				// Pack Spot Angles 
+				// Default cutoffs for point lights (so they calculate to 1.0 intensity)
+				float inner = -1.0f;
+				float outer = -1.0f;
+
+				if (light.type == LightComponent::SPOT) {
+					// Assuming cutOff is in degrees, convert to radians then cosine
+					inner = glm::cos(glm::radians(light.innerConeAngle));
+					outer = glm::cos(glm::radians(light.outerConeAngle));
+				}
+				data.spot_cutoffs = glm::vec4(inner, outer, 0.0f, 0.0f);
+
+				// Track distance for shadow priority
+				float dist = glm::length(camera.position - light.position);
+
+				// Frustum check (reuse point logic for now)
+				if (isLightInFrustum(light.position, light.radius, viewProj)) {
+					lightDistances.push_back({ static_cast<int>(m_pointLightData.size()), dist });
+				}
+
+				m_pointLightData.push_back(data);
+			}
+		}
+
+		// 2. Sort visible lights by distance for shadow assignment
+		std::sort(lightDistances.begin(), lightDistances.end(),
+			[](const auto& a, const auto& b) { return a.second < b.second; });
+
+		// Assign shadow maps
+		int shadowCount = std::min(MAX_SHADOW_CASTING_LIGHTS, (int)lightDistances.size());
+		for (int i = 0; i < shadowCount; i++) {
+			int lightIndex = lightDistances[i].first;
+			m_pointLightData[lightIndex].direction_shadow.w = float(i); // Update shadow index in new location
+		}
+
+		// 3. Upload
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_pointLightSSBO);
+		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+			sizeof(PointLightSSBO) * m_pointLightData.size(),
+			m_pointLightData.data());
+	}
+
+	void GraphicsSystem::RenderDirectionalShadow()
 	{
-		auto light_view = registry.view<LightComponent>();
-		if (light_view.empty()) return;
-		auto& main_light = light_view.get<LightComponent>(light_view.front());
+		LightComponent* dirLight = nullptr;
+		for (auto [entity, light] : registry.view<LightComponent>().each()) {
+			if (light.type == LightComponent::DIRECTIONAL) {  
+				dirLight = &light;
+				break;
+			}
+		}
 
-		float orthoSize = 1000.0f;  // Increased from 100
-		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize,
-			-orthoSize, orthoSize,
-			-500.0f, 1000.0f);
-		
-		glm::vec3 lightPos = main_light.position;
-		glm::vec3 lightTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::mat4 lightView = glm::lookAt(lightPos, lightTarget, glm::vec3(0.0, 1.0, 0.0));
+		if (!dirLight) return;
 
-		m_lightSpaceMatrix = lightProjection * lightView;
+		// Get camera info
+		auto active_camera_entity = GetFirstActiveCamera();
+		if (active_camera_entity == entt::null) return;
+
+		CameraComponent& camera = registry.get<CameraComponent>(active_camera_entity);
+		glm::mat4 camView = Camera::getLookAt(camera);
+
+		// Calculate cascade splits
+		CalculateCascadeSplits(camera.nearPlane, camera.farPlane);
 
 		std::shared_ptr<ShaderProgram> shader{};
 		if (shadow_shader_guid != xresource::full_guid{})
@@ -298,33 +413,115 @@ namespace EngineFramework
 
 		shader->use();
 
-		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
-
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
-		glClear(GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
 
-		auto view = registry.view<MeshComponent, TransformComponent>();
-		for (auto [entity, meshComp, transformComp] : view.each())
-		{
-			if (meshComp.meshName == "SkyBox") continue;
+		// Render each cascade
+		for (int cascade = 0; cascade < CASCADE_COUNT; cascade++) {
+			// Bind to the cascade layer
+			glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
+			glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+				m_csmTextureArray, 0, cascade);
+			glClear(GL_DEPTH_BUFFER_BIT);
 
-			// 1. Get the GUID for the mesh by its name.
-			xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp.meshName);
+			// Calculate per-cascade bias
+			float cascadeBias = m_shadow_bias * (1.0f + float(cascade) * 0.5f);
+			m_cascadeBiases[cascade] = cascadeBias;
 
-			// 2. Get the mesh resource using the GUID.
-			auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-			if (!meshData || meshData->vao == 0) continue;
+			// Calculate frustum corners for this cascade
+			float nearSplit = m_cascadeSplits[cascade];
+			float farSplit = m_cascadeSplits[cascade + 1];
 
-			// For shadows, we don't care about materials, we just draw all geometry.
-			shader->setUniform("u_Model", transformComp.modelMatrix);
+			// Get frustum corners in world space
+			std::vector<glm::vec3> frustumCorners = GetFrustumCornersWorldSpace(
+				camera, camView, nearSplit, farSplit);
 
-			glBindVertexArray(meshData->vao);
-			// Draw all sub-meshes
-			for (const auto& subMesh : meshData->subMeshes) {
-				glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * subMesh.baseIndex));
+			// Calculate bounding box
+			glm::vec3 center(0.0f);
+			for (const auto& corner : frustumCorners) {
+				center += corner;
+			}
+			center /= frustumCorners.size();
+
+			// Create light view matrix looking at cascade center
+			glm::vec3 lightDir = dirLight->direction;
+
+			// Use a stable up vector
+			glm::vec3 up = glm::abs(lightDir.y) > 0.999f ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
+
+			// 1. Create Light View Matrix anchored at the Origin (Rotation only)
+			// This ensures the coordinate system axes never shift, only rotate with the light.
+			glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f), lightDir, up);
+
+			// 2. Calculate Bounding Sphere of the Frustum
+			// a sphere is rotation-invariant.
+			// It prevents the shadow map from shrinking/growing when camera is turned.
+			glm::vec3 frustumCenter(0.0f);
+			for (const auto& corner : frustumCorners) {
+				frustumCenter += corner;
+			}
+			frustumCenter /= frustumCorners.size();
+
+			float radius = 0.0f;
+			for (const auto& corner : frustumCorners) {
+				float dist = glm::length(corner - frustumCenter);
+				radius = glm::max(radius, dist);
+			}
+
+			// 3. Transform Center to Light Space
+			glm::vec3 lightSpaceCenter = glm::vec3(lightView * glm::vec4(frustumCenter, 1.0f));
+
+			// 4. Calculate Texel Size based on Sphere Diameter
+			// The diameter is constant per cascade, so texel size is constant -> no shimmering
+			float diameter = radius * 2.0f;
+			float texelSize = diameter / SHADOW_WIDTH;
+
+			// 5. Snap the Center to the Texel Grid
+			lightSpaceCenter.x = floor(lightSpaceCenter.x / texelSize) * texelSize;
+			lightSpaceCenter.y = floor(lightSpaceCenter.y / texelSize) * texelSize;
+
+			// 6. Define Orthographic Bounds using the Sphere
+			float minX = lightSpaceCenter.x - radius;
+			float maxX = lightSpaceCenter.x + radius;
+			float minY = lightSpaceCenter.y - radius;
+			float maxY = lightSpaceCenter.y + radius;
+
+			// Z-Bounds: We need to cover the frustum (center +/- radius) and geometry between light and frustum.
+			// We extend the 'near' plane (negative view Z) significantly towards the light.
+			// In Light View space (looking down -Z), objects are at negative Z.
+			float zMult = 10.0f;
+			float minZ = lightSpaceCenter.z - radius * zMult; // Far back towards light
+			float maxZ = lightSpaceCenter.z + radius * zMult; // Forward past frustum
+
+			// GLM Ortho: left, right, bottom, top, zNear, zFar
+			// For standard lookAt, zNear is distance to near plane (positive).
+			// To capture range [minZ, maxZ], we use zNear = -maxZ, zFar = -minZ.
+			glm::mat4 lightProj = glm::ortho(minX, maxX, minY, maxY, -maxZ, -minZ);
+
+			m_cascadeViewProjMatrices[cascade] = lightProj * lightView;
+
+			// Set shader uniforms 
+			shader->setUniform("u_LightMatrix", m_cascadeViewProjMatrices[cascade]);
+
+			// Render scene to this cascade
+			auto view = registry.view<MeshComponent, TransformComponent>();
+			for (auto [entity, meshComp, transformComp] : view.each()) {
+				if (meshComp.meshName == "SkyBox") continue;
+
+				xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(
+					AssetManagerSystem::MESH_GUID, meshComp.meshName);
+				auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
+
+				if (!meshData || meshData->vao == 0) continue;
+
+				shader->setUniform("u_Model", transformComp.modelMatrix);
+
+				glBindVertexArray(meshData->vao);
+				for (const auto& subMesh : meshData->subMeshes) {
+					glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT,
+						(void*)(sizeof(unsigned int) * subMesh.baseIndex));
+				}
 			}
 		}
 
@@ -332,25 +529,155 @@ namespace EngineFramework
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		shader->disuse();
 		glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
+
 	}
+
+	void GraphicsSystem::RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius) {
+
+		glm::vec3 lightPos = glm::vec3(lightPosRadius);
+		float radius = lightPosRadius.w;
+
+		// Setup for point shadow rendering
+		glViewport(0, 0, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
+		glEnable(GL_DEPTH_TEST);
+		glCullFace(GL_FRONT);
+
+		// Shadow projection matrix (90 degree FOV for cubemap)
+		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, radius);
+
+		// 6 view matrices for cubemap faces
+		glm::mat4 shadowViews[6] = {
+			glm::lookAt(lightPos, lightPos + glm::vec3(1,0,0), glm::vec3(0,-1,0)),  // +X
+			glm::lookAt(lightPos, lightPos + glm::vec3(-1,0,0), glm::vec3(0,-1,0)), // -X
+			glm::lookAt(lightPos, lightPos + glm::vec3(0,1,0), glm::vec3(0,0,1)),   // +Y
+			glm::lookAt(lightPos, lightPos + glm::vec3(0,-1,0), glm::vec3(0,0,-1)),  // -Y
+			glm::lookAt(lightPos, lightPos + glm::vec3(0,0,1), glm::vec3(0,-1,0)),  // +Z
+			glm::lookAt(lightPos, lightPos + glm::vec3(0,0,-1), glm::vec3(0,-1,0))   // -Z
+		};
+
+		// Get point shadow shader
+		std::shared_ptr<ShaderProgram> shader{};
+		if (point_shadow_shader_guid != xresource::full_guid{}) {
+			shader = AssetManagerSystem::GetResource<ShaderProgram>(point_shadow_shader_guid);
+		}
+		else {
+			using E_AM = AssetManagerSystem;
+			point_shadow_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "PointShadow");
+			shader = E_AM::GetResource<ShaderProgram>(point_shadow_shader_guid);
+		}
+
+		if (!shader) {
+			LOGE("Point shadow shader not found!");
+			return;
+		}
+
+		shader->use();
+		shader->setUniform("u_LightPos", lightPos);
+		shader->setUniform("u_FarPlane", radius);
+
+		for (int face = 0; face < 6; face++) {
+			// Attach the cube face to FBO
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+				m_pointShadowMapTextures[cubemapSlot], 0);
+
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			glm::mat4 lightMatrix = shadowProj * shadowViews[face];
+			shader->setUniform("u_LightMatrix", lightMatrix);
+
+			// Render all meshes from this light's perspective
+			auto view = registry.view<MeshComponent, TransformComponent>();
+			for (auto [entity, meshComp, transformComp] : view.each()) {
+				if (meshComp.meshName == "SkyBox") continue;
+
+				xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(
+					AssetManagerSystem::MESH_GUID, meshComp.meshName);
+				auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
+
+				if (!meshData || meshData->vao == 0) {
+					meshData = meshCache[meshComp.meshName];
+				}
+				if (!meshData || meshData->vao == 0) continue;
+
+				shader->setUniform("u_Model", transformComp.modelMatrix);
+
+				glBindVertexArray(meshData->vao);
+				for (const auto& subMesh : meshData->subMeshes) {
+					glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT,
+						(void*)(sizeof(unsigned int) * subMesh.baseIndex));
+				}
+			}
+		}
+
+		shader->disuse();
+
+		// Restore state
+		glCullFace(GL_BACK);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
+	}
+
+	void GraphicsSystem::RenderPointLightShadows()
+	{
+		for (const auto& light : m_pointLightData) {
+			// Read shadow index from .w of direction_shadow
+			if (light.direction_shadow.w >= 0.0f) {
+				int cubemapSlot = int(light.direction_shadow.w);
+
+				// Render to cubemap array at index cubemapSlot
+				RenderShadowCubemap(cubemapSlot, light.position_radius);
+			}
+		}
+	}
+
+	void GraphicsSystem::ShadowPass()
+	{
+		// Render directional shadow first
+		RenderDirectionalShadow();
+
+		// Then render point light shadows
+		RenderPointLightShadows();
+	}
+
+	
 
 	void GraphicsSystem::UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P)
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBO);
 		VolumetricUBO* ubo = (VolumetricUBO*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(VolumetricUBO), GL_MAP_WRITE_BIT);
 
-		auto light_view = registry.view<LightComponent>();
-		LightComponent& main_light = light_view.get<LightComponent>(light_view.front());
-		glm::vec3 lightDir = glm::normalize(glm::vec3(0.0f) - main_light.position);
+		LightComponent* dirLight = nullptr;
+		for (auto [entity, light] : registry.view<LightComponent>().each()) {
+			if (light.type == LightComponent::DIRECTIONAL) { 
+				dirLight = &light;
+				break;
+			}
+		}
+
+		glm::vec3 direction = glm::vec3(0, -1, 0);
+		glm::vec3 color = glm::vec3(1.0f);
+		float intensity = 0.0f;
+
+		if (dirLight) {
+			direction = dirLight->direction;
+			color = dirLight->color;
+			intensity = dirLight->intensity;
+		}
 
 		ubo->view = V;
 		ubo->projection = P;
 		ubo->view_proj = P * V;
 		ubo->prev_view_proj = m_frame_idx == 0 ? P * V : m_prev_view_projection;
-		ubo->light_view_proj = m_lightSpaceMatrix;
 		ubo->inv_view_proj = glm::inverse(ubo->view_proj);
-		ubo->light_direction = glm::vec4(lightDir, 0.0f);
-		ubo->light_color = glm::vec4(main_light.color * main_light.intensity, m_ambient_light_intensity);
+		for (int i = 0; i < CASCADE_COUNT; i++) {
+			ubo->cascade_view_proj[i] = m_cascadeViewProjMatrices[i];
+		}
+		ubo->cascade_splits = glm::vec4(m_cascadeSplits[1], m_cascadeSplits[2],m_cascadeSplits[3], m_cascadeSplits[4]);
+		ubo->cascade_biases = glm::vec4(m_cascadeBiases[0], m_cascadeBiases[1], m_cascadeBiases[2], m_cascadeBiases[3]);
+		ubo->light_direction = glm::vec4(direction, 0.0f);
+		ubo->light_color = glm::vec4(color * intensity, m_ambient_light_intensity);
 		ubo->camera_position = glm::vec4(camera.position, 1.0f);
 		ubo->bias_near_far_pow = glm::vec4(m_shadow_bias, camera.nearPlane, camera.farPlane, m_depth_power);
 		ubo->aniso_density_scattering_absorption = glm::vec4(m_anisotropy, m_density, m_scattering, m_absorption);
@@ -377,6 +704,7 @@ namespace EngineFramework
 
 		shader->use();
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_pointLightSSBO);
 
 		uint32_t read_idx = static_cast<uint32_t>(m_ping_pong);
 		uint32_t write_idx = static_cast<uint32_t>(!m_ping_pong);
@@ -392,9 +720,21 @@ namespace EngineFramework
 		shader->setUniform("s_BlueNoise", TextureUnits::VOLUMETRIC_BLUE_NOISE_UNIT);
 
 		glActiveTexture(GL_TEXTURE0 + TextureUnits::SHADOW_MAP_UNIT);
-		glBindTexture(GL_TEXTURE_2D, m_shadowMapTextureID);
-		shader->setUniform("s_ShadowMap", TextureUnits::SHADOW_MAP_UNIT);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_csmTextureArray);  
+		shader->setUniform("s_CascadeShadowMaps", TextureUnits::SHADOW_MAP_UNIT);
 
+		int baseUnit = TextureUnits::POINT_SHADOW_MAP_UNIT;
+
+		for (int i = 0; i < MAX_SHADOW_CASTING_LIGHTS; i++) {
+			glActiveTexture(GL_TEXTURE0 + baseUnit + i);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointShadowMapTextures[i]);
+
+			// Set the sampler uniform array element
+			std::string uniformName = "s_PointShadowCubemaps[" + std::to_string(i) + "]";
+			shader->setUniform(uniformName.c_str(), baseUnit + i);
+		}
+
+		shader->setUniform("u_NumPointLights", (int)m_pointLightData.size());
 		shader->setUniform("u_Accumulation", m_frame_idx > 0 && m_temporal_accumulation);
 
 		glDispatchCompute((VOXEL_GRID_SIZE_X + 7) / 8, (VOXEL_GRID_SIZE_Y + 7) / 8, (VOXEL_GRID_SIZE_Z + 0) / 1);
@@ -452,16 +792,58 @@ namespace EngineFramework
 
 		shader->use();
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_pointLightSSBO);
 
 		// Bind common textures
 		glActiveTexture(GL_TEXTURE0 + TextureUnits::SHADOW_MAP_UNIT);
-		glBindTexture(GL_TEXTURE_2D, m_shadowMapTextureID);
-		shader->setUniform("s_ShadowMap", TextureUnits::SHADOW_MAP_UNIT);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_csmTextureArray);
+		shader->setUniform("s_CascadeShadowMaps", TextureUnits::SHADOW_MAP_UNIT);
+
+		int baseUnit = TextureUnits::POINT_SHADOW_MAP_UNIT;
+
+		for (int i = 0; i < MAX_SHADOW_CASTING_LIGHTS; i++) {
+			glActiveTexture(GL_TEXTURE0 + baseUnit + i);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointShadowMapTextures[i]);
+
+			// Set the sampler uniform array element
+			std::string uniformName = "s_PointShadowCubemaps[" + std::to_string(i) + "]";
+			shader->setUniform(uniformName.c_str(), baseUnit + i);
+		}
 
 		glActiveTexture(GL_TEXTURE0 + TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
 		glBindTexture(GL_TEXTURE_3D, m_ray_march_voxel_grid);
 		shader->setUniform("s_VoxelGrid", TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
 		shader->setUniform("u_Tricubic", m_tricubic_filtering);
+		// Pass the number of point lights
+		shader->setUniform("u_NumPointLights", (int)m_pointLightData.size());
+
+		// ========================================== DEBUG MODE HANDLING ==========================================
+		if (SceneManager::GetInstance().is_file_loaded) {
+			if (ImGui::IsKeyDown(ImGuiKey_F1)) debugMode = 0;  // Normal
+			if (ImGui::IsKeyDown(ImGuiKey_F2)) debugMode = 1;  // Cascade colors
+			if (ImGui::IsKeyDown(ImGuiKey_F3)) debugMode = 2;  // Shadow UV
+			if (ImGui::IsKeyDown(ImGuiKey_F4)) debugMode = 3;  // Raw shadow
+			if (ImGui::IsKeyDown(ImGuiKey_F5)) debugMode = 4;  // Depth values
+			if (ImGui::IsKeyDown(ImGuiKey_F6)) debugMode = 5;  // Cascade gradients
+			if (ImGui::IsKeyDown(ImGuiKey_F7)) debugMode = 6;  // Cascade 0 only
+			if (ImGui::IsKeyDown(ImGuiKey_F8)) debugMode = 7;  // Light direction
+			if (ImGui::IsKeyDown(ImGuiKey_F9)) debugMode = 8;  // Distance
+			if (ImGui::IsKeyDown(ImGuiKey_F10)) debugMode = 9; // Cascade 0 lit/shadow
+		}
+		shader->setUniform("u_DebugMode", debugMode);
+
+		// Log current mode
+		static int lastDebugMode = -1;
+		if (debugMode != lastDebugMode) {
+			const char* modeNames[] = {
+				"Normal", "Cascade Colors", "Shadow UV", "Raw Shadow",
+				"Depth Values", "Cascade Gradients", "Cascade 0 Only",
+				"Light Direction", "Distance", "Cascade 0 Lit/Shadow"
+			};
+			LOGI("Debug Mode: %d - %s", debugMode, modeNames[debugMode]);
+			lastDebugMode = debugMode;
+		}
+		// =========================================================================================================
 
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
@@ -580,7 +962,8 @@ namespace EngineFramework
 		shader->use();
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
 
-		glDepthFunc(GL_LEQUAL); // Standard skybox trick
+		glDepthFunc(GL_LEQUAL); 
+		glDisable(GL_CULL_FACE);
 
 		auto skybox_view = registry.view<MeshComponent, SkyboxRenderPass>();
 		for (auto [entity, meshComp] : skybox_view.each()) {
@@ -598,7 +981,7 @@ namespace EngineFramework
 				LOGE("Skybox mesh '%s' has no submeshes!", meshComp.meshName.c_str());
 			}
 		}
-
+		glEnable(GL_CULL_FACE);
 		glDepthFunc(GL_LESS);
 		shader->disuse();
 	}
@@ -681,6 +1064,75 @@ namespace EngineFramework
 		LOGI("Primitive meshes cached.");
 	}
 	
+	bool GraphicsSystem::isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj) {
+		// Transform light center to clip space
+		glm::vec4 clipPos = viewProj * glm::vec4(lightPos, 1.0f);
+
+		// Early reject if behind camera
+		if (clipPos.w < 0.0f) return false;
+
+		// Perspective divide
+		glm::vec3 ndc = glm::vec3(clipPos) / clipPos.w;
+
+		// Check if sphere intersects NDC cube (expanded by radius)
+		float radiusNDC = radius / clipPos.w; // Approximate radius in NDC
+
+		return (std::abs(ndc.x) <= 1.0f + radiusNDC) &&
+			(std::abs(ndc.y) <= 1.0f + radiusNDC) &&
+			(ndc.z >= -1.0f - radiusNDC && ndc.z <= 1.0f + radiusNDC);
+	}
+
+	void GraphicsSystem::CalculateCascadeSplits(float nearPlane, float farPlane)
+	{
+		// Practical split scheme (PSSM) - blend between logarithmic and uniform
+		float lambda = 0.75f;  // Weight towards logarithmic (0.95 = mostly log, good for outdoor scenes)
+
+		for (int i = 0; i < CASCADE_COUNT + 1; i++) {
+			float p = static_cast<float>(i) / CASCADE_COUNT;
+
+			// Logarithmic split
+			float log = nearPlane * std::pow(farPlane / nearPlane, p);
+
+			// Uniform split
+			float uniform = nearPlane + (farPlane - nearPlane) * p;
+
+			// Blend
+			m_cascadeSplits[i] = lambda * log + (1.0f - lambda) * uniform;
+		}
+
+	}
+
+	std::vector<glm::vec3> GraphicsSystem::GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ)
+	{
+
+		float aspect = (float)screen.x / screen.y;
+
+		// Create a temporary camera with the cascade's near/far planes
+		CameraComponent tempCam = camera;
+		tempCam.nearPlane = nearZ;
+		tempCam.farPlane = farZ;
+
+		// Generate projection matrix for this slice
+		glm::mat4 sliceProj = Camera::getPerspective(tempCam, aspect);
+		const glm::mat4 inv = glm::inverse(sliceProj * view);
+
+		// Generate the 8 corners
+		std::vector<glm::vec3> frustumCorners;
+		for (unsigned int x = 0; x < 2; ++x) {
+			for (unsigned int y = 0; y < 2; ++y) {
+				for (unsigned int z = 0; z < 2; ++z) {
+					glm::vec4 pt = inv * glm::vec4(
+						2.0f * x - 1.0f,
+						2.0f * y - 1.0f,
+						2.0f * z - 1.0f,
+						1.0f);
+					frustumCorners.push_back(glm::vec3(pt) / pt.w);
+				}
+			}
+		}
+		return frustumCorners;
+	}
+
 	//==Event Handlers==//
 
 	//When level editor is toggled on/off.

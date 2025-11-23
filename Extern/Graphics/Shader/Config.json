@@ -11,6 +11,10 @@
     "vertex":   "Extern/Graphics/Shader/ShadowMap.vert",
     "fragment": "Extern/Graphics/Shader/ShadowMap.frag"
   },
+  "PointShadow" : {
+    "vertex":   "Extern/Graphics/Shader/PointShadowMap.vert",
+    "fragment": "Extern/Graphics/Shader/PointShadowMap.frag"
+  },
   "LightInjection" : {
     "compute":   "Extern/Graphics/Shader/LightInjection.comp"
   },

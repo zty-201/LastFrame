@@ -83,6 +83,8 @@ namespace EngineFramework {
         EditorFeatures::DrawInspector(reg, selected_var.selected_objectID, selected_var.selected_modelID, is_display_entity_properties);
     }
 
+
+
     void LFeature_PropertyManager::Debug_SpawnTestEntityAndSelect() {
         //auto& reg = GameObjectSystem::GetInstance().GetRegistry();
         auto& reg = GameObjectSystem::GetRegistry();

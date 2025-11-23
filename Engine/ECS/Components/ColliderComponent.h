@@ -4,6 +4,7 @@
 #define COLLIDER_COMPONENT
 
 #include <glm/glm.hpp>
+#include <vector>
 
 enum class ColliderShape
 {
@@ -12,33 +13,45 @@ enum class ColliderShape
     Capsule = 2
 };
 
+struct ColliderData
+{
+    int type = 0;
+
+    //Shape Dimensions
+    glm::vec3 boxHalfExtents = { 0.5f, 0.5f, 0.5f };
+    float sphereRadius = 0.5f;
+    float capsuleHeight = 1.0f;
+    float capsuleRadius = 0.25f;
+
+    //Orientation / Offset
+    glm::vec3 offsetPosition = { 0.0f, 0.0f, 0.0f };
+    glm::vec3 offsetRotation = { 0.0f, 0.0f, 0.0f };
+};
+
 struct ColliderComponent
 {
-    // expose as plain int so your editor shows it
-    int shape = static_cast<int>(ColliderShape::Box);
+    enum class Mode
+    {
+        SOLID_COLLIDER,
+        TRIGGER_SENSOR,
+        LEVEL_EDITOR        //Editor selection
+    };
 
-    // -------- shape data --------
-    // Box: use full extents (easier to reason about in editor)
-    glm::vec3 size{ 1.0f, 1.0f, 1.0f };    // width, height, depth
+    int mode = 0;
 
-    // Sphere:
-    float radius = 0.5f;
+    //Array of shapes
+    std::vector<ColliderData> shapes;
 
-    // Capsule:
-    float height = 1.0f;      // full capsule height (cylinder + 2 hemispheres)
-    float capRadius = 0.25f;
+    //AABB
+    glm::vec3 minBounds = { -0.5f, -0.5f, -0.5f };
+    glm::vec3 maxBounds = { 0.5f, 0.5f, 0.5f };
 
-    // -------- physics flags / material --------
-    bool  isStatic = false;   // create static vs dynamic body
-    bool  isTrigger = false;   // for later when you do sensor bodies
+    ColliderComponent()
+    {
+        shapes.emplace_back(); //Add one box by default
+    }
 
-    float friction = 0.5f;
-    float restitution = 0.0f;
-    float density = 1.0f;
-    // collision filtering (for later)
-    int   layer = 1;
-
-    bool _prevIsStatic = false;
+    Mode GetMode() const { return static_cast<Mode>(mode); }
 };
 
 #endif // COLLIDER_COMPONENT
