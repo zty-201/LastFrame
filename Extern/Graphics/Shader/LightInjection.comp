@@ -58,8 +58,9 @@ layout(std140, binding = 0) uniform VolumetricUBO
 struct PointLightData {
     vec4 position_radius;
     vec4 color_intensity;
-    vec4 attenuation;
-    vec4 shadow_index;
+    vec4 attenuation_type;     // .w is TYPE
+    vec4 direction_shadow;     // .xyz is Dir, .w is ShadowIndex
+    vec4 spot_cutoffs;         // .x=inner, .y=outer
 };
 
 layout(std430, binding = 1) readonly buffer PointLightBuffer {
@@ -192,21 +193,28 @@ void main()
             if (distance < light.position_radius.w) {
                 vec3 Wi = normalize(lightVec);
                 
+                // SpotLight
+                float spotIntensity = 1.0;
+                if (light.attenuation_type.w > 1.5) { 
+                    float theta = dot(normalize(-Wi), normalize(light.direction_shadow.xyz));
+                    float epsilon = light.spot_cutoffs.x - light.spot_cutoffs.y;
+                    spotIntensity = clamp((theta - light.spot_cutoffs.y) / epsilon, 0.0, 1.0);
+                }
                 // Attenuation
-                float attenuation = 1.0 / (light.attenuation.x + 
-                                        light.attenuation.y * distance + 
-                                        light.attenuation.z * distance * distance);
+                float attenuation = 1.0 / (light.attenuation_type.x + 
+                                        light.attenuation_type.y * distance + 
+                                        light.attenuation_type.z * distance * distance);
                 
-                // Shadow (if this light casts shadows)
+                // Shadow Logic
                 float pointVisibility = 1.0;
-                if (light.shadow_index.x >= 0.0) {
-                    int idx = int(round(light.shadow_index.x));
+                if (light.direction_shadow.w >= 0.0) { 
+                    int idx = int(round(light.direction_shadow.w));
                     pointVisibility = getPointLightVisibility(world_pos, light.position_radius.xyz, light.position_radius.w, idx);
                 }
                 
-                // Add to lighting with phase function
-                if (pointVisibility > EPSILON) {
-                    lighting += pointVisibility * light.color_intensity.rgb * attenuation * 
+                // Final mix
+                if (pointVisibility > EPSILON && spotIntensity > EPSILON) { // Optimization
+                    lighting += pointVisibility * spotIntensity * light.color_intensity.rgb * attenuation * 
                             phase_function(Wo, Wi, aniso_density_scattering_absorption.x);
                 }
             }

@@ -58,10 +58,11 @@ layout(std140, binding = 0) uniform VolumetricUBO
 };
 
 struct PointLightData {
-    vec4 position_radius;     // xyz = position, w = radius
-    vec4 color_intensity;      // xyz = color * intensity, w = unused
-    vec4 attenuation;          // x = constant, y = linear, z = quadratic
-    vec4 shadow_index;         // x = shadow cubemap index (-1 if no shadow)
+    vec4 position_radius;      
+    vec4 color_intensity;      
+    vec4 attenuation_type;     // .w is TYPE
+    vec4 direction_shadow;     // .xyz is Dir, .w is ShadowIndex
+    vec4 spot_cutoffs;         // .x=inner, .y=outer
 };
 
 layout(std430, binding = 1) readonly buffer PointLightBuffer {
@@ -110,7 +111,7 @@ float getCascadeBlend(float depth, int cascade) {
                      cascade == 1 ? cascade_splits.y :
                      cascade == 2 ? cascade_splits.z : cascade_splits.w;
     
-    // Define blend region (10% of the cascade range works well)
+    // Define blend region (10% of the cascade range)
     float blendRange = splitDist * 0.1;
     
     // Calculate blend factor (0 = fully this cascade, 1 = fully next cascade)
@@ -210,26 +211,22 @@ float visibility(vec3 p)
     // Sample primary cascade
     float shadow = visibility_cascade(p, cascade);
     
-    // Blend cascades (existing code)
+    // Blend cascades
     float blend = getCascadeBlend(depth, cascade);
     if (blend > 0.0 && cascade < 3) {
         float shadow2 = visibility_cascade(p, cascade + 1);
         shadow = mix(shadow, shadow2, blend);
     }
 
-    // FIX: Fade out shadows at the max shadow distance
-    // This prevents the hard "cut-off" line you see on the ceiling.
-    // We fade out over the last 10% of the max shadow distance.
+    // Fade out shadows at the max shadow distance
     float maxShadowDist = cascade_splits.w;
     float fadeStart = maxShadowDist * 0.9;
     float distBlend = smoothstep(maxShadowDist, fadeStart, depth); // 1.0 close, 0.0 at max dist
     
-    // If beyond max distance, return 1.0 (fully lit) to match your out-of-bounds logic,
-    // OR you can clamp it to the last known shadow value if you prefer.
-    // Standard approach: Fade to 1.0 (lit) implies no shadow caster logic known.
-    // However, for dark corridors, you might want to fade to ambient occlusion or 0.0.
-    // Given your scene looks dark, let's clamp the shadow to 1.0 (lit) smoothly.
-    
+    // If beyond max distance, return 0.0 (fully dark) to match out-of-bounds logic,
+    // or we can clamp it to the last known shadow value.
+    // Standard approach: Fade to 0.0 (dark) implies no shadow caster logic known.
+
     return mix(0.0, shadow, distBlend);
 }
 
@@ -373,35 +370,49 @@ vec3 calculatePointLight(int lightIndex, vec3 worldPos, vec3 N, vec3 Wo, vec3 F0
     PointLightData light = pointLightBuffer.lights[lightIndex];
     
     vec3 lightVec = light.position_radius.xyz - worldPos;
-    float distance = length(lightVec);
+    float dist = length(lightVec);
     
-    // Skip if outside light radius
-    if (distance > light.position_radius.w) {
-        return vec3(0.0);
-    }
+    if (dist > light.position_radius.w) return vec3(0.0);
     
     vec3 Wi = normalize(lightVec);
-    vec3 Wh = normalize(Wo + Wi);
     
+    // --- NEW: Spotlight Intensity Logic ---
+    float spotIntensity = 1.0;
+    
+    // Check if Type == 2.0 (Spot)
+    if (light.attenuation_type.w > 1.5) { 
+        // Dot product of Light Direction and Vector from Light to Pixel
+        // Note: Wi is Pixel->Light. We need Light->Pixel, which is -Wi.
+        // light.direction_shadow.xyz should be normalized!
+        float theta = dot(normalize(-Wi), normalize(light.direction_shadow.xyz));
+        
+        float epsilon = light.spot_cutoffs.x - light.spot_cutoffs.y; // inner - outer
+        spotIntensity = clamp((theta - light.spot_cutoffs.y) / epsilon, 0.0, 1.0);
+    }
+    // --------------------------------------
+
+    vec3 Wh = normalize(Wo + Wi);
     float NdotL = max(dot(N, Wi), 0.0);
     
-    // Calculate attenuation
-    float attenuation = 1.0 / (light.attenuation.x + 
-                               light.attenuation.y * distance + 
-                               light.attenuation.z * distance * distance);
+    // Standard Attenuation
+    float attenuationDivisor = light.attenuation_type.x + 
+                               light.attenuation_type.y * dist + 
+                               light.attenuation_type.z * dist * dist;
+    float attenuation = 1.0 / max(attenuationDivisor, 0.0001);
     
-    // Calculate BRDF
     vec3 brdf = evaluate_uber_brdf(diffuse_color, roughness, N, F0, Wo, Wh, Wi);
     
-    // Get shadow (only if this light has a shadow)
+    // Shadow Logic (Using stored index at .w)
     float shadow = 1.0;
-    if (light.shadow_index.x >= 0.0) {
-        int idx = int(round(light.shadow_index.x)); // Convert float to safe int
+    if (light.direction_shadow.w >= 0.0) {
+        int idx = int(round(light.direction_shadow.w));
         shadow = getPointShadow(worldPos, light.position_radius.xyz, light.position_radius.w, idx);
     }
     
-    return brdf * light.color_intensity.rgb * attenuation * shadow * NdotL;
+    // Combine everything, including spotIntensity
+    return brdf * light.color_intensity.rgb * attenuation * shadow * NdotL * spotIntensity;
 }
+
 // ------------------------------------------------------------------
 // MAIN -------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -599,7 +610,7 @@ void main()
     // Direct lighting
     vec3 color = direct_lighting(Wo, N, FS_IN_WorldPos, F0, diffuse_color, roughness);
     
-    // point lights
+    // Point lights
     for (int i = 0; i < u_NumPointLights; i++) {
         color += calculatePointLight(i, FS_IN_WorldPos, N, Wo, F0, diffuse_color, roughness);
     }
@@ -610,7 +621,7 @@ void main()
     // Volumetric fog
     color = add_inscattered_light(color, FS_IN_WorldPos);
 
-    // tone mapping
+    // Tone mapping
     vec3 toneMapped = ((color * (0.15 * color + 0.05) + 0.004) / 
                    (color * (0.15 * color + 0.50) + 0.06)) - 0.02 / 0.30;
     color = toneMapped;

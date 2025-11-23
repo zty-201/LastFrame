@@ -145,7 +145,7 @@ namespace EngineFramework
 		FBO tempShadowFBO(FBO::CSMTextureArray, SHADOW_WIDTH, SHADOW_HEIGHT, &m_csmTextureArray, CASCADE_COUNT);
 		m_shadowFBO = std::move(tempShadowFBO);
 
-		// Create the point shadow map framebuffer
+		// Create the point shadow map framebuffer (we use default and setup manually as we need multiple cube map faces)
 		FBO tempPointShadowFBO(FBO::Default, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE);
 		m_pointShadowFBO = std::move(tempPointShadowFBO);
 
@@ -155,13 +155,10 @@ namespace EngineFramework
 		// 3. Explicitly tell OpenGL this FBO has no color buffers
 		GLenum drawBuffers[] = { GL_NONE };
 		glDrawBuffers(1, drawBuffers);
-
 		glReadBuffer(GL_NONE);
-
-		// 4. Check status (It might still be "Incomplete Missing Attachment" until you bind a depth texture, 
-		//    but this sets the correct "No Color" state for later).
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+		// Create point shadow map textures
 		m_pointShadowMapTextures.resize(MAX_SHADOW_CASTING_LIGHTS);
 		glGenTextures(MAX_SHADOW_CASTING_LIGHTS, m_pointShadowMapTextures.data());
 
@@ -176,8 +173,6 @@ namespace EngineFramework
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-			// Required for samplerCubeShadow to work!
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 		}
@@ -293,22 +288,22 @@ namespace EngineFramework
 		}
 
 		glm::mat4 viewProj = P * V;
-		// Update point light SSBO
+		// 1. Update point light SSBO
 		UpdatePointLightSSBO(*active_camera, viewProj);
-		// 1. Create shadow map
+		// 2. Create shadow map
 		ShadowPass();
-		// 2. Update all uniforms now that shadow pass is done
+		// 3. Update all uniforms now that shadow pass is done
 		UpdateUBOs(*active_camera, V, P);
-		// 3. Inject shadowed light into the volume
+		// 4. Inject shadowed light into the volume
 		VolumetricLightInjectionPass();
-		// 4. Integrate the light through the volume
+		// 5. Integrate the light through the volume
 		VolumetricRayMarchPass();
-		// 5. Render all meshes
+		// 6. Render all meshes
 		MeshPass();
-		// 6. Render the skybox last
+		// 7. Render the skybox last
 		SkyboxPass();
 
-		// 7. Copy to screen if needed
+		// 8. Copy to screen if needed
 		if (!m_isRenderingToFBO) {
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -322,19 +317,40 @@ namespace EngineFramework
 
 	void GraphicsSystem::UpdatePointLightSSBO(const CameraComponent& camera, const glm::mat4& viewProj) {
 		m_pointLightData.clear();
-		std::vector<std::pair<int, float>> lightDistances;  // For shadow selection
+		std::vector<std::pair<int, float>> lightDistances;
 
-		// 1. Collect ALL lights (visible or not for now)
+		// 1. Collect point and spot lights
 		for (auto [entity, light] : registry.view<LightComponent>().each()) {
-			if (light.type == LightComponent::POINT && m_pointLightData.size() < MAX_POINT_LIGHTS) {  // point light
+			bool isValidType = (light.type == LightComponent::POINT || light.type == LightComponent::SPOT);
+
+			if (isValidType && m_pointLightData.size() < MAX_POINT_LIGHTS) {
 				PointLightSSBO data;
 				data.position_radius = glm::vec4(light.position, light.radius);
 				data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f);
-				data.attenuation = glm::vec4(light.constant, light.linear, light.quadratic, 0.0f);
-				data.shadow_index = glm::vec4(-1.0f, 0, 0, 0);  // Default: no shadow
 
-				// Track distance for shadow assignment
+				// Pack Type into .w
+				float typeVal = (light.type == LightComponent::SPOT) ? 2.0f : 1.0f;
+				data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, typeVal);
+
+				// Pack Direction into .xyz and Default Shadow into .w
+				data.direction_shadow = glm::vec4(light.direction, -1.0f);
+
+				// Pack Spot Angles 
+				// Default cutoffs for point lights (so they calculate to 1.0 intensity)
+				float inner = -1.0f;
+				float outer = -1.0f;
+
+				if (light.type == LightComponent::SPOT) {
+					// Assuming cutOff is in degrees, convert to radians then cosine
+					inner = glm::cos(glm::radians(light.innerConeAngle));
+					outer = glm::cos(glm::radians(light.outerConeAngle));
+				}
+				data.spot_cutoffs = glm::vec4(inner, outer, 0.0f, 0.0f);
+
+				// Track distance for shadow priority
 				float dist = glm::length(camera.position - light.position);
+
+				// Frustum check (reuse point logic for now)
 				if (isLightInFrustum(light.position, light.radius, viewProj)) {
 					lightDistances.push_back({ static_cast<int>(m_pointLightData.size()), dist });
 				}
@@ -343,17 +359,18 @@ namespace EngineFramework
 			}
 		}
 
-		// 2. Sort visible lights by distance and assign shadow indices
+		// 2. Sort visible lights by distance for shadow assignment
 		std::sort(lightDistances.begin(), lightDistances.end(),
 			[](const auto& a, const auto& b) { return a.second < b.second; });
 
+		// Assign shadow maps
 		int shadowCount = std::min(MAX_SHADOW_CASTING_LIGHTS, (int)lightDistances.size());
 		for (int i = 0; i < shadowCount; i++) {
 			int lightIndex = lightDistances[i].first;
-			m_pointLightData[lightIndex].shadow_index.x = float(i);  // This light uses cubemap slot i
+			m_pointLightData[lightIndex].direction_shadow.w = float(i); // Update shadow index in new location
 		}
 
-		// 3. Upload ALL lights (the full buffer)
+		// 3. Upload
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_pointLightSSBO);
 		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
 			sizeof(PointLightSSBO) * m_pointLightData.size(),
@@ -438,8 +455,8 @@ namespace EngineFramework
 			glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f), lightDir, up);
 
 			// 2. Calculate Bounding Sphere of the Frustum
-			// This is "Industry Standard" because a sphere is rotation-invariant.
-			// It prevents the shadow map from shrinking/growing when you turn the camera.
+			// a sphere is rotation-invariant.
+			// It prevents the shadow map from shrinking/growing when camera is turned.
 			glm::vec3 frustumCenter(0.0f);
 			for (const auto& corner : frustumCorners) {
 				frustumCenter += corner;
@@ -456,7 +473,7 @@ namespace EngineFramework
 			glm::vec3 lightSpaceCenter = glm::vec3(lightView * glm::vec4(frustumCenter, 1.0f));
 
 			// 4. Calculate Texel Size based on Sphere Diameter
-			// The diameter is constant per cascade, so texel size is constant -> No shimmering!
+			// The diameter is constant per cascade, so texel size is constant -> no shimmering
 			float diameter = radius * 2.0f;
 			float texelSize = diameter / SHADOW_WIDTH;
 
@@ -470,7 +487,7 @@ namespace EngineFramework
 			float minY = lightSpaceCenter.y - radius;
 			float maxY = lightSpaceCenter.y + radius;
 
-			// Z-Bounds: We need to cover the frustum (center +/- radius) AND geometry between light and frustum.
+			// Z-Bounds: We need to cover the frustum (center +/- radius) and geometry between light and frustum.
 			// We extend the 'near' plane (negative view Z) significantly towards the light.
 			// In Light View space (looking down -Z), objects are at negative Z.
 			float zMult = 10.0f;
@@ -516,9 +533,6 @@ namespace EngineFramework
 	}
 
 	void GraphicsSystem::RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius) {
-
-		// TO implement: Use cubemapSlot to select the correct layer in a cubemap array
-		UNREFERENCED_PARAMETER(cubemapSlot);
 
 		glm::vec3 lightPos = glm::vec3(lightPosRadius);
 		float radius = lightPosRadius.w;
@@ -608,8 +622,10 @@ namespace EngineFramework
 	void GraphicsSystem::RenderPointLightShadows()
 	{
 		for (const auto& light : m_pointLightData) {
-			if (light.shadow_index.x >= 0.0f) {
-				int cubemapSlot = int(light.shadow_index.x);
+			// Read shadow index from .w of direction_shadow
+			if (light.direction_shadow.w >= 0.0f) {
+				int cubemapSlot = int(light.direction_shadow.w);
+
 				// Render to cubemap array at index cubemapSlot
 				RenderShadowCubemap(cubemapSlot, light.position_radius);
 			}
@@ -618,14 +634,11 @@ namespace EngineFramework
 
 	void GraphicsSystem::ShadowPass()
 	{
-
 		// Render directional shadow first
 		RenderDirectionalShadow();
 
 		// Then render point light shadows
 		RenderPointLightShadows();
-
-		
 	}
 
 	
@@ -637,7 +650,7 @@ namespace EngineFramework
 
 		LightComponent* dirLight = nullptr;
 		for (auto [entity, light] : registry.view<LightComponent>().each()) {
-			if (light.type == LightComponent::DIRECTIONAL) { // false = directional
+			if (light.type == LightComponent::DIRECTIONAL) { 
 				dirLight = &light;
 				break;
 			}
@@ -803,8 +816,9 @@ namespace EngineFramework
 		shader->setUniform("u_Tricubic", m_tricubic_filtering);
 		// Pass the number of point lights
 		shader->setUniform("u_NumPointLights", (int)m_pointLightData.size());
+
+		// ========================================== DEBUG MODE HANDLING ==========================================
 		if (SceneManager::GetInstance().is_file_loaded) {
-			// Add keyboard control (or use ImGui if you have it)
 			if (ImGui::IsKeyDown(ImGuiKey_F1)) debugMode = 0;  // Normal
 			if (ImGui::IsKeyDown(ImGuiKey_F2)) debugMode = 1;  // Cascade colors
 			if (ImGui::IsKeyDown(ImGuiKey_F3)) debugMode = 2;  // Shadow UV
@@ -816,8 +830,6 @@ namespace EngineFramework
 			if (ImGui::IsKeyDown(ImGuiKey_F9)) debugMode = 8;  // Distance
 			if (ImGui::IsKeyDown(ImGuiKey_F10)) debugMode = 9; // Cascade 0 lit/shadow
 		}
-		
-
 		shader->setUniform("u_DebugMode", debugMode);
 
 		// Log current mode
@@ -831,6 +843,7 @@ namespace EngineFramework
 			LOGI("Debug Mode: %d - %s", debugMode, modeNames[debugMode]);
 			lastDebugMode = debugMode;
 		}
+		// =========================================================================================================
 
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
@@ -949,7 +962,7 @@ namespace EngineFramework
 		shader->use();
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
 
-		glDepthFunc(GL_LEQUAL); // Standard skybox trick
+		glDepthFunc(GL_LEQUAL); 
 		glDisable(GL_CULL_FACE);
 
 		auto skybox_view = registry.view<MeshComponent, SkyboxRenderPass>();
@@ -1087,8 +1100,6 @@ namespace EngineFramework
 			m_cascadeSplits[i] = lambda * log + (1.0f - lambda) * uniform;
 		}
 
-		// Manual tweaks for better distribution (optional)
-		// m_cascadeSplits = {nearPlane, 10.0f, 50.0f, 200.0f, farPlane};
 	}
 
 	std::vector<glm::vec3> GraphicsSystem::GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ)
@@ -1121,6 +1132,7 @@ namespace EngineFramework
 		}
 		return frustumCorners;
 	}
+
 	//==Event Handlers==//
 
 	//When level editor is toggled on/off.

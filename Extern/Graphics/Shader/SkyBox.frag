@@ -74,9 +74,11 @@ void main()
     vec3 sunDir = -normalize(light_direction.xyz);
 
     // We simulate the camera being on the planet surface
-    // If your game world is small, we add the planet radius to the Y position
+    // If your game world is small, add the planet radius to the Y position
     vec3 camPos = vec3(0.0, PLANET_RADIUS + 1000.0, 0.0); 
-    // OR: vec3 camPos = vec3(camera_position.x, camera_position.y + PLANET_RADIUS, camera_position.z);
+
+    // alternative
+    // vec3 camPos = vec3(camera_position.x, camera_position.y + PLANET_RADIUS, camera_position.z);
 
     // Check intersection with atmosphere
     vec2 hit = raySphereIntersect(camPos, viewDir, ATMOSPHERE_RADIUS);
@@ -97,7 +99,7 @@ void main()
     // Phase functions
     float mu = dot(viewDir, sunDir);
     float phaseRay = 3.0 / (16.0 * PI) * (1.0 + mu * mu);
-    float g = aniso_density_scattering_absorption.x; // Use your fog anisotropy
+    float g = aniso_density_scattering_absorption.x; // Use fog anisotropy
     float phaseMie = 3.0 / (8.0 * PI) * ((1.0 - g * g) * (1.0 + mu * mu)) / ((2.0 + g * g) * pow(1.0 + g * g - 2.0 * g * mu, 1.5));
 
     vec3 currentPos = camPos;

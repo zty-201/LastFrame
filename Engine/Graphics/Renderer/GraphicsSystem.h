@@ -134,12 +134,14 @@ namespace EngineFramework
 
     private:
 
+        // Debug Mode
         int debugMode = 0;
 
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* pWindow = nullptr;
 #endif
 
+		// Resource Structs
         struct VolumetricUBO
         {
             glm::mat4 view;
@@ -160,16 +162,16 @@ namespace EngineFramework
         };
 
         struct PointLightSSBO {
-            glm::vec4 position_radius;
-            glm::vec4 color_intensity;
-            glm::vec4 attenuation;
-            glm::vec4 shadow_index;  // This can store shadowIndex!
+            glm::vec4 position_radius;      // .xyz = position, .w = radius
+            glm::vec4 color_intensity;      // .xyz = color, .w = intensity
+            glm::vec4 attenuation_type;     // .x = constant, .y = linear, .z = quadratic, .w = TYPE (1.0=Point, 2.0=Spot)
+            glm::vec4 direction_shadow;     // .xyz = direction, .w = shadow_index
+            glm::vec4 spot_cutoffs;         // .x = cos(inner), .y = cos(outer), .z,w = paddingE
         };
 
-		std::vector<PointLightSSBO> m_pointLightData;
-
         //std::unique_ptr<InstancingSystem> m_instancingSystem;
-        // A map to cache loaded mesh data (VAO, index count)
+        
+		// Shader GUIDs
         xresource::full_guid mesh_shader_guid;
         xresource::full_guid skybox_shader_guid;
         xresource::full_guid shadow_shader_guid;
@@ -177,8 +179,10 @@ namespace EngineFramework
         xresource::full_guid light_injection_shader_guid;
         xresource::full_guid ray_march_shader_guid;
 
+		// UBOs
         GLuint m_volumetricUBO = 0;
 
+		// Cached resources
         std::unordered_map<std::string, std::shared_ptr<Mesh::MeshData>> meshCache;
         std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCacheWire;
 
@@ -189,18 +193,22 @@ namespace EngineFramework
         std::array<float, CASCADE_COUNT + 1> m_cascadeSplits;
 		std::array<float, CASCADE_COUNT> m_cascadeBiases;
 
+		// Framebuffer Objects
         FBO mainFBO;
         FBO m_shadowFBO;
 		FBO m_pointShadowFBO;
 
+		// FBO texture attachments
         GLuint sceneTextureID;
         std::vector<GLuint> m_pointShadowMapTextures;
 
+        // SSBOs
 		GLuint m_pointLightSSBO = 0;
+        std::vector<PointLightSSBO> m_pointLightData;
+
         // 3D textures for volumetric fog passes
         GLuint m_ray_march_voxel_grid = 0;
         GLuint m_temporal_integration_voxel_grid[2] = { 0, 0 };
-
         GLuint m_defaultWhiteTexture = 0;
         GLuint m_defaultNormalTexture = 0;
         std::vector<GLuint> m_blue_noise_textures;
@@ -217,10 +225,14 @@ namespace EngineFramework
         bool m_tricubic_filtering = false;
         int m_frame_idx = 0;
         bool m_ping_pong = false;
+
+		// Previous frame matrices for temporal reprojection
         glm::mat4 m_prev_view_projection;
         
+		// Screen dimensions
         glm::vec2 screen = { WIDTH,HEIGHT };
         
+		// Other flags
         bool show_debugDraw = false;
         bool m_isRenderingToFBO = false;
 
@@ -234,8 +246,12 @@ namespace EngineFramework
         void SkyboxPass();
         void VolumetricLightInjectionPass();
         void VolumetricRayMarchPass();
+
+		// Update methods
         void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
 		void UpdatePointLightSSBO(const CameraComponent& camera, const glm::mat4& viewProj);
+
+		// Helper methods
         void PreGeneratePrimitives();
         void LoadBlueNoiseTextures();
 		void RenderDirectionalShadow();
@@ -244,6 +260,7 @@ namespace EngineFramework
         void CalculateCascadeSplits(float nearPlane, float farPlane);
         bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
         std::vector<glm::vec3> GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ);
+
         //==Event Handlers, one for each type of event.
         void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);
