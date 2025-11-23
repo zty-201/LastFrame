@@ -872,6 +872,30 @@ namespace EditorFeatures {
 					}
 				}
 
+				else if (field.type() == entt::resolve<LightComponent::Type>()) {
+					auto& value = field.cast<LightComponent::Type&>();
+					int current = static_cast<int>(value);
+
+					if (ImGui::RadioButton("Directional", current == static_cast<int>(LightComponent::Type::DIRECTIONAL))) {
+						current = static_cast<int>(LightComponent::Type::DIRECTIONAL);
+					}
+					ImGui::SameLine();
+					if (ImGui::RadioButton("Point", current == static_cast<int>(LightComponent::Type::POINT))) {
+						current = static_cast<int>(LightComponent::Type::POINT);
+					}
+					ImGui::SameLine();
+					if (ImGui::RadioButton("Spot", current == static_cast<int>(LightComponent::Type::SPOT))) {
+						current = static_cast<int>(LightComponent::Type::SPOT);
+					}
+
+					if (static_cast<int>(value) != current) {
+						const auto new_value = static_cast<LightComponent::Type>(current);
+						commit_instant_history(entity, component_name, data, obj, [&]() {
+							value = new_value;
+							data.set(obj, value);
+							});
+					}
+				}
 				// Temp test
 				//int raw = tmp.cast<int>();
 				//if (ImGui::DragInt(label.c_str(), &raw, 1.f)) {
