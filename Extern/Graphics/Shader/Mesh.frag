@@ -83,7 +83,7 @@ uniform sampler3D            s_VoxelGrid;
 uniform bool u_Tricubic;
 uniform int u_DebugMode;
 uniform int u_NumPointLights;
-uniform samplerCubeShadow s_PointShadowCubemap; 
+uniform samplerCubeShadow s_PointShadowCubemaps[4]; 
 
 // ------------------------------------------------------------------
 // FUNCTIONS --------------------------------------------------------
@@ -349,15 +349,22 @@ vec3 add_inscattered_light(vec3 color, vec3 world_pos)
 
 // ------------------------------------------------------------------
 
-float getPointShadow(vec3 worldPos, vec3 lightPos, float farPlane) {
+float getPointShadow(vec3 worldPos, vec3 lightPos, float farPlane, int shadowIndex) {
     vec3 lightToFrag = worldPos - lightPos;
     float currentDepth = length(lightToFrag) / farPlane;
-    
-    // Add small bias to prevent shadow acne
     float bias = 0.005;
-    
-    // Sample the cubemap shadow
-    return texture(s_PointShadowCubemap, vec4(lightToFrag, currentDepth - bias));
+    vec4 coords = vec4(lightToFrag, currentDepth - bias);
+
+    // Dynamic indexing of samplers is often forbidden in GLSL.
+    // We use a manual switch.
+    float shadow = 1.0;
+    switch (shadowIndex) {
+        case 0: shadow = texture(s_PointShadowCubemaps[0], coords); break;
+        case 1: shadow = texture(s_PointShadowCubemaps[1], coords); break;
+        case 2: shadow = texture(s_PointShadowCubemaps[2], coords); break;
+        case 3: shadow = texture(s_PointShadowCubemaps[3], coords); break;
+    }
+    return shadow;
 }
 
 // ------------------------------------------------------------------
@@ -389,9 +396,8 @@ vec3 calculatePointLight(int lightIndex, vec3 worldPos, vec3 N, vec3 Wo, vec3 F0
     // Get shadow (only if this light has a shadow)
     float shadow = 1.0;
     if (light.shadow_index.x >= 0.0) {
-        // For now, we only support one shadow cubemap (index 0)
-        // Later you can extend this to support multiple cubemaps
-        shadow = getPointShadow(worldPos, light.position_radius.xyz, light.position_radius.w);
+        int idx = int(round(light.shadow_index.x)); // Convert float to safe int
+        shadow = getPointShadow(worldPos, light.position_radius.xyz, light.position_radius.w, idx);
     }
     
     return brdf * light.color_intensity.rgb * attenuation * shadow * NdotL;

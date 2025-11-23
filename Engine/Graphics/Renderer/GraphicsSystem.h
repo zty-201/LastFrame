@@ -194,7 +194,7 @@ namespace EngineFramework
 		FBO m_pointShadowFBO;
 
         GLuint sceneTextureID;
-		GLuint m_pointShadowMapTextureID;
+        std::vector<GLuint> m_pointShadowMapTextures;
 
 		GLuint m_pointLightSSBO = 0;
         // 3D textures for volumetric fog passes

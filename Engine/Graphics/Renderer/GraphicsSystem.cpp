@@ -146,8 +146,41 @@ namespace EngineFramework
 		m_shadowFBO = std::move(tempShadowFBO);
 
 		// Create the point shadow map framebuffer
-		FBO tempPointShadowFBO(FBO::ShadowCube, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE, &m_pointShadowMapTextureID);
+		FBO tempPointShadowFBO(FBO::Default, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE);
 		m_pointShadowFBO = std::move(tempPointShadowFBO);
+
+		glGenFramebuffers(1, &m_pointShadowFBO.handle);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
+
+		// 3. Explicitly tell OpenGL this FBO has no color buffers
+		GLenum drawBuffers[] = { GL_NONE };
+		glDrawBuffers(1, drawBuffers);
+
+		glReadBuffer(GL_NONE);
+
+		// 4. Check status (It might still be "Incomplete Missing Attachment" until you bind a depth texture, 
+		//    but this sets the correct "No Color" state for later).
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		m_pointShadowMapTextures.resize(MAX_SHADOW_CASTING_LIGHTS);
+		glGenTextures(MAX_SHADOW_CASTING_LIGHTS, m_pointShadowMapTextures.data());
+
+		for (int i = 0; i < MAX_SHADOW_CASTING_LIGHTS; i++) {
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointShadowMapTextures[i]);
+			for (unsigned int face = 0; face < 6; ++face) {
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_DEPTH_COMPONENT24,
+					POINT_SHADOW_SIZE, POINT_SHADOW_SIZE, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+			}
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+			// Required for samplerCubeShadow to work!
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+		}
 
 		// Get shader GUIDs 
 		mesh_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Mesh");
@@ -395,7 +428,7 @@ namespace EngineFramework
 			center /= frustumCorners.size();
 
 			// Create light view matrix looking at cascade center
-			glm::vec3 lightDir = glm::normalize(glm::vec3(0.0f) - dirLight->position);
+			glm::vec3 lightDir = dirLight->direction;
 
 			// Use a stable up vector
 			glm::vec3 up = glm::abs(lightDir.y) > 0.999f ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
@@ -533,7 +566,7 @@ namespace EngineFramework
 			// Attach the cube face to FBO
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-				m_pointShadowMapTextureID, 0);
+				m_pointShadowMapTextures[cubemapSlot], 0);
 
 			glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -602,9 +635,23 @@ namespace EngineFramework
 		glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBO);
 		VolumetricUBO* ubo = (VolumetricUBO*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(VolumetricUBO), GL_MAP_WRITE_BIT);
 
-		auto light_view = registry.view<LightComponent>();
-		LightComponent& main_light = light_view.get<LightComponent>(light_view.front());
-		glm::vec3 lightDir = glm::normalize(glm::vec3(0.0f) - main_light.position);
+		LightComponent* dirLight = nullptr;
+		for (auto [entity, light] : registry.view<LightComponent>().each()) {
+			if (!light.type) { // false = directional
+				dirLight = &light;
+				break;
+			}
+		}
+
+		glm::vec3 direction = glm::vec3(0, -1, 0);
+		glm::vec3 color = glm::vec3(1.0f);
+		float intensity = 0.0f;
+
+		if (dirLight) {
+			direction = dirLight->direction;
+			color = dirLight->color;
+			intensity = dirLight->intensity;
+		}
 
 		ubo->view = V;
 		ubo->projection = P;
@@ -616,8 +663,8 @@ namespace EngineFramework
 		}
 		ubo->cascade_splits = glm::vec4(m_cascadeSplits[1], m_cascadeSplits[2],m_cascadeSplits[3], m_cascadeSplits[4]);
 		ubo->cascade_biases = glm::vec4(m_cascadeBiases[0], m_cascadeBiases[1], m_cascadeBiases[2], m_cascadeBiases[3]);
-		ubo->light_direction = glm::vec4(lightDir, 0.0f);
-		ubo->light_color = glm::vec4(main_light.color * main_light.intensity, m_ambient_light_intensity);
+		ubo->light_direction = glm::vec4(direction, 0.0f);
+		ubo->light_color = glm::vec4(color * intensity, m_ambient_light_intensity);
 		ubo->camera_position = glm::vec4(camera.position, 1.0f);
 		ubo->bias_near_far_pow = glm::vec4(m_shadow_bias, camera.nearPlane, camera.farPlane, m_depth_power);
 		ubo->aniso_density_scattering_absorption = glm::vec4(m_anisotropy, m_density, m_scattering, m_absorption);
@@ -663,9 +710,16 @@ namespace EngineFramework
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_csmTextureArray);  
 		shader->setUniform("s_CascadeShadowMaps", TextureUnits::SHADOW_MAP_UNIT);
 
-		glActiveTexture(GL_TEXTURE0 + TextureUnits::POINT_SHADOW_MAP_UNIT);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointShadowMapTextureID);
-		shader->setUniform("s_PointShadowCubemap", TextureUnits::POINT_SHADOW_MAP_UNIT);
+		int baseUnit = TextureUnits::POINT_SHADOW_MAP_UNIT;
+
+		for (int i = 0; i < MAX_SHADOW_CASTING_LIGHTS; i++) {
+			glActiveTexture(GL_TEXTURE0 + baseUnit + i);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointShadowMapTextures[i]);
+
+			// Set the sampler uniform array element
+			std::string uniformName = "s_PointShadowCubemaps[" + std::to_string(i) + "]";
+			shader->setUniform(uniformName.c_str(), baseUnit + i);
+		}
 
 		shader->setUniform("u_NumPointLights", (int)m_pointLightData.size());
 		shader->setUniform("u_Accumulation", m_frame_idx > 0 && m_temporal_accumulation);
@@ -732,9 +786,16 @@ namespace EngineFramework
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_csmTextureArray);
 		shader->setUniform("s_CascadeShadowMaps", TextureUnits::SHADOW_MAP_UNIT);
 
-		glActiveTexture(GL_TEXTURE0 + TextureUnits::POINT_SHADOW_MAP_UNIT);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointShadowMapTextureID);
-		shader->setUniform("s_PointShadowCubemap", TextureUnits::POINT_SHADOW_MAP_UNIT);
+		int baseUnit = TextureUnits::POINT_SHADOW_MAP_UNIT;
+
+		for (int i = 0; i < MAX_SHADOW_CASTING_LIGHTS; i++) {
+			glActiveTexture(GL_TEXTURE0 + baseUnit + i);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointShadowMapTextures[i]);
+
+			// Set the sampler uniform array element
+			std::string uniformName = "s_PointShadowCubemaps[" + std::to_string(i) + "]";
+			shader->setUniform(uniformName.c_str(), baseUnit + i);
+		}
 
 		glActiveTexture(GL_TEXTURE0 + TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
 		glBindTexture(GL_TEXTURE_3D, m_ray_march_voxel_grid);

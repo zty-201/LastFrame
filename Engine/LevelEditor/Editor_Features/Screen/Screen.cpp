@@ -836,60 +836,42 @@ namespace EngineFramework
                     if (registry.valid(selected_light_entity) && registry.all_of<LightComponent>(selected_light_entity)) {
                         auto& light = registry.get<LightComponent>(selected_light_entity);
 
-                        // Drop down to adjust the light position
-                        float pos[3] = { light.position.x, light.position.y, light.position.z };
-                        if (ImGui::InputFloat3("Light Position", pos, "%.3f")) {
-                            light.position = glm::vec3(pos[0], pos[1], pos[2]);
-                        }
-
                         // Intensity
                         float intensity = light.intensity;
                         if (ImGui::InputFloat("Light Intensity", &intensity)) {
                             light.intensity = intensity;
                         }
 
+                        // Controls specific to light type
+                        if (light.type) { // Point Light
+                            float pos[3] = { light.position.x, light.position.y, light.position.z };
+                            if (ImGui::InputFloat3("Light Position", pos, "%.3f")) {
+                                light.position = glm::vec3(pos[0], pos[1], pos[2]);
+                            }
+                        }
+                        else { // Directional Light
+                            // Convert direction vector to pitch and yaw for sliders
+                            float pitch = glm::degrees(asinf(-light.direction.y));
+                            float yaw = glm::degrees(atan2f(light.direction.x, light.direction.z));
 
-                        // Drop down to adjust the light intensities, in case there isn't enough intensities
-       //                 for (int i = 0; i < light.L.size(); i++) {
-                            //// If there is 1 intensity, it is ambient
-       //                     std::string title;
-       //                     if (i == 0) {
-                            //	title = "Ambient Intensity";
-       //                     }
-                            //// If there are 2 intensities, the second is diffuse
-       //                     else if (i == 1) {
-                            //	title = "Diffuse Intensity";
-       //                     }
-                            //// If there are 3 intensities, the third is specular
-       //                     else if (i == 2) {
-                            //	title = "Specular Intensity";
-       //                     }
-                            //// Anything more than 3, just call it component i
-       //                     else {
-       //                         std::stringstream ss;
-       //                         ss << "Component " << i;
-       //                         title = ss.str();
-       //                     }
+                            bool changed = false;
+                            changed |= ImGui::SliderFloat("Pitch", &pitch, -89.9f, 89.9f, "%.1f deg");
+                            changed |= ImGui::SliderFloat("Yaw", &yaw, -180.0f, 180.0f, "%.1f deg");
 
-       //                     // Obtain current intensity
-       //                     float intensity[3] = { light.L[i].x, light.L[i].y, light.L[i].z };
-       //                     if (ImGui::ColorEdit3(title.c_str(), intensity)) {
-                            //	light.L[i] = glm::vec3(intensity[0], intensity[1], intensity[2]);
-       //                     }
-       //                 }
+                            if (changed) {
+                                // Convert degrees back to radians
+                                float pitchRad = glm::radians(pitch);
+                                float yawRad = glm::radians(yaw);
 
-       //                 ImGui::Spacing();
+                                // Recalculate direction vector
+                                glm::vec3 newDirection;
+                                newDirection.x = cos(pitchRad) * sin(yawRad);
+                                newDirection.y = -sin(pitchRad);
+                                newDirection.z = cos(pitchRad) * cos(yawRad);
 
-       //                 // Additional features
-       //                 // Add/Remove intensity components
-       //                 if (ImGui::Button("Add Intensity Component")) {
-       //                     light.L.push_back(glm::vec3(1.0f));
-       //                 }
-
-       //                 ImGui::SameLine();
-       //                 if (ImGui::Button("Remove Last Component")) {
-       //                     if (!light.L.empty()) light.L.pop_back();
-       //                 }
+                                light.direction = glm::normalize(newDirection);
+                            }
+                        }
                     }
                     else {
                         ImGui::TextDisabled("Selected Light entity is invalid or no LightComponent attached.");
@@ -911,7 +893,7 @@ namespace EngineFramework
                 }
 
                 ImGui::PopStyleColor();
-
+                ImGui::EndTabItem();
                 // If you want to add new lights
     //            if(ImGui::Button("Add New Light")) {
                 //	// Create a new entity with LightComponent

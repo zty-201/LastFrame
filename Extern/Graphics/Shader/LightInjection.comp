@@ -74,17 +74,29 @@ uniform sampler3D s_History;
 uniform bool u_Accumulation;
 
 uniform int u_NumPointLights;
-uniform samplerCubeShadow s_PointShadowCubemap;
+uniform samplerCubeShadow s_PointShadowCubemaps[4]; 
 // ------------------------------------------------------------------
 // FUNCTIONS --------------------------------------------------------
 // ------------------------------------------------------------------
 
-float getPointLightVisibility(vec3 worldPos, vec3 lightPos, float farPlane) {
+float getPointLightVisibility(vec3 worldPos, vec3 lightPos, float farPlane, int shadowIndex) {
     vec3 lightToFrag = worldPos - lightPos;
     float currentDepth = length(lightToFrag) / farPlane;
     float bias = 0.005;
+    vec4 coords = vec4(lightToFrag, currentDepth - bias);
     
-    return texture(s_PointShadowCubemap, vec4(lightToFrag, currentDepth - bias));
+    float shadow = 1.0;
+    
+    // Manual switch for sampler arrays (GLSL best practice for broad compatibility)
+    switch (shadowIndex) {
+        case 0: shadow = texture(s_PointShadowCubemaps[0], coords); break;
+        case 1: shadow = texture(s_PointShadowCubemaps[1], coords); break;
+        case 2: shadow = texture(s_PointShadowCubemaps[2], coords); break;
+        case 3: shadow = texture(s_PointShadowCubemaps[3], coords); break;
+        default: shadow = 1.0; break;
+    }
+
+    return shadow;
 }
 
 // ------------------------------------------------------------------
@@ -188,7 +200,8 @@ void main()
                 // Shadow (if this light casts shadows)
                 float pointVisibility = 1.0;
                 if (light.shadow_index.x >= 0.0) {
-                    pointVisibility = getPointLightVisibility(world_pos, light.position_radius.xyz, light.position_radius.w);
+                    int idx = int(round(light.shadow_index.x));
+                    pointVisibility = getPointLightVisibility(world_pos, light.position_radius.xyz, light.position_radius.w, idx);
                 }
                 
                 // Add to lighting with phase function

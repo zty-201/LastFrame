@@ -20,10 +20,10 @@ struct LightComponent
     bool type; // false = directional, true = point/spot
     glm::vec3 position;    // For point/spot
     glm::vec3 direction;   // For directional/spot
-    glm::vec3 color;
-    float intensity;
-    float radius;          // For point/spot
-    float constant, linear, quadratic; // For point/spot
+    glm::vec3 color{ 1.0f, 1.0f, 1.0f };
+    float intensity{ 1.0f };
+    float radius{ 1.0f };          // For point/spot
+    float constant{ 1.0f }, linear{ 0.09f }, quadratic{ 0.032f }; // For point/spot
 };
 
 #endif
