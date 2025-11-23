@@ -306,7 +306,7 @@ namespace EngineFramework
 		// 5. Render all meshes
 		MeshPass();
 		// 6. Render the skybox last
-		//SkyboxPass();
+		SkyboxPass();
 
 		// 7. Copy to screen if needed
 		if (!m_isRenderingToFBO) {
@@ -950,6 +950,7 @@ namespace EngineFramework
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
 
 		glDepthFunc(GL_LEQUAL); // Standard skybox trick
+		glDisable(GL_CULL_FACE);
 
 		auto skybox_view = registry.view<MeshComponent, SkyboxRenderPass>();
 		for (auto [entity, meshComp] : skybox_view.each()) {
@@ -967,7 +968,7 @@ namespace EngineFramework
 				LOGE("Skybox mesh '%s' has no submeshes!", meshComp.meshName.c_str());
 			}
 		}
-
+		glEnable(GL_CULL_FACE);
 		glDepthFunc(GL_LESS);
 		shader->disuse();
 	}
