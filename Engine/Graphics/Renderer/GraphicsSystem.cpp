@@ -326,7 +326,7 @@ namespace EngineFramework
 
 		// 1. Collect ALL lights (visible or not for now)
 		for (auto [entity, light] : registry.view<LightComponent>().each()) {
-			if (light.type && m_pointLightData.size() < MAX_POINT_LIGHTS) {  // point light
+			if (light.type == LightComponent::POINT && m_pointLightData.size() < MAX_POINT_LIGHTS) {  // point light
 				PointLightSSBO data;
 				data.position_radius = glm::vec4(light.position, light.radius);
 				data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f);
@@ -364,7 +364,7 @@ namespace EngineFramework
 	{
 		LightComponent* dirLight = nullptr;
 		for (auto [entity, light] : registry.view<LightComponent>().each()) {
-			if (!light.type) {  // false = directional
+			if (light.type == LightComponent::DIRECTIONAL) {  
 				dirLight = &light;
 				break;
 			}
@@ -637,7 +637,7 @@ namespace EngineFramework
 
 		LightComponent* dirLight = nullptr;
 		for (auto [entity, light] : registry.view<LightComponent>().each()) {
-			if (!light.type) { // false = directional
+			if (light.type == LightComponent::DIRECTIONAL) { // false = directional
 				dirLight = &light;
 				break;
 			}

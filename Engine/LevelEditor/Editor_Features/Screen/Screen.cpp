@@ -898,13 +898,13 @@ namespace EngineFramework
                         }
 
                         // Controls specific to light type
-                        if (light.type) { // Point Light
+                        if (light.type == LightComponent::POINT) { // Point Light
                             float pos[3] = { light.position.x, light.position.y, light.position.z };
                             if (ImGui::InputFloat3("Light Position", pos, "%.3f")) {
                                 light.position = glm::vec3(pos[0], pos[1], pos[2]);
                             }
                         }
-                        else { // Directional Light
+                        else if (light.type == LightComponent::DIRECTIONAL) { // Directional Light
                             // Convert direction vector to pitch and yaw for sliders
                             float pitch = glm::degrees(asinf(-light.direction.y));
                             float yaw = glm::degrees(atan2f(light.direction.x, light.direction.z));

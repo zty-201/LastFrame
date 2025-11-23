@@ -128,6 +128,17 @@ struct adl_serializer<CameraComponent::CameraType> {
 };
 
 template<>
+struct adl_serializer<LightComponent::Type> {
+	static void to_json(json& j, const LightComponent::Type& type) {
+		j = static_cast<int>(type);
+	}
+
+	static void from_json(const json& j, LightComponent::Type& type) {
+		type = static_cast<LightComponent::Type>(j.get<int>());
+	}
+};
+
+template<>
 struct adl_serializer<TriggerShapeType> {
 	static void to_json(nlohmann::json& j, const TriggerShapeType& v) {
 		j = static_cast<int>(v);
@@ -238,6 +249,7 @@ namespace EngineFramework
 		SetMeta(std::vector<float>),
 		SetMeta(std::vector<std::string>),
 		SetMeta(CameraComponent::CameraType),
+		SetMeta(LightComponent::Type),
 		SetMeta(std::filesystem::path),
 		SetMeta(TriggerShapeType),
 		SetMeta(::ColliderShape),
@@ -286,6 +298,7 @@ namespace EngineFramework
 		SetJson(std::vector<float>),
 		SetJson(std::vector<std::string>),
 		SetJson(CameraComponent::CameraType),
+		SetJson(LightComponent::Type),
 		SetJson(std::filesystem::path),
 		SetJson(TriggerShapeType),
 		SetJson(::ColliderShape),
@@ -422,6 +435,7 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(xresource::instance_guid);
 		REGISTER_ARBITRARY_TYPE(std::vector<glm::vec3>);
 		REGISTER_ARBITRARY_TYPE(CameraComponent::CameraType);
+		REGISTER_ARBITRARY_TYPE(LightComponent::Type);
 		REGISTER_ARBITRARY_TYPE(std::filesystem::path);
 		REGISTER_ARBITRARY_TYPE(TriggerShapeType);
 		REGISTER_ARBITRARY_TYPE(::ColliderShape);
@@ -512,13 +526,6 @@ namespace EngineFramework
 			.func<&Remover<LightComponent>::RemoveComponent>("remove")
 			.func<&Getter<LightComponent>::GetComponent>("get")
 			.func<&GetRef<LightComponent>>("get_ref");
-
-		//== Register CameraComponent Enums == //
-		/*entt::meta_factory<CameraComponent::CameraType>()
-			.type("CameraType")
-			.data<CameraComponent::CameraType::ORBITING>("ORBITING")
-			.data<CameraComponent::CameraType::WALKING>("WALKING")
-			.conv<std::underlying_type_t<CameraComponent::CameraType>>();*/
 
 
 		// === Register CameraComponent ===

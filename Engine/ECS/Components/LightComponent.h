@@ -17,7 +17,13 @@
 
 struct LightComponent
 {
-    bool type; // false = directional, true = point/spot
+    enum Type
+    {
+        DIRECTIONAL = 0,
+        POINT = 1,
+        SPOT = 2
+	};
+    Type type; // false = directional, true = point/spot
     glm::vec3 position;    // For point/spot
     glm::vec3 direction;   // For directional/spot
     glm::vec3 color{ 1.0f, 1.0f, 1.0f };

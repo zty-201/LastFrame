@@ -24,7 +24,7 @@
 			],
 			"quadratic": 0.0,
 			"radius": 0.0,
-			"type": false
+			"type": 0
 		}
 	},
 	"1000": {
@@ -247,7 +247,7 @@
 			],
 			"quadratic": 0.03200000151991844,
 			"radius": 500.0,
-			"type": true
+			"type": 1
 		}
 	}
 }
