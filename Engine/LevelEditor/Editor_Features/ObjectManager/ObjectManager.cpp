@@ -157,6 +157,24 @@ namespace EngineFramework
 					// This is safe: sets the context to the currently right-clicked entity
 					selected_entity = entity;
 
+					// Add the actions to be tracked by history system to ensure the redo/undo works for duplicating and delete etc
+					std::string duplicateLabel = "Duplicate Entity##" + std::to_string((uint32_t)entity);
+					if (ImGui::MenuItem(duplicateLabel.c_str())) {
+						entt::entity duplicated_entity = GameObjectSystem::GetInstance().DuplicateInstance(entity);
+						if (duplicated_entity != entt::null) {
+							HistorySystem* history_system = HistorySystem::this_class ? &HistorySystem::GetInstance() : nullptr;
+							if (history_system) {
+								auto record = history_system->start_track(duplicated_entity, Record_Type::ENTITY_ADDED);
+								history_system->end_track(record);
+							}
+							selected_entity = duplicated_entity;
+							LevelEditor::GetInstance().variables.selected_objectID = duplicated_entity;
+							LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+						}
+						ImGui::EndPopup();
+						break;
+					}
+
 					// --- 2. UNIQUE MENU ITEM LABEL ---
 					// Optional: Ensure the delete text itself is unique for clarity, though not mandatory
 					std::string deleteLabel = "Delete Entity##" + std::to_string((uint32_t)entity);

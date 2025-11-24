@@ -1151,21 +1151,38 @@ namespace EngineFramework
 
         if (ImGui::BeginPopup("Entity_Shortcut_Menu"))
         {
-            if (ImGui::MenuItem("Delete")) {
+            entt::entity id = entt::null;
+            if (editor_ptr)
+            {
+                id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+            }
+            bool has_selection = (id != entt::null) && registry.valid(id);
+
+            if (ImGui::MenuItem("Delete", nullptr, false, has_selection)) {
                 // your delete code
             }
-            if (ImGui::MenuItem("Duplicate")) {
-                // duplicate code
+            if (ImGui::MenuItem("Duplicate", nullptr, false, has_selection)) {
+                entt::entity duplicated = GameObjectSystem::GetInstance().DuplicateInstance(id);
+                if (duplicated != entt::null)
+                {
+                    if (editor_ptr)
+                    {
+                        editor_ptr->selected_objectID = duplicated;
+                        editor_ptr->latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+                    }
+                    if (history)
+                    {
+                        auto record = history->start_track(duplicated, Record_Type::ENTITY_ADDED);
+                        history->end_track(record);
+                    }
+                }
             }
 
             /*
             * Adjusting trigger box
             */
-            entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
-
             //TriggerBoxComponent
-
-            if (registry.all_of<TransformComponent, TriggerBoxComponent>(id))
+            if (has_selection && registry.all_of<TransformComponent, TriggerBoxComponent>(id))
             {
                 std::string caption = "Adjust Trigger Box";
                 if (is_adjusting_triggerbox) caption = "Stop Adjusting";
