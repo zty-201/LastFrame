@@ -26,6 +26,7 @@
 #include "TransformComponent.h"
 #include "TextureComponent.h"
 #include "NormalMapComponent.h"
+#include "AnimationComponent.h"
 
 #include "FBO.h"
 #include "Light.h"

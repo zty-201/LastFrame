@@ -447,6 +447,28 @@ namespace EngineFramework
 			CalculateModelMatrix(transform, transform.modelMatrix);
 			basic_shader->setUniform("M", transform.modelMatrix);
 
+			// Upload bones if animation exists within this entity
+			if(registry.all_of<AnimationComponent>(entity)) {
+				// Get the animation component
+				auto& anim = registry.get<AnimationComponent>(entity);
+
+				// Check if skeleton and palette matrices are valid
+				if (anim.skeleton && !anim.paletteMatrices.empty()) {
+					// Upload the UBO binding to 0
+					UploadBonePalettes(anim.paletteMatrices);
+
+					// Tell shader that skinning is enabled
+					basic_shader->setUniform("uUseSkinning", true);
+				}
+				// Fallback if skinning is not correct
+				else {
+					basic_shader->setUniform("uUseSkinning", false);
+				}
+			}
+			else {
+				basic_shader->setUniform("uUseSkinning", false);
+			}
+
 			glDrawElements(GL_TRIANGLES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
 
 			if (isCheckerboard) {
@@ -692,8 +714,25 @@ namespace EngineFramework
 
 	void GraphicsSystem::UploadBonePalettes(const std::vector<glm::mat4>& boneMatrices)
 	{
+		// Ensure UBO exists
+		if (skinningUBO == 0) {
+			glGenBuffers(1, &skinningUBO);
+			glBindBuffer(GL_UNIFORM_BUFFER, skinningUBO);
+			// allocate maximum size once to avoid repeated reallocations
+			glBufferData(GL_UNIFORM_BUFFER, maxBones * sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+			// Bind to a binding point that your shaders also use (e.g. binding = 1)
+			const GLuint bindingPoint = 0u;
+			glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, skinningUBO);
+		}
+
+		// Upload current palette (clamped to maxBones)
+		size_t count = std::min<size_t>(boneMatrices.size(), static_cast<size_t>(maxBones));
+		if (count == 0) return;
+
 		glBindBuffer(GL_UNIFORM_BUFFER, skinningUBO);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, boneMatrices.size() * sizeof(glm::mat4), boneMatrices.data());
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, count * sizeof(glm::mat4), boneMatrices.data());
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 

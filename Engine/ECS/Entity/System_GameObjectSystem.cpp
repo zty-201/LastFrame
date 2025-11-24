@@ -24,6 +24,7 @@
 #include "ReflectionRegister.hpp"
 
 // Game Object Components
+#include "AnimationComponent.h"
 #include "TransformComponent.h"
 #include "MeshComponent.h"
 #include "MaterialComponent.h"

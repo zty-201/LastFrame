@@ -226,6 +226,7 @@ namespace EngineFramework {
 		static inline constexpr const char CUBEMAP[8]{ "cubemap" };
 		static inline constexpr const char AUDIO[6]{ "audio" };
 		static inline constexpr const char ARCHTYPE[9]{ "archtype" };
+		static inline constexpr const char ANIMATION[10]{ "animation" };
 
 		/*
 			Precomputed type guids.
@@ -236,6 +237,7 @@ namespace EngineFramework {
 		static inline constexpr xresource::type_guid CUBEMAP_GUID{ CUBEMAP };
 		static inline constexpr xresource::type_guid AUDIO_GUID{ AUDIO };
 		static inline constexpr xresource::type_guid ARCHTYPE_GUID{ ARCHTYPE };
+		static inline constexpr xresource::type_guid ANIMATION_GUID{ ANIMATION };
 	private:
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
@@ -295,6 +297,7 @@ namespace EngineFramework {
 		static bool LoadShader(const std::filesystem::path&);
 		static bool LoadAudio(const std::filesystem::path&);
 		static bool LoadArchtype(const std::filesystem::path&);
+		static bool LoadAnimation(const std::filesystem::path&);
 
 
 		static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer

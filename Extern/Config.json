@@ -4,5 +4,6 @@
 	"mesh": "Extern/Graphics/Mesh",
 	"cubemap": "Extern/Graphics/CubeMap/Config.json",
 	"audio": "Extern/Audio/Config.json",
-	"archtype": "Extern/Archtypes"
+	"archtype": "Extern/Archtypes",
+	"animation": "Extern/Graphics/Animation"
 }

@@ -8,7 +8,7 @@ layout(location=3) in vec2  aUV;
 layout(location=4) in vec4  aWeights;    // normalized from u8 -> [0,1]
 layout(location=5) in uvec4 aBones;      // indices (u8 -> uint)
 
-layout(std140) uniform Skinning {
+layout(std140, binding = 0) uniform Skinning {
     mat4 uBones[256];
 };
 
