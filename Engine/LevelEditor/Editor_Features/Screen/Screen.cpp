@@ -39,6 +39,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "ImGuizmo.h"
 #include "TriggerBoxComponent.h"
 #include "MeshComponent.h"
+#include "ColliderComponent.h"
 #include "Editor_Features/CameraController/EditorCameraController.hpp"
 
 //#include <iostream>
@@ -342,6 +343,7 @@ namespace EngineFramework
                 gizmos();
                 //triggerbox();
                 drop_target();
+                colliderbox();
 
                 if (hovered) {
                     camera_controls_in_screen_only();
@@ -1383,6 +1385,51 @@ namespace EngineFramework
             });
     }
 
+    void EngineFramework::Screen::colliderbox()
+    {
+        if (is_adjusting_lights) return;
+        if (is_simulator_running) return;
+
+        auto camera_view = registry.view<CameraComponent>();
+        if (camera_view.empty()) return;
+        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+
+        float aspect = GraphicsSystem::GetInstance().GetWindowSize().second > 0
+            ? (float)GraphicsSystem::GetInstance().GetWindowSize().first /
+            (float)GraphicsSystem::GetInstance().GetWindowSize().second
+            : 1.0f;
+
+        glm::mat4 view = Camera::getLookAt(camera);
+        glm::mat4 proj = Camera::getPerspective(camera, aspect);
+
+        ImGuizmo::BeginFrame();
+        ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
+
+        auto v = registry.view<TransformComponent, ColliderComponent>();
+        v.each([&](const TransformComponent& tf,
+            const ColliderComponent& col)
+            {
+                if (col.shapes.empty()) return;
+
+                const glm::mat4 model = tf.modelMatrix;
+                const ColliderData& shape = col.shapes[0];
+
+                // only draw boxes for now
+                if (shape.type != (int)ColliderShape::Box)
+                    return;
+
+                glm::vec3 centerLocal = shape.offsetPosition;
+                glm::vec3 sizeLocal = 2.0f * shape.boxHalfExtents;
+
+                glm::quat qLocal = EulerDegToQuat(glm::vec3(0.0f)); // if you later use offsetRotation, convert it here
+                glm::mat4 colliderM = model * TRS(centerLocal, qLocal, sizeLocal);
+
+                DrawWireOBB(colliderM, view, proj, screen_pos, available_size,
+                    IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
+            });
+    }
 
     void Screen::drop_target() {
 
