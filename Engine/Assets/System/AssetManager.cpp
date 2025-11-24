@@ -700,7 +700,7 @@ namespace EngineFramework {
 
 	bool AssetManagerSystem::LoadAnimation(const std::filesystem::path& folder_path)
 	{
-		LOGD("Loading Texture");
+		LOGD("Loading Animation");
 		//Acceptable files that can be loaded as a texture.
 		std::vector<std::string> animation_extensions{ ".fbx" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, animation_extensions);
@@ -719,7 +719,7 @@ namespace EngineFramework {
 			//Allocate resource
 			try
 			{
-				loaded_resources.emplace_back(new animImport(OFBXAnimationImporter::importFromFile(path.string()));
+				loaded_resources.emplace_back(new animImport(OFBXAnimationImporter::importFromFile(path.string())));
 				asset_names.emplace_back(name); //Done if resource loading is a success.
 			}
 			catch (std::exception& e)

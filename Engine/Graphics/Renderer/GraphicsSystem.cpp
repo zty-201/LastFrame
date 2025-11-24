@@ -448,6 +448,7 @@ namespace EngineFramework
 			basic_shader->setUniform("M", transform.modelMatrix);
 
 			// Upload bones if animation exists within this entity
+			bool skinning = false;
 			if(registry.all_of<AnimationComponent>(entity)) {
 				// Get the animation component
 				auto& anim = registry.get<AnimationComponent>(entity);
@@ -458,16 +459,11 @@ namespace EngineFramework
 					UploadBonePalettes(anim.paletteMatrices);
 
 					// Tell shader that skinning is enabled
-					basic_shader->setUniform("uUseSkinning", true);
-				}
-				// Fallback if skinning is not correct
-				else {
-					basic_shader->setUniform("uUseSkinning", false);
+					skinning = true;
 				}
 			}
-			else {
-				basic_shader->setUniform("uUseSkinning", false);
-			}
+
+			basic_shader->setUniform("uUseSkinning", skinning);
 
 			glDrawElements(GL_TRIANGLES, (GLsizei)indexCount, GL_UNSIGNED_INT, 0);
 

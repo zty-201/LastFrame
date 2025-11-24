@@ -12,10 +12,13 @@
 
 struct AnimationComponent
 {
+	// Name of animation file to use
+	std::string animationName;
+
 	// Pointer to the skeleton data for the animated model
-	std::unique_ptr<EngineFramework::Skeleton> skeleton;
+	EngineFramework::Skeleton* skeleton = nullptr;
 	// Pointer to the animation package containing all animations for the model
-	std::unique_ptr<EngineFramework::AnimationPackage> animationPackage;
+	EngineFramework::AnimationPackage* animationPackage = nullptr;
 
 	// Animation player to manage current animation state
 	EngineFramework::AnimationPlayer player; 
@@ -23,6 +26,9 @@ struct AnimationComponent
 
 	// Palette matrices for skinning
 	std::vector<glm::mat4> paletteMatrices; 
+
+	// Bool to check if loaded
+	bool loaded = false;
 };
 // --- Other Scene Entity Components ---
 

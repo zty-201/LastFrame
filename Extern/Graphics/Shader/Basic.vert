@@ -8,6 +8,18 @@ layout(location=1) in vec3 VertexNormal;
 layout(location=2) in vec2 VertexTexCoord;
 layout(location=3) in vec4 VertexTangent;
 
+// For animation
+layout(location=4) in vec4 BoneWeights; // from GL_UNSIGNED_BYTE, normalized
+layout(location=5) in uvec4 BoneIndices; // from GL_UNSIGNED_BYTE
+
+// Bone UBO
+layout(std140, binding = 0) uniform Skinning {
+    mat4 uBones[256];
+};
+
+// Toggle for skinning
+uniform bool uUseSkinning;
+
 out vec3 Position;
 out vec3 Normal;
 out vec2 TexCoord;

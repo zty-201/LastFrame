@@ -16,7 +16,6 @@ namespace EngineFramework
 	}
 
 	AnimationSystem::~AnimationSystem() { 
-		glfwTerminate(); 
 	}
 
 	void AnimationSystem::Update(float deltaTime) {
@@ -24,14 +23,42 @@ namespace EngineFramework
 
 		for (auto [entity, transform, anim] : view.each())
 		{ 
+			// Check if animation was successfully loaded
+			if (!anim.loaded) {
+				// Get the animation guid
+				auto anim_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::ANIMATION_GUID, anim.animationName);
+				auto bundle = AssetManagerSystem::GetResource<animImport>(anim_guid);
+
+				// Check the bundle is valid
+				if (!bundle) {
+					// Asset not found
+					continue;
+				}
+
+				// Assign it back to current component if it is valid
+				anim.skeleton = bundle->skeleton.get();
+				anim.animationPackage = bundle->animations.get();
+
+				// Tell and set the component to have initialized
+				anim.loaded = true;
+
+				if (!anim.skeleton || !anim.animationPackage) {
+					continue;
+				}
+
+				anim.currentClip = 0;
+				anim.player.package = anim.animationPackage;
+				anim.player.time = 0.0f;
+
+				anim.paletteMatrices.resize(anim.skeleton->count());
+			}
+
 			// Check if animation exists
 			if (!anim.skeleton || !anim.animationPackage) {
 				continue;
 			}
 
 			// Step 1 — Advance animation time
-			anim.player.package = anim.animationPackage.get();
-			anim.player.currentAnimIndex = anim.currentClip;
 			anim.player.update(deltaTime);
 
 			// Step 2 — Compute world matrix

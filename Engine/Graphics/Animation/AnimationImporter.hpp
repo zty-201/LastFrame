@@ -67,7 +67,7 @@ namespace EngineFramework
 		return T;
 	}
 
-	inline std::pair<bool, float> Sample1D(const ofbx::AnimationCurve* curve, double t;
+	inline std::pair<bool, float> Sample1D(const ofbx::AnimationCurve* curve, double t);
 
 	inline TRSSample SampleTRS(const ofbx::Object* obj, const ofbx::AnimationLayer* layer, double t);
 
