@@ -79,6 +79,7 @@ namespace EngineFramework
         void control_window();
         void drop_target();
         void adjust_triggerbox();
+        void colliderbox();
         void entity_shortcut_menu();
 
         float camera_speed;

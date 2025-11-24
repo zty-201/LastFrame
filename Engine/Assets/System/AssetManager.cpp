@@ -637,7 +637,7 @@ namespace EngineFramework {
 				{
 					std::string compute_shader_path = shader_filepaths["compute"];
 					std::string compute_source = LoadShaderSourceWithIncludes(compute_shader_path);
-					if (compute_source.empty()) throw std::runtime_error("Failed to load compute shader.");
+					if (compute_source.empty()) throw std::runtime_error("Failed to load compute shader from " + compute_shader_path);
 
 					loaded_resources.emplace_back(new ShaderProgram(compute_source.c_str()));
 					asset_names.emplace_back(shader_name);
@@ -650,7 +650,7 @@ namespace EngineFramework {
 
 					std::string vertex_source = LoadShaderSourceWithIncludes(vertex_shader_path);
 					std::string fragment_source = LoadShaderSourceWithIncludes(fragment_shader_path);
-					if (vertex_source.empty() || fragment_source.empty()) throw std::runtime_error("Failed to load graphics shaders.");
+					if (vertex_source.empty() || fragment_source.empty()) throw std::runtime_error("Failed to load graphics shaders from " + vertex_shader_path + " or " + fragment_shader_path);
 
 					// Call the new constructor that takes source code
 					loaded_resources.emplace_back(new ShaderProgram(vertex_source.c_str(), fragment_source.c_str(), true));

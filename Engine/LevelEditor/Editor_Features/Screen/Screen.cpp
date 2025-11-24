@@ -39,6 +39,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "ImGuizmo.h"
 #include "TriggerBoxComponent.h"
 #include "MeshComponent.h"
+#include "ColliderComponent.h"
 #include "Editor_Features/CameraController/EditorCameraController.hpp"
 
 //#include <iostream>
@@ -131,6 +132,60 @@ namespace EngineFramework
     static inline glm::quat EulerDegToQuat(const glm::vec3& deg) {
         return glm::quat(glm::radians(deg));
     }
+
+    static void FitTriggerToMesh(entt::registry& reg, entt::entity id)
+    {
+        LOGI("[TriggerBox] Fitting entity %u", (unsigned)id);
+
+        if (!reg.all_of<MeshComponent, TriggerBoxComponent>(id))
+            return;
+
+        auto& meshComp = reg.get<MeshComponent>(id);
+        auto& box = reg.get<TriggerBoxComponent>(id);
+
+        LOGI("[TriggerBox] Fitting for entity %u, meshName='%s'",
+            (unsigned)id, meshComp.meshName.c_str());
+
+        // 1) Get guid from mesh name
+        xresource::full_guid meshGuid =
+            EngineFramework::AssetManagerSystem::GetFullGuid(
+                EngineFramework::AssetManagerSystem::MESH_GUID,
+                meshComp.meshName);
+
+        if (!EngineFramework::AssetManagerSystem::HasResource(meshGuid))
+        {
+            LOGI("[TriggerBox] Mesh resource NOT found for '%s'; using default trigger size.",
+                meshComp.meshName.c_str());
+            return;
+        }
+
+        // 2) Get the actual MeshData
+        auto meshData =
+            EngineFramework::AssetManagerSystem::GetResource<Mesh::MeshData>(meshGuid);
+        if (!meshData)
+        {
+            LOGI("[TriggerBox] MeshData is null for '%s'; using default trigger size.",
+                meshComp.meshName.c_str());
+            return;
+        }
+
+        // 3) Use MeshData's AABB (from the OBJ vertices)
+        const auto& aabb = meshData->GetAABB();
+        glm::vec3 center = aabb.center();
+        glm::vec3 half = aabb.halfExtents();
+
+        LOGI("[TriggerBox] mesh='%s' center(%.3f, %.3f, %.3f) half(%.3f, %.3f, %.3f)",
+            meshComp.meshName.c_str(),
+            center.x, center.y, center.z,
+            half.x, half.y, half.z);
+
+        box.type = TriggerShapeType::Box;
+        box.localPosition = center;
+        box.halfExtents = half;
+    }
+
+
+
 
     static inline bool ProjectToScreen(const glm::mat4& V, const glm::mat4& P, const glm::vec3& p,
         ImVec2 pos, ImVec2 size, ImVec2& out) {
@@ -288,6 +343,7 @@ namespace EngineFramework
                 gizmos();
                 //triggerbox();
                 drop_target();
+                colliderbox();
 
                 if (hovered) {
                     camera_controls_in_screen_only();
@@ -616,6 +672,7 @@ namespace EngineFramework
 
                 //only if selected object have transform component
                 entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+
                 if (registry.all_of<TransformComponent>(id)) {
 
                     auto& object = registry.get<TransformComponent>(id);
@@ -724,44 +781,6 @@ namespace EngineFramework
             // -------- Environment / Lighting tab --------
             if (ImGui::BeginTabItem("Environment")) {
                 ImGui::Spacing();
-
-                // Start Fog settings
-                ImGui::SeparatorText("Fog Settings");
-                ImGui::Spacing();
-                ImGui::EndTabItem();
-
-                // Get the scene pointer to from graphics system
-                auto* scene = GraphicsSystem::GetInstance().GetScene().get();
-
-                // Check if scene is valid (Modify Fog)
-                if (scene) {
-                    // Fog color of scene
-                    float fogCol[3] = { scene->fogColor.r, scene->fogColor.g, scene->fogColor.b };
-
-                    // ImGui Color Edit with drop down for color picker
-                    if (ImGui::ColorEdit3("Fog Color", fogCol,
-                        ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB)) {
-                        scene->fogColor = glm::vec3(fogCol[0], fogCol[1], fogCol[2]);
-                    }
-
-                    // Set for Fog distances for scene
-                    float fogMinDist = scene->fogMinDist;
-                    float fogMaxDist = scene->fogMaxDist;
-
-                    // Set value for Fog Min Distance
-                    if (ImGui::InputFloat("Fog Min Distance", &fogMinDist)) {
-                        scene->fogMinDist = fogMinDist;
-                    }
-
-                    // Set value for Fog Max Distance
-                    if (ImGui::InputFloat("Fog Max Distance", &fogMaxDist)) {
-                        scene->fogMaxDist = fogMaxDist;
-                    }
-                }
-                // Fall through if scene not active
-                else {
-                    ImGui::TextDisabled("Scene not active. Cannot modify fog settings.");
-                }
 
                 ImGui::Spacing();
                 ImGui::Separator();
@@ -874,60 +893,42 @@ namespace EngineFramework
                     if (registry.valid(selected_light_entity) && registry.all_of<LightComponent>(selected_light_entity)) {
                         auto& light = registry.get<LightComponent>(selected_light_entity);
 
-                        // Drop down to adjust the light position
-                        float pos[3] = { light.position.x, light.position.y, light.position.z };
-                        if (ImGui::InputFloat3("Light Position", pos, "%.3f")) {
-                            light.position = glm::vec3(pos[0], pos[1], pos[2]);
-                        }
-
                         // Intensity
                         float intensity = light.intensity;
                         if (ImGui::InputFloat("Light Intensity", &intensity)) {
                             light.intensity = intensity;
                         }
 
+                        // Controls specific to light type
+                        if (light.type == LightComponent::POINT) { // Point Light
+                            float pos[3] = { light.position.x, light.position.y, light.position.z };
+                            if (ImGui::InputFloat3("Light Position", pos, "%.3f")) {
+                                light.position = glm::vec3(pos[0], pos[1], pos[2]);
+                            }
+                        }
+                        else if (light.type == LightComponent::DIRECTIONAL) { // Directional Light
+                            // Convert direction vector to pitch and yaw for sliders
+                            float pitch = glm::degrees(asinf(-light.direction.y));
+                            float yaw = glm::degrees(atan2f(light.direction.x, light.direction.z));
 
-                        // Drop down to adjust the light intensities, in case there isn't enough intensities
-       //                 for (int i = 0; i < light.L.size(); i++) {
-                            //// If there is 1 intensity, it is ambient
-       //                     std::string title;
-       //                     if (i == 0) {
-                            //	title = "Ambient Intensity";
-       //                     }
-                            //// If there are 2 intensities, the second is diffuse
-       //                     else if (i == 1) {
-                            //	title = "Diffuse Intensity";
-       //                     }
-                            //// If there are 3 intensities, the third is specular
-       //                     else if (i == 2) {
-                            //	title = "Specular Intensity";
-       //                     }
-                            //// Anything more than 3, just call it component i
-       //                     else {
-       //                         std::stringstream ss;
-       //                         ss << "Component " << i;
-       //                         title = ss.str();
-       //                     }
+                            bool changed = false;
+                            changed |= ImGui::SliderFloat("Pitch", &pitch, -89.9f, 89.9f, "%.1f deg");
+                            changed |= ImGui::SliderFloat("Yaw", &yaw, -180.0f, 180.0f, "%.1f deg");
 
-       //                     // Obtain current intensity
-       //                     float intensity[3] = { light.L[i].x, light.L[i].y, light.L[i].z };
-       //                     if (ImGui::ColorEdit3(title.c_str(), intensity)) {
-                            //	light.L[i] = glm::vec3(intensity[0], intensity[1], intensity[2]);
-       //                     }
-       //                 }
+                            if (changed) {
+                                // Convert degrees back to radians
+                                float pitchRad = glm::radians(pitch);
+                                float yawRad = glm::radians(yaw);
 
-       //                 ImGui::Spacing();
+                                // Recalculate direction vector
+                                glm::vec3 newDirection;
+                                newDirection.x = cos(pitchRad) * sin(yawRad);
+                                newDirection.y = -sin(pitchRad);
+                                newDirection.z = cos(pitchRad) * cos(yawRad);
 
-       //                 // Additional features
-       //                 // Add/Remove intensity components
-       //                 if (ImGui::Button("Add Intensity Component")) {
-       //                     light.L.push_back(glm::vec3(1.0f));
-       //                 }
-
-       //                 ImGui::SameLine();
-       //                 if (ImGui::Button("Remove Last Component")) {
-       //                     if (!light.L.empty()) light.L.pop_back();
-       //                 }
+                                light.direction = glm::normalize(newDirection);
+                            }
+                        }
                     }
                     else {
                         ImGui::TextDisabled("Selected Light entity is invalid or no LightComponent attached.");
@@ -949,7 +950,7 @@ namespace EngineFramework
                 }
 
                 ImGui::PopStyleColor();
-
+                ImGui::EndTabItem();
                 // If you want to add new lights
     //            if(ImGui::Button("Add New Light")) {
                 //	// Create a new entity with LightComponent
@@ -1163,6 +1164,7 @@ namespace EngineFramework
             */
             entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
 
+            LOGI("[Menu] Selected entity = %u", (unsigned)id);
             //TriggerBoxComponent
 
             if (registry.all_of<TransformComponent, TriggerBoxComponent>(id))
@@ -1173,6 +1175,12 @@ namespace EngineFramework
 
                 if (ImGui::MenuItem(caption.c_str())) {
                     is_adjusting_triggerbox = !is_adjusting_triggerbox;
+
+                    if (is_adjusting_triggerbox) {
+                        LOGI(">> User clicked Adjust Trigger Box for entity %u", (unsigned)id);
+
+                        FitTriggerToMesh(registry, id);
+                    }
                 }
             }
 
@@ -1342,56 +1350,86 @@ namespace EngineFramework
 
         // Draw a wire box for every entity that has a TriggerBoxComponent
         auto v = registry.view<TransformComponent, TriggerBoxComponent>();
-        v.each([&](entt::entity e,
-            const TransformComponent& tf,
-            const TriggerBoxComponent& trg)
+        v.each([&](const TransformComponent& tf,
+            const TriggerBoxComponent& trg)   // removed entt::entity e (no warning)
             {
                 if (!trg.enabled) return;
 
-                // Base transform from the entity (already T*R*S)
                 const glm::mat4 model = tf.modelMatrix;
 
-                // Auto-fit around WHOLE object if it has a mesh (local AABB -> OBB in world)
-                glm::vec3 centerLocal(0.0f);
+                // Local center & size come from the trigger itself
+                glm::vec3 centerLocal = trg.localPosition;
                 glm::vec3 sizeLocal(1.0f);
 
-                if (auto mesh = registry.try_get<MeshComponent>(e)) {
-                    glm::vec3 localMin(mesh->localMin[0], mesh->localMin[1], mesh->localMin[2]);
-                    glm::vec3 localMax(mesh->localMax[0], mesh->localMax[1], mesh->localMax[2]);
-                    centerLocal = 0.5f * (localMin + localMax);
-                    sizeLocal = (localMax - localMin);     // full extents
-                }
-                else {
-                    // Fallback: use the authoring numbers on the trigger itself
-                    switch (trg.type) {
-                    case TriggerShapeType::Box:
-                        centerLocal = trg.localPosition;
-                        sizeLocal = 2.0f * trg.halfExtents;
-                        break;
-                    case TriggerShapeType::Sphere:
-                        centerLocal = trg.localPosition;
-                        sizeLocal = glm::vec3(2.0f * trg.radius);
-                        break;
-                    case TriggerShapeType::Capsule:
-                        centerLocal = trg.localPosition;
-                        sizeLocal = glm::vec3(2.0f * trg.capRadius,
-                            2.0f * (trg.capHalfHeight + trg.capRadius),
-                            2.0f * trg.capRadius);
-                        break;
-                    }
+                switch (trg.type)
+                {
+                case TriggerShapeType::Box:
+                    sizeLocal = 2.0f * trg.halfExtents;
+                    break;
+                case TriggerShapeType::Sphere:
+                    sizeLocal = glm::vec3(2.0f * trg.radius);
+                    break;
+                case TriggerShapeType::Capsule:
+                    sizeLocal = glm::vec3(2.0f * trg.capRadius,
+                        2.0f * (trg.capHalfHeight + trg.capRadius),
+                        2.0f * trg.capRadius);
+                    break;
                 }
 
-                // Optional local offset/rotation for the trigger
                 const glm::quat qLocal = EulerDegToQuat(trg.localEulerDeg);
 
-                // Final OBB transform: model * localCenter/rot * scale(size)
                 const glm::mat4 triggerM = model * TRS(centerLocal, qLocal, sizeLocal);
 
-                // make ImGuizmo cube fully transparent but keep green wire overlay 
-                DrawWireOBB(triggerM, view, proj, screen_pos, available_size, IM_COL32(0, 255, 0, 255), 1.6f);
+                DrawWireOBB(triggerM, view, proj, screen_pos, available_size,
+                    IM_COL32(0, 255, 0, 255), 1.6f);
             });
     }
 
+    void EngineFramework::Screen::colliderbox()
+    {
+        if (is_adjusting_lights) return;
+        if (is_simulator_running) return;
+
+        auto camera_view = registry.view<CameraComponent>();
+        if (camera_view.empty()) return;
+        auto& camera = camera_view.get<CameraComponent>(camera_view.front());
+
+        float aspect = GraphicsSystem::GetInstance().GetWindowSize().second > 0
+            ? (float)GraphicsSystem::GetInstance().GetWindowSize().first /
+            (float)GraphicsSystem::GetInstance().GetWindowSize().second
+            : 1.0f;
+
+        glm::mat4 view = Camera::getLookAt(camera);
+        glm::mat4 proj = Camera::getPerspective(camera, aspect);
+
+        ImGuizmo::BeginFrame();
+        ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
+
+        auto v = registry.view<TransformComponent, ColliderComponent>();
+        v.each([&](const TransformComponent& tf,
+            const ColliderComponent& col)
+            {
+                if (col.shapes.empty()) return;
+
+                const glm::mat4 model = tf.modelMatrix;
+                const ColliderData& shape = col.shapes[0];
+
+                // only draw boxes for now
+                if (shape.type != (int)ColliderShape::Box)
+                    return;
+
+                glm::vec3 centerLocal = shape.offsetPosition;
+                glm::vec3 sizeLocal = 2.0f * shape.boxHalfExtents;
+
+                glm::quat qLocal = EulerDegToQuat(glm::vec3(0.0f)); // if you later use offsetRotation, convert it here
+                glm::mat4 colliderM = model * TRS(centerLocal, qLocal, sizeLocal);
+
+                DrawWireOBB(colliderM, view, proj, screen_pos, available_size,
+                    IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
+            });
+    }
 
     void Screen::drop_target() {
 

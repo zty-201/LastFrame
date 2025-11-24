@@ -102,11 +102,6 @@ struct Scene
         Texture& operator=(const Texture& rhs) = delete;
     };
 
-    glm::vec3 fogColor;
-    float fogMinDist;
-    float fogMaxDist;
-
-   
 };
 
 #endif
