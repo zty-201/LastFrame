@@ -172,6 +172,10 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 11740093013966520321
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 17584542703313420289
 				}
 			]
 		},
@@ -279,6 +283,67 @@
 			"quadratic": 0.03200000151991844,
 			"radius": 1000.0,
 			"type": 2
+		}
+	},
+	"8": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 17941734448800677889
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				0,
+				0
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "Sphere"
+		},
+		"TransformComponent": {
+			"position": [
+				-279.62200927734375,
+				58.43225860595703,
+				-26.404136657714844
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				10.0,
+				10.0,
+				10.0
+			]
 		}
 	}
 }
