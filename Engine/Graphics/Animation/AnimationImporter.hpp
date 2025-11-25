@@ -5,16 +5,6 @@
 
 namespace EngineFramework
 {
-	// Animation flags
-	ofbx::u64 animFlags =
-		(ofbx::u64)ofbx::LoadFlags::IGNORE_BLEND_SHAPES |
-		(ofbx::u64)ofbx::LoadFlags::IGNORE_CAMERAS |
-		(ofbx::u64)ofbx::LoadFlags::IGNORE_LIGHTS |
-		(ofbx::u64)ofbx::LoadFlags::IGNORE_TEXTURES |
-		(ofbx::u64)ofbx::LoadFlags::IGNORE_MATERIALS |
-		(ofbx::u64)ofbx::LoadFlags::IGNORE_VIDEOS |
-		(ofbx::u64)ofbx::LoadFlags::IGNORE_POSES;
-
 	// Helper functions for FBX processing
 	inline std::vector<uint8_t> ReadFBXFile(const std::string& path);
 

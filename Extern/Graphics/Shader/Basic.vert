@@ -35,8 +35,25 @@ void main()
 {
     // Pass 0: Forward rendering for transparent objects and special effects
     if (Pass == 0) {
+        // Local Pos / Normal
         TexCoord = VertexTexCoord;
-        mat4 MV = V * M; 
+
+        // Skinning
+        mat4 skinMat = mat4(1.0);
+
+        // Check if this mesh needs to be skinned
+        if (uUseSkinning) {
+            // Create a linear blend
+            skinMat = BoneWeights.x * uBones[int(BoneIndices.x)]
+                    + BoneWeights.y * uBones[int(BoneIndices.y)]
+                    + BoneWeights.z * uBones[int(BoneIndices.z)]
+                    + BoneWeights.w * uBones[int(BoneIndices.w)];
+        }
+
+        // Fold skin using model Matrix
+        mat4 Mskinned = uUseSkinning ? (M * skinMat) : M;
+
+        mat4 MV = V * Mskinned; 
         mat3 N = mat3(vec3(MV[0]), vec3(MV[1]), vec3(MV[2])); 
         
         Normal = normalize(N * VertexNormal);

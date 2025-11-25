@@ -459,7 +459,7 @@ namespace EngineFramework
 					UploadBonePalettes(anim.paletteMatrices);
 
 					// Tell shader that skinning is enabled
-					skinning = true;
+					skinning = false;
 				}
 			}
 
@@ -605,6 +605,28 @@ namespace EngineFramework
 			return;
 		}
 
+		bool fakeSkin = (meshName == "PocongTest");
+
+		if (fakeSkin) {
+			size_t vertexCount = meshData.points.size() / 3;
+
+			meshData.boneWeights.resize(vertexCount * 4);
+			meshData.boneIndices.resize(vertexCount * 4);
+
+			for (size_t v = 0; v < vertexCount; ++v) {
+				// Full weight on bone 0 (255 == 1.0 after normalization)
+				meshData.boneWeights[v * 4 + 0] = 255;
+				meshData.boneWeights[v * 4 + 1] = 0;
+				meshData.boneWeights[v * 4 + 2] = 0;
+				meshData.boneWeights[v * 4 + 3] = 0;
+
+				meshData.boneIndices[v * 4 + 0] = 0; // all influence bone 0
+				meshData.boneIndices[v * 4 + 1] = 0;
+				meshData.boneIndices[v * 4 + 2] = 0;
+				meshData.boneIndices[v * 4 + 3] = 0;
+			}
+		}
+
 		GLuint vao = 0, indexBuf = 0, posBuf = 0, normBuf = 0;
 		std::vector<GLuint> buffers;
 
@@ -672,7 +694,7 @@ namespace EngineFramework
 			glBindBuffer(GL_ARRAY_BUFFER, indiBuf);
 			glBufferData(GL_ARRAY_BUFFER, meshData.boneIndices.size() * sizeof(uint8_t), meshData.boneIndices.data(), GL_STATIC_DRAW);
 			glEnableVertexAttribArray(5);
-			glVertexAttribIPointer(5, 4, GL_UNSIGNED_BYTE, GL_FALSE, 0, 0);
+			glVertexAttribIPointer(5, 4, GL_UNSIGNED_BYTE, 0, (void*)0);
 		}
 
 		glBindVertexArray(0);

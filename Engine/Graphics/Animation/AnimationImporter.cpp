@@ -4,12 +4,24 @@
 
 namespace EngineFramework
 {
+	// Animation flags
+	ofbx::u64 animFlags =
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_BLEND_SHAPES |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_CAMERAS |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_LIGHTS |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_TEXTURES |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_MATERIALS |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_VIDEOS |
+		(ofbx::u64)ofbx::LoadFlags::IGNORE_POSES;
+
 	std::vector<uint8_t> ReadFBXFile(const std::string& path) {
 		// Buffer to hold file data
 		std::vector<uint8_t> buffer;
 
 		// Check if file is valid
-		if (FILE* f = std::fopen(path.c_str(), "rb")) {
+		FILE* f = nullptr;
+		fopen_s(&f, path.c_str(), "rb");
+		if (f) {
 			// Find the end of file
 			std::fseek(f, 0, SEEK_END);
 			long sz = std::ftell(f);
@@ -30,13 +42,13 @@ namespace EngineFramework
 	std::pair<bool, float> Sample1D(const ofbx::AnimationCurve* curve, double t) {
 		// Verify if there is a curve pointer, this function is used to sample a value at t
 		if (!curve) {
-			return { false, 0.0 };
+			return { false, 0.0f };
 		}
 
 		// Validate if there are more than 1 key
 		int keyc = curve->getKeyCount();
 		if (keyc == 0) {
-			return { false, 0.0 };
+			return { false, 0.0f };
 		}
 		if (keyc == 1) {
 			return { true, curve->getKeyValue()[0]};
@@ -164,7 +176,8 @@ namespace EngineFramework
 		}
 
 		// Obtain the scene
-		ofbx::IScene* scene = ofbx::load(data.data(), data.size(), animFlags);
+		int byteCount = static_cast<int>(data.size());
+		ofbx::IScene* scene = ofbx::load(data.data(), byteCount, (ofbx::u16)animFlags);
 
 		// Check if scene was properly parsed
 		if (!scene) {
@@ -249,7 +262,7 @@ namespace EngineFramework
 		}
 
 		// Fill up the skeleton array based on the order
-		for (int i = 0; i < order.size(); i++) {
+		for (int i = 0; i < (int)order.size(); i++) {
 			// Obtain the object based on order
 			int index = order[i];
 			const ofbx::Object* obj = boneObjs[index];
@@ -372,7 +385,7 @@ namespace EngineFramework
 			const int numFrames = std::max(1, int(std::ceil((tMax - tMin) * anim.fps)));
 			
 			// Resample each bone at the fixed FPS
-			for (int j = 0; j < boneObjs.size(); j++) {
+			for (int j = 0; j < (int)boneObjs.size(); j++) {
 				// Obtain the animation clip of the obj
 				const ofbx::Object* obj = boneObjs[j];
 				auto& animTrack = anim.boneKeyframes[j];
