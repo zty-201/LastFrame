@@ -11,6 +11,7 @@
 #include "MaterialComponent.h"
 #include "MeshComponent.h"
 #include "TransformComponent.h"
+#include "AnimationComponent.h"
 #include "AudioComponent.h"
 #include "ColliderComponent.h"
 #include "PhysicsMaterialComponent.h"

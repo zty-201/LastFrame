@@ -48,15 +48,6 @@ namespace EngineFramework
 		return glm::normalize(qz * qy * qx);
 	}
 
-	// Concatenate transforms: T * R * S
-	inline glm::mat4 TRS(const glm::vec3& translation, const glm::quat& rotation, const glm::vec3& scale) {
-		glm::mat4 T(1.0f);
-		T = glm::translate(T, translation);
-		T *= glm::mat4_cast(rotation);
-		T = glm::scale(T, scale);
-		return T;
-	}
-
 	inline std::pair<bool, float> Sample1D(const ofbx::AnimationCurve* curve, double t);
 
 	inline TRSSample SampleTRS(const ofbx::Object* obj, const ofbx::AnimationLayer* layer, double t);

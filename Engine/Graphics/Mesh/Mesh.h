@@ -57,6 +57,10 @@ namespace Mesh {
         glm::vec3 Normal;
         glm::vec2 TexCoords;
         glm::vec4 Tangent; // Using vec4 to include handedness (w component)
+        
+        // Add skinning data
+        glm::u8vec4 BoneIndices;
+        glm::u8vec4 BoneWeights;
     };
 
     struct AABB {
@@ -351,6 +355,12 @@ namespace Mesh {
             glEnableVertexAttribArray(3); // Tangent (location 3)
             glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
 
+            glEnableVertexAttribArray(4); // Bone Weights (location 4)
+            glVertexAttribPointer(4, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)offsetof(Vertex, BoneWeights));
+
+            glEnableVertexAttribArray(5); // Bone Indices (location 5)
+            glVertexAttribIPointer(5, 4, GL_UNSIGNED_BYTE, sizeof(Vertex), (void*)offsetof(Vertex, BoneIndices));
+            
             glBindVertexArray(0);
         }
 

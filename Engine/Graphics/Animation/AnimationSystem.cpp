@@ -3,6 +3,7 @@
 #include "Debug.h"
 #include "AnimationSystem.h"
 #include "GraphicsSystem.h"
+#include "AnimationComponent.h"
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
