@@ -16,7 +16,7 @@
 				0.3605816960334778
 			],
 			"innerConeAngle": 12.5,
-			"intensity": 50.0,
+			"intensity": 1.0,
 			"linear": 0.0,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -162,6 +162,31 @@
 		"archtype": 11270566386067177473
 	},
 	"5": {
+		"LightComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"constant": 1.0,
+			"direction": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"innerConeAngle": 15.0,
+			"intensity": 10000.0,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"position": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 2
+		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -225,9 +250,9 @@
 				0.0
 			],
 			"scale": [
-				10.0,
-				10.0,
-				10.0
+				0.0,
+				0.0,
+				0.0
 			]
 		}
 	},
@@ -256,6 +281,23 @@
 			"quadratic": 0.03200000151991844,
 			"radius": 500.0,
 			"type": 1
+		},
+		"TransformComponent": {
+			"position": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
 		}
 	},
 	"7": {

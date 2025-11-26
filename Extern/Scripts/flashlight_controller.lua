@@ -12,6 +12,12 @@ local camera = nil
 local range   = 8.0
 local fovDeg  = 40.0
 local isOn    = false
+local transform = nil
+local light     = nil
+local baseIntensity = 10000.0
+
+-- Remember previous F state so we can detect a press
+local prevFDown = false
 
 local function getGlobalShared()
     return rawget(_G, "SHARED")
@@ -26,6 +32,11 @@ end
 
 function on_create(self)
     camera = GetMainCamera()
+    transform = EntityTransform
+    light     = EntityLight
+
+    print("[flashlight_controller] on_create, transform=", transform, " light=", light)
+
     if not camera then
         print("[flashlight_controller] ERROR: no camera")
         return
@@ -39,6 +50,22 @@ function on_create(self)
         FL.posX, FL.posY, FL.posZ = camera:GetPosition()
         FL.fx, FL.fy, FL.fz       = 0.0, 0.0, 1.0
     end
+
+    -- sync Lua state with actual light state
+    if light then
+        -- remember whatever you set in the inspector as the "ON" value
+        if light.GetIntensity then
+            local current = light:GetIntensity()
+            if current and current > 0.0 then
+                baseIntensity = current
+            end
+        end
+
+        -- start flashlight OFF
+        light:SetIntensity(0.0)
+        isOn = false
+        if FL then FL.isOn = false end
+    end
 end
 
 -- This is what we’ll call from C++ / UI
@@ -51,8 +78,15 @@ function Flashlight_Toggle()
 
     print("[flashlight_controller] Toggled flashlight, isOn=", isOn)
 
-    -- TODO: if you have a Light component, enable/disable it here.
+    if light then
+        if isOn then
+            light:SetIntensity(baseIntensity)   -- back to full strength
+        else
+            light:SetIntensity(0.0)            -- completely off
+        end
+    end
 end
+
 
 function on_update(self, dt)
     if not camera then return end
@@ -70,15 +104,57 @@ function on_update(self, dt)
         pitch = SHARED.POV.pitch or 0.0
     end
 
-    local radYaw   = math.rad(yaw)
+     local radYaw   = math.rad(yaw)
     local radPitch = math.rad(pitch)
     local cosPitch = math.cos(radPitch)
 
+    -- Camera forward vector
     local fx = cosPitch * math.sin(radYaw)
     local fy = math.sin(radPitch)
     local fz = cosPitch * math.cos(radYaw)
 
-    FL.fx, FL.fy, FL.fz = fx, fy, fz
+    -- Use the SAME forward for flashlight
+    local dirX = fx
+    local dirY = fy
+    local dirZ = fz
+
+    -- Store this as the cone's forward vector too (icons will use this)
+    FL.fx, FL.fy, FL.fz = dirX, dirY, dirZ
+
+    if transform and light then
+        -- 1) move light to player
+        local px, py, pz = transform:GetPosition()
+
+        -- Give it a slight offset in front + up (tweak these)
+        local forwardOffset = 0.5
+        local upOffset      = 0
+
+        local lx = px + dirX * forwardOffset
+        local ly = py + upOffset
+        local lz = pz + dirZ * forwardOffset
+
+        light:SetPosition(lx, ly, lz)
+
+        -- 2) aim the light forward into the world
+        light:SetDirection(dirX, dirY, dirZ)
+    end
+
+    -- =========================================
+    -- Keyboard test + flashlight toggle
+    -- =========================================
+    if PLATFORM == "windows" then
+        
+        -- Proper edge-detected toggle on F
+        if Input.GetKey(GLFW_KEY_Q) then
+            if not prevFDown then
+                print("[FLASH] Q pressed")
+                Flashlight_Toggle()
+            end
+            prevFDown = true
+        else
+            prevFDown = false
+        end
+    end
 end
 
 function on_destroy()

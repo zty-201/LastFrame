@@ -122,6 +122,36 @@ namespace Engine {
         LOGI("[ScriptSystem] TransformComponent bindings complete.");
 
         // ===============================================================
+        // Light Component bindings
+        // ===============================================================
+        // (Assuming your LightComponent has fields:
+        //  glm::vec3 position, direction, color;
+        //  float intensity, radius, constant, linear, quadratic,
+        //        innerConeAngle, outerConeAngle)
+        s_Lua.new_usertype<LightComponent>("LightComponent",
+            "GetPosition", [](LightComponent& light) {
+                return std::make_tuple(light.position.x, light.position.y, light.position.z);
+            },
+            "SetPosition", [](LightComponent& light, float x, float y, float z) {
+                light.position = glm::vec3(x, y, z);
+            },
+            "GetDirection", [](LightComponent& light) {
+                return std::make_tuple(light.direction.x, light.direction.y, light.direction.z);
+            },
+            "SetDirection", [](LightComponent& light, float x, float y, float z) {
+                light.direction = glm::normalize(glm::vec3(x, y, z));
+            },
+            "GetIntensity", [](LightComponent& light) {
+                return light.intensity;
+            },
+            "SetIntensity", [](LightComponent& light, float i) {
+                light.intensity = i;
+            }
+        );
+
+        LOGI("[ScriptSystem] LightComponent bindings complete.");
+
+        // ===============================================================
         // InputManager bindings
         // ===============================================================
         s_Lua.set_function("Input", []() -> EngineFramework::InputManager& {
@@ -260,6 +290,10 @@ namespace Engine {
         s_Lua["GLFW_KEY_A"] = 65;
         s_Lua["GLFW_KEY_S"] = 83;
         s_Lua["GLFW_KEY_D"] = 68;
+        s_Lua["GLFW_KEY_F"] = 70;
+        s_Lua["GLFW_KEY_Q"] = 81;
+        s_Lua["GLFW_KEY_E"] = 69;
+
         s_Lua["GLFW_KEY_SPACE"] = 32;
         s_Lua["GLFW_KEY_SHIFT"] = 340;
 
@@ -510,10 +544,16 @@ namespace Engine {
                     static_cast<unsigned>(e));
             }
 
+            LightComponent* entityLight = nullptr;
+            if (registry.all_of<LightComponent>(e)) {
+                entityLight = &registry.get<LightComponent>(e);
+            }
+
             // Create environment and inject variables
             inst.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
             inst.Env["EntityID"] = static_cast<uint32_t>(e);
             inst.Env["EntityTransform"] = entityTransform;
+            inst.Env["EntityLight"] = entityLight;
 
             LOGI("[LuaRuntime] Injected EntityID=%u and EntityTransform=%p into environment",
                 static_cast<unsigned>(e), (void*)entityTransform);
