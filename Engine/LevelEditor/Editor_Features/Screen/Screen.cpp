@@ -380,6 +380,13 @@ namespace EngineFramework
 
                 entity_shortcut_menu();
                 adjust_triggerbox();
+
+                if (!io.WantTextInput) {
+                    const ImGuiInputFlags delete_shortcut_flags = ImGuiInputFlags_RouteGlobal | ImGuiInputFlags_RouteOverFocused;
+                    if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Delete, delete_shortcut_flags)) {
+                        delete_selected_entity();
+                    }
+                }
             }
 
         }
@@ -543,7 +550,7 @@ namespace EngineFramework
         entt::entity camEnt = camera_view.front();
         auto& cam = camera_view.get<CameraComponent>(camEnt);
 
-        // We don’t use mouse or focus here (outside viewport).
+        // We donï¿½t use mouse or focus here (outside viewport).
         entt::entity selected = static_cast<entt::entity>(editor_ptr->selected_objectID);
 
         m_editorCamera.Update(cam, input, registry, selected);
@@ -1145,6 +1152,37 @@ namespace EngineFramework
 
     }
 
+    bool Screen::delete_selected_entity() {
+
+        if (is_simulator_running || is_adjusting_lights) {
+            return false;
+        }
+
+        if (!editor_ptr) {
+            return false;
+        }
+
+        entt::entity selected = static_cast<entt::entity>(editor_ptr->selected_objectID);
+        if (selected == entt::null || !registry.valid(selected)) {
+            return false;
+        }
+
+        std::unique_ptr<Record> entity_history{};
+        HistorySystem* history_system = history ? history.get() : nullptr;
+        if (history_system) {
+            entity_history = history_system->start_track(selected, Record_Type::ENTITY_REMOVED);
+        }
+
+        registry.destroy(selected);
+
+        if (history_system && entity_history) {
+            history_system->end_track(entity_history);
+        }
+
+        editor_ptr->selected_objectID = entt::null;
+        return true;
+    }
+
     void Screen::entity_shortcut_menu() {
 
         if (is_simulator_running) return;
@@ -1152,22 +1190,39 @@ namespace EngineFramework
 
         if (ImGui::BeginPopup("Entity_Shortcut_Menu"))
         {
-            if (ImGui::MenuItem("Delete")) {
-                // your delete code
+            entt::entity id = entt::null;
+            if (editor_ptr)
+            {
+                id = static_cast<entt::entity>(editor_ptr->selected_objectID);
             }
-            if (ImGui::MenuItem("Duplicate")) {
-                // duplicate code
+            bool has_selection = (id != entt::null) && registry.valid(id);
+
+            if (ImGui::MenuItem("Delete", "Ctrl+Del", false, has_selection)) {
+                delete_selected_entity();
+            }
+            if (ImGui::MenuItem("Duplicate", nullptr, false, has_selection)) {
+                entt::entity duplicated = GameObjectSystem::GetInstance().DuplicateInstance(id);
+                if (duplicated != entt::null)
+                {
+                    if (editor_ptr)
+                    {
+                        editor_ptr->selected_objectID = duplicated;
+                        editor_ptr->latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+                    }
+                    if (history)
+                    {
+                        auto record = history->start_track(duplicated, Record_Type::ENTITY_ADDED);
+                        history->end_track(record);
+                    }
+                }
             }
 
             /*
             * Adjusting trigger box
             */
-            entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
-
             LOGI("[Menu] Selected entity = %u", (unsigned)id);
             //TriggerBoxComponent
-
-            if (registry.all_of<TransformComponent, TriggerBoxComponent>(id))
+            if (has_selection && registry.all_of<TransformComponent, TriggerBoxComponent>(id))
             {
                 std::string caption = "Adjust Trigger Box";
                 if (is_adjusting_triggerbox) caption = "Stop Adjusting";
@@ -1562,7 +1617,7 @@ namespace EngineFramework
         }
         else
         {
-            LOGE("[Simulation] Player entity not found — ensure player_pov_camera.lua is attached!");
+            LOGE("[Simulation] Player entity not found ï¿½ ensure player_pov_camera.lua is attached!");
         }
 
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoKeyboard;

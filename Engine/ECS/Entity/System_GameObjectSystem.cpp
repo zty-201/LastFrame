@@ -425,6 +425,53 @@ namespace EngineFramework
 		return Instantiate(archtype, archtype_guid.m_Instance, registry.create());
 	}
 
+	// For duplication of instances
+	// 1. Validates source entity
+	// 2. Creates new registry entry and walk through every component to clone the reflected components via registered get/emplace functions
+	// Duplicated components must expose get, get_ref, emplace, remove in reflectionregister or wont copy
+	entt::entity GameObjectSystem::DuplicateInstance(entt::entity entity)
+	{
+		if (entity == entt::null || !registry.valid(entity))
+		{
+			LOGE("[GameObjectSystem] Cannot duplicate invalid entity %" PRIu32, static_cast<uint32_t>(entt::to_entity(entity)));
+			return entt::null;
+		}
+
+		entt::entity duplicated_entity = registry.create();
+
+		for (auto&& comp_storage : registry.storage())
+		{
+			auto& storage = comp_storage.second;
+			if (!storage.contains(entity)) continue;
+
+			entt::meta_type component_type = entt::resolve(storage.info());
+			if (!component_type) continue;
+			if (component_type.traits<REGISTERED_TYPE>() == REGISTERED_TYPE::NON_COMPONENT) continue;
+
+			auto get_func = component_type.func("get"_hs);
+			auto emplace_func = component_type.func("emplace"_hs);
+			if (!get_func || !emplace_func) continue;
+
+			entt::meta_any component_data = get_func.invoke({}, entity);
+			if (!component_data) continue;
+
+			entt::meta_any result = emplace_func.invoke({}, duplicated_entity, static_cast<const void*>(&component_data));
+			if (result && result.type() == entt::resolve<bool>() && !result.cast<bool>())
+			{
+				LOGE("[GameObjectSystem] Duplicate component %s already present when duplicating entity %" PRIu32,
+					component_type.name(), static_cast<uint32_t>(entt::to_entity(duplicated_entity)));
+			}
+		}
+
+		auto archtype_entry = entity_archtype_map.find(entity);
+		if (archtype_entry != entity_archtype_map.end())
+		{
+			AssignArchtypeToInstance(duplicated_entity, archtype_entry->second);
+		}
+
+		return duplicated_entity;
+	}
+
 	/*
 			Creates a single entity with the same component data (copied) from archtype,
 			and sets its transform.
