@@ -324,6 +324,13 @@ namespace EngineFramework
 
                 entity_shortcut_menu();
                 adjust_triggerbox();
+
+                if (!io.WantTextInput) {
+                    const ImGuiInputFlags delete_shortcut_flags = ImGuiInputFlags_RouteGlobal | ImGuiInputFlags_RouteOverFocused;
+                    if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Delete, delete_shortcut_flags)) {
+                        delete_selected_entity();
+                    }
+                }
             }
 
         }
@@ -1144,6 +1151,37 @@ namespace EngineFramework
 
     }
 
+    bool Screen::delete_selected_entity() {
+
+        if (is_simulator_running || is_adjusting_lights) {
+            return false;
+        }
+
+        if (!editor_ptr) {
+            return false;
+        }
+
+        entt::entity selected = static_cast<entt::entity>(editor_ptr->selected_objectID);
+        if (selected == entt::null || !registry.valid(selected)) {
+            return false;
+        }
+
+        std::unique_ptr<Record> entity_history{};
+        HistorySystem* history_system = history ? history.get() : nullptr;
+        if (history_system) {
+            entity_history = history_system->start_track(selected, Record_Type::ENTITY_REMOVED);
+        }
+
+        registry.destroy(selected);
+
+        if (history_system && entity_history) {
+            history_system->end_track(entity_history);
+        }
+
+        editor_ptr->selected_objectID = entt::null;
+        return true;
+    }
+
     void Screen::entity_shortcut_menu() {
 
         if (is_simulator_running) return;
@@ -1158,8 +1196,8 @@ namespace EngineFramework
             }
             bool has_selection = (id != entt::null) && registry.valid(id);
 
-            if (ImGui::MenuItem("Delete", nullptr, false, has_selection)) {
-                // your delete code
+            if (ImGui::MenuItem("Delete", "Ctrl+Del", false, has_selection)) {
+                delete_selected_entity();
             }
             if (ImGui::MenuItem("Duplicate", nullptr, false, has_selection)) {
                 entt::entity duplicated = GameObjectSystem::GetInstance().DuplicateInstance(id);

@@ -15,7 +15,8 @@
 // Windows logging macros
 #include <stdio.h>
 #define LOGE(...) do { printf("[ERROR] "); printf(__VA_ARGS__); printf("\n"); } while(0)
-#define LOGI(...) do { printf("[INFO] ");  printf(__VA_ARGS__); printf("\n"); } while(0)
+#define LOGW(...) do { printf("[WARN ] "); printf(__VA_ARGS__); printf("\n"); } while(0)
+#define LOGI(...) do { printf("[INFO ] "); printf(__VA_ARGS__); printf("\n"); } while(0)
 #define LOGD(...) do { printf("[DEBUG] "); printf(__VA_ARGS__); printf("\n"); } while(0)
 #elif defined(PLATFORM_ANDROID)
 #include <android/log.h>
@@ -23,6 +24,7 @@
 // Android logging macros (LOG_TAG should be defined in each source file)
 #ifndef LOGI
 #define LOGE(...) do { __android_log_print(ANDROID_LOG_ERROR, "MyApp", __VA_ARGS__); } while(0)
+#define LOGW(...) do { __android_log_print(ANDROID_LOG_WARN,  "MyApp", __VA_ARGS__); } while(0)
 #define LOGI(...) do { __android_log_print(ANDROID_LOG_INFO,  "MyApp", __VA_ARGS__); } while(0)
 #define LOGD(...) do { __android_log_print(ANDROID_LOG_DEBUG, "MyApp", __VA_ARGS__); } while(0)
 #define DEFINE_GLFW_KEYS
