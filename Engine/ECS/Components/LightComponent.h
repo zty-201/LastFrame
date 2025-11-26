@@ -17,9 +17,23 @@
 
 struct LightComponent
 {
-    glm::vec3 position{};
-    glm::vec3 color{ 1.0f, 1.0f, 1.0f }; // The actual color of the light (e.g., white)
-    float intensity{ 1.0f };
+    enum Type
+    {
+        DIRECTIONAL = 0,
+        POINT = 1,
+        SPOT = 2
+	};
+
+    Type type; // false = directional, true = point/spot
+    glm::vec3 position;    // For point/spot
+    glm::vec3 direction;   // For directional/spot
+	glm::vec3 color{ 1.0f, 1.0f, 1.0f }; // Light color
+	float intensity{ 1.0f }; 	 // Overall intensity multiplier
+    float radius{ 1.0f };          // For point/spot
+    float constant{ 1.0f }, linear{ 0.09f }, quadratic{ 0.032f }; // For point/spot
+
+	float innerConeAngle{ 12.5f }; // For spot
+	float outerConeAngle{ 17.5f }; // For spot
 };
 
 #endif

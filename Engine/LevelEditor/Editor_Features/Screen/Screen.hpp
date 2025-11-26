@@ -81,6 +81,17 @@ namespace EngineFramework
 		void adjust_triggerbox();
 		void entity_shortcut_menu();
 		bool delete_selected_entity();
+        std::unique_ptr<HistorySystem> history;
+        void display_screen();
+        void gizmos();
+        void triggerbox();
+        void camera_controls_outside_screen();
+        void camera_controls_in_screen_only();
+        void control_window();
+        void drop_target();
+        void adjust_triggerbox();
+        void colliderbox();
+        void entity_shortcut_menu();
 
 		float camera_speed;
 		float scrolling_speed;
