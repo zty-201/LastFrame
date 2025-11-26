@@ -995,6 +995,54 @@ namespace EngineFramework
         }
     }
 
+    void GraphicsSystem::CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix)
+    {
+
+        // Translation
+        glm::mat4 T = glm::translate(glm::mat4(1.0f), transform.position);
+
+        // Rotation (Euler - Quaternion - Matrix)
+        glm::vec3 rotationRadians = glm::radians(transform.rotation);
+        glm::quat Q = glm::quat(rotationRadians);
+        glm::mat4 R = glm::mat4_cast(Q);
+
+        // Scale
+        glm::mat4 S = glm::scale(glm::mat4(1.0f), transform.scale);
+
+        // Combine: TRS
+        modelMatrix = T * R * S;
+    }
+
+    void GraphicsSystem::LoadBlueNoiseTextures()
+    {
+        m_blue_noise_textures.resize(NUM_BLUE_NOISE_TEXTURES);
+        glGenTextures(NUM_BLUE_NOISE_TEXTURES, m_blue_noise_textures.data());
+
+        for (int i = 0; i < NUM_BLUE_NOISE_TEXTURES; i++)
+        {
+            std::string filename = "Extern/Graphics/Texture/blue_noise/LDR_LLL1_" + std::to_string(i) + ".png";
+            int width, height, bytesPerPix;
+
+            std::vector<unsigned char> texture_data = AssetManagerSystem::GetDataFromFile(std::filesystem::path(filename));
+            unsigned char* data = stbi_load_from_memory(texture_data.data(), static_cast<int>(texture_data.size()), &width, &height, &bytesPerPix, 1);
+
+            if (!data) {
+                LOGE("Failed to load blue noise texture: %s", filename.c_str());
+                continue;
+            }
+
+            glBindTexture(GL_TEXTURE_2D, m_blue_noise_textures[i]);
+            glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8, width, height);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, data);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+            stbi_image_free(data);
+        }
+    }
+
     void GraphicsSystem::PreGeneratePrimitives()
     {
         LOGI("Pre-generating primitive meshes...");
