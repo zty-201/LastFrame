@@ -82,7 +82,8 @@
 #include "Audio.hpp"
 #include "InputManager.hpp"
 #include "Math.hpp"
-
+#include "Animation.hpp"
+#include "AnimationImporter.hpp"
 
 //Event system
 #include "event_structures.hpp"

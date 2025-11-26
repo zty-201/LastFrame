@@ -24,7 +24,7 @@
 #include "Audio.hpp"
 #include "SoundAsset.hpp"
 #include "Archtype.hpp"
-
+#include "AnimationImporter.hpp"
 
 namespace EngineFramework {
 
@@ -392,6 +392,7 @@ namespace EngineFramework {
 		asset_loader_map[AUDIO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAudio);
 		asset_loader_map[SCRIPT] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadScript);
 		asset_loader_map[ARCHTYPE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadArchtype);
+		asset_loader_map[ANIMATION] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAnimation);
 		//=====================================//
 
 		//Set AAsetManager for android, in audio system.
@@ -832,6 +833,41 @@ namespace EngineFramework {
 		}
 
 		SetMappings(ARCHTYPE_GUID, asset_names, loaded_resources, folder_path);
+
+		return true;
+	}
+
+	bool AssetManagerSystem::LoadAnimation(const std::filesystem::path& folder_path)
+	{
+		LOGD("Loading Animation");
+		//Acceptable files that can be loaded as a texture.
+		std::vector<std::string> animation_extensions{ ".fbx" };
+		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, animation_extensions);
+
+		/*
+			Asset names used for mapping to guid.
+			Resources are kept in an array until guid mappings are read.
+		*/
+		std::vector<std::string> asset_names{};
+		std::vector< std::shared_ptr<animImport>> loaded_resources{};
+
+		//Iterate through all texture files
+		for (const std::filesystem::path& path : files)
+		{
+			std::string name = path.stem().string();
+			//Allocate resource
+			try
+			{
+				loaded_resources.emplace_back(new animImport(OFBXAnimationImporter::importFromFile(path.string())));
+				asset_names.emplace_back(name); //Done if resource loading is a success.
+			}
+			catch (std::exception& e)
+			{
+				LOGE("%s %s %s", "Unable to Load Animation", name.c_str(), e.what());
+			}
+		}
+
+		SetMappings(ANIMATION_GUID, asset_names, loaded_resources, folder_path);
 
 		return true;
 	}
