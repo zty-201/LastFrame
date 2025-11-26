@@ -1220,8 +1220,6 @@ namespace EngineFramework
             /*
             * Adjusting trigger box
             */
-            entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
-
             LOGI("[Menu] Selected entity = %u", (unsigned)id);
             //TriggerBoxComponent
             if (has_selection && registry.all_of<TransformComponent, TriggerBoxComponent>(id))
