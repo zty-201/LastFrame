@@ -1,5 +1,66 @@
 {
 	"0": {
+		"ColliderComponent": {
+			"maxBounds": [
+				2.545584201812744,
+				3.045584201812744,
+				2.545584201812744
+			],
+			"minBounds": [
+				-2.545584201812744,
+				-2.045584201812744,
+				-2.545584201812744
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						2.545584201812744,
+						2.545584201812744,
+						2.545584201812744
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.5,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": false,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": false,
+			"layer": 1,
+			"restitution": 0.0
+		},
 		"archtype": 1531488210877235207
 	},
 	"1": {
@@ -280,5 +341,86 @@
 			"radius": 1000.0,
 			"type": 2
 		}
+	},
+	"8": {
+		"ColliderComponent": {
+			"maxBounds": [
+				8.696000099182129,
+				8.045999526977539,
+				8.795999526977539
+			],
+			"minBounds": [
+				4.553999900817871,
+				2.303999900817871,
+				7.9039998054504395
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						2.545584201812744,
+						2.545584201812744,
+						2.545584201812744
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.5,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-267.71075439453125,
+				326.2235107421875,
+				-147.61264038085938
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"archtype": 4071738312750153729
 	}
 }

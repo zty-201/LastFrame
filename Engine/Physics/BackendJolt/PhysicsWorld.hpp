@@ -9,6 +9,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <memory>
 #include <Jolt/Physics/Collision/ContactListener.h>
+#include <limits>
 
 using uint = unsigned int;
 
@@ -24,7 +25,8 @@ namespace Layers
 {
     static constexpr JPH::ObjectLayer STATIC = 0;
     static constexpr JPH::ObjectLayer DYNAMIC = 1;
-    static constexpr JPH::ObjectLayer NUM_LAYERS = 2;
+    static constexpr JPH::ObjectLayer EDITOR_GHOST = 2;
+    static constexpr JPH::ObjectLayer NUM_LAYERS = 3;
 }
 
 static inline JPH::ObjectLayer GetObjectLayerForIsStatic(bool isStatic)
@@ -36,7 +38,8 @@ namespace BroadPhaseLayers
 {
     static constexpr JPH::BroadPhaseLayer STATIC_LAYER = JPH::BroadPhaseLayer(0);
     static constexpr JPH::BroadPhaseLayer DYNAMIC_LAYER = JPH::BroadPhaseLayer(1);
-    static constexpr uint32_t NUM_LAYERS = 2;
+    static constexpr JPH::BroadPhaseLayer EDITOR_LAYER(2);
+    static constexpr uint32_t NUM_LAYERS = 3;
 }
 
 
@@ -53,6 +56,7 @@ public:
         mObjectToBroadPhase[Layers::STATIC] = BroadPhaseLayers::STATIC_LAYER;
         // DYNAMIC objects -> DYNAMIC broadphase layer
         mObjectToBroadPhase[Layers::DYNAMIC] = BroadPhaseLayers::DYNAMIC_LAYER;
+        mObjectToBroadPhase[Layers::EDITOR_GHOST] = BroadPhaseLayers::EDITOR_LAYER;
     }
 
     virtual uint GetNumBroadPhaseLayers() const override
@@ -74,6 +78,7 @@ public:
         {
         case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::STATIC_LAYER:   return "STATIC";
         case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::DYNAMIC_LAYER:  return "DYNAMIC";
+        case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::EDITOR_LAYER:   return "EDITOR";
         default:                                                           return "UNKNOWN";
         }
     }
@@ -104,7 +109,8 @@ public:
             // dynamic collides with both
             return (inLayer2 == BroadPhaseLayers::STATIC_LAYER) ||
                 (inLayer2 == BroadPhaseLayers::DYNAMIC_LAYER);
-
+        case Layers::EDITOR_GHOST:
+            return false;
         default:
             return false;
         }
@@ -117,6 +123,9 @@ public:
     virtual bool ShouldCollide(JPH::ObjectLayer inLayer1,
         JPH::ObjectLayer inLayer2) const override
     {
+        if (inLayer1 == Layers::EDITOR_GHOST || inLayer2 == Layers::EDITOR_GHOST)
+            return false;
+
         // Allow dynamic<->dynamic and dynamic<->static.
         // We can choose to ignore static<->static (no need for 2 floors to collide).
         if (inLayer1 == Layers::DYNAMIC && inLayer2 == Layers::DYNAMIC) return true;
@@ -124,6 +133,14 @@ public:
         if (inLayer1 == Layers::STATIC && inLayer2 == Layers::DYNAMIC) return true;
         return false;
     }
+};
+
+struct RaycastHit
+{
+    entt::entity entity = entt::null;
+    glm::vec3 position{ 0.0f };
+    float distance = 0.0f;
+    bool hasHit = false;
 };
 
 class PhysicsWorld
@@ -189,6 +206,7 @@ public:
     void SetLinearVelocity(entt::entity entity, const glm::vec3& velocity);
     void AddForce(entt::entity entity, const glm::vec3& force);
 
+    bool Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& putHit);
 
 private:
     PhysicsWorld() = default;

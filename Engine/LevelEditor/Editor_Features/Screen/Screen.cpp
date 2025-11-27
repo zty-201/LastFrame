@@ -56,8 +56,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 //Creation of instances
 #include "System_GameObjectSystem.hpp"
 #include "SceneManager.hpp"
-
-
+#include "PhysicsWorld.hpp"
 
 namespace EngineFramework
 {
@@ -119,7 +118,6 @@ namespace EngineFramework
         if (dy >= dx && dy >= dz) return 1;
         return 2;
     }
-
 
     static inline glm::mat4 TRS(const glm::vec3& t, const glm::quat& q, const glm::vec3& s) {
         glm::mat4 M(1.0f);
@@ -326,11 +324,7 @@ namespace EngineFramework
                         history->undo();
                     }
                 }
-
-
-
                 ImGui::EndMenuBar();
-
             }
 
             ImGui::PopStyleColor();
@@ -344,6 +338,45 @@ namespace EngineFramework
                 //triggerbox();
                 drop_target();
                 colliderbox();
+
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && hovered && !ImGuizmo::IsOver())
+                {
+                    ImVec2 mousePos = ImGui::GetMousePos();
+                    ImVec2 viewportPos = ImGui::GetItemRectMin();
+                    ImVec2 viewportSize = ImGui::GetItemRectSize();
+
+                    float localX = mousePos.x - viewportPos.x;
+                    float localY = mousePos.y - viewportPos.y;
+
+                    if (!camera_view.empty())
+                    {
+                        const auto& cam = registry.get<CameraComponent>(camera_view.front());
+
+                        glm::vec3 rayOrigin, rayDir;
+                        Camera::ScreenPointToRay(
+                            cam,
+                            localX, localY,
+                            viewportSize.x, viewportSize.y,
+                            rayOrigin, rayDir
+                        );
+
+                        RaycastHit hit;
+                        if (PhysicsWorld::Get().Raycast(rayOrigin, rayDir, 1000.f, hit))
+                        {
+                            LOGI("Mouse Picked Entity: %u", (uint32_t)hit.entity);
+                            LevelEditor::GetInstance().variables.selected_objectID = hit.entity;
+                            LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+                        }
+                        else
+                        {
+                            //Deselect if clicking empty space
+                            LevelEditor::GetInstance().variables.selected_objectID = entt::null;
+                            LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::NONE;
+
+                            LOGI("Selection cleared.");
+                        }
+                    }
+                }
 
                 if (hovered) {
                     camera_controls_in_screen_only();
@@ -375,22 +408,14 @@ namespace EngineFramework
                     {
                         ImGui::OpenPopup("Entity_Shortcut_Menu");
                     }
-                    
                 }
-
                 entity_shortcut_menu();
                 adjust_triggerbox();
             }
-
         }
-
         ImGui::PopStyleColor();
         ImGui::End();
-
-
-
         control_window();
-
     }
     void Screen::Close() {
         clear_backup();
@@ -467,7 +492,6 @@ namespace EngineFramework
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
             Camera::Move_Cam_and_Target(camera, glm::vec3(camera_speed, 0, 0));
         }
-
     }*/
 
 
@@ -489,7 +513,6 @@ namespace EngineFramework
                     Light::onCursor(light, Mouse_delta.x, Mouse_delta.y);
                     //std::cout << "Mouse_delta.x: " << Mouse_delta.x << " | Mouse_delta.y: " << Mouse_delta.y << std::endl;
                 }
-                
             }
         }
 
@@ -977,7 +1000,6 @@ namespace EngineFramework
         }
 
         ImGui::End();
-
     }
 
     //return true if theres a difference
@@ -1133,13 +1155,7 @@ namespace EngineFramework
                 current_record = nullptr;
                 //std::cout << "End track\n";
             }
-
-
-
-
             gizmos_started_drag = gizmos_IS_dragged;
-
-
         }
 
 
