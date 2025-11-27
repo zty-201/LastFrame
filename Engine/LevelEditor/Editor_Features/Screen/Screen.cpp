@@ -40,6 +40,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "TriggerBoxComponent.h"
 #include "MeshComponent.h"
 #include "ColliderComponent.h"
+#include "TriggerSystem.hpp"
+#include "TriggerEvents.hpp"
 #include "Editor_Features/CameraController/EditorCameraController.hpp"
 
 //#include <iostream>
@@ -182,9 +184,6 @@ namespace EngineFramework
         box.halfExtents = half;
     }
 
-
-
-
     static inline bool ProjectToScreen(const glm::mat4& V, const glm::mat4& P, const glm::vec3& p,
         ImVec2 pos, ImVec2 size, ImVec2& out) {
         glm::vec4 clip = P * V * glm::vec4(p, 1.0f);
@@ -203,6 +202,24 @@ namespace EngineFramework
         ImDrawList* dl = ImGui::GetWindowDrawList(); ImVec2 pts[8]; bool ok[8];
         for (int i = 0; i < 8; ++i) { glm::vec3 w = glm::vec3(M * glm::vec4(C[i], 1)); ok[i] = ProjectToScreen(V, P, w, pos, size, pts[i]); }
         for (auto& e : E) if (ok[e[0]] && ok[e[1]]) dl->AddLine(pts[e[0]], pts[e[1]], color, thick);
+    }
+
+    static void OnTriggerEnter(const Event_OnTriggerEnter& e)
+    {
+        LOGI("[TriggerEnter] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);
+    }
+
+    static void OnTriggerStay(const Event_OnTriggerStay& e)
+    {
+        LOGI("[TriggerStay] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);
+    }
+
+    static void OnTriggerExit(const Event_OnTriggerExit& e)
+    {
+        LOGI("[TriggerExit] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);
     }
 
     void Screen::Initialize() {
@@ -232,6 +249,11 @@ namespace EngineFramework
         Event_Level_Editor_Simulation editor_toggled{};
         editor_toggled.is_enabled = false;
         event_dispatcher.trigger<Event_Level_Editor_Simulation>(std::move(editor_toggled));
+        event_dispatcher.sink<Event_OnTriggerEnter>().connect<&OnTriggerEnter>();
+        event_dispatcher.sink<Event_OnTriggerStay>().connect<&OnTriggerStay>();
+        event_dispatcher.sink<Event_OnTriggerExit>().connect<&OnTriggerExit>();
+
+        LOGI("[TriggerSystem] Subscribed to trigger events.");
 
 		//No longer auto attach Lua camera script here
 //#if defined(ENGINE_ENABLE_LUA)
@@ -294,6 +316,7 @@ namespace EngineFramework
 
                 static std::string caption = "Run Simulator";
                 if (is_simulator_running) {
+                    
                     caption = "Stop Simulator";
                 }
                 else {
@@ -335,7 +358,7 @@ namespace EngineFramework
                 bool hovered = ImGui::IsItemHovered();
 
                 gizmos();
-                //triggerbox();
+                triggerbox();
                 drop_target();
                 colliderbox();
 
@@ -376,6 +399,12 @@ namespace EngineFramework
                             LOGI("Selection cleared.");
                         }
                     }
+                EngineFramework::TriggerSystem::Update(registry);
+                auto tfView = registry.view<TransformComponent>();
+                for (auto ent : tfView)
+                {
+                    auto& tf = tfView.get<TransformComponent>(ent);
+                    tf.prevModelMatrix = tf.modelMatrix;
                 }
 
                 if (hovered) {
@@ -422,8 +451,10 @@ namespace EngineFramework
         }
         ImGui::PopStyleColor();
         ImGui::End();
+
         control_window();
     }
+
     void Screen::Close() {
         clear_backup();
         LOGI("Screen closed");
@@ -1395,7 +1426,6 @@ namespace EngineFramework
 
     void EngineFramework::Screen::triggerbox()
     {
-        
         if (is_adjusting_lights) return;
         if (is_simulator_running) return;
         
