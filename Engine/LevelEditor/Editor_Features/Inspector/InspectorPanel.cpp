@@ -391,14 +391,17 @@ namespace EditorFeatures {
 		// Redo only enabled when it can be redo (under history singleton also)
 		if (HistorySystem::this_class) {
 			HistorySystem& history = HistorySystem::GetInstance();
+			const ImGuiInputFlags history_shortcut_flags = ImGuiInputFlags_RouteGlobal | ImGuiInputFlags_Tooltip; // allow Ctrl+Z/Y even when inspector isn't focused
 			ImGui::BeginGroup();
 			ImGui::BeginDisabled(!history.can_undo());
+			ImGui::SetNextItemShortcut(ImGuiMod_Ctrl | ImGuiKey_Z, history_shortcut_flags);
 			if (ImGui::Button("Undo##InspectorPanelUndo")) {
 				history.undo();
 			}
 			ImGui::EndDisabled();
 			ImGui::SameLine();
 			ImGui::BeginDisabled(!history.can_redo());
+			ImGui::SetNextItemShortcut(ImGuiMod_Ctrl | ImGuiKey_Y, history_shortcut_flags);
 			if (ImGui::Button("Redo##InspectorPanelRedo")) {
 				history.redo();
 			}
