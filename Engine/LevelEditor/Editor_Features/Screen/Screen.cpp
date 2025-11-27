@@ -1485,20 +1485,47 @@ namespace EngineFramework
                 if (col.shapes.empty()) return;
 
                 const glm::mat4 model = tf.modelMatrix;
-                const ColliderData& shape = col.shapes[0];
 
-                // only draw boxes for now
-                if (shape.type != (int)ColliderShape::Box)
-                    return;
+                for (const auto& shape : col.shapes)
+                {
+                    glm::vec3 sizeLocal(1.0f);
 
-                glm::vec3 centerLocal = shape.offsetPosition;
-                glm::vec3 sizeLocal = 2.0f * shape.boxHalfExtents;
+                    switch (static_cast<ColliderShape>(shape.type))
+                    {
+                    case ColliderShape::Box:
+                        sizeLocal = shape.boxHalfExtents * 2.0f;
+                        break;
+                    case ColliderShape::Sphere:
+                        sizeLocal = glm::vec3(shape.sphereRadius * 2.0f);
+                        break;
+                    case ColliderShape::Capsule:
+                        sizeLocal = glm::vec3(
+                            shape.capsuleRadius * 2.0f,
+                            shape.capsuleHeight,
+                            shape.capsuleRadius * 2.0f);
+                        break;
+                    }
 
-                glm::quat qLocal = EulerDegToQuat(glm::vec3(0.0f)); // if you later use offsetRotation, convert it here
-                glm::mat4 colliderM = model * TRS(centerLocal, qLocal, sizeLocal);
+                    glm::quat qShape = EulerDegToQuat(shape.offsetRotation);
+                    glm::mat4 shapeTransform = model * TRS(shape.offsetPosition, qShape, sizeLocal);
 
-                DrawWireOBB(colliderM, view, proj, screen_pos, available_size,
-                    IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
+                    DrawWireOBB(shapeTransform, view, proj, screen_pos, available_size,
+                        IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
+                }
+                //const ColliderData& shape = col.shapes[0];
+
+                //// only draw boxes for now
+                //if (shape.type != (int)ColliderShape::Box)
+                //    return;
+
+                //glm::vec3 centerLocal = shape.offsetPosition;
+                //glm::vec3 sizeLocal = 2.0f * shape.boxHalfExtents;
+
+                //glm::quat qLocal = EulerDegToQuat(glm::vec3(0.0f)); // if you later use offsetRotation, convert it here
+                //glm::mat4 colliderM = model * TRS(centerLocal, qLocal, sizeLocal);
+
+                //DrawWireOBB(colliderM, view, proj, screen_pos, available_size,
+                //    IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
             });
     }
 
