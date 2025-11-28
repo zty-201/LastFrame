@@ -16,6 +16,7 @@
 #include "PhysicsMaterialComponent.h"
 #include "PhysicsComponent.h"
 #include "TriggerBoxComponent.h"
+#include "UIComponent.h"
 #include "Scripting/Script.hpp"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 #include "MetaInspector.hpp"
@@ -25,6 +26,20 @@
 	If not, you can use the same template too.
 */
 NLOHMANN_JSON_NAMESPACE_BEGIN
+
+template<>
+struct adl_serializer<glm::vec2> {
+	static void to_json(nlohmann::json& j, const glm::vec2& p)
+	{
+		j = nlohmann::json{ p.x, p.y };
+	}
+	static void from_json(const nlohmann::json& j, glm::vec2& p)
+	{
+		p.x = j[0];
+		p.y = j[1];
+	}
+};
+
 template<>
 struct adl_serializer<glm::vec3> {
 	static void to_json(nlohmann::json& j, const glm::vec3& p)
@@ -242,6 +257,7 @@ namespace EngineFramework
 		SetMeta(char8_t),
 		SetMeta(char16_t),
 		SetMeta(char32_t),
+		SetMeta(glm::vec2),
 		SetMeta(glm::vec3),
 		SetMeta(glm::mat4),
 		SetMeta(xresource::full_guid),
@@ -291,6 +307,7 @@ namespace EngineFramework
 		SetJson(char8_t),
 		SetJson(char16_t),
 		SetJson(char32_t),
+		SetJson(glm::vec2),
 		SetJson(glm::vec3),
 		SetJson(glm::mat4),
 		SetJson(xresource::full_guid),
@@ -429,6 +446,7 @@ namespace EngineFramework
 		*/
 #define REGISTER_ARBITRARY_TYPE(T) entt::meta_factory<T>().traits(REGISTERED_TYPE::NON_COMPONENT)
 		//Register the non-component arbitrary types used.
+		REGISTER_ARBITRARY_TYPE(glm::vec2);
 		REGISTER_ARBITRARY_TYPE(glm::vec3);
 		REGISTER_ARBITRARY_TYPE(glm::mat4);
 		REGISTER_ARBITRARY_TYPE(xresource::full_guid);
@@ -669,6 +687,20 @@ namespace EngineFramework
 			.func<&Remover<TriggerBoxComponent>::RemoveComponent>("remove")
 			.func<&Getter<TriggerBoxComponent>::GetComponent>("get")
 			.func<&GetRef<TriggerBoxComponent>>("get_ref");
+
+		entt::meta_factory<UIComponent>()
+			.type("UIComponent") 
+			.data<&UIComponent::textureid>("textureid")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
+			.data<&UIComponent::position>("position")
+			.data<&UIComponent::size>("size")
+			.data<&UIComponent::color>("color")
+			.data<&UIComponent::visible>("visible")
+			.data<&UIComponent::layer>("layer")
+			.func<&Emplacer<UIComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<UIComponent>::RemoveComponent>("remove")
+			.func<&Getter<UIComponent>::GetComponent>("get")
+			.func<&GetRef<UIComponent>>("get_ref");
 	}
 
 

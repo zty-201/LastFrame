@@ -178,6 +178,7 @@ namespace EngineFramework
 		xresource::full_guid point_shadow_shader_guid;
         xresource::full_guid light_injection_shader_guid;
         xresource::full_guid ray_march_shader_guid;
+		xresource::full_guid ui_shader_guid;
 
 		// UBOs
         GLuint m_volumetricUBO = 0;
@@ -246,6 +247,7 @@ namespace EngineFramework
         void SkyboxPass();
         void VolumetricLightInjectionPass();
         void VolumetricRayMarchPass();
+        void RenderUI();
 
 		// Update methods
         void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
