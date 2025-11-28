@@ -141,6 +141,51 @@
 			]
 		}
 	},
+	"11": {
+		"LightComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"constant": 1.0,
+			"direction": [
+				0.0,
+				0.0,
+				1.0
+			],
+			"innerConeAngle": 15.0,
+			"intensity": 10000.0,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"position": [
+				-808.864990234375,
+				487.2690124511719,
+				-621.8790283203125
+			],
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 2
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-808.8648681640625,
+				487.2690734863281,
+				-621.87890625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				10.0,
+				10.0,
+				10.0
+			]
+		}
+	},
 	"2": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -265,7 +310,7 @@
 			"direction": [
 				0.0,
 				0.0,
-				0.0
+				1.0
 			],
 			"innerConeAngle": 15.0,
 			"intensity": 10000.0,
@@ -343,9 +388,9 @@
 				0.0
 			],
 			"scale": [
-				10.0,
-				10.0,
-				10.0
+				0.0,
+				0.0,
+				0.0
 			]
 		}
 	},
@@ -387,7 +432,7 @@
 			"direction": [
 				0.0,
 				0.0,
-				-1.0
+				1.0
 			],
 			"innerConeAngle": 15.0,
 			"intensity": 10000.0,
@@ -510,7 +555,7 @@
 				150.0
 			],
 			"textureid": [
-				3601763066940784641,
+				4470148554707877889,
 				3711223656383638553
 			],
 			"visible": true

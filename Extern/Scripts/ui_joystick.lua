@@ -2,7 +2,7 @@
 -- ui_joystick.lua (2D joystick knob)
 -- ============================================================
 
-local KNOB_SIZE = 90.0
+local KNOB_SIZE = 225.0
 local DEAD_ZONE = 0.05
 local MAX_MAG = 1.0
 
@@ -53,21 +53,33 @@ function on_update(self, dt)
     if not UI then return end
 
     local uiShared = ensureUIShared()
-    local centerX = uiShared.joyCenterX
-    local centerY = uiShared.joyCenterY
-    local radius  = uiShared.joyRadius
+    local radius   = uiShared.joyRadius or 200.0  -- fallback radius
 
-    knobCenterX = centerX
-    knobCenterY = centerY
+    -- Actual current knob rect on screen (already scaled / laid out by UI)
+    local ux, uy = UI:GetPosition()
+    local uw, uh = UI:GetSize()
+    local visualCenterX = ux + uw * 0.5
+    local visualCenterY = uy + uh * 0.5
 
-    local mx, my = Input.GetMousePosition()
+    -- "Rest" center follows the icon when not dragging, so it moves with resolution changes.
+    if not isDragging then
+        knobCenterX = visualCenterX
+        knobCenterY = visualCenterY
+    end
+
+    -- Mouse position: X is already correct, Y needs to be flipped to match UI's bottom-left origin
+    local mx, rawMy = Input.GetMousePosition()
+    local virtualH   = uiShared.joyScreenHeight or 1440.0  -- same as screenHeight in bg script
+    local my         = virtualH - rawMy
+
     local down = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
     local held = Input.GetMouseButton(GLFW_MOUSE_BUTTON_LEFT)
     local up   = Input.GetMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT)
 
+    -- Start dragging only if we pressed inside the knob's visual area
     if down then
-        local dx = mx - centerX
-        local dy = my - centerY
+        local dx = mx - visualCenterX
+        local dy = my - visualCenterY
         if dx*dx + dy*dy <= radius*radius then
             isDragging = true
             dragStartX = mx
@@ -76,10 +88,11 @@ function on_update(self, dt)
     end
 
     if held and isDragging then
-        local dx = mx - centerX
-        local dy = my - centerY
+        -- Movement is relative to the rest center
+        local dx = mx - knobCenterX
+        local dy = my - knobCenterY
 
-        local dist = length(dx, dy)
+        local dist      = length(dx, dy)
         local clampedDX = dx
         local clampedDY = dy
 
@@ -89,8 +102,13 @@ function on_update(self, dt)
             clampedDY = dy * k
         end
 
-        UI:SetPosition(centerX + clampedDX - KNOB_SIZE * 0.5, centerY + clampedDY - KNOB_SIZE * 0.5)
+        -- Position knob sprite
+        UI:SetPosition(
+            knobCenterX + clampedDX - KNOB_SIZE * 0.5,
+            knobCenterY + clampedDY - KNOB_SIZE * 0.5
+        )
 
+        -- Normalised joystick direction
         local nx = clampedDX / radius
         local ny = clampedDY / radius
 
@@ -102,16 +120,22 @@ function on_update(self, dt)
             ny = ny / mag
         end
 
-        uiShared.joystickX = -nx
-        uiShared.joystickY = ny
+        uiShared.joystickX      = nx
+        uiShared.joystickY      = -ny
         uiShared.joystickActive = (nx ~= 0 or ny ~= 0)
     end
 
     if up then
         isDragging = false
-        UI:SetPosition(centerX - KNOB_SIZE * 0.5,centerY - KNOB_SIZE * 0.5)
-        uiShared.joystickX = 0
-        uiShared.joystickY = 0
+
+        -- Snap knob back to its rest center
+        UI:SetPosition(
+            knobCenterX - KNOB_SIZE * 0.5,
+            knobCenterY - KNOB_SIZE * 0.5
+        )
+
+        uiShared.joystickX      = 0
+        uiShared.joystickY      = 0
         uiShared.joystickActive = false
     end
 end

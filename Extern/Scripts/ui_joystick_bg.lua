@@ -2,9 +2,9 @@
 -- ui_joystick_bg.lua (2D joystick background)
 -- ============================================================
 
-local ANCHOR_X = 0.18
-local ANCHOR_Y = 0.20
-local BG_SIZE  = 150.0
+local ANCHOR_X = 0.15
+local ANCHOR_Y = 0.30
+local BG_SIZE  = 550.0
 
 local screenWidth, screenHeight = 3088, 1440
 
@@ -35,11 +35,27 @@ function on_create(self)
     UI:SetVisible(true)
 
     local uiShared = ensureUIShared()
-    uiShared.joyCenterX = centerX
-    uiShared.joyCenterY = centerY
-    uiShared.joyRadius  = BG_SIZE * 0.5
+    uiShared.joyCenterX       = centerX
+    uiShared.joyCenterY       = centerY
+    uiShared.joyRadius        = BG_SIZE * 0.5
+    uiShared.joyScreenHeight  = screenHeight   -- <<< NEW: reference UI height
 end
 
+
 function on_update(self, dt)
-    -- background does nothing each frame
+    if not UI then return end
+
+    -- Read current UI position/size (already adjusted by resolution / fullscreen)
+    local x, y = UI:GetPosition()
+    local w, h = UI:GetSize()
+
+    -- Recompute center from the actual rect on screen
+    local centerX = x + w * 0.5
+    local centerY = y + h * 0.5
+
+    -- Push updated center + radius into SHARED.UI every frame
+    local uiShared = ensureUIShared()
+    uiShared.joyCenterX = centerX
+    uiShared.joyCenterY = centerY
+    uiShared.joyRadius  = math.min(w, h) * 0.5
 end
