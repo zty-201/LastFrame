@@ -533,7 +533,7 @@ namespace EngineFramework {
 		LOGI("Loading Mesh");
 
 		// Acceptable files that can be loaded as a mesh.
-		std::vector<std::string> mesh_extensions{ ".obj" };
+		std::vector<std::string> mesh_extensions{ ".obj", ".fbx" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, mesh_extensions);
 
 		/*

@@ -49,6 +49,12 @@ namespace EngineFramework
 			for (auto& a : animations) if (a.name == n) return &a;
 			return nullptr;
 		}
+
+		const int FindClip(const std::string& n) const {
+			for (int i = 0; i < (int)animations.size(); i++) {
+				if (animations[i].name == n) return i;
+			}
+		}
 	};
 
 	struct AnimationPlayer {

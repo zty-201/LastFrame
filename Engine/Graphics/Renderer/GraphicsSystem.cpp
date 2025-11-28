@@ -5,6 +5,7 @@
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
 #include "MaterialComponent.h"
+#include "AnimationComponent.h"
 
 #include "SceneManager.hpp"
 
@@ -828,9 +829,36 @@ namespace EngineFramework
 
         auto view = registry.view<MeshComponent, TransformComponent>();
 
+        // Reusable identity palette for non-skinned meshes
+        static std::vector<glm::mat4> s_identityPalette;
+
         for (auto [entity, meshComp, transformComp] : view.each())
         {
             if (meshComp.meshName == "SkyBox") continue;
+
+            // Upload bone palette  
+            const std::vector<glm::mat4>* paletteToUse = nullptr;
+            bool useSkinning = false;
+
+            if (auto anim = registry.try_get<AnimationComponent>(entity))
+            {
+                if (anim->loaded && !anim->paletteMatrices.empty())
+                {
+                    paletteToUse = &anim->paletteMatrices;
+                    useSkinning = true;
+                }
+            }
+
+            if (!paletteToUse)
+            {
+                // Use identity palette for non-animated meshes or if anim not ready
+                if (s_identityPalette.empty())
+                    s_identityPalette.assign(maxBones, glm::mat4(1.0f));
+                paletteToUse = &s_identityPalette;
+                useSkinning = false;
+            }
+
+            UploadBonePalettes(*paletteToUse);
 
             xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(
                 AssetManagerSystem::MESH_GUID, meshComp.meshName);

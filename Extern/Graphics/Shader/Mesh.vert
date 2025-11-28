@@ -8,8 +8,9 @@ layout(location = 0) in vec3 VS_IN_Position;
 layout(location = 1) in vec2 VS_IN_TexCoord;
 layout(location = 2) in vec3 VS_IN_Normal;
 layout(location = 3) in vec4 VS_IN_Tangent;
-layout(location = 4) in vec4 VS_IN_BoneWeights;
-layout(location = 5) in uvec4 VS_IN_BoneIndices;
+layout(location = 4) in ivec4 VS_IN_BoneIndices;
+layout(location = 5) in vec4 VS_IN_BoneWeights;
+
 
 // ------------------------------------------------------------------
 // OUTPUT VARIABLES -------------------------------------------------
@@ -95,7 +96,7 @@ void main()
     mat3 world3 = mat3(model);
     mat3 normal_mat = transpose(inverse(world3));
 
-    vec3 skinnedNormal = normal_mat * VS_IN_Normal.xyz;
+    vec3 skinnedNormal = normal_mat * VS_IN_Normal;
     vec3 skinnedTangent = normal_mat * VS_IN_Tangent.xyz;
 
     FS_IN_Normal    = normalize(skinnedNormal);

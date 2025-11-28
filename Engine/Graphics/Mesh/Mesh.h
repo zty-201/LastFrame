@@ -59,8 +59,8 @@ namespace Mesh {
         glm::vec4 Tangent; // Using vec4 to include handedness (w component)
         
         // Add skinning data
-        glm::u8vec4 BoneIndices;
-        glm::u8vec4 BoneWeights;
+        glm::ivec4 BoneIndices;
+        glm::vec4 BoneWeights;
     };
 
     struct AABB {
@@ -156,9 +156,19 @@ namespace Mesh {
                 throw std::runtime_error("Assimp Error: " + std::string(importer.GetErrorString()));
             }
 
+            for (unsigned int m = 0; m < scene->mNumMeshes; ++m) {
+                const aiMesh* mesh = scene->mMeshes[m];
+                LOGI("aiMesh[%u]: name='%s', verts=%u, bones=%u",
+                    m,
+                    mesh->mName.C_Str(),
+                    mesh->mNumVertices,
+                    mesh->mNumBones);
+            }
+
             processMaterials(scene);
             processNode(scene->mRootNode, scene);
             createGLBuffers(m_temp_vertices, m_temp_indices);
+
 
             m_temp_vertices.clear();
             m_temp_indices.clear();
@@ -313,6 +323,10 @@ namespace Mesh {
                     LOGE("Mesh '%s' missing tangents, using generated fallback", mesh->mName.C_Str());
                 }
 
+				// Add skinning data
+				vertex.BoneIndices = glm::uvec4(0);
+				vertex.BoneWeights = glm::vec4(0.0f);
+
                 subBox.expand(vertex.Position);
                 m_aabb.expand(vertex.Position);
 
@@ -326,6 +340,48 @@ namespace Mesh {
                 }
                 subMesh.indexCount += face.mNumIndices;
             }
+
+			// Fill bone weights and indices
+            if (mesh->HasBones()) {
+                // Vertex starts at baseVertex 
+                const unsigned int numBones = mesh->mNumBones;
+
+                for (unsigned int b = 0; b < numBones; b++) {
+					const aiBone* bone = mesh->mBones[b];
+					unsigned int boneIndex = b; // Local to this mesh
+
+                    // Loop through for weight
+                    for (unsigned int w = 0; w < bone->mNumWeights; w++) {
+						const aiVertexWeight& vw = bone->mWeights[w];
+						unsigned int vtxId = vw.mVertexId; // Local to this mesh
+						float weight = vw.mWeight;
+
+                        // Get the vertex in global array for submesh
+                        Vertex& v = m_temp_vertices[subMesh.baseVertex + vtxId];
+
+                        // Put weight into the first empty slots
+                        for (int k = 0; k < 4; k++) {
+                            if (v.BoneWeights[k] == 0.0f) {
+                                v.BoneWeights[k] = weight;
+                                v.BoneIndices[k] = static_cast<int>(boneIndex);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Normalize weights so each vertex sums to 1 where possible
+                for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
+                    Vertex& v = m_temp_vertices[subMesh.baseVertex + i];
+                    float sum = v.BoneWeights.x + v.BoneWeights.y +
+                        v.BoneWeights.z + v.BoneWeights.w;
+
+                    if (sum > 0.0f) {
+                        v.BoneWeights /= sum;
+                    }
+                }
+            }
+
             subMeshes.push_back(subMesh);
             m_submeshAABBs.push_back(subBox);
         }
@@ -355,12 +411,12 @@ namespace Mesh {
             glEnableVertexAttribArray(3); // Tangent (location 3)
             glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
 
-            glEnableVertexAttribArray(4); // Bone Weights (location 4)
-            glVertexAttribPointer(4, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)offsetof(Vertex, BoneWeights));
-
-            glEnableVertexAttribArray(5); // Bone Indices (location 5)
-            glVertexAttribIPointer(5, 4, GL_UNSIGNED_BYTE, sizeof(Vertex), (void*)offsetof(Vertex, BoneIndices));
+            glEnableVertexAttribArray(4); // Bone Indices (location 5)
+            glVertexAttribIPointer(4, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, BoneIndices));
             
+            glEnableVertexAttribArray(5); // Bone Weights (location 5)
+            glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, BoneWeights));
+
             glBindVertexArray(0);
         }
 

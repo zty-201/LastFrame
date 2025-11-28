@@ -4,6 +4,7 @@
 #include "AnimationSystem.h"
 #include "GraphicsSystem.h"
 #include "AnimationComponent.h"
+#include <glm/gtx/string_cast.hpp>
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
@@ -43,11 +44,8 @@ namespace EngineFramework
 				// Tell and set the component to have initialized
 				anim.loaded = true;
 
-				if (!anim.skeleton || !anim.animationPackage) {
-					continue;
-				}
-
 				anim.currentClip = 0;
+				anim.player.currentAnimIndex = anim.currentClip;
 				anim.player.package = anim.animationPackage;
 				anim.player.time = 0.0f;
 
@@ -73,7 +71,13 @@ namespace EngineFramework
 			}
 
 			// Step 4 — Build bone palette
-			anim.player.computeMatrices(anim.paletteMatrices, world, *anim.skeleton);
+			anim.player.computeMatrices(anim.paletteMatrices, glm::mat4(1.0f), *anim.skeleton);
+			LOGI("AnimSystem: entity=%u, skeletonCount=%d, package=%p, clips=%zu, time=%.3f",
+				(unsigned)entity,
+				anim.skeleton ? anim.skeleton->count() : -1,
+				(void*)anim.animationPackage,
+				anim.animationPackage ? anim.animationPackage->animations.size() : 0,
+				anim.player.time);
 		}
 	}
 
