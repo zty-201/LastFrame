@@ -24,7 +24,7 @@
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
 #include "MaterialComponent.h"
-
+#include "UIComponent.h"
 #include "SceneManager.hpp"
 
 #include "stb_image.h"
@@ -184,7 +184,7 @@ namespace EngineFramework
 		light_injection_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "LightInjection");
 		ray_march_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "RayMarch");
 		point_shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "PointShadow");
-
+		ui_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "UI");	
 		// Initialize instancing system
 		//m_instancingSystem = std::make_unique<InstancingSystem>();
 		//m_instancingSystem->Initialize(10000);
@@ -253,6 +253,7 @@ namespace EngineFramework
 		UNREFERENCED_PARAMETER(deltaTime);
 		// Draw scene
 		RenderScene();
+		
 	}
 
 	void GraphicsSystem::PostUpdate(float deltaTime)
@@ -302,8 +303,9 @@ namespace EngineFramework
 		MeshPass();
 		// 7. Render the skybox last
 		SkyboxPass();
-
-		// 8. Copy to screen if needed
+		// 8.  UI Pass
+		RenderUI();
+		// 9. Copy to screen if needed
 		if (!m_isRenderingToFBO) {
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -986,6 +988,88 @@ namespace EngineFramework
 		shader->disuse();
 	}
 	
+	void GraphicsSystem::RenderUI() {
+		// 1. Setup Orthographic Projection (0,0 is Bottom-Left, ScreenWidth,ScreenHeight is Top-Right)
+		glm::mat4 projection = glm::ortho(0.0f, screen.x, 0.0f, screen.y);
+
+		// 2. Prepare GL State for 2D
+		glDisable(GL_DEPTH_TEST);    // UI is always on top
+		glDisable(GL_CULL_FACE);     // Don't cull backfaces
+		glEnable(GL_BLEND);          // Transparency is required for UI
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// 3. Get the UI Shader
+		std::shared_ptr<ShaderProgram> shader{};
+		if (ui_shader_guid != xresource::full_guid{})
+		{
+			shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(ui_shader_guid);
+		}
+		else
+		{
+			using E_AM = EngineFramework::AssetManagerSystem;
+			ui_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "UI");
+			shader = E_AM::GetResource<ShaderProgram>(ui_shader_guid);
+		}
+
+		shader->use();
+		shader->setUniform("u_Projection", projection);
+
+		// 4. Get the Quad Mesh (We reuse the existing 3D quad)
+		auto meshData = meshCache["Quad"];
+		glBindVertexArray(meshData->vao);
+
+		// 5. Iterate all UI Elements
+		// We sort them by 'layer' so background panels draw before text/icons
+		auto view = registry.view<UIComponent>();
+
+		for (auto [entity, ui] : view.each())
+		{
+			if (!ui.visible) continue;
+
+			// --- CALCULATE MODEL MATRIX ---
+			// This is the math you were asking about. 
+			// It tells the GPU: "Take that generic square and put it HERE."
+			glm::mat4 model = glm::mat4(1.0f);
+
+			// 1. Move to the final Pixel Position
+			model = glm::translate(model, glm::vec3(ui.position.x, ui.position.y, 0.0f));
+
+			// 2. Scale to the final Pixel Size
+			model = glm::scale(model, glm::vec3(ui.size.x, ui.size.y, 1.0f));
+
+			// --- COMPENSATION FOR -1 TO 1 MESH ---
+
+			// 3. Move pivot from Center to Bottom-Left
+			// Current range: -1 to 1. We want 0 to 2.
+			// So we translate by +1.0 (relative to the mesh's internal coords) 
+
+			model = glm::translate(model, glm::vec3(0.5f, 0.5f, 0.0f)); // Move (0,0) to center of unit square
+			model = glm::scale(model, glm::vec3(0.5f, 0.5f, 1.0f));     // Shrink 2.0 size down to 1.0
+
+			shader->setUniform("u_Model", model);
+			shader->setUniform("u_Color", glm::vec4(ui.color, 1.0f)); // full color alpha
+
+			// --- BIND TEXTURE ---
+			glActiveTexture(GL_TEXTURE0);
+
+			auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
+			// Handle missing texture 
+			GLuint texID = (tex) ? tex->id : m_defaultWhiteTexture;
+			glBindTexture(GL_TEXTURE_2D, texID);
+			shader->setUniform("s_Texture", 0);
+
+			// --- DRAW ---
+			glDrawElements(GL_TRIANGLES, meshData->subMeshes[0].indexCount, GL_UNSIGNED_INT, 0);
+		}
+
+		shader->disuse();
+
+		// 6. Restore Critical 3D States
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glDisable(GL_BLEND); // (Or keep enabled if your 3D engine uses it)
+	}
+
 	void GraphicsSystem::LoadAndCacheMesh(const std::string& meshName)
 	{
 		if (meshName == "Quad" || meshName == "Plane" || meshName == "Cube" || meshName == "Sphere" || meshName == "SkyBox")

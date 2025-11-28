@@ -1098,7 +1098,16 @@ namespace EditorFeatures {
 				}
 			}
 			}
-
+			else if (field.type() == entt::resolve<glm::vec2>()) {
+				glm::vec2& v = field.cast<glm::vec2&>();
+				float values[2]{ v.x, v.y };
+				const bool edited = ImGui::DragFloat2(label.c_str(), values, 0.01f);
+				update_field_history(entity, component_name, data, obj);
+				if (edited) {
+					v = { values[0], values[1] };
+					data.set(obj, v);
+				}
+			}
 			else if (field.type() == entt::resolve<glm::vec3>()) {
 				glm::vec3& v = field.cast<glm::vec3&>();
 
