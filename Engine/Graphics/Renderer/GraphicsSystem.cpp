@@ -820,19 +820,19 @@ namespace EngineFramework
 		shader->setUniform("u_NumPointLights", (int)m_pointLightData.size());
 
 		// ========================================== DEBUG MODE HANDLING ==========================================
-		if (SceneManager::GetInstance().is_file_loaded) {
-			if (ImGui::IsKeyDown(ImGuiKey_F1)) debugMode = 0;  // Normal
-			if (ImGui::IsKeyDown(ImGuiKey_F2)) debugMode = 1;  // Cascade colors
-			if (ImGui::IsKeyDown(ImGuiKey_F3)) debugMode = 2;  // Shadow UV
-			if (ImGui::IsKeyDown(ImGuiKey_F4)) debugMode = 3;  // Raw shadow
-			if (ImGui::IsKeyDown(ImGuiKey_F5)) debugMode = 4;  // Depth values
-			if (ImGui::IsKeyDown(ImGuiKey_F6)) debugMode = 5;  // Cascade gradients
-			if (ImGui::IsKeyDown(ImGuiKey_F7)) debugMode = 6;  // Cascade 0 only
-			if (ImGui::IsKeyDown(ImGuiKey_F8)) debugMode = 7;  // Light direction
-			if (ImGui::IsKeyDown(ImGuiKey_F9)) debugMode = 8;  // Distance
-			if (ImGui::IsKeyDown(ImGuiKey_F10)) debugMode = 9; // Cascade 0 lit/shadow
-		}
-		shader->setUniform("u_DebugMode", debugMode);
+//		if (SceneManager::GetInstance().is_file_loaded) {
+//			if (ImGui::IsKeyDown(ImGuiKey_F1)) debugMode = 0;  // Normal
+//			if (ImGui::IsKeyDown(ImGuiKey_F2)) debugMode = 1;  // Cascade colors
+//			if (ImGui::IsKeyDown(ImGuiKey_F3)) debugMode = 2;  // Shadow UV
+//			if (ImGui::IsKeyDown(ImGuiKey_F4)) debugMode = 3;  // Raw shadow
+//			if (ImGui::IsKeyDown(ImGuiKey_F5)) debugMode = 4;  // Depth values
+//			if (ImGui::IsKeyDown(ImGuiKey_F6)) debugMode = 5;  // Cascade gradients
+//			if (ImGui::IsKeyDown(ImGuiKey_F7)) debugMode = 6;  // Cascade 0 only
+//			if (ImGui::IsKeyDown(ImGuiKey_F8)) debugMode = 7;  // Light direction
+//			if (ImGui::IsKeyDown(ImGuiKey_F9)) debugMode = 8;  // Distance
+//			if (ImGui::IsKeyDown(ImGuiKey_F10)) debugMode = 9; // Cascade 0 lit/shadow
+//		}
+//		shader->setUniform("u_DebugMode", debugMode);
 
 		// Log current mode
 		static int lastDebugMode = -1;
