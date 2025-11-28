@@ -176,6 +176,10 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 17584542703313420289
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 10481855918384840705
 				}
 			]
 		},
@@ -286,6 +290,42 @@
 		}
 	},
 	"8": {
+		"ColliderComponent": {
+			"maxBounds": [
+				10.0,
+				10.0,
+				10.0
+			],
+			"minBounds": [
+				-10.0,
+				-10.0,
+				-10.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -328,11 +368,28 @@
 		"MeshComponent": {
 			"meshName": "Sphere"
 		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 0.0,
+			"mass": 0.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
 		"TransformComponent": {
 			"position": [
-				-279.62200927734375,
-				58.43225860595703,
-				-26.404136657714844
+				-1142.4559326171875,
+				617.8934326171875,
+				-297.4641418457031
 			],
 			"rotation": [
 				0.0,

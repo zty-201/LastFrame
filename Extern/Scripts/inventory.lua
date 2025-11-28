@@ -2,11 +2,6 @@
 -- Inventory Script (Stable, Clean, Diagnostic Version)
 ----------------------------------------------------------------
 
-----------------------------------------------------------------
--- GLOBAL DIAGNOSTIC SWITCH 
--- Set true = show update calls (only once per frame)
--- Set false = silent unless adding/removing items
-----------------------------------------------------------------
 local DEBUG_UPDATE = true
 
 ----------------------------------------------------------------
@@ -19,10 +14,8 @@ function on_create(Self)
         items = {}
     }
 
-    -- Allow other scripts in the world to query player's inventory
     SHARED["player_inventory_ref"] = Self.inventory
 end
-
 
 ----------------------------------------------------------------
 -- Add item
@@ -65,7 +58,7 @@ function RemoveItem(Self, itemId, amount)
 end
 
 ----------------------------------------------------------------
--- Get item quantity
+-- Get quantity
 ----------------------------------------------------------------
 function GetQuantity(Self, itemId)
     local item = Self.inventory.items[itemId]
@@ -83,28 +76,25 @@ function PrintInventory(Self)
 end
 
 ----------------------------------------------------------------
--- on_update
+-- on_update (working)
 ----------------------------------------------------------------
-local frame_counter = 0
-
 function on_update(Self, dt)
 
-    -- Add item: press E
+    -- Add Potion (ID=1)
     if Input.GetKeyDown(69) then  -- E key
         AddItem(Self, 1, "Potion", 1)
     end
 
-    -- Remove item: press R
+    -- Remove Potion
     if Input.GetKeyDown(82) then  -- R key
         RemoveItem(Self, 1, 1)
     end
 
-    -- Print inventory: press T
+    -- Print inventory
     if Input.GetKeyDown(84) then  -- T key
         PrintInventory(Self)
     end
 end
-
 
 ----------------------------------------------------------------
 function on_destroy(Self)
