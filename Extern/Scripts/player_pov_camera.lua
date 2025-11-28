@@ -4,7 +4,7 @@
 -- MUST BE LOADED FIRST (before player_movement.lua)
 -- ============================================================
 
-local mouseSensitivity = 0.2
+local mouseSensitivity = 0.08
 local gyroSensitivity  = 5.0
 local pitchLimit       = 89.0
 local gyroEnabled      = true

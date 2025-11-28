@@ -77,12 +77,19 @@ function on_update(self, dt)
         if Input.GetKey(GLFW_KEY_A) then print("[MOVE] A pressed") moveX = moveX + 1 end
         if Input.GetKey(GLFW_KEY_D) then print("[MOVE] D pressed") moveX = moveX - 1 end
 
+        -- Joystick input (from UI)
+        if SHARED and SHARED.UI then
+            local jx = SHARED.UI.joystickX or 0.0
+            local jy = SHARED.UI.joystickY or 0.0
+            moveX = moveX + jx
+            moveZ = moveZ + jy
+        end
+
         local len = math.sqrt(moveX*moveX + moveZ*moveZ)
         if len > 0 then
             moveX, moveZ = moveX / len, moveZ / len
 
             local radYaw = math.rad(yaw)
-            -- FIXED: Correct forward and right vector calculations
             local forwardX = math.sin(radYaw)
             local forwardZ = math.cos(radYaw)
             local rightX   = math.cos(radYaw)
