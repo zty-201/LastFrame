@@ -320,16 +320,14 @@ vec3 direct_lighting(in vec3 Wo, in vec3 N, in vec3 P, in vec3 F0, in vec3 diffu
 {
     vec3 Wi = -light_direction.xyz;
     vec3 Wh = normalize(Wo + Wi);
+    float NdotL = max(dot(N, Wi), 0.0); // Calculate Dot Product
 
     vec3 brdf = evaluate_uber_brdf(diffuse_color, roughness, N, F0, Wo, Wh, Wi);
-
     vec3 Li = light_color.xyz;
 
     float shadow_val = visibility(FS_IN_WorldPos);
-    float min_light = 0.3; // Adjust this value to make shadows lighter (0.5) or darker (0.1)
-    float light_factor = mix(min_light, 1.0, shadow_val);
-
-    return brdf * Li * light_factor;
+    
+    return brdf * Li * shadow_val * NdotL;
 }
 
 // ------------------------------------------------------------------
@@ -616,7 +614,13 @@ void main()
     }
 
     // Ambient
-    color += diffuse_color * light_color.w;
+    vec3 skyColor = vec3(0.5, 0.7, 1.0); // Blueish Sky
+    vec3 groundColor = vec3(0.2, 0.2, 0.2); // Dark Ground
+    
+    float hemiFactor = normalize(N).y * 0.5 + 0.5; // Map Y [-1, 1] to [0, 1]
+    vec3 ambientLight = mix(groundColor, skyColor, hemiFactor) * light_color.w;
+    
+    color += diffuse_color * ambientLight;
     
     // Volumetric fog
     color = add_inscattered_light(color, FS_IN_WorldPos);

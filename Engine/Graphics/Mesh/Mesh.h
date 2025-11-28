@@ -378,7 +378,9 @@ namespace Mesh {
             glm::vec3 edge2 = v2.Position - v0.Position;
             glm::vec2 deltaUV1 = v1.TexCoords - v0.TexCoords;
             glm::vec2 deltaUV2 = v2.TexCoords - v0.TexCoords;
-            float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+            float det = (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+            if (std::abs(det) < 1e-6f) continue;
+            float f = 1.0f / det;
             glm::vec3 tangent, bitangent;
             tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
             tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
@@ -397,6 +399,10 @@ namespace Mesh {
         for (size_t i = 0; i < vertices.size(); ++i) {
             const glm::vec3& n = vertices[i].Normal;
             const glm::vec3& t = tan1[i];
+            if (glm::length(t) < 1e-6f) {
+                vertices[i].Tangent = glm::vec4(1, 0, 0, 1); // Default tangent
+                continue;
+            }
             glm::vec3 tangent = glm::normalize(t - n * glm::dot(n, t));
             float handedness = (glm::dot(glm::cross(n, t), tan2[i]) < 0.0f) ? -1.0f : 1.0f;
             vertices[i].Tangent = glm::vec4(tangent, handedness);

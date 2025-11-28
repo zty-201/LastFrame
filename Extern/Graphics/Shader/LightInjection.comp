@@ -176,7 +176,7 @@ void main()
         float density    = aniso_density_scattering_absorption.y;
         
         // Perform lighting.
-        vec3 lighting = light_color.rgb * light_color.a;
+        vec3 lighting = vec3(0.0);
 
         float visibility_value = visibility(world_pos);
 
