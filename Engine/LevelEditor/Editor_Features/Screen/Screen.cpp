@@ -40,6 +40,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "TriggerBoxComponent.h"
 #include "MeshComponent.h"
 #include "ColliderComponent.h"
+#include "TriggerSystem.hpp"
+#include "TriggerEvents.hpp"
 #include "Editor_Features/CameraController/EditorCameraController.hpp"
 
 //#include <iostream>
@@ -56,8 +58,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 //Creation of instances
 #include "System_GameObjectSystem.hpp"
 #include "SceneManager.hpp"
-
-
+#include "PhysicsWorld.hpp"
 
 namespace EngineFramework
 {
@@ -119,7 +120,6 @@ namespace EngineFramework
         if (dy >= dx && dy >= dz) return 1;
         return 2;
     }
-
 
     static inline glm::mat4 TRS(const glm::vec3& t, const glm::quat& q, const glm::vec3& s) {
         glm::mat4 M(1.0f);
@@ -197,6 +197,7 @@ namespace EngineFramework
         out.y = (ndc.y * -0.5f + 0.5f) * size.y + pos.y;
         return true;
     }
+
     static void DrawWireOBB(const glm::mat4& M, const glm::mat4& V, const glm::mat4& P,
         ImVec2 pos, ImVec2 size, ImU32 color = IM_COL32(0, 255, 0, 255), float thick = 1.6f) {
         static const glm::vec3 C[8] = { {-0.5,-0.5,-0.5},{0.5,-0.5,-0.5},{0.5,0.5,-0.5},{-0.5,0.5,-0.5},
@@ -205,6 +206,24 @@ namespace EngineFramework
         ImDrawList* dl = ImGui::GetWindowDrawList(); ImVec2 pts[8]; bool ok[8];
         for (int i = 0; i < 8; ++i) { glm::vec3 w = glm::vec3(M * glm::vec4(C[i], 1)); ok[i] = ProjectToScreen(V, P, w, pos, size, pts[i]); }
         for (auto& e : E) if (ok[e[0]] && ok[e[1]]) dl->AddLine(pts[e[0]], pts[e[1]], color, thick);
+    }
+
+    static void OnTriggerEnter(const Event_OnTriggerEnter& e)
+    {
+        LOGI("[TriggerEnter] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);
+    }
+
+    static void OnTriggerStay(const Event_OnTriggerStay& e)
+    {
+        LOGI("[TriggerStay] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);
+    }
+
+    static void OnTriggerExit(const Event_OnTriggerExit& e)
+    {
+        LOGI("[TriggerExit] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);
     }
 
     void Screen::Initialize() {
@@ -234,6 +253,9 @@ namespace EngineFramework
         Event_Level_Editor_Simulation editor_toggled{};
         editor_toggled.is_enabled = false;
         event_dispatcher.trigger<Event_Level_Editor_Simulation>(std::move(editor_toggled));
+        event_dispatcher.sink<Event_OnTriggerEnter>().connect<&OnTriggerEnter>();
+        event_dispatcher.sink<Event_OnTriggerStay>().connect<&OnTriggerStay>();
+        event_dispatcher.sink<Event_OnTriggerExit>().connect<&OnTriggerExit>();
 
 		//No longer auto attach Lua camera script here
 //#if defined(ENGINE_ENABLE_LUA)
@@ -326,11 +348,7 @@ namespace EngineFramework
                         history->undo();
                     }
                 }
-
-
-
                 ImGui::EndMenuBar();
-
             }
 
             ImGui::PopStyleColor();
@@ -344,6 +362,53 @@ namespace EngineFramework
                 //triggerbox();
                 drop_target();
                 colliderbox();
+
+                EngineFramework::TriggerSystem::Update(registry);
+                auto tfView = registry.view<TransformComponent>();
+                for (auto ent : tfView)
+                {
+                    auto& tf = tfView.get<TransformComponent>(ent);
+                    tf.prevModelMatrix = tf.modelMatrix;
+                }
+
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && hovered && !ImGuizmo::IsOver())
+                {
+                    ImVec2 mousePos = ImGui::GetMousePos();
+                    ImVec2 viewportPos = ImGui::GetItemRectMin();
+                    ImVec2 viewportSize = ImGui::GetItemRectSize();
+
+                    float localX = mousePos.x - viewportPos.x;
+                    float localY = mousePos.y - viewportPos.y;
+
+                    if (!camera_view.empty())
+                    {
+                        const auto& cam = registry.get<CameraComponent>(camera_view.front());
+
+                        glm::vec3 rayOrigin, rayDir;
+                        Camera::ScreenPointToRay(
+                            cam,
+                            localX, localY,
+                            viewportSize.x, viewportSize.y,
+                            rayOrigin, rayDir
+                        );
+
+                        RaycastHit hit;
+                        if (PhysicsWorld::Get().Raycast(rayOrigin, rayDir, 1000.f, hit))
+                        {
+                            LOGI("Mouse Picked Entity: %u", (uint32_t)hit.entity);
+                            LevelEditor::GetInstance().variables.selected_objectID = hit.entity;
+                            LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+                        }
+                        else
+                        {
+                            //Deselect if clicking empty space
+                            LevelEditor::GetInstance().variables.selected_objectID = entt::null;
+                            LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::NONE;
+
+                            LOGI("Selection cleared.");
+                        }
+                    }
+                }
 
                 if (hovered) {
                     camera_controls_in_screen_only();
@@ -375,9 +440,7 @@ namespace EngineFramework
                     {
                         ImGui::OpenPopup("Entity_Shortcut_Menu");
                     }
-                    
                 }
-
                 entity_shortcut_menu();
                 adjust_triggerbox();
 
@@ -388,16 +451,10 @@ namespace EngineFramework
                     }
                 }
             }
-
         }
-
         ImGui::PopStyleColor();
         ImGui::End();
-
-
-
         control_window();
-
     }
     void Screen::Close() {
         clear_backup();
@@ -474,7 +531,6 @@ namespace EngineFramework
             auto& camera = camera_view.get<CameraComponent>(camera_view.front());
             Camera::Move_Cam_and_Target(camera, glm::vec3(camera_speed, 0, 0));
         }
-
     }*/
 
 
@@ -496,7 +552,6 @@ namespace EngineFramework
                     Light::onCursor(light, Mouse_delta.x, Mouse_delta.y);
                     //std::cout << "Mouse_delta.x: " << Mouse_delta.x << " | Mouse_delta.y: " << Mouse_delta.y << std::endl;
                 }
-                
             }
         }
 
@@ -984,7 +1039,6 @@ namespace EngineFramework
         }
 
         ImGui::End();
-
     }
 
     //return true if theres a difference
@@ -1140,13 +1194,7 @@ namespace EngineFramework
                 current_record = nullptr;
                 //std::cout << "End track\n";
             }
-
-
-
-
             gizmos_started_drag = gizmos_IS_dragged;
-
-
         }
 
 
@@ -1469,20 +1517,47 @@ namespace EngineFramework
                 if (col.shapes.empty()) return;
 
                 const glm::mat4 model = tf.modelMatrix;
-                const ColliderData& shape = col.shapes[0];
 
-                // only draw boxes for now
-                if (shape.type != (int)ColliderShape::Box)
-                    return;
+                for (const auto& shape : col.shapes)
+                {
+                    glm::vec3 sizeLocal(1.0f);
 
-                glm::vec3 centerLocal = shape.offsetPosition;
-                glm::vec3 sizeLocal = 2.0f * shape.boxHalfExtents;
+                    switch (static_cast<ColliderShape>(shape.type))
+                    {
+                    case ColliderShape::Box:
+                        sizeLocal = shape.boxHalfExtents * 2.0f;
+                        break;
+                    case ColliderShape::Sphere:
+                        sizeLocal = glm::vec3(shape.sphereRadius * 2.0f);
+                        break;
+                    case ColliderShape::Capsule:
+                        sizeLocal = glm::vec3(
+                            shape.capsuleRadius * 2.0f,
+                            shape.capsuleHeight,
+                            shape.capsuleRadius * 2.0f);
+                        break;
+                    }
 
-                glm::quat qLocal = EulerDegToQuat(glm::vec3(0.0f)); // if you later use offsetRotation, convert it here
-                glm::mat4 colliderM = model * TRS(centerLocal, qLocal, sizeLocal);
+                    glm::quat qShape = EulerDegToQuat(shape.offsetRotation);
+                    glm::mat4 shapeTransform = model * TRS(shape.offsetPosition, qShape, sizeLocal);
 
-                DrawWireOBB(colliderM, view, proj, screen_pos, available_size,
-                    IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
+                    DrawWireOBB(shapeTransform, view, proj, screen_pos, available_size,
+                        IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
+                }
+                //const ColliderData& shape = col.shapes[0];
+
+                //// only draw boxes for now
+                //if (shape.type != (int)ColliderShape::Box)
+                //    return;
+
+                //glm::vec3 centerLocal = shape.offsetPosition;
+                //glm::vec3 sizeLocal = 2.0f * shape.boxHalfExtents;
+
+                //glm::quat qLocal = EulerDegToQuat(glm::vec3(0.0f)); // if you later use offsetRotation, convert it here
+                //glm::mat4 colliderM = model * TRS(centerLocal, qLocal, sizeLocal);
+
+                //DrawWireOBB(colliderM, view, proj, screen_pos, available_size,
+                //    IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
             });
     }
 

@@ -1,5 +1,66 @@
 {
 	"0": {
+		"ColliderComponent": {
+			"maxBounds": [
+				2.545584201812744,
+				3.045584201812744,
+				2.545584201812744
+			],
+			"minBounds": [
+				-2.545584201812744,
+				-2.045584201812744,
+				-2.545584201812744
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						2.545584201812744,
+						2.545584201812744,
+						2.545584201812744
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.5,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": false,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": false,
+			"layer": 1,
+			"restitution": 0.0
+		},
 		"archtype": 1531488210877235207
 	},
 	"1": {
@@ -16,7 +77,7 @@
 				0.3605816960334778
 			],
 			"innerConeAngle": 12.5,
-			"intensity": 1.0,
+			"intensity": 50.0,
 			"linear": 0.0,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -162,31 +223,6 @@
 		"archtype": 11270566386067177473
 	},
 	"5": {
-		"LightComponent": {
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"constant": 1.0,
-			"direction": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"innerConeAngle": 15.0,
-			"intensity": 10000.0,
-			"linear": 0.09000000357627869,
-			"outerConeAngle": 35.0,
-			"position": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"quadratic": 0.03200000151991844,
-			"radius": 1000.0,
-			"type": 2
-		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -197,10 +233,6 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 11740093013966520321
-				},
-				{
-					"Loaded": true,
-					"ScriptGuid": 15968805962367582209
 				}
 			]
 		},
@@ -211,7 +243,7 @@
 				0.10000000149011612
 			],
 			"albedoMap": [
-				3601763066940784641,
+				12382137438329683979,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -250,9 +282,9 @@
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				10.0,
+				10.0,
+				10.0
 			]
 		}
 	},
@@ -281,23 +313,6 @@
 			"quadratic": 0.03200000151991844,
 			"radius": 500.0,
 			"type": 1
-		},
-		"TransformComponent": {
-			"position": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"rotation": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
 		}
 	},
 	"7": {
@@ -328,58 +343,76 @@
 		}
 	},
 	"8": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
+		"ColliderComponent": {
+			"maxBounds": [
+				8.696000099182129,
+				8.045999526977539,
+				8.795999526977539
+			],
+			"minBounds": [
+				4.553999900817871,
+				2.303999900817871,
+				7.9039998054504395
+			],
+			"mode": 0,
+			"shapes": [
 				{
-					"Loaded": true,
-					"ScriptGuid": 13060597717967175685
+					"boxHalfExtents": [
+						2.545584201812744,
+						2.545584201812744,
+						2.545584201812744
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.5,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
 				}
 			]
 		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
 			],
-			"albedoMap": [
-				3601763066940784641,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				0,
-				0
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				0,
-				0
-			],
-			"name": "UI_joystick_bg",
-			"normalMap": [
-				0,
-				0
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
 			]
 		},
-		"MeshComponent": {
-			"meshName": "quad"
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
 		},
-		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-363.2720947265625,
-				335.8331298828125,
-				-307.1758117675781
+				-267.71075439453125,
+				326.2235107421875,
+				-147.61264038085938
 			],
 			"rotation": [
-				108.5999984741211,
-				294.79998779296875,
+				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
@@ -387,68 +420,7 @@
 				1.0,
 				1.0
 			]
-		}
-	},
-	"9": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 6719529442629517315
-				}
-			]
 		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				3601763066940784643,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				0,
-				0
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				0,
-				0
-			],
-			"name": "UI_joystick",
-			"normalMap": [
-				0,
-				0
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "quad"
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-363.2720947265625,
-				335.8331298828125,
-				-307.1758117675781
-			],
-			"rotation": [
-				108.5999984741211,
-				294.79998779296875,
-				0.0
-			],
-			"scale": [
-				0.30000001192092896,
-				1.0,
-				0.30000001192092896
-			]
-		}
+		"archtype": 4071738312750153729
 	}
 }

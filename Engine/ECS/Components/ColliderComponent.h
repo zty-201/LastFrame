@@ -23,9 +23,13 @@ struct ColliderData
     float capsuleHeight = 1.0f;
     float capsuleRadius = 0.25f;
 
-    //Orientation / Offset
+    // Orientation / Offset
     glm::vec3 offsetPosition = { 0.0f, 0.0f, 0.0f };
     glm::vec3 offsetRotation = { 0.0f, 0.0f, 0.0f };
+
+    // Per-Shape AABB (Relative to Entity Origin)
+    glm::vec3 aabbMin = { 0.0f, 0.0f, 0.0f };
+    glm::vec3 aabbMax = { 0.0f, 0.0f, 0.0f };
 };
 
 struct ColliderComponent
@@ -52,6 +56,8 @@ struct ColliderComponent
     }
 
     Mode GetMode() const { return static_cast<Mode>(mode); }
+
+    void RecalculateBounds();
 };
 
 #endif // COLLIDER_COMPONENT

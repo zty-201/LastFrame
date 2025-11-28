@@ -568,6 +568,7 @@ namespace EngineFramework
 
 		entt::meta_factory<::ColliderData>()
 			.type("ColliderData")
+			.ctor<>()
 			// Dimensions
 			.data<&::ColliderData::type>("type")
 			.data<&ColliderData::boxHalfExtents>("boxHalfExtents")
