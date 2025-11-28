@@ -50,13 +50,12 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 	glGenTextures(1, &texID);
 	glBindTexture(GL_TEXTURE_2D, texID);
 
-	int mipLevels = 1 + static_cast<int>(floor(log2(std::max(width, height))));
+	GLint internalFormat = isSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
 
-	// === Use SRGB for color textures, LINEAR for data textures ===
-	GLenum internalFormat = isSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
-	glTexStorage2D(GL_TEXTURE_2D, mipLevels, internalFormat, width, height);
+	// Allocates AND uploads Level 0 in one go
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	// Automatically generates levels 1...N
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

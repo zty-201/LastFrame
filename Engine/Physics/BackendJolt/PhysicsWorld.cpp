@@ -18,7 +18,8 @@
 #include <iostream>
 #include "ColliderComponent.h"
 #include "PhysicsMaterialComponent.h"
-#include "TransformComponent.h"
+#include <Jolt/Physics/Collision/RayCast.h>
+#include <Jolt/Physics/Collision/CastResult.h>
 
 //TEST VALUES ONLY
 const float TEST_DENSITY = 1000.0f;
@@ -277,10 +278,6 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
 {
     if (HasBody(entity)) return;
 
-    if (static_cast<ColliderComponent::Mode>(collider.mode) == ColliderComponent::Mode::LEVEL_EDITOR) {
-        return;
-    }
-
     if (collider.shapes.empty()) {
         LOGI("[JOLT] Entity %u has ColliderComponent but no shapes defined. Skipping body creation.", (unsigned)entity);
         return;
@@ -289,7 +286,21 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
     JPH::ShapeRefC finalShape = CreateJoltShapeFromCollider(collider, scale);
     if (!finalShape) return;
 
-    const JPH::EMotionType motionType = material.isStatic ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic;
+    JPH::EMotionType motionType;
+    JPH::ObjectLayer objectLayer;
+    ColliderComponent::Mode modeEnum = static_cast<ColliderComponent::Mode>(collider.mode);
+
+    if (modeEnum == ColliderComponent::Mode::LEVEL_EDITOR)
+    {
+        motionType = JPH::EMotionType::Static;
+        objectLayer = Layers::EDITOR_GHOST;
+    }
+    else
+    {
+        motionType = material.isStatic ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic;
+        objectLayer = GetObjectLayerForIsStatic(material.isStatic);
+    }
+
     const bool isTrigger = static_cast<ColliderComponent::Mode>(collider.mode) == ColliderComponent::Mode::TRIGGER_SENSOR;
 
     glm::quat qRot = glm::quat(glm::radians(rot));
@@ -299,24 +310,34 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
         JPH::Vec3(pos.x, pos.y, pos.z),
         JPH::Quat(qRot.x, qRot.y, qRot.z, qRot.w),
         motionType,
-        GetObjectLayerForIsStatic(material.isStatic)
+        objectLayer
     );
 
     bodySettings.mIsSensor = isTrigger;
 
-    if (!material.isStatic)
+    if (motionType == JPH::EMotionType::Dynamic)
     {
         JPH::MassProperties massProperties;
-
         JPH::MassProperties shapeMassProps = finalShape->GetMassProperties();
 
         float volume = shapeMassProps.mMass;
-        float mass = volume * material.density;
-        float mass_ratio = mass / volume;
-        massProperties.mMass = mass;
-        massProperties.mInertia = shapeMassProps.mInertia * mass_ratio;
+        
+        if (volume > 0.0001f)
+        {
+            float mass = volume * material.density;
+            float mass_ratio = mass / volume;
 
-        bodySettings.mMassPropertiesOverride = massProperties;
+            massProperties.mMass = mass;
+            massProperties.mInertia = shapeMassProps.mInertia * mass_ratio;
+
+            bodySettings.mMassPropertiesOverride = massProperties;
+        }
+        else
+        {
+            bodySettings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
+            bodySettings.mMassPropertiesOverride.mMass = 1.0f;
+        }
+
         bodySettings.mGravityFactor = gravityFactor;
         bodySettings.mFriction = material.friction;
         bodySettings.mRestitution = material.restitution;
@@ -663,4 +684,65 @@ void PhysicsWorld::AddForce(entt::entity entity, const glm::vec3& force)
         bodyID,
         JPH::Vec3(force.x, force.y, force.z)
     );
+}
+
+bool PhysicsWorld::Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit)
+{
+    if (!m_physicsSystem) return false;
+
+    struct RaycastFilterAll : public JPH::BroadPhaseLayerFilter, public JPH::ObjectLayerFilter, public JPH::BodyFilter
+    {
+        // BroadPhase: Hit Static, Dynamic, and Editor layers
+        virtual bool ShouldCollide(JPH::BroadPhaseLayer /*inLayer*/) const override { return true; }
+
+        // Object Layer: Hit Static, Dynamic, and Editor Ghost layers
+        virtual bool ShouldCollide(JPH::ObjectLayer /*inLayer*/) const override { return true; }
+
+        // Body: Hit any body ID
+        virtual bool ShouldCollide(const JPH::BodyID& /*inBodyID*/) const override { return true; }
+
+        // Body Locked: Allow hitting bodies even if locked (standard check)
+        virtual bool ShouldCollideLocked(const JPH::Body& /*inBody*/) const override { return true; }
+    };
+
+    // 1. Setup Jolt Ray
+    // Jolt uses RVec3 (double precision) for positions, Vec3 for direction * distance
+    JPH::RVec3 jOrigin(origin.x, origin.y, origin.z);
+    JPH::Vec3 jDirection(direction.x * maxDistance, direction.y * maxDistance, direction.z * maxDistance);
+
+    JPH::RRayCast ray(jOrigin, jDirection);
+    JPH::RayCastResult hit;
+    RaycastFilterAll filter;
+    const JPH::NarrowPhaseQuery& query = m_physicsSystem->GetNarrowPhaseQueryNoLock();
+
+    bool success = query.CastRay(
+        ray,
+        hit,
+        filter, // Hit all layers
+        filter,     // Hit all objects
+        filter            // Hit all bodies
+    );
+
+    if (success)
+    {
+        outHit.hasHit = true;
+        outHit.distance = hit.mFraction * maxDistance;
+
+        // Calculate world position
+        JPH::RVec3 hitPos = ray.GetPointOnRay(hit.mFraction);
+        outHit.position = glm::vec3(hitPos.GetX(), hitPos.GetY(), hitPos.GetZ());
+
+        JPH::BodyLockRead lock(m_physicsSystem->GetBodyLockInterface(), hit.mBodyID);
+        if (lock.Succeeded())
+        {
+            // 4. Retrieve Entity from User Data
+            const JPH::Body& body = lock.GetBody();
+            uint64_t userData = body.GetUserData();
+            outHit.entity = static_cast<entt::entity>(static_cast<uint32_t>(userData));
+        }
+        return true;
+    }
+
+    outHit.hasHit = false;
+    return false;
 }

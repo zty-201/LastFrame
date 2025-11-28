@@ -20,5 +20,9 @@
   },
   "RayMarch" : {
     "compute":   "Extern/Graphics/Shader/RayMarch.comp"
+  },
+  "UI" : {
+    "vertex":   "Extern/Graphics/Shader/UI.vert",
+    "fragment": "Extern/Graphics/Shader/UI.frag"
   }
 }

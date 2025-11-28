@@ -178,6 +178,7 @@ namespace EngineFramework
 		xresource::full_guid point_shadow_shader_guid;
         xresource::full_guid light_injection_shader_guid;
         xresource::full_guid ray_march_shader_guid;
+		xresource::full_guid ui_shader_guid;
 
 		// UBOs
         GLuint m_volumetricUBO = 0;
@@ -220,7 +221,7 @@ namespace EngineFramework
         float m_absorption = 0.0f; 
         float m_shadow_bias = 0.001f;
         float m_depth_power = 1.0f; // For exponential depth mapping
-        float m_ambient_light_intensity = 0.001f;
+        float m_ambient_light_intensity = 8.0f;
         bool m_temporal_accumulation = true;
         bool m_tricubic_filtering = false;
         int m_frame_idx = 0;
@@ -246,6 +247,7 @@ namespace EngineFramework
         void SkyboxPass();
         void VolumetricLightInjectionPass();
         void VolumetricRayMarchPass();
+        void RenderUI();
 
 		// Update methods
         void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
