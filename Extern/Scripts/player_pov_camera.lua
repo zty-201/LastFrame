@@ -80,7 +80,7 @@ local function applyLook()
     -- -------------------------------
     -- Smoothed camera follow
     -- -------------------------------
-    local smooth = 0.15
+    local smooth = 1.0
 
     local cx, cy, cz = camera:GetPosition()
 

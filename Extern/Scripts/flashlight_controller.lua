@@ -104,7 +104,7 @@ function on_update(self, dt)
         pitch = SHARED.POV.pitch or 0.0
     end
 
-     local radYaw   = math.rad(yaw)
+    local radYaw   = math.rad(yaw)
     local radPitch = math.rad(pitch)
     local cosPitch = math.cos(radPitch)
 

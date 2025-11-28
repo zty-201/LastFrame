@@ -215,7 +215,7 @@ namespace EngineFramework
         
         // Fog control parameters
         float m_anisotropy = 0.6f;      // Slightly forward scattering
-        float m_density = 0.5f;         // Much lower density (was 0.15)
+        float m_density = 0.001f;         // Much lower density (was 0.15)
         float m_scattering = 0.0f;
         float m_absorption = 0.0f; 
         float m_shadow_bias = 0.001f;

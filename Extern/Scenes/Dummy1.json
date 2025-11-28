@@ -211,7 +211,7 @@
 				0.10000000149011612
 			],
 			"albedoMap": [
-				12382137438329683979,
+				3601763066940784641,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -325,6 +325,130 @@
 			"quadratic": 0.03200000151991844,
 			"radius": 1000.0,
 			"type": 2
+		}
+	},
+	"8": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 13060597717967175685
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3601763066940784641,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "UI_joystick_bg",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "quad"
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-363.2720947265625,
+				335.8331298828125,
+				-307.1758117675781
+			],
+			"rotation": [
+				108.5999984741211,
+				294.79998779296875,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"9": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6719529442629517315
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3601763066940784643,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "UI_joystick",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "quad"
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-363.2720947265625,
+				335.8331298828125,
+				-307.1758117675781
+			],
+			"rotation": [
+				108.5999984741211,
+				294.79998779296875,
+				0.0
+			],
+			"scale": [
+				0.30000001192092896,
+				1.0,
+				0.30000001192092896
+			]
 		}
 	}
 }
