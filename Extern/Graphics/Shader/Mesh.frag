@@ -421,6 +421,11 @@ void main()
     vec3  albedo    = texture(s_Albedo, FS_IN_TexCoord).rgb * u_AlbedoFactor;
     float roughness = texture(s_Roughness, FS_IN_TexCoord).r * u_RoughnessFactor;
     float metallic  = texture(s_Metallic, FS_IN_TexCoord).r * u_MetallicFactor;
+    float alpha     = texture(s_Albedo, FS_IN_TexCoord).a;
+
+    if (alpha < 0.5){
+        discard;
+    }
     
     // Clamp to safe ranges
     roughness = clamp(roughness, 0.04, 1.0);
