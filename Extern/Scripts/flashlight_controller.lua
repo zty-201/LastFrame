@@ -155,6 +155,14 @@ function on_update(self, dt)
             prevFDown = false
         end
     end
+
+    -- =========================================
+    -- UI toggle request (from ui_flashlight.lua)
+    -- =========================================
+    if FL.requestToggle then
+        FL.requestToggle = false
+        Flashlight_Toggle()
+    end
 end
 
 function on_destroy()

@@ -2,7 +2,7 @@
 -- player_movement.lua  (FIXED - Corrected direction vectors)
 -- ============================================================
 
-local moveSpeed = 50.0
+local moveSpeed = 500.0
 local deadZone  = 20.0
 
 local transform = nil

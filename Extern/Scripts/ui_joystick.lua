@@ -120,8 +120,8 @@ function on_update(self, dt)
             ny = ny / mag
         end
 
-        uiShared.joystickX      = nx
-        uiShared.joystickY      = -ny
+        uiShared.joystickX      = -nx
+        uiShared.joystickY      = ny
         uiShared.joystickActive = (nx ~= 0 or ny ~= 0)
     end
 
