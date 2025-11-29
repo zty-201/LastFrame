@@ -329,17 +329,20 @@ namespace Engine {
         s_Lua["GLFW_KEY_A"] = 65;
         s_Lua["GLFW_KEY_S"] = 83;
         s_Lua["GLFW_KEY_D"] = 68;
+
         s_Lua["GLFW_KEY_F"] = 70;
         s_Lua["GLFW_KEY_Q"] = 81;
         s_Lua["GLFW_KEY_E"] = 69;
+        s_Lua["GLFW_KEY_C"] = 67;  // <-- add this line for calibrate
 
         s_Lua["GLFW_KEY_SPACE"] = 32;
         s_Lua["GLFW_KEY_SHIFT"] = 340;
 
         // Mouse button constants
-        s_Lua["GLFW_MOUSE_BUTTON_LEFT"] = 0;
-        s_Lua["GLFW_MOUSE_BUTTON_RIGHT"] = 1;
+        s_Lua["GLFW_MOUSE_BUTTON_LEFT"]   = 0;
+        s_Lua["GLFW_MOUSE_BUTTON_RIGHT"]  = 1;
         s_Lua["GLFW_MOUSE_BUTTON_MIDDLE"] = 2;
+
 
         LOGI("[ScriptSystem] Lua bindings initialized successfully.");
 
