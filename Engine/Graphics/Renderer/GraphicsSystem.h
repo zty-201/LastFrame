@@ -261,6 +261,7 @@ namespace EngineFramework
         void RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius);
         void CalculateCascadeSplits(float nearPlane, float farPlane);
         bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
+        bool WorldToScreen(const glm::vec3& worldPos, glm::vec2& outScreenPos, float& outScale);
         std::vector<glm::vec3> GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ);
 
         //==Event Handlers, one for each type of event.

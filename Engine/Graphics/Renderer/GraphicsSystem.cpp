@@ -1026,28 +1026,45 @@ namespace EngineFramework
 		{
 			if (!ui.visible) continue;
 
+			glm::vec2 finalPos = ui.position;
+			glm::vec2 finalSize = ui.size;
+
+			if (registry.all_of<TransformComponent>(entity)) {
+				auto& transform = registry.get<TransformComponent>(entity);
+
+				glm::vec2 screenPos;
+				float scaleFactor = 1.0f;
+
+				if (WorldToScreen(transform.position, screenPos, scaleFactor)) {
+					// 1. Calculate the Scaled Size based on the original ui.size
+					finalSize = ui.size * scaleFactor;
+
+					// 2. Center the position based on the NEW size
+					finalPos.x = screenPos.x - (finalSize.x * 0.5f);
+					finalPos.y = screenPos.y - (finalSize.y * 0.5f);;
+				}
+				else {
+					continue; // Skip rendering if not on screen
+				}
+			}
+
+			
 			// --- CALCULATE MODEL MATRIX ---
-			// This is the math you were asking about. 
-			// It tells the GPU: "Take that generic square and put it HERE."
 			glm::mat4 model = glm::mat4(1.0f);
 
-			// 1. Move to the final Pixel Position
-			model = glm::translate(model, glm::vec3(ui.position.x, ui.position.y, 0.0f));
+			// Use 'finalPos' instead of 'ui.position'
+			model = glm::translate(model, glm::vec3(finalPos.x, finalPos.y, 0.0f));
 
-			// 2. Scale to the final Pixel Size
-			model = glm::scale(model, glm::vec3(ui.size.x, ui.size.y, 1.0f));
+			// Use 'finalSize' instead of 'ui.size'
+			model = glm::scale(model, glm::vec3(finalSize.x, finalSize.y, 1.0f));
 
 			// --- COMPENSATION FOR -1 TO 1 MESH ---
-
-			// 3. Move pivot from Center to Bottom-Left
-			// Current range: -1 to 1. We want 0 to 2.
-			// So we translate by +1.0 (relative to the mesh's internal coords) 
-
-			model = glm::translate(model, glm::vec3(0.5f, 0.5f, 0.0f)); // Move (0,0) to center of unit square
-			model = glm::scale(model, glm::vec3(0.5f, 0.5f, 1.0f));     // Shrink 2.0 size down to 1.0
+			model = glm::translate(model, glm::vec3(0.5f, 0.5f, 0.0f));
+			model = glm::scale(model, glm::vec3(0.5f, 0.5f, 1.0f));
 
 			shader->setUniform("u_Model", model);
-			shader->setUniform("u_Color", glm::vec4(ui.color, 1.0f)); // full color alpha
+			shader->setUniform("u_Color", glm::vec4(ui.color, 1.0f));
+			shader->setUniform("u_Luminance", ui.luminance);
 
 			// --- BIND TEXTURE ---
 			glActiveTexture(GL_TEXTURE0);
@@ -1215,6 +1232,46 @@ namespace EngineFramework
 			}
 		}
 		return frustumCorners;
+	}
+
+	bool GraphicsSystem::WorldToScreen(const glm::vec3& worldPos, glm::vec2& outScreenPos, float& outScale)
+	{
+		auto active_camera_entity = GetFirstActiveCamera();
+		if (active_camera_entity == entt::null) return false;
+
+		CameraComponent& camera = registry.get<CameraComponent>(active_camera_entity);
+
+		// 1. Calculate Distance
+		float dist = glm::distance(camera.position, worldPos);
+		if (dist < 0.1f) dist = 0.1f;
+
+		// 2. Calculate Scale
+		// REFERENCE_DIST: The distance where the UI is exactly 1.0x its original size
+		const float REFERENCE_DIST = 10.0f;
+
+		// Big when Close, Small when Far
+		outScale = REFERENCE_DIST / dist;
+
+		// Allow it to get smaller (0.05) and much bigger (10.0)
+		outScale = std::clamp(outScale, 0.05f, 10.0f);
+
+		glm::mat4 view = Camera::getLookAt(camera);
+		float aspect = (screen.y > 0) ? (float)screen.x / screen.y : 1.0f;
+		glm::mat4 proj = Camera::getPerspective(camera, aspect);
+		glm::mat4 viewProj = proj * view;
+
+		glm::vec4 clipSpace = viewProj * glm::vec4(worldPos, 1.0f);
+
+		if (clipSpace.w <= 0.0f) return false;
+
+		glm::vec3 ndc = glm::vec3(clipSpace) / clipSpace.w;
+
+		if (ndc.x < -1.2f || ndc.x > 1.2f || ndc.y < -1.2f || ndc.y > 1.2f) return false;
+
+		outScreenPos.x = (ndc.x + 1.0f) * 0.5f * screen.x;
+		outScreenPos.y = (ndc.y + 1.0f) * 0.5f * screen.y;
+
+		return true;
 	}
 
 	//==Event Handlers==//
