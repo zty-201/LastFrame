@@ -41,13 +41,11 @@ function on_create(self)
         print("[player_pov_camera ERROR] Camera missing")
     end
 
-    -- Initialize yaw/pitch to zero (or from some initial setting)
-    -- DO NOT read from transform rotation to avoid circular dependencies
     pitch = 0.0
-    yaw = 0.0
+    yaw   = 0.0
 
     -- Setup SHARED.POV
-    local SHARED = getGlobalShared()
+    local SHARED = rawget(_G, "SHARED")
     if not SHARED then
         print("[player_pov_camera ERROR] Missing SHARED global!")
         return
@@ -58,11 +56,14 @@ function on_create(self)
         print("[player_pov_camera] Created SHARED.POV")
     end
 
-    SHARED.POV.yaw = yaw
+    SHARED.POV.yaw   = yaw
     SHARED.POV.pitch = pitch
+    SHARED.POV.cam   = camera   -- <<<<<< THE FIX
 
-    print("[player_pov_camera] Initialized yaw=", yaw, " pitch=", pitch)
+    print("[player_pov_camera] Initialized. yaw=", yaw, " pitch=", pitch)
 end
+
+
 
 -- ============================================================
 -- Apply rotation + smoothing
@@ -72,12 +73,10 @@ local function applyLook()
     if pitch > pitchLimit then pitch = pitchLimit end
     if pitch < -pitchLimit then pitch = -pitchLimit end
 
-    -- CRITICAL: DO NOT touch transform rotation!
-    -- Only update camera position and look-at direction
-
+    -- Player position
     local x, y, z = transform:GetPosition()
 
-    -- Compute forward vector from yaw/pitch
+    -- Compute forward vector
     local radYaw   = math.rad(yaw)
     local radPitch = math.rad(pitch)
     local cosPitch = math.cos(radPitch)
@@ -92,26 +91,19 @@ local function applyLook()
     local smooth = 1.0
 
     local cx, cy, cz = camera:GetPosition()
-
-    -- new smoothed camera position
     local nx = cx + (x - cx) * smooth
     local ny = cy + (y - cy) * smooth
     local nz = cz + (z - cz) * smooth
 
     camera:SetPosition(nx, ny, nz)
+    camera:LookAt(nx + fx, ny + fy, nz + fz)
 
-    -- NO smoothing on look direction - instant response to mouse/gyro input
-    local tx = nx + fx
-    local ty = ny + fy
-    local tz = nz + fz
-
-    camera:LookAt(tx, ty, tz)
-
-    -- Update global yaw/pitch for movement script
-    local SHARED = getGlobalShared()
+    -- <<<<<< UPDATE SHARED.POV EVERY FRAME
+    local SHARED = rawget(_G, "SHARED")
     if SHARED and SHARED.POV then
-        SHARED.POV.yaw = yaw
+        SHARED.POV.yaw   = yaw
         SHARED.POV.pitch = pitch
+        SHARED.POV.cam   = camera   -- <<<<<< REQUIRED for raycast
     end
 end
 
