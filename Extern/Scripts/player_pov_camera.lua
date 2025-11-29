@@ -4,7 +4,7 @@
 -- MUST BE LOADED FIRST (before player_movement.lua)
 -- ============================================================
 
-local mouseSensitivity = 0.2
+local mouseSensitivity = 0.08
 local gyroSensitivity  = 5.0
 local pitchLimit       = 89.0
 local gyroEnabled      = true
@@ -12,6 +12,15 @@ local gyroEnabled      = true
 local camera      = nil
 local transform   = nil
 local yaw, pitch  = 0.0, 0.0
+
+-- Recenter smoothing
+local recenterActive        = false
+local recenterTime          = 0.0
+local recenterDuration      = 0.25   -- seconds for smooth return
+local recenterStartYaw      = 0.0
+local recenterStartPitch    = 0.0
+local recenterTargetYaw     = 0.0    -- where "centre" faces
+local recenterTargetPitch   = 0.0
 
 -- ============================================================
 -- Access true global table
@@ -76,8 +85,11 @@ local function applyLook()
     local fy = math.sin(radPitch)
     local fz = cosPitch * math.cos(radYaw)
 
-    -- Smoothing
-    local smooth = 0.15
+    -- -------------------------------
+    -- Smoothed camera follow
+    -- -------------------------------
+    local smooth = 1.0
+
     local cx, cy, cz = camera:GetPosition()
     local nx = cx + (x - cx) * smooth
     local ny = cy + (y - cy) * smooth
@@ -95,24 +107,57 @@ local function applyLook()
     end
 end
 
-
--- ============================================================
 function on_update(self, dt)
     if not camera or not transform then return end
 
+    local SHARED = getGlobalShared()
+
     -- ======================================
-    -- WINDOWS LOOK CONTROL (ALWAYS APPLIES)
+    -- HANDLE RECENTER REQUEST FROM UI
+    -- ======================================
+    if SHARED and SHARED.UI and SHARED.UI.recenterRequested then
+        -- Start a smooth recenter animation from current yaw/pitch
+        recenterActive      = true
+        recenterTime        = 0.0
+        recenterStartYaw    = yaw
+        recenterStartPitch  = pitch
+        recenterTargetYaw   = 0.0   -- change these if your "centre" is different
+        recenterTargetPitch = 0.0
+
+        SHARED.UI.recenterRequested = false
+    end
+
+    -- ======================================
+    -- WINDOWS LOOK CONTROL
     -- ======================================
     if PLATFORM == "windows" then
-        local dx, dy = Input.GetMouseDelta()
 
-        -- Update yaw/pitch ONLY if mouse moved
+        if recenterActive then
+            -- Progress smoothing
+            recenterTime = recenterTime + dt
+            local t = recenterTime / recenterDuration
+            if t >= 1.0 then
+                t = 1.0
+                recenterActive = false
+            end
+
+            -- Smoothstep (nicer than linear)
+            local s = t * t * (3.0 - 2.0 * t)
+
+            yaw   = recenterStartYaw   + (recenterTargetYaw   - recenterStartYaw)   * s
+            pitch = recenterStartPitch + (recenterTargetPitch - recenterStartPitch) * s
+
+            applyLook()
+            return
+        end
+
+        -- Normal mouse look when not recentering
+        local dx, dy = Input.GetMouseDelta()
         if dx ~= 0 or dy ~= 0 then
             yaw   = yaw + dx * mouseSensitivity
             pitch = pitch - dy * mouseSensitivity
         end
 
-        -- ALWAYS update camera orientation + SHARED.POV
         applyLook()
         return
     end
@@ -121,6 +166,24 @@ function on_update(self, dt)
     -- ANDROID GYRO LOOK
     -- ======================================
     if PLATFORM == "android" and gyroEnabled then
+
+        if recenterActive then
+            recenterTime = recenterTime + dt
+            local t = recenterTime / recenterDuration
+            if t >= 1.0 then
+                t = 1.0
+                recenterActive = false
+            end
+
+            local s = t * t * (3.0 - 2.0 * t)
+
+            yaw   = recenterStartYaw   + (recenterTargetYaw   - recenterStartYaw)   * s
+            pitch = recenterStartPitch + (recenterTargetPitch - recenterStartPitch) * s
+
+            applyLook()
+            return
+        end
+
         local gx, gy, gz = Input.GetGyroscopeRotatioRate()
 
         yaw   = yaw   + math.deg(gx) * dt * gyroSensitivity

@@ -90,6 +90,38 @@
 			"type": 0
 		}
 	},
+	"10": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6719529442629517315
+				}
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"position": [
+				40.0,
+				40.0
+			],
+			"size": [
+				90.0,
+				90.0
+			],
+			"textureid": [
+				3601763066940784643,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
 	"1000": {
 		"CameraComponent": {
 			"camType": 1,
@@ -107,6 +139,147 @@
 				335.7760314941406,
 				-0.2768867015838623
 			]
+		}
+	},
+	"11": {
+		"LightComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"constant": 1.0,
+			"direction": [
+				0.0,
+				0.0,
+				1.0
+			],
+			"innerConeAngle": 15.0,
+			"intensity": 10000.0,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"position": [
+				-808.864990234375,
+				487.2690124511719,
+				-621.8790283203125
+			],
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 2
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-808.8648681640625,
+				487.2690734863281,
+				-621.87890625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				10.0,
+				10.0,
+				10.0
+			]
+		}
+	},
+	"12": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 17128755557071454211
+				}
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"position": [
+				1469.0,
+				155.39999389648438
+			],
+			"size": [
+				150.0,
+				150.0
+			],
+			"textureid": [
+				8518163340552814593,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
+	"13": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 5023079758699560965
+				}
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"position": [
+				2098.360107421875,
+				191.8000030517578
+			],
+			"size": [
+				250.0,
+				250.0
+			],
+			"textureid": [
+				3330016569822003203,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
+	"14": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 5599540511002984449
+				}
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"position": [
+				2449.800048828125,
+				141.8000030517578
+			],
+			"size": [
+				350.0,
+				350.0
+			],
+			"textureid": [
+				12149384054227566593,
+				3711223656383638553
+			],
+			"visible": true
 		}
 	},
 	"2": {
@@ -223,6 +396,31 @@
 		"archtype": 11270566386067177473
 	},
 	"5": {
+		"LightComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"constant": 1.0,
+			"direction": [
+				0.0,
+				0.0,
+				1.0
+			],
+			"innerConeAngle": 15.0,
+			"intensity": 10000.0,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"position": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 2
+		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -241,6 +439,9 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 10481855918384840705
+				},				{
+					"Loaded": true,
+					"ScriptGuid": 15968805962367582209
 				}
 			]
 		},
@@ -290,9 +491,9 @@
 				0.0
 			],
 			"scale": [
-				10.0,
-				10.0,
-				10.0
+				0.0,
+				0.0,
+				0.0
 			]
 		}
 	},
@@ -334,7 +535,7 @@
 			"direction": [
 				0.0,
 				0.0,
-				-1.0
+				1.0
 			],
 			"innerConeAngle": 15.0,
 			"intensity": 10000.0,
@@ -445,6 +646,15 @@
 		"archtype": 4071738312750153729
 	},
 	"9": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 13060597717967175685
+				}
+			]
+		},
 		"UIComponent": {
 			"color": [
 				1.0,
@@ -453,8 +663,8 @@
 			],
 			"layer": 0,
 			"position": [
-				20.0,
-				20.0
+				10.0,
+				10.0
 			],
 			"size": [
 				150.0,
