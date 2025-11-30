@@ -44,7 +44,7 @@ function on_create(self)
 
     if physics then
         print("[player_movement] PhysicsComponent OK")
-        physics.lockRotation = true
+        physics:SetLockRotation(true)
     else
         print("[player_movement WARNING] No PhysicsComponent on this entity")
     end
