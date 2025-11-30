@@ -801,50 +801,143 @@ namespace EditorFeatures {
 			using EF_AM = EngineFramework::AssetManagerSystem;
 			using EF_AUD = EngineFramework::AudioSystem;
 
-			// comp.audio_guid is already full guid
-			xresource::full_guid full = comp.audio_guid;
-
-			// Load audio
+			//---------------------
+			// Audio asset picker
+			//---------------------
 			std::shared_ptr<SoundAsset> sound = nullptr;
-			if (!full.empty())
-				sound = EF_AM::GetResource<SoundAsset>(full);
-
-			//---------------------
-			// Volume (clamped)
-			//---------------------
-			comp.volume = std::clamp(comp.volume, 0.0f, 1.0f);
-
-			if (ImGui::SliderFloat("Volume", &comp.volume, 0.0f, 1.0f))
 			{
-				// If audio is playing, update volume in real time here if your AudioSystem supports it
+				// Build descriptor for AUDIO assets
+				const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
+				const bool has_sources = !descriptor.sources.empty();
+
+				// Start from the current guid
+				xresource::full_guid full = comp.audio_guid;
+
+				if (has_sources)
+				{
+					// Show combo + drag/drop picker
+					if (draw_asset_guid_picker("Audio",
+						full,
+						AssetPickerKind::Audio,
+						descriptor.none_label,
+						descriptor.sources,
+						descriptor.formatter))
+					{
+						// User picked a different audio asset
+						comp.audio_guid = full;
+					}
+				}
+				else
+				{
+					ImGui::TextDisabled("Audio: (no audio assets available)");
+				}
+
+				// Load the chosen sound (if any) for preview buttons
+				if (!comp.audio_guid.empty())
+				{
+					sound = EF_AM::GetResource<SoundAsset>(comp.audio_guid);
+				}
 			}
 
 			//---------------------
-			// Buttons
+			// Basic playback flags
+			//---------------------
+			ImGui::Checkbox("Loop", &comp.loop);
+			ImGui::SameLine();
+			ImGui::Checkbox("Play On Start", &comp.playOnStart);
+
+			//---------------------
+			// 2D / 3D controls
+			//---------------------
+			ImGui::Checkbox("3D Audio", &comp.is3D);
+
+			if (comp.is3D)
+			{
+				// Ensure sane values
+				if (comp.minDistance < 0.0f) comp.minDistance = 0.0f;
+				if (comp.maxDistance < comp.minDistance)
+					comp.maxDistance = comp.minDistance + 0.1f;
+
+				ImGui::DragFloat("Min Distance", &comp.minDistance, 0.1f, 0.0f, 1000.0f);
+				ImGui::DragFloat("Max Distance", &comp.maxDistance, 0.1f, 0.0f, 1000.0f);
+			}
+
+			//---------------------
+			// Volume
+			//---------------------
+			comp.volume = std::clamp(comp.volume, 0.0f, 1.0f);
+			ImGui::SliderFloat("Volume", &comp.volume, 0.0f, 1.0f);
+
+			//---------------------
+			// Preview buttons
 			//---------------------
 			if (ImGui::Button("Play"))
 			{
 				if (sound)
 				{
-					EF_AUD::GetInstance().Play(sound, comp.volume, comp.loop,
+					EF_AUD::GetInstance().Play(
+						sound,
+						comp.volume,
+						comp.loop,
 						EngineFramework::AudioGroup::Music);
 				}
 			}
-
 			ImGui::SameLine();
 			if (ImGui::Button("Stop"))
-			{
 				EF_AUD::GetInstance().StopAll();
-			}
 
 			ImGui::SameLine();
 			if (ImGui::Button("Pause"))
-			{
 				EF_AUD::GetInstance().PauseAll(true);
+
+			//---------------------
+			// ECS-based 3D test button
+			//---------------------
+			if (ImGui::Button("Play 3D (ECS)"))
+			{
+				// Mark this component to be played by AudioSystem::Update
+				comp.playRequested = true;
 			}
 
 			ImGui::Separator();
-			return false;
+			return false; // keep using custom UI
+
+			////---------------------
+			//// Volume (clamped)
+			////---------------------
+			//comp.volume = std::clamp(comp.volume, 0.0f, 1.0f);
+
+			//if (ImGui::SliderFloat("Volume", &comp.volume, 0.0f, 1.0f))
+			//{
+			//	// If audio is playing, update volume in real time here if your AudioSystem supports it
+			//}
+
+			////---------------------
+			//// Buttons
+			////---------------------
+			//if (ImGui::Button("Play"))
+			//{
+			//	if (sound)
+			//	{
+			//		EF_AUD::GetInstance().Play(sound, comp.volume, comp.loop,
+			//			EngineFramework::AudioGroup::Music);
+			//	}
+			//}
+
+			//ImGui::SameLine();
+			//if (ImGui::Button("Stop"))
+			//{
+			//	EF_AUD::GetInstance().StopAll();
+			//}
+
+			//ImGui::SameLine();
+			//if (ImGui::Button("Pause"))
+			//{
+			//	EF_AUD::GetInstance().PauseAll(true);
+			//}
+
+			//ImGui::Separator();
+			//return false;
 		}
 		
 		// Each entry is pair<entt::id_type, entt::meta_data> - for self reference
