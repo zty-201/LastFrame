@@ -17,5 +17,7 @@ struct PhysicsComponent
     bool _prevUseGravity = false;
 
     bool editorOverride = false;
+    
+    bool  lockRotation{false};
 };
 #endif // PHYSICS_COMPONENT

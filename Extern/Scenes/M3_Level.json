@@ -15,9 +15,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						1.0,
-						1.0,
-						1.0
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -43,7 +43,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -207,9 +207,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						1.0,
-						1.0,
-						1.0
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -235,7 +235,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -417,9 +417,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -445,7 +445,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -531,9 +531,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -559,7 +559,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -645,9 +645,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -673,7 +673,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -759,9 +759,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -787,7 +787,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -873,9 +873,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						30.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -901,7 +901,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -1023,9 +1023,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						1.0,
-						1.0,
-						1.0
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -1051,7 +1051,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -1137,9 +1137,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -1165,7 +1165,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -1279,7 +1279,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -1333,7 +1333,7 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-300.0,
+				0.0,
 				180.0,
 				0.0
 			],
@@ -1393,7 +1393,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -1447,7 +1447,7 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-300.0,
+				0.0,
 				180.0,
 				200.0
 			],
@@ -1507,7 +1507,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -1561,7 +1561,7 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-300.0,
+				0.0,
 				180.0,
 				400.0
 			],
@@ -1621,7 +1621,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				9133045429292728339,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -1735,7 +1735,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -1821,9 +1821,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						30.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -1849,7 +1849,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -1935,9 +1935,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						10.0,
+						40.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -1963,7 +1963,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -2049,9 +2049,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						80.0,
+						40.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -2077,7 +2077,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				6827202420079034377,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -2163,9 +2163,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						1.0,
-						1.0,
-						1.0
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -2191,7 +2191,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -2276,9 +2276,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -2304,7 +2304,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -2390,9 +2390,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -2418,7 +2418,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -2504,9 +2504,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -2532,7 +2532,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -2618,9 +2618,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -2646,7 +2646,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -2732,9 +2732,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -2760,7 +2760,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -2846,9 +2846,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -2874,7 +2874,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -2960,9 +2960,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -2988,7 +2988,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				11438888438506422279,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -3074,9 +3074,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -3102,7 +3102,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -3188,9 +3188,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -3216,7 +3216,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -3302,9 +3302,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -3330,7 +3330,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				11438888438506422279,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -3470,9 +3470,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -3498,7 +3498,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				11438888438506422279,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -3584,9 +3584,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -3612,7 +3612,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				11438888438506422279,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -3698,9 +3698,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						30.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -3726,7 +3726,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -3812,9 +3812,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						30.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -3840,7 +3840,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -3926,9 +3926,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						15.0,
+						40.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -3954,7 +3954,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -4068,7 +4068,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -4154,9 +4154,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						80.0,
+						40.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -4182,7 +4182,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				6827202420079034377,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -4268,9 +4268,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -4296,7 +4296,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -4382,9 +4382,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -4410,7 +4410,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -4496,9 +4496,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -4524,7 +4524,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -4610,9 +4610,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						2.545584201812744,
-						2.545584201812744,
-						2.545584201812744
+						15.0,
+						80.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -4703,9 +4703,6 @@
 				0
 			]
 		},
-		"MeshComponent": {
-			"meshName": "Sphere"
-		},
 		"PhysicsComponent": {
 			"_prevUseGravity": true,
 			"acceleration": [
@@ -4714,13 +4711,13 @@
 				0.0
 			],
 			"editorOverride": false,
-			"gravityFactor": 0.0,
+			"gravityFactor": 3.0,
 			"mass": 1.0,
 			"useGravity": true,
 			"velocity": [
-				0.0,
-				0.0,
-				0.0
+				-0.015517055056989193,
+				0.01635628193616867,
+				-0.0949077233672142
 			]
 		},
 		"PhysicsMaterialComponent": {
@@ -4734,19 +4731,19 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-15.70842456817627,
-				45.512516021728516,
-				67.2619400024414
+				-0.02042142115533352,
+				89.47721099853516,
+				-0.08557860553264618
 			],
 			"rotation": [
-				21.49474334716797,
-				-2.350144624710083,
-				171.36550903320313
+				-0.007466697599738836,
+				-0.0018035243265330791,
+				0.004888592753559351
 			],
 			"scale": [
-				1.0000125169754028,
-				1.0000115633010864,
-				0.9999986886978149
+				1.0,
+				0.9999989867210388,
+				0.9999994039535522
 			]
 		}
 	},
@@ -4766,9 +4763,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -4794,7 +4791,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -4880,9 +4877,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -4908,7 +4905,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -4994,9 +4991,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -5022,7 +5019,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -5108,9 +5105,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -5136,7 +5133,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -5222,9 +5219,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						10.0,
+						100.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -5250,7 +5247,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -5336,9 +5333,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						25.0,
+						25.0,
+						25.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -5364,7 +5361,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -5450,9 +5447,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						25.0,
+						25.0,
+						25.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -5478,7 +5475,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -5564,9 +5561,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						25.0,
+						25.0,
+						25.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -5592,7 +5589,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -5678,9 +5675,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						25.0,
+						25.0,
+						25.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -5706,7 +5703,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -5792,9 +5789,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						25.0,
+						25.0,
+						25.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -5820,7 +5817,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -5906,9 +5903,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						25.0,
+						25.0,
+						25.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -5934,7 +5931,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -6020,9 +6017,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						25.0,
+						25.0,
+						25.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -6048,7 +6045,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -6162,7 +6159,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				2791977153955069953,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -6276,7 +6273,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080645,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -6347,50 +6344,6 @@
 		}
 	},
 	"63": {
-		"LightComponent": {
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"constant": 1.0,
-			"direction": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"innerConeAngle": 12.5,
-			"intensity": 10000.0,
-			"linear": 0.09000000357627869,
-			"outerConeAngle": 17.5,
-			"position": [
-				226.11000061035156,
-				112.01300048828125,
-				0.0
-			],
-			"quadratic": 0.03200000151991844,
-			"radius": 10000.0,
-			"type": 1
-		},
-		"TransformComponent": {
-			"position": [
-				226.1097869873047,
-				112.01327514648438,
-				0.0
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
-		}
-	},
-	"64": {
 		"ColliderComponent": {
 			"maxBounds": [
 				0.5,
@@ -6434,7 +6387,121 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17779956713844080661,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Ceiling",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				200.0,
+				180.0,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				10.0,
+				100.0
+			]
+		}
+	},
+	"64": {
+		"ColliderComponent": {
+			"maxBounds": [
+				15.0,
+				15.0,
+				15.0
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						15.0,
+						15.0,
+						15.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -6507,9 +6574,9 @@
 	"65": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -6520,9 +6587,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						15.0,
+						15.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -6548,7 +6615,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -6621,9 +6688,9 @@
 	"66": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -6634,9 +6701,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						15.0,
+						15.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -6662,7 +6729,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -6735,9 +6802,9 @@
 	"67": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -6748,9 +6815,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						15.0,
+						15.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -6776,7 +6843,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -6849,9 +6916,9 @@
 	"68": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -6862,9 +6929,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						15.0,
+						15.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -6890,7 +6957,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -6963,9 +7030,9 @@
 	"69": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -6976,9 +7043,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						15.0,
+						15.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -7004,7 +7071,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -7090,9 +7157,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						100.0,
+						10.0,
+						100.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -7118,7 +7185,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				17203495961540657167,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -7191,9 +7258,9 @@
 	"70": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -7204,9 +7271,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						15.0,
+						15.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -7232,7 +7299,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -7305,9 +7372,9 @@
 	"71": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -7318,9 +7385,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						15.0,
+						15.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -7346,7 +7413,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -7419,9 +7486,9 @@
 	"72": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -7432,9 +7499,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						15.0,
+						15.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -7460,7 +7527,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -7533,9 +7600,9 @@
 	"73": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -7546,9 +7613,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						15.0,
+						15.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -7574,7 +7641,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -7647,9 +7714,9 @@
 	"74": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -7660,9 +7727,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						15.0,
+						15.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -7688,7 +7755,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -7761,9 +7828,9 @@
 	"75": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -7774,9 +7841,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						15.0,
+						15.0,
+						15.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -7802,7 +7869,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -7875,9 +7942,9 @@
 	"76": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				15.0,
+				15.0,
+				15.0
 			],
 			"minBounds": [
 				-0.5,
@@ -7888,9 +7955,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -7916,7 +7983,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -7989,9 +8056,9 @@
 	"77": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				10.0,
+				10.0,
+				10.0
 			],
 			"minBounds": [
 				-0.5,
@@ -8002,9 +8069,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -8030,7 +8097,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -8103,9 +8170,9 @@
 	"78": {
 		"ColliderComponent": {
 			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
+				10.0,
+				10.0,
+				10.0
 			],
 			"minBounds": [
 				-0.5,
@@ -8116,9 +8183,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -8144,7 +8211,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -8230,9 +8297,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -8258,7 +8325,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -8392,7 +8459,7 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-0.4100799560546875,
+				-72.37308502197266,
 				19.17709732055664,
 				0.0
 			],
@@ -8425,9 +8492,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -8453,7 +8520,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -8539,9 +8606,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -8567,7 +8634,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -8653,9 +8720,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -8681,7 +8748,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -8767,9 +8834,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -8795,7 +8862,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -8881,9 +8948,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -8909,7 +8976,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -8995,9 +9062,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -9023,7 +9090,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -9109,9 +9176,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -9137,7 +9204,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -9223,9 +9290,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						5.0,
+						5.0,
+						5.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -9251,7 +9318,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				10862427686202998801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -9365,7 +9432,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				9133045429292728339,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -9479,7 +9546,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				9133045429292728339,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -9597,9 +9664,9 @@
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
+						25.0,
+						25.0,
+						25.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
@@ -9625,7 +9692,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9499833676812566535,
+				12015349190809845763,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -9692,6 +9759,918 @@
 				24.999971389770508,
 				24.999773025512695,
 				24.99997901916504
+			]
+		}
+	},
+	"91": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17779956713844080661,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Ceiling",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				200.0,
+				180.0,
+				200.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				10.0,
+				100.0
+			]
+		}
+	},
+	"92": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17779956713844080661,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Ceiling",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				200.0,
+				180.0,
+				400.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				10.0,
+				100.0
+			]
+		}
+	},
+	"93": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17779956713844080661,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Ceiling",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				400.0,
+				180.0,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				10.0,
+				100.0
+			]
+		}
+	},
+	"94": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17779956713844080661,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Ceiling",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				400.0,
+				180.0,
+				200.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				10.0,
+				100.0
+			]
+		}
+	},
+	"95": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17779956713844080661,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Ceiling",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				400.0,
+				180.0,
+				400.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				10.0,
+				100.0
+			]
+		}
+	},
+	"96": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17779956713844080661,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Ceiling",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				600.0,
+				180.0,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				10.0,
+				100.0
+			]
+		}
+	},
+	"97": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17779956713844080661,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Ceiling",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				600.0,
+				180.0,
+				200.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				10.0,
+				100.0
+			]
+		}
+	},
+	"98": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17779956713844080661,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Ceiling",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				600.0,
+				180.0,
+				400.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				10.0,
+				100.0
 			]
 		}
 	}
