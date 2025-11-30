@@ -23,6 +23,14 @@ namespace EngineFramework
 		bool hasS = false;
 	};
 
+	struct SceneDeleter {
+		void operator()(ofbx::IScene* s) const {
+			if (s) {
+				LOGI("Destroying FBX Scene");
+				s->destroy();
+			}  // Call the correct OpenFBX function
+		}
+	};
 
 	// Convert FBX vec3 to glm vec3
 	inline glm::vec3 vec3Converter(const ofbx::Vec3& v) {

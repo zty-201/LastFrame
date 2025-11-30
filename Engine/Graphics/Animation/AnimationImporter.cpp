@@ -191,7 +191,9 @@ namespace EngineFramework
 
 		// Obtain the scene
 		int byteCount = static_cast<int>(data.size());
-		ofbx::IScene* scene = ofbx::load(data.data(), byteCount, (ofbx::u16)animFlags);
+		std::unique_ptr<ofbx::IScene, SceneDeleter> scene(
+			ofbx::load(data.data(), byteCount, static_cast<ofbx::u16>(animFlags))
+		);
 
 		// Check if scene was properly parsed
 		if (!scene) {
@@ -219,7 +221,6 @@ namespace EngineFramework
 		if (boneObjs.empty()) {
 			bundle.skeleton = std::make_unique<Skeleton>();
 			bundle.animations = std::make_unique<AnimationPackage>();
-			scene->destroy();
 			return bundle;
 		}
 
@@ -526,8 +527,6 @@ namespace EngineFramework
 		// Done and return
 		bundle.skeleton = std::move(skeleton);
 		bundle.animations = std::move(package);
-
-		scene->destroy();
 		return bundle;
 	}
 }
