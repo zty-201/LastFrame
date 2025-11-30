@@ -8,6 +8,7 @@ struct UIComponent
     glm::vec2 size;          // Width, Height in Pixels
     glm::vec3 color = glm::vec3(1.0f); // Default White (No tint)
     bool visible = true;
+	float luminance = 1.0f; // Brightness multiplier
     int layer = 0;           // Optional: Render order (0=Back, 10=Front)
 };
 

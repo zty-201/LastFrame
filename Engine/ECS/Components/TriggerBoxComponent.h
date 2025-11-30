@@ -44,6 +44,7 @@ struct TriggerBoxComponent
 
     // runtime
     std::unordered_set<entt::entity> currentInside;
+    std::unordered_set<entt::entity> highlightedEntities;
 
     // --- runtime (filled by TriggerBuildSystem) ---
     static constexpr uint32_t InvalidId = 0xFFFFFFFFu;

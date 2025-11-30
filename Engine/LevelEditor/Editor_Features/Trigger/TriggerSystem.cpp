@@ -45,6 +45,12 @@ namespace EngineFramework
 
     void TriggerSystem::Update(entt::registry& reg)
     {
+        auto tview = reg.view<TriggerBoxComponent>();
+        for (auto ent : tview) {
+            auto& tbox = tview.get<TriggerBoxComponent>(ent);
+            tbox.highlightedEntities.clear();
+        }
+
         auto triggers = reg.view<TransformComponent, TriggerBoxComponent>();
 
         triggers.each(
@@ -84,10 +90,14 @@ namespace EngineFramework
                     {
                         insideNow.insert(otherEnt);
 
+                        box.highlightedEntities.insert(otherEnt);
+
                         if (box.currentInside.find(otherEnt) == box.currentInside.end())
                         {
                             event_dispatcher.trigger(Event_OnTriggerEnter{ triggerEnt, otherEnt });
                         }
+
+                        box.currentInside = std::move(insideNow);
 
                         if (otf.modelMatrix != otf.prevModelMatrix) {
                             event_dispatcher.trigger(Event_OnTriggerStay{ triggerEnt, otherEnt });
