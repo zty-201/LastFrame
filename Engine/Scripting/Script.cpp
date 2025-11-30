@@ -26,6 +26,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 //For UI access in scripts
 #include "UIComponent.h"
 
+//For UI access in scripts
+#include "PhysicsComponent.h"
+#include "PhysicsWorld.hpp"
+
 //For platform android vs windows
 #include "Platform.h"
 
@@ -123,6 +127,60 @@ namespace Engine {
         );
 
         LOGI("[ScriptSystem] TransformComponent bindings complete.");
+
+        // ===============================================================
+        // PhysicsComponent bindings
+        // ===============================================================
+        s_Lua.new_usertype<PhysicsComponent>("PhysicsComponent",
+            "GetVelocity", [](PhysicsComponent& phys) {
+                return std::make_tuple(
+                    phys.velocity.x,
+                    phys.velocity.y,
+                    phys.velocity.z
+                );
+            },
+            "SetVelocity", [](PhysicsComponent& phys, float x, float y, float z) {
+                phys.velocity = glm::vec3(x, y, z);
+            },
+            "GetUseGravity", [](PhysicsComponent& phys) {
+                return phys.useGravity;
+            },
+            "SetUseGravity", [](PhysicsComponent& phys, bool v) {
+                phys.useGravity = v;
+            },
+            "GetGravityFactor", [](PhysicsComponent& phys) {
+                return phys.gravityFactor;
+            },
+            "SetGravityFactor", [](PhysicsComponent& phys, float f) {
+                phys.gravityFactor = f;
+            }
+        );
+
+        // ===============================================================
+        // Direct physics helpers (operate on the actual Jolt body)
+        // ===============================================================
+        s_Lua.set_function("Physics_SetVelocity",
+            [](uint32_t entityId, float x, float y, float z)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!PhysicsWorld::Get().HasBody(e))
+                    return;
+
+                glm::vec3 v{ x, y, z };
+                PhysicsWorld::Get().SetLinearVelocity(e, v);
+                PhysicsWorld::Get().ActivateBody(e);
+            });
+
+        s_Lua.set_function("Physics_GetVelocity",
+            [](uint32_t entityId)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!PhysicsWorld::Get().HasBody(e))
+                    return std::make_tuple(0.0f, 0.0f, 0.0f);
+
+                glm::vec3 v = PhysicsWorld::Get().GetBodyVelocity(e);
+                return std::make_tuple(v.x, v.y, v.z);
+            });
 
         // ===============================================================
         // Light Component bindings
@@ -435,7 +493,7 @@ namespace Engine {
 #endif
     }
 
-    void ScriptSystem::OnRuntimeStop(entt::registry& reg) {
+    void ScriptSystem::OnRuntimeStop(entt::registry& reg) {;
         auto nativeView = reg.view<NativeScriptComponent>();
         for (auto [e, nsc] : nativeView.each()) {
             if (nsc.Instance) { nsc.Instance->OnDestroy(); DestroyNativeInstance(nsc); }
@@ -598,12 +656,19 @@ namespace Engine {
                 entityUI = &registry.get<UIComponent>(e);
             }
 
+            // Get PhysicsComponent
+            PhysicsComponent* entityPhysics = nullptr;
+            if (registry.all_of<PhysicsComponent>(e)) {
+                entityPhysics = &registry.get<PhysicsComponent>(e);
+            }
+
             // Create environment and inject variables
             inst.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
             inst.Env["EntityID"] = static_cast<uint32_t>(e);
             inst.Env["EntityTransform"] = entityTransform;
             inst.Env["EntityLight"] = entityLight;
             inst.Env["EntityUI"] = entityUI;
+            inst.Env["EntityPhysics"] = entityPhysics;
 
             LOGI("[LuaRuntime] Injected EntityID=%u and EntityTransform=%p into environment",
                 static_cast<unsigned>(e), (void*)entityTransform);
