@@ -102,8 +102,8 @@ namespace Mesh {
         MeshData() = default;
 
         // Constructor for loading a mesh from a file via Assimp.
-        explicit MeshData(const std::string& filePath) {
-            loadWithAssimp(filePath);
+        explicit MeshData(const std::string& filePath, EngineFramework::Skeleton* skeleton = nullptr) {
+            loadWithAssimp(filePath, skeleton);
         }
 
         const AABB& GetAABB() const { return m_aabb; }

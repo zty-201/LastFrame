@@ -464,9 +464,33 @@ namespace EngineFramework
 
 					TRSSample s = SampleTRS(obj, layer, t);
 					keyFrame tr;
-					tr.position = s.hasT ? s.T : glm::vec3(0);
-					tr.rotation = ConvertEuler(s.Rdeg, s.rotOrder); // or whatever you do now
-					tr.scale = s.hasS ? s.S : glm::vec3(1);
+					if (s.hasT) {
+						tr.position = s.T;
+					}
+					else {
+						// Fallback to the static bind pose position
+						ofbx::DVec3 v = obj->getLocalTranslation();
+						tr.position = glm::vec3(v.x, v.y, v.z);
+					}
+
+					if (s.hasR) {
+						tr.rotation = ConvertEuler(s.Rdeg, s.rotOrder);
+					}
+					else {
+						// Fallback to the static bind pose rotation
+						ofbx::DVec3 v = obj->getLocalRotation();
+						// Convert Euler to Quat (assuming same rotation order)
+						tr.rotation = ConvertEuler(glm::vec3(v.x, v.y, v.z), s.rotOrder);
+					}
+
+					if (s.hasS) {
+						tr.scale = s.S;
+					}
+					else {
+						// Fallback to the static bind pose scale
+						ofbx::DVec3 v = obj->getLocalScaling();
+						tr.scale = glm::vec3(v.x, v.y, v.z);
+					}
 
 					if (skeleton->bones[j].parentIndex == -1) {
 						// Apply the same -90 X rotation to the animation keyframe
