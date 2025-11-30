@@ -184,9 +184,6 @@ namespace EngineFramework
         box.halfExtents = half;
     }
 
-
-
-
     static inline bool ProjectToScreen(const glm::mat4& V, const glm::mat4& P, const glm::vec3& p,
         ImVec2 pos, ImVec2 size, ImVec2& out) {
         glm::vec4 clip = P * V * glm::vec4(p, 1.0f);
@@ -1483,8 +1480,13 @@ namespace EngineFramework
 
                 const glm::mat4 triggerM = model * TRS(centerLocal, qLocal, sizeLocal);
 
+                ImU32 color = trg.highlightedEntities.empty()
+                    ? IM_COL32(0, 255, 0, 255)      // green (normal)
+                    : IM_COL32(255, 255, 0, 255);   // yellow (highlight)
+
                 DrawWireOBB(triggerM, view, proj, screen_pos, available_size,
-                    IM_COL32(0, 255, 0, 255), 1.6f);
+                    color, 2.5f);
+
             });
     }
 

@@ -696,6 +696,7 @@ namespace EngineFramework
 			.data<&UIComponent::size>("size")
 			.data<&UIComponent::color>("color")
 			.data<&UIComponent::visible>("visible")
+			.data<&UIComponent::luminance>("luminance")
 			.data<&UIComponent::layer>("layer")
 			.func<&Emplacer<UIComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<UIComponent>::RemoveComponent>("remove")

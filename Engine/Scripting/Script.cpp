@@ -26,11 +26,14 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 //For UI access in scripts
 #include "UIComponent.h"
 
+//For UI access in scripts
+#include "PhysicsComponent.h"
+#include "PhysicsWorld.hpp"
+
 //For platform android vs windows
 #include "Platform.h"
 
 namespace Engine {
-    static std::vector<entt::entity> g_DestroyQueue;
 
 #if defined(ENGINE_ENABLE_LUA)
     namespace { sol::state s_Lua; }
@@ -125,17 +128,59 @@ namespace Engine {
 
         LOGI("[ScriptSystem] TransformComponent bindings complete.");
 
-        s_Lua.set_function("DestroyEntity", [](uint32_t id)
-            {
-                entt::entity e = (entt::entity)id;
+        // ===============================================================
+        // PhysicsComponent bindings
+        // ===============================================================
+        s_Lua.new_usertype<PhysicsComponent>("PhysicsComponent",
+            "GetVelocity", [](PhysicsComponent& phys) {
+                return std::make_tuple(
+                    phys.velocity.x,
+                    phys.velocity.y,
+                    phys.velocity.z
+                );
+            },
+            "SetVelocity", [](PhysicsComponent& phys, float x, float y, float z) {
+                phys.velocity = glm::vec3(x, y, z);
+            },
+            "GetUseGravity", [](PhysicsComponent& phys) {
+                return phys.useGravity;
+            },
+            "SetUseGravity", [](PhysicsComponent& phys, bool v) {
+                phys.useGravity = v;
+            },
+            "GetGravityFactor", [](PhysicsComponent& phys) {
+                return phys.gravityFactor;
+            },
+            "SetGravityFactor", [](PhysicsComponent& phys, float f) {
+                phys.gravityFactor = f;
+            },
+            "lockRotation", & PhysicsComponent::lockRotation
+        );
 
-                if (registry.valid(e)) {
-                    g_DestroyQueue.push_back(e);
-                    LOGI("[LuaRuntime] Queued DestroyEntity(%u)", id);
-                }
-                else {
-                    LOGE("[LuaRuntime] DestroyEntity(%u) FAILED: invalid entity", id);
-                }
+        // ===============================================================
+        // Direct physics helpers (operate on the actual Jolt body)
+        // ===============================================================
+        s_Lua.set_function("Physics_SetVelocity",
+            [](uint32_t entityId, float x, float y, float z)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!PhysicsWorld::Get().HasBody(e))
+                    return;
+
+                glm::vec3 v{ x, y, z };
+                PhysicsWorld::Get().SetLinearVelocity(e, v);
+                PhysicsWorld::Get().ActivateBody(e);
+            });
+
+        s_Lua.set_function("Physics_GetVelocity",
+            [](uint32_t entityId)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!PhysicsWorld::Get().HasBody(e))
+                    return std::make_tuple(0.0f, 0.0f, 0.0f);
+
+                glm::vec3 v = PhysicsWorld::Get().GetBodyVelocity(e);
+                return std::make_tuple(v.x, v.y, v.z);
             });
 
         // ===============================================================
@@ -343,18 +388,21 @@ namespace Engine {
         s_Lua["GLFW_KEY_A"] = 65;
         s_Lua["GLFW_KEY_S"] = 83;
         s_Lua["GLFW_KEY_D"] = 68;
+
         s_Lua["GLFW_KEY_F"] = 70;
         s_Lua["GLFW_KEY_Q"] = 81;
         s_Lua["GLFW_KEY_E"] = 69;
+        s_Lua["GLFW_KEY_C"] = 67;  // <-- add this line for calibrate
 
         s_Lua["GLFW_KEY_SPACE"] = 32;
         s_Lua["GLFW_KEY_SHIFT"] = 340;
 
         // Mouse button constants
-        s_Lua["GLFW_MOUSE_BUTTON_LEFT"] = 0;
-        s_Lua["GLFW_MOUSE_BUTTON_RIGHT"] = 1;
+        s_Lua["GLFW_MOUSE_BUTTON_LEFT"]   = 0;
+        s_Lua["GLFW_MOUSE_BUTTON_RIGHT"]  = 1;
         s_Lua["GLFW_MOUSE_BUTTON_MIDDLE"] = 2;
-        
+
+
         LOGI("[ScriptSystem] Lua bindings initialized successfully.");
 
         //No longer needed to sanity check here (Debugging)
@@ -446,7 +494,7 @@ namespace Engine {
 #endif
     }
 
-    void ScriptSystem::OnRuntimeStop(entt::registry& reg) {
+    void ScriptSystem::OnRuntimeStop(entt::registry& reg) {;
         auto nativeView = reg.view<NativeScriptComponent>();
         for (auto [e, nsc] : nativeView.each()) {
             if (nsc.Instance) { nsc.Instance->OnDestroy(); DestroyNativeInstance(nsc); }
@@ -464,7 +512,6 @@ namespace Engine {
     // ------------------------------------------------------------------
     // Per-frame update
     // ------------------------------------------------------------------
-// ------------------------------------------------------------------
     void ScriptSystem::OnUpdate(entt::registry& reg, float dt) {
         {   // Native scripts
             auto view = reg.view<NativeScriptComponent>();
@@ -480,13 +527,25 @@ namespace Engine {
         {   // Lua scripts
             auto view = reg.view<LuaScriptComponent>();
             for (auto [e, comp] : view.each()) {
+                //LOGI("[ScriptSystem] OnUpdate running with registry %p", (void*)&reg);
+                //LOGI("[ScriptSystem] LuaScriptComponent.Enabled = %d for entity %u",
+                //     comp.Enabled, static_cast<unsigned>(e));
                 if (!comp.Enabled) continue;
                 for (auto& inst : comp.Scripts) {
                     if (!inst.Loaded)
                         LoadLuaFor(reg, e, inst);
 
-                    if (inst.Loaded && inst.FnOnUpdate.valid()) {
+                    //if (inst.FnOnUpdate.valid()) {
+                    //    LOGI("[LuaRuntime] FnOnUpdate is VALID for GUID %llu", inst.ScriptGuid.m_Value);
+                    //}
+                    //else {
+                    //    LOGE("[LuaRuntime] FnOnUpdate is NIL for GUID %llu", inst.ScriptGuid.m_Value);
+                    //}
+
+                    if (inst.Loaded && inst.FnOnUpdate.valid()) { //Calling on_update for scripts side
                         try {
+                            //LOGI("[LuaRuntime] on_update() for entity %u, script GUID %llu",
+                            //    static_cast<unsigned>(e), inst.ScriptGuid.m_Value);
                             inst.FnOnUpdate(inst.Self, dt);
                         }
                         catch (const sol::error& err) {
@@ -498,26 +557,7 @@ namespace Engine {
             }
         }
 #endif
-
-        // ------------------------------------------------------------
-        // DESTROY QUEUE — process deferred destruction safely here
-        // ------------------------------------------------------------
-        for (entt::entity e : g_DestroyQueue)
-        {
-            if (reg.valid(e))
-            {
-                // Disable script so it no longer receives on_update
-                if (reg.any_of<LuaScriptComponent>(e)) {
-                    reg.get<LuaScriptComponent>(e).Enabled = false;
-                }
-
-                reg.destroy(e);
-                LOGI("[LuaRuntime] Destroyed entity %u", (uint32_t)e);
-            }
-        }
-        g_DestroyQueue.clear();
     }
-
 
     // ------------------------------------------------------------------
     // Native helpers
@@ -617,12 +657,19 @@ namespace Engine {
                 entityUI = &registry.get<UIComponent>(e);
             }
 
+            // Get PhysicsComponent
+            PhysicsComponent* entityPhysics = nullptr;
+            if (registry.all_of<PhysicsComponent>(e)) {
+                entityPhysics = &registry.get<PhysicsComponent>(e);
+            }
+
             // Create environment and inject variables
             inst.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
             inst.Env["EntityID"] = static_cast<uint32_t>(e);
             inst.Env["EntityTransform"] = entityTransform;
             inst.Env["EntityLight"] = entityLight;
             inst.Env["EntityUI"] = entityUI;
+            inst.Env["EntityPhysics"] = entityPhysics;
 
             LOGI("[LuaRuntime] Injected EntityID=%u and EntityTransform=%p into environment",
                 static_cast<unsigned>(e), (void*)entityTransform);
