@@ -157,6 +157,7 @@
 				1.0
 			],
 			"layer": 0,
+			"luminance": 1.0,
 			"position": [
 				40.0,
 				40.0
@@ -322,6 +323,7 @@
 				1.0
 			],
 			"layer": 0,
+			"luminance": 1.0,
 			"position": [
 				1469.0,
 				155.39999389648438
@@ -354,6 +356,7 @@
 				1.0
 			],
 			"layer": 0,
+			"luminance": 1.0,
 			"position": [
 				2098.360107421875,
 				191.8000030517578
@@ -386,6 +389,7 @@
 				1.0
 			],
 			"layer": 0,
+			"luminance": 1.0,
 			"position": [
 				2449.800048828125,
 				141.8000030517578
@@ -1614,6 +1618,15 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 15547578672589373441
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -2067,6 +2080,15 @@
 					],
 					"sphereRadius": 0.5,
 					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 4900708513786691585
 				}
 			]
 		},
@@ -4715,9 +4737,9 @@
 			"mass": 1.0,
 			"useGravity": true,
 			"velocity": [
-				-0.01725226640701294,
-				-0.4736708998680115,
-				-0.09443099796772003
+				-0.01685495488345623,
+				-0.4776603877544403,
+				-0.06936801970005035
 			]
 		},
 		"PhysicsMaterialComponent": {
@@ -4731,14 +4753,14 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				229.5304718017578,
-				89.46932220458984,
-				211.64805603027344
+				140.0053253173828,
+				89.47108459472656,
+				250.4680938720703
 			],
 			"rotation": [
-				-0.008876482024788857,
-				-0.02497195638716221,
-				0.005785756278783083
+				-0.007076089270412922,
+				-0.7035990357398987,
+				0.004703295882791281
 			],
 			"scale": [
 				1.0,
@@ -6263,6 +6285,15 @@
 					],
 					"sphereRadius": 0.5,
 					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 18028006536409677825
 				}
 			]
 		},
@@ -9425,6 +9456,15 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 5234599409030299649
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -9539,6 +9579,15 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 2928756399816605701
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -9633,6 +9682,7 @@
 				1.0
 			],
 			"layer": 0,
+			"luminance": 1.0,
 			"position": [
 				10.0,
 				10.0
