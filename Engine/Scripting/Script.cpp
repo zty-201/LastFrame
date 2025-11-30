@@ -384,6 +384,17 @@ namespace Engine {
             });
 
         // ===============================================================
+        // Global helper: GetEntityUI(entity)
+        // ===============================================================
+        s_Lua.set_function("GetEntityUI", [](entt::entity e) -> UIComponent* {
+            if (registry.all_of<UIComponent>(e)) {
+                return &registry.get<UIComponent>(e);
+            }
+            return nullptr;
+            });
+
+
+        // ===============================================================
         // GLFW Key Constants (for WASD and other keys)
         // ===============================================================
         s_Lua["GLFW_KEY_W"] = 87;

@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
 -- metal_pick_interaction.lua (SAFE NO-DESTROY VERSION)
--- NEW: If player already has an allen_key,
---      consume allen_key and give lock_pick instead.
+-- NEW: UI 108 visibility when looking at item
+-- NEW: Crafting logic with allen_key → lock_pick
 ----------------------------------------------------------------
 
 local PLAYER_ENTITY_ID = 5
@@ -60,16 +60,16 @@ end
 local function SafeRemoveMetalPick()
     print("[MetalPick] Safely removing item WITHOUT DestroyEntity")
 
-    -- 1. Hide visually
+    -- Hide visually
     EntityTransform:SetScale(0, 0, 0)
 
-    -- 2. Move away (removes collisions)
+    -- Move far away
     local ix, iy, iz = EntityTransform:GetPosition()
     EntityTransform:SetPosition(ix, iy - 99999, iz)
 
-    -- 3. Disable script forever
-    on_update = nil
-    on_create = nil
+    -- Disable script
+    on_update  = nil
+    on_create  = nil
     on_destroy = nil
 
     print("[MetalPick] Script disabled, item removed safely.")
@@ -81,18 +81,36 @@ end
 function on_update(self, dt)
 
     local inRange, dist = IsPlayerInRange()
+    local facing        = IsFacing()
+
+    ------------------------------------------------------------
+    -- UI 108 visibility logic
+    ------------------------------------------------------------
+    local ui108 = GetEntityUI(108)
+    if ui108 then
+        if inRange and facing then
+            ui108:SetVisible(true)
+        else
+            ui108:SetVisible(false)
+        end
+    end
+
+    -- Prevent pickup if invalid
     if not inRange then return end
-    if not IsFacing() then return end
+    if not facing then return end
 
     SHARED.interactable     = EntityID
     SHARED.interactableType = "metal_pick"
     SHARED.interactableDist = dist
 
+    ------------------------------------------------------------
+    -- INTERACTION
+    ------------------------------------------------------------
     if Input.GetKeyDown(GLFW_KEY_E) then
         print("[MetalPick] INTERACTED!")
 
         --------------------------------------------------------
-        -- INVENTORY LOGIC (CRAFTING OPPOSITE)
+        -- INVENTORY LOGIC
         --------------------------------------------------------
         local invRef = SHARED and SHARED.player_inventory_ref
         if invRef and invRef.items then
@@ -103,21 +121,16 @@ function on_update(self, dt)
             local lockPick  = items["lock_pick"]
 
             ----------------------------------------------------
-            -- CASE 1: Player already has an Allen Key
-            --   → remove allen_key
-            --   → give lock_pick
-            --   → DO NOT add metal_pick
+            -- CASE 1: Convert allen_key → lock_pick
             ----------------------------------------------------
             if allenKey and allenKey.qty > 0 then
                 print("[MetalPick] Allen Key detected → Crafting Lock Pick")
 
-                -- Remove 1 allen_key
                 allenKey.qty = allenKey.qty - 1
                 if allenKey.qty <= 0 then
                     items["allen_key"] = nil
                 end
 
-                -- Add lock_pick
                 if lockPick then
                     lockPick.qty = lockPick.qty + 1
                 else
@@ -127,7 +140,7 @@ function on_update(self, dt)
                 print("[Inventory] allen_key → lock_pick SUCCESS")
 
             ----------------------------------------------------
-            -- CASE 2: No Allen Key → normal metal pick pickup
+            -- CASE 2: Pickup metal_pick normally
             ----------------------------------------------------
             else
                 print("[MetalPick] No Allen Key → adding Metal Pick")
@@ -146,6 +159,7 @@ function on_update(self, dt)
         --------------------------------------------------------
         -- SAFE REMOVE AFTER PICKUP
         --------------------------------------------------------
+        if ui108 then ui108:SetVisible(false) end
         SafeRemoveMetalPick()
 
         SHARED.interactable     = nil

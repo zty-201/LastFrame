@@ -186,8 +186,8 @@
 		"TransformComponent": {
 			"position": [
 				95.89035034179688,
-				81.26718139648438,
-				190.35357666015625
+				79.80804443359375,
+				182.2129669189453
 			],
 			"rotation": [
 				0.0,
@@ -370,6 +370,293 @@
 			]
 		}
 	},
+	"103": {
+		"TransformComponent": {
+			"position": [
+				77.59943389892578,
+				80.53903198242188,
+				221.564208984375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				100.0,
+				100.0
+			],
+			"size": [
+				1000.0,
+				1000.0
+			],
+			"textureid": [
+				5451880499761692701,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"104": {
+		"TransformComponent": {
+			"position": [
+				77.59943389892578,
+				80.53903198242188,
+				221.564208984375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				100.0,
+				100.0
+			],
+			"size": [
+				1000.0,
+				1000.0
+			],
+			"textureid": [
+				16044425988305469441,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"105": {
+		"TransformComponent": {
+			"position": [
+				-44.856544494628906,
+				71.8005142211914,
+				470.33489990234375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				100.0,
+				100.0
+			],
+			"size": [
+				1000.0,
+				1000.0
+			],
+			"textureid": [
+				15828174041223315483,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"106": {
+		"TransformComponent": {
+			"position": [
+				397.6858825683594,
+				69.19720458984375,
+				-79.3177261352539
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				100.0,
+				100.0
+			],
+			"size": [
+				1000.0,
+				1000.0
+			],
+			"textureid": [
+				15828174041223315483,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"107": {
+		"TransformComponent": {
+			"position": [
+				397.4397888183594,
+				68.6144027709961,
+				90.8726577758789
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				100.0,
+				100.0
+			],
+			"size": [
+				1000.0,
+				1000.0
+			],
+			"textureid": [
+				15828174041223315483,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"108": {
+		"TransformComponent": {
+			"position": [
+				117.4056167602539,
+				59.32914352416992,
+				458.6583251953125
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				100.0,
+				100.0
+			],
+			"size": [
+				1000.0,
+				1000.0
+			],
+			"textureid": [
+				15828174041223315483,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"109": {
+		"TransformComponent": {
+			"position": [
+				194.17697143554688,
+				81.3907241821289,
+				52.515113830566406
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				100.0,
+				100.0
+			],
+			"size": [
+				1000.0,
+				1000.0
+			],
+			"textureid": [
+				16044425988305469441,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
 	"11": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -481,6 +768,271 @@
 				5.0,
 				100.0,
 				100.0
+			]
+		}
+	},
+	"110": {
+		"TransformComponent": {
+			"position": [
+				194.17697143554688,
+				81.3907241821289,
+				52.515113830566406
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				100.0,
+				100.0
+			],
+			"size": [
+				1000.0,
+				1000.0
+			],
+			"textureid": [
+				5451880499761692701,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"111": {
+		"TransformComponent": {
+			"position": [
+				478.73797607421875,
+				82.03227233886719,
+				22.11328887939453
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				100.0,
+				100.0
+			],
+			"size": [
+				1000.0,
+				1000.0
+			],
+			"textureid": [
+				3146037490547998743,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"112": {
+		"TransformComponent": {
+			"position": [
+				478.73797607421875,
+				82.03227233886719,
+				22.11328887939453
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				100.0,
+				100.0
+			],
+			"size": [
+				1000.0,
+				1000.0
+			],
+			"textureid": [
+				5451880499761692697,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"113": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						10.0,
+						80.0,
+						40.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				6827202420079034377,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Room_Door",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "door"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				519.2939453125,
+				7.189104080200195,
+				-41.123836517333984
+			],
+			"rotation": [
+				0.00010427345841890201,
+				-64.1999740600586,
+				0.00010427326196804643
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
+	"114": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6296560516753670145
+				}
+			]
+		},
+		"TransformComponent": {
+			"position": [
+				490.85888671875,
+				79.80804443359375,
+				-2.676666498184204
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				10.0,
+				10.0,
+				10.0
 			]
 		}
 	},
@@ -4919,9 +5471,9 @@
 			"mass": 1.0,
 			"useGravity": true,
 			"velocity": [
-				-0.01948981173336506,
-				-0.4720761179924011,
-				-0.1032998338341713
+				-5.794266400016568e-08,
+				-0.49009132385253906,
+				1.787247754236887e-07
 			]
 		},
 		"PhysicsMaterialComponent": {
@@ -4935,14 +5487,14 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-0.8088881373405457,
-				89.46916198730469,
-				-3.843635320663452
+				440.0199279785156,
+				89.46821594238281,
+				19.980018615722656
 			],
 			"rotation": [
-				-0.01044516358524561,
-				-0.0826791301369667,
-				0.0064725810661911964
+				-1.9660559757994633e-07,
+				-6.567508535226807e-05,
+				-1.5768058801768348e-05
 			],
 			"scale": [
 				1.0,
@@ -8686,8 +9238,7 @@
 				1.0,
 				1.0
 			]
-		},
-		"archtype": 4071738312750153729
+		}
 	},
 	"80": {
 		"ColliderComponent": {
