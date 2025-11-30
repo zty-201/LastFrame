@@ -208,6 +208,8 @@ JPH::ShapeRefC CreateJoltShapeFromCollider(const ColliderComponent& collider, co
 
     JPH::StaticCompoundShapeSettings compoundSettings;
 
+    const float MIN_DIMENSION = 0.001f;
+
     glm::vec3 absScale = glm::abs(scale);
 
     for (const auto& shapeData : collider.shapes)
@@ -218,15 +220,19 @@ JPH::ShapeRefC CreateJoltShapeFromCollider(const ColliderComponent& collider, co
         {
             case ColliderShape::Box:
             {
-                const glm::vec3 halfExt = shapeData.boxHalfExtents;
-                glm::vec3 safeHalfExt = glm::max(halfExt, glm::vec3(0.01f));
-                singleShape = new JPH::BoxShape(JPH::Vec3(safeHalfExt.x, safeHalfExt.y, safeHalfExt.z));
+                glm::vec3 halfExt = shapeData.boxHalfExtents;
+                
+                halfExt.x = std::max(halfExt.x, MIN_DIMENSION);
+                halfExt.x = std::max(halfExt.y, MIN_DIMENSION);
+                halfExt.x = std::max(halfExt.z, MIN_DIMENSION);
+
+                singleShape = new JPH::BoxShape(JPH::Vec3(halfExt.x, halfExt.y, halfExt.z));
                 break;
             }
             case ColliderShape::Sphere:
             {
                 float maxScale = std::max({ absScale.x, absScale.y, absScale.z });
-                float finalRadius = std::max(shapeData.sphereRadius * maxScale, 0.01f);
+                float finalRadius = std::max(shapeData.sphereRadius * maxScale, MIN_DIMENSION);
 
                 singleShape = new JPH::SphereShape(finalRadius);
                 break;
@@ -237,11 +243,11 @@ JPH::ShapeRefC CreateJoltShapeFromCollider(const ColliderComponent& collider, co
                 float scaleXZ = std::max(absScale.x, absScale.z);
 
                 float finalHeight = shapeData.capsuleHeight * scaleY;
-                float finalRadius = std::max(shapeData.capsuleRadius * scaleXZ, 0.01f);
+                float finalRadius = std::max(shapeData.capsuleRadius * scaleXZ, MIN_DIMENSION);
 
                 // Recalculate cylinder half-height (Total Height - 2 * Radius) / 2
                 float halfCylinderHeight = 0.5f * (finalHeight - 2.0f * finalRadius);
-                if (halfCylinderHeight < 0.0f) halfCylinderHeight = 0.01f; // Ensure valid geometry
+                if (halfCylinderHeight < 0.0f) halfCylinderHeight = MIN_DIMENSION; // Ensure valid geometry
 
                 singleShape = new JPH::CapsuleShape(halfCylinderHeight, finalRadius);
                 break;
@@ -334,8 +340,9 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
         }
         else
         {
-            bodySettings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
+            bodySettings.mOverrideMassProperties = JPH::EOverrideMassProperties::MassAndInertiaProvided;
             bodySettings.mMassPropertiesOverride.mMass = 1.0f;
+            bodySettings.mMassPropertiesOverride.mInertia = JPH::Mat44::sIdentity();
         }
 
         bodySettings.mGravityFactor = gravityFactor;

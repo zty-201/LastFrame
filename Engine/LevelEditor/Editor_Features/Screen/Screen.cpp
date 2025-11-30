@@ -70,6 +70,7 @@ namespace EngineFramework
     bool Screen::gizmos_IS_dragged = false;
     bool Screen::is_adjusting_lights = false;
     bool Screen::is_adjusting_triggerbox = false;
+    bool Screen::s_DrawColliders = true;
     
     //
     std::string Screen::json_backup{};
@@ -343,6 +344,19 @@ namespace EngineFramework
                     if (ImGui::MenuItem("Undo")) {
                         //std::cout << "undo is clicked\n";
                         history->undo();
+                    }
+
+                    float menuBarWidth = ImGui::GetContentRegionAvail().x;
+                    float toggleWidth = 230.f;
+                    if (menuBarWidth > toggleWidth)
+                    {
+                        ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - toggleWidth);
+                    }
+                    
+                    bool debugPhysics = Screen::s_DrawColliders;
+                    if (ImGui::Checkbox("Debug Physics", &debugPhysics))
+                    {
+                        Screen::s_DrawColliders = debugPhysics;
                     }
                 }
                 ImGui::EndMenuBar();
@@ -1424,7 +1438,8 @@ namespace EngineFramework
 
     void EngineFramework::Screen::triggerbox()
     {
-        
+        if (!s_DrawColliders) return;
+
         if (is_adjusting_lights) return;
         if (is_simulator_running) return;
         
@@ -1492,6 +1507,8 @@ namespace EngineFramework
 
     void EngineFramework::Screen::colliderbox()
     {
+        if (!s_DrawColliders) return;
+
         if (is_adjusting_lights) return;
         if (is_simulator_running) return;
 
