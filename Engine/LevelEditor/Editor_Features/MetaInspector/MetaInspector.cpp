@@ -74,6 +74,42 @@ namespace EditorFeatures {
 		shape.offsetRotation = glm::vec3(0.0f); // Reset rotation
 	}
 
+	void RecalculateGlobalBounds(ColliderComponent& col)
+	{
+		// Start with inverted infinity
+		constexpr float maxFloat = std::numeric_limits<float>::max();
+		col.minBounds = glm::vec3(maxFloat);
+		col.maxBounds = glm::vec3(-maxFloat);
+
+		for (const auto& shape : col.shapes)
+		{
+			glm::vec3 extent(0.0f);
+
+			// Determine size based on shape type
+			if (static_cast<ColliderShape>(shape.type) == ColliderShape::Box) {
+				extent = shape.boxHalfExtents;
+			}
+			else if (static_cast<ColliderShape>(shape.type) == ColliderShape::Sphere) {
+				extent = glm::vec3(shape.sphereRadius);
+			}
+			else { // Capsule
+				float r = shape.capsuleRadius;
+				float h = shape.capsuleHeight * 0.5f;
+				extent = glm::vec3(r, h, r);
+			}
+
+			// Calculate LOCAL bounds for this shape
+			// Note: This ignores rotation for simplicity (AABB of OBB), 
+			// but ensures the box is large enough.
+			glm::vec3 shapeMin = shape.offsetPosition - extent;
+			glm::vec3 shapeMax = shape.offsetPosition + extent;
+
+			// Merge into global component bounds
+			col.minBounds = glm::min(col.minBounds, shapeMin);
+			col.maxBounds = glm::max(col.maxBounds, shapeMax);
+		}
+	}
+
 	// Add on to this map if want to hide any fields
 	static const std::unordered_map<std::string_view, std::unordered_set<std::string_view>> hidden_fields = {
 		{"CameraComponent", {"view_vector", "proj_matrix", "oldx", "oldy"}},
@@ -1338,8 +1374,14 @@ namespace EditorFeatures {
 						}
 					}
 
-					if (vector_modified) {
-						data.set(obj, field); // Writes the modified vector back to the component
+					if (vector_modified)
+					{
+						data.set(obj, field);
+						if (obj.type() == entt::resolve<ColliderComponent>())
+						{
+							auto& collider = obj.cast<ColliderComponent&>();
+							RecalculateGlobalBounds(collider);
+						}
 						any_change = true;
 					}
 

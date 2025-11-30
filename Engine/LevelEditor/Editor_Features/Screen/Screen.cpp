@@ -75,6 +75,7 @@ namespace EngineFramework
     bool Screen::is_adjusting_lights = false;
     bool Screen::is_adjusting_triggerbox = false;
     bool Screen::s_DrawColliders = true;
+    bool Screen::s_DrawAllColliders = false;
     
     //
     std::string Screen::json_backup{};
@@ -350,17 +351,29 @@ namespace EngineFramework
                         history->undo();
                     }
 
-                    float menuBarWidth = ImGui::GetContentRegionAvail().x;
-                    float toggleWidth = 230.f;
-                    if (menuBarWidth > toggleWidth)
+                    float requiredWidth = 250.f;
+                    if (s_DrawColliders)
                     {
-                        ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - toggleWidth);
+                        requiredWidth += 200.f;
                     }
-                    
-                    bool debugPhysics = Screen::s_DrawColliders;
-                    if (ImGui::Checkbox("Debug Physics", &debugPhysics))
+                    float menuBarWidth = ImGui::GetContentRegionAvail().x;
+                    if (menuBarWidth > requiredWidth)
+                    {
+                        ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - requiredWidth);
+                    }
+                    bool debugPhysics = s_DrawColliders;
+                    if (ImGui::Checkbox("Debug Collider", &debugPhysics))
                     {
                         Screen::s_DrawColliders = debugPhysics;
+                    }
+                    if (debugPhysics)
+                    {
+                        ImGui::SameLine();
+                        bool showAll = Screen::s_DrawAllColliders;
+                        if (ImGui::Checkbox("Show All", &showAll))
+                        {
+                            Screen::s_DrawAllColliders = showAll;
+                        }
                     }
                 }
                 ImGui::EndMenuBar();
@@ -1509,6 +1522,7 @@ namespace EngineFramework
             });
     }
 
+ 
     void EngineFramework::Screen::colliderbox()
     {
         if (!s_DrawColliders) return;
@@ -1533,13 +1547,27 @@ namespace EngineFramework
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
 
+        entt::entity selected = LevelEditor::GetInstance().variables.selected_objectID;
+
         auto v = registry.view<TransformComponent, ColliderComponent>();
-        v.each([&](const TransformComponent& tf,
+        v.each([&](entt::entity e, const TransformComponent& tf,
             const ColliderComponent& col)
             {
+                if (!s_DrawAllColliders && e != selected)
+                {
+                    return;
+                }
+
                 if (col.shapes.empty()) return;
 
                 const glm::mat4 model = tf.modelMatrix;
+
+                glm::vec3 aabbCenter = (col.minBounds + col.maxBounds) * 0.5f;
+                glm::vec3 aabbSize = col.maxBounds - col.minBounds;
+                glm::mat4 aabbLocalM = glm::translate(glm::mat4(1.0f), aabbCenter) * glm::scale(glm::mat4(1.0f), aabbSize);
+                glm::mat4 aabbWorldM = model * aabbLocalM;
+                DrawWireOBB(aabbWorldM, view, proj, screen_pos, available_size, IM_COL32(0, 255, 255, 255), 1.0f);
+
                 glm::vec3 entPos, entScale, entSkew;
                 glm::vec4 entPersp;
                 glm::quat entRot;
