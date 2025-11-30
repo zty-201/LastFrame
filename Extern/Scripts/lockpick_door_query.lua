@@ -75,19 +75,10 @@ local function PlayerHasKey()
 
     local inv = SHARED["player_inventory_ref"]
     if not inv then 
-        -- print("[DoorQuery] ERROR: player_inventory_ref is NIL")
         return false 
     end
 
     local item = inv.items[REQUIRED_ITEM_ID]
-
-    if DEBUG then
-        if item then
-            -- print("[DoorQuery] KEY FOUND qty =", item.qty)
-        else
-            -- print("[DoorQuery] NO KEY FOUND")
-        end
-    end
 
     return item and item.qty > 0
 end
@@ -111,16 +102,12 @@ function on_update(Self, dt)
 
     if not IsPlayerFacingDoor(px, py, pz, ix, iy, iz) then return end
 
-
-
     -- ICON & INTERACTION INDICATOR
     if PlayerHasKey() then
 
-        -- SHOW 103 (unlock)
         local ui103 = GetEntityUI(112)
         if ui103 then ui103:SetVisible(true) end
 
-        -- HIDE 104 (locked)
         local ui104 = GetEntityUI(111)
         if ui104 then ui104:SetVisible(false) end
 
@@ -128,11 +115,9 @@ function on_update(Self, dt)
 
     else
 
-        -- SHOW 104 (locked)
         local ui104 = GetEntityUI(111)
         if ui104 then ui104:SetVisible(true) end
 
-        -- HIDE 103 (unlock)
         local ui103 = GetEntityUI(112)
         if ui103 then ui103:SetVisible(false) end
 
@@ -140,17 +125,30 @@ function on_update(Self, dt)
         return
     end
 
-
     SHARED.interactable     = EntityID
     SHARED.interactableType = "door"
     SHARED.interactableDist = 0
-
 
     ----------------------------------------------------------------
     -- E PRESSED → USE KEY → OPEN DOOR
     ----------------------------------------------------------------
     if Input.GetKeyDown(GLFW_KEY_E) and PlayerHasKey() then
         print("[DoorQuery] E pressed → opening door")
+
+        --------------------------------------------------------
+        -- 🔊 AUDIO PLAY (ONLY ADDITION)
+        --------------------------------------------------------
+        if EntityAudio then
+            EntityAudio:SetLoop(false)
+            EntityAudio:RequestPlay()
+            print("[DoorQuery] Played door unlock sound via EntityAudio.")
+        end
+
+        if Play3D_ECS then
+            Play3D_ECS(EntityID)
+            print("[DoorQuery] Played door unlock sound via Play3D_ECS.")
+        end
+        --------------------------------------------------------
 
         --------------------------------------------------------
         -- (1) Consume the key
@@ -166,7 +164,6 @@ function on_update(Self, dt)
                 ui111:SetSize(0, 0)
             local ui112 = GetEntityUI(112)
                 ui112:SetSize(0, 0)
-
 
             if keyItem.qty <= 0 then
                 inv.items["lock_pick"] = nil

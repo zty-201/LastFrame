@@ -482,6 +482,13 @@ namespace EngineFramework
 			channel->setMode(FMOD_2D);
 		}
 
+		// Force loop mode update (runtime override)
+		if (comp.loop)
+			channel->setMode(FMOD_LOOP_NORMAL);
+		else
+			channel->setMode(FMOD_LOOP_OFF);
+
+
 		// Start playback
 		channel->setPaused(false);
 		return true;

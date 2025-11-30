@@ -122,6 +122,18 @@ function on_update(self, dt)
             if metalPick and metalPick.qty > 0 then
                 print("[AllenKey] Metal Pick detected → Crafting Lock Pick")
 
+                ----------------------------------------------------------------
+                -- AUDIO ADDED HERE (plays when crafting happens)
+                ----------------------------------------------------------------
+                if EntityAudio then
+                    EntityAudio:SetLoop(false)
+                    EntityAudio:RequestPlay()
+                    print("[AllenKey] Played crafting sound.")
+                else
+                    print("[AllenKey] WARNING: No AudioComponent on entity!")
+                end
+                ----------------------------------------------------------------
+
                 metalPick.qty = metalPick.qty - 1
                 if metalPick.qty <= 0 then
                     items["metal_pick"] = nil
@@ -138,6 +150,18 @@ function on_update(self, dt)
             -- CASE 2 — pickup Allen Key normally
             else
                 print("[AllenKey] No Metal Pick → adding normal Allen Key")
+
+                ----------------------------------------------------------------
+                -- AUDIO ADDED HERE (plays when allen key picked normally)
+                ----------------------------------------------------------------
+                if EntityAudio then
+                    EntityAudio:SetLoop(false)
+                    EntityAudio:RequestPlay()
+                    print("[AllenKey] Played pickup sound.")
+                else
+                    print("[AllenKey] WARNING: No AudioComponent on entity!")
+                end
+                ----------------------------------------------------------------
 
                 if allenKey then
                     allenKey.qty = allenKey.qty + 1

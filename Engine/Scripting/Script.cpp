@@ -30,6 +30,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "PhysicsComponent.h"
 #include "PhysicsWorld.hpp"
 
+#include "AudioComponent.h"
+
 //For platform android vs windows
 #include "Platform.h"
 
@@ -216,6 +218,28 @@ namespace Engine {
         LOGI("[ScriptSystem] LightComponent bindings complete.");
 
         // ===============================================================
+        // AudioComponent bindings
+        // ===============================================================
+        s_Lua.new_usertype<AudioComponent>("AudioComponent",
+            "GetVolume", [](AudioComponent& a) { return a.volume; },
+            "SetVolume", [](AudioComponent& a, float v) { a.volume = v; },
+
+            "GetLoop", [](AudioComponent& a) { return a.loop; },
+            "SetLoop", [](AudioComponent& a, bool v) { a.loop = v; },
+
+            "GetPlayOnStart", [](AudioComponent& a) { return a.playOnStart; },
+            "SetPlayOnStart", [](AudioComponent& a, bool v) { a.playOnStart = v; },
+
+            "GetIs3D", [](AudioComponent& a) { return a.is3D; },
+            "SetIs3D", [](AudioComponent& a, bool v) { a.is3D = v; },
+
+            "SetMinDistance", [](AudioComponent& a, float d) { a.minDistance = d; },
+            "SetMaxDistance", [](AudioComponent& a, float d) { a.maxDistance = d; },
+
+            "RequestPlay", [](AudioComponent& a) { a.playRequested = true; }
+        );
+
+        // ===============================================================
         // UIComponent bindings
         // ===============================================================
         s_Lua.new_usertype<UIComponent>("UIComponent",
@@ -392,6 +416,16 @@ namespace Engine {
             }
             return nullptr;
             });
+
+        // ===============================================================
+        // Global helper: GetEntityAudio(entity)
+        // ===============================================================
+        s_Lua.set_function("GetEntityAudio", [](entt::entity e) -> AudioComponent* {
+            if (registry.all_of<AudioComponent>(e))
+                return &registry.get<AudioComponent>(e);
+            return nullptr;
+            });
+
 
 
         // ===============================================================
@@ -676,6 +710,14 @@ namespace Engine {
                 entityPhysics = &registry.get<PhysicsComponent>(e);
             }
 
+            // Get AudioComponent
+            AudioComponent* entityAudio = nullptr;
+            if (registry.all_of<AudioComponent>(e)) {
+                entityAudio = &registry.get<AudioComponent>(e);
+            }
+
+
+
             // Create environment and inject variables
             inst.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
             inst.Env["EntityID"] = static_cast<uint32_t>(e);
@@ -683,6 +725,7 @@ namespace Engine {
             inst.Env["EntityLight"] = entityLight;
             inst.Env["EntityUI"] = entityUI;
             inst.Env["EntityPhysics"] = entityPhysics;
+            inst.Env["EntityAudio"] = entityAudio;
 
             LOGI("[LuaRuntime] Injected EntityID=%u and EntityTransform=%p into environment",
                 static_cast<unsigned>(e), (void*)entityTransform);

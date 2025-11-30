@@ -43,7 +43,9 @@ local function IsFacing()
     fx,fy,fz = fx/fm, fy/fm, fz/fm
 
     local ix,iy,iz = EntityTransform:GetPosition()
-    local dx,dy,dz = ix - cx, iy - cy, iz - cz
+    local dx = ix - cx
+    local dy = iy - cy
+    local dz = iz - cz
     local dm = math.sqrt(dx*dx + dy*dy + dz*dz)
     dx,dy,dz = dx/dm, dy/dm, dz/dm
 
@@ -56,14 +58,11 @@ end
 local function SafeRemoveKey()
     print("[MusicKey] Safely removing key WITHOUT DestroyEntity")
 
-    -- 1. Hide visually
     EntityTransform:SetScale(0, 0, 0)
 
-    -- 2. Move away
     local ix, iy, iz = EntityTransform:GetPosition()
     EntityTransform:SetPosition(ix, iy - 99999, iz)
 
-    -- 3. Disable script
     on_update = nil
     on_create = nil
     on_destroy = nil
@@ -91,11 +90,9 @@ function on_update(self, dt)
         end
     end
 
-    -- Block interaction if not valid
     if not inRange then return end
     if not facing then return end
 
-    -- Mark interactable
     SHARED.interactable     = EntityID
     SHARED.interactableType = "music_key"
     SHARED.interactableDist = dist
@@ -105,6 +102,23 @@ function on_update(self, dt)
     ------------------------------------------------------------
     if Input.GetKeyDown(GLFW_KEY_E) then
         print("[MusicKey] PICKED UP MUSIC BOX KEY!")
+
+        --------------------------------------------------------
+        -- AUDIO PLAY (ONLY ADDITIONS, NO EXISTING CODE MODIFIED)
+        --------------------------------------------------------
+        if EntityAudio then
+            EntityAudio:SetLoop(false)
+            EntityAudio:RequestPlay()
+            print("[MusicKey] Played pickup sound via EntityAudio.")
+        else
+            print("[MusicKey] WARNING: No AudioComponent on this key entity!")
+        end
+
+        if Play3D_ECS then
+            Play3D_ECS(EntityID)
+            print("[MusicKey] Played pickup sound via Play3D_ECS.")
+        end
+        --------------------------------------------------------
 
         -- Add to inventory
         local invRef = SHARED and SHARED.player_inventory_ref
@@ -123,13 +137,10 @@ function on_update(self, dt)
             print("[MusicKey] ERROR: No inventory ref!")
         end
 
-        -- Hide UI 106 on pickup
         if ui106 then ui106:SetVisible(false) end
 
-        -- Remove entity safely
         SafeRemoveKey()
 
-        -- Clear interactable data
         SHARED.interactable     = nil
         SHARED.interactableType = nil
         SHARED.interactableDist = nil

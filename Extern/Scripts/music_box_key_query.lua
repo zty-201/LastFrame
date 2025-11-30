@@ -117,6 +117,18 @@ function on_update(Self, dt)
     if Input.GetKeyDown(GLFW_KEY_E) and PlayerHasMusicKey() then
         print("[MusicBoxKeyQuery] E pressed → opening music box!")
 
+        -------------------------------------------------------
+        -- AUDIO PLAY HERE (ONLY ADDITION)
+        -------------------------------------------------------
+        if EntityAudio then
+            EntityAudio:SetLoop(false)
+            EntityAudio:RequestPlay()
+            print("[MusicBoxKeyQuery] Played music box unlock sound.")
+        else
+            print("[MusicBoxKeyQuery] WARNING: No AudioComponent found!")
+        end
+        -------------------------------------------------------
+
         local inv = SHARED.player_inventory_ref
         local item = inv.items[REQUIRED_ITEM_ID]
 
@@ -136,6 +148,5 @@ function on_update(Self, dt)
         end
 
         -- TODO: Place what happens when the music box opens
-        -- Tell me what effect you want (open lid, spawn key, cutscene, etc)
     end
 end

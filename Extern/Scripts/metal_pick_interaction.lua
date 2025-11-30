@@ -126,6 +126,18 @@ function on_update(self, dt)
             if allenKey and allenKey.qty > 0 then
                 print("[MetalPick] Allen Key detected → Crafting Lock Pick")
 
+                ----------------------------------------------------------------
+                -- AUDIO (ADDED): Play crafting sound once when Allen Key is used
+                ----------------------------------------------------------------
+                if EntityAudio then
+                    EntityAudio:SetLoop(false)
+                    EntityAudio:RequestPlay()
+                    print("[MetalPick] Played crafting sound.")
+                else
+                    print("[MetalPick] WARNING: No AudioComponent on this entity!")
+                end
+                ----------------------------------------------------------------
+
                 allenKey.qty = allenKey.qty - 1
                 if allenKey.qty <= 0 then
                     items["allen_key"] = nil

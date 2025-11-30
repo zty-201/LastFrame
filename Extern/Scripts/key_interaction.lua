@@ -103,6 +103,17 @@ function on_update(self, dt)
         print("[KeyInteraction] PICKED UP KEY!")
 
         --------------------------------------------------------
+        -- PLAY PICKUP AUDIO HERE (one-shot)
+        --------------------------------------------------------
+        if EntityAudio then
+            EntityAudio:SetLoop(false)      -- ensure no looping
+            EntityAudio:RequestPlay()       -- plays once
+            print("[KeyInteraction] Played pickup sound")
+        else
+            print("[KeyInteraction] No AudioComponent found!")
+        end
+
+        --------------------------------------------------------
         -- ADD TO INVENTORY
         --------------------------------------------------------
         local invRef = SHARED and SHARED.player_inventory_ref
