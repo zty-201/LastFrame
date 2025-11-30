@@ -4,7 +4,7 @@
 -- ============================================================
 
 local ICON_SIZE = 100.0   -- smaller than action icon
-local ANCHOR_X  = 0.80    -- slightly left of action_icon
+local ANCHOR_X  = 0.70    -- slightly left of action_icon
 local ANCHOR_Y  = 0.17    -- align vertically with action_icon
 
 local screenWidth, screenHeight = 2340, 1080

@@ -4,7 +4,7 @@
 -- ============================================================
 
 local ICON_SIZE = 200.0   -- big icon
-local ANCHOR_X  = 0.90    -- 0 = left, 1 = right
+local ANCHOR_X  = 0.80    -- 0 = left, 1 = right
 local ANCHOR_Y  = 0.22    -- 0 = bottom, 1 = top
 local prevEDown = false
 
