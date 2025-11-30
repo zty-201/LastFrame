@@ -328,7 +328,6 @@ namespace EngineFramework {
 		// Note that type_guid is requested jic there are different asset types with the same name.
 		static inline std::unordered_map<xresource::type_guid, std::unordered_map<std::string, xresource::instance_guid>> name_guid_map{};
 
-		static inline std::vector<EngineFramework::animImport> loaded_animations;
 	};
 
 } // namespace EngineFramework

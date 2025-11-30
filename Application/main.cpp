@@ -94,6 +94,7 @@ void Game_Initialize(void* android_asset_manager)
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+	//_CrtSetBreakAlloc(11183);
 #endif
 #ifdef PLATFORM_WINDOWS
 	UNREFERENCED_PARAMETER(android_asset_manager);

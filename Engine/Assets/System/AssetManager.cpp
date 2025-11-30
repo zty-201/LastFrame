@@ -550,26 +550,6 @@ namespace EngineFramework {
 			// Try catch guard for loading mesh
 			try {
 				LOGI("Loading Mesh: %s", path.string().c_str());
-				EngineFramework::Skeleton* skeletonPtr = nullptr;
-
-				if(path.extension() == ".fbx")
-				{
-					// Load the bundle (Skeleton + Animations)
-					auto animBundle = EngineFramework::OFBXAnimationImporter::importFromFile(path.string());
-
-					// Get the raw pointer to pass to the Mesh constructor
-					skeletonPtr = animBundle.skeleton.get();
-
-					// ---------------------------------------------------------
-					// IMPORTANT: STORE THE BUNDLE!
-					// ---------------------------------------------------------
-					// You must save 'animBundle' into a member variable of AssetManagerSystem
-					// (e.g., m_loadedAnimations). If you don't do this, 'animBundle' 
-					// goes out of scope here, deleting the Skeleton, and causing a crash.
-					// 
-					// Example:
-					loaded_animations.push_back(std::move(animBundle));
-				}
 
 				loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
 				asset_names.emplace_back(name); // Done if resource loading is a success.
