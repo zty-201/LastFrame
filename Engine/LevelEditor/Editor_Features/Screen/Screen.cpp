@@ -17,6 +17,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "pch.hpp"
 
+//GLM
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
+
 //File management, JSON file parser/writer
 #include <filesystem>
 #include <fstream>
@@ -1536,6 +1540,10 @@ namespace EngineFramework
                 if (col.shapes.empty()) return;
 
                 const glm::mat4 model = tf.modelMatrix;
+                glm::vec3 entPos, entScale, entSkew;
+                glm::vec4 entPersp;
+                glm::quat entRot;
+                glm::decompose(model, entScale, entRot, entPos, entSkew, entPersp);
 
                 for (const auto& shape : col.shapes)
                 {
@@ -1556,9 +1564,10 @@ namespace EngineFramework
                             shape.capsuleRadius * 2.0f);
                         break;
                     }
-
-                    glm::quat qShape = EulerDegToQuat(shape.offsetRotation);
-                    glm::mat4 shapeTransform = model * TRS(shape.offsetPosition, qShape, sizeLocal);
+                    glm::vec3 finalSize = sizeLocal * entScale;
+                    glm::quat qShape = entRot * EulerDegToQuat(shape.offsetRotation);
+                    glm::vec3 finalPos = entPos + (entRot * (shape.offsetPosition * entScale));
+                    glm::mat4 shapeTransform = model * TRS(finalPos, qShape, finalSize);
 
                     DrawWireOBB(shapeTransform, view, proj, screen_pos, available_size,
                         IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
