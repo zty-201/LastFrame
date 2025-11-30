@@ -496,7 +496,6 @@ namespace EngineFramework
 		// === Register AnimationComponent ===
 		entt::meta_factory<AnimationComponent>()
 			.type("AnimationComponent")
-			.type("AnimationComponent")
 			.data<&AnimationComponent::animationName>("animationName") 
 			.data<&AnimationComponent::currentClip>("currentClip")
 			.func<&Emplacer<AnimationComponent>::EmplaceComponent>("emplace")

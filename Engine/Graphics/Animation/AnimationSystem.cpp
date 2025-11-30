@@ -86,7 +86,7 @@ namespace EngineFramework
 			}
 
 			// Log matrices
-			if (root != -1) {
+			/*if (root != -1) {
 				printf("Root: %s\n", glm::to_string(anim.paletteMatrices[root]).c_str());
 			}
 			if (hip != -1) {
@@ -97,7 +97,7 @@ namespace EngineFramework
 			}
 			if (ankle != -1) {
 				printf("Ankle: %s\n", glm::to_string(anim.paletteMatrices[ankle]).c_str());
-			}
+			}*/
 		}
 	}
 
