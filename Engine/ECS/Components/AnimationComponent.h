@@ -17,7 +17,7 @@ struct AnimationComponent
 
 	// Pointer to the skeleton data for the animated model
 	EngineFramework::Skeleton* skeleton = nullptr;
-	// Pointer to the animation package containing all animations for the model
+	// Pointer to the animation package containing all geminianimations for the model
 	EngineFramework::AnimationPackage* animationPackage = nullptr;
 
 	// Animation player to manage current animation state
@@ -26,6 +26,7 @@ struct AnimationComponent
 
 	// Palette matrices for skinning
 	std::vector<glm::mat4> paletteMatrices; 
+	glm::mat4 globalAnimationTransform = glm::mat4(1.0f);
 
 	// Bool to check if loaded
 	bool loaded = false;

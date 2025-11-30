@@ -2,8 +2,8 @@
     { "type": "texture", "path": "Extern/Graphics/Texture" },
     { "type": "cubemap", "path": "Extern/Graphics/CubeMap/Config.json" },
     { "type": "shader",  "path": "Extern/Graphics/Shader/Config.json" },
-    { "type": "mesh",    "path": "Extern/Graphics/Mesh" },
     { "type": "animation", "path": "Extern/Graphics/Animation" },
+    { "type": "mesh",    "path": "Extern/Graphics/Mesh" },
     { "type": "audio",   "path": "Extern/Audio/Config.json" },
     { "type": "archtype","path": "Extern/Archtypes" },
     { "type": "script",  "path": "Extern/Scripts" }

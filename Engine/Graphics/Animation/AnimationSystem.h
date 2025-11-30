@@ -17,8 +17,8 @@ namespace EngineFramework
         void Update(float deltaTime) override;
 
     private:
-		void ComputeWorldMatrix(const TransformComponent& transform, glm::mat4& outWorldMatrix);
-		static inline AnimationSystem* AnimationSystemPtr = nullptr;
+        void ComputeWorldMatrix(const TransformComponent& transform, glm::mat4& outWorldMatrix);
+        static inline AnimationSystem* AnimationSystemPtr = nullptr;
     };
 }
 

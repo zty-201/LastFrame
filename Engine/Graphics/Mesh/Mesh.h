@@ -33,6 +33,7 @@
 #include "MaterialComponent.h"
 #include "global.hpp" // For AssetManagerSystem, etc.
 #include "AssimpWrapper.h"
+#include "Animation.hpp"
 
 #ifdef min
 #undef min
@@ -57,7 +58,7 @@ namespace Mesh {
         glm::vec3 Normal;
         glm::vec2 TexCoords;
         glm::vec4 Tangent; // Using vec4 to include handedness (w component)
-        
+
         // Add skinning data
         glm::ivec4 BoneIndices;
         glm::vec4 BoneWeights;
@@ -104,7 +105,7 @@ namespace Mesh {
         explicit MeshData(const std::string& filePath) {
             loadWithAssimp(filePath);
         }
-        
+
         const AABB& GetAABB() const { return m_aabb; }
         const std::vector<AABB>& GetSubmeshAABBs() const { return m_submeshAABBs; }
 
@@ -323,9 +324,9 @@ namespace Mesh {
                     LOGE("Mesh '%s' missing tangents, using generated fallback", mesh->mName.C_Str());
                 }
 
-				// Add skinning data
-				vertex.BoneIndices = glm::uvec4(0);
-				vertex.BoneWeights = glm::vec4(0.0f);
+                // Add skinning data
+                vertex.BoneIndices = glm::uvec4(0);
+                vertex.BoneWeights = glm::vec4(0.0f);
 
                 subBox.expand(vertex.Position);
                 m_aabb.expand(vertex.Position);
@@ -341,26 +342,39 @@ namespace Mesh {
                 subMesh.indexCount += face.mNumIndices;
             }
 
-			// Fill bone weights and indices
+            // Fill bone weights and indices
             if (mesh->HasBones()) {
-                // Vertex starts at baseVertex 
                 const unsigned int numBones = mesh->mNumBones;
 
-                for (unsigned int b = 0; b < numBones; b++) {
-					const aiBone* bone = mesh->mBones[b];
-					unsigned int boneIndex = b; // Local to this mesh
+                for (unsigned int b = 0; b < numBones; ++b) {
+                    const aiBone* bone = mesh->mBones[b];
 
-                    // Loop through for weight
-                    for (unsigned int w = 0; w < bone->mNumWeights; w++) {
-						const aiVertexWeight& vw = bone->mWeights[w];
-						unsigned int vtxId = vw.mVertexId; // Local to this mesh
-						float weight = vw.mWeight;
+                    // Start with local index, then try to remap via OFBX skeleton
+                    unsigned int boneIndex = b;
 
-                        // Get the vertex in global array for submesh
+                    auto itRemap = EngineFramework::g_OFBXBoneIndexByName.find(bone->mName.C_Str());
+                    if (itRemap != EngineFramework::g_OFBXBoneIndexByName.end()) {
+                        boneIndex = static_cast<unsigned int>(itRemap->second);
+                    }
+                    else {
+                        LOGE("[SKIN] Assimp bone '%s' not found in OFBX skeleton; using local index %u",
+                            bone->mName.C_Str(), boneIndex);
+                    }
+
+                    LOGI("[SKIN] Assimp bone %u ('%s') -> OFBX index %u",
+                        b, bone->mName.C_Str(), boneIndex);
+
+                    // Loop through weights for this bone
+                    for (unsigned int w = 0; w < bone->mNumWeights; ++w) {
+                        const aiVertexWeight& vw = bone->mWeights[w];
+                        unsigned int vtxId = vw.mVertexId;   // local to this mesh
+                        float weight = vw.mWeight;
+
+                        // Get the vertex in global array for this submesh
                         Vertex& v = m_temp_vertices[subMesh.baseVertex + vtxId];
 
-                        // Put weight into the first empty slots
-                        for (int k = 0; k < 4; k++) {
+                        // Put weight into the first empty slot
+                        for (int k = 0; k < 4; ++k) {
                             if (v.BoneWeights[k] == 0.0f) {
                                 v.BoneWeights[k] = weight;
                                 v.BoneIndices[k] = static_cast<int>(boneIndex);
@@ -373,7 +387,8 @@ namespace Mesh {
                 // Normalize weights so each vertex sums to 1 where possible
                 for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
                     Vertex& v = m_temp_vertices[subMesh.baseVertex + i];
-                    float sum = v.BoneWeights.x + v.BoneWeights.y +
+                    float sum =
+                        v.BoneWeights.x + v.BoneWeights.y +
                         v.BoneWeights.z + v.BoneWeights.w;
 
                     if (sum > 0.0f) {
@@ -413,7 +428,7 @@ namespace Mesh {
 
             glEnableVertexAttribArray(4); // Bone Indices (location 5)
             glVertexAttribIPointer(4, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, BoneIndices));
-            
+
             glEnableVertexAttribArray(5); // Bone Weights (location 5)
             glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, BoneWeights));
 

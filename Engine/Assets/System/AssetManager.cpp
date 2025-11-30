@@ -387,12 +387,12 @@ namespace EngineFramework {
 		//==Add function loaders for each type==//
 		asset_loader_map[TEXTURE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadTexture);
 		asset_loader_map[CUBEMAP] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadCubemap);
+		asset_loader_map[ANIMATION] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAnimation);
 		asset_loader_map[MESH] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadMesh);
 		asset_loader_map[SHADER] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadShader);
 		asset_loader_map[AUDIO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAudio);
 		asset_loader_map[SCRIPT] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadScript);
 		asset_loader_map[ARCHTYPE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadArchtype);
-		asset_loader_map[ANIMATION] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAnimation);
 		//=====================================//
 
 		//Set AAsetManager for android, in audio system.

@@ -1,9 +1,12 @@
+#include <stdio.h>
 #include "pch.hpp"
 #include "Animation.hpp"
 #include "AnimationImporter.hpp"
 
 namespace EngineFramework
 {
+	std::unordered_map<std::string, int> g_OFBXBoneIndexByName;
+
 	// Animation flags
 	ofbx::u64 animFlags =
 		(ofbx::u64)ofbx::LoadFlags::IGNORE_BLEND_SHAPES |
@@ -51,7 +54,7 @@ namespace EngineFramework
 			return { false, 0.0f };
 		}
 		if (keyc == 1) {
-			return { true, curve->getKeyValue()[0]};
+			return { true, curve->getKeyValue()[0] };
 		}
 
 		// Binary search for the right keyframe
@@ -63,9 +66,10 @@ namespace EngineFramework
 
 		while (low < high) {
 			int mid = (low + high + 1) >> 1;
-			if(static_cast<double>(times[mid]) <= T) {
+			if (static_cast<double>(times[mid]) <= T) {
 				low = mid;
-			} else {
+			}
+			else {
 				high = mid - 1;
 			}
 		}
@@ -124,6 +128,16 @@ namespace EngineFramework
 				out.hasS = true;
 			}
 		}
+
+		// Pre & Post Rotations
+		ofbx::DVec3 pr = obj->getPreRotation();
+		ofbx::DVec3 por = obj->getPostRotation();
+
+		out.preR = glm::vec3(pr.x, pr.y, pr.z);
+		out.postR = glm::vec3(por.x, por.y, por.z);
+
+		// Rotation order
+		out.rotOrder = obj->getRotationOrder();
 
 		return out;
 	}
@@ -194,11 +208,12 @@ namespace EngineFramework
 			// Get the object
 			if (const ofbx::Object* obj = scene->getAllObjects()[i]) {
 				// Check if object is a limb node
-				if(obj->getType() == ofbx::Object::Type::LIMB_NODE) {
+				if (obj->getType() == ofbx::Object::Type::LIMB_NODE) {
 					boneObjs.push_back(obj);
 				}
 			}
 		}
+
 
 		// Else if no bones found, return empty bundle
 		if (boneObjs.empty()) {
@@ -211,7 +226,7 @@ namespace EngineFramework
 		// Map for quick index lookup
 		std::unordered_map<const ofbx::Object*, int> indexOf;
 		indexOf.reserve(boneObjs.size());
-		for(int i = 0; i < (int)boneObjs.size(); i++) {
+		for (int i = 0; i < (int)boneObjs.size(); i++) {
 			indexOf[boneObjs[i]] = i;
 		}
 
@@ -226,6 +241,7 @@ namespace EngineFramework
 		// Obtain global for bones that are linked in a cluster
 		// Loop through meshes to find clusters
 		std::unordered_map<int, glm::mat4> boneGlobalMap;
+		std::unordered_map<int, glm::mat4> boneInvBindMap;
 		for (int i = 0; i < scene->getMeshCount(); i++) {
 			// Check for valid mesh
 			const ofbx::Mesh* mesh = scene->getMesh(i);
@@ -257,72 +273,116 @@ namespace EngineFramework
 				// FBX gives: TransformLinkMatrix (bone global bind), TransformMatrix (geometry global bind)
 				// We need bone global bind to compute invBind = inverse(boneGlobalBind).
 				ofbx::DMatrix linkBind = cluster->getTransformLinkMatrix();
-				boneGlobalMap[index] = mat4Converter(linkBind);
+				glm::mat4 B = mat4Converter(linkBind);
+				boneGlobalMap[index] = B;
+
+				// Geometry global at bind (M) � same for all clusters of this skin
+				ofbx::DMatrix geomBindDM = cluster->getTransformMatrix();
+				glm::mat4 M = mat4Converter(geomBindDM);
+
+				// Precompute the full inverse-bind
+				glm::mat4 invBind = glm::inverse(B);
+				boneInvBindMap[index] = invBind;
+
 			}
 		}
 
-		// Fill up the skeleton array based on the order
-		for (int i = 0; i < (int)order.size(); i++) {
-			// Obtain the object based on order
-			int index = order[i];
-			const ofbx::Object* obj = boneObjs[index];
+		// Fill skeleton->bones in the SAME order as boneObjs
+		// so bone index i == cluster index i == vertex bone index.
+		for (int i = 0; i < (int)boneObjs.size(); ++i)
+		{
+			const ofbx::Object* obj = boneObjs[i];
 
 			Bone bone{};
 			bone.name = obj->name;
 
-			// Check for parent index of the bone
-			int parent = -1; // To check if valid
-			if (const ofbx::Object* p = obj->getParent()) {
-				auto iter = indexOf.find(p);
-				// Assign the parent index if found
-				if (iter != indexOf.end()) {
-					parent = iter->second;
+			// Parent index in boneObjs space
+			int parent = -1;
+			const ofbx::Object* parentObj = obj->getParent();
+
+			// TRAVERSE UP until we find a parent that exists in our loaded bone list
+			// or we hit the root (nullptr)
+			while (parentObj) {
+				auto it = indexOf.find(parentObj);
+				if (it != indexOf.end()) {
+					parent = it->second;
+					break; // Found a valid bone parent!
 				}
+				// This node wasn't a bone (maybe a helper/group), keep going up
+				parentObj = parentObj->getParent();
 			}
+
 			bone.parentIndex = parent;
 
-			// Set the binding to inverse or use the global transforms
-			auto boneIter = boneGlobalMap.find(index);
-			glm::mat4 globalB;
-			// Bind based on order
-			if (boneIter != boneGlobalMap.end()) {
-				globalB = boneIter->second;
+			// ---------------- Global bind pose (B) ----------------
+			glm::mat4 globalBind;
+			auto itB = boneGlobalMap.find(i);
+			if (itB != boneGlobalMap.end()) {
+				globalBind = itB->second;
 			}
-			// Bind based on global transform
 			else {
-				globalB = mat4Converter(obj->getGlobalTransform());
+				globalBind = mat4Converter(obj->getGlobalTransform());
 			}
 
-			// inverse the bone bind
-			bone.invBind = glm::inverse(globalB);
-			skeleton->bones[index] = std::move(bone);
+			// The ROOT ROTATION FIX (Z-up to Y-up) MUST STAY:
+				// This fixes the 'lying down' issue.
+			//if (bone.parentIndex == -1) {
+			//	glm::mat4 fixRot = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1, 0, 0));
+			//	globalBind = fixRot * globalBind;
+			//}
+
+			
+
+			// The simplified invBind calculation must stay (assuming M is baked into vertices):
+			auto itBI = boneInvBindMap.find(i);
+			if (itBI != boneInvBindMap.end()) {
+				bone.invBind = itBI->second;
+			} else {
+				bone.invBind = glm::inverse(globalBind);
+			}
+
+			// ---------------- Optional local bind (neutralPose) ----------------
+			if (parent >= 0)
+			{
+				const Bone& parentBone = skeleton->bones[parent];
+				glm::mat4 parentGlobal = glm::inverse(parentBone.invBind);
+				bone.neutralPose = glm::inverse(parentGlobal) * globalBind;
+			}
+			else
+			{
+				bone.neutralPose = globalBind;
+			}
+
+			skeleton->bones[i] = bone;
+		}
+
+		// After filling skeleton->bones
+		g_OFBXBoneIndexByName.clear();
+		for (int i = 0; i < (int)boneObjs.size(); ++i)
+		{
+			const char* n = boneObjs[i]->name;
+			g_OFBXBoneIndexByName[std::string(n)] = i;
 		}
 
 		// 5) return bundle (Animation Package)
 		auto package = std::make_unique<AnimationPackage>();
 
-		// Count number of animation stacks
 		int count = scene->getAnimationStackCount();
 
-		// Loop through to obtain each stack and layer
 		for (int i = 0; i < count; i++) {
-			// Check if stack is valid
 			const ofbx::AnimationStack* stack = scene->getAnimationStack(i);
-			if (!stack) { continue; }
+			if (!stack) continue;
 
-			// Check if layer is valid
 			const ofbx::AnimationLayer* layer = stack->getLayer(0);
-			if (!layer) { continue; }
+			if (!layer) continue;
 
-			// Animation clip processing
 			Animation anim{};
 			anim.fps = 30;
 			anim.name = stack->name;
 
-			// Find the duration of the animation clip in seconds
 			double tMin = 1e30;
 			double tMax = -1e30;
-			bool anyKeys = false;
+			bool   anyKeys = false;
 
 			// Allocate memory based on the keyframes
 			anim.boneKeyframes.resize(boneObjs.size());
@@ -356,7 +416,7 @@ namespace EngineFramework
 							tMax = std::max(tMax, ts);
 						}
 					}
-				};
+					};
 
 				timeRange(tNode);
 				timeRange(rNode);
@@ -367,6 +427,7 @@ namespace EngineFramework
 			if (!anyKeys) {
 				// If no key, create a 1 frame idle so that no crash at runtime
 				anim.duration = 0.f;
+				anim.boneKeyframes.resize(boneObjs.size());
 				for (auto& track : anim.boneKeyframes) {
 					track.frames.resize(1);
 					track.frames[0] = keyFrame{};
@@ -382,33 +443,58 @@ namespace EngineFramework
 
 			anim.duration = static_cast<float>(tMax - tMin);
 			const double dt = 1.0 / anim.fps;
-			const int numFrames = std::max(1, int(std::ceil((tMax - tMin) * anim.fps)));
-			
+			const int    numFrames = std::max(1, int(std::ceil((tMax - tMin) * anim.fps)));
+
+			// --------------------------------------------
+			// 1) First build tracks in boneObjs-index space
+			// --------------------------------------------
 			// Resample each bone at the fixed FPS
-			for (int j = 0; j < (int)boneObjs.size(); j++) {
-				// Obtain the animation clip of the obj
+			anim.boneKeyframes.clear();
+			anim.boneKeyframes.resize(boneObjs.size());
+
+			for (int j = 0; j < (int)boneObjs.size(); j++)
+			{
 				const ofbx::Object* obj = boneObjs[j];
 				auto& animTrack = anim.boneKeyframes[j];
 				animTrack.frames.resize(numFrames);
 
-				for (int k = 0; k < numFrames; k++) {
+				for (int k = 0; k < numFrames; k++)
+				{
 					double t = tMin + k * dt;
 
 					TRSSample s = SampleTRS(obj, layer, t);
-
-					// If missing, just used identity TRS
-					glm::vec3 T = s.hasT ? s.T : glm::vec3(0);
-					glm::vec3 R = s.hasR ? s.Rdeg : glm::vec3(0);
-					glm::vec3 S = s.hasS ? s.S : glm::vec3(1);
-
-					// Formulate the full transformation for the keyFrame
 					keyFrame tr;
-					tr.position = T;
-					tr.rotation = EulerDegreesXYZtoQuat(R);
-					tr.scale = S;
+					tr.position = s.hasT ? s.T : glm::vec3(0);
+					tr.rotation = ConvertEuler(s.Rdeg, s.rotOrder); // or whatever you do now
+					tr.scale = s.hasS ? s.S : glm::vec3(1);
+
+					if (skeleton->bones[j].parentIndex == -1) {
+						// Apply the same -90 X rotation to the animation keyframe
+						glm::quat fixQ = glm::angleAxis(glm::radians(-90.0f), glm::vec3(1, 0, 0));
+						tr.rotation = fixQ * tr.rotation;
+					}
+
+					
+					// NEW: copy FBX bone constants onto every keyframe
+					tr.preRotDeg = s.preR;
+					tr.postRotDeg = s.postR;
+					tr.rotOrder = s.rotOrder;
+
 					animTrack.frames[k] = tr;
 				}
 			}
+
+			//// --------------------------------------------
+			//// 2) Now reorder tracks into parent-first order
+			////     so index i matches skeleton->bones[i]
+			//// --------------------------------------------
+			//anim.boneKeyframes.clear();
+			//anim.boneKeyframes.resize(order.size());
+
+			//for (int iBone = 0; iBone < (int)order.size(); ++iBone) {
+			//	int objIndex = order[iBone];           // index in boneObjs
+			//	anim.boneKeyframes[iBone] = std::move(rawTracks[objIndex]);
+			//}
 
 			package->animations.push_back(std::move(anim));
 		}

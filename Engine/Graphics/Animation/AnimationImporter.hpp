@@ -13,6 +13,11 @@ namespace EngineFramework
 		glm::vec3 T = { 0.f, 0.f, 0.f };
 		glm::vec3 Rdeg = { 0.f, 0.f, 0.f };
 		glm::vec3 S = { 1,1,1 };
+
+		glm::vec3 preR;
+		glm::vec3 postR;
+		ofbx::RotationOrder rotOrder;
+
 		bool hasT = false;
 		bool hasR = false;
 		bool hasS = false;
@@ -27,9 +32,11 @@ namespace EngineFramework
 	// Convert FBX matrix to glm mat4
 	inline glm::mat4 mat4Converter(const ofbx::DMatrix& m) {
 		glm::mat4 result;
-		for (int row = 0; row < 4; row++) {
-			for (int col = 0; col < 4; col++) {
-				result[row][col] = static_cast<float>(m.m[row + col*4]);
+		for (int col = 0; col < 4; col++) {
+			for (int row = 0; row < 4; row++) {
+				// GLM is result[col][row
+				// OpenFBX is m[col * 4 + row] (Standard Column-Major)
+				result[col][row] = static_cast<float>(m.m[col * 4 + row]);
 			}
 		}
 		return result;
@@ -52,7 +59,7 @@ namespace EngineFramework
 
 	inline TRSSample SampleTRS(const ofbx::Object* obj, const ofbx::AnimationLayer* layer, double t);
 
-	static inline const ofbx::AnimationCurveNode* GetPropNode(const ofbx::Object* obj,const ofbx::AnimationLayer* layer, const char* prop);
+	static inline const ofbx::AnimationCurveNode* GetPropNode(const ofbx::Object* obj, const ofbx::AnimationLayer* layer, const char* prop);
 
 	inline void BuildParentFirstSkeleton(const std::vector<const ofbx::Object*>& boneObjs, std::vector<int>& outOrder, const std::unordered_map<const ofbx::Object*, int>& indexOf);
 
