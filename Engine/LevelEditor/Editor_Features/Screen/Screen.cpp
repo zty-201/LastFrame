@@ -351,10 +351,10 @@ namespace EngineFramework
                         history->undo();
                     }
 
-                    float requiredWidth = 140.f;
+                    float requiredWidth = 250.f;
                     if (s_DrawColliders)
                     {
-                        requiredWidth += 100.f;
+                        requiredWidth += 200.f;
                     }
                     float menuBarWidth = ImGui::GetContentRegionAvail().x;
                     if (menuBarWidth > requiredWidth)
