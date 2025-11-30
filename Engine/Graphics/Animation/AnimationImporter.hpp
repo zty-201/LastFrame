@@ -6,7 +6,7 @@
 namespace EngineFramework
 {
 	// Helper functions for FBX processing
-	inline std::vector<uint8_t> ReadFBXFile(const std::string& path);
+	//inline std::vector<uint8_t> ReadFBXFile(const std::string& path);
 
 	// Sampling struct
 	struct TRSSample {

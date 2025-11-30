@@ -801,7 +801,7 @@ namespace EngineFramework
         shader->setUniform("u_NumPointLights", (int)m_pointLightData.size());
 
         // Debug modes via F1-F10
-        if (SceneManager::GetInstance().is_file_loaded) {
+        /*if (SceneManager::GetInstance().is_file_loaded) {
             if (ImGui::IsKeyDown(ImGuiKey_F1)) debugMode = 0;
             if (ImGui::IsKeyDown(ImGuiKey_F2)) debugMode = 1;
             if (ImGui::IsKeyDown(ImGuiKey_F3)) debugMode = 2;
@@ -824,7 +824,7 @@ namespace EngineFramework
             };
             LOGI("Debug Mode: %d - %s", debugMode, modeNames[debugMode]);
             lastDebugMode = debugMode;
-        }
+        }*/
 
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
