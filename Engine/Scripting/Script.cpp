@@ -30,6 +30,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Platform.h"
 
 namespace Engine {
+    static std::vector<entt::entity> g_DestroyQueue;
 
 #if defined(ENGINE_ENABLE_LUA)
     namespace { sol::state s_Lua; }
@@ -123,6 +124,19 @@ namespace Engine {
         );
 
         LOGI("[ScriptSystem] TransformComponent bindings complete.");
+
+        s_Lua.set_function("DestroyEntity", [](uint32_t id)
+            {
+                entt::entity e = (entt::entity)id;
+
+                if (registry.valid(e)) {
+                    g_DestroyQueue.push_back(e);
+                    LOGI("[LuaRuntime] Queued DestroyEntity(%u)", id);
+                }
+                else {
+                    LOGE("[LuaRuntime] DestroyEntity(%u) FAILED: invalid entity", id);
+                }
+            });
 
         // ===============================================================
         // Light Component bindings
@@ -340,7 +354,7 @@ namespace Engine {
         s_Lua["GLFW_MOUSE_BUTTON_LEFT"] = 0;
         s_Lua["GLFW_MOUSE_BUTTON_RIGHT"] = 1;
         s_Lua["GLFW_MOUSE_BUTTON_MIDDLE"] = 2;
-
+        
         LOGI("[ScriptSystem] Lua bindings initialized successfully.");
 
         //No longer needed to sanity check here (Debugging)
@@ -450,6 +464,7 @@ namespace Engine {
     // ------------------------------------------------------------------
     // Per-frame update
     // ------------------------------------------------------------------
+// ------------------------------------------------------------------
     void ScriptSystem::OnUpdate(entt::registry& reg, float dt) {
         {   // Native scripts
             auto view = reg.view<NativeScriptComponent>();
@@ -465,25 +480,13 @@ namespace Engine {
         {   // Lua scripts
             auto view = reg.view<LuaScriptComponent>();
             for (auto [e, comp] : view.each()) {
-                //LOGI("[ScriptSystem] OnUpdate running with registry %p", (void*)&reg);
-                //LOGI("[ScriptSystem] LuaScriptComponent.Enabled = %d for entity %u",
-                //     comp.Enabled, static_cast<unsigned>(e));
                 if (!comp.Enabled) continue;
                 for (auto& inst : comp.Scripts) {
                     if (!inst.Loaded)
                         LoadLuaFor(reg, e, inst);
 
-                    //if (inst.FnOnUpdate.valid()) {
-                    //    LOGI("[LuaRuntime] FnOnUpdate is VALID for GUID %llu", inst.ScriptGuid.m_Value);
-                    //}
-                    //else {
-                    //    LOGE("[LuaRuntime] FnOnUpdate is NIL for GUID %llu", inst.ScriptGuid.m_Value);
-                    //}
-
-                    if (inst.Loaded && inst.FnOnUpdate.valid()) { //Calling on_update for scripts side
+                    if (inst.Loaded && inst.FnOnUpdate.valid()) {
                         try {
-                            //LOGI("[LuaRuntime] on_update() for entity %u, script GUID %llu",
-                            //    static_cast<unsigned>(e), inst.ScriptGuid.m_Value);
                             inst.FnOnUpdate(inst.Self, dt);
                         }
                         catch (const sol::error& err) {
@@ -495,7 +498,26 @@ namespace Engine {
             }
         }
 #endif
+
+        // ------------------------------------------------------------
+        // DESTROY QUEUE — process deferred destruction safely here
+        // ------------------------------------------------------------
+        for (entt::entity e : g_DestroyQueue)
+        {
+            if (reg.valid(e))
+            {
+                // Disable script so it no longer receives on_update
+                if (reg.any_of<LuaScriptComponent>(e)) {
+                    reg.get<LuaScriptComponent>(e).Enabled = false;
+                }
+
+                reg.destroy(e);
+                LOGI("[LuaRuntime] Destroyed entity %u", (uint32_t)e);
+            }
+        }
+        g_DestroyQueue.clear();
     }
+
 
     // ------------------------------------------------------------------
     // Native helpers

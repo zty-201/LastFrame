@@ -14,8 +14,10 @@ function on_create(Self)
         items = {}
     }
 
-    SHARED["player_inventory_ref"] = Self.inventory
+    SHARED.player_inventory_ref  = Self.inventory
+    SHARED.player_inventory_self = Self
 end
+
 
 ----------------------------------------------------------------
 -- Add item
@@ -79,16 +81,6 @@ end
 -- on_update (working)
 ----------------------------------------------------------------
 function on_update(Self, dt)
-
-    -- Add Potion (ID=1)
-    if Input.GetKeyDown(69) then  -- E key
-        AddItem(Self, 1, "Potion", 1)
-    end
-
-    -- Remove Potion
-    if Input.GetKeyDown(82) then  -- R key
-        RemoveItem(Self, 1, 1)
-    end
 
     -- Print inventory
     if Input.GetKeyDown(84) then  -- T key
