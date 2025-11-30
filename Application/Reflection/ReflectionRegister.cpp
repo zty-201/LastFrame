@@ -13,6 +13,7 @@
 #include "TransformComponent.h"
 #include "AnimationComponent.h"
 #include "AudioComponent.h"
+#include "AudioListenerComponent.h"
 #include "ColliderComponent.h"
 #include "PhysicsMaterialComponent.h"
 #include "PhysicsComponent.h"
@@ -576,17 +577,50 @@ namespace EngineFramework
 			.func<&GetRef<CameraComponent>>("get_ref");
 
 		// === Register AudioComponent ===
+		//entt::meta_factory<AudioComponent>()
+		//	.type("AudioComponent")
+		//	.data<&AudioComponent::audio_guid>("audio_guid")
+		//	.data<&AudioComponent::volume>("volume")
+		//	.data<&AudioComponent::loop>("loop")
+		//	.data<&AudioComponent::playOnStart>("playOnStart")
+		//	.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Audio })
+		//	.func<&Emplacer<AudioComponent>::EmplaceComponent>("emplace")
+		//	.func<&Remover<AudioComponent>::RemoveComponent>("remove")
+		//	.func<&Getter<AudioComponent>::GetComponent>("get")
+		//	.func<&GetRef<AudioComponent>>("get_ref");
+
+		// === Register AudioComponent ===
 		entt::meta_factory<AudioComponent>()
 			.type("AudioComponent")
+
+			// Audio asset
 			.data<&AudioComponent::audio_guid>("audio_guid")
+			.custom<EditorFeatures::AssetPickerTag>(
+				EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Audio })
+
+			// Basic fields
 			.data<&AudioComponent::volume>("volume")
 			.data<&AudioComponent::loop>("loop")
 			.data<&AudioComponent::playOnStart>("playOnStart")
-			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Audio })
+
+			// 2D / 3D behaviour
+			.data<&AudioComponent::is3D>("is3D")
+			.data<&AudioComponent::minDistance>("minDistance")
+			.data<&AudioComponent::maxDistance>("maxDistance")
+
 			.func<&Emplacer<AudioComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<AudioComponent>::RemoveComponent>("remove")
 			.func<&Getter<AudioComponent>::GetComponent>("get")
 			.func<&GetRef<AudioComponent>>("get_ref");
+
+		// === Register AudioListenerComponent ===
+		entt::meta_factory<AudioListenerComponent>()
+			.type("AudioListenerComponent")
+			.data<&AudioListenerComponent::active>("active")
+			.func<&Emplacer<AudioListenerComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<AudioListenerComponent>::RemoveComponent>("remove")
+			.func<&Getter<AudioListenerComponent>::GetComponent>("get")
+			.func<&GetRef<AudioListenerComponent>>("get_ref");
 
 		entt::meta_factory<::ColliderShape>()
 			.type("ColliderShape") // Arbitrary name for the type

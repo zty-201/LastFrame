@@ -69,6 +69,7 @@ namespace EngineFramework
 		bool has_saved_cam_before_sim = false;
 
 		static bool s_DrawColliders;
+		static bool s_DrawAllColliders;
 
 		private:
 

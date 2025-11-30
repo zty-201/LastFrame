@@ -17,30 +17,30 @@ namespace EngineFramework
 		(ofbx::u64)ofbx::LoadFlags::IGNORE_VIDEOS |
 		(ofbx::u64)ofbx::LoadFlags::IGNORE_POSES;
 
-	std::vector<uint8_t> ReadFBXFile(const std::string& path) {
-		// Buffer to hold file data
-		std::vector<uint8_t> buffer;
+	//std::vector<uint8_t> ReadFBXFile(const std::string& path) {
+	//	// Buffer to hold file data
+	//	std::vector<uint8_t> buffer;
 
-		// Check if file is valid
-		FILE* f = nullptr;
-		fopen_s(&f, path.c_str(), "rb");
-		if (f) {
-			// Find the end of file
-			std::fseek(f, 0, SEEK_END);
-			long sz = std::ftell(f);
-			// Reset to the start
-			std::fseek(f, 0, SEEK_SET);
+	//	// Check if file is valid
+	//	FILE* f = nullptr;
+	//	fopen_s(&f, path.c_str(), "rb");
+	//	if (f) {
+	//		// Find the end of file
+	//		std::fseek(f, 0, SEEK_END);
+	//		long sz = std::ftell(f);
+	//		// Reset to the start
+	//		std::fseek(f, 0, SEEK_SET);
 
-			// Allocate space based on the size of the file obtained by sz
-			buffer.resize((size_t)sz);
-			// Read the file and close
-			std::fread(buffer.data(), 1, buffer.size(), f);
-			std::fclose(f);
-		}
+	//		// Allocate space based on the size of the file obtained by sz
+	//		buffer.resize((size_t)sz);
+	//		// Read the file and close
+	//		std::fread(buffer.data(), 1, buffer.size(), f);
+	//		std::fclose(f);
+	//	}
 
-		return buffer;
+	//	return buffer;
 
-	}
+	//}
 
 	std::pair<bool, float> Sample1D(const ofbx::AnimationCurve* curve, double t) {
 		// Verify if there is a curve pointer, this function is used to sample a value at t
@@ -182,7 +182,7 @@ namespace EngineFramework
 	{
 		// 1) load FBX into ofbx::IScene*
 		animImport bundle;
-		auto data = ReadFBXFile(filename);
+		auto data = AssetManagerSystem::GetDataFromFile(filename);
 
 		// Check for successful read
 		if (data.empty()) {

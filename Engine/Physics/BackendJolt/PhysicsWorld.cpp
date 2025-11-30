@@ -310,10 +310,13 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
     const bool isTrigger = static_cast<ColliderComponent::Mode>(collider.mode) == ColliderComponent::Mode::TRIGGER_SENSOR;
 
     glm::quat qRot = glm::quat(glm::radians(rot));
+    JPH::Vec3 com = finalShape->GetCenterOfMass();
+    glm::vec3 centerOfMassOffset = glm::vec3(com.GetX(), com.GetY(), com.GetZ());
+    glm::vec3 finalBodyPos = pos + (qRot * centerOfMassOffset);
 
     JPH::BodyCreationSettings bodySettings(
         finalShape,
-        JPH::Vec3(pos.x, pos.y, pos.z),
+        JPH::Vec3(finalBodyPos.x, finalBodyPos.y, finalBodyPos.z),
         JPH::Quat(qRot.x, qRot.y, qRot.z, qRot.w),
         motionType,
         objectLayer
