@@ -1,14 +1,14 @@
 -- ============================================================
--- ui_action.lua
+-- ui_action.lua  (FIXED FOR WINDOWS + ANDROID CLICK)
 -- Big action icon (bottom-right)
 -- ============================================================
 
-local ICON_SIZE = 200.0   -- big icon
-local ANCHOR_X  = 0.80    -- 0 = left, 1 = right
-local ANCHOR_Y  = 0.22    -- 0 = bottom, 1 = top
+local ICON_SIZE = 350.0
+local ANCHOR_X  = 0.90
+local ANCHOR_Y  = 0.22
 local prevEDown = false
 
-local screenWidth, screenHeight = 2340, 1080
+local screenWidth, screenHeight = 3088, 1440
 
 local UI = nil
 
@@ -23,31 +23,42 @@ local function ensureUIShared()
     return SH.UI
 end
 
+-- ============================================================
+-- FIXED: Pointer detection works on BOTH Windows + Android
+-- ============================================================
 local function isPointerOver()
-    if not UI then
-        UI = EntityUI
-    end
+    if not UI then UI = EntityUI end
     if not UI then return false end
 
     local uiShared = ensureUIShared()
     if not uiShared then return false end
 
-    -- Mouse position in input space (top-left origin)
+    -- Raw OS mouse position
     local mx, rawMy = Input.GetMousePosition()
 
-    -- Convert Y into the same bottom-left space as UI (same as joystick)
-    local virtualH = uiShared.joyScreenHeight or 1440.0
-    local my       = virtualH - rawMy
+    -- FIX:
+    -- Windows already uses bottom-left origin → DO NOT flip Y
+    -- Android uses top-left → MUST flip
+    local my
 
-    -- Rect of this icon in UI space (bottom-left origin)
+    if PLATFORM == "android" then
+        local virtualH = uiShared.joyScreenHeight or 1440.0
+        my = virtualH - rawMy
+    else
+        -- WINDOWS
+        my = rawMy
+    end
+
+    -- Icon rectangle
     local x, y = UI:GetPosition()
     local w, h = UI:GetSize()
 
-    return mx >= x and mx <= x + w
-       and my >= y and my <= y + h
+    return (mx >= x and mx <= x + w and my >= y and my <= y + h)
 end
 
-
+-- ============================================================
+-- on_create
+-- ============================================================
 function on_create(self)
     UI = EntityUI
     if not UI then
@@ -55,7 +66,7 @@ function on_create(self)
         return
     end
 
-    -- initial layout in virtual screen space
+    -- initial layout
     local centerX = ANCHOR_X * screenWidth
     local centerY = ANCHOR_Y * screenHeight
 
@@ -64,32 +75,36 @@ function on_create(self)
     UI:SetVisible(true)
 end
 
+-- ============================================================
+-- on_update
+-- ============================================================
 function on_update(self, dt)
     if not UI then return end
 
-    -- ===========================
-    -- MOUSE/TAP ON ICON
-    -- ===========================
+    local uiShared = ensureUIShared()
+    if not uiShared then return end
+
+    ------------------------------------------------------------
+    -- CLICK / TAP ON ICON
+    ------------------------------------------------------------
     local downMouse = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
+
     if downMouse and isPointerOver() then
-        -- Placeholder – actual action will be wired later
-        print("[ui_action] Icon pressed (no gameplay hooked yet)")
+        print("[ui_action] Icon pressed")
+        uiShared.actionRequested = true
     end
 
-    -- ===========================
-    -- WINDOWS KEYBOARD: E to "press" action
-    -- ===========================
+    ------------------------------------------------------------
+    -- KEYBOARD E (Windows)
+    ------------------------------------------------------------
     if PLATFORM == "windows" then
         local isEDown = Input.GetKey(GLFW_KEY_E)
 
-        -- Edge-detect: only fire once per key press
         if isEDown and not prevEDown then
-            -- Same behaviour as clicking the button
-            print("[ui_action] E pressed (action button)")
-            -- later you can also set SHARED.UI.actionRequested = true here
+            print("[ui_action] E pressed (action)")
+            uiShared.actionRequested = true
         end
 
         prevEDown = isEDown
     end
 end
-
