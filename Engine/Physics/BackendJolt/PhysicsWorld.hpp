@@ -236,7 +236,9 @@ private:
         {
             const uint32_t a = (uint32_t)b1.GetUserData();
             const uint32_t b = (uint32_t)b2.GetUserData();
-            LOGI("[Physics] Collision Enter: %u <-> %u", a, b);
+            //LOGI("[Physics] Collision Enter: %u <-> %u", a, b);
+            JPH_UNUSED(a);
+            JPH_UNUSED(b);
         }
 
         void OnContactRemoved(const JPH::SubShapeIDPair& p) override
@@ -245,7 +247,9 @@ private:
             // You can still log something useful:
             uint32_t id1 = p.GetBody1ID().GetIndexAndSequenceNumber();
             uint32_t id2 = p.GetBody2ID().GetIndexAndSequenceNumber();
-            LOGI("[Physics] Collision Exit (BodyID): %u <-> %u", id1, id2);
+            //LOGI("[Physics] Collision Exit (BodyID): %u <-> %u", id1, id2);
+            JPH_UNUSED(id1);
+            JPH_UNUSED(id2);
         }
 
         // Optional: sensor hooks, keep them simple & not using BodyInterface
@@ -255,7 +259,9 @@ private:
         {
             uint32_t s = sensor.GetIndexAndSequenceNumber();
             uint32_t o = other.GetIndexAndSequenceNumber();
-            LOGI("[Physics] Trigger Enter (BodyID): %u <-> %u", s, o);
+            //LOGI("[Physics] Trigger Enter (BodyID): %u <-> %u", s, o);
+            JPH_UNUSED(s);
+            JPH_UNUSED(o);
         }
 
         void OnSensorContactRemoved(const JPH::BodyID& sensor,
@@ -264,7 +270,9 @@ private:
         {
             uint32_t s = sensor.GetIndexAndSequenceNumber();
             uint32_t o = other.GetIndexAndSequenceNumber();
-            LOGI("[Physics] Trigger Exit (BodyID): %u <-> %u", s, o);
+            //LOGI("[Physics] Trigger Exit (BodyID): %u <-> %u", s, o);
+            JPH_UNUSED(s);
+            JPH_UNUSED(o);
         }
     };
 

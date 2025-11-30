@@ -154,7 +154,9 @@ namespace Engine {
             "SetGravityFactor", [](PhysicsComponent& phys, float f) {
                 phys.gravityFactor = f;
             },
-            "lockRotation", & PhysicsComponent::lockRotation
+            "SetLockRotation", [](PhysicsComponent& phys, bool v) {
+                phys.lockRotation = v;
+            }
         );
 
         // ===============================================================
