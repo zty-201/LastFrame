@@ -1,9 +1,9 @@
 ----------------------------------------------------------------
--- musicbox_key_interaction.lua (SAFE NO-DESTROY VERSION)
+-- musicbox_key_interaction.lua (SAFE NO-DESTROY VERSION + UI 106)
 ----------------------------------------------------------------
 
 local PLAYER_ENTITY_ID = 5
-local INTERACT_RANGE   = 120.0
+local INTERACT_RANGE   = 70.0
 local FACING_THRESHOLD = 0.5
 
 function on_create(self)
@@ -43,7 +43,9 @@ local function IsFacing()
     fx,fy,fz = fx/fm, fy/fm, fz/fm
 
     local ix,iy,iz = EntityTransform:GetPosition()
-    local dx,dy,dz = ix - cx, iy - cy, iz - cz
+    local dx = ix - cx
+    local dy = iy - cy
+    local dz = iz - cz
     local dm = math.sqrt(dx*dx + dy*dy + dz*dz)
     dx,dy,dz = dx/dm, dy/dm, dz/dm
 
@@ -56,14 +58,11 @@ end
 local function SafeRemoveKey()
     print("[MusicKey] Safely removing key WITHOUT DestroyEntity")
 
-    -- 1. Make invisible
     EntityTransform:SetScale(0, 0, 0)
 
-    -- 2. Move far away (removes hitbox)
     local ix, iy, iz = EntityTransform:GetPosition()
     EntityTransform:SetPosition(ix, iy - 99999, iz)
 
-    -- 3. Disable script permanently
     on_update = nil
     on_create = nil
     on_destroy = nil
@@ -75,11 +74,25 @@ end
 -- on_update
 ----------------------------------------------------------------
 function on_update(self, dt)
-    local inRange, dist = IsPlayerInRange()
-    if not inRange then return end
-    if not IsFacing() then return end
 
-    -- Mark as interactable for UI
+    local inRange, dist = IsPlayerInRange()
+    local facing        = IsFacing()
+
+    ------------------------------------------------------------
+    -- UI 106 visibility logic
+    ------------------------------------------------------------
+    local ui106 = GetEntityUI(106)
+    if ui106 then
+        if inRange and facing then
+            ui106:SetVisible(true)
+        else
+            ui106:SetVisible(false)
+        end
+    end
+
+    if not inRange then return end
+    if not facing then return end
+
     SHARED.interactable     = EntityID
     SHARED.interactableType = "music_key"
     SHARED.interactableDist = dist
@@ -91,8 +104,23 @@ function on_update(self, dt)
         print("[MusicKey] PICKED UP MUSIC BOX KEY!")
 
         --------------------------------------------------------
-        -- ADD ITEM INTO INVENTORY
+        -- AUDIO PLAY (ONLY ADDITIONS, NO EXISTING CODE MODIFIED)
         --------------------------------------------------------
+        if EntityAudio then
+            EntityAudio:SetLoop(false)
+            EntityAudio:RequestPlay()
+            print("[MusicKey] Played pickup sound via EntityAudio.")
+        else
+            print("[MusicKey] WARNING: No AudioComponent on this key entity!")
+        end
+
+        if Play3D_ECS then
+            Play3D_ECS(EntityID)
+            print("[MusicKey] Played pickup sound via Play3D_ECS.")
+        end
+        --------------------------------------------------------
+
+        -- Add to inventory
         local invRef = SHARED and SHARED.player_inventory_ref
         if invRef and invRef.items then
             local items = invRef.items
@@ -109,12 +137,10 @@ function on_update(self, dt)
             print("[MusicKey] ERROR: No inventory ref!")
         end
 
-        --------------------------------------------------------
-        -- SAFE REMOVE (NO DESTROY)
-        --------------------------------------------------------
+        if ui106 then ui106:SetVisible(false) end
+
         SafeRemoveKey()
 
-        -- Clear SHARED interactable info
         SHARED.interactable     = nil
         SHARED.interactableType = nil
         SHARED.interactableDist = nil

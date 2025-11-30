@@ -60,8 +60,8 @@ namespace Mesh {
         glm::vec4 Tangent; // Using vec4 to include handedness (w component)
 
         // Add skinning data
-        glm::ivec4 BoneIndices;
-        glm::vec4 BoneWeights;
+        glm::ivec4 BoneIndices = glm::ivec4(0);
+        glm::vec4 BoneWeights = glm::vec4(0.f);
     };
 
     struct AABB {

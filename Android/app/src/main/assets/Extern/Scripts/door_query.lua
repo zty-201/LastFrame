@@ -1,5 +1,5 @@
 ----------------------------------------------------------------
--- door_query_debug.lua
+-- door_query_debug.lua  (with DOOR OPEN AUDIO)
 ----------------------------------------------------------------
 
 local REQUIRED_ITEM_ID  = "key"
@@ -39,7 +39,7 @@ local function IsPlayerInRange()
 end
 
 ----------------------------------------------------------------
--- Facing check (debug)
+-- Facing check
 ----------------------------------------------------------------
 local function IsPlayerFacingDoor(px, py, pz, ix, iy, iz)
     local cam = GetMainCamera()
@@ -71,50 +71,41 @@ end
 -- Required item check
 ----------------------------------------------------------------
 local function PlayerHasKey()
-    if DEBUG then print("[DoorQuery] Checking inventory...") end
-
     local inv = SHARED["player_inventory_ref"]
-    if not inv then 
-        print("[DoorQuery] ERROR: player_inventory_ref is NIL")
-        return false 
-    end
+    if not inv then return false end
 
     local item = inv.items[REQUIRED_ITEM_ID]
-
-    if DEBUG then
-        if item then
-            print("[DoorQuery] KEY FOUND qty =", item.qty)
-        else
-            print("[DoorQuery] NO KEY FOUND")
-        end
-    end
-
     return item and item.qty > 0
 end
 
 
 ----------------------------------------------------------------
--- on_update (with debug)
+-- UPDATE
 ----------------------------------------------------------------
 function on_update(Self, dt)
 
-    EntityTransform:GetPosition() -- keep your original line
+    EntityTransform:GetPosition()
+
+    -- ALWAYS HIDE BOTH ICONS
+    local ui103 = GetEntityUI(103)
+    local ui104 = GetEntityUI(104)
+    if ui103 then ui103:SetVisible(false) end
+    if ui104 then ui104:SetVisible(false) end
 
     local inRange, px, py, pz, ix, iy, iz = IsPlayerInRange()
     if not inRange then return end
-
     if not IsPlayerFacingDoor(px, py, pz, ix, iy, iz) then return end
 
-
-    -- ICON & INTERACTION INDICATOR
+    -- SHOW ICONS
     if PlayerHasKey() then
-        print("[DoorQuery] >>> UNLOCK <<<")
+        if ui103 then ui103:SetVisible(true) end
         SHARED.door_icon_status = "unlock"
     else
-        print("[DoorQuery] >>> LOCK <<<")
+        if ui104 then ui104:SetVisible(true) end
         SHARED.door_icon_status = "lock"
         return
     end
+
 
     SHARED.interactable     = EntityID
     SHARED.interactableType = "door"
@@ -122,47 +113,57 @@ function on_update(Self, dt)
 
 
     ----------------------------------------------------------------
-    -- E PRESSED → USE KEY → OPEN DOOR
+    -- E PRESSED = OPEN DOOR
     ----------------------------------------------------------------
     if Input.GetKeyDown(GLFW_KEY_E) and PlayerHasKey() then
         print("[DoorQuery] E pressed → opening door")
 
         --------------------------------------------------------
-        -- (1) Consume the key
+        -- (AUDIO) Play door unlock sound
+        --------------------------------------------------------
+        if EntityAudio then
+            EntityAudio:SetLoop(false)
+            EntityAudio:RequestPlay()
+            print("[DoorQuery] Played door unlock sound")
+        else
+            print("[DoorQuery] WARNING: No AudioComponent on door entity!")
+        end
+
+        --------------------------------------------------------
+        -- Consume key
         --------------------------------------------------------
         local inv = SHARED.player_inventory_ref
         local keyItem = inv.items["key"]
 
         if keyItem then
             keyItem.qty = keyItem.qty - 1
-            print("[DoorQuery] Key consumed. Remaining:", keyItem.qty)
 
             if keyItem.qty <= 0 then
                 inv.items["key"] = nil
-                print("[DoorQuery] Key removed from inventory.")
             end
         end
 
+        -- Hide UI icons permanently
+        local ui13 = GetEntityUI(103)
+        if ui13 then ui13:SetSize(0, 0) end
+
+        local ui14 = GetEntityUI(104)
+        if ui14 then ui14:SetSize(0, 0) end
+
         --------------------------------------------------------
-        -- (2) SCALE ENTITY 29 → 0,0,0 (hide original door)
+        -- Hide original door (29)
         --------------------------------------------------------
         local t29 = GetEntityTransform(29)
         if t29 then
             t29:SetScale(0,0,0)
-            print("[DoorQuery] Entity 29 hidden successfully.")
-        else
-            print("[DoorQuery] ERROR: Transform for entity 29 not found!")
         end
 
         --------------------------------------------------------
-        -- (3) SCALE ENTITY 101 → 30,30,30 (show opened door)
+        -- Show opened door (101)
         --------------------------------------------------------
         local t101 = GetEntityTransform(101)
         if t101 then
             t101:SetScale(30,30,30)
-            print("[DoorQuery] Entity 101 scaled to 30,30,30 (opened door).")
-        else
-            print("[DoorQuery] ERROR: Transform for entity 101 not found!")
         end
     end
 end

@@ -62,9 +62,9 @@ function on_create(self)
         end
 
         -- start flashlight OFF
-        light:SetIntensity(0.0)
-        isOn = false
-        if FL then FL.isOn = false end
+        light:SetIntensity(10000.0)
+        isOn = true
+        if FL then FL.isOn = true end
     end
 end
 
@@ -142,19 +142,33 @@ function on_update(self, dt)
     -- =========================================
     -- Keyboard test + flashlight toggle
     -- =========================================
-    if PLATFORM == "windows" then
+-- =========================================
+-- Keyboard toggle + AUDIO PLAY
+-- =========================================
+if PLATFORM == "windows" then
         
-        -- Proper edge-detected toggle on F
-        if Input.GetKey(GLFW_KEY_Q) then
-            if not prevFDown then
-                print("[FLASH] Q pressed")
-                Flashlight_Toggle()
+    if Input.GetKey(GLFW_KEY_Q) then
+        if not prevFDown then
+            print("[FLASH] Q pressed")
+
+            -- 1) toggle flashlight
+            Flashlight_Toggle()
+
+            -- 2) play audio ONCE (NO LOOP)
+            if EntityAudio then
+                EntityAudio:SetLoop(false)
+                EntityAudio:RequestPlay()
+                print("[FLASH] Played toggle sound")
+            else
+                print("[FLASH] NO AUDIO COMPONENT FOUND!")
             end
-            prevFDown = true
-        else
-            prevFDown = false
         end
+        prevFDown = true
+    else
+        prevFDown = false
     end
+end
+
 
     -- =========================================
     -- UI toggle request (from ui_flashlight.lua)

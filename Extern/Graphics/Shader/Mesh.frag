@@ -31,8 +31,8 @@ in vec2 FS_IN_TexCoord;
 in vec3 FS_IN_Tangent;
 in vec3 FS_IN_Bitangent;
 
-in flat float FS_IN_Roughness;
-in flat float FS_IN_Metallic;
+//in flat float FS_IN_Roughness;
+//in flat float FS_IN_Metallic;
 
 // ------------------------------------------------------------------
 // UNIFORMS ---------------------------------------------------------
@@ -78,7 +78,7 @@ uniform vec3  u_AlbedoFactor;
 uniform float u_RoughnessFactor;
 uniform float u_MetallicFactor;
 
-uniform sampler2DArrayShadow s_CascadeShadowMaps;;
+uniform sampler2DArrayShadow s_CascadeShadowMaps;
 uniform sampler3D            s_VoxelGrid;
 
 uniform bool u_Tricubic;

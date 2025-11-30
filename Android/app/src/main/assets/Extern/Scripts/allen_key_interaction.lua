@@ -1,11 +1,9 @@
 ----------------------------------------------------------------
--- allenkey_interaction.lua (SAFE NO-DESTROY VERSION)
--- New behavior: if player already has a metal_pick,
--- convert metal_pick → lock_pick instead of adding allen_key.
+-- allenkey_interaction.lua (SAFE NO-DESTROY VERSION + UI 107)
 ----------------------------------------------------------------
 
 local PLAYER_ENTITY_ID = 5
-local INTERACT_RANGE   = 120.0
+local INTERACT_RANGE   = 70.0
 local FACING_THRESHOLD = 0.5
 
 function on_create(self)
@@ -63,11 +61,11 @@ local function SafeRemoveAllenKey()
     -- 1. Hide visually
     EntityTransform:SetScale(0, 0, 0)
 
-    -- 2. Move away to ensure no collision or interaction
+    -- 2. Move far away
     local ix, iy, iz = EntityTransform:GetPosition()
     EntityTransform:SetPosition(ix, iy - 99999, iz)
 
-    -- 3. Disable script permanently
+    -- 3. Disable script
     on_update = nil
     on_create = nil
     on_destroy = nil
@@ -81,43 +79,66 @@ end
 function on_update(self, dt)
 
     local inRange, dist = IsPlayerInRange()
+    local facing        = IsFacing()
+
+    ------------------------------------------------------------
+    -- UI 107 visibility logic
+    ------------------------------------------------------------
+    local ui107 = GetEntityUI(107)
+    if ui107 then
+        if inRange and facing then
+            ui107:SetVisible(true)
+        else
+            ui107:SetVisible(false)
+        end
+    end
+
+    -- Block pickup if invalid
     if not inRange then return end
-    if not IsFacing() then return end
+    if not facing then return end
 
     SHARED.interactable     = EntityID
     SHARED.interactableType = "allen_key"
     SHARED.interactableDist = dist
 
+    ------------------------------------------------------------
+    -- INTERACTION
+    ------------------------------------------------------------
     if Input.GetKeyDown(GLFW_KEY_E) then
         print("[AllenKey] INTERACTED!")
 
         --------------------------------------------------------
-        -- INVENTORY LOGIC (NEW BEHAVIOR)
+        -- INVENTORY LOGIC
         --------------------------------------------------------
         local invRef = SHARED and SHARED.player_inventory_ref
         if invRef and invRef.items then
 
-            local items = invRef.items
+            local items     = invRef.items
             local metalPick = items["metal_pick"]
             local allenKey  = items["allen_key"]
             local lockPick  = items["lock_pick"]
 
-            ----------------------------------------------------
-            -- CASE 1: Player already has a metal pick
-            --   → consume metal_pick
-            --   → give lock_pick
-            --   → DO NOT give allen_key
-            ----------------------------------------------------
+            -- CASE 1 — convert metal_pick → lock_pick
             if metalPick and metalPick.qty > 0 then
                 print("[AllenKey] Metal Pick detected → Crafting Lock Pick")
 
-                -- Remove 1 metal_pick
+                ----------------------------------------------------------------
+                -- AUDIO ADDED HERE (plays when crafting happens)
+                ----------------------------------------------------------------
+                if EntityAudio then
+                    EntityAudio:SetLoop(false)
+                    EntityAudio:RequestPlay()
+                    print("[AllenKey] Played crafting sound.")
+                else
+                    print("[AllenKey] WARNING: No AudioComponent on entity!")
+                end
+                ----------------------------------------------------------------
+
                 metalPick.qty = metalPick.qty - 1
                 if metalPick.qty <= 0 then
                     items["metal_pick"] = nil
                 end
 
-                -- Add lock_pick
                 if lockPick then
                     lockPick.qty = lockPick.qty + 1
                 else
@@ -125,12 +146,22 @@ function on_update(self, dt)
                 end
 
                 print("[Inventory] metal_pick → lock_pick SUCCESS")
-            
-            ----------------------------------------------------
-            -- CASE 2: No metal pick → normal allen key pickup
-            ----------------------------------------------------
+
+            -- CASE 2 — pickup Allen Key normally
             else
                 print("[AllenKey] No Metal Pick → adding normal Allen Key")
+
+                ----------------------------------------------------------------
+                -- AUDIO ADDED HERE (plays when allen key picked normally)
+                ----------------------------------------------------------------
+                if EntityAudio then
+                    EntityAudio:SetLoop(false)
+                    EntityAudio:RequestPlay()
+                    print("[AllenKey] Played pickup sound.")
+                else
+                    print("[AllenKey] WARNING: No AudioComponent on entity!")
+                end
+                ----------------------------------------------------------------
 
                 if allenKey then
                     allenKey.qty = allenKey.qty + 1
@@ -143,9 +174,10 @@ function on_update(self, dt)
             print("[AllenKey] ERROR: No inventory reference!")
         end
 
-        --------------------------------------------------------
-        -- SAFE REMOVE (NO DESTROY)
-        --------------------------------------------------------
+        -- Hide UI 107 on pickup
+        if ui107 then ui107:SetVisible(false) end
+
+        -- Remove Allen Key safely
         SafeRemoveAllenKey()
 
         SHARED.interactable     = nil

@@ -78,7 +78,7 @@ uniform vec3  u_AlbedoFactor;
 uniform float u_RoughnessFactor;
 uniform float u_MetallicFactor;
 
-uniform sampler2DArrayShadow s_CascadeShadowMaps;;
+uniform sampler2DArrayShadow s_CascadeShadowMaps;
 uniform sampler3D            s_VoxelGrid;
 
 uniform bool u_Tricubic;

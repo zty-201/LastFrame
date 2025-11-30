@@ -1,9 +1,9 @@
 ----------------------------------------------------------------
--- key_interaction.lua (SAFE VERSION)
+-- key_interaction.lua (SAFE VERSION + UI 105 HIGHLIGHT)
 ----------------------------------------------------------------
 
 local PLAYER_ENTITY_ID = 5
-local INTERACT_RANGE   = 120.0
+local INTERACT_RANGE   = 80.0
 local FACING_THRESHOLD = 0.5
 
 function on_create(self)
@@ -56,15 +56,12 @@ end
 local function RemoveKeySafely()
     print("[KeyInteraction] Safely removing key (NO DESTROY).")
 
-    -- 1. Hide it instantly
     EntityTransform:SetScale(0, 0, 0)
 
-    -- 2. Move it VERY far away so no collisions or raycasts
     local ix,iy,iz = EntityTransform:GetPosition()
     EntityTransform:SetPosition(ix, iy - 99999, iz)
 
-    -- 3. Disable this script by killing update callbacks
-    --    Removes on_update so engine stops calling it
+    -- disable script
     on_update = nil
     on_create = nil
     on_destroy = nil
@@ -78,8 +75,25 @@ end
 function on_update(self, dt)
 
     local inRange, dist = IsPlayerInRange()
+    local facing = IsFacing()
+
+    ------------------------------------------------------------
+    -- UPDATE UI ENTITY 105 VISIBILITY
+    ------------------------------------------------------------
+    local ui105 = GetEntityUI(105)
+    if ui105 then
+        if inRange and facing then
+            ui105:SetVisible(true)
+        else
+            ui105:SetVisible(false)
+        end
+    end
+
+    ------------------------------------------------------------
+    -- No interaction unless both conditions true
+    ------------------------------------------------------------
     if not inRange then return end
-    if not IsFacing() then return end
+    if not facing then return end
 
     SHARED.interactable     = EntityID
     SHARED.interactableType = "key"
@@ -87,6 +101,17 @@ function on_update(self, dt)
 
     if Input.GetKeyDown(GLFW_KEY_E) then
         print("[KeyInteraction] PICKED UP KEY!")
+
+        --------------------------------------------------------
+        -- PLAY PICKUP AUDIO HERE (one-shot)
+        --------------------------------------------------------
+        if EntityAudio then
+            EntityAudio:SetLoop(false)      -- ensure no looping
+            EntityAudio:RequestPlay()       -- plays once
+            print("[KeyInteraction] Played pickup sound")
+        else
+            print("[KeyInteraction] No AudioComponent found!")
+        end
 
         --------------------------------------------------------
         -- ADD TO INVENTORY
@@ -108,11 +133,15 @@ function on_update(self, dt)
         end
 
         --------------------------------------------------------
-        -- SAFE REMOVE (NO DESTROY)
+        -- HIDE UI 105 ON PICKUP
+        --------------------------------------------------------
+        if ui105 then ui105:SetVisible(false) end
+
+        --------------------------------------------------------
+        -- REMOVE KEY FROM WORLD
         --------------------------------------------------------
         RemoveKeySafely()
 
-        -- cleanup global interactable
         SHARED.interactable     = nil
         SHARED.interactableType = nil
         SHARED.interactableDist = nil

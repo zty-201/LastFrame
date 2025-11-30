@@ -349,7 +349,7 @@ namespace EngineFramework
 
 #ifdef PLATFORM_ANDROID
 		// Example policy: add streaming on mobile for big files if desired
-		// mode |= FMOD_CREATESTREAM;
+		// mode |= FMOD_CREATESAMPLE;
 
 		std::string loadPath = resolved;
 		/*if (m_androidAssetMgr != NULL)

@@ -773,6 +773,11 @@ namespace EngineFramework
             shader = E_AM::GetResource<ShaderProgram>(mesh_shader_guid);
         }
 
+        if (!shader) {
+            LOGE("Mesh shader not found!");
+			return;
+        }
+
         shader->use();
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_pointLightSSBO);

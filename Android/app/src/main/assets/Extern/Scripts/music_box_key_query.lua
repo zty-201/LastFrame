@@ -1,5 +1,5 @@
 ----------------------------------------------------------------
--- music_box_key_query.lua
+-- music_box_key_query.lua (with UI 109 + 110)
 ----------------------------------------------------------------
 
 local REQUIRED_ITEM_ID  = "music_key"
@@ -18,11 +18,7 @@ end
 ----------------------------------------------------------------
 local function IsPlayerInRange()
     local boxTransform = GetEntityTransform(EntityID)
-
-    if not boxTransform then
-        print("[MusicBoxKeyQuery] ERROR: Transform NIL for", EntityID)
-        return false
-    end
+    if not boxTransform then return false end
 
     local playerTransform = GetEntityTransform(PLAYER_ENTITY_ID)
     if not playerTransform then return false end
@@ -33,8 +29,8 @@ local function IsPlayerInRange()
     local dx = px - ix
     local dy = py - iy
     local dz = pz - iz
-    local dist = math.sqrt(dx*dx + dy*dy + dz*dz)
 
+    local dist = math.sqrt(dx*dx + dy*dy + dz*dz)
     return dist <= INTERACT_RANGE, px, py, pz, ix, iy, iz
 end
 
@@ -58,38 +54,17 @@ local function IsPlayerFacing(px, py, pz, ix, iy, iz)
     local dm = math.sqrt(dx*dx + dy*dy + dz*dz)
     dx, dy, dz = dx/dm, dy/dm, dz/dm
 
-    local dot = fx*dx + fy*dy + fz*dz
-
-    if DEBUG then
-        print(string.format("[MusicBoxKeyQuery] FacingDot = %.3f (need %.3f)",
-            dot, FACING_THRESHOLD))
-    end
-
-    return dot > FACING_THRESHOLD
+    return (fx*dx + fy*dy + fz*dz) > FACING_THRESHOLD
 end
 
 ----------------------------------------------------------------
--- Inventory check for MUSIC KEY
+-- Inventory check
 ----------------------------------------------------------------
 local function PlayerHasMusicKey()
-    if DEBUG then print("[MusicBoxKeyQuery] Checking inventory...") end
-
     local inv = SHARED["player_inventory_ref"]
-    if not inv then
-        print("[MusicBoxKeyQuery] ERROR: inventory ref NIL")
-        return false
-    end
+    if not inv then return false end
 
     local item = inv.items[REQUIRED_ITEM_ID]
-
-    if DEBUG then
-        if item then
-            print("[MusicBoxKeyQuery] MUSIC KEY FOUND qty =", item.qty)
-        else
-            print("[MusicBoxKeyQuery] NO MUSIC KEY FOUND")
-        end
-    end
-
     return item and item.qty > 0
 end
 
@@ -98,32 +73,61 @@ end
 ----------------------------------------------------------------
 function on_update(Self, dt)
 
-    EntityTransform:GetPosition() -- keep your line
+    -- ALWAYS HIDE UI (109 locked, 110 unlocked)
+    local uiLocked  = GetEntityUI(109)
+    local uiUnlock  = GetEntityUI(110)
 
+    if uiLocked then uiLocked:SetVisible(false) end
+    if uiUnlock then uiUnlock:SetVisible(false) end
+
+    -------------------------------------------------------
+    -- Check distance + facing
+    -------------------------------------------------------
     local inRange, px, py, pz, ix, iy, iz = IsPlayerInRange()
     if not inRange then return end
 
     if not IsPlayerFacing(px, py, pz, ix, iy, iz) then return end
 
-    -- SHOW INTERACTABLE UI
+    -------------------------------------------------------
+    -- Show UI states
+    -------------------------------------------------------
     if PlayerHasMusicKey() then
+        -- Player can unlock → show UI 110
+        if uiUnlock then uiUnlock:SetVisible(true) end
         SHARED.musicbox_icon_status = "unlock"
         print("[MusicBoxKeyQuery] >>> UNLOCK <<<")
     else
+        -- Player missing key → show UI 109
+        if uiLocked then uiLocked:SetVisible(true) end
         SHARED.musicbox_icon_status = "lock"
         print("[MusicBoxKeyQuery] >>> LOCK <<<")
         return
     end
 
+    -------------------------------------------------------
+    -- Mark as interactable for UI system
+    -------------------------------------------------------
     SHARED.interactable     = EntityID
     SHARED.interactableType = "music_box"
     SHARED.interactableDist = 0
 
-    ----------------------------------------------------------------
-    -- WHEN E IS PRESSED → CONSUME THE MUSIC KEY
-    ----------------------------------------------------------------
+    -------------------------------------------------------
+    -- Use key (E pressed)
+    -------------------------------------------------------
     if Input.GetKeyDown(GLFW_KEY_E) and PlayerHasMusicKey() then
-        print("[MusicBoxKeyQuery] E pressed → using music key!")
+        print("[MusicBoxKeyQuery] E pressed → opening music box!")
+
+        -------------------------------------------------------
+        -- AUDIO PLAY HERE (ONLY ADDITION)
+        -------------------------------------------------------
+        if EntityAudio then
+            EntityAudio:SetLoop(false)
+            EntityAudio:RequestPlay()
+            print("[MusicBoxKeyQuery] Played music box unlock sound.")
+        else
+            print("[MusicBoxKeyQuery] WARNING: No AudioComponent found!")
+        end
+        -------------------------------------------------------
 
         local inv = SHARED.player_inventory_ref
         local item = inv.items[REQUIRED_ITEM_ID]
@@ -132,13 +136,17 @@ function on_update(Self, dt)
             item.qty = item.qty - 1
             print("[MusicBoxKeyQuery] Music key consumed. Remaining:", item.qty)
 
+            local ui19 = GetEntityUI(109)
+                ui19:SetSize(0, 0)
+            local ui10 = GetEntityUI(110)
+                ui10:SetSize(0, 0)
+
             if item.qty <= 0 then
                 inv.items[REQUIRED_ITEM_ID] = nil
-                print("[MusicBoxKeyQuery] Music key removed from inventory.")
+                print("[MusicBoxKeyQuery] Removed music_key from inventory.")
             end
         end
 
-        -- (OPTIONAL): trigger animation, open box, reveal object...  
-        -- Tell me what you want this to do.
+        -- TODO: Place what happens when the music box opens
     end
 end
