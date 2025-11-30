@@ -347,7 +347,7 @@ namespace EngineFramework
                     }
 
                     float menuBarWidth = ImGui::GetContentRegionAvail().x;
-                    float toggleWidth = 150.f;
+                    float toggleWidth = 230.f;
                     if (menuBarWidth > toggleWidth)
                     {
                         ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - toggleWidth);
