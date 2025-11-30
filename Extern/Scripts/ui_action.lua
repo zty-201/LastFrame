@@ -6,6 +6,7 @@
 local ICON_SIZE = 350.0   -- big icon
 local ANCHOR_X  = 0.90    -- 0 = left, 1 = right
 local ANCHOR_Y  = 0.22    -- 0 = bottom, 1 = top
+local prevEDown = false
 
 local screenWidth, screenHeight = 3088, 1440
 
@@ -66,9 +67,29 @@ end
 function on_update(self, dt)
     if not UI then return end
 
-    local down = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
-    if down and isPointerOver() then
+    -- ===========================
+    -- MOUSE/TAP ON ICON
+    -- ===========================
+    local downMouse = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
+    if downMouse and isPointerOver() then
         -- Placeholder – actual action will be wired later
         print("[ui_action] Icon pressed (no gameplay hooked yet)")
     end
+
+    -- ===========================
+    -- WINDOWS KEYBOARD: E to "press" action
+    -- ===========================
+    if PLATFORM == "windows" then
+        local isEDown = Input.GetKey(GLFW_KEY_E)
+
+        -- Edge-detect: only fire once per key press
+        if isEDown and not prevEDown then
+            -- Same behaviour as clicking the button
+            print("[ui_action] E pressed (action button)")
+            -- later you can also set SHARED.UI.actionRequested = true here
+        end
+
+        prevEDown = isEDown
+    end
 end
+

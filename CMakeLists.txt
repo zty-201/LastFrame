@@ -346,6 +346,14 @@ elseif(ANDROID)
   target_include_directories(jnicpp PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
 endif()
 
+#Adding /bigobj for Script.cpp as it's too big
+if (MSVC)
+    set_source_files_properties(
+        Engine/Scripting/Script.cpp
+        PROPERTIES COMPILE_OPTIONS "/bigobj"
+    )
+endif()
+
 
 # ======================= END AUTO CONFIGURATION =========================
 
