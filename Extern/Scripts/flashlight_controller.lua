@@ -62,9 +62,9 @@ function on_create(self)
         end
 
         -- start flashlight OFF
-        light:SetIntensity(0.0)
-        isOn = false
-        if FL then FL.isOn = false end
+        light:SetIntensity(10000.0)
+        isOn = true
+        if FL then FL.isOn = true end
     end
 end
 
