@@ -1567,7 +1567,7 @@ namespace EngineFramework
                     glm::vec3 finalSize = sizeLocal * entScale;
                     glm::quat qShape = entRot * EulerDegToQuat(shape.offsetRotation);
                     glm::vec3 finalPos = entPos + (entRot * (shape.offsetPosition * entScale));
-                    glm::mat4 shapeTransform = model * TRS(finalPos, qShape, finalSize);
+                    glm::mat4 shapeTransform = TRS(finalPos, qShape, finalSize);
 
                     DrawWireOBB(shapeTransform, view, proj, screen_pos, available_size,
                         IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
