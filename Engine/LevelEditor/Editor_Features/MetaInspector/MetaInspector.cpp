@@ -43,9 +43,36 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <cstring>
 #include <memory>
 #include <utility>
+#include <PhysicsBuildSystem.hpp>
 
 // FILE TO HANDLE THE META DATA OF THE ENTITIY
 namespace EditorFeatures {
+
+	static void FitShapeToMesh(entt::registry& reg, entt::entity entity, ColliderData& shape)
+	{
+		// 1. Check for MeshComponent
+		if (!reg.all_of<MeshComponent>(entity)) return;
+		const auto& meshComp = reg.get<MeshComponent>(entity);
+
+		// 2. Get Mesh Resource
+		auto meshGuid = EngineFramework::AssetManagerSystem::GetFullGuid(
+			EngineFramework::AssetManagerSystem::MESH_GUID,
+			meshComp.meshName
+		);
+
+		if (!EngineFramework::AssetManagerSystem::HasResource(meshGuid)) return;
+		auto meshData = EngineFramework::AssetManagerSystem::GetResource<Mesh::MeshData>(meshGuid);
+		if (!meshData) return;
+
+		// 3. Get Bounds
+		const auto& aabb = meshData->GetAABB();
+
+		// 4. Apply to THIS shape instance
+		shape.type = static_cast<int>(ColliderShape::Box); // Reset to Box
+		shape.boxHalfExtents = aabb.halfExtents();
+		shape.offsetPosition = aabb.center();
+		shape.offsetRotation = glm::vec3(0.0f); // Reset rotation
+	}
 
 	// Add on to this map if want to hide any fields
 	static const std::unordered_map<std::string_view, std::unordered_set<std::string_view>> hidden_fields = {
@@ -141,11 +168,14 @@ namespace EditorFeatures {
 		return std::string(buffer);
 	}
 
-	static inline void draw_vec3_drag(const char* label, glm::vec3& v, float speed = 0.05f) {
+	static inline bool draw_vec3_drag(const char* label, glm::vec3& v, float speed = 0.05f) {
 		float a[3]{ v.x, v.y, v.z };
+		bool changed = false;
 		if (ImGui::DragFloat3(label, a, speed)) {
 			v = { a[0], a[1], a[2] };
+			changed = true;
 		}
+		return changed;
 	}
 
 	static inline void draw_vec4_drag(const char* label, glm::vec4& v, float speed = 0.05f) {
@@ -748,8 +778,9 @@ namespace EditorFeatures {
 	
 	// Main function to view/edit property
 	// Takes a mneta type and the corresponding instance and writes the edited values back through entt::meta_data::set
-	void DrawMetaObject(entt::entity entity, const char* component_name, entt::meta_type& mt, entt::meta_any& obj) {
+	bool DrawMetaObject(entt::entity entity, const char* component_name, entt::meta_type& mt, entt::meta_any& obj) {
 		//const char* typeName = mt.name();
+		bool any_change = false;
 
 		auto t = obj.type();
 
@@ -758,7 +789,7 @@ namespace EditorFeatures {
 			if (obj.allow_cast<Engine::LuaScriptComponent&>()) {
 				draw_lua_script_component(entity, component_name, obj);
 			}
-			return;
+			return false;
 		}
 #endif
 
@@ -813,6 +844,7 @@ namespace EditorFeatures {
 			}
 
 			ImGui::Separator();
+			return false;
 		}
 		
 		// Each entry is pair<entt::id_type, entt::meta_data> - for self reference
@@ -841,6 +873,7 @@ namespace EditorFeatures {
 				update_field_history(entity, component_name, data, obj);
 				if (interacted) {
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 			else if (field.type().is_enum()) {
@@ -869,6 +902,7 @@ namespace EditorFeatures {
 						commit_instant_history(entity, component_name, data, obj, [&]() {
 							value = new_value;
 							data.set(obj, value);
+							any_change = true;
 						});
 					}
 				}
@@ -894,6 +928,7 @@ namespace EditorFeatures {
 						commit_instant_history(entity, component_name, data, obj, [&]() {
 							value = new_value;
 							data.set(obj, value);
+							any_change = true;
 							});
 					}
 				}
@@ -917,16 +952,18 @@ namespace EditorFeatures {
 					commit_instant_history(entity, component_name, data, obj, [&]() {
 						value = new_value;
 						data.set(obj, value);
+						any_change = true;
 					});
 				}
 			}
 
 			else if (field.type() == entt::resolve<float>()) {
 				float& v = field.cast<float&>();
-				const bool interacted = ImGui::DragFloat(label.c_str(), &v, 0.01f);
-				update_field_history(entity, component_name, data, obj);
-				if (interacted) {
+				//const bool interacted = ImGui::DragFloat(label.c_str(), &v, 0.01f);
+				if (ImGui::DragFloat(label.c_str(), &v, 0.01f)) {
+					update_field_history(entity, component_name, data, obj);
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 
@@ -936,6 +973,7 @@ namespace EditorFeatures {
 				update_field_history(entity, component_name, data, obj);
 				if (interacted) {
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 
@@ -944,6 +982,7 @@ namespace EditorFeatures {
 				if (ImGui::Checkbox(label.c_str(), &v)) {
 					commit_instant_history(entity, component_name, data, obj, [&]() {
 						data.set(obj, v);
+						any_change = true;
 					});
 				}
 			}
@@ -956,6 +995,7 @@ namespace EditorFeatures {
 				update_field_history(entity, component_name, data, obj);
 				if (interacted) {
 					data.set(obj, std::string{ buffer });
+					any_change = true;
 				}
 			}
 
@@ -1059,7 +1099,16 @@ namespace EditorFeatures {
 				}
 			}
 			}
-
+			else if (field.type() == entt::resolve<glm::vec2>()) {
+				glm::vec2& v = field.cast<glm::vec2&>();
+				float values[2]{ v.x, v.y };
+				const bool edited = ImGui::DragFloat2(label.c_str(), values, 0.01f);
+				update_field_history(entity, component_name, data, obj);
+				if (edited) {
+					v = { values[0], values[1] };
+					data.set(obj, v);
+				}
+			}
 			else if (field.type() == entt::resolve<glm::vec3>()) {
 				glm::vec3& v = field.cast<glm::vec3&>();
 
@@ -1074,12 +1123,16 @@ namespace EditorFeatures {
 					if (interacted) {
 						v = { color[0], color[1], color[2] };
 						data.set(obj, v);
+						any_change = true;
 					}
 				}
 				else {
-					draw_vec3_drag(label.c_str(), v);
-					update_field_history(entity, component_name, data, obj);
-					data.set(obj, v);
+					if (draw_vec3_drag(label.c_str(), v))
+					{
+						update_field_history(entity, component_name, data, obj);
+						data.set(obj, v);
+						any_change = true;
+					}
 				}
 			}
 			else if (field.type() == entt::resolve<glm::vec4>()) {
@@ -1095,6 +1148,7 @@ namespace EditorFeatures {
 					if (interacted) {
 						v = { color[0], color[1], color[2], color[3] };
 						data.set(obj, v);
+						any_change = true;
 					}
 				}
 				else {
@@ -1125,6 +1179,7 @@ namespace EditorFeatures {
 				{
 					auto view = field.as_sequence_container();
 					int index = 0;
+					bool vector_modified = false;
 					for (auto it = view.begin(); it != view.end(); ++it)
 					{
 						ImGui::PushID(index);
@@ -1135,15 +1190,34 @@ namespace EditorFeatures {
 						if (ImGui::TreeNode(element_label.c_str()))
 						{
 							entt::meta_type element_type = element.type();
-							DrawMetaObject(entity, component_name, element_type, element);
+							if (DrawMetaObject(entity, component_name, element_type, element))
+							{
+								vector_modified = true;
+							}
 							ImGui::TreePop();
+						}
+
+						if (element.type() == entt::resolve<ColliderData>())
+						{
+							ImGui::SameLine();
+							if (ImGui::Button("Reset"))
+							{
+								if (ColliderData* shapeData = element.try_cast<ColliderData>())
+								{
+									FitShapeToMesh(registry, entity, *shapeData);
+									data.set(obj, field);
+									vector_modified = true;
+								}
+							}
 						}
 
 						ImGui::SameLine();
 						if (ImGui::SmallButton("X"))
 						{
 							view.erase(it);
+							data.set(obj, field);
 							ImGui::PopID();
+							vector_modified = true;
 							break;
 						}
 
@@ -1158,9 +1232,22 @@ namespace EditorFeatures {
 						if (inner_type) {
 							entt::meta_any new_element = inner_type.construct();
 							if (new_element) {
+								if(new_element.type() == entt::resolve<ColliderData>())
+								{
+									ColliderData& shapeRef = new_element.cast<ColliderData&>();
+									FitShapeToMesh(registry, entity, shapeRef);
+								}
+
 								view.insert(view.end(), new_element);
+								data.set(obj, field);
+								vector_modified = true;
 							}
 						}
+					}
+
+					if (vector_modified) {
+						data.set(obj, field); // Writes the modified vector back to the component
+						any_change = true;
 					}
 
 					ImGui::TreePop();
@@ -1171,7 +1258,11 @@ namespace EditorFeatures {
 				// Nested struct: recurse
 				if (ImGui::TreeNode(label.c_str())) {
 					auto f = field.type();
-					DrawMetaObject(entity, component_name, f, field);
+					if (DrawMetaObject(entity, component_name, f, field))
+					{
+						data.set(obj, field);
+						any_change = true;
+					}
 					ImGui::TreePop();
 				}
 			}
@@ -1181,6 +1272,7 @@ namespace EditorFeatures {
 
 			ImGui::PopID();
 		}
+		return any_change;
 	}
 }
 

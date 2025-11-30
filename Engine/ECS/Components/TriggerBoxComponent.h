@@ -21,6 +21,8 @@ struct TriggerBoxComponent
 {
     // --- authoring ---
     bool                enabled = true;                    // turn on/off without removing
+    bool                highlight = false;
+
     TriggerShapeType    type = TriggerShapeType::Box;   // which shape to use
 
     // Box parameters (used when type == Box)
@@ -39,6 +41,10 @@ struct TriggerBoxComponent
 
     // Optional: visual debug (ignored by runtime)
     glm::vec3           debugColor = { 0.1f, 0.8f, 0.2f };      // for gizmos
+
+    // runtime
+    std::unordered_set<entt::entity> currentInside;
+    std::unordered_set<entt::entity> highlightedEntities;
 
     // --- runtime (filled by TriggerBuildSystem) ---
     static constexpr uint32_t InvalidId = 0xFFFFFFFFu;

@@ -23,6 +23,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "CameraComponent.h"
 #include "Camera.h"
 
+//For UI access in scripts
+#include "UIComponent.h"
+
 //For platform android vs windows
 #include "Platform.h"
 
@@ -120,6 +123,72 @@ namespace Engine {
         );
 
         LOGI("[ScriptSystem] TransformComponent bindings complete.");
+
+        // ===============================================================
+        // Light Component bindings
+        // ===============================================================
+        // (Assuming your LightComponent has fields:
+        //  glm::vec3 position, direction, color;
+        //  float intensity, radius, constant, linear, quadratic,
+        //        innerConeAngle, outerConeAngle)
+        s_Lua.new_usertype<LightComponent>("LightComponent",
+            "GetPosition", [](LightComponent& light) {
+                return std::make_tuple(light.position.x, light.position.y, light.position.z);
+            },
+            "SetPosition", [](LightComponent& light, float x, float y, float z) {
+                light.position = glm::vec3(x, y, z);
+            },
+            "GetDirection", [](LightComponent& light) {
+                return std::make_tuple(light.direction.x, light.direction.y, light.direction.z);
+            },
+            "SetDirection", [](LightComponent& light, float x, float y, float z) {
+                light.direction = glm::normalize(glm::vec3(x, y, z));
+            },
+            "GetIntensity", [](LightComponent& light) {
+                return light.intensity;
+            },
+            "SetIntensity", [](LightComponent& light, float i) {
+                light.intensity = i;
+            }
+        );
+
+        LOGI("[ScriptSystem] LightComponent bindings complete.");
+
+        // ===============================================================
+        // UIComponent bindings
+        // ===============================================================
+        s_Lua.new_usertype<UIComponent>("UIComponent",
+            "GetPosition", [](UIComponent& ui) {
+                return std::make_tuple(ui.position.x, ui.position.y);
+            },
+            "SetPosition", [](UIComponent& ui, float x, float y) {
+                ui.position = glm::vec2(x, y);
+            },
+            "GetSize", [](UIComponent& ui) {
+                return std::make_tuple(ui.size.x, ui.size.y);
+            },
+            "SetSize", [](UIComponent& ui, float w, float h) {
+                ui.size = glm::vec2(w, h);
+            },
+            "GetColor", [](UIComponent& ui) {
+                return std::make_tuple(ui.color.r, ui.color.g, ui.color.b);
+            },
+            "SetColor", [](UIComponent& ui, float r, float g, float b, float a) {
+                ui.color = glm::vec4(r, g, b, a);
+            },
+            "IsVisible", [](UIComponent& ui) {
+                return ui.visible;
+            },
+            "SetVisible", [](UIComponent& ui, bool v) {
+                ui.visible = v;
+            },
+            "GetLayer", [](UIComponent& ui) {
+                return ui.layer;
+            },
+            "SetLayer", [](UIComponent& ui, int layer) {
+                ui.layer = layer;
+            }
+        );
 
         // ===============================================================
         // InputManager bindings
@@ -260,6 +329,10 @@ namespace Engine {
         s_Lua["GLFW_KEY_A"] = 65;
         s_Lua["GLFW_KEY_S"] = 83;
         s_Lua["GLFW_KEY_D"] = 68;
+        s_Lua["GLFW_KEY_F"] = 70;
+        s_Lua["GLFW_KEY_Q"] = 81;
+        s_Lua["GLFW_KEY_E"] = 69;
+
         s_Lua["GLFW_KEY_SPACE"] = 32;
         s_Lua["GLFW_KEY_SHIFT"] = 340;
 
@@ -510,10 +583,24 @@ namespace Engine {
                     static_cast<unsigned>(e));
             }
 
+            // Get LightComponent
+            LightComponent* entityLight = nullptr;
+            if (registry.all_of<LightComponent>(e)) {
+                entityLight = &registry.get<LightComponent>(e);
+            }
+
+            // Get UIComponent
+            UIComponent* entityUI = nullptr;
+            if (registry.all_of<UIComponent>(e)) {
+                entityUI = &registry.get<UIComponent>(e);
+            }
+
             // Create environment and inject variables
             inst.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
             inst.Env["EntityID"] = static_cast<uint32_t>(e);
             inst.Env["EntityTransform"] = entityTransform;
+            inst.Env["EntityLight"] = entityLight;
+            inst.Env["EntityUI"] = entityUI;
 
             LOGI("[LuaRuntime] Injected EntityID=%u and EntityTransform=%p into environment",
                 static_cast<unsigned>(e), (void*)entityTransform);

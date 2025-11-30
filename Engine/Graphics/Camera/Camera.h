@@ -183,6 +183,32 @@ namespace Camera {
         // Update shader program with the new camera settings
         //setUniforms(pProgram);
     }
+
+    //Calulates world-space Ray (origin and direction) from screen-space mouse pos
+    inline void ScreenPointToRay(
+        const CameraComponent& cam,
+        float mouseX, float mouseY,
+        float screenWidth, float screenHeight,
+        glm::vec3& outOrigin, glm::vec3& outDir)
+    {
+        glm::mat4 viewMatrix = glm::lookAt(cam.position, cam.target, glm::vec3(0.0f, 1.0f, 0.0f));
+        float aspectRatio = screenWidth / screenHeight;
+        glm::mat4 projMatrix = glm::perspective(glm::radians(cam.fieldOfView), aspectRatio, cam.nearPlane, cam.farPlane);
+
+        float x = (2.0f * mouseX) / screenWidth - 1.0f;
+        float y = 1.0f - (2.0f * mouseY) / screenHeight;
+        float z = 1.0f;
+
+        glm::vec3 ray_nds = glm::vec3(x, y, z);
+        glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0f, 1.0f);
+        glm::vec4 ray_eye = glm::inverse(projMatrix) * ray_clip;
+        ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0f, 0.0f); // Set W to 0 for a direction vector
+
+        glm::vec3 ray_wor = glm::vec3(glm::inverse(viewMatrix) * ray_eye);
+
+        outDir = glm::normalize(ray_wor);
+        outOrigin = cam.position;
+    }
 }
 
 #endif // CAMERA_H

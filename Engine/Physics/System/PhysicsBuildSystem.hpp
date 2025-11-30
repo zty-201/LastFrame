@@ -10,3 +10,5 @@ class PhysicsBuildSystem
 public:
     static void Update(entt::registry& registry);
 };
+
+//static void FitColliderToMeshAABB(entt::registry& ecs, entt::entity e);

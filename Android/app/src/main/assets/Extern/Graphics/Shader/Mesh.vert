@@ -29,8 +29,10 @@ layout(std140, binding = 0) uniform VolumetricUBO
     mat4  projection;
     mat4  view_proj;
     mat4  prev_view_proj;
-    mat4  light_view_proj;
     mat4  inv_view_proj;
+    mat4  cascade_view_proj[4];  // Array of cascade matrices
+    vec4  cascade_splits;
+    vec4  cascade_biases;
     vec4  light_direction;
     vec4  light_color;
     vec4  camera_position;
@@ -39,7 +41,6 @@ layout(std140, binding = 0) uniform VolumetricUBO
     vec4  time;
     ivec4 width_height;
 };
-
 uniform mat4 u_Model;
 
 // ------------------------------------------------------------------
@@ -48,9 +49,7 @@ uniform mat4 u_Model;
 
 void main()
 {
-
     mat4 model = u_Model;
-    // -------------------------
 
     vec4 world_pos = model * vec4(VS_IN_Position.xyz, 1.0f);
     FS_IN_WorldPos = world_pos.xyz;
@@ -61,8 +60,6 @@ void main()
     FS_IN_Normal    = normalize(normal_mat * VS_IN_Normal.xyz);
     FS_IN_Tangent   = normalize(mat3(model) * VS_IN_Tangent.xyz);
     FS_IN_Bitangent = cross(FS_IN_Normal, FS_IN_Tangent) * VS_IN_Tangent.w;
-
-    // ----------------------------------------------
 
     gl_Position = view_proj * world_pos;
 }

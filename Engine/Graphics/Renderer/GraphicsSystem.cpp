@@ -7,6 +7,7 @@
 #include "MaterialComponent.h"
 #include "AnimationComponent.h"
 
+#include "UIComponent.h"
 #include "SceneManager.hpp"
 
 #include "stb_image.h"
@@ -168,7 +169,8 @@ namespace EngineFramework
         light_injection_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "LightInjection");
         ray_march_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "RayMarch");
         point_shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "PointShadow");
-
+        ui_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "UI");	
+        
         // Create SSBO for point lights
         glGenBuffers(1, &m_pointLightSSBO);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_pointLightSSBO);
