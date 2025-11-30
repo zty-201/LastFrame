@@ -11,6 +11,7 @@
 #include "MaterialComponent.h"
 #include "MeshComponent.h"
 #include "TransformComponent.h"
+#include "AnimationComponent.h"
 #include "AudioComponent.h"
 #include "ColliderComponent.h"
 #include "PhysicsMaterialComponent.h"
@@ -491,6 +492,16 @@ namespace EngineFramework
 			.func<&Remover<MeshComponent>::RemoveComponent>("remove")
 			.func<&Getter<MeshComponent>::GetComponent>("get")
 			.func<&GetRef<MeshComponent>>("get_ref");
+
+		// === Register AnimationComponent ===
+		entt::meta_factory<AnimationComponent>()
+			.type("AnimationComponent")
+			.data<&AnimationComponent::animationName>("animationName") 
+			.data<&AnimationComponent::currentClip>("currentClip")
+			.func<&Emplacer<AnimationComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<AnimationComponent>::RemoveComponent>("remove")
+			.func<&Getter<AnimationComponent>::GetComponent>("get")
+			.func<&GetRef<AnimationComponent>>("get_ref");
 
 		// === Register MaterialComponent ===
 		entt::meta_factory<MaterialComponent>()

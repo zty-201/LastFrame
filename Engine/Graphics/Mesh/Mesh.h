@@ -33,6 +33,7 @@
 #include "MaterialComponent.h"
 #include "global.hpp" // For AssetManagerSystem, etc.
 #include "AssimpWrapper.h"
+#include "Animation.hpp"
 
 #ifdef min
 #undef min
@@ -57,6 +58,10 @@ namespace Mesh {
         glm::vec3 Normal;
         glm::vec2 TexCoords;
         glm::vec4 Tangent; // Using vec4 to include handedness (w component)
+
+        // Add skinning data
+        glm::ivec4 BoneIndices;
+        glm::vec4 BoneWeights;
     };
 
     struct AABB {
@@ -97,10 +102,10 @@ namespace Mesh {
         MeshData() = default;
 
         // Constructor for loading a mesh from a file via Assimp.
-        explicit MeshData(const std::string& filePath) {
-            loadWithAssimp(filePath);
+        explicit MeshData(const std::string& filePath, EngineFramework::Skeleton* skeleton = nullptr) {
+            loadWithAssimp(filePath, skeleton);
         }
-        
+
         const AABB& GetAABB() const { return m_aabb; }
         const std::vector<AABB>& GetSubmeshAABBs() const { return m_submeshAABBs; }
 
@@ -132,8 +137,22 @@ namespace Mesh {
         AABB m_aabb;                     // whole-mesh AABB (object space)
         std::vector<AABB> m_submeshAABBs; // per-submesh AABBs
 
+        // Assimp Convertion helper
+        static inline glm::mat4 AssimpToGLM(const aiMatrix4x4& from) {
+            glm::mat4 to;
+            // Assimp is Row-Major, GLM is Column-Major. 
+            // We usually need to transpose, but the memory layout of aiMatrix4x4 
+            // often maps directly to glm::mat4 depending on how you access it.
+            // The safest manual assignment:
+            to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = from.a4;
+            to[0][1] = from.b1; to[1][1] = from.b2; to[2][1] = from.b3; to[3][1] = from.b4;
+            to[0][2] = from.c1; to[1][2] = from.c2; to[2][2] = from.c3; to[3][2] = from.c4;
+            to[0][3] = from.d1; to[1][3] = from.d2; to[2][3] = from.d3; to[3][3] = from.d4;
+            return to;
+        }
+
         // The core Assimp loading function.
-        void loadWithAssimp(const std::string& filePath) {
+        void loadWithAssimp(const std::string& filePath, EngineFramework::Skeleton* skeleton = nullptr) {
             LOGI("Loading mesh from file: %s", filePath.c_str());
             Assimp::Importer importer;
 
@@ -152,9 +171,19 @@ namespace Mesh {
                 throw std::runtime_error("Assimp Error: " + std::string(importer.GetErrorString()));
             }
 
+            for (unsigned int m = 0; m < scene->mNumMeshes; ++m) {
+                const aiMesh* mesh = scene->mMeshes[m];
+                LOGI("aiMesh[%u]: name='%s', verts=%u, bones=%u",
+                    m,
+                    mesh->mName.C_Str(),
+                    mesh->mNumVertices,
+                    mesh->mNumBones);
+            }
+
             processMaterials(scene);
-            processNode(scene->mRootNode, scene);
+            processNode(scene->mRootNode, scene, skeleton);
             createGLBuffers(m_temp_vertices, m_temp_indices);
+
 
             m_temp_vertices.clear();
             m_temp_indices.clear();
@@ -265,17 +294,17 @@ namespace Mesh {
         }
 
         // Recursively processes Assimp nodes.
-        void processNode(aiNode* node, const aiScene* scene) {
+        void processNode(aiNode* node, const aiScene* scene, EngineFramework::Skeleton * skeleton) {
             for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-                processSubMesh(scene->mMeshes[node->mMeshes[i]], scene);
+                processSubMesh(scene->mMeshes[node->mMeshes[i]], scene, skeleton);
             }
             for (unsigned int i = 0; i < node->mNumChildren; i++) {
-                processNode(node->mChildren[i], scene);
+                processNode(node->mChildren[i], scene, skeleton);
             }
         }
 
         // Extracts vertex data from a single Assimp mesh.
-        void processSubMesh(aiMesh* mesh, const aiScene* scene) {
+        void processSubMesh(aiMesh* mesh, const aiScene* scene, EngineFramework::Skeleton* skeleton) {
             UNREFERENCED_PARAMETER(scene);
             SubMesh subMesh;
             subMesh.name = mesh->mName.C_Str();
@@ -309,6 +338,10 @@ namespace Mesh {
                     LOGE("Mesh '%s' missing tangents, using generated fallback", mesh->mName.C_Str());
                 }
 
+                // Add skinning data
+                vertex.BoneIndices = glm::uvec4(0);
+                vertex.BoneWeights = glm::vec4(0.0f);
+
                 subBox.expand(vertex.Position);
                 m_aabb.expand(vertex.Position);
 
@@ -322,6 +355,74 @@ namespace Mesh {
                 }
                 subMesh.indexCount += face.mNumIndices;
             }
+
+            // Fill bone weights and indices
+            if (mesh->HasBones()) {
+                const unsigned int numBones = mesh->mNumBones;
+
+                for (unsigned int b = 0; b < numBones; ++b) {
+                    const aiBone* bone = mesh->mBones[b];
+
+                    // Start with local index, then try to remap via OFBX skeleton
+                    unsigned int boneIndex = b;
+
+                    auto itRemap = EngineFramework::g_OFBXBoneIndexByName.find(bone->mName.C_Str());
+                    if (itRemap != EngineFramework::g_OFBXBoneIndexByName.end()) {
+                        boneIndex = static_cast<unsigned int>(itRemap->second);
+                    }
+                    else {
+                        LOGE("[SKIN] Assimp bone '%s' not found in OFBX skeleton; using local index %u",
+                            bone->mName.C_Str(), boneIndex);
+                    }
+
+                    LOGI("[SKIN] Assimp bone %u ('%s') -> OFBX index %u",
+                        b, bone->mName.C_Str(), boneIndex);
+
+                    if (skeleton != nullptr && boneIndex < skeleton->bones.size()) {
+                        skeleton->bones[boneIndex].invBind = AssimpToGLM(bone->mOffsetMatrix);
+                    }
+
+                    //if (skeleton && boneIndex < skeleton->bones.size()) {
+                    //    // Overwrite the manual OpenFBX matrix with Assimp's correct matrix
+                    //    skeleton->bones[boneIndex].invBind = AssimpToGLM(bone->mOffsetMatrix);
+
+                    //    // Optional: Debugging
+                    //    // LOGI("Corrected InvBind for bone %s", bone->mName.C_Str());
+                    //}
+
+                    // Loop through weights for this bone
+                    for (unsigned int w = 0; w < bone->mNumWeights; ++w) {
+                        const aiVertexWeight& vw = bone->mWeights[w];
+                        unsigned int vtxId = vw.mVertexId;   // local to this mesh
+                        float weight = vw.mWeight;
+
+                        // Get the vertex in global array for this submesh
+                        Vertex& v = m_temp_vertices[subMesh.baseVertex + vtxId];
+
+                        // Put weight into the first empty slot
+                        for (int k = 0; k < 4; ++k) {
+                            if (v.BoneWeights[k] == 0.0f) {
+                                v.BoneWeights[k] = weight;
+                                v.BoneIndices[k] = static_cast<int>(boneIndex);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Normalize weights so each vertex sums to 1 where possible
+                for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
+                    Vertex& v = m_temp_vertices[subMesh.baseVertex + i];
+                    float sum =
+                        v.BoneWeights.x + v.BoneWeights.y +
+                        v.BoneWeights.z + v.BoneWeights.w;
+
+                    if (sum > 0.0f) {
+                        v.BoneWeights /= sum;
+                    }
+                }
+            }
+
             subMeshes.push_back(subMesh);
             m_submeshAABBs.push_back(subBox);
         }
@@ -350,6 +451,12 @@ namespace Mesh {
 
             glEnableVertexAttribArray(3); // Tangent (location 3)
             glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+
+            glEnableVertexAttribArray(4); // Bone Indices (location 5)
+            glVertexAttribIPointer(4, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, BoneIndices));
+
+            glEnableVertexAttribArray(5); // Bone Weights (location 5)
+            glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, BoneWeights));
 
             glBindVertexArray(0);
         }

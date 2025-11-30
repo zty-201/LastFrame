@@ -63,6 +63,8 @@ namespace EngineFramework
         void SetDebugStatus(bool enable) { show_debugDraw = enable; }
         bool GetDebugStatus() { return show_debugDraw; }
 
+		void UploadBonePalettes(const std::vector<glm::mat4>& boneMatrices);
+
 		// Accessor for the scene
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* GetGLFWwindow() { return pWindow; }
@@ -269,6 +271,11 @@ namespace EngineFramework
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);
 
         static inline GraphicsSystem* this_graphics_ptr = nullptr;
+
+        // Animation stuffs
+
+        GLuint skinningUBO = 0;
+        int maxBones = 256;
     };
 }
 

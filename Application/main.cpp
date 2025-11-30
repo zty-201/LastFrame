@@ -30,6 +30,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetManager.hpp"
 #include "Audio/Audio.hpp"
 #include "PhysicsRuntimeSystem.hpp"
+#include "AnimationSystem.h"
 #include "Scripting/Script.hpp"   // testing scripting (?)
 #if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
 #include "Scripting/ScriptDebug.hpp" //For testing Lua scripts in DEBUG mode
@@ -132,7 +133,7 @@ void Game_Initialize(void* android_asset_manager)
 			std::make_unique<EngineFramework::GraphicsSystem>(),
 			1,  // Init Order: First
 			5,  // Update Order: After game logic and editor
-			7   // Destruct Order: Last
+			8   // Destruct Order: Last
 		);
 
 		// 2. InputManager: Needs the window from GraphicsSystem to register callbacks.
@@ -180,6 +181,15 @@ void Game_Initialize(void* android_asset_manager)
 			6,  // Init Order
 			3,  // Update Order: After Input and Asset Management
 			2   // Destruct Order
+		);
+
+		// 5. AnimationSystem: For animation to work.
+		core_engine.AddSystem(
+			"AnimationSystem",
+			std::make_unique<EngineFramework::AnimationSystem>(),
+			7,	// Init Order
+			4,	// Update Order
+			7	// Destruct Order
 		);
 
 		// --- Debug/Editor Systems (Conditional) ---

@@ -25,7 +25,6 @@
 #include "SoundAsset.hpp"
 #include "Archtype.hpp"
 
-
 namespace EngineFramework {
 
 	// -------- lifecycle --------
@@ -387,6 +386,7 @@ namespace EngineFramework {
 		//==Add function loaders for each type==//
 		asset_loader_map[TEXTURE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadTexture);
 		asset_loader_map[CUBEMAP] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadCubemap);
+		asset_loader_map[ANIMATION] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAnimation);
 		asset_loader_map[MESH] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadMesh);
 		asset_loader_map[SHADER] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadShader);
 		asset_loader_map[AUDIO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAudio);
@@ -532,7 +532,7 @@ namespace EngineFramework {
 		LOGI("Loading Mesh");
 
 		// Acceptable files that can be loaded as a mesh.
-		std::vector<std::string> mesh_extensions{ ".obj" };
+		std::vector<std::string> mesh_extensions{ ".obj", ".fbx" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, mesh_extensions);
 
 		/*
@@ -550,6 +550,27 @@ namespace EngineFramework {
 			// Try catch guard for loading mesh
 			try {
 				LOGI("Loading Mesh: %s", path.string().c_str());
+				EngineFramework::Skeleton* skeletonPtr = nullptr;
+
+				if(path.extension() == ".fbx")
+				{
+					// Load the bundle (Skeleton + Animations)
+					auto animBundle = EngineFramework::OFBXAnimationImporter::importFromFile(path.string());
+
+					// Get the raw pointer to pass to the Mesh constructor
+					skeletonPtr = animBundle.skeleton.get();
+
+					// ---------------------------------------------------------
+					// IMPORTANT: STORE THE BUNDLE!
+					// ---------------------------------------------------------
+					// You must save 'animBundle' into a member variable of AssetManagerSystem
+					// (e.g., m_loadedAnimations). If you don't do this, 'animBundle' 
+					// goes out of scope here, deleting the Skeleton, and causing a crash.
+					// 
+					// Example:
+					loaded_animations.push_back(std::move(animBundle));
+				}
+
 				loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
 				asset_names.emplace_back(name); // Done if resource loading is a success.
 			}
@@ -832,6 +853,41 @@ namespace EngineFramework {
 		}
 
 		SetMappings(ARCHTYPE_GUID, asset_names, loaded_resources, folder_path);
+
+		return true;
+	}
+
+	bool AssetManagerSystem::LoadAnimation(const std::filesystem::path& folder_path)
+	{
+		LOGD("Loading Animation");
+		//Acceptable files that can be loaded as a texture.
+		std::vector<std::string> animation_extensions{ ".fbx" };
+		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, animation_extensions);
+
+		/*
+			Asset names used for mapping to guid.
+			Resources are kept in an array until guid mappings are read.
+		*/
+		std::vector<std::string> asset_names{};
+		std::vector< std::shared_ptr<animImport>> loaded_resources{};
+
+		//Iterate through all texture files
+		for (const std::filesystem::path& path : files)
+		{
+			std::string name = path.stem().string();
+			//Allocate resource
+			try
+			{
+				loaded_resources.emplace_back(new animImport(OFBXAnimationImporter::importFromFile(path.string())));
+				asset_names.emplace_back(name); //Done if resource loading is a success.
+			}
+			catch (std::exception& e)
+			{
+				LOGE("%s %s %s", "Unable to Load Animation", name.c_str(), e.what());
+			}
+		}
+
+		SetMappings(ANIMATION_GUID, asset_names, loaded_resources, folder_path);
 
 		return true;
 	}

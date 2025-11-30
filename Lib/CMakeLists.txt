@@ -14,6 +14,7 @@ add_subdirectory(Shared/stb_image)
 add_subdirectory(Shared/xresource)
 add_subdirectory(Shared/lua)
 add_subdirectory(Shared/sol)
+add_subdirectory(Shared/OpenFBX)
 
 # --- Assimp ---
 # Turn off parts we don't need
@@ -24,6 +25,7 @@ set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "Disable warnings as errors for ass
 set(ASSIMP_NO_EXPORT ON CACHE BOOL "Disable Assimp's exporting feature" FORCE)
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE BOOL "Disable all importers by default" FORCE)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "Enable ONLY the OBJ importer" FORCE)
+set(ASSIMP_BUILD_FBX_IMPORTER ON CACHE BOOL "Enable FBX importer" FORCE)
 
 # Force static library build
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build Assimp as a static library" FORCE)
