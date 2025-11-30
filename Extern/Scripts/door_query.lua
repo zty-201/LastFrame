@@ -75,7 +75,7 @@ local function PlayerHasKey()
 
     local inv = SHARED["player_inventory_ref"]
     if not inv then 
-        print("[DoorQuery] ERROR: player_inventory_ref is NIL")
+        -- print("[DoorQuery] ERROR: player_inventory_ref is NIL")
         return false 
     end
 
@@ -83,9 +83,9 @@ local function PlayerHasKey()
 
     if DEBUG then
         if item then
-            print("[DoorQuery] KEY FOUND qty =", item.qty)
+            -- print("[DoorQuery] KEY FOUND qty =", item.qty)
         else
-            print("[DoorQuery] NO KEY FOUND")
+            -- print("[DoorQuery] NO KEY FOUND")
         end
     end
 
@@ -98,7 +98,13 @@ end
 ----------------------------------------------------------------
 function on_update(Self, dt)
 
-    EntityTransform:GetPosition() -- keep your original line
+    EntityTransform:GetPosition()
+
+    -- ALWAYS HIDE BOTH UI ICONS FIRST
+    local ui103 = GetEntityUI(103)
+    local ui104 = GetEntityUI(104)
+    if ui103 then ui103:SetVisible(false) end
+    if ui104 then ui104:SetVisible(false) end
 
     local inRange, px, py, pz, ix, iy, iz = IsPlayerInRange()
     if not inRange then return end
@@ -106,15 +112,34 @@ function on_update(Self, dt)
     if not IsPlayerFacingDoor(px, py, pz, ix, iy, iz) then return end
 
 
+
     -- ICON & INTERACTION INDICATOR
     if PlayerHasKey() then
-        print("[DoorQuery] >>> UNLOCK <<<")
+
+        -- SHOW 103 (unlock)
+        local ui103 = GetEntityUI(103)
+        if ui103 then ui103:SetVisible(true) end
+
+        -- HIDE 104 (locked)
+        local ui104 = GetEntityUI(104)
+        if ui104 then ui104:SetVisible(false) end
+
         SHARED.door_icon_status = "unlock"
+
     else
-        print("[DoorQuery] >>> LOCK <<<")
+
+        -- SHOW 104 (locked)
+        local ui104 = GetEntityUI(104)
+        if ui104 then ui104:SetVisible(true) end
+
+        -- HIDE 103 (unlock)
+        local ui103 = GetEntityUI(103)
+        if ui103 then ui103:SetVisible(false) end
+
         SHARED.door_icon_status = "lock"
         return
     end
+
 
     SHARED.interactable     = EntityID
     SHARED.interactableType = "door"
@@ -136,6 +161,12 @@ function on_update(Self, dt)
         if keyItem then
             keyItem.qty = keyItem.qty - 1
             print("[DoorQuery] Key consumed. Remaining:", keyItem.qty)
+
+            local ui13 = GetEntityUI(103)
+                ui13:SetSize(0, 0)
+            local ui14 = GetEntityUI(104)
+                ui14:SetSize(0, 0)
+
 
             if keyItem.qty <= 0 then
                 inv.items["key"] = nil
