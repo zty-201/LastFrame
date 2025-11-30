@@ -6,6 +6,7 @@
 local ICON_SIZE = 100.0   -- very small icon
 local ANCHOR_X  = 0.50    -- centre horizontally
 local ANCHOR_Y  = 0.13  -- close to bottom
+local prevCDown = false
 
 local screenWidth, screenHeight = 3088, 1440
 
@@ -84,8 +85,25 @@ end
 function on_update(self, dt)
     if not UI then return end
 
-    local down = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
-    if down and isPointerOver() then
+    -- ===========================
+    -- MOUSE/TAP ON ICON
+    -- ===========================
+    local downMouse = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
+    if downMouse and isPointerOver() then
         Calibrate_View_Center()
+    end
+
+    -- ===========================
+    -- WINDOWS KEYBOARD: C to calibrate
+    -- ===========================
+    if PLATFORM == "windows" then
+        local isCDown = Input.GetKey(GLFW_KEY_C)
+
+        -- Edge-detect: only fire once per key press
+        if isCDown and not prevCDown then
+            Calibrate_View_Center()
+        end
+
+        prevCDown = isCDown
     end
 end
