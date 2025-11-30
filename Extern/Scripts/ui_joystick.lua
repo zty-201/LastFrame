@@ -2,7 +2,7 @@
 -- ui_joystick.lua (2D joystick knob)
 -- ============================================================
 
-local KNOB_SIZE = 225.0
+local KNOB_SIZE = 180.0
 local DEAD_ZONE = 0.05
 local MAX_MAG = 1.0
 

@@ -3,12 +3,12 @@
 -- Big action icon (bottom-right)
 -- ============================================================
 
-local ICON_SIZE = 350.0   -- big icon
+local ICON_SIZE = 200.0   -- big icon
 local ANCHOR_X  = 0.90    -- 0 = left, 1 = right
 local ANCHOR_Y  = 0.22    -- 0 = bottom, 1 = top
 local prevEDown = false
 
-local screenWidth, screenHeight = 3088, 1440
+local screenWidth, screenHeight = 2340, 1080
 
 local UI = nil
 
