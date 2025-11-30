@@ -68,6 +68,8 @@ namespace EngineFramework
 		glm::vec3 saved_cam_target_before_sim{};
 		bool has_saved_cam_before_sim = false;
 
+		static bool s_DrawColliders;
+
 		private:
 
 			std::unique_ptr<HistorySystem> history;
