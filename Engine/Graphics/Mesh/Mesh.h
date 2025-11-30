@@ -137,8 +137,22 @@ namespace Mesh {
         AABB m_aabb;                     // whole-mesh AABB (object space)
         std::vector<AABB> m_submeshAABBs; // per-submesh AABBs
 
+        // Assimp Convertion helper
+        static inline glm::mat4 AssimpToGLM(const aiMatrix4x4& from) {
+            glm::mat4 to;
+            // Assimp is Row-Major, GLM is Column-Major. 
+            // We usually need to transpose, but the memory layout of aiMatrix4x4 
+            // often maps directly to glm::mat4 depending on how you access it.
+            // The safest manual assignment:
+            to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = from.a4;
+            to[0][1] = from.b1; to[1][1] = from.b2; to[2][1] = from.b3; to[3][1] = from.b4;
+            to[0][2] = from.c1; to[1][2] = from.c2; to[2][2] = from.c3; to[3][2] = from.c4;
+            to[0][3] = from.d1; to[1][3] = from.d2; to[2][3] = from.d3; to[3][3] = from.d4;
+            return to;
+        }
+
         // The core Assimp loading function.
-        void loadWithAssimp(const std::string& filePath) {
+        void loadWithAssimp(const std::string& filePath, EngineFramework::Skeleton* skeleton = nullptr) {
             LOGI("Loading mesh from file: %s", filePath.c_str());
             Assimp::Importer importer;
 
@@ -167,7 +181,7 @@ namespace Mesh {
             }
 
             processMaterials(scene);
-            processNode(scene->mRootNode, scene);
+            processNode(scene->mRootNode, scene, skeleton);
             createGLBuffers(m_temp_vertices, m_temp_indices);
 
 
@@ -280,17 +294,17 @@ namespace Mesh {
         }
 
         // Recursively processes Assimp nodes.
-        void processNode(aiNode* node, const aiScene* scene) {
+        void processNode(aiNode* node, const aiScene* scene, EngineFramework::Skeleton * skeleton) {
             for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-                processSubMesh(scene->mMeshes[node->mMeshes[i]], scene);
+                processSubMesh(scene->mMeshes[node->mMeshes[i]], scene, skeleton);
             }
             for (unsigned int i = 0; i < node->mNumChildren; i++) {
-                processNode(node->mChildren[i], scene);
+                processNode(node->mChildren[i], scene, skeleton);
             }
         }
 
         // Extracts vertex data from a single Assimp mesh.
-        void processSubMesh(aiMesh* mesh, const aiScene* scene) {
+        void processSubMesh(aiMesh* mesh, const aiScene* scene, EngineFramework::Skeleton* skeleton) {
             UNREFERENCED_PARAMETER(scene);
             SubMesh subMesh;
             subMesh.name = mesh->mName.C_Str();
@@ -363,6 +377,18 @@ namespace Mesh {
 
                     LOGI("[SKIN] Assimp bone %u ('%s') -> OFBX index %u",
                         b, bone->mName.C_Str(), boneIndex);
+
+                    if (skeleton != nullptr && boneIndex < skeleton->bones.size()) {
+                        skeleton->bones[boneIndex].invBind = AssimpToGLM(bone->mOffsetMatrix);
+                    }
+
+                    //if (skeleton && boneIndex < skeleton->bones.size()) {
+                    //    // Overwrite the manual OpenFBX matrix with Assimp's correct matrix
+                    //    skeleton->bones[boneIndex].invBind = AssimpToGLM(bone->mOffsetMatrix);
+
+                    //    // Optional: Debugging
+                    //    // LOGI("Corrected InvBind for bone %s", bone->mName.C_Str());
+                    //}
 
                     // Loop through weights for this bone
                     for (unsigned int w = 0; w < bone->mNumWeights; ++w) {
