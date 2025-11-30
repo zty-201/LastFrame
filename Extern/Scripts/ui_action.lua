@@ -1,14 +1,14 @@
 -- ============================================================
--- ui_action.lua  (FIXED FOR WINDOWS + ANDROID CLICK)
+-- ui_action.lua  (Windows + Android, flashlight-style hitbox)
 -- Big action icon (bottom-right)
 -- ============================================================
 
-local ICON_SIZE = 350.0
-local ANCHOR_X  = 0.90
+local ICON_SIZE = 200.0
+local ANCHOR_X  = 0.80
 local ANCHOR_Y  = 0.22
 local prevEDown = false
 
-local screenWidth, screenHeight = 3088, 1440
+local screenWidth, screenHeight = 2340, 1080
 
 local UI = nil
 
@@ -24,36 +24,25 @@ local function ensureUIShared()
 end
 
 -- ============================================================
--- FIXED: Pointer detection works on BOTH Windows + Android
+-- Hitbox: same as ui_flashlight
 -- ============================================================
 local function isPointerOver()
-    if not UI then UI = EntityUI end
+    if not UI then
+        UI = EntityUI
+    end
     if not UI then return false end
 
     local uiShared = ensureUIShared()
     if not uiShared then return false end
 
-    -- Raw OS mouse position
     local mx, rawMy = Input.GetMousePosition()
+    local virtualH   = uiShared.joyScreenHeight or 1440.0
+    local my         = virtualH - rawMy   -- SAME as ui_flashlight
 
-    -- FIX:
-    -- Windows already uses bottom-left origin → DO NOT flip Y
-    -- Android uses top-left → MUST flip
-    local my
-
-    if PLATFORM == "android" then
-        local virtualH = uiShared.joyScreenHeight or 1440.0
-        my = virtualH - rawMy
-    else
-        -- WINDOWS
-        my = rawMy
-    end
-
-    -- Icon rectangle
     local x, y = UI:GetPosition()
     local w, h = UI:GetSize()
 
-    return (mx >= x and mx <= x + w and my >= y and my <= y + h)
+    return mx >= x and mx <= x + w and my >= y and my <= y + h
 end
 
 -- ============================================================
@@ -66,7 +55,6 @@ function on_create(self)
         return
     end
 
-    -- initial layout
     local centerX = ANCHOR_X * screenWidth
     local centerY = ANCHOR_Y * screenHeight
 
@@ -85,7 +73,7 @@ function on_update(self, dt)
     if not uiShared then return end
 
     ------------------------------------------------------------
-    -- CLICK / TAP ON ICON
+    -- CLICK / TAP ON ICON (Windows + Android)
     ------------------------------------------------------------
     local downMouse = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
 
@@ -97,7 +85,8 @@ function on_update(self, dt)
     ------------------------------------------------------------
     -- KEYBOARD E (Windows)
     ------------------------------------------------------------
-    if PLATFORM == "windows" then
+    local SH = getShared()
+    if SH and SH.PLATFORM == "windows" then
         local isEDown = Input.GetKey(GLFW_KEY_E)
 
         if isEDown and not prevEDown then

@@ -114,7 +114,13 @@ function on_update(Self, dt)
     -------------------------------------------------------
     -- Use key (E pressed)
     -------------------------------------------------------
-    if Input.GetKeyDown(GLFW_KEY_E) and PlayerHasMusicKey() then
+    local SH     = rawget(_G, "SHARED")
+    local uiReq  = SH and SH.UI and SH.UI.actionRequested
+    if uiReq then
+        SH.UI.actionRequested = false
+    end
+
+    if Input.GetKeyDown(GLFW_KEY_E) or uiReq and PlayerHasMusicKey() then
         print("[MusicBoxKeyQuery] E pressed → opening music box!")
 
         -------------------------------------------------------

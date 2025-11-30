@@ -100,7 +100,13 @@ function on_update(self, dt)
     ------------------------------------------------------------
     -- PICKUP
     ------------------------------------------------------------
-    if Input.GetKeyDown(GLFW_KEY_E) then
+    local SH     = rawget(_G, "SHARED")
+    local uiReq  = SH and SH.UI and SH.UI.actionRequested
+    if uiReq then
+        SH.UI.actionRequested = false
+    end
+
+    if Input.GetKeyDown(GLFW_KEY_E) or uiReq then
         print("[MusicKey] PICKED UP MUSIC BOX KEY!")
 
         --------------------------------------------------------
