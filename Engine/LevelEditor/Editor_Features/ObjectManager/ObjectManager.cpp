@@ -318,12 +318,12 @@ namespace EngineFramework
 
 	void ObjectManager::top_buttons()
 	{
-		if (ImGui::Button("Create Empty Object"))
+		/*if (ImGui::Button("Create Empty Object"))
 		{
 			entt::entity instance = registry.create();
 			UNREFERENCED_PARAMETER(instance);
-		}
-		if (ImGui::Button("Create Empty Object At Camera"))
+		}*/
+		if (ImGui::Button("Create Empty Object"))
 		{
 			entt::entity instance = registry.create();
 			TransformComponent instance_transform{};
