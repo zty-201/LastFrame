@@ -19,6 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "MetaInspector.hpp"
 #include "CameraComponent.h" // Testing purposes of property manager
 #include "MeshComponent.h"
+#include "AnimationComponent.h"
 #include "LightComponent.h"
 #include "TransformComponent.h"
 #include "MaterialComponent.h"
@@ -42,9 +43,72 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <cstring>
 #include <memory>
 #include <utility>
+#include <PhysicsBuildSystem.hpp>
 
 // FILE TO HANDLE THE META DATA OF THE ENTITIY
 namespace EditorFeatures {
+
+	static void FitShapeToMesh(entt::registry& reg, entt::entity entity, ColliderData& shape)
+	{
+		// 1. Check for MeshComponent
+		if (!reg.all_of<MeshComponent>(entity)) return;
+		const auto& meshComp = reg.get<MeshComponent>(entity);
+
+		// 2. Get Mesh Resource
+		auto meshGuid = EngineFramework::AssetManagerSystem::GetFullGuid(
+			EngineFramework::AssetManagerSystem::MESH_GUID,
+			meshComp.meshName
+		);
+
+		if (!EngineFramework::AssetManagerSystem::HasResource(meshGuid)) return;
+		auto meshData = EngineFramework::AssetManagerSystem::GetResource<Mesh::MeshData>(meshGuid);
+		if (!meshData) return;
+
+		// 3. Get Bounds
+		const auto& aabb = meshData->GetAABB();
+
+		// 4. Apply to THIS shape instance
+		shape.type = static_cast<int>(ColliderShape::Box); // Reset to Box
+		shape.boxHalfExtents = aabb.halfExtents();
+		shape.offsetPosition = aabb.center();
+		shape.offsetRotation = glm::vec3(0.0f); // Reset rotation
+	}
+
+	void RecalculateGlobalBounds(ColliderComponent& col)
+	{
+		// Start with inverted infinity
+		constexpr float maxFloat = std::numeric_limits<float>::max();
+		col.minBounds = glm::vec3(maxFloat);
+		col.maxBounds = glm::vec3(-maxFloat);
+
+		for (const auto& shape : col.shapes)
+		{
+			glm::vec3 extent(0.0f);
+
+			// Determine size based on shape type
+			if (static_cast<ColliderShape>(shape.type) == ColliderShape::Box) {
+				extent = shape.boxHalfExtents;
+			}
+			else if (static_cast<ColliderShape>(shape.type) == ColliderShape::Sphere) {
+				extent = glm::vec3(shape.sphereRadius);
+			}
+			else { // Capsule
+				float r = shape.capsuleRadius;
+				float h = shape.capsuleHeight * 0.5f;
+				extent = glm::vec3(r, h, r);
+			}
+
+			// Calculate LOCAL bounds for this shape
+			// Note: This ignores rotation for simplicity (AABB of OBB), 
+			// but ensures the box is large enough.
+			glm::vec3 shapeMin = shape.offsetPosition - extent;
+			glm::vec3 shapeMax = shape.offsetPosition + extent;
+
+			// Merge into global component bounds
+			col.minBounds = glm::min(col.minBounds, shapeMin);
+			col.maxBounds = glm::max(col.maxBounds, shapeMax);
+		}
+	}
 
 	// Add on to this map if want to hide any fields
 	static const std::unordered_map<std::string_view, std::unordered_set<std::string_view>> hidden_fields = {
@@ -140,11 +204,14 @@ namespace EditorFeatures {
 		return std::string(buffer);
 	}
 
-	static inline void draw_vec3_drag(const char* label, glm::vec3& v, float speed = 0.05f) {
+	static inline bool draw_vec3_drag(const char* label, glm::vec3& v, float speed = 0.05f) {
 		float a[3]{ v.x, v.y, v.z };
+		bool changed = false;
 		if (ImGui::DragFloat3(label, a, speed)) {
 			v = { a[0], a[1], a[2] };
+			changed = true;
 		}
+		return changed;
 	}
 
 	static inline void draw_vec4_drag(const char* label, glm::vec4& v, float speed = 0.05f) {
@@ -747,8 +814,9 @@ namespace EditorFeatures {
 	
 	// Main function to view/edit property
 	// Takes a mneta type and the corresponding instance and writes the edited values back through entt::meta_data::set
-	void DrawMetaObject(entt::entity entity, const char* component_name, entt::meta_type& mt, entt::meta_any& obj) {
+	bool DrawMetaObject(entt::entity entity, const char* component_name, entt::meta_type& mt, entt::meta_any& obj) {
 		//const char* typeName = mt.name();
+		bool any_change = false;
 
 		auto t = obj.type();
 
@@ -757,7 +825,7 @@ namespace EditorFeatures {
 			if (obj.allow_cast<Engine::LuaScriptComponent&>()) {
 				draw_lua_script_component(entity, component_name, obj);
 			}
-			return;
+			return false;
 		}
 #endif
 
@@ -769,49 +837,143 @@ namespace EditorFeatures {
 			using EF_AM = EngineFramework::AssetManagerSystem;
 			using EF_AUD = EngineFramework::AudioSystem;
 
-			// comp.audio_guid is already full guid
-			xresource::full_guid full = comp.audio_guid;
-
-			// Load audio
+			//---------------------
+			// Audio asset picker
+			//---------------------
 			std::shared_ptr<SoundAsset> sound = nullptr;
-			if (!full.empty())
-				sound = EF_AM::GetResource<SoundAsset>(full);
-
-			//---------------------
-			// Volume (clamped)
-			//---------------------
-			comp.volume = std::clamp(comp.volume, 0.0f, 1.0f);
-
-			if (ImGui::SliderFloat("Volume", &comp.volume, 0.0f, 1.0f))
 			{
-				// If audio is playing, update volume in real time here if your AudioSystem supports it
+				// Build descriptor for AUDIO assets
+				const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
+				const bool has_sources = !descriptor.sources.empty();
+
+				// Start from the current guid
+				xresource::full_guid full = comp.audio_guid;
+
+				if (has_sources)
+				{
+					// Show combo + drag/drop picker
+					if (draw_asset_guid_picker("Audio",
+						full,
+						AssetPickerKind::Audio,
+						descriptor.none_label,
+						descriptor.sources,
+						descriptor.formatter))
+					{
+						// User picked a different audio asset
+						comp.audio_guid = full;
+					}
+				}
+				else
+				{
+					ImGui::TextDisabled("Audio: (no audio assets available)");
+				}
+
+				// Load the chosen sound (if any) for preview buttons
+				if (!comp.audio_guid.empty())
+				{
+					sound = EF_AM::GetResource<SoundAsset>(comp.audio_guid);
+				}
 			}
 
 			//---------------------
-			// Buttons
+			// Basic playback flags
+			//---------------------
+			ImGui::Checkbox("Loop", &comp.loop);
+			ImGui::SameLine();
+			ImGui::Checkbox("Play On Start", &comp.playOnStart);
+
+			//---------------------
+			// 2D / 3D controls
+			//---------------------
+			ImGui::Checkbox("3D Audio", &comp.is3D);
+
+			if (comp.is3D)
+			{
+				// Ensure sane values
+				if (comp.minDistance < 0.0f) comp.minDistance = 0.0f;
+				if (comp.maxDistance < comp.minDistance)
+					comp.maxDistance = comp.minDistance + 0.1f;
+
+				ImGui::DragFloat("Min Distance", &comp.minDistance, 0.1f, 0.0f, 1000.0f);
+				ImGui::DragFloat("Max Distance", &comp.maxDistance, 0.1f, 0.0f, 1000.0f);
+			}
+
+			//---------------------
+			// Volume
+			//---------------------
+			comp.volume = std::clamp(comp.volume, 0.0f, 1.0f);
+			ImGui::SliderFloat("Volume", &comp.volume, 0.0f, 1.0f);
+
+			//---------------------
+			// Preview buttons
 			//---------------------
 			if (ImGui::Button("Play"))
 			{
 				if (sound)
 				{
-					EF_AUD::GetInstance().Play(sound, comp.volume, comp.loop,
+					EF_AUD::GetInstance().Play(
+						sound,
+						comp.volume,
+						comp.loop,
 						EngineFramework::AudioGroup::Music);
 				}
 			}
-
 			ImGui::SameLine();
 			if (ImGui::Button("Stop"))
-			{
 				EF_AUD::GetInstance().StopAll();
-			}
 
 			ImGui::SameLine();
 			if (ImGui::Button("Pause"))
-			{
 				EF_AUD::GetInstance().PauseAll(true);
+
+			//---------------------
+			// ECS-based 3D test button
+			//---------------------
+			if (ImGui::Button("Play 3D (ECS)"))
+			{
+				// Mark this component to be played by AudioSystem::Update
+				comp.playRequested = true;
 			}
 
 			ImGui::Separator();
+			return false; // keep using custom UI
+
+			////---------------------
+			//// Volume (clamped)
+			////---------------------
+			//comp.volume = std::clamp(comp.volume, 0.0f, 1.0f);
+
+			//if (ImGui::SliderFloat("Volume", &comp.volume, 0.0f, 1.0f))
+			//{
+			//	// If audio is playing, update volume in real time here if your AudioSystem supports it
+			//}
+
+			////---------------------
+			//// Buttons
+			////---------------------
+			//if (ImGui::Button("Play"))
+			//{
+			//	if (sound)
+			//	{
+			//		EF_AUD::GetInstance().Play(sound, comp.volume, comp.loop,
+			//			EngineFramework::AudioGroup::Music);
+			//	}
+			//}
+
+			//ImGui::SameLine();
+			//if (ImGui::Button("Stop"))
+			//{
+			//	EF_AUD::GetInstance().StopAll();
+			//}
+
+			//ImGui::SameLine();
+			//if (ImGui::Button("Pause"))
+			//{
+			//	EF_AUD::GetInstance().PauseAll(true);
+			//}
+
+			//ImGui::Separator();
+			//return false;
 		}
 		
 		// Each entry is pair<entt::id_type, entt::meta_data> - for self reference
@@ -840,6 +1002,7 @@ namespace EditorFeatures {
 				update_field_history(entity, component_name, data, obj);
 				if (interacted) {
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 			else if (field.type().is_enum()) {
@@ -868,6 +1031,7 @@ namespace EditorFeatures {
 						commit_instant_history(entity, component_name, data, obj, [&]() {
 							value = new_value;
 							data.set(obj, value);
+							any_change = true;
 						});
 					}
 				}
@@ -893,6 +1057,7 @@ namespace EditorFeatures {
 						commit_instant_history(entity, component_name, data, obj, [&]() {
 							value = new_value;
 							data.set(obj, value);
+							any_change = true;
 							});
 					}
 				}
@@ -916,16 +1081,18 @@ namespace EditorFeatures {
 					commit_instant_history(entity, component_name, data, obj, [&]() {
 						value = new_value;
 						data.set(obj, value);
+						any_change = true;
 					});
 				}
 			}
 
 			else if (field.type() == entt::resolve<float>()) {
 				float& v = field.cast<float&>();
-				const bool interacted = ImGui::DragFloat(label.c_str(), &v, 0.01f);
-				update_field_history(entity, component_name, data, obj);
-				if (interacted) {
+				//const bool interacted = ImGui::DragFloat(label.c_str(), &v, 0.01f);
+				if (ImGui::DragFloat(label.c_str(), &v, 0.01f)) {
+					update_field_history(entity, component_name, data, obj);
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 
@@ -935,6 +1102,7 @@ namespace EditorFeatures {
 				update_field_history(entity, component_name, data, obj);
 				if (interacted) {
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 
@@ -943,6 +1111,7 @@ namespace EditorFeatures {
 				if (ImGui::Checkbox(label.c_str(), &v)) {
 					commit_instant_history(entity, component_name, data, obj, [&]() {
 						data.set(obj, v);
+						any_change = true;
 					});
 				}
 			}
@@ -955,6 +1124,7 @@ namespace EditorFeatures {
 				update_field_history(entity, component_name, data, obj);
 				if (interacted) {
 					data.set(obj, std::string{ buffer });
+					any_change = true;
 				}
 			}
 
@@ -1058,7 +1228,16 @@ namespace EditorFeatures {
 				}
 			}
 			}
-
+			else if (field.type() == entt::resolve<glm::vec2>()) {
+				glm::vec2& v = field.cast<glm::vec2&>();
+				float values[2]{ v.x, v.y };
+				const bool edited = ImGui::DragFloat2(label.c_str(), values, 0.01f);
+				update_field_history(entity, component_name, data, obj);
+				if (edited) {
+					v = { values[0], values[1] };
+					data.set(obj, v);
+				}
+			}
 			else if (field.type() == entt::resolve<glm::vec3>()) {
 				glm::vec3& v = field.cast<glm::vec3&>();
 
@@ -1073,12 +1252,16 @@ namespace EditorFeatures {
 					if (interacted) {
 						v = { color[0], color[1], color[2] };
 						data.set(obj, v);
+						any_change = true;
 					}
 				}
 				else {
-					draw_vec3_drag(label.c_str(), v);
-					update_field_history(entity, component_name, data, obj);
-					data.set(obj, v);
+					if (draw_vec3_drag(label.c_str(), v))
+					{
+						update_field_history(entity, component_name, data, obj);
+						data.set(obj, v);
+						any_change = true;
+					}
 				}
 			}
 			else if (field.type() == entt::resolve<glm::vec4>()) {
@@ -1094,6 +1277,7 @@ namespace EditorFeatures {
 					if (interacted) {
 						v = { color[0], color[1], color[2], color[3] };
 						data.set(obj, v);
+						any_change = true;
 					}
 				}
 				else {
@@ -1124,6 +1308,7 @@ namespace EditorFeatures {
 				{
 					auto view = field.as_sequence_container();
 					int index = 0;
+					bool vector_modified = false;
 					for (auto it = view.begin(); it != view.end(); ++it)
 					{
 						ImGui::PushID(index);
@@ -1134,15 +1319,34 @@ namespace EditorFeatures {
 						if (ImGui::TreeNode(element_label.c_str()))
 						{
 							entt::meta_type element_type = element.type();
-							DrawMetaObject(entity, component_name, element_type, element);
+							if (DrawMetaObject(entity, component_name, element_type, element))
+							{
+								vector_modified = true;
+							}
 							ImGui::TreePop();
+						}
+
+						if (element.type() == entt::resolve<ColliderData>())
+						{
+							ImGui::SameLine();
+							if (ImGui::Button("Reset"))
+							{
+								if (ColliderData* shapeData = element.try_cast<ColliderData>())
+								{
+									FitShapeToMesh(registry, entity, *shapeData);
+									data.set(obj, field);
+									vector_modified = true;
+								}
+							}
 						}
 
 						ImGui::SameLine();
 						if (ImGui::SmallButton("X"))
 						{
 							view.erase(it);
+							data.set(obj, field);
 							ImGui::PopID();
+							vector_modified = true;
 							break;
 						}
 
@@ -1157,9 +1361,28 @@ namespace EditorFeatures {
 						if (inner_type) {
 							entt::meta_any new_element = inner_type.construct();
 							if (new_element) {
+								if(new_element.type() == entt::resolve<ColliderData>())
+								{
+									ColliderData& shapeRef = new_element.cast<ColliderData&>();
+									FitShapeToMesh(registry, entity, shapeRef);
+								}
+
 								view.insert(view.end(), new_element);
+								data.set(obj, field);
+								vector_modified = true;
 							}
 						}
+					}
+
+					if (vector_modified)
+					{
+						data.set(obj, field);
+						if (obj.type() == entt::resolve<ColliderComponent>())
+						{
+							auto& collider = obj.cast<ColliderComponent&>();
+							RecalculateGlobalBounds(collider);
+						}
+						any_change = true;
 					}
 
 					ImGui::TreePop();
@@ -1170,7 +1393,11 @@ namespace EditorFeatures {
 				// Nested struct: recurse
 				if (ImGui::TreeNode(label.c_str())) {
 					auto f = field.type();
-					DrawMetaObject(entity, component_name, f, field);
+					if (DrawMetaObject(entity, component_name, f, field))
+					{
+						data.set(obj, field);
+						any_change = true;
+					}
 					ImGui::TreePop();
 				}
 			}
@@ -1180,6 +1407,7 @@ namespace EditorFeatures {
 
 			ImGui::PopID();
 		}
+		return any_change;
 	}
 }
 

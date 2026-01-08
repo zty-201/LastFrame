@@ -1,0 +1,58 @@
+{
+	"AnimationComponent": {
+		"animationName": "test_animation",
+		"currentClip": 0
+	},
+	"MaterialComponent": {
+		"albedoFactor": [
+			1.0,
+			1.0,
+			1.0
+		],
+		"albedoMap": [
+			0,
+			0
+		],
+		"ambientOcclusionMap": [
+			0,
+			0
+		],
+		"metallicFactor": 1.0,
+		"metallicMap": [
+			0,
+			0
+		],
+		"name": "",
+		"normalMap": [
+			0,
+			0
+		],
+		"roughnessFactor": 1.0,
+		"roughnessMap": [
+			0,
+			0
+		]
+	},
+	"MeshComponent": {
+		"meshName": "PocongTest.obj"
+	},
+	"SceneRenderPass": null,
+	"TransformComponent": {
+		"position": [
+			0.0,
+			0.0,
+			0.0
+		],
+		"rotation": [
+			0.0,
+			0.0,
+			0.0
+		],
+		"scale": [
+			1.0,
+			1.0,
+			1.0
+		]
+	},
+	"model_type": ""
+}

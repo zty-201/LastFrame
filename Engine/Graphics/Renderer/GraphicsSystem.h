@@ -63,6 +63,8 @@ namespace EngineFramework
         void SetDebugStatus(bool enable) { show_debugDraw = enable; }
         bool GetDebugStatus() { return show_debugDraw; }
 
+		void UploadBonePalettes(const std::vector<glm::mat4>& boneMatrices);
+
 		// Accessor for the scene
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* GetGLFWwindow() { return pWindow; }
@@ -178,6 +180,7 @@ namespace EngineFramework
 		xresource::full_guid point_shadow_shader_guid;
         xresource::full_guid light_injection_shader_guid;
         xresource::full_guid ray_march_shader_guid;
+		xresource::full_guid ui_shader_guid;
 
 		// UBOs
         GLuint m_volumetricUBO = 0;
@@ -215,12 +218,12 @@ namespace EngineFramework
         
         // Fog control parameters
         float m_anisotropy = 0.6f;      // Slightly forward scattering
-        float m_density = 0.5f;         // Much lower density (was 0.15)
+        float m_density = 0.01f;         // Much lower density (was 0.15)
         float m_scattering = 0.0f;
         float m_absorption = 0.0f; 
         float m_shadow_bias = 0.001f;
         float m_depth_power = 1.0f; // For exponential depth mapping
-        float m_ambient_light_intensity = 0.001f;
+        float m_ambient_light_intensity = 0.1f;
         bool m_temporal_accumulation = true;
         bool m_tricubic_filtering = false;
         int m_frame_idx = 0;
@@ -246,6 +249,7 @@ namespace EngineFramework
         void SkyboxPass();
         void VolumetricLightInjectionPass();
         void VolumetricRayMarchPass();
+        void RenderUI();
 
 		// Update methods
         void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
@@ -259,6 +263,7 @@ namespace EngineFramework
         void RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius);
         void CalculateCascadeSplits(float nearPlane, float farPlane);
         bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
+        bool WorldToScreen(const glm::vec3& worldPos, glm::vec2& outScreenPos, float& outScale);
         std::vector<glm::vec3> GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ);
 
         //==Event Handlers, one for each type of event.
@@ -266,6 +271,11 @@ namespace EngineFramework
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);
 
         static inline GraphicsSystem* this_graphics_ptr = nullptr;
+
+        // Animation stuffs
+
+        GLuint skinningUBO = 0;
+        int maxBones = 256;
     };
 }
 

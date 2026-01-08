@@ -26,6 +26,10 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "SoundAsset.hpp"
 #endif
 
+struct AudioComponent;
+struct AudioListenerComponent;
+struct TransformComponent;
+
 namespace EngineFramework
 {
     // For listener/source transform positions
@@ -103,6 +107,10 @@ namespace EngineFramework
         bool Play(const std::shared_ptr<SoundAsset>& sound,
             float volume = 1.0f,
             bool paused = false,
+            AudioGroup group = AudioGroup::SFX);
+
+        bool PlayFromComponent(const AudioComponent& comp,
+            const glm::vec3& worldPos,
             AudioGroup group = AudioGroup::SFX);
 
         // ===== 3D Functions =====

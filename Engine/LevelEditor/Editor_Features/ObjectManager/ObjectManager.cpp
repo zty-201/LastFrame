@@ -92,6 +92,66 @@ namespace EngineFramework
 			ImGui::Text("Scene Hierarchy");
 			static bool open_popup_once{};
 			static entt::entity selected_entity = entt::null;
+			static entt::entity copied_entity = entt::null;
+
+			auto duplicate_and_select = [&](entt::entity source_entity) -> entt::entity {
+				if (source_entity == entt::null || !registry.valid(source_entity)) {
+					LOGW("[ObjectManager] Cannot duplicate invalid entity");
+					return entt::null;
+				}
+
+				entt::entity duplicated_entity = GameObjectSystem::GetInstance().DuplicateInstance(source_entity);
+				if (duplicated_entity == entt::null) {
+					return entt::null;
+				}
+
+				if (HistorySystem::this_class) {
+					HistorySystem& history_system = HistorySystem::GetInstance();
+					auto record = history_system.start_track(duplicated_entity, Record_Type::ENTITY_ADDED);
+					history_system.end_track(record);
+				}
+
+				selected_entity = duplicated_entity;
+				LevelEditor::GetInstance().variables.selected_objectID = duplicated_entity;
+				LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+				return duplicated_entity;
+			};
+
+			const bool window_focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+			const bool window_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
+
+			// Ensure that the objectmanager window is being focused on
+			const bool allow_copy_paste = (window_focused || window_hovered) && !ImGui::GetIO().WantTextInput;
+			const ImGuiInputFlags copy_paste_flags = ImGuiInputFlags_RouteGlobal | ImGuiInputFlags_RouteOverFocused;
+
+			// If copy paste is possible (when window is being focus on)
+			// Ctrl + C caches the currently selected entity in copied_entity
+			if (allow_copy_paste) {
+				if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_C, copy_paste_flags)) {
+					if (selected_entity != entt::null && registry.valid(selected_entity)) {
+						copied_entity = selected_entity;
+					}
+					else {
+						LOGW("[ObjectManager] No valid entity selected to copy");
+					}
+				}
+
+				// Ctrl + V reuses duplicate_and_select function to get the copied entity and paste the instance which is also tracked by history/selection
+				// Hnece duplicated instances can be redo/undo etc
+				if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_V, copy_paste_flags)) {
+					if (copied_entity == entt::null) {
+						LOGW("[ObjectManager] No copied entity available to paste. Use Ctrl+C first.");
+					}
+					else if (!registry.valid(copied_entity)) {
+						LOGW("[ObjectManager] Copied entity is no longer valid. Copy again.");
+						copied_entity = entt::null;
+					}
+					else {
+						duplicate_and_select(copied_entity);
+					}
+				}
+			}
+
 			int incrementing_imgui_id{};
 			for (auto entity : entities) {
 				ImGui::PushID(incrementing_imgui_id++);
@@ -156,6 +216,14 @@ namespace EngineFramework
 
 					// This is safe: sets the context to the currently right-clicked entity
 					selected_entity = entity;
+
+					// Add the actions to be tracked by history system to ensure the redo/undo works for duplicating and delete etc
+					std::string duplicateLabel = "Duplicate Entity##" + std::to_string((uint32_t)entity);
+					if (ImGui::MenuItem(duplicateLabel.c_str())) {
+						duplicate_and_select(entity);
+						ImGui::EndPopup();
+						break;
+					}
 
 					// --- 2. UNIQUE MENU ITEM LABEL ---
 					// Optional: Ensure the delete text itself is unique for clarity, though not mandatory
@@ -250,12 +318,12 @@ namespace EngineFramework
 
 	void ObjectManager::top_buttons()
 	{
-		if (ImGui::Button("Create Empty Object"))
+		/*if (ImGui::Button("Create Empty Object"))
 		{
 			entt::entity instance = registry.create();
 			UNREFERENCED_PARAMETER(instance);
-		}
-		if (ImGui::Button("Create Empty Object At Camera"))
+		}*/
+		if (ImGui::Button("Create Empty Object"))
 		{
 			entt::entity instance = registry.create();
 			TransformComponent instance_transform{};

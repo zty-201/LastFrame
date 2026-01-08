@@ -97,6 +97,11 @@ namespace EngineFramework
 		entt::entity CreateInstance(std::string archtype, const TransformComponent& transform);
 
 		/*
+			Duplicates an existing entity by copying all of its reflected components.
+		*/
+		entt::entity DuplicateInstance(entt::entity entity);
+
+		/*
 			Returns an archtype created from an instance
 			Does not modify asset manager or entity_archtype_map.
 

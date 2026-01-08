@@ -11,11 +11,14 @@
 #include "MaterialComponent.h"
 #include "MeshComponent.h"
 #include "TransformComponent.h"
+#include "AnimationComponent.h"
 #include "AudioComponent.h"
+#include "AudioListenerComponent.h"
 #include "ColliderComponent.h"
 #include "PhysicsMaterialComponent.h"
 #include "PhysicsComponent.h"
 #include "TriggerBoxComponent.h"
+#include "UIComponent.h"
 #include "Scripting/Script.hpp"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 #include "MetaInspector.hpp"
@@ -25,6 +28,20 @@
 	If not, you can use the same template too.
 */
 NLOHMANN_JSON_NAMESPACE_BEGIN
+
+template<>
+struct adl_serializer<glm::vec2> {
+	static void to_json(nlohmann::json& j, const glm::vec2& p)
+	{
+		j = nlohmann::json{ p.x, p.y };
+	}
+	static void from_json(const nlohmann::json& j, glm::vec2& p)
+	{
+		p.x = j[0];
+		p.y = j[1];
+	}
+};
+
 template<>
 struct adl_serializer<glm::vec3> {
 	static void to_json(nlohmann::json& j, const glm::vec3& p)
@@ -242,6 +259,7 @@ namespace EngineFramework
 		SetMeta(char8_t),
 		SetMeta(char16_t),
 		SetMeta(char32_t),
+		SetMeta(glm::vec2),
 		SetMeta(glm::vec3),
 		SetMeta(glm::mat4),
 		SetMeta(xresource::full_guid),
@@ -291,6 +309,7 @@ namespace EngineFramework
 		SetJson(char8_t),
 		SetJson(char16_t),
 		SetJson(char32_t),
+		SetJson(glm::vec2),
 		SetJson(glm::vec3),
 		SetJson(glm::mat4),
 		SetJson(xresource::full_guid),
@@ -429,6 +448,7 @@ namespace EngineFramework
 		*/
 #define REGISTER_ARBITRARY_TYPE(T) entt::meta_factory<T>().traits(REGISTERED_TYPE::NON_COMPONENT)
 		//Register the non-component arbitrary types used.
+		REGISTER_ARBITRARY_TYPE(glm::vec2);
 		REGISTER_ARBITRARY_TYPE(glm::vec3);
 		REGISTER_ARBITRARY_TYPE(glm::mat4);
 		REGISTER_ARBITRARY_TYPE(xresource::full_guid);
@@ -473,6 +493,16 @@ namespace EngineFramework
 			.func<&Remover<MeshComponent>::RemoveComponent>("remove")
 			.func<&Getter<MeshComponent>::GetComponent>("get")
 			.func<&GetRef<MeshComponent>>("get_ref");
+
+		// === Register AnimationComponent ===
+		entt::meta_factory<AnimationComponent>()
+			.type("AnimationComponent")
+			.data<&AnimationComponent::animationName>("animationName") 
+			.data<&AnimationComponent::currentClip>("currentClip")
+			.func<&Emplacer<AnimationComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<AnimationComponent>::RemoveComponent>("remove")
+			.func<&Getter<AnimationComponent>::GetComponent>("get")
+			.func<&GetRef<AnimationComponent>>("get_ref");
 
 		// === Register MaterialComponent ===
 		entt::meta_factory<MaterialComponent>()
@@ -547,17 +577,50 @@ namespace EngineFramework
 			.func<&GetRef<CameraComponent>>("get_ref");
 
 		// === Register AudioComponent ===
+		//entt::meta_factory<AudioComponent>()
+		//	.type("AudioComponent")
+		//	.data<&AudioComponent::audio_guid>("audio_guid")
+		//	.data<&AudioComponent::volume>("volume")
+		//	.data<&AudioComponent::loop>("loop")
+		//	.data<&AudioComponent::playOnStart>("playOnStart")
+		//	.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Audio })
+		//	.func<&Emplacer<AudioComponent>::EmplaceComponent>("emplace")
+		//	.func<&Remover<AudioComponent>::RemoveComponent>("remove")
+		//	.func<&Getter<AudioComponent>::GetComponent>("get")
+		//	.func<&GetRef<AudioComponent>>("get_ref");
+
+		// === Register AudioComponent ===
 		entt::meta_factory<AudioComponent>()
 			.type("AudioComponent")
+
+			// Audio asset
 			.data<&AudioComponent::audio_guid>("audio_guid")
+			.custom<EditorFeatures::AssetPickerTag>(
+				EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Audio })
+
+			// Basic fields
 			.data<&AudioComponent::volume>("volume")
 			.data<&AudioComponent::loop>("loop")
 			.data<&AudioComponent::playOnStart>("playOnStart")
-			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Audio })
+
+			// 2D / 3D behaviour
+			.data<&AudioComponent::is3D>("is3D")
+			.data<&AudioComponent::minDistance>("minDistance")
+			.data<&AudioComponent::maxDistance>("maxDistance")
+
 			.func<&Emplacer<AudioComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<AudioComponent>::RemoveComponent>("remove")
 			.func<&Getter<AudioComponent>::GetComponent>("get")
 			.func<&GetRef<AudioComponent>>("get_ref");
+
+		// === Register AudioListenerComponent ===
+		entt::meta_factory<AudioListenerComponent>()
+			.type("AudioListenerComponent")
+			.data<&AudioListenerComponent::active>("active")
+			.func<&Emplacer<AudioListenerComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<AudioListenerComponent>::RemoveComponent>("remove")
+			.func<&Getter<AudioListenerComponent>::GetComponent>("get")
+			.func<&GetRef<AudioListenerComponent>>("get_ref");
 
 		entt::meta_factory<::ColliderShape>()
 			.type("ColliderShape") // Arbitrary name for the type
@@ -568,6 +631,7 @@ namespace EngineFramework
 
 		entt::meta_factory<::ColliderData>()
 			.type("ColliderData")
+			.ctor<>()
 			// Dimensions
 			.data<&::ColliderData::type>("type")
 			.data<&ColliderData::boxHalfExtents>("boxHalfExtents")
@@ -668,6 +732,21 @@ namespace EngineFramework
 			.func<&Remover<TriggerBoxComponent>::RemoveComponent>("remove")
 			.func<&Getter<TriggerBoxComponent>::GetComponent>("get")
 			.func<&GetRef<TriggerBoxComponent>>("get_ref");
+
+		entt::meta_factory<UIComponent>()
+			.type("UIComponent") 
+			.data<&UIComponent::textureid>("textureid")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
+			.data<&UIComponent::position>("position")
+			.data<&UIComponent::size>("size")
+			.data<&UIComponent::color>("color")
+			.data<&UIComponent::visible>("visible")
+			.data<&UIComponent::luminance>("luminance")
+			.data<&UIComponent::layer>("layer")
+			.func<&Emplacer<UIComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<UIComponent>::RemoveComponent>("remove")
+			.func<&Getter<UIComponent>::GetComponent>("get")
+			.func<&GetRef<UIComponent>>("get_ref");
 	}
 
 

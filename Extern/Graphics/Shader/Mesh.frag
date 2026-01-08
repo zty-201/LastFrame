@@ -31,8 +31,8 @@ in vec2 FS_IN_TexCoord;
 in vec3 FS_IN_Tangent;
 in vec3 FS_IN_Bitangent;
 
-in flat float FS_IN_Roughness;
-in flat float FS_IN_Metallic;
+//in flat float FS_IN_Roughness;
+//in flat float FS_IN_Metallic;
 
 // ------------------------------------------------------------------
 // UNIFORMS ---------------------------------------------------------
@@ -78,11 +78,11 @@ uniform vec3  u_AlbedoFactor;
 uniform float u_RoughnessFactor;
 uniform float u_MetallicFactor;
 
-uniform sampler2DArrayShadow s_CascadeShadowMaps;;
+uniform sampler2DArrayShadow s_CascadeShadowMaps;
 uniform sampler3D            s_VoxelGrid;
 
 uniform bool u_Tricubic;
-uniform int u_DebugMode;
+// uniform int u_DebugMode;
 uniform int u_NumPointLights;
 uniform samplerCubeShadow s_PointShadowCubemaps[4]; 
 
@@ -320,16 +320,14 @@ vec3 direct_lighting(in vec3 Wo, in vec3 N, in vec3 P, in vec3 F0, in vec3 diffu
 {
     vec3 Wi = -light_direction.xyz;
     vec3 Wh = normalize(Wo + Wi);
+    float NdotL = max(dot(N, Wi), 0.0); // Calculate Dot Product
 
     vec3 brdf = evaluate_uber_brdf(diffuse_color, roughness, N, F0, Wo, Wh, Wi);
-
     vec3 Li = light_color.xyz;
 
     float shadow_val = visibility(FS_IN_WorldPos);
-    float min_light = 0.3; // Adjust this value to make shadows lighter (0.5) or darker (0.1)
-    float light_factor = mix(min_light, 1.0, shadow_val);
-
-    return brdf * Li * light_factor;
+    
+    return brdf * Li * shadow_val * NdotL;
 }
 
 // ------------------------------------------------------------------
@@ -423,6 +421,11 @@ void main()
     vec3  albedo    = texture(s_Albedo, FS_IN_TexCoord).rgb * u_AlbedoFactor;
     float roughness = texture(s_Roughness, FS_IN_TexCoord).r * u_RoughnessFactor;
     float metallic  = texture(s_Metallic, FS_IN_TexCoord).r * u_MetallicFactor;
+    float alpha     = texture(s_Albedo, FS_IN_TexCoord).a;
+
+    if (alpha < 0.5){
+        discard;
+    }
     
     // Clamp to safe ranges
     roughness = clamp(roughness, 0.04, 1.0);
@@ -434,178 +437,178 @@ void main()
     vec3 diffuse_color = albedo * (1.0 - metallic);
 
     // ----------------------------DEBUGGING-------------------------------
-    if (u_DebugMode == 1) {
-        vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
-        float depth = abs(view_pos.z);
-        
-        int cascade = 3;
-        if (depth < cascade_splits.x) cascade = 0;
-        else if (depth < cascade_splits.y) cascade = 1;
-        else if (depth < cascade_splits.z) cascade = 2;
-        
-        vec3 cascadeColors[4] = vec3[4](
-            vec3(1.0, 0.0, 0.0),  // Red
-            vec3(0.0, 1.0, 0.0),  // Green
-            vec3(0.0, 0.0, 1.0),  // Blue
-            vec3(1.0, 1.0, 0.0)   // Yellow
-        );
-        FS_OUT_Color = vec4(cascadeColors[cascade], 1.0);
-        return;
-    }
-    
-    // DEBUG MODE 2: Show shadow map UV coordinates
-    if (u_DebugMode == 2) {
-        vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
-        float depth = abs(view_pos.z);
-        
-        int cascade = 3;
-        if (depth < cascade_splits.x) cascade = 0;
-        else if (depth < cascade_splits.y) cascade = 1;
-        else if (depth < cascade_splits.z) cascade = 2;
-        
-        vec4 light_space_pos = cascade_view_proj[cascade] * vec4(FS_IN_WorldPos, 1.0);
-        vec3 proj_coords = light_space_pos.xyz / light_space_pos.w;
-        proj_coords = proj_coords * 0.5 + 0.5;
-        
-        // Red = U, Green = V, Blue = 0 if in bounds, 1 if out
-        float outOfBounds = (proj_coords.x < 0.0 || proj_coords.x > 1.0 || 
-                            proj_coords.y < 0.0 || proj_coords.y > 1.0) ? 1.0 : 0.0;
-        FS_OUT_Color = vec4(proj_coords.x, proj_coords.y, outOfBounds, 1.0);
-        return;
-    }
-    
-    // DEBUG MODE 3: Show raw shadow value (no PCF)
-    if (u_DebugMode == 3) {
-        vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
-        float depth = abs(view_pos.z);
-        
-        int cascade = 3;
-        if (depth < cascade_splits.x) cascade = 0;
-        else if (depth < cascade_splits.y) cascade = 1;
-        else if (depth < cascade_splits.z) cascade = 2;
-        
-        vec4 light_space_pos = cascade_view_proj[cascade] * vec4(FS_IN_WorldPos, 1.0);
-        vec3 proj_coords = light_space_pos.xyz / light_space_pos.w;
-        proj_coords = proj_coords * 0.5 + 0.5;
-        
-        float bias = cascade_biases[cascade];
-        float shadow = texture(s_CascadeShadowMaps, 
-                               vec4(proj_coords.xy, float(cascade), proj_coords.z - bias));
-        
-        // White = lit, Black = shadowed
-        FS_OUT_Color = vec4(vec3(shadow), 1.0);
-        return;
-    }
-    
-    // DEBUG MODE 4: Show depth comparison values
-    if (u_DebugMode == 4) {
-        vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
-        float depth = abs(view_pos.z);
-        
-        int cascade = 3;
-        if (depth < cascade_splits.x) cascade = 0;
-        else if (depth < cascade_splits.y) cascade = 1;
-        else if (depth < cascade_splits.z) cascade = 2;
-        
-        vec4 light_space_pos = cascade_view_proj[cascade] * vec4(FS_IN_WorldPos, 1.0);
-        vec3 proj_coords = light_space_pos.xyz / light_space_pos.w;
-        proj_coords = proj_coords * 0.5 + 0.5;
-        
-        // Visualize the Z value (depth)
-        FS_OUT_Color = vec4(vec3(proj_coords.z), 1.0);
-        return;
-    }
-    
-    // DEBUG MODE 5: Show cascade boundaries with gradient
-    if (u_DebugMode == 5) {
-        vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
-        float depth = abs(view_pos.z);
-        
-        // Show depth as gradient within each cascade
-        float t = 0.0;
-        vec3 color;
-        
-        if (depth < cascade_splits.x) {
-            t = depth / cascade_splits.x;
-            color = mix(vec3(1,0,0), vec3(0.5,0,0), t);  // Red gradient
-        }
-        else if (depth < cascade_splits.y) {
-            t = (depth - cascade_splits.x) / (cascade_splits.y - cascade_splits.x);
-            color = mix(vec3(0,1,0), vec3(0,0.5,0), t);  // Green gradient
-        }
-        else if (depth < cascade_splits.z) {
-            t = (depth - cascade_splits.y) / (cascade_splits.z - cascade_splits.y);
-            color = mix(vec3(0,0,1), vec3(0,0,0.5), t);  // Blue gradient
-        }
-        else {
-            t = (depth - cascade_splits.z) / (cascade_splits.w - cascade_splits.z);
-            color = mix(vec3(1,1,0), vec3(0.5,0.5,0), t);  // Yellow gradient
-        }
-        
-        FS_OUT_Color = vec4(color, 1.0);
-        return;
-    }
-    
-    // DEBUG MODE 6: Show cascade 0 only with shadow
-    if (u_DebugMode == 6) {
-        vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
-        float depth = abs(view_pos.z);
-        
-        if (depth < cascade_splits.x) {  // Only show cascade 0
-            float shadow = visibility_cascade(FS_IN_WorldPos, 0);
-            // Red tinted by shadow
-            FS_OUT_Color = vec4(shadow, shadow * 0.2, shadow * 0.2, 1.0);
-        } else {
-            // Gray for other cascades
-            FS_OUT_Color = vec4(0.5, 0.5, 0.5, 1.0);
-        }
-        return;
-    }
-    
-    // DEBUG MODE 7: Show light direction alignment
-    if (u_DebugMode == 7) {
-        vec3 N = get_normal_from_map(FS_IN_Tangent, FS_IN_Bitangent, FS_IN_Normal, FS_IN_TexCoord, s_Normal);
-        float NdotL = dot(N, -light_direction.xyz);
-        
-        // Red = facing away from light, Green = facing toward light
-        vec3 color = NdotL > 0.0 ? vec3(0, NdotL, 0) : vec3(-NdotL, 0, 0);
-        FS_OUT_Color = vec4(color, 1.0);
-        return;
-    }
-    
-    // DEBUG MODE 8: Show distance from camera
-    if (u_DebugMode == 8) {
-        float dist = length(camera_position.xyz - FS_IN_WorldPos);
-        float normalized = dist / 50.0;  // Normalize to 50 units
-        
-        // Rainbow gradient based on distance
-        vec3 color = vec3(normalized, 1.0 - normalized, sin(normalized * 3.14159));
-        FS_OUT_Color = vec4(color, 1.0);
-        return;
-    }
-    
-    // DEBUG MODE 9: Show if in cascade 0 AND lit/shadowed
-    if (u_DebugMode == 9) {
-        vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
-        float depth = abs(view_pos.z);
-        
-        if (depth < cascade_splits.x) {
-            // In cascade 0
-            float shadow = visibility(FS_IN_WorldPos);
-            if (shadow > 0.5) {
-                // Lit area in cascade 0 - BRIGHT GREEN (this is the "light block")
-                FS_OUT_Color = vec4(0.0, 1.0, 0.0, 1.0);
-            } else {
-                // Shadowed area in cascade 0 - DARK RED
-                FS_OUT_Color = vec4(0.5, 0.0, 0.0, 1.0);
-            }
-        } else {
-            // Not in cascade 0 - render normally but dimmed
-            vec3 color = direct_lighting(Wo, N, FS_IN_WorldPos, F0, diffuse_color, roughness);
-            FS_OUT_Color = vec4(color * 0.3, 1.0);
-        }
-        return;
-    }
+    //if (u_DebugMode == 1) {
+    //    vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
+    //    float depth = abs(view_pos.z);
+    //    
+    //    int cascade = 3;
+    //    if (depth < cascade_splits.x) cascade = 0;
+    //    else if (depth < cascade_splits.y) cascade = 1;
+    //    else if (depth < cascade_splits.z) cascade = 2;
+    //    
+    //    vec3 cascadeColors[4] = vec3[4](
+    //        vec3(1.0, 0.0, 0.0),  // Red
+    //        vec3(0.0, 1.0, 0.0),  // Green
+    //        vec3(0.0, 0.0, 1.0),  // Blue
+    //        vec3(1.0, 1.0, 0.0)   // Yellow
+    //    );
+    //    FS_OUT_Color = vec4(cascadeColors[cascade], 1.0);
+    //    return;
+    //}
+    //
+    //// DEBUG MODE 2: Show shadow map UV coordinates
+    //if (u_DebugMode == 2) {
+    //    vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
+    //    float depth = abs(view_pos.z);
+    //    
+    //    int cascade = 3;
+    //    if (depth < cascade_splits.x) cascade = 0;
+    //    else if (depth < cascade_splits.y) cascade = 1;
+    //    else if (depth < cascade_splits.z) cascade = 2;
+    //    
+    //    vec4 light_space_pos = cascade_view_proj[cascade] * vec4(FS_IN_WorldPos, 1.0);
+    //    vec3 proj_coords = light_space_pos.xyz / light_space_pos.w;
+    //    proj_coords = proj_coords * 0.5 + 0.5;
+    //    
+    //    // Red = U, Green = V, Blue = 0 if in bounds, 1 if out
+    //    float outOfBounds = (proj_coords.x < 0.0 || proj_coords.x > 1.0 || 
+    //                        proj_coords.y < 0.0 || proj_coords.y > 1.0) ? 1.0 : 0.0;
+    //    FS_OUT_Color = vec4(proj_coords.x, proj_coords.y, outOfBounds, 1.0);
+    //    return;
+    //}
+    //
+    //// DEBUG MODE 3: Show raw shadow value (no PCF)
+    //if (u_DebugMode == 3) {
+    //    vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
+    //    float depth = abs(view_pos.z);
+    //    
+    //    int cascade = 3;
+    //    if (depth < cascade_splits.x) cascade = 0;
+    //    else if (depth < cascade_splits.y) cascade = 1;
+    //    else if (depth < cascade_splits.z) cascade = 2;
+    //    
+    //    vec4 light_space_pos = cascade_view_proj[cascade] * vec4(FS_IN_WorldPos, 1.0);
+    //    vec3 proj_coords = light_space_pos.xyz / light_space_pos.w;
+    //    proj_coords = proj_coords * 0.5 + 0.5;
+    //    
+    //    float bias = cascade_biases[cascade];
+    //    float shadow = texture(s_CascadeShadowMaps, 
+    //                           vec4(proj_coords.xy, float(cascade), proj_coords.z - bias));
+    //    
+    //    // White = lit, Black = shadowed
+    //    FS_OUT_Color = vec4(vec3(shadow), 1.0);
+    //    return;
+    //}
+    //
+    //// DEBUG MODE 4: Show depth comparison values
+    //if (u_DebugMode == 4) {
+    //    vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
+    //    float depth = abs(view_pos.z);
+    //    
+    //    int cascade = 3;
+    //    if (depth < cascade_splits.x) cascade = 0;
+    //    else if (depth < cascade_splits.y) cascade = 1;
+    //    else if (depth < cascade_splits.z) cascade = 2;
+    //    
+    //    vec4 light_space_pos = cascade_view_proj[cascade] * vec4(FS_IN_WorldPos, 1.0);
+    //    vec3 proj_coords = light_space_pos.xyz / light_space_pos.w;
+    //    proj_coords = proj_coords * 0.5 + 0.5;
+    //    
+    //    // Visualize the Z value (depth)
+    //    FS_OUT_Color = vec4(vec3(proj_coords.z), 1.0);
+    //    return;
+    //}
+    //
+    //// DEBUG MODE 5: Show cascade boundaries with gradient
+    //if (u_DebugMode == 5) {
+    //    vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
+    //    float depth = abs(view_pos.z);
+    //    
+    //    // Show depth as gradient within each cascade
+    //    float t = 0.0;
+    //    vec3 color;
+    //    
+    //    if (depth < cascade_splits.x) {
+    //        t = depth / cascade_splits.x;
+    //        color = mix(vec3(1,0,0), vec3(0.5,0,0), t);  // Red gradient
+    //    }
+    //    else if (depth < cascade_splits.y) {
+    //        t = (depth - cascade_splits.x) / (cascade_splits.y - cascade_splits.x);
+    //        color = mix(vec3(0,1,0), vec3(0,0.5,0), t);  // Green gradient
+    //    }
+    //    else if (depth < cascade_splits.z) {
+    //        t = (depth - cascade_splits.y) / (cascade_splits.z - cascade_splits.y);
+    //        color = mix(vec3(0,0,1), vec3(0,0,0.5), t);  // Blue gradient
+    //    }
+    //    else {
+    //        t = (depth - cascade_splits.z) / (cascade_splits.w - cascade_splits.z);
+    //        color = mix(vec3(1,1,0), vec3(0.5,0.5,0), t);  // Yellow gradient
+    //    }
+    //    
+    //    FS_OUT_Color = vec4(color, 1.0);
+    //    return;
+    //}
+    //
+    //// DEBUG MODE 6: Show cascade 0 only with shadow
+    //if (u_DebugMode == 6) {
+    //    vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
+    //    float depth = abs(view_pos.z);
+    //    
+    //    if (depth < cascade_splits.x) {  // Only show cascade 0
+    //        float shadow = visibility_cascade(FS_IN_WorldPos, 0);
+    //        // Red tinted by shadow
+    //        FS_OUT_Color = vec4(shadow, shadow * 0.2, shadow * 0.2, 1.0);
+    //    } else {
+    //        // Gray for other cascades
+    //        FS_OUT_Color = vec4(0.5, 0.5, 0.5, 1.0);
+    //    }
+    //    return;
+    //}
+    //
+    //// DEBUG MODE 7: Show light direction alignment
+    //if (u_DebugMode == 7) {
+    //    vec3 N = get_normal_from_map(FS_IN_Tangent, FS_IN_Bitangent, FS_IN_Normal, FS_IN_TexCoord, s_Normal);
+    //    float NdotL = dot(N, -light_direction.xyz);
+    //    
+    //    // Red = facing away from light, Green = facing toward light
+    //    vec3 color = NdotL > 0.0 ? vec3(0, NdotL, 0) : vec3(-NdotL, 0, 0);
+    //    FS_OUT_Color = vec4(color, 1.0);
+    //    return;
+    //}
+    //
+    //// DEBUG MODE 8: Show distance from camera
+    //if (u_DebugMode == 8) {
+    //    float dist = length(camera_position.xyz - FS_IN_WorldPos);
+    //    float normalized = dist / 50.0;  // Normalize to 50 units
+    //    
+    //    // Rainbow gradient based on distance
+    //    vec3 color = vec3(normalized, 1.0 - normalized, sin(normalized * 3.14159));
+    //    FS_OUT_Color = vec4(color, 1.0);
+    //    return;
+    //}
+    //
+    //// DEBUG MODE 9: Show if in cascade 0 AND lit/shadowed
+    //if (u_DebugMode == 9) {
+    //    vec4 view_pos = view * vec4(FS_IN_WorldPos, 1.0);
+    //    float depth = abs(view_pos.z);
+    //    
+    //    if (depth < cascade_splits.x) {
+    //        // In cascade 0
+    //        float shadow = visibility(FS_IN_WorldPos);
+    //        if (shadow > 0.5) {
+    //            // Lit area in cascade 0 - BRIGHT GREEN (this is the "light block")
+    //            FS_OUT_Color = vec4(0.0, 1.0, 0.0, 1.0);
+    //        } else {
+    //            // Shadowed area in cascade 0 - DARK RED
+    //            FS_OUT_Color = vec4(0.5, 0.0, 0.0, 1.0);
+    //        }
+    //    } else {
+    //        // Not in cascade 0 - render normally but dimmed
+    //        vec3 color = direct_lighting(Wo, N, FS_IN_WorldPos, F0, diffuse_color, roughness);
+    //        FS_OUT_Color = vec4(color * 0.3, 1.0);
+    //    }
+    //    return;
+    //}
     // -------------------------------------------------------------------------
     // Direct lighting
     vec3 color = direct_lighting(Wo, N, FS_IN_WorldPos, F0, diffuse_color, roughness);
@@ -616,7 +619,13 @@ void main()
     }
 
     // Ambient
-    color += diffuse_color * light_color.w;
+    vec3 skyColor = vec3(0.5, 0.7, 1.0); // Blueish Sky
+    vec3 groundColor = vec3(0.2, 0.2, 0.2); // Dark Ground
+    
+    float hemiFactor = normalize(N).y * 0.5 + 0.5; // Map Y [-1, 1] to [0, 1]
+    vec3 ambientLight = mix(groundColor, skyColor, hemiFactor) * light_color.w;
+    
+    color += diffuse_color * ambientLight;
     
     // Volumetric fog
     color = add_inscattered_light(color, FS_IN_WorldPos);

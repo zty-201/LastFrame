@@ -35,7 +35,7 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
             glm::quat q = glm::quat(glm::radians(transform.rotation));
             PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q, /*activate=*/true);
 
-            // Clear old motion so it doesn't “remember” a velocity from before
+            // Clear old motion so it doesn't ï¿½rememberï¿½ a velocity from before
             PhysicsWorld::Get().SetLinearVelocity(ent, glm::vec3(0.0f));
         }
 
@@ -48,10 +48,24 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
             continue; // skip normal Jolt -> ECS pull this frame
         }
 
+        // Always pull latest position from physics
         transform.position = PhysicsWorld::Get().GetBodyPosition(ent);
 
-        const glm::quat jq = PhysicsWorld::Get().GetBodyRotation(ent);
-        transform.rotation = glm::degrees(glm::eulerAngles(jq));
+        if (physics.lockRotation)
+        {
+            // Force the body to stay upright: zero rotation
+            glm::vec3 uprightEuler{0.0f, 0.0f, 0.0f};
+            transform.rotation = uprightEuler;
+
+            glm::quat uprightQ = glm::quat(glm::radians(uprightEuler));
+            // Write this rotation back into Jolt so the collider never tips
+            PhysicsWorld::Get().SetPositionRotation(ent, transform.position, uprightQ, /*activate=*/false);
+        }
+        else
+        {
+            const glm::quat jq = PhysicsWorld::Get().GetBodyRotation(ent);
+            transform.rotation = glm::degrees(glm::eulerAngles(jq));
+        }
 
         physics.velocity = PhysicsWorld::Get().GetBodyVelocity(ent);
 

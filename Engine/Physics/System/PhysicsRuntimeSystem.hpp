@@ -7,6 +7,7 @@
 #include "PhysicsBuildSystem.hpp"
 #include "PhysicsSyncSystem.hpp"
 #include "CoreEngine.hpp"
+#include "Screen.hpp"
 
 namespace EngineFramework
 {
@@ -32,6 +33,9 @@ namespace EngineFramework
             // 1) get ECS registry from the engine singleton
             // name it ecs, not registry, to avoid shadowing the global
             //entt::registry& ecs = CoreEngine::GetInstance().GetRegistry();
+
+            if (!Screen::GetInstance().is_simulator_running)
+                return;
 
             // 2) make sure ECS entities have Jolt bodies
             m_buildSystem.Update(registry);

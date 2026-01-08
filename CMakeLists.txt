@@ -231,7 +231,7 @@ endif()
 
 
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp openfbx CACHE INTERNAL "")
 
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
@@ -344,6 +344,14 @@ if(WIN32)
 elseif(ANDROID)
   target_sources(jnicpp PUBLIC ${ENGINE_SOURCE} ${APPLICATION_SOURCE})
   target_include_directories(jnicpp PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
+endif()
+
+#Adding /bigobj for Script.cpp as it's too big
+if (MSVC)
+    set_source_files_properties(
+        Engine/Scripting/Script.cpp
+        PROPERTIES COMPILE_OPTIONS "/bigobj"
+    )
 endif()
 
 
