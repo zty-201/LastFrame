@@ -326,11 +326,13 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
 
     if (motionType == JPH::EMotionType::Dynamic)
     {
+        //bodySettings.mMotionQuality = JPH::EMotionQuality::LinearCast;
+
         JPH::MassProperties massProperties;
         JPH::MassProperties shapeMassProps = finalShape->GetMassProperties();
 
         float volume = shapeMassProps.mMass;
-        
+
         if (volume > 0.0001f)
         {
             float mass = volume * material.density;
