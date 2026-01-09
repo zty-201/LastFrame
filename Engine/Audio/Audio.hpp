@@ -113,6 +113,14 @@ namespace EngineFramework
         bool PlayFromComponent(const AudioComponent& comp,
             std::size_t clipIndex,
             const glm::vec3& worldPos,
+            AudioGroup group = AudioGroup::SFX);*/
+        bool PlayOneShot(const std::string& guid,
+            const glm::vec3& worldPos,
+            float volume = 1.0f,
+            bool is3D = true,
+            bool loop = false,
+            float minDist = 1.0f,
+            float maxDist = 50.0f,
             AudioGroup group = AudioGroup::SFX);
 
         // ===== 3D Functions =====
@@ -215,6 +223,8 @@ namespace EngineFramework
 
         // Testing purpose
         //void DebugPlayTestSound();
+        // 
+        void DebugStereoPanTest();
 
         void DebugMainMenuAutoPlay();
         void DebugMainMenuHandleKeys();

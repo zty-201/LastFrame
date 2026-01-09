@@ -19,6 +19,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "AudioComponent.h"
 #include "AudioListenerComponent.h"
 
+
 #include <entt/entt.hpp>
 
 #ifdef PLATFORM_ANDROID
@@ -26,6 +27,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <android/asset_manager_jni.h>
 #endif
 #include "AssetManager.hpp"
+
 
 /*
 * Listener: Any entity with [AudioListenerComponent] + [TransformComponent]
@@ -190,10 +192,18 @@ namespace EngineFramework
 
 						glm::vec3 pos = tf.position;
 
-						// TODO: derive from rotation/camera; using simple defaults for now
-						glm::vec3 forward(0.0f, 0.0f, -1.0f);
-						glm::vec3 up(0.0f, 1.0f, 0.0f);
-						glm::vec3 vel(0.0f); // you can compute real velocity later
+						// 1. Convert Euler angles (degrees) to a Quaternion
+		// Note: Assuming tf.rotation is in degrees. If radians, remove glm::radians.
+						glm::quat q = glm::quat(glm::radians(tf.rotation));
+
+						// 2. Rotate the default world vectors by the player's rotation
+						// Default OpenGL Forward is -Z, Up is +Y
+						glm::vec3 forward = q * glm::vec3(0.0f, 0.0f, -1.0f);
+						glm::vec3 up = q * glm::vec3(0.0f, 1.0f, 0.0f);
+
+						// --- NEW CODE END ---
+
+						glm::vec3 vel(0.0f);
 
 						FMOD_VECTOR fPos{ pos.x, pos.y, pos.z };
 						FMOD_VECTOR fVel{ vel.x, vel.y, vel.z };
@@ -227,6 +237,24 @@ namespace EngineFramework
 								clip->playRequested = false;
 							}
 						}
+
+						// ---------------------------------------------------------
+						// 2. PROCESS REQUEST QUEUE
+						// ---------------------------------------------------------
+						for (const auto& req : comp.requestQueue)
+						{
+							// Find the asset path/guid from the logical name (e.g. "BGM")
+							auto it = comp.soundBank.find(req.clipName);
+							if (it == comp.soundBank.end()) continue;
+
+							std::string guid = it->second;
+
+							// Play the sound using your helper
+							PlayOneShot(guid, tf.position, req.volume, req.is3D, req.loop, req.minDistance, req.maxDistance);
+						}
+
+						// Clear queue after processing so sounds don't repeat forever
+						comp.requestQueue.clear();
 					});
 			}
 		}
@@ -435,6 +463,11 @@ namespace EngineFramework
 	bool AudioSystem::PlayFromComponent(const AudioComponent& comp,
 		std::size_t clipIndex,
 		const glm::vec3& worldPos,
+		float volume,
+		bool is3D,
+		bool loop,
+		float minDist,
+		float maxDist,
 		AudioGroup group)
 	{
 		if (!m_initialized)
@@ -447,14 +480,26 @@ namespace EngineFramework
 		const AudioComponent::AudioClip* clip = comp.GetClip(clipIndex);
 		if (clip == nullptr)
 			return false;
+		if (!m_initialized || m_system == nullptr) return false;
 
+		// 1. Load/Find the asset
 		using EngineFramework::AssetManagerSystem;
+		/*std::shared_ptr<SoundAsset> sound = AssetManagerSystem::GetResource<SoundAsset>(guid);*/
+		auto fullID = AssetManagerSystem::GetFullGuid(AssetManagerSystem::AUDIO_GUID, guid);
 
 		// Resolve SoundAsset from GUID
 		std::shared_ptr<SoundAsset> sound =
 			AssetManagerSystem::GetResource<SoundAsset>(clip->audio_guid);
 		if (!sound || !sound->sound)
+		// 2. Pass the ID (not the string!) to GetResource
+		std::shared_ptr<SoundAsset> sound = AssetManagerSystem::GetResource<SoundAsset>(fullID);
+
+		// Safety check: if sound isn't found, try to resolve path or fail
+		if (!sound || !sound->sound) {
+			// Optional: Try to Load it on the fly if not found? 
+			// For now, let's just fail safely.
 			return false;
+		}
 
 		FMOD::Channel* channel = nullptr;
 		FMOD_RESULT r = m_system->playSound(sound->sound, nullptr, true, &channel);
@@ -462,7 +507,9 @@ namespace EngineFramework
 		if (r != FMOD_OK || channel == nullptr)
 			return false;
 
-		// Put channel into the correct group
+		if (r != FMOD_OK || channel == nullptr) return false;
+
+		// 2. Assign Group
 		if (FMOD::ChannelGroup* grp = pickGroup(group))
 			channel->setChannelGroup(grp);
 
@@ -474,12 +521,15 @@ namespace EngineFramework
 
 		// 2D / 3D setup
 		if (clip->is3D)
+		// 3. Set Volume
+		channel->setVolume(std::clamp(volume, 0.0f, 1.0f));
+
+		// 4. Set 3D Settings
+		if (is3D)
 		{
 			channel->setMode(FMOD_3D);
-
 			FMOD_VECTOR pos{ worldPos.x, worldPos.y, worldPos.z };
 			FMOD_VECTOR vel{ 0.0f, 0.0f, 0.0f };
-
 			channel->set3DAttributes(&pos, &vel);
 			channel->set3DMinMaxDistance(clip->minDistance, clip->maxDistance);
 		}
@@ -493,10 +543,12 @@ namespace EngineFramework
 			channel->setMode(FMOD_LOOP_NORMAL);
 		else
 			channel->setMode(FMOD_LOOP_OFF);
+		// 5. Loop Settings
+		channel->setMode(loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
 
-
-		// Start playback
+		// 6. Unpause to play
 		channel->setPaused(false);
+
 		return true;
 #else
 		(void)comp; (void)clipIndex; (void)worldPos; (void)group;

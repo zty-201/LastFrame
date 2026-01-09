@@ -833,7 +833,6 @@ namespace EditorFeatures {
 		if (mt == entt::resolve<AudioComponent>())
 		{
 			auto& comp = obj.cast<AudioComponent&>();
-
 			using EF_AM = EngineFramework::AssetManagerSystem;
 			using EF_AUD = EngineFramework::AudioSystem;
 
@@ -938,47 +937,93 @@ namespace EditorFeatures {
 			if (ImGui::Button("Add Clip"))
 			{
 				comp.AddClip();
+			ImGui::Text("Audio Sound Bank");
+			ImGui::TextDisabled("Map Logical Names (e.g. 'BGM') to Assets");
+			ImGui::Separator();
+
+			// 1. ADD NEW SOUNDS
+			static char nameBuffer[64] = "";
+			ImGui::InputText("Logical Name", nameBuffer, 64);
+
+			static xresource::full_guid tempGuid;
+			const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
+			draw_asset_guid_picker("Asset", tempGuid, AssetPickerKind::Audio, descriptor.none_label, descriptor.sources, descriptor.formatter);
+
+			if (ImGui::Button("Add to Bank"))
+			{
+				if (strlen(nameBuffer) > 0 && !tempGuid.empty())
+				{
+					// Convert GUID to string name for storage
+					std::string assetName = EF_AM::GetName(tempGuid);
+					if (assetName.empty()) assetName = "Unknown_Audio";
+
+					comp.soundBank[std::string(nameBuffer)] = assetName;
+					memset(nameBuffer, 0, 64);
+					tempGuid = {};
+				}
 			}
 
 			ImGui::Separator();
-			return false; // keep using custom UI
 
-			////---------------------
-			//// Volume (clamped)
-			////---------------------
-			//comp.volume = std::clamp(comp.volume, 0.0f, 1.0f);
+			// 2. PLAY ON START SETTINGS (Background Music)
+			if (ImGui::BeginCombo("Play On Start", comp.playOnStartName.empty() ? "(None)" : comp.playOnStartName.c_str()))
+			{
+				if (ImGui::Selectable("(None)", comp.playOnStartName.empty()))
+					comp.playOnStartName = "";
 
-			//if (ImGui::SliderFloat("Volume", &comp.volume, 0.0f, 1.0f))
-			//{
-			//	// If audio is playing, update volume in real time here if your AudioSystem supports it
-			//}
+				for (auto& [key, value] : comp.soundBank)
+				{
+					bool isSelected = (comp.playOnStartName == key);
+					if (ImGui::Selectable(key.c_str(), isSelected))
+						comp.playOnStartName = key;
 
-			////---------------------
-			//// Buttons
-			////---------------------
-			//if (ImGui::Button("Play"))
-			//{
-			//	if (sound)
-			//	{
-			//		EF_AUD::GetInstance().Play(sound, comp.volume, comp.loop,
-			//			EngineFramework::AudioGroup::Music);
-			//	}
-			//}
+					if (isSelected) ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
 
-			//ImGui::SameLine();
-			//if (ImGui::Button("Stop"))
-			//{
-			//	EF_AUD::GetInstance().StopAll();
-			//}
+			if (!comp.playOnStartName.empty())
+			{
+				ImGui::Checkbox("Loop##Start", &comp.playOnStartLoop);
+				ImGui::SameLine();
+				ImGui::Checkbox("3D##Start", &comp.playOnStart3D);
+				ImGui::SliderFloat("Volume##Start", &comp.playOnStartVolume, 0.0f, 1.0f);
+			}
 
-			//ImGui::SameLine();
-			//if (ImGui::Button("Pause"))
-			//{
-			//	EF_AUD::GetInstance().PauseAll(true);
-			//}
+			ImGui::Separator();
 
-			//ImGui::Separator();
-			//return false;
+			// 3. SOUND LIST
+			std::string toRemove;
+			if (ImGui::BeginTable("SoundBankTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+			{
+				ImGui::TableSetupColumn("Name");
+				ImGui::TableSetupColumn("Asset");
+				ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+				ImGui::TableHeadersRow();
+
+				for (auto& [key, value] : comp.soundBank)
+				{
+					ImGui::PushID(key.c_str());
+					ImGui::TableNextRow();
+					ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted(key.c_str());
+					ImGui::TableSetColumnIndex(1); ImGui::TextDisabled("%s", value.c_str());
+					ImGui::TableSetColumnIndex(2);
+
+					if (ImGui::SmallButton("Test")) {
+						// Simple test play
+						EF_AUD::GetInstance().PlayOneShot(value, glm::vec3(0.f), 1.0f, false);
+					}
+					ImGui::SameLine();
+					if (ImGui::SmallButton("Del")) {
+						toRemove = key;
+					}
+					ImGui::PopID();
+				}
+				ImGui::EndTable();
+			}
+			if (!toRemove.empty()) comp.soundBank.erase(toRemove);
+
+			return false;
 		}
 		
 		// Each entry is pair<entt::id_type, entt::meta_data> - for self reference

@@ -175,16 +175,11 @@
 	},
 	"100": {
 		"AudioComponent": {
-			"audio_guid": [
-				16287532407446159361,
-				11537445004664754516
-			],
-			"is3D": true,
-			"loop": false,
-			"maxDistance": 3.0,
-			"minDistance": 1.0,
-			"playOnStart": false,
-			"volume": 1.0
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "",
+			"playOnStartVolume": 0.5,
+			"soundBank": {}
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -356,16 +351,11 @@
 	},
 	"102": {
 		"AudioComponent": {
-			"audio_guid": [
-				15134610902839312391,
-				11537445004664754516
-			],
-			"is3D": true,
-			"loop": false,
-			"maxDistance": 3.0,
-			"minDistance": 1.0,
-			"playOnStart": false,
-			"volume": 1.0
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "",
+			"playOnStartVolume": 0.5,
+			"soundBank": {}
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -1034,16 +1024,11 @@
 	},
 	"114": {
 		"AudioComponent": {
-			"audio_guid": [
-				1371416927605194753,
-				11537445004664754516
-			],
-			"is3D": true,
-			"loop": false,
-			"maxDistance": 3.0,
-			"minDistance": 1.0,
-			"playOnStart": false,
-			"volume": 1.0
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "",
+			"playOnStartVolume": 0.5,
+			"soundBank": {}
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -1140,16 +1125,11 @@
 	},
 	"13": {
 		"AudioComponent": {
-			"audio_guid": [
-				16287532407446159363,
-				11537445004664754516
-			],
-			"is3D": true,
-			"loop": false,
-			"maxDistance": 2.0,
-			"minDistance": 1.0,
-			"playOnStart": false,
-			"volume": 1.0
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "",
+			"playOnStartVolume": 0.5,
+			"soundBank": {}
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -2394,16 +2374,11 @@
 	},
 	"25": {
 		"AudioComponent": {
-			"audio_guid": [
-				11515484817139662851,
-				11537445004664754516
-			],
-			"is3D": true,
-			"loop": false,
-			"maxDistance": 1.0,
-			"minDistance": 1.0,
-			"playOnStart": false,
-			"volume": 1.0
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "",
+			"playOnStartVolume": 0.5,
+			"soundBank": {}
 		},
 		"ColliderComponent": {
 			"maxBounds": [
@@ -6969,16 +6944,11 @@
 	},
 	"61": {
 		"AudioComponent": {
-			"audio_guid": [
-				15134610902839312391,
-				11537445004664754516
-			],
-			"is3D": true,
-			"loop": false,
-			"maxDistance": 1.0,
-			"minDistance": 1.0,
-			"playOnStart": false,
-			"volume": 1.0
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "",
+			"playOnStartVolume": 0.5,
+			"soundBank": {}
 		},
 		"ColliderComponent": {
 			"maxBounds": [
@@ -7095,16 +7065,11 @@
 	},
 	"62": {
 		"AudioComponent": {
-			"audio_guid": [
-				11515484817139662851,
-				11537445004664754516
-			],
-			"is3D": true,
-			"loop": false,
-			"maxDistance": 1.0,
-			"minDistance": 1.0,
-			"playOnStart": false,
-			"volume": 1.0
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "",
+			"playOnStartVolume": 0.5,
+			"soundBank": {}
 		},
 		"ColliderComponent": {
 			"maxBounds": [
@@ -10274,16 +10239,11 @@
 	},
 	"88": {
 		"AudioComponent": {
-			"audio_guid": [
-				16127170835567050753,
-				11537445004664754516
-			],
-			"is3D": true,
-			"loop": false,
-			"maxDistance": 1.0,
-			"minDistance": 1.0,
-			"playOnStart": false,
-			"volume": 1.0
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "",
+			"playOnStartVolume": 0.5,
+			"soundBank": {}
 		},
 		"ColliderComponent": {
 			"maxBounds": [
@@ -10409,16 +10369,11 @@
 	},
 	"89": {
 		"AudioComponent": {
-			"audio_guid": [
-				11515484817139662851,
-				11537445004664754516
-			],
-			"is3D": true,
-			"loop": false,
-			"maxDistance": 1.0,
-			"minDistance": 1.0,
-			"playOnStart": false,
-			"volume": 1.0
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "",
+			"playOnStartVolume": 0.5,
+			"soundBank": {}
 		},
 		"ColliderComponent": {
 			"maxBounds": [
@@ -11147,16 +11102,11 @@
 	},
 	"95": {
 		"AudioComponent": {
-			"audio_guid": [
-				15935213613728841733,
-				11537445004664754516
-			],
-			"is3D": true,
-			"loop": true,
-			"maxDistance": 2.5,
-			"minDistance": 1.0,
-			"playOnStart": true,
-			"volume": 1.0
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "",
+			"playOnStartVolume": 0.5,
+			"soundBank": {}
 		},
 		"ColliderComponent": {
 			"maxBounds": [
@@ -11509,6 +11459,15 @@
 		}
 	},
 	"98": {
+		"AudioComponent": {
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "BGM",
+			"playOnStartVolume": 1.0,
+			"soundBank": {
+				"BGM": "20.Room-Tone_SFX_Ambience_Loop"
+			}
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				0.5,

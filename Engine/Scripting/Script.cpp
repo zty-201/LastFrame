@@ -271,6 +271,15 @@ namespace Engine {
             "RequestPlayClip", [](AudioComponent& a, std::size_t index) {
                 if (auto* clip = a.GetClip(index))
                     clip->playRequested = true;
+            // Expose the Play function so scripts can trigger sounds
+            // Usage in Lua: EntityAudio:Play("Footstep", 0.5)
+            "Play", [](AudioComponent& a, const std::string& name, float volume) {
+                a.Play(name, volume);
+            },
+
+            // Optional: Helper to check if a sound exists in the bank
+            "HasSound", [](AudioComponent& a, const std::string& name) {
+                return a.soundBank.find(name) != a.soundBank.end();
             }
         );
 
