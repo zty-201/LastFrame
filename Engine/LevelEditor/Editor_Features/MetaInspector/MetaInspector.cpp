@@ -829,38 +829,148 @@ namespace EditorFeatures {
 		}
 #endif
 
-		// ------- CUSTOM UI FOR AUDIO COMPONENT -------
-		if (mt == entt::resolve<AudioComponent>())
-		{
-			auto& comp = obj.cast<AudioComponent&>();
-			using EF_AM = EngineFramework::AssetManagerSystem;
-			using EF_AUD = EngineFramework::AudioSystem;
-
-			ImGui::Text("Audio Sound Bank");
-			ImGui::TextDisabled("Map Logical Names (e.g. 'BGM') to Assets");
-			ImGui::Separator();
-
-			// 1. ADD NEW SOUNDS
-			static char nameBuffer[64] = "";
-			ImGui::InputText("Logical Name", nameBuffer, 64);
-
-			static xresource::full_guid tempGuid;
-			const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
-			draw_asset_guid_picker("Asset", tempGuid, AssetPickerKind::Audio, descriptor.none_label, descriptor.sources, descriptor.formatter);
-
-			if (ImGui::Button("Add to Bank"))
+		// CUSTOM UI FOR AUDIO COMPONENT
+		// Allows edtor to manage multiple audio clips per entity, assign audio assets and configure playback settings in the editor directly
+		// Also provides a logical sound bank that maps certain names such as BGM to audio assets, support selecting a sound to play automatically on start with
+		// configurable options and includes tools to test, add and remove sounds
+			if (mt == entt::resolve<AudioComponent>())
 			{
-				if (strlen(nameBuffer) > 0 && !tempGuid.empty())
-				{
-					// Convert GUID to string name for storage
-					std::string assetName = EF_AM::GetName(tempGuid);
-					if (assetName.empty()) assetName = "Unknown_Audio";
+				auto& comp = obj.cast<AudioComponent&>();
+				using EF_AM = EngineFramework::AssetManagerSystem;
+				using EF_AUD = EngineFramework::AudioSystem;
 
-					comp.soundBank[std::string(nameBuffer)] = assetName;
-					memset(nameBuffer, 0, 64);
-					tempGuid = {};
+				if (comp.GetClipCount() == 0)
+				{
+					comp.AddClip();
 				}
-			}
+
+				const auto audioDescriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
+				const bool has_sources = !audioDescriptor.sources.empty();
+
+				for (std::size_t clipIdx = 0; clipIdx < comp.GetClipCount(); ++clipIdx)
+				{
+					auto* clip = comp.GetClip(clipIdx);
+					if (!clip)
+						continue;
+
+					ImGui::PushID(static_cast<int>(clipIdx));
+					std::string header = "Audio Clip " + std::to_string(clipIdx + 1);
+					if (ImGui::CollapsingHeader(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						if (comp.GetClipCount() > 1)
+						{
+							if (ImGui::Button("Remove Clip"))
+							{
+								comp.RemoveClip(clipIdx);
+								--clipIdx;
+								ImGui::PopID();
+								continue;
+							}
+						}
+
+						std::shared_ptr<SoundAsset> sound = nullptr;
+						if (has_sources)
+						{
+							xresource::full_guid full = clip->audio_guid;
+							if (draw_asset_guid_picker("Audio",
+								full,
+								AssetPickerKind::Audio,
+								audioDescriptor.none_label,
+								audioDescriptor.sources,
+								audioDescriptor.formatter))
+							{
+								clip->audio_guid = full;
+							}
+						}
+						else
+						{
+							ImGui::TextDisabled("Audio: (no audio assets available)");
+						}
+
+						if (!clip->audio_guid.empty())
+						{
+							sound = EF_AM::GetResource<SoundAsset>(clip->audio_guid);
+						}
+
+						ImGui::Checkbox("Loop", &clip->loop);
+						ImGui::SameLine();
+						ImGui::Checkbox("Play On Start", &clip->playOnStart);
+
+						ImGui::Checkbox("3D Audio", &clip->is3D);
+						if (clip->is3D)
+						{
+							if (clip->minDistance < 0.0f) clip->minDistance = 0.0f;
+							if (clip->maxDistance < clip->minDistance)
+								clip->maxDistance = clip->minDistance + 0.1f;
+
+							ImGui::DragFloat("Min Distance", &clip->minDistance, 0.1f, 0.0f, 1000.0f);
+							ImGui::DragFloat("Max Distance", &clip->maxDistance, 0.1f, 0.0f, 1000.0f);
+						}
+
+						clip->volume = std::clamp(clip->volume, 0.0f, 1.0f);
+						ImGui::SliderFloat("Volume", &clip->volume, 0.0f, 1.0f);
+
+						if (ImGui::Button("Play"))
+						{
+							if (sound)
+							{
+								EF_AUD::GetInstance().Play(
+									sound,
+									clip->volume,
+									clip->loop,
+									EngineFramework::AudioGroup::Music);
+							}
+						}
+						ImGui::SameLine();
+						if (ImGui::Button("Stop"))
+							EF_AUD::GetInstance().StopAll();
+
+						ImGui::SameLine();
+						if (ImGui::Button("Pause"))
+							EF_AUD::GetInstance().PauseAll(true);
+
+						if (ImGui::Button("Play 3D (ECS)"))
+						{
+							clip->playRequested = true;
+						}
+					}
+					ImGui::PopID();
+				}
+
+				if (ImGui::Button("Add Clip"))
+				{
+					comp.AddClip();
+				}
+
+				ImGui::Text("Audio Sound Bank");
+				ImGui::TextDisabled("Map Logical Names (e.g. 'BGM') to Assets");
+				ImGui::Separator();
+
+				// 1. ADD NEW SOUNDS
+				static char nameBuffer[64] = "";
+				ImGui::InputText("Logical Name", nameBuffer, 64);
+
+				static xresource::full_guid tempGuid;
+				draw_asset_guid_picker("Asset",
+					tempGuid,
+					AssetPickerKind::Audio,
+					audioDescriptor.none_label,
+					audioDescriptor.sources,
+					audioDescriptor.formatter);
+
+				if (ImGui::Button("Add to Bank"))
+				{
+					if (strlen(nameBuffer) > 0 && !tempGuid.empty())
+					{
+						// Convert GUID to string name for storage
+						std::string assetName = EF_AM::GetName(tempGuid);
+						if (assetName.empty()) assetName = "Unknown_Audio";
+
+						comp.soundBank[std::string(nameBuffer)] = assetName;
+						memset(nameBuffer, 0, 64);
+						tempGuid = {};
+					}
+				}
 
 			ImGui::Separator();
 

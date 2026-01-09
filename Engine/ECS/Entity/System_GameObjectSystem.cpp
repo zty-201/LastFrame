@@ -31,6 +31,7 @@
 #include "MeshComponent.h"
 #include "MaterialComponent.h"
 #include "LightComponent.h"
+#include "AudioComponentSerialization.hpp"
 #include "AssetManager.hpp"
 
 //For printing instance/type_guids in error messages
@@ -348,6 +349,12 @@ namespace EngineFramework
 			{
 				//Already read the archtype. it's not a component to emplace.
 				if (comp_name == "archtype") continue;
+
+				if (comp_name == "AudioComponent")
+				{
+					NormalizeAudioComponentJson(comp_data_json);
+				}
+
 				//Creation of component.
 				entt::meta_type comp_type = entt::resolve(GetID(comp_name));
 				entt::meta_any comp_data = comp_type.construct();
