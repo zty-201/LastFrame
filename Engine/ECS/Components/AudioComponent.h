@@ -1,14 +1,26 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <unordered_map>
+
 #include "xresource_guid.h"
 
 #include <cstddef>
+#include <string>
+#include <unordered_map>
 #include <vector>
+
+struct AudioRequest
+{
+	std::string clipName;
+	float volume = 1.0f;
+	bool is3D = true;
+	bool loop = false;
+	float minDistance = 1.0f;
+	float maxDistance = 50.0f;
+};
 
 struct AudioComponent
 {
+	// Each clip holds the GUID that points to the sound asset
+	// Alongside with the playback attributes
 	struct AudioClip
 	{
 		// Which sound to play (linked to SoundAsset via this GUID)
@@ -26,8 +38,24 @@ struct AudioComponent
 
 		bool playRequested = false; // set by Lua / editor, consumed by AudioSystem
 	};
-
+	
+	// Stores per-entity sound clips plus the logical sound bank used by scripts and designers.
 	std::vector<AudioClip> Clips;
+
+	// 1. CONFIG: Map "Logical Name" -> "File Path" (or GUID)
+	std::unordered_map<std::string, std::string> soundBank;
+
+	// 2. STATE: The list of sounds to play this frame
+	std::vector<AudioRequest> requestQueue;
+
+	// 3. PLAY ON START CONFIGURATION
+	std::string playOnStartName;
+	bool playOnStartLoop = true;
+	bool playOnStart3D = false;
+	float playOnStartVolume = 0.5f;
+
+	// 4. RUNTIME STATE
+	bool _hasStarted = false; // Prevents it from restarting every frame
 
 	AudioComponent()
 		: Clips(1) {}
@@ -79,44 +107,12 @@ struct AudioComponent
 		Clips.erase(Clips.begin() + static_cast<std::vector<AudioClip>::difference_type>(index));
 		return true;
 	}
-};
 
-// A request to play a specific sound
-struct AudioRequest
-{
-    std::string clipName;   // The logical name (e.g. "Footstep")
-    float volume = 1.0f;
-    bool is3D = true;
-    bool loop = false;
-    float minDistance = 1.0f;
-    float maxDistance = 50.0f;
-};
-
-struct AudioComponent
-{
-    // 1. CONFIG: Map "Logical Name" -> "File Path" (or GUID)
-    std::unordered_map<std::string, std::string> soundBank;
-
-    // 2. STATE: The list of sounds to play this frame
-    std::vector<AudioRequest> requestQueue;
-
-    // 3. PLAY ON START CONFIGURATION (Add these lines!)
-    std::string playOnStartName;  // Name of the sound to play (e.g. "BGM")
-    bool playOnStartLoop = true;
-    bool playOnStart3D = false;
-    float playOnStartVolume = 0.5f;
-
-    // 4. RUNTIME STATE
-    bool _hasStarted = false; // Prevents it from restarting every frame
-
-    // 5. HELPER
-    void Play(const std::string& name, float vol = 1.0f)
-    {
-        AudioRequest req;
-        req.clipName = name;
-        req.volume = vol;
-        req.is3D = true;
-        req.loop = false;
-        requestQueue.push_back(req);
-    }
+	void Play(const std::string& name, float vol = 1.0f)
+	{
+		AudioRequest req;
+		req.clipName = name;
+		req.volume = vol;
+		requestQueue.push_back(req);
+	}
 };

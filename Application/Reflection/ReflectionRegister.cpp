@@ -23,7 +23,6 @@
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 #include "MetaInspector.hpp"
 
-using SoundBankMap = std::unordered_map<std::string, std::string>;
 /*
 	This is for third-party types.
 	For your own types, simply put to/from_json in global namespace or in the respective namespace of the type e.g. namespace hello{ to/fromjson}
@@ -250,130 +249,157 @@ inline void from_json(const nlohmann::json& j, ::ColliderData& c) {
 using namespace entt::literals;
 namespace EngineFramework
 {
-
-	//For use with SetMetaAny and SetJson functions. 
-	template <typename T>
-	void SetMetaAnyWithJson(entt::meta_any& comp_data, const entt::meta_data& data_type, const nlohmann::json& data)
+	namespace detail
 	{
-		data_type.set(comp_data, data.get<T>());
-	}
-	template <typename T>
-	void SetJsonWithMetaAny(nlohmann::json& comp_json, const std::string& name, const entt::meta_any& data)
-	{
-		comp_json[name] = data.cast<T>();
-	}
+		template <typename T>
+		void AssignMetaFromJson(entt::meta_any& comp_data, const entt::meta_data& data_type, const nlohmann::json& data)
+		{
+			data_type.set(comp_data, data.get<T>());
+		}
 
-	/*
-		Note: When modifying maps to include arbitrary types, ensure to_json and from_json methods are declared for your type at the top of this file.
-	*/
+		template <typename T>
+		void AssignJsonFromMeta(nlohmann::json& comp_json, const std::string& name, const entt::meta_any& data)
+		{
+			comp_json[name] = data.cast<T>();
+		}
 
-	//Basically puts partial specialisations of the template function into a map together with the associated type id.
-#define SetMeta(T) {entt::resolve<T>().id(), SetMetaAnyWithJson<T>}
-	static std::unordered_map<entt::id_type, std::function<void(entt::meta_any&, const entt::meta_data&, const nlohmann::json&)>> set_meta_with_json_map
-	{
-		SetMeta(signed char),
-		SetMeta(short),
-		SetMeta(int),
-		SetMeta(long),
-		SetMeta(long long),
-		SetMeta(bool),
-		SetMeta(unsigned char),
-		SetMeta(unsigned short),
-		SetMeta(unsigned int),
-		SetMeta(unsigned long),
-		SetMeta(unsigned long long),
-		SetMeta(char),
-		SetMeta(wchar_t),
-		SetMeta(float),
-		SetMeta(double),
-		SetMeta(long double),
-		SetMeta(std::string),
-		SetMeta(std::nullptr_t),
-		SetMeta(char8_t),
-		SetMeta(char16_t),
-		SetMeta(char32_t),
-		SetMeta(glm::vec2),
-		SetMeta(glm::vec3),
-		SetMeta(glm::mat4),
-		SetMeta(xresource::full_guid),
-		SetMeta(std::vector<int>),
-		SetMeta(std::vector<float>),
-		SetMeta(std::vector<std::string>),
-		SetMeta(std::vector<AudioComponent::AudioClip>),
-		SetMeta(CameraComponent::CameraType),
-		SetMeta(LightComponent::Type),
-		SetMeta(std::filesystem::path),
-		SetMeta(TriggerShapeType),
-		SetMeta(::ColliderShape),
-		SetMeta(::ColliderData),
-		SetMeta(std::vector<::ColliderData>),
-		SetMeta(::ColliderComponent::Mode),
-		SetMeta(ColliderShape),
-		SetMeta(ColliderData),
-		SetMeta(std::vector<ColliderData>),
-		SetMeta(ColliderComponent::Mode),
-		SetMeta(xresource::instance_guid),
-		SetMeta(SoundBankMap),
+		using MetaSetter = void(*)(entt::meta_any&, const entt::meta_data&, const nlohmann::json&);
+		using JsonSetter = void(*)(nlohmann::json&, const std::string&, const entt::meta_any&);
 
+		template <typename T>
+		constexpr std::pair<entt::id_type, MetaSetter> MetaEntry()
+		{
+			return { entt::resolve<T>().id(), &AssignMetaFromJson<T> };
+		}
 
+		template <typename T>
+		constexpr std::pair<entt::id_type, JsonSetter> JsonEntry()
+		{
+			return { entt::resolve<T>().id(), &AssignJsonFromMeta<T> };
+		}
+
+		const auto& GetMetaSetterMap()
+		{
+			using MapType = std::unordered_map<entt::id_type, MetaSetter>;
+			static const MapType map = []()
+			{
+				MapType temp{
+					MetaEntry<signed char>(),
+					MetaEntry<short>(),
+					MetaEntry<int>(),
+					MetaEntry<long>(),
+					MetaEntry<long long>(),
+					MetaEntry<bool>(),
+					MetaEntry<unsigned char>(),
+					MetaEntry<unsigned short>(),
+					MetaEntry<unsigned int>(),
+					MetaEntry<unsigned long>(),
+					MetaEntry<unsigned long long>(),
+					MetaEntry<char>(),
+					MetaEntry<wchar_t>(),
+					MetaEntry<float>(),
+					MetaEntry<double>(),
+					MetaEntry<long double>(),
+					MetaEntry<std::string>(),
+					MetaEntry<std::nullptr_t>(),
+					MetaEntry<char8_t>(),
+					MetaEntry<char16_t>(),
+					MetaEntry<char32_t>(),
+					MetaEntry<glm::vec2>(),
+					MetaEntry<glm::vec3>(),
+					MetaEntry<glm::mat4>(),
+					MetaEntry<xresource::full_guid>(),
+					MetaEntry<std::vector<int>>(),
+					MetaEntry<std::vector<float>>(),
+					MetaEntry<std::vector<std::string>>(),
+					MetaEntry<std::vector<AudioComponent::AudioClip>>(),
+					MetaEntry<CameraComponent::CameraType>(),
+					MetaEntry<LightComponent::Type>(),
+					MetaEntry<std::filesystem::path>(),
+					MetaEntry<TriggerShapeType>(),
+					MetaEntry<::ColliderShape>(),
+					MetaEntry<::ColliderData>(),
+					MetaEntry<std::vector<::ColliderData>>(),
+					MetaEntry<::ColliderComponent::Mode>(),
+					MetaEntry<ColliderShape>(),
+					MetaEntry<ColliderData>(),
+					MetaEntry<std::vector<ColliderData>>(),
+					MetaEntry<ColliderComponent::Mode>(),
+					MetaEntry<xresource::instance_guid>(),
+					MetaEntry<SoundBankMap>()
+				};
 #if defined(ENGINE_ENABLE_LUA)
-		
-		SetMeta(Engine::LuaScriptComponent::LuaInstance),
-		SetMeta(std::vector<Engine::LuaScriptComponent::LuaInstance>)
+				temp.insert({
+					MetaEntry<Engine::LuaScriptComponent::LuaInstance>(),
+					MetaEntry<std::vector<Engine::LuaScriptComponent::LuaInstance>>()
+				});
 #endif
-	};
-#define SetJson(T) {entt::resolve<T>().id(), SetJsonWithMetaAny<T>}
-	static std::unordered_map<entt::id_type, std::function<void(nlohmann::json&, const std::string&, const entt::meta_any&)>> set_json_with_meta_map
-	{
-		SetJson(signed char),
-		SetJson(short),
-		SetJson(int),
-		SetJson(long),
-		SetJson(long long),
-		SetJson(bool),
-		SetJson(unsigned char),
-		SetJson(unsigned short),
-		SetJson(unsigned int),
-		SetJson(unsigned long),
-		SetJson(unsigned long long),
-		SetJson(char),
-		SetJson(wchar_t),
-		SetJson(float),
-		SetJson(double),
-		SetJson(long double),
-		SetJson(std::string),
-		SetJson(std::nullptr_t),
-		SetJson(char8_t),
-		SetJson(char16_t),
-		SetJson(char32_t),
-		SetJson(glm::vec2),
-		SetJson(glm::vec3),
-		SetJson(glm::mat4),
-		SetJson(xresource::full_guid),
-		SetJson(std::vector<int>),
-		SetJson(std::vector<float>),
-		SetJson(std::vector<std::string>),
-		SetJson(std::vector<AudioComponent::AudioClip>),
-		SetJson(CameraComponent::CameraType),
-		SetJson(LightComponent::Type),
-		SetJson(std::filesystem::path),
-		SetJson(TriggerShapeType),
-		SetJson(::ColliderShape),
-		SetJson(::ColliderData),
-		SetJson(std::vector<::ColliderData>),
-		SetJson(::ColliderComponent::Mode),
-		SetJson(ColliderShape),
-		SetJson(ColliderData),
-		SetJson(std::vector<ColliderData>),
-		SetJson(ColliderComponent::Mode),
-		SetJson(xresource::instance_guid),
-		SetJson(SoundBankMap),
+				return temp;
+			}();
+			return map;
+		}
+
+		const auto& GetJsonSetterMap()
+		{
+			using MapType = std::unordered_map<entt::id_type, JsonSetter>;
+			static const MapType map = []()
+			{
+				MapType temp{
+					JsonEntry<signed char>(),
+					JsonEntry<short>(),
+					JsonEntry<int>(),
+					JsonEntry<long>(),
+					JsonEntry<long long>(),
+					JsonEntry<bool>(),
+					JsonEntry<unsigned char>(),
+					JsonEntry<unsigned short>(),
+					JsonEntry<unsigned int>(),
+					JsonEntry<unsigned long>(),
+					JsonEntry<unsigned long long>(),
+					JsonEntry<char>(),
+					JsonEntry<wchar_t>(),
+					JsonEntry<float>(),
+					JsonEntry<double>(),
+					JsonEntry<long double>(),
+					JsonEntry<std::string>(),
+					JsonEntry<std::nullptr_t>(),
+					JsonEntry<char8_t>(),
+					JsonEntry<char16_t>(),
+					JsonEntry<char32_t>(),
+					JsonEntry<glm::vec2>(),
+					JsonEntry<glm::vec3>(),
+					JsonEntry<glm::mat4>(),
+					JsonEntry<xresource::full_guid>(),
+					JsonEntry<std::vector<int>>(),
+					JsonEntry<std::vector<float>>(),
+					JsonEntry<std::vector<std::string>>(),
+					JsonEntry<std::vector<AudioComponent::AudioClip>>(),
+					JsonEntry<CameraComponent::CameraType>(),
+					JsonEntry<LightComponent::Type>(),
+					JsonEntry<std::filesystem::path>(),
+					JsonEntry<TriggerShapeType>(),
+					JsonEntry<::ColliderShape>(),
+					JsonEntry<::ColliderData>(),
+					JsonEntry<std::vector<::ColliderData>>(),
+					JsonEntry<::ColliderComponent::Mode>(),
+					JsonEntry<ColliderShape>(),
+					JsonEntry<ColliderData>(),
+					JsonEntry<std::vector<ColliderData>>(),
+					JsonEntry<ColliderComponent::Mode>(),
+					JsonEntry<xresource::instance_guid>(),
+					JsonEntry<SoundBankMap>()
+				};
 #if defined(ENGINE_ENABLE_LUA)
-		
-		SetJson(Engine::LuaScriptComponent::LuaInstance),
-		SetJson(std::vector<Engine::LuaScriptComponent::LuaInstance>)
+				temp.insert({
+					JsonEntry<Engine::LuaScriptComponent::LuaInstance>(),
+					JsonEntry<std::vector<Engine::LuaScriptComponent::LuaInstance>>()
+				});
 #endif
-	};
+				return temp;
+			}();
+			return map;
+		}
+	} // namespace detail
 
 	// Templated class, to provide different function overloads for each type that all do the same thing
 	template <typename T>
@@ -792,62 +818,43 @@ namespace EngineFramework
 			.func<&GetRef<UIComponent>>("get_ref");
 	}
 
-
 	//Helper function to cast json to the correct data type, and set comp_data.
 	void SetMetaAnyWithJson(entt::meta_any& comp_data, const entt::meta_data& data_type, const nlohmann::json& data)
 	{
-		if (!data_type) return; //Not a valid data member, it could be a function etc.
-		entt::id_type type = data_type.type().id();
-
-		//Call the respective template function if successful matching.
-		if (set_meta_with_json_map.find(type) != set_meta_with_json_map.end())
+		if (!data_type) return;
+		const entt::id_type type = data_type.type().id();
+		const auto& setters = detail::GetMetaSetterMap();
+		if (auto it = setters.find(type); it != setters.end())
 		{
-			set_meta_with_json_map[type](comp_data, data_type, data);
+			it->second(comp_data, data_type, data);
 			return;
 		}
-		//Else throw an assertion.
+
 		assert(false && "Type is not supported by SetMetaAnyWithJson function. Please add to map.");
 	}
 
 	// Helper function to cast meta_any member_data to the correct json data type, and set comp_json.
 	void SetJsonWithMetaAny(nlohmann::json& comp_json, const entt::meta_data& data_type, const entt::meta_any& data)
 	{
-		if (!data_type) return; //Not a valid data member, it could be a function etc.
-		//Get the string to set the json.
+		if (!data_type) return;
+
 		std::string name = data_type.name();
 		if (name.empty())
 		{
 			throw std::runtime_error("Meta Data does not have a name, was likely registered with a _hs hashed string instead of a string.");
 		}
-		// Compare types
-		entt::id_type type = data_type.type().id();
 
-		// Call the respective template function if successful matching.
-		if (set_json_with_meta_map.find(type) != set_json_with_meta_map.end())
+		const entt::id_type type = data_type.type().id();
+		const auto& setters = detail::GetJsonSetterMap();
+		if (auto it = setters.find(type); it != setters.end())
 		{
-			set_json_with_meta_map[type](comp_json, name, data);
+			it->second(comp_json, name, data);
 			return;
 		}
-		if (set_json_with_meta_map.find(type) == set_json_with_meta_map.end())
-		{
-			// 1. Print the ID we are looking for
-			std::cout << "CRASH: Looking for Type ID: " << type << " (" << name << ")" << std::endl;
 
-			// 2. Print all IDs currently inside the map to check for mismatches
-			std::cout << "--- Dumping Available Map IDs ---" << std::endl;
-			for (const auto& pair : set_json_with_meta_map) {
-				std::cout << "Map has ID: " << pair.first << std::endl;
-				// If you want to check if one matches, you can try resolving it here
-				if (pair.first == entt::resolve<::ColliderComponent::Mode>().id()) {
-					std::cout << "   (This matches ColliderComponent::Mode!)" << std::endl;
-				}
-			}
-			std::cout << "---------------------------------" << std::endl;
-		}
-		// Else throw an assertion.
 		assert(false && "Type is not supported by SetJsonWithMetaAny function. Please add to map.");
 	}
-}
+
 
 //if (type.is_integral())
 		//{
@@ -1055,3 +1062,4 @@ namespace EngineFramework
 //	return;
 //}
 ////not supported by nlohmann json library: void*, void.
+}

@@ -463,69 +463,39 @@ namespace EngineFramework
 	bool AudioSystem::PlayFromComponent(const AudioComponent& comp,
 		std::size_t clipIndex,
 		const glm::vec3& worldPos,
-		float volume,
-		bool is3D,
-		bool loop,
-		float minDist,
-		float maxDist,
 		AudioGroup group)
 	{
-		if (!m_initialized)
+		if (!m_initialized || m_system == nullptr)
 			return false;
 
 #ifndef DISABLE_FMOD
-		if (m_system == nullptr)
-			return false;
-
 		const AudioComponent::AudioClip* clip = comp.GetClip(clipIndex);
 		if (clip == nullptr)
 			return false;
-		if (!m_initialized || m_system == nullptr) return false;
 
-		// 1. Load/Find the asset
 		using EngineFramework::AssetManagerSystem;
-		/*std::shared_ptr<SoundAsset> sound = AssetManagerSystem::GetResource<SoundAsset>(guid);*/
-		auto fullID = AssetManagerSystem::GetFullGuid(AssetManagerSystem::AUDIO_GUID, guid);
-
-		// Resolve SoundAsset from GUID
 		std::shared_ptr<SoundAsset> sound =
 			AssetManagerSystem::GetResource<SoundAsset>(clip->audio_guid);
 		if (!sound || !sound->sound)
-		// 2. Pass the ID (not the string!) to GetResource
-		std::shared_ptr<SoundAsset> sound = AssetManagerSystem::GetResource<SoundAsset>(fullID);
-
-		// Safety check: if sound isn't found, try to resolve path or fail
-		if (!sound || !sound->sound) {
-			// Optional: Try to Load it on the fly if not found? 
-			// For now, let's just fail safely.
 			return false;
-		}
 
 		FMOD::Channel* channel = nullptr;
 		FMOD_RESULT r = m_system->playSound(sound->sound, nullptr, true, &channel);
-        logFmodError(r, "System::playSound (PlayFromComponent)");
+		logFmodError(r, "System::playSound (PlayFromComponent)");
 		if (r != FMOD_OK || channel == nullptr)
 			return false;
 
-		if (r != FMOD_OK || channel == nullptr) return false;
-
-		// 2. Assign Group
 		if (FMOD::ChannelGroup* grp = pickGroup(group))
 			channel->setChannelGroup(grp);
 
-		// Volume clamp
-		float vol = clip->volume;
-		if (vol < 0.0f) vol = 0.0f;
-		if (vol > 1.0f) vol = 1.0f;
-		channel->setVolume(vol);
+		// Clamp and apply volume
+		float volume = clip->volume;
+		if (volume < 0.0f) volume = 0.0f;
+		if (volume > 1.0f) volume = 1.0f;
+		channel->setVolume(volume);
 
-		// 2D / 3D setup
+		// Configure spatial settings
 		if (clip->is3D)
-		// 3. Set Volume
-		channel->setVolume(std::clamp(volume, 0.0f, 1.0f));
-
-		// 4. Set 3D Settings
-		if (is3D)
 		{
 			channel->setMode(FMOD_3D);
 			FMOD_VECTOR pos{ worldPos.x, worldPos.y, worldPos.z };
@@ -538,20 +508,66 @@ namespace EngineFramework
 			channel->setMode(FMOD_2D);
 		}
 
-		// Force loop mode update (runtime override)
-		if (clip->loop)
-			channel->setMode(FMOD_LOOP_NORMAL);
-		else
-			channel->setMode(FMOD_LOOP_OFF);
-		// 5. Loop Settings
-		channel->setMode(loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+		// Apply loop behaviour without stomping the dimensional flag
+		FMOD_MODE loopMode = clip->loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
+		channel->setMode(loopMode | (clip->is3D ? FMOD_3D : FMOD_2D));
 
-		// 6. Unpause to play
 		channel->setPaused(false);
-
 		return true;
 #else
 		(void)comp; (void)clipIndex; (void)worldPos; (void)group;
+		return true;
+#endif
+	}
+
+	bool AudioSystem::PlayOneShot(const std::string& guid,
+		const glm::vec3& worldPos,
+		float volume,
+		bool is3D,
+		bool loop,
+		float minDist,
+		float maxDist,
+		AudioGroup group)
+	{
+		if (!m_initialized || m_system == nullptr)
+			return false;
+
+#ifndef DISABLE_FMOD
+		using EngineFramework::AssetManagerSystem;
+		auto fullID = AssetManagerSystem::GetFullGuid(AssetManagerSystem::AUDIO_GUID, guid);
+		std::shared_ptr<SoundAsset> sound = AssetManagerSystem::GetResource<SoundAsset>(fullID);
+		if (!sound || !sound->sound)
+			return false;
+
+		FMOD::Channel* channel = nullptr;
+		FMOD_RESULT r = m_system->playSound(sound->sound, nullptr, true, &channel);
+		logFmodError(r, "System::playSound (PlayOneShot)");
+		if (r != FMOD_OK || channel == nullptr)
+			return false;
+
+		if (FMOD::ChannelGroup* grp = pickGroup(group))
+			channel->setChannelGroup(grp);
+
+		channel->setVolume(std::clamp(volume, 0.0f, 1.0f));
+
+		if (is3D)
+		{
+			channel->setMode(FMOD_3D);
+			FMOD_VECTOR pos{ worldPos.x, worldPos.y, worldPos.z };
+			FMOD_VECTOR vel{ 0.0f, 0.0f, 0.0f };
+			channel->set3DAttributes(&pos, &vel);
+			channel->set3DMinMaxDistance(minDist, maxDist);
+		}
+		else
+		{
+			channel->setMode(FMOD_2D);
+		}
+
+		channel->setMode((loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF) | (is3D ? FMOD_3D : FMOD_2D));
+		channel->setPaused(false);
+		return true;
+#else
+		(void)guid; (void)worldPos; (void)volume; (void)is3D; (void)loop; (void)minDist; (void)maxDist; (void)group;
 		return true;
 #endif
 	}

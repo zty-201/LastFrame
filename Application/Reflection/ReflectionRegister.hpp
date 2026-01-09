@@ -60,9 +60,13 @@
 #include "entt/meta/meta.hpp"
 #include "entt/meta/resolve.hpp"
 #include "nlohmann/json.hpp"
+#include <string>
+#include <unordered_map>
 #include <variant>
 namespace EngineFramework
 {
+	using SoundBankMap = std::unordered_map<std::string, std::string>;
+
 	inline entt::id_type GetID(std::string type_name)
 	{
 		return entt::hashed_string{ type_name.c_str() }.value();
