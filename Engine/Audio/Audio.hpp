@@ -14,6 +14,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #ifndef ENGINE_AUDIO_HPP
 #define ENGINE_AUDIO_HPP
 
+#include <cstddef>
 #include <string>
 #include <unordered_map>
 #include <functional>
@@ -110,6 +111,7 @@ namespace EngineFramework
             AudioGroup group = AudioGroup::SFX);
 
         bool PlayFromComponent(const AudioComponent& comp,
+            std::size_t clipIndex,
             const glm::vec3& worldPos,
             AudioGroup group = AudioGroup::SFX);
 

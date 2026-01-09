@@ -837,102 +837,107 @@ namespace EditorFeatures {
 			using EF_AM = EngineFramework::AssetManagerSystem;
 			using EF_AUD = EngineFramework::AudioSystem;
 
-			//---------------------
-			// Audio asset picker
-			//---------------------
-			std::shared_ptr<SoundAsset> sound = nullptr;
+			if (comp.GetClipCount() == 0)
 			{
-				// Build descriptor for AUDIO assets
-				const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
-				const bool has_sources = !descriptor.sources.empty();
+				comp.AddClip();
+			}
 
-				// Start from the current guid
-				xresource::full_guid full = comp.audio_guid;
+			const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
+			const bool has_sources = !descriptor.sources.empty();
 
-				if (has_sources)
+			for (std::size_t clipIdx = 0; clipIdx < comp.GetClipCount(); ++clipIdx)
+			{
+				auto* clip = comp.GetClip(clipIdx);
+				if (!clip)
+					continue;
+
+				ImGui::PushID(static_cast<int>(clipIdx));
+				std::string header = "Audio Clip " + std::to_string(clipIdx + 1);
+				if (ImGui::CollapsingHeader(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					// Show combo + drag/drop picker
-					if (draw_asset_guid_picker("Audio",
-						full,
-						AssetPickerKind::Audio,
-						descriptor.none_label,
-						descriptor.sources,
-						descriptor.formatter))
+					if (comp.GetClipCount() > 1)
 					{
-						// User picked a different audio asset
-						comp.audio_guid = full;
+						if (ImGui::Button("Remove Clip"))
+						{
+							comp.RemoveClip(clipIdx);
+							--clipIdx;
+							ImGui::PopID();
+							continue;
+						}
+					}
+
+					std::shared_ptr<SoundAsset> sound = nullptr;
+					if (has_sources)
+					{
+						xresource::full_guid full = clip->audio_guid;
+						if (draw_asset_guid_picker("Audio",
+							full,
+							AssetPickerKind::Audio,
+							descriptor.none_label,
+							descriptor.sources,
+							descriptor.formatter))
+						{
+							clip->audio_guid = full;
+						}
+					}
+					else
+					{
+						ImGui::TextDisabled("Audio: (no audio assets available)");
+					}
+
+					if (!clip->audio_guid.empty())
+					{
+						sound = EF_AM::GetResource<SoundAsset>(clip->audio_guid);
+					}
+
+					ImGui::Checkbox("Loop", &clip->loop);
+					ImGui::SameLine();
+					ImGui::Checkbox("Play On Start", &clip->playOnStart);
+
+					ImGui::Checkbox("3D Audio", &clip->is3D);
+					if (clip->is3D)
+					{
+						if (clip->minDistance < 0.0f) clip->minDistance = 0.0f;
+						if (clip->maxDistance < clip->minDistance)
+							clip->maxDistance = clip->minDistance + 0.1f;
+
+						ImGui::DragFloat("Min Distance", &clip->minDistance, 0.1f, 0.0f, 1000.0f);
+						ImGui::DragFloat("Max Distance", &clip->maxDistance, 0.1f, 0.0f, 1000.0f);
+					}
+
+					clip->volume = std::clamp(clip->volume, 0.0f, 1.0f);
+					ImGui::SliderFloat("Volume", &clip->volume, 0.0f, 1.0f);
+
+					if (ImGui::Button("Play"))
+					{
+						if (sound)
+						{
+							EF_AUD::GetInstance().Play(
+								sound,
+								clip->volume,
+								clip->loop,
+								EngineFramework::AudioGroup::Music);
+						}
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("Stop"))
+						EF_AUD::GetInstance().StopAll();
+
+					ImGui::SameLine();
+					if (ImGui::Button("Pause"))
+						EF_AUD::GetInstance().PauseAll(true);
+
+					if (ImGui::Button("Play 3D (ECS)"))
+					{
+						clip->playRequested = true;
 					}
 				}
-				else
-				{
-					ImGui::TextDisabled("Audio: (no audio assets available)");
-				}
-
-				// Load the chosen sound (if any) for preview buttons
-				if (!comp.audio_guid.empty())
-				{
-					sound = EF_AM::GetResource<SoundAsset>(comp.audio_guid);
-				}
+				ImGui::PopID();
 			}
 
-			//---------------------
-			// Basic playback flags
-			//---------------------
-			ImGui::Checkbox("Loop", &comp.loop);
-			ImGui::SameLine();
-			ImGui::Checkbox("Play On Start", &comp.playOnStart);
-
-			//---------------------
-			// 2D / 3D controls
-			//---------------------
-			ImGui::Checkbox("3D Audio", &comp.is3D);
-
-			if (comp.is3D)
+			if (ImGui::Button("Add Clip"))
 			{
-				// Ensure sane values
-				if (comp.minDistance < 0.0f) comp.minDistance = 0.0f;
-				if (comp.maxDistance < comp.minDistance)
-					comp.maxDistance = comp.minDistance + 0.1f;
-
-				ImGui::DragFloat("Min Distance", &comp.minDistance, 0.1f, 0.0f, 1000.0f);
-				ImGui::DragFloat("Max Distance", &comp.maxDistance, 0.1f, 0.0f, 1000.0f);
-			}
-
-			//---------------------
-			// Volume
-			//---------------------
-			comp.volume = std::clamp(comp.volume, 0.0f, 1.0f);
-			ImGui::SliderFloat("Volume", &comp.volume, 0.0f, 1.0f);
-
-			//---------------------
-			// Preview buttons
-			//---------------------
-			if (ImGui::Button("Play"))
-			{
-				if (sound)
-				{
-					EF_AUD::GetInstance().Play(
-						sound,
-						comp.volume,
-						comp.loop,
-						EngineFramework::AudioGroup::Music);
-				}
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Stop"))
-				EF_AUD::GetInstance().StopAll();
-
-			ImGui::SameLine();
-			if (ImGui::Button("Pause"))
-				EF_AUD::GetInstance().PauseAll(true);
-
-			//---------------------
-			// ECS-based 3D test button
-			//---------------------
-			if (ImGui::Button("Play 3D (ECS)"))
-			{
-				// Mark this component to be played by AudioSystem::Update
-				comp.playRequested = true;
+				comp.AddClip();
 			}
 
 			ImGui::Separator();

@@ -30,7 +30,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 /*
 * Listener: Any entity with [AudioListenerComponent] + [TransformComponent]
 * Sources: Any entity with [AudioComponent] + [TransformComponent]
-* Trigger: set [comp.playRequested = true] in Lua or C++ and the sound will play once
+ * Trigger: set [AudioClip::playRequested = true] in Lua or C++ and the sound will play once
 */
 
 namespace EngineFramework
@@ -214,13 +214,18 @@ namespace EngineFramework
 						TransformComponent& tf,
 						AudioComponent& comp)
 					{
-						if (!comp.playRequested)
-							return;
-
-						if (PlayFromComponent(comp, tf.position, AudioGroup::SFX))
+						const std::size_t clipCount = comp.GetClipCount();
+						for (std::size_t clipIndex = 0; clipIndex < clipCount; ++clipIndex)
 						{
-							// one-shot consumed
-							comp.playRequested = false;
+							auto* clip = comp.GetClip(clipIndex);
+							if (!clip || !clip->playRequested)
+								continue;
+
+							if (PlayFromComponent(comp, clipIndex, tf.position, AudioGroup::SFX))
+							{
+								// one-shot consumed
+								clip->playRequested = false;
+							}
 						}
 					});
 			}
@@ -428,6 +433,7 @@ namespace EngineFramework
 	}
 
 	bool AudioSystem::PlayFromComponent(const AudioComponent& comp,
+		std::size_t clipIndex,
 		const glm::vec3& worldPos,
 		AudioGroup group)
 	{
@@ -438,21 +444,21 @@ namespace EngineFramework
 		if (m_system == nullptr)
 			return false;
 
-		// No audio asset assigned
-		/*if (comp.audio_guid.empty())
-			return false;*/
+		const AudioComponent::AudioClip* clip = comp.GetClip(clipIndex);
+		if (clip == nullptr)
+			return false;
 
 		using EngineFramework::AssetManagerSystem;
 
 		// Resolve SoundAsset from GUID
 		std::shared_ptr<SoundAsset> sound =
-			AssetManagerSystem::GetResource<SoundAsset>(comp.audio_guid);
+			AssetManagerSystem::GetResource<SoundAsset>(clip->audio_guid);
 		if (!sound || !sound->sound)
 			return false;
 
 		FMOD::Channel* channel = nullptr;
 		FMOD_RESULT r = m_system->playSound(sound->sound, nullptr, true, &channel);
-		logFmodError(r, "System::playSound (PlayFromComponent)");
+        logFmodError(r, "System::playSound (PlayFromComponent)");
 		if (r != FMOD_OK || channel == nullptr)
 			return false;
 
@@ -461,13 +467,13 @@ namespace EngineFramework
 			channel->setChannelGroup(grp);
 
 		// Volume clamp
-		float vol = comp.volume;
+		float vol = clip->volume;
 		if (vol < 0.0f) vol = 0.0f;
 		if (vol > 1.0f) vol = 1.0f;
 		channel->setVolume(vol);
 
 		// 2D / 3D setup
-		if (comp.is3D)
+		if (clip->is3D)
 		{
 			channel->setMode(FMOD_3D);
 
@@ -475,7 +481,7 @@ namespace EngineFramework
 			FMOD_VECTOR vel{ 0.0f, 0.0f, 0.0f };
 
 			channel->set3DAttributes(&pos, &vel);
-			channel->set3DMinMaxDistance(comp.minDistance, comp.maxDistance);
+			channel->set3DMinMaxDistance(clip->minDistance, clip->maxDistance);
 		}
 		else
 		{
@@ -483,7 +489,7 @@ namespace EngineFramework
 		}
 
 		// Force loop mode update (runtime override)
-		if (comp.loop)
+		if (clip->loop)
 			channel->setMode(FMOD_LOOP_NORMAL);
 		else
 			channel->setMode(FMOD_LOOP_OFF);
@@ -493,7 +499,7 @@ namespace EngineFramework
 		channel->setPaused(false);
 		return true;
 #else
-		(void)comp; (void)worldPos; (void)group;
+		(void)comp; (void)clipIndex; (void)worldPos; (void)group;
 		return true;
 #endif
 	}

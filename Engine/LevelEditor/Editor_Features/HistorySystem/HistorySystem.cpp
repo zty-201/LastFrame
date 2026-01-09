@@ -37,6 +37,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "HistorySystem.hpp"
 #include "InspectorPanel.hpp"
 #include "GraphicsSystem.h"
+#include "AudioComponentSerialization.hpp"
 
 
 
@@ -88,6 +89,9 @@ namespace EngineFramework
             entt::meta_any instance = meta.construct();
             if (!payload.empty()) {
                 nlohmann::json json = nlohmann::json::parse(payload);
+                if (meta == entt::resolve<AudioComponent>()) {
+                    NormalizeAudioComponentJson(json);
+                }
                 for (auto&& [id, member] : meta.data()) {
                     auto it = json.find(member.name());
                     if (it != json.end()) {

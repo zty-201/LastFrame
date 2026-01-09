@@ -106,6 +106,37 @@ struct adl_serializer<xresource::instance_guid> {
 	}
 };
 
+template<>
+struct adl_serializer<AudioComponent::AudioClip> {
+	static void to_json(json& j, const AudioComponent::AudioClip& clip) {
+		j = json::object();
+		j["audio_guid"] = clip.audio_guid;
+		j["volume"] = clip.volume;
+		j["loop"] = clip.loop;
+		j["playOnStart"] = clip.playOnStart;
+		j["is3D"] = clip.is3D;
+		j["minDistance"] = clip.minDistance;
+		j["maxDistance"] = clip.maxDistance;
+	}
+
+	static void from_json(const json& j, AudioComponent::AudioClip& clip) {
+		if (j.contains("audio_guid") && !j["audio_guid"].is_null()) {
+			clip.audio_guid = j["audio_guid"].get<xresource::full_guid>();
+		}
+		else {
+			clip.audio_guid = xresource::full_guid{};
+		}
+
+		clip.volume = j.value("volume", 1.0f);
+		clip.loop = j.value("loop", false);
+		clip.playOnStart = j.value("playOnStart", false);
+		clip.is3D = j.value("is3D", true);
+		clip.minDistance = j.value("minDistance", 1.0f);
+		clip.maxDistance = j.value("maxDistance", 25.0f);
+		clip.playRequested = j.value("playRequested", false);
+	}
+};
+
 #if defined(ENGINE_ENABLE_LUA)
 template<>
 struct adl_serializer<Engine::LuaScriptComponent::LuaInstance> {
@@ -266,6 +297,7 @@ namespace EngineFramework
 		SetMeta(std::vector<int>),
 		SetMeta(std::vector<float>),
 		SetMeta(std::vector<std::string>),
+		SetMeta(std::vector<AudioComponent::AudioClip>),
 		SetMeta(CameraComponent::CameraType),
 		SetMeta(LightComponent::Type),
 		SetMeta(std::filesystem::path),
@@ -316,6 +348,7 @@ namespace EngineFramework
 		SetJson(std::vector<int>),
 		SetJson(std::vector<float>),
 		SetJson(std::vector<std::string>),
+		SetJson(std::vector<AudioComponent::AudioClip>),
 		SetJson(CameraComponent::CameraType),
 		SetJson(LightComponent::Type),
 		SetJson(std::filesystem::path),
@@ -590,24 +623,19 @@ namespace EngineFramework
 		//	.func<&GetRef<AudioComponent>>("get_ref");
 
 		// === Register AudioComponent ===
+		entt::meta_factory<AudioComponent::AudioClip>()
+			.type("AudioClip")
+			.data<&AudioComponent::AudioClip::audio_guid>("audio_guid")
+			.data<&AudioComponent::AudioClip::volume>("volume")
+			.data<&AudioComponent::AudioClip::loop>("loop")
+			.data<&AudioComponent::AudioClip::playOnStart>("playOnStart")
+			.data<&AudioComponent::AudioClip::is3D>("is3D")
+			.data<&AudioComponent::AudioClip::minDistance>("minDistance")
+			.data<&AudioComponent::AudioClip::maxDistance>("maxDistance");
+
 		entt::meta_factory<AudioComponent>()
 			.type("AudioComponent")
-
-			// Audio asset
-			.data<&AudioComponent::audio_guid>("audio_guid")
-			.custom<EditorFeatures::AssetPickerTag>(
-				EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Audio })
-
-			// Basic fields
-			.data<&AudioComponent::volume>("volume")
-			.data<&AudioComponent::loop>("loop")
-			.data<&AudioComponent::playOnStart>("playOnStart")
-
-			// 2D / 3D behaviour
-			.data<&AudioComponent::is3D>("is3D")
-			.data<&AudioComponent::minDistance>("minDistance")
-			.data<&AudioComponent::maxDistance>("maxDistance")
-
+			.data<&AudioComponent::Clips>("Clips")
 			.func<&Emplacer<AudioComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<AudioComponent>::RemoveComponent>("remove")
 			.func<&Getter<AudioComponent>::GetComponent>("get")

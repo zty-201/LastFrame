@@ -220,23 +220,58 @@ namespace Engine {
         // ===============================================================
         // AudioComponent bindings
         // ===============================================================
+        s_Lua.new_usertype<AudioComponent::AudioClip>("AudioClip",
+            "GetVolume", [](AudioComponent::AudioClip& clip) { return clip.volume; },
+            "SetVolume", [](AudioComponent::AudioClip& clip, float v) { clip.volume = v; },
+
+            "GetLoop", [](AudioComponent::AudioClip& clip) { return clip.loop; },
+            "SetLoop", [](AudioComponent::AudioClip& clip, bool v) { clip.loop = v; },
+
+            "GetPlayOnStart", [](AudioComponent::AudioClip& clip) { return clip.playOnStart; },
+            "SetPlayOnStart", [](AudioComponent::AudioClip& clip, bool v) { clip.playOnStart = v; },
+
+            "GetIs3D", [](AudioComponent::AudioClip& clip) { return clip.is3D; },
+            "SetIs3D", [](AudioComponent::AudioClip& clip, bool v) { clip.is3D = v; },
+
+            "SetMinDistance", [](AudioComponent::AudioClip& clip, float d) { clip.minDistance = d; },
+            "SetMaxDistance", [](AudioComponent::AudioClip& clip, float d) { clip.maxDistance = d; },
+
+            "RequestPlay", [](AudioComponent::AudioClip& clip) { clip.playRequested = true; }
+        );
+
         s_Lua.new_usertype<AudioComponent>("AudioComponent",
-            "GetVolume", [](AudioComponent& a) { return a.volume; },
-            "SetVolume", [](AudioComponent& a, float v) { a.volume = v; },
+            "GetClipCount", [](AudioComponent& a) { return static_cast<int>(a.GetClipCount()); },
+            "GetClip", [](AudioComponent& a, std::size_t index) -> AudioComponent::AudioClip* {
+                return a.GetClip(index);
+            },
+            "AddClip", [](AudioComponent& a) -> AudioComponent::AudioClip* {
+                return &a.AddClip();
+            },
+            "RemoveClip", [](AudioComponent& a, std::size_t index) {
+                return a.RemoveClip(index);
+            },
 
-            "GetLoop", [](AudioComponent& a) { return a.loop; },
-            "SetLoop", [](AudioComponent& a, bool v) { a.loop = v; },
+            // Legacy helpers operate on the first clip for backward compatibility
+            "GetVolume", [](AudioComponent& a) { return a.PrimaryClip().volume; },
+            "SetVolume", [](AudioComponent& a, float v) { a.PrimaryClip().volume = v; },
 
-            "GetPlayOnStart", [](AudioComponent& a) { return a.playOnStart; },
-            "SetPlayOnStart", [](AudioComponent& a, bool v) { a.playOnStart = v; },
+            "GetLoop", [](AudioComponent& a) { return a.PrimaryClip().loop; },
+            "SetLoop", [](AudioComponent& a, bool v) { a.PrimaryClip().loop = v; },
 
-            "GetIs3D", [](AudioComponent& a) { return a.is3D; },
-            "SetIs3D", [](AudioComponent& a, bool v) { a.is3D = v; },
+            "GetPlayOnStart", [](AudioComponent& a) { return a.PrimaryClip().playOnStart; },
+            "SetPlayOnStart", [](AudioComponent& a, bool v) { a.PrimaryClip().playOnStart = v; },
 
-            "SetMinDistance", [](AudioComponent& a, float d) { a.minDistance = d; },
-            "SetMaxDistance", [](AudioComponent& a, float d) { a.maxDistance = d; },
+            "GetIs3D", [](AudioComponent& a) { return a.PrimaryClip().is3D; },
+            "SetIs3D", [](AudioComponent& a, bool v) { a.PrimaryClip().is3D = v; },
 
-            "RequestPlay", [](AudioComponent& a) { a.playRequested = true; }
+            "SetMinDistance", [](AudioComponent& a, float d) { a.PrimaryClip().minDistance = d; },
+            "SetMaxDistance", [](AudioComponent& a, float d) { a.PrimaryClip().maxDistance = d; },
+
+            "RequestPlay", [](AudioComponent& a) { a.PrimaryClip().playRequested = true; },
+            "RequestPlayClip", [](AudioComponent& a, std::size_t index) {
+                if (auto* clip = a.GetClip(index))
+                    clip->playRequested = true;
+            }
         );
 
         // ===============================================================
