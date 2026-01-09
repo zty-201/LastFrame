@@ -109,8 +109,16 @@ namespace EngineFramework
             bool paused = false,
             AudioGroup group = AudioGroup::SFX);
 
-        bool PlayFromComponent(const AudioComponent& comp,
+        /*bool PlayFromComponent(const AudioComponent& comp,
             const glm::vec3& worldPos,
+            AudioGroup group = AudioGroup::SFX);*/
+        bool PlayOneShot(const std::string& guid,
+            const glm::vec3& worldPos,
+            float volume = 1.0f,
+            bool is3D = true,
+            bool loop = false,
+            float minDist = 1.0f,
+            float maxDist = 50.0f,
             AudioGroup group = AudioGroup::SFX);
 
         // ===== 3D Functions =====

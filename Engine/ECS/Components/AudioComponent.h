@@ -1,24 +1,45 @@
-#ifndef AUDIO_COMPONENT_H
-#define AUDIO_COMPONENT_H
-
+#pragma once
+#include <string>
+#include <vector>
+#include <unordered_map>
 #include "xresource_guid.h"
+
+
+// A request to play a specific sound
+struct AudioRequest
+{
+    std::string clipName;   // The logical name (e.g. "Footstep")
+    float volume = 1.0f;
+    bool is3D = true;
+    bool loop = false;
+    float minDistance = 1.0f;
+    float maxDistance = 50.0f;
+};
 
 struct AudioComponent
 {
-	// Which sound to play (linked to SoundAsset via this GUID)
-	xresource::full_guid audio_guid{};
+    // 1. CONFIG: Map "Logical Name" -> "File Path"
+    std::unordered_map<std::string, std::string> soundBank;
 
-	// Basic playback controls
-	float volume = 1.0f;
-	bool loop = false;
-	bool playOnStart = false;
+    // 2. STATE: Queue
+    std::vector<AudioRequest> requestQueue;
 
-	// 2D / 3D behaviour
-	bool is3D = true;          // true = spatialized, false = pure 2D
-	float minDistance = 1.0f;  // for 3D rolloff
-	float maxDistance = 25.0f; // for 3D rolloff
+    // 3. STARTUP SETTINGS (This is what you were missing!)
+    std::string playOnStartName;
+    bool playOnStartLoop = true;
+    bool playOnStart3D = false;
+    float playOnStartVolume = 0.5f;
 
-	bool playRequested = false; // set by Lua / editor, consumed by AudioSystem
+    bool _hasStarted = false; // Runtime flag to ensure it only plays once
+
+    // 4. HELPER
+    void Play(const std::string& name, float vol = 1.0f)
+    {
+        AudioRequest req;
+        req.clipName = name;
+        req.volume = vol;
+        req.is3D = true;
+        req.loop = false;
+        requestQueue.push_back(req);
+    }
 };
-
-#endif // AUDIO_COMPONENT_H

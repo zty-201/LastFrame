@@ -221,22 +221,16 @@ namespace Engine {
         // AudioComponent bindings
         // ===============================================================
         s_Lua.new_usertype<AudioComponent>("AudioComponent",
-            "GetVolume", [](AudioComponent& a) { return a.volume; },
-            "SetVolume", [](AudioComponent& a, float v) { a.volume = v; },
+            // Expose the Play function so scripts can trigger sounds
+            // Usage in Lua: EntityAudio:Play("Footstep", 0.5)
+            "Play", [](AudioComponent& a, const std::string& name, float volume) {
+                a.Play(name, volume);
+            },
 
-            "GetLoop", [](AudioComponent& a) { return a.loop; },
-            "SetLoop", [](AudioComponent& a, bool v) { a.loop = v; },
-
-            "GetPlayOnStart", [](AudioComponent& a) { return a.playOnStart; },
-            "SetPlayOnStart", [](AudioComponent& a, bool v) { a.playOnStart = v; },
-
-            "GetIs3D", [](AudioComponent& a) { return a.is3D; },
-            "SetIs3D", [](AudioComponent& a, bool v) { a.is3D = v; },
-
-            "SetMinDistance", [](AudioComponent& a, float d) { a.minDistance = d; },
-            "SetMaxDistance", [](AudioComponent& a, float d) { a.maxDistance = d; },
-
-            "RequestPlay", [](AudioComponent& a) { a.playRequested = true; }
+            // Optional: Helper to check if a sound exists in the bank
+            "HasSound", [](AudioComponent& a, const std::string& name) {
+                return a.soundBank.find(name) != a.soundBank.end();
+            }
         );
 
         // ===============================================================

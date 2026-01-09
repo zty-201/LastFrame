@@ -833,147 +833,97 @@ namespace EditorFeatures {
 		if (mt == entt::resolve<AudioComponent>())
 		{
 			auto& comp = obj.cast<AudioComponent&>();
-
 			using EF_AM = EngineFramework::AssetManagerSystem;
 			using EF_AUD = EngineFramework::AudioSystem;
 
-			//---------------------
-			// Audio asset picker
-			//---------------------
-			std::shared_ptr<SoundAsset> sound = nullptr;
+			ImGui::Text("Audio Sound Bank");
+			ImGui::TextDisabled("Map Logical Names (e.g. 'BGM') to Assets");
+			ImGui::Separator();
+
+			// 1. INPUTS FOR NEW SOUND
+			static char nameBuffer[64] = "";
+			ImGui::InputText("Logical Name", nameBuffer, 64);
+
+			static xresource::full_guid tempGuid;
+			// Re-create descriptor locally if needed, or use static helper
+			const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
+			draw_asset_guid_picker("Asset", tempGuid, AssetPickerKind::Audio, descriptor.none_label, descriptor.sources, descriptor.formatter);
+
+			if (ImGui::Button("Add to Bank"))
 			{
-				// Build descriptor for AUDIO assets
-				const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
-				const bool has_sources = !descriptor.sources.empty();
-
-				// Start from the current guid
-				xresource::full_guid full = comp.audio_guid;
-
-				if (has_sources)
+				if (strlen(nameBuffer) > 0 && !tempGuid.empty())
 				{
-					// Show combo + drag/drop picker
-					if (draw_asset_guid_picker("Audio",
-						full,
-						AssetPickerKind::Audio,
-						descriptor.none_label,
-						descriptor.sources,
-						descriptor.formatter))
-					{
-						// User picked a different audio asset
-						comp.audio_guid = full;
-					}
+					std::string assetName = EF_AM::GetName(tempGuid);
+					if (assetName.empty()) assetName = "Unknown_Audio";
+
+					// Save to the BANK, not audio_guid
+					comp.soundBank[std::string(nameBuffer)] = assetName;
+					memset(nameBuffer, 0, 64);
+					tempGuid = {};
 				}
-				else
-				{
-					ImGui::TextDisabled("Audio: (no audio assets available)");
-				}
-
-				// Load the chosen sound (if any) for preview buttons
-				if (!comp.audio_guid.empty())
-				{
-					sound = EF_AM::GetResource<SoundAsset>(comp.audio_guid);
-				}
-			}
-
-			//---------------------
-			// Basic playback flags
-			//---------------------
-			ImGui::Checkbox("Loop", &comp.loop);
-			ImGui::SameLine();
-			ImGui::Checkbox("Play On Start", &comp.playOnStart);
-
-			//---------------------
-			// 2D / 3D controls
-			//---------------------
-			ImGui::Checkbox("3D Audio", &comp.is3D);
-
-			if (comp.is3D)
-			{
-				// Ensure sane values
-				if (comp.minDistance < 0.0f) comp.minDistance = 0.0f;
-				if (comp.maxDistance < comp.minDistance)
-					comp.maxDistance = comp.minDistance + 0.1f;
-
-				ImGui::DragFloat("Min Distance", &comp.minDistance, 0.1f, 0.0f, 1000.0f);
-				ImGui::DragFloat("Max Distance", &comp.maxDistance, 0.1f, 0.0f, 1000.0f);
-			}
-
-			//---------------------
-			// Volume
-			//---------------------
-			comp.volume = std::clamp(comp.volume, 0.0f, 1.0f);
-			ImGui::SliderFloat("Volume", &comp.volume, 0.0f, 1.0f);
-
-			//---------------------
-			// Preview buttons
-			//---------------------
-			if (ImGui::Button("Play"))
-			{
-				if (sound)
-				{
-					EF_AUD::GetInstance().Play(
-						sound,
-						comp.volume,
-						comp.loop,
-						EngineFramework::AudioGroup::Music);
-				}
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Stop"))
-				EF_AUD::GetInstance().StopAll();
-
-			ImGui::SameLine();
-			if (ImGui::Button("Pause"))
-				EF_AUD::GetInstance().PauseAll(true);
-
-			//---------------------
-			// ECS-based 3D test button
-			//---------------------
-			if (ImGui::Button("Play 3D (ECS)"))
-			{
-				// Mark this component to be played by AudioSystem::Update
-				comp.playRequested = true;
 			}
 
 			ImGui::Separator();
-			return false; // keep using custom UI
 
-			////---------------------
-			//// Volume (clamped)
-			////---------------------
-			//comp.volume = std::clamp(comp.volume, 0.0f, 1.0f);
+			// 2. PLAY ON START SETTINGS
+			// This allows you to pick which sound from the bank plays automatically
+			if (ImGui::BeginCombo("Play On Start", comp.playOnStartName.empty() ? "(None)" : comp.playOnStartName.c_str()))
+			{
+				if (ImGui::Selectable("(None)", comp.playOnStartName.empty()))
+					comp.playOnStartName = "";
 
-			//if (ImGui::SliderFloat("Volume", &comp.volume, 0.0f, 1.0f))
-			//{
-			//	// If audio is playing, update volume in real time here if your AudioSystem supports it
-			//}
+				for (auto& [key, value] : comp.soundBank)
+				{
+					bool isSelected = (comp.playOnStartName == key);
+					if (ImGui::Selectable(key.c_str(), isSelected))
+						comp.playOnStartName = key;
+					if (isSelected) ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
 
-			////---------------------
-			//// Buttons
-			////---------------------
-			//if (ImGui::Button("Play"))
-			//{
-			//	if (sound)
-			//	{
-			//		EF_AUD::GetInstance().Play(sound, comp.volume, comp.loop,
-			//			EngineFramework::AudioGroup::Music);
-			//	}
-			//}
+			if (!comp.playOnStartName.empty())
+			{
+				ImGui::Checkbox("Loop##Start", &comp.playOnStartLoop);
+				ImGui::SameLine();
+				ImGui::Checkbox("3D##Start", &comp.playOnStart3D);
+				ImGui::SliderFloat("Volume##Start", &comp.playOnStartVolume, 0.0f, 1.0f);
+			}
 
-			//ImGui::SameLine();
-			//if (ImGui::Button("Stop"))
-			//{
-			//	EF_AUD::GetInstance().StopAll();
-			//}
+			ImGui::Separator();
 
-			//ImGui::SameLine();
-			//if (ImGui::Button("Pause"))
-			//{
-			//	EF_AUD::GetInstance().PauseAll(true);
-			//}
+			// 3. LIST EXISTING SOUNDS
+			std::string toRemove;
+			if (ImGui::BeginTable("SoundBankTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+			{
+				ImGui::TableSetupColumn("Name");
+				ImGui::TableSetupColumn("Asset");
+				ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+				ImGui::TableHeadersRow();
 
-			//ImGui::Separator();
-			//return false;
+				for (auto& [key, value] : comp.soundBank)
+				{
+					ImGui::PushID(key.c_str());
+					ImGui::TableNextRow();
+					ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted(key.c_str());
+					ImGui::TableSetColumnIndex(1); ImGui::TextDisabled("%s", value.c_str());
+					ImGui::TableSetColumnIndex(2);
+
+					if (ImGui::SmallButton("Test")) {
+						// Helper to test in editor
+						EF_AUD::GetInstance().PlayOneShot(value, glm::vec3(0.f), 1.0f, false);
+					}
+					ImGui::SameLine();
+					if (ImGui::SmallButton("Del")) {
+						toRemove = key;
+					}
+					ImGui::PopID();
+				}
+				ImGui::EndTable();
+			}
+			if (!toRemove.empty()) comp.soundBank.erase(toRemove);
+
+			return false;
 		}
 		
 		// Each entry is pair<entt::id_type, entt::meta_data> - for self reference

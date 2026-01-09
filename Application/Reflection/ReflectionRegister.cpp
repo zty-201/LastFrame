@@ -22,6 +22,8 @@
 #include "Scripting/Script.hpp"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 #include "MetaInspector.hpp"
+
+using SoundBankMap = std::unordered_map<std::string, std::string>;
 /*
 	This is for third-party types.
 	For your own types, simply put to/from_json in global namespace or in the respective namespace of the type e.g. namespace hello{ to/fromjson}
@@ -278,9 +280,12 @@ namespace EngineFramework
 		SetMeta(ColliderData),
 		SetMeta(std::vector<ColliderData>),
 		SetMeta(ColliderComponent::Mode),
-		SetMeta(xresource::instance_guid)
+		SetMeta(xresource::instance_guid),
+		SetMeta(SoundBankMap),
+
+
 #if defined(ENGINE_ENABLE_LUA)
-		,
+		
 		SetMeta(Engine::LuaScriptComponent::LuaInstance),
 		SetMeta(std::vector<Engine::LuaScriptComponent::LuaInstance>)
 #endif
@@ -328,9 +333,10 @@ namespace EngineFramework
 		SetJson(ColliderData),
 		SetJson(std::vector<ColliderData>),
 		SetJson(ColliderComponent::Mode),
-		SetJson(xresource::instance_guid)
+		SetJson(xresource::instance_guid),
+		SetJson(SoundBankMap),
 #if defined(ENGINE_ENABLE_LUA)
-		,
+		
 		SetJson(Engine::LuaScriptComponent::LuaInstance),
 		SetJson(std::vector<Engine::LuaScriptComponent::LuaInstance>)
 #endif
@@ -466,6 +472,7 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(std::vector<ColliderData>);
 		REGISTER_ARBITRARY_TYPE(::ColliderComponent::Mode);
 		REGISTER_ARBITRARY_TYPE(ColliderComponent::Mode);
+		REGISTER_ARBITRARY_TYPE(SoundBankMap);
 #if defined(ENGINE_ENABLE_LUA)
 		REGISTER_ARBITRARY_TYPE(Engine::LuaScriptComponent::LuaInstance);
 		REGISTER_ARBITRARY_TYPE(std::vector<Engine::LuaScriptComponent::LuaInstance>);
@@ -592,21 +599,13 @@ namespace EngineFramework
 		// === Register AudioComponent ===
 		entt::meta_factory<AudioComponent>()
 			.type("AudioComponent")
+			// We only save the Sound Bank now. The requestQueue is temporary and doesn't need saving.
+			.data<&AudioComponent::soundBank>("soundBank")
 
-			// Audio asset
-			.data<&AudioComponent::audio_guid>("audio_guid")
-			.custom<EditorFeatures::AssetPickerTag>(
-				EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Audio })
-
-			// Basic fields
-			.data<&AudioComponent::volume>("volume")
-			.data<&AudioComponent::loop>("loop")
-			.data<&AudioComponent::playOnStart>("playOnStart")
-
-			// 2D / 3D behaviour
-			.data<&AudioComponent::is3D>("is3D")
-			.data<&AudioComponent::minDistance>("minDistance")
-			.data<&AudioComponent::maxDistance>("maxDistance")
+			.data<&AudioComponent::playOnStartName>("playOnStartName")
+			.data<&AudioComponent::playOnStartLoop>("playOnStartLoop")
+			.data<&AudioComponent::playOnStart3D>("playOnStart3D")
+			.data<&AudioComponent::playOnStartVolume>("playOnStartVolume")
 
 			.func<&Emplacer<AudioComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<AudioComponent>::RemoveComponent>("remove")
