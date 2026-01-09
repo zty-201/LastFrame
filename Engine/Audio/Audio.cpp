@@ -19,6 +19,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "AudioComponent.h"
 #include "AudioListenerComponent.h"
 
+
 #include <entt/entt.hpp>
 
 #ifdef PLATFORM_ANDROID
@@ -26,6 +27,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <android/asset_manager_jni.h>
 #endif
 #include "AssetManager.hpp"
+
 
 /*
 * Listener: Any entity with [AudioListenerComponent] + [TransformComponent]
@@ -217,39 +219,51 @@ namespace EngineFramework
 			{
 				auto view = ecsRegistry.view<TransformComponent, AudioComponent>();
 
-				view.each([&](entt::entity /*entity*/, TransformComponent& tf, AudioComponent& comp)
+				view.each(
+					[&](entt::entity /*entity*/,
+						TransformComponent& tf,
+						AudioComponent& comp)
 					{
-						// --- NEW: Handle Play On Start ---
+						// ---------------------------------------------------------
+						// 1. PLAY ON START LOGIC (Background Music Fix)
+						// ---------------------------------------------------------
+						// If the component hasn't started its BGM yet, and a BGM name is set...
 						if (!comp._hasStarted && !comp.playOnStartName.empty())
 						{
 							// Check if the sound exists in the bank
 							if (comp.soundBank.find(comp.playOnStartName) != comp.soundBank.end())
 							{
-								// Create a request manually
+								// Create a play request manually
 								AudioRequest req;
 								req.clipName = comp.playOnStartName;
 								req.volume = comp.playOnStartVolume;
 								req.is3D = comp.playOnStart3D;
 								req.loop = comp.playOnStartLoop;
 
+								// Push to queue so it plays in step 2 below
 								comp.requestQueue.push_back(req);
-								comp._hasStarted = true; // Mark done so it doesn't restart next frame
+
+								// Mark as started so we don't spam it every frame
+								comp._hasStarted = true;
 							}
 						}
 
-						// --- 2. PROCESS QUEUE ---
+						// ---------------------------------------------------------
+						// 2. PROCESS REQUEST QUEUE
+						// ---------------------------------------------------------
 						for (const auto& req : comp.requestQueue)
 						{
+							// Find the asset path/guid from the logical name (e.g. "BGM")
 							auto it = comp.soundBank.find(req.clipName);
 							if (it == comp.soundBank.end()) continue;
 
 							std::string guid = it->second;
 
-							// Pass all parameters correctly
-							PlayOneShot(guid, tf.position, req.volume, req.is3D, req.loop);
+							// Play the sound using your helper
+							PlayOneShot(guid, tf.position, req.volume, req.is3D, req.loop, req.minDistance, req.maxDistance);
 						}
 
-						// Clear queue after processing
+						// Clear queue after processing so sounds don't repeat forever
 						comp.requestQueue.clear();
 					});
 			}

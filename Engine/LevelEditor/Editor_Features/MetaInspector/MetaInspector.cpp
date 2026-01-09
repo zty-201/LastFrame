@@ -840,12 +840,11 @@ namespace EditorFeatures {
 			ImGui::TextDisabled("Map Logical Names (e.g. 'BGM') to Assets");
 			ImGui::Separator();
 
-			// 1. INPUTS FOR NEW SOUND
+			// 1. ADD NEW SOUNDS
 			static char nameBuffer[64] = "";
 			ImGui::InputText("Logical Name", nameBuffer, 64);
 
 			static xresource::full_guid tempGuid;
-			// Re-create descriptor locally if needed, or use static helper
 			const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
 			draw_asset_guid_picker("Asset", tempGuid, AssetPickerKind::Audio, descriptor.none_label, descriptor.sources, descriptor.formatter);
 
@@ -853,10 +852,10 @@ namespace EditorFeatures {
 			{
 				if (strlen(nameBuffer) > 0 && !tempGuid.empty())
 				{
+					// Convert GUID to string name for storage
 					std::string assetName = EF_AM::GetName(tempGuid);
 					if (assetName.empty()) assetName = "Unknown_Audio";
 
-					// Save to the BANK, not audio_guid
 					comp.soundBank[std::string(nameBuffer)] = assetName;
 					memset(nameBuffer, 0, 64);
 					tempGuid = {};
@@ -865,8 +864,7 @@ namespace EditorFeatures {
 
 			ImGui::Separator();
 
-			// 2. PLAY ON START SETTINGS
-			// This allows you to pick which sound from the bank plays automatically
+			// 2. PLAY ON START SETTINGS (Background Music)
 			if (ImGui::BeginCombo("Play On Start", comp.playOnStartName.empty() ? "(None)" : comp.playOnStartName.c_str()))
 			{
 				if (ImGui::Selectable("(None)", comp.playOnStartName.empty()))
@@ -877,6 +875,7 @@ namespace EditorFeatures {
 					bool isSelected = (comp.playOnStartName == key);
 					if (ImGui::Selectable(key.c_str(), isSelected))
 						comp.playOnStartName = key;
+
 					if (isSelected) ImGui::SetItemDefaultFocus();
 				}
 				ImGui::EndCombo();
@@ -892,7 +891,7 @@ namespace EditorFeatures {
 
 			ImGui::Separator();
 
-			// 3. LIST EXISTING SOUNDS
+			// 3. SOUND LIST
 			std::string toRemove;
 			if (ImGui::BeginTable("SoundBankTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
 			{
@@ -910,7 +909,7 @@ namespace EditorFeatures {
 					ImGui::TableSetColumnIndex(2);
 
 					if (ImGui::SmallButton("Test")) {
-						// Helper to test in editor
+						// Simple test play
 						EF_AUD::GetInstance().PlayOneShot(value, glm::vec3(0.f), 1.0f, false);
 					}
 					ImGui::SameLine();

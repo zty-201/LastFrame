@@ -11460,10 +11460,10 @@
 	},
 	"98": {
 		"AudioComponent": {
-			"playOnStart3D": true,
+			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "BGM",
-			"playOnStartVolume": 0.5,
+			"playOnStartVolume": 1.0,
 			"soundBank": {
 				"BGM": "20.Room-Tone_SFX_Ambience_Loop"
 			}

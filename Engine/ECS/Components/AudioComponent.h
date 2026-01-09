@@ -18,21 +18,22 @@ struct AudioRequest
 
 struct AudioComponent
 {
-    // 1. CONFIG: Map "Logical Name" -> "File Path"
+    // 1. CONFIG: Map "Logical Name" -> "File Path" (or GUID)
     std::unordered_map<std::string, std::string> soundBank;
 
-    // 2. STATE: Queue
+    // 2. STATE: The list of sounds to play this frame
     std::vector<AudioRequest> requestQueue;
 
-    // 3. STARTUP SETTINGS (This is what you were missing!)
-    std::string playOnStartName;
+    // 3. PLAY ON START CONFIGURATION (Add these lines!)
+    std::string playOnStartName;  // Name of the sound to play (e.g. "BGM")
     bool playOnStartLoop = true;
     bool playOnStart3D = false;
     float playOnStartVolume = 0.5f;
 
-    bool _hasStarted = false; // Runtime flag to ensure it only plays once
+    // 4. RUNTIME STATE
+    bool _hasStarted = false; // Prevents it from restarting every frame
 
-    // 4. HELPER
+    // 5. HELPER
     void Play(const std::string& name, float vol = 1.0f)
     {
         AudioRequest req;
