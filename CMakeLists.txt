@@ -350,6 +350,7 @@ endif()
 if (MSVC)
     set_source_files_properties(
         Engine/Scripting/Script.cpp
+        Application/Reflection/ReflectionRegister.cpp
         PROPERTIES COMPILE_OPTIONS "/bigobj"
     )
 endif()

@@ -19,6 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <cstdio>
 
 //Entt reflection system
 #include <entt/meta/meta.hpp>
@@ -42,6 +43,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "HistorySystem.hpp"
+
+// To rename objects
+#include "NameComponent.h"
 
 namespace EngineFramework
 {
@@ -93,6 +97,12 @@ namespace EngineFramework
 			static bool open_popup_once{};
 			static entt::entity selected_entity = entt::null;
 			static entt::entity copied_entity = entt::null;
+
+			// For renaming purposes
+			static bool open_rename_popup{};
+			static entt::entity rename_target = entt::null;
+			static char rename_buffer[128]{};
+
 
 			auto duplicate_and_select = [&](entt::entity source_entity) -> entt::entity {
 				if (source_entity == entt::null || !registry.valid(source_entity)) {
@@ -262,6 +272,19 @@ namespace EngineFramework
 						break;
 					}
 
+					// To rename the entity
+					// Will open a modal popup for user to edit the name
+					std::string rename_label = "Rename##" + std::to_string((uint32_t)entity);
+					if (ImGui::MenuItem(rename_label.c_str())) {
+						rename_target = entity;
+						std::string current_name = GameObjectSystem::GetEntityName(entity);
+						std::snprintf(rename_buffer, sizeof(rename_buffer), "%s", current_name.c_str());
+						rename_buffer[sizeof(rename_buffer) - 1] = '\0';
+						open_rename_popup = true;
+						ImGui::EndPopup();
+						break;
+					}
+
 					ImGui::EndPopup();
 				}
 
@@ -270,6 +293,89 @@ namespace EngineFramework
 					ImGui::SetTooltip("Entity ID: %u", (uint32_t)entity);
 				}
 
+			}
+
+			if (rename_target != entt::null && open_rename_popup)
+			{
+				ImGui::OpenPopup("Rename Entity");
+				open_rename_popup = false;
+			}
+
+			// In the modal popup, user can edit the name
+			// If the input is empty, remove the NameComponent
+			// Update the existing component if NameComponent is present
+			// Emplace a fresh NameComponent if missing
+			if (ImGui::BeginPopupModal("Rename Entity"))
+			{
+				CALL_AT_END(imgui_endrename, ImGui::EndPopup(););
+				auto reset_rename_state = [&]()
+				{
+					rename_target = entt::null;
+					rename_buffer[0] = '\0';
+				};
+
+				if (rename_target == entt::null || !registry.valid(rename_target))
+				{
+					reset_rename_state();
+					ImGui::CloseCurrentPopup();
+				}
+				else
+				{
+					ImGui::InputText("Name", rename_buffer, sizeof(rename_buffer));
+
+					auto finalize_rename = [&](const char* new_name)
+					{
+						HistorySystem* history_system = HistorySystem::this_class ? &HistorySystem::GetInstance() : nullptr;
+						bool has_component = registry.all_of<NameComponent>(rename_target);
+						const std::string desired_name = new_name ? std::string(new_name) : std::string{};
+
+						if (desired_name.empty())
+						{
+							if (has_component)
+							{
+								std::unique_ptr<Record> record = history_system ? history_system->start_track(rename_target, "NameComponent", Record_Type::COMP_REMOVED) : nullptr;
+								registry.remove<NameComponent>(rename_target);
+								if (history_system)
+								{
+									history_system->end_track(record);
+								}
+							}
+							return;
+						}
+
+						if (has_component)
+						{
+							std::unique_ptr<Record> record = history_system ? history_system->start_track(rename_target, "NameComponent", "name") : nullptr;
+							registry.get<NameComponent>(rename_target).name = desired_name;
+							if (history_system)
+							{
+								history_system->end_track(record, entt::meta_any{ desired_name });
+							}
+						}
+						else
+						{
+							registry.emplace<NameComponent>(rename_target, NameComponent{ desired_name });
+							if (history_system)
+							{
+								std::unique_ptr<Record> record = history_system->start_track(rename_target, "NameComponent", Record_Type::COMP_ADDED);
+								history_system->end_track(record);
+							}
+						}
+					};
+
+					if (ImGui::Button("Confirm"))
+					{
+						finalize_rename(rename_buffer);
+						reset_rename_state();
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("Cancel"))
+					{
+						reset_rename_state();
+						ImGui::CloseCurrentPopup();
+					}
+				}
 			}
 
 			if (instance_to_create_archtype != entt::null && open_popup_once)

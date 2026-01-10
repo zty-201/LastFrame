@@ -22,6 +22,7 @@
 #include "Scripting/Script.hpp"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 #include "MetaInspector.hpp"
+#include "NameComponent.h"
 
 /*
 	This is for third-party types.
@@ -816,6 +817,16 @@ namespace EngineFramework
 			.func<&Remover<UIComponent>::RemoveComponent>("remove")
 			.func<&Getter<UIComponent>::GetComponent>("get")
 			.func<&GetRef<UIComponent>>("get_ref");
+
+		// Register the name component
+		entt::meta_factory<NameComponent>()
+			.type("NameComponent")
+			.data<&NameComponent::name>("name")
+			.func<&Emplacer<NameComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<NameComponent>::RemoveComponent>("remove")
+			.func<&Getter<NameComponent>::GetComponent>("get")
+			.func<&GetRef<NameComponent>>("get_ref");
+
 	}
 
 	//Helper function to cast json to the correct data type, and set comp_data.
