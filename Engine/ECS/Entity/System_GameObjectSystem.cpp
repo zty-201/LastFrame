@@ -33,10 +33,10 @@
 #include "LightComponent.h"
 #include "AudioComponentSerialization.hpp"
 #include "AssetManager.hpp"
+#include "NameComponent.h"
 
 //For printing instance/type_guids in error messages
 #include <inttypes.h>
-
 
 
 namespace EngineFramework
@@ -58,6 +58,13 @@ namespace EngineFramework
 		if (entity == entt::null || !registry.valid(entity)) {
 			return {};
 		}
+
+		// Check for NameComponent of the entity first before falling back to prefab name then to old entity label
+		// Order would be: explicit name -> prefab name -> entity id
+		if (auto* name = registry.try_get<NameComponent>(entity); name && !name->name.empty()) {
+			return name->name;
+		}
+
 		try
 		{
 			auto it = entity_archtype_map.find(entity);
