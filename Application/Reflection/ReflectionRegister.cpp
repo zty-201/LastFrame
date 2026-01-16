@@ -588,6 +588,8 @@ namespace EngineFramework
 			.data<&MaterialComponent::albedoFactor>("albedoFactor")
 			.data<&MaterialComponent::metallicFactor>("metallicFactor")
 			.data<&MaterialComponent::roughnessFactor>("roughnessFactor")
+			.data<&MaterialComponent::uvTiling>("uvTiling")
+			.data<&MaterialComponent::uvOffset>("uvOffset")
 			.func<&Emplacer<MaterialComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<MaterialComponent>::RemoveComponent>("remove")
 			.func<&Getter<MaterialComponent>::GetComponent>("get")

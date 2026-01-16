@@ -205,7 +205,7 @@ namespace EngineFramework
 		std::vector<const ofbx::Object*> boneObjs;
 		boneObjs.reserve(scene->getAllObjectCount());
 
-		/// Get each bone / limb node
+		// Get each bone / limb node
 		for (int i = 0; i < scene->getAllObjectCount(); i++) {
 			// Get the object
 			if (const ofbx::Object* obj = scene->getAllObjects()[i]) {
@@ -277,7 +277,7 @@ namespace EngineFramework
 				glm::mat4 B = mat4Converter(linkBind);
 				boneGlobalMap[index] = B;
 
-				// Geometry global at bind (M) � same for all clusters of this skin
+				// Geometry global at bind (M) same for all clusters of this skin
 				ofbx::DMatrix geomBindDM = cluster->getTransformMatrix();
 				glm::mat4 M = mat4Converter(geomBindDM);
 

@@ -28,6 +28,9 @@ struct MaterialComponent
     glm::vec3 albedoFactor = { 1.0f, 1.0f, 1.0f };
     float metallicFactor = 1.0f;
     float roughnessFactor = 1.0f;
+
+    glm::vec2 uvTiling = { 1.0f, 1.0f };
+    glm::vec2 uvOffset = { 0.0f, 0.0f };
 };
 
 inline bool operator==(const MaterialComponent& a, const MaterialComponent& b)
@@ -39,7 +42,9 @@ inline bool operator==(const MaterialComponent& a, const MaterialComponent& b)
         && a.normalMap == b.normalMap
         && a.metallicMap == b.metallicMap
         && a.roughnessMap == b.roughnessMap
-        && a.ambientOcclusionMap == b.ambientOcclusionMap;
+        && a.ambientOcclusionMap == b.ambientOcclusionMap
+        && a.uvTiling == b.uvTiling   
+        && a.uvOffset == b.uvOffset;
 }
 
 inline bool operator!=(const MaterialComponent& a, const MaterialComponent& b)

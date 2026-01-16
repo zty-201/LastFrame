@@ -392,7 +392,7 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
 //    JPH::BodyCreationSettings bodySettings(
 //        shape, jPos, jRot, motionType, GetObjectLayerForIsStatic(isStatic)
 //    );
-//    bodySettings.mIsSensor = isTrigger; // <— make it a trigger/sensor if requested
+//    bodySettings.mIsSensor = isTrigger; // <?make it a trigger/sensor if requested
 //
 //    if (!isStatic)
 //    {
