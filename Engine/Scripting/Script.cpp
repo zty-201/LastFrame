@@ -16,6 +16,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Script.hpp"
 #include "Scripting/ScriptAsset.hpp"
 #include "AssetManager.hpp"
+#include <glm/geometric.hpp> 
 #include <iostream>
 
 #if defined(ENGINE_ENABLE_LUA)
@@ -52,6 +53,8 @@ namespace Engine {
         std::mutex s_ReloadMutex;
         bool s_ReloadAllRequested = false;
         std::unordered_set<entt::entity> s_ReloadEntityRequests;
+
+        entt::registry* s_RuntimeRegistry = nullptr;
     }
     sol::state& ScriptSystem::GetLuaState() { return s_Lua; }
 #endif
@@ -349,6 +352,38 @@ namespace Engine {
 
         sol::table inputTable = s_Lua.create_named_table("Input");
 
+        // ===============================================================
+        // Query helpers
+        // ===============================================================
+        sol::table queryTable = s_Lua.create_named_table("Query");
+
+        queryTable.set_function("IsEntityInRange",
+            [](uint32_t entityAId, uint32_t entityBId, float range) -> bool
+            {
+                if (!s_RuntimeRegistry) return false;
+                if (range < 0.0f) return false;
+
+                entt::entity a = static_cast<entt::entity>(entityAId);
+                entt::entity b = static_cast<entt::entity>(entityBId);
+
+                if (!s_RuntimeRegistry->valid(a) || !s_RuntimeRegistry->valid(b))
+                    return false;
+
+                if (!s_RuntimeRegistry->all_of<TransformComponent>(a) ||
+                    !s_RuntimeRegistry->all_of<TransformComponent>(b))
+                    return false;
+
+                const auto& ta = s_RuntimeRegistry->get<TransformComponent>(a);
+                const auto& tb = s_RuntimeRegistry->get<TransformComponent>(b);
+
+                const glm::vec3 d = tb.position - ta.position;
+                const float distSq = glm::dot(d, d);
+                const float rSq = range * range;
+
+                return distSq <= rSq;
+            });
+
+
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         inputTable.set_function("GetAction", [](const std::string& action) {
             return EngineFramework::InputManager::GetAction(action);
@@ -515,6 +550,8 @@ namespace Engine {
 #if defined(ENGINE_ENABLE_LUA)
         LOGI("[ScriptSystem] OnRuntimeStart called — initializing Lua scripts...");
 
+        s_RuntimeRegistry = &reg;
+
         reg.view<LuaScriptComponent>().each([](auto& comp) {
             for (auto& inst : comp.Scripts)
                 inst.Loaded = false;
@@ -544,6 +581,8 @@ namespace Engine {
         }
 
 #if defined(ENGINE_ENABLE_LUA)
+        s_RuntimeRegistry = nullptr;
+
         auto luaView = reg.view<LuaScriptComponent>();
         for (auto [e, comp] : luaView.each()) {
             for (auto& inst : comp.Scripts)
