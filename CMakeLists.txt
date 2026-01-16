@@ -177,9 +177,8 @@ endif()
 
 #==========Building of External Dependencies==========
 # Include project-wide utility and dependency modules
-#include(ImportDependencies)
-#NOTE: importDependencies is failing and I don't know how to debug it, so Vendoring will be used instead.
-#importDependencies()
+include(ImportDependencies)
+importDependencies()
 
 # -----------------------------------------------------------------------------
 # Jolt overrides (must be set **before** add_subdirectory(Lib))
@@ -231,7 +230,7 @@ endif()
 
 
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp openfbx CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp openfbx googletest CACHE INTERNAL "")
 
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
