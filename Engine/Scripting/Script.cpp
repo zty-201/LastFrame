@@ -349,6 +349,23 @@ namespace Engine {
 
         sol::table inputTable = s_Lua.create_named_table("Input");
 
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        inputTable.set_function("GetAction", [](const std::string& action) {
+            return EngineFramework::InputManager::GetAction(action);
+            });
+        inputTable.set_function("GetActionDown", [](const std::string& action) {
+            return EngineFramework::InputManager::GetActionDown(action);
+            });
+        inputTable.set_function("GetActionUp", [](const std::string& action) {
+            return EngineFramework::InputManager::GetActionUp(action);
+            });
+#else
+        // optional: compile-safe stubs for non-editor builds
+        inputTable.set_function("GetAction", [](const std::string&) { return false; });
+        inputTable.set_function("GetActionDown", [](const std::string&) { return false; });
+        inputTable.set_function("GetActionUp", [](const std::string&) { return false; });
+#endif
+
         inputTable.set_function("GetMouseButtonDown", &EngineFramework::InputManager::GetMouseButtonDown);
         inputTable.set_function("GetMouseButton", &EngineFramework::InputManager::GetMouseButton);
         inputTable.set_function("GetMouseButtonUp", &EngineFramework::InputManager::GetMouseButtonUp);
