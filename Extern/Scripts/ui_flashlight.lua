@@ -4,10 +4,14 @@
 -- ============================================================
 
 local ICON_SIZE = 100.0   -- smaller than action icon
-local ANCHOR_X  = 0.70    -- slightly left of action_icon
-local ANCHOR_Y  = 0.17    -- align vertically with action_icon
+local ANCHOR_X  = 0.8    -- slightly left of action_icon
+local ANCHOR_Y  = 0.1    -- align vertically with action_icon
 
-local screenWidth, screenHeight = 2340, 1080
+local function getCanvasSize(ui)
+    local w = (ui and ui.screenW) or (ui and ui.joyScreenWidth) or 2560.0
+    local h = (ui and ui.screenH) or (ui and ui.joyScreenHeight) or 1440.0
+    return w, h
+end
 
 local UI = nil
 
@@ -32,8 +36,14 @@ local function isPointerOver()
     if not uiShared then return false end
 
     local mx, rawMy = Input.GetMousePosition()
-    local virtualH   = uiShared.joyScreenHeight or 1440.0
-    local my         = virtualH - rawMy
+    local _, screenH = getCanvasSize(uiShared)
+
+    local my
+    if uiShared.ToUIY then
+        my = uiShared.ToUIY(rawMy)
+    else
+        my = screenH - rawMy
+    end
 
     local x, y = UI:GetPosition()
     local w, h = UI:GetSize()
@@ -50,8 +60,11 @@ function on_create(self)
         return
     end
 
-    local centerX = ANCHOR_X * screenWidth
-    local centerY = ANCHOR_Y * screenHeight
+    local uiShared = ensureUIShared()
+    local screenW, screenH = getCanvasSize(uiShared)
+
+    local centerX = ANCHOR_X * screenW
+    local centerY = ANCHOR_Y * screenH
 
     UI:SetSize(ICON_SIZE, ICON_SIZE)
     UI:SetPosition(centerX - ICON_SIZE * 0.5, centerY - ICON_SIZE * 0.5)

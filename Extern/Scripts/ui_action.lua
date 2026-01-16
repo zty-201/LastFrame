@@ -4,11 +4,9 @@
 -- ============================================================
 
 local ICON_SIZE = 200.0
-local ANCHOR_X  = 0.80
-local ANCHOR_Y  = 0.22
+local ANCHOR_X  = 0.9
+local ANCHOR_Y  = 0.1
 local prevEDown = false
-
-local screenWidth, screenHeight = 2340, 1080
 
 local UI = nil
 
@@ -21,6 +19,12 @@ local function ensureUIShared()
     if not SH then return nil end
     SH.UI = SH.UI or {}
     return SH.UI
+end
+
+local function getCanvasSize(uiShared)
+    local w = (uiShared and uiShared.screenW) or (uiShared and uiShared.joyScreenWidth) or 2560.0
+    local h = (uiShared and uiShared.screenH) or (uiShared and uiShared.joyScreenHeight) or 1440.0
+    return w, h
 end
 
 -- ============================================================
@@ -36,8 +40,14 @@ local function isPointerOver()
     if not uiShared then return false end
 
     local mx, rawMy = Input.GetMousePosition()
-    local virtualH   = uiShared.joyScreenHeight or 1440.0
-    local my         = virtualH - rawMy   -- SAME as ui_flashlight
+    local _, screenH = getCanvasSize(uiShared)
+
+    local my
+    if uiShared.ToUIY then
+        my = uiShared.ToUIY(rawMy)
+    else
+        my = screenH - rawMy
+    end
 
     local x, y = UI:GetPosition()
     local w, h = UI:GetSize()
@@ -55,8 +65,11 @@ function on_create(self)
         return
     end
 
-    local centerX = ANCHOR_X * screenWidth
-    local centerY = ANCHOR_Y * screenHeight
+    local uiShared = ensureUIShared()
+    local screenW, screenH = getCanvasSize(uiShared)
+
+    local centerX = ANCHOR_X * screenW
+    local centerY = ANCHOR_Y * screenH
 
     UI:SetSize(ICON_SIZE, ICON_SIZE)
     UI:SetPosition(centerX - ICON_SIZE * 0.5, centerY - ICON_SIZE * 0.5)

@@ -4,11 +4,9 @@
 -- ============================================================
 
 local ICON_SIZE = 75.0   -- very small icon
-local ANCHOR_X  = 0.50    -- centre horizontally
-local ANCHOR_Y  = 0.13  -- close to bottom
+local ANCHOR_X  = 0.5    -- centre horizontally
+local ANCHOR_Y  = 0.1  -- close to bottom
 local prevCDown = false
-
-local screenWidth, screenHeight = 2340, 1080
 
 local UI = nil
 
@@ -30,6 +28,12 @@ local function ensureUIShared()
     return SH.UI
 end
 
+local function getCanvasSize(ui)
+    local w = (ui and ui.screenW) or (ui and ui.joyScreenWidth) or 2560.0
+    local h = (ui and ui.screenH) or (ui and ui.joyScreenHeight) or 1440.0
+    return w, h
+end
+
 local function isPointerOver()
     if not UI then
         UI = EntityUI
@@ -40,8 +44,14 @@ local function isPointerOver()
     if not uiShared then return false end
 
     local mx, rawMy = Input.GetMousePosition()
-    local virtualH   = uiShared.joyScreenHeight or 1440.0
-    local my         = virtualH - rawMy
+    local _, screenH = getCanvasSize(uiShared)
+
+    local my
+    if uiShared.ToUIY then
+        my = uiShared.ToUIY(rawMy)
+    else
+        my = screenH - rawMy
+    end
 
     local x, y = UI:GetPosition()
     local w, h = UI:GetSize()
@@ -74,8 +84,11 @@ function on_create(self)
         return
     end
 
-    local centerX = ANCHOR_X * screenWidth
-    local centerY = ANCHOR_Y * screenHeight
+    local uiShared = ensureUIShared()
+    local screenW, screenH = getCanvasSize(uiShared)
+
+    local centerX = ANCHOR_X * screenW
+    local centerY = ANCHOR_Y * screenH
 
     UI:SetSize(ICON_SIZE, ICON_SIZE)
     UI:SetPosition(centerX - ICON_SIZE * 0.5, centerY - ICON_SIZE * 0.5)

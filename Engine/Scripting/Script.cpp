@@ -352,7 +352,11 @@ namespace Engine {
             "GetKeyUp", sol::overload(
                 static_cast<bool(*)(int)>(&EngineFramework::InputManager::GetKeyUp),
                 static_cast<bool(*)(EngineFramework::Key_Actions)>(&EngineFramework::InputManager::GetKeyUp)
-            )
+            ),
+            "GetWindowSize", [](EngineFramework::InputManager& im) {
+                auto [w, h] = im.GetWindowSize();
+                return std::make_tuple(w, h);
+            }
         );
 
         // Create a global Input table/namespace with direct function access
@@ -385,7 +389,11 @@ namespace Engine {
         inputTable.set_function("GetGyroscopeRotatioRate", []() {
             glm::vec3 rate = EngineFramework::InputManager::GetGyroscopeRotatioRate();
             return std::make_tuple(rate.x, rate.y, rate.z);
-            });
+        });
+        inputTable.set_function("GetWindowSize", []() {
+            auto [w, h] = EngineFramework::InputManager::GetInstance().GetWindowSize();
+            return std::make_tuple(w, h);
+         });
 
         LOGI("[ScriptSystem] InputManager bindings complete (static table approach)");
 

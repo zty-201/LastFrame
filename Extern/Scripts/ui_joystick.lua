@@ -81,8 +81,14 @@ function on_update(self, dt)
     -- Pointer (mouse / first touch)
     ------------------------------------------------------------
     local mx, rawMy = Input.GetMousePosition()
-    local virtualH   = uiShared.joyScreenHeight or 1440.0
-    local my         = virtualH - rawMy   -- SAME convention as ui_flashlight
+
+    local virtualH = uiShared.screenH or uiShared.joyScreenHeight or 1440.0
+    local my
+    if uiShared.ToUIY then
+        my = uiShared.ToUIY(rawMy)
+    else
+        my = virtualH - rawMy   -- fallback (same convention as before)
+    end
 
     local down = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
     local held = Input.GetMouseButton(GLFW_MOUSE_BUTTON_LEFT)
