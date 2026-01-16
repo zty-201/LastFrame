@@ -211,6 +211,29 @@ namespace EngineFramework
         for (auto& e : E) if (ok[e[0]] && ok[e[1]]) dl->AddLine(pts[e[0]], pts[e[1]], color, thick);
     }
 
+    // To ensure all entities selected (not just entities with collider component) will get highlighted
+    static bool BuildSelectionOBB(entt::entity e, glm::mat4& out_matrix) {
+        if (!registry.all_of<TransformComponent>(e)) {
+            return false;
+        }
+
+        const auto& tf = registry.get<TransformComponent>(e);
+        glm::vec3 center(0.0f);
+        glm::vec3 half(0.5f);
+
+        if (registry.all_of<MeshComponent>(e)) {
+            const auto& mesh = registry.get<MeshComponent>(e);
+            glm::vec3 min(mesh.localMin[0], mesh.localMin[1], mesh.localMin[2]);
+            glm::vec3 max(mesh.localMax[0], mesh.localMax[1], mesh.localMax[2]);
+            center = (min + max) * 0.5f;
+            half = (max - min) * 0.5f;
+        }
+
+        glm::mat4 local = glm::translate(glm::mat4(1.0f), center) * glm::scale(glm::mat4(1.0f), half * 2.0f);
+        out_matrix = tf.modelMatrix * local;
+        return true;
+    }
+
     static void OnTriggerEnter(const Event_OnTriggerEnter& e)
     {
         LOGI("[TriggerEnter] Trigger %u -> Entity %u",
@@ -1560,7 +1583,20 @@ namespace EngineFramework
                     return;
                 }
 
-                if (col.shapes.empty()) return;
+                // If the selected entity lacks collider shapes, render a yellow wireframe using the helper function before skipping the collider drawing block
+                if (col.shapes.empty())
+                {
+                    if (e == selected)
+                    {
+                        glm::mat4 highlightM;
+                        if (BuildSelectionOBB(e, highlightM))
+                        {
+                            DrawWireOBB(highlightM, view, proj, screen_pos, available_size,
+                                IM_COL32(255, 255, 0, 255), 2.0f);
+                        }
+                    }
+                    return;
+                }
 
                 const glm::mat4 model = tf.modelMatrix;
 
@@ -1617,6 +1653,19 @@ namespace EngineFramework
                 //DrawWireOBB(colliderM, view, proj, screen_pos, available_size,
                 //    IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
             });
+
+        // If the selected entity doesnt have a collider component, shows a wireframe that highlights regardless of collider data
+        if (selected != entt::null &&
+            registry.valid(selected) &&
+            !registry.all_of<ColliderComponent>(selected))
+        {
+            glm::mat4 highlightM;
+            if (BuildSelectionOBB(selected, highlightM))
+            {
+                DrawWireOBB(highlightM, view, proj, screen_pos, available_size,
+                    IM_COL32(255, 255, 0, 255), 2.0f);
+            }
+        }
     }
 
     void Screen::drop_target() {
