@@ -82,6 +82,7 @@ endif()
 #Code analysis for Visual Studio
 #Enable VS code analysis for faster checks.
 #Enable clang tidy code analysis for more checks.
+# NOTE: Enabling VS_GLOBAL_RunCodeAnalysis causes precompiled headers for application_executable to fail (as the app reuses pch from engine_library)
 set_target_properties(engine_library PROPERTIES
 	VS_GLOBAL_RunCodeAnalysis ${CODE_ANALYSIS_ON_BUILD}
 	# Do not use visual studio core guidelines if clang tidy is enabled.
@@ -98,33 +99,9 @@ set_target_properties(application_executable PROPERTIES
 	VS_GLOBAL_EnableClangTidyCodeAnalysis false
 	VS_GLOBAL_ClangTidyChecks -checks=-*,clang-analyzer-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-use-trailing-return-type
 )
-
 #Output Names
 set_target_properties(application_executable PROPERTIES OUTPUT_NAME LastFrame)
 set_target_properties(engine_library PROPERTIES OUTPUT_NAME EngineLibrary)
-
-
-# #Copies assets to build directory, every build (to refresh assets)
-# #This is necessary when run from visual studio (instead of running the executable)
-# add_custom_command(
-#   TARGET application_executable
-#   POST_BUILD
-#   COMMAND ${CMAKE_COMMAND} -E copy_directory
-#           ${CMAKE_SOURCE_DIR}/Extern
-#           ${CMAKE_BINARY_DIR}/Extern
-#   COMMENT "Copying Extern/ to build directory ${CMAKE_BINARY_DIR}/"
-# )
-
-# #Copies assets to executable directory.
-# #This is necessary for executable to find it.
-# add_custom_command(
-#   TARGET application_executable
-#   POST_BUILD
-#   COMMAND ${CMAKE_COMMAND} -E copy_directory
-#           ${CMAKE_SOURCE_DIR}/Extern
-#           $<TARGET_FILE_DIR:application_executable>/Extern
-#   COMMENT "Copying Extern/ to executable directory"
-# )
 
 #Sets the default startup project for visual studio to application_executable, other IDEs will ignore this.
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT application_executable)
@@ -172,7 +149,6 @@ add_custom_target(copy_assets ALL
 add_dependencies(jnicpp copy_assets)
 endif()
 #==============ANDROID END==================
-
 
 
 #==========Building of External Dependencies==========
@@ -227,10 +203,10 @@ add_subdirectory(Lib)
 if (TARGET Jolt)
   set_property(TARGET Jolt PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
-
+#---------------------------------------------END JOLT CONFIG----------------------------------------------------------------
 
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp openfbx googletest CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp openfbx CACHE INTERNAL "")
 
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
