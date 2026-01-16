@@ -44,7 +44,7 @@ if(WIN32)
   add_library(engine_library STATIC)
   #Add precompiled headers to speed up compilation times. 
   target_precompile_headers(engine_library PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
-  target_precompile_headers(application_executable REUSE_FROM engine_library) #Use the same pch as engine_library 
+  #target_precompile_headers(application_executable REUSE_FROM engine_library) #Use the same pch as engine_library 
   #Preprocessor Definitions 
   target_compile_definitions(engine_library PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG> ENGINE_ENABLE_LUA )  # <--- ADD THIS LINE 
 
@@ -266,16 +266,20 @@ endif()
 #=====Building of Engine Library and Executable, or Android Shared library======#
 
 
+
 # ======================= AUTO PROJECT DISCOVERY =========================
 #TODO: NOTE: it only works for paths without spaces.
 
-# Get all cpp files in the engine folder and its subdirectories
-file(GLOB_RECURSE ENGINE_SOURCE "Engine/*.cpp" "Engine/*.c" "Engine/*.hpp" "Engine/*.h")
-# Get all cpp files in the application folder and its subdirectories
-file(GLOB_RECURSE APPLICATION_SOURCE "Application/*.cpp" "Application/*.c" "Application/*.hpp" "Application/*.h")
+# Get all cpp files in the engine, application folder and its subdirectories (including main.cpp)
+file(GLOB_RECURSE ENGINE_SOURCE "Engine/*.cpp" "Engine/*.c" "Engine/*.hpp" "Engine/*.h" "Application/*.cpp" "Application/*.c" "Application/*.hpp" "Application/*.h")
+list(REMOVE_ITEM ENGINE_SOURCE "Application/win_main.cpp") #Exclude files belonging to application_executable
+# Get only the main file for windows.
+file(GLOB APPLICATION_SOURCE "Application/win_main.cpp")
+# Get all cpp/hpp testing files
+file(GLOB_RECURSE TESTER_SOURCE "Tester/*.cpp" "Tester/*.c" "Tester/*.hpp" "Tester/*.h")
 
 #Set folder properties on each file so visual studio knows how to set up filters.
-foreach(file IN LISTS ENGINE_SOURCE APPLICATION_SOURCE)
+foreach(file IN LISTS ENGINE_SOURCE APPLICATION_SOURCE TESTER_SOURCE)
 	#get the folder path of the file.
 	file(RELATIVE_PATH relative_path "${CMAKE_SOURCE_DIR}" "${file}")
 	get_filename_component(folder_path "${relative_path}" PATH)
@@ -290,9 +294,11 @@ endforeach()
 #Get the combined Include Directories of Engine and Application.
 set(ENGINE_APPLICATION_INCLUDE_DIRECTORIES "Engine/" "Application/")
 
+set(TESTER_INCLUDE_DIRECTORIES "Tester/")
+
 #Engine includes
 file(GLOB_RECURSE ENGINE_HEADER_DIRECTORIES LIST_DIRECTORIES true "Engine/*")
-#Only include subdirectories.
+#Only include subdirectories, not files.
 foreach(item ${ENGINE_HEADER_DIRECTORIES})
 	if(IS_DIRECTORY "${item}")
 		list(APPEND ENGINE_APPLICATION_INCLUDE_DIRECTORIES "${item}")
@@ -301,19 +307,31 @@ endforeach()
 
 #Application includes
 file(GLOB_RECURSE APPLICATION_HEADER_DIRECTORIES LIST_DIRECTORIES true "Application/*")
-#Only include subdirectories.
+#Only include subdirectories, not files.
 foreach(item ${APPLICATION_HEADER_DIRECTORIES})
 	if(IS_DIRECTORY "${item}")
 		list(APPEND ENGINE_APPLICATION_INCLUDE_DIRECTORIES "${item}")
 	endif()
 endforeach()
 
+#Tester includes
+file(GLOB_RECURSE TESTER_INCLUDE_DIRECTORIES LIST_DIRECTORIES true "Tester/*")
+#Only include subdirectories, not files.
+foreach(item ${TESTER_INCLUDE_DIRECTORIES})
+	if(IS_DIRECTORY "${item}")
+		list(APPEND TESTER_INCLUDE_DIRECTORIES "${item}")
+	endif()
+endforeach()
+
+
 
 #Adding include directories and sources
 if(WIN32)
-  target_sources(engine_library PRIVATE ${ENGINE_SOURCE} "Engine/ECS/Components/TriggerBoxComponent.h")
-  target_sources(application_executable PRIVATE ${APPLICATION_SOURCE} "Engine/ECS/Components/TriggerBoxComponent.h")
+  target_sources(engine_library PRIVATE ${ENGINE_SOURCE})
+  target_sources(application_executable PRIVATE ${APPLICATION_SOURCE} )
+
   #TODO: By right, the engine shouldn't need to include application headers? Need to research more on this.
+  #TODO2: Engine lib now consists of folders and files in both Engine and Application, except for Application/win_main.cpp. This is because of mistaken configuration from last time that's hard to fix now.
   target_include_directories(engine_library PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
   target_include_directories(application_executable PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
 elseif(ANDROID)
@@ -333,6 +351,28 @@ endif()
 
 # ======================= END AUTO CONFIGURATION =========================
 
+
+#====================Creation of Tester Project=======================
+#Tester is only used for CI Pipeline to run unit/integration tests before pushing to git remote.
+#As such, it should not be built together with applicationexecutable for typical development unless manually specified.
+#Do not include it when shipping.
+enable_testing()
+
+add_executable(tester_executable)
+target_sources(tester_executable PRIVATE ${TESTER_SOURCE} )
+target_include_directories(tester_executable PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES} ${TESTER_INCLUDE_DIRECTORIES})
+if(WIN32)
+	target_link_libraries(tester_executable PRIVATE engine_library GTest::gtest)
+elseif(ANDROID)
+	target_link_libraries(tester_executable PRIVATE jnicpp GTest::gtest)
+endif()
+
+include(GoogleTest)
+gtest_discover_tests(tester_executable CONFIGURATIONS Debug Release)
+
+
+#======================================================================
+
 #Copying of dlls
 #Copies fmod dll to executable path
 if(WIN32)
@@ -351,6 +391,25 @@ if(WIN32)
 	COMMAND ${CMAKE_COMMAND} -E copy
 			$<TARGET_FILE:fmod>
 			$<TARGET_FILE_DIR:application_executable>
+	COMMENT "Copying fmod dll to executable directory"
+  )
+
+  #For Tester, use the same things as Application
+  add_custom_command(
+	TARGET tester_executable
+	PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			${IMGUI_DEFAULT_LAYOUT_BIN}
+			$<TARGET_FILE_DIR:tester_executable>/imgui.ini
+	COMMENT "Copying default ImGui layout to executable directory"
+  )
+
+  add_custom_command(
+	TARGET tester_executable
+	POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+			$<TARGET_FILE:fmod>
+			$<TARGET_FILE_DIR:tester_executable>
 	COMMENT "Copying fmod dll to executable directory"
   )
 endif()
