@@ -313,9 +313,10 @@ namespace EngineFramework
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
         ImGui::SetNextWindowSize(ImVec2(800, 800), ImGuiCond_Once);  // Width: 300,500
 
-        std::string levelLoaded = "Level Loaded: " + SceneManager::GetInstance().GetCurrentScene();
+        std::string sceneName = SceneManager::GetInstance().GetCurrentScene();
+        std::string windowTitle = "Level Loaded: " + (sceneName.empty() ? "None" : sceneName) + "###LevelEditorViewport";
 
-        if (ImGui::Begin(levelLoaded.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse)) {
+        if (ImGui::Begin(windowTitle.c_str(), NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse)) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));      // Black text
             if (ImGui::BeginMenuBar()) {
 
@@ -468,6 +469,7 @@ namespace EngineFramework
                     {
                         ImGui::OpenPopup("Entity_Shortcut_Menu");
                     }
+                    right_clicked = false; // IMPORTANT reset
                 }
                 entity_shortcut_menu();
                 adjust_triggerbox();
