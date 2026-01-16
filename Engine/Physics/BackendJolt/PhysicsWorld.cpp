@@ -326,7 +326,7 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
 
     if (motionType == JPH::EMotionType::Dynamic)
     {
-        //bodySettings.mMotionQuality = JPH::EMotionQuality::LinearCast;
+        bodySettings.mMotionQuality = JPH::EMotionQuality::LinearCast;
 
         JPH::MassProperties massProperties;
         JPH::MassProperties shapeMassProps = finalShape->GetMassProperties();
@@ -592,6 +592,42 @@ void PhysicsWorld::RemoveBody(entt::entity entity)
     // Clean up maps
     m_bodyToEntity.erase(bodyID);
     m_entityToBody.erase(it);
+}
+
+void PhysicsWorld::DestroyAllBodies()
+{
+    if (!m_physicsSystem) return;
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterface();
+
+    std::vector<JPH::BodyID> toRemove;
+    for (auto& [entity, bodyID] : m_entityToBody)
+    {
+        toRemove.push_back(bodyID);
+    }
+
+    if (!toRemove.empty()) {
+        bodyInterface.RemoveBodies(toRemove.data(), static_cast<int>(toRemove.size()));
+        bodyInterface.DestroyBodies(toRemove.data(), static_cast<int>(toRemove.size()));
+    }
+
+    m_entityToBody.clear();
+    m_bodyToEntity.clear();
+}
+
+glm::vec3 PhysicsWorld::GetCenterOfMassOffset(entt::entity entity) const
+{
+    auto it = m_entityToBody.find(entity);
+    if (it == m_entityToBody.end()) return glm::vec3(0.0f);
+
+    const JPH::BodyLockInterfaceNoLock& lockInterface = m_physicsSystem->GetBodyLockInterfaceNoLock();
+    JPH::BodyLockRead bodyLock(lockInterface, it->second);
+
+    if (bodyLock.Succeeded()) {
+        const JPH::Body& body = bodyLock.GetBody();
+        JPH::Vec3 com = body.GetShape()->GetCenterOfMass();
+        return glm::vec3(com.GetX(), com.GetY(), com.GetZ());
+    }
+    return glm::vec3(0.0f);
 }
 
 // ------------------------------------------------------------
