@@ -8,6 +8,7 @@
 #include "PhysicsSyncSystem.hpp"
 #include "CoreEngine.hpp"
 #include "Screen.hpp"
+#include "Level_Editor.hpp"
 
 namespace EngineFramework
 {
@@ -36,6 +37,30 @@ namespace EngineFramework
 
             /*if (!Screen::GetInstance().is_simulator_running)
                 return;*/
+
+            bool shouldRunPhysics = true;
+            bool editorActive = false;
+
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+            if (LevelEditor::GetInstance().Get_Editor_State())
+            {
+                editorActive = true;
+                shouldRunPhysics = Screen::GetInstance().is_simulator_running;
+            }
+#endif
+
+            if (editorActive)
+            {
+                static bool wasRunning = false;
+
+                if (!shouldRunPhysics && !wasRunning)
+                {
+                    PhysicsWorld::Get().DestroyAllBodies();
+                }
+                wasRunning = shouldRunPhysics;
+            }
+
+            if (!shouldRunPhysics) return;
 
             // 2) make sure ECS entities have Jolt bodies
             m_buildSystem.Update(registry);
