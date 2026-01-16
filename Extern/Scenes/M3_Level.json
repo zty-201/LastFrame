@@ -127,7 +127,7 @@
 				0.3605816960334778
 			],
 			"innerConeAngle": 12.5,
-			"intensity": 0.0,
+			"intensity": 100.0,
 			"linear": 0.0,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -175,6 +175,20 @@
 	},
 	"100": {
 		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
 			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "",
@@ -209,21 +223,57 @@
 		}
 	},
 	"1000": {
-		"CameraComponent": {
-			"camType": 1,
-			"farPlane": 3000.0,
-			"fieldOfView": 75.0,
-			"is_active": true,
-			"nearPlane": 1.5,
-			"position": [
-				-15.929680824279785,
-				336.05120849609375,
-				0.6462521553039551
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
 			],
-			"target": [
-				-16.19768714904785,
-				335.7760314941406,
-				-0.2768867015838623
+			"albedoMap": [
+				13018842733790724097,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "football",
+			"normalMap": [
+				14171764238397571075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				6101313706149642245,
+				3711223656383638553
+			]
+		},
+		"MeshComponent": {
+			"meshName": "football"
+		},
+		"NameComponent": {
+			"name": "futbol"
+		},
+		"TransformComponent": {
+			"position": [
+				0.0,
+				262.801513671875,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -351,6 +401,20 @@
 	},
 	"102": {
 		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
 			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "",
@@ -1024,6 +1088,20 @@
 	},
 	"114": {
 		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
 			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "",
@@ -1090,6 +1168,61 @@
 			"visible": false
 		}
 	},
+	"116": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				13018842733790724097,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "football",
+			"normalMap": [
+				14171764238397571075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				6101313706149642245,
+				3711223656383638553
+			]
+		},
+		"MeshComponent": {
+			"meshName": "football"
+		},
+		"NameComponent": {
+			"name": "new_futbol"
+		},
+		"TransformComponent": {
+			"position": [
+				467.6124572753906,
+				240.46908569335938,
+				279.89678955078125
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				10.0,
+				10.0,
+				10.0
+			]
+		}
+	},
 	"12": {
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -1125,6 +1258,20 @@
 	},
 	"13": {
 		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
 			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "",
@@ -2374,6 +2521,20 @@
 	},
 	"25": {
 		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
 			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "",
@@ -5497,6 +5658,10 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 17584542703313420289
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 5490970403712286721
 				}
 			]
 		},
@@ -5542,9 +5707,9 @@
 			"mass": 1.0,
 			"useGravity": true,
 			"velocity": [
-				-0.00017889532318804413,
-				-0.48289090394973755,
-				-0.0466366782784462
+				-0.00010090938303619623,
+				-0.4851604998111725,
+				-0.031792785972356796
 			]
 		},
 		"PhysicsMaterialComponent": {
@@ -5558,14 +5723,14 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				3.6896440982818604,
-				89.47093963623047,
-				22.324810028076172
+				3.716881513595581,
+				89.47103118896484,
+				20.34638023376465
 			],
 			"rotation": [
-				-0.004710002802312374,
-				-0.0032643424347043037,
-				0.0006652447045780718
+				-0.0041413623839616776,
+				-0.39152586460113525,
+				0.0006042791064828634
 			],
 			"scale": [
 				1.0,
@@ -6944,6 +7109,20 @@
 	},
 	"61": {
 		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
 			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "",
@@ -7065,6 +7244,20 @@
 	},
 	"62": {
 		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
 			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "",
@@ -10239,6 +10432,20 @@
 	},
 	"88": {
 		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
 			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "",
@@ -10369,6 +10576,20 @@
 	},
 	"89": {
 		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
 			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "",
@@ -11102,6 +11323,20 @@
 	},
 	"95": {
 		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
 			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "",
@@ -11460,6 +11695,20 @@
 	},
 	"98": {
 		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
 			"playOnStart3D": false,
 			"playOnStartLoop": true,
 			"playOnStartName": "BGM",
@@ -11578,6 +11827,25 @@
 				100.0,
 				10.0,
 				100.0
+			]
+		}
+	},
+	"99": {
+		"TransformComponent": {
+			"position": [
+				-189.49867248535156,
+				294.911865234375,
+				-163.49380493164063
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	}

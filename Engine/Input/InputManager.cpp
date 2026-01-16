@@ -260,6 +260,40 @@ namespace EngineFramework
         LOGE("GLFW Error: %s", description);
     }
 
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+
+    bool InputManager::GetAction(const std::string& action)
+    {
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
+            return false;
+
+        auto it = key_mapping_data.find(action);
+        if (it == key_mapping_data.end()) return false;
+        return GetKey(it->second);
+    }
+
+    bool InputManager::GetActionDown(const std::string& action)
+    {
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
+            return false;
+
+        auto it = key_mapping_data.find(action);
+        if (it == key_mapping_data.end()) return false;
+        return GetKeyDown(it->second);
+    }
+
+    bool InputManager::GetActionUp(const std::string& action)
+    {
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
+            return false;
+
+        auto it = key_mapping_data.find(action);
+        if (it == key_mapping_data.end()) return false;
+        return GetKeyUp(it->second);
+    }
+
+#endif
+
     bool InputManager::GetKey(int key)
     {
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)   

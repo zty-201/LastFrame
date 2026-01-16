@@ -189,6 +189,9 @@ public:
         bool isTrigger = false);*/
 
     void RemoveBody(entt::entity entity);
+    void DestroyAllBodies();
+
+    glm::vec3 GetCenterOfMassOffset(entt::entity entity) const;
 
     void SetGravityFactor(entt::entity entity, float factor);
 

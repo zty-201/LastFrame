@@ -1,8 +1,24 @@
 {
     "gameplay_keys": [
         {
+            "glfw_key": 81,
+            "key_action": "FLASHLIGHT"
+        },
+        {
+            "glfw_key": 69,
+            "key_action": "INTERACT"
+        },
+        {
+            "glfw_key": 73,
+            "key_action": "INVENTORY"
+        },
+        {
             "glfw_key": 32,
             "key_action": "JUMP"
+        },
+        {
+            "glfw_key": 83,
+            "key_action": "MOVE_BACK"
         },
         {
             "glfw_key": 87,
