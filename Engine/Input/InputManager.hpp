@@ -72,6 +72,11 @@ namespace EngineFramework
         static bool GetAction(const std::string& action);       // true while held
         static bool GetActionDown(const std::string& action);   // true on press
         static bool GetActionUp(const std::string& action);     // true on release
+
+        static bool GetAction(int action);       // true while held
+        static bool GetActionDown(int action);   // true on press
+        static bool GetActionUp(int action);     // true on release
+
 #endif
 
         // --- Mouse API ---
@@ -109,15 +114,17 @@ namespace EngineFramework
 
         static glm::vec3 GetGyroscopeRotatioRate();
         static std::unordered_map<Key_Actions, int> key_mapping;
-
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         static std::map <std::string, int> key_mapping_data; //json file data
-
-        void seralise();
         void codegen_deseralise();
+        void initialise_keymapping();
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)     
+        //saving of new keys only happens in debug - level editor
+        void seralise();  
+        void key_mapping_codegen_script(); //avoid using it FOR NOW (I am still testing)
         void key_mapping_codegen(); //write to initialise_keymapping
 #endif
-        void initialise_keymapping();
+        
 
     private:
 #ifdef PLATFORM_WINDOWS

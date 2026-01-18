@@ -83,6 +83,26 @@ namespace Engine {
 #endif
     // ===============================================================
 
+    //void ScriptSystem::Init_Keyaction() {
+
+    //    // ===============================================================
+    //    // KeyActions bindings
+    //    // ===============================================================
+
+    //    sol::table keyActions = s_Lua.create_named_table("Key_Actions");
+
+    //    keyActions["FLASHLIGHT"] = (int)EngineFramework::Key_Actions::FLASHLIGHT;
+    //    keyActions["INTERACT"] = (int)EngineFramework::Key_Actions::INTERACT;
+    //    keyActions["INVENTORY"] = (int)EngineFramework::Key_Actions::INVENTORY;
+    //    keyActions["JUMP"] = (int)EngineFramework::Key_Actions::JUMP;
+    //    keyActions["MOVE_BACK"] = (int)EngineFramework::Key_Actions::MOVE_BACK;
+    //    keyActions["MOVE_FORWARD"] = (int)EngineFramework::Key_Actions::MOVE_FORWARD;
+    //    keyActions["MOVE_LEFT"] = (int)EngineFramework::Key_Actions::MOVE_LEFT;
+    //    keyActions["MOVE_RIGHT"] = (int)EngineFramework::Key_Actions::MOVE_RIGHT;
+    //    keyActions["OPEN_EDITOR"] = (int)EngineFramework::Key_Actions::OPEN_EDITOR;
+
+    //}
+
     void ScriptSystem::Init() {
 #if defined(ENGINE_ENABLE_LUA)
         s_Lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math,
@@ -320,9 +340,12 @@ namespace Engine {
         // ===============================================================
         // InputManager bindings
         // ===============================================================
+
         s_Lua.set_function("Input", []() -> EngineFramework::InputManager& {
             return EngineFramework::InputManager::GetInstance();
             });
+
+        ScriptSystem::Init_Keyaction();
 
         s_Lua.new_usertype<EngineFramework::InputManager>("InputManager",
             "GetMouseButtonDown", &EngineFramework::InputManager::GetMouseButtonDown,
@@ -351,6 +374,8 @@ namespace Engine {
         );
 
         sol::table inputTable = s_Lua.create_named_table("Input");
+
+        
 
         // ===============================================================
         // Query helpers
@@ -385,7 +410,7 @@ namespace Engine {
 
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-        inputTable.set_function("GetAction", [](const std::string& action) {
+        /*inputTable.set_function("GetAction", [](const std::string& action) {
             return EngineFramework::InputManager::GetAction(action);
             });
         inputTable.set_function("GetActionDown", [](const std::string& action) {
@@ -393,7 +418,35 @@ namespace Engine {
             });
         inputTable.set_function("GetActionUp", [](const std::string& action) {
             return EngineFramework::InputManager::GetActionUp(action);
-            });
+            });*/
+
+        inputTable.set_function("GetAction", sol::overload(
+            [](const std::string& action) {
+                return EngineFramework::InputManager::GetAction(action);
+            },
+            [](int action) {
+                return EngineFramework::InputManager::GetAction(action);
+            }
+        ));
+
+        inputTable.set_function("GetActionDown", sol::overload(
+            [](const std::string& action) {
+                return EngineFramework::InputManager::GetActionDown(action);
+            },
+            [](int action) {
+                return EngineFramework::InputManager::GetActionDown(action);
+            }
+        ));
+
+        inputTable.set_function("GetActionUp", sol::overload(
+            [](const std::string& action) {
+                return EngineFramework::InputManager::GetActionUp(action);
+            },
+            [](int action) {
+                return EngineFramework::InputManager::GetActionUp(action);
+            }
+        ));
+
 #else
         // optional: compile-safe stubs for non-editor builds
         inputTable.set_function("GetAction", [](const std::string&) { return false; });
@@ -430,6 +483,13 @@ namespace Engine {
             });
 
         LOGI("[ScriptSystem] InputManager bindings complete (static table approach)");
+
+
+
+
+        
+
+
 
         // ===============================================================
         // CameraComponent bindings

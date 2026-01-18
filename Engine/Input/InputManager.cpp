@@ -46,9 +46,9 @@ namespace EngineFramework
     std::unordered_map<Key_Actions, int> InputManager::key_mapping;
 
 
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+//#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
     std::map <std::string, int> InputManager::key_mapping_data;
-#endif   
+//#endif   
 
     std::unordered_map<int, KeyState> InputManager::mouseButtonStates;
 
@@ -291,6 +291,44 @@ namespace EngineFramework
         if (it == key_mapping_data.end()) return false;
         return GetKeyUp(it->second);
     }
+
+    //KEY ACTION ENUM CALLING
+
+    bool InputManager::GetAction(int action)
+    {
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
+            return false;
+
+        auto it = key_mapping.find(static_cast<EngineFramework::Key_Actions>(action));
+        if (it == key_mapping.end()) return false;
+        return GetKey(it->second);
+    }
+
+    bool InputManager::GetActionDown(int action)
+    {
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
+            return false;
+
+        auto it = key_mapping.find(static_cast<EngineFramework::Key_Actions>(action));
+        if (it == key_mapping.end()) return false;
+        return GetKeyDown(it->second);
+    }
+
+    bool InputManager::GetActionUp(int action)
+    {
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
+            return false;
+
+        auto it = key_mapping.find(static_cast<EngineFramework::Key_Actions>(action));
+        if (it == key_mapping.end()) return false;
+        return GetKeyUp(it->second);
+    }
+
+    
+
+
+
+
 
 #endif
 
@@ -684,6 +722,49 @@ namespace EngineFramework
 
     }
 
+    void InputManager::key_mapping_codegen_script() {
+
+        
+        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scripts/A1.txt";
+
+        std::ofstream file_2(path);
+        if (!file_2.is_open())
+        {
+            LOGE("Failed to open file for writing: %s", path.c_str());
+            return;
+        }
+
+        if (key_mapping.empty() || key_mapping_data.empty())return;
+
+
+        file_2 << "\n-- ============================================================\n";
+        file_2 << "--Key_Actions.lua(Inputs)\n";
+        file_2 << "-- ============================================================\n";
+   
+        file_2 << "\nKey_Actions = {\n";
+
+        for (const auto& [action, keycode] : key_mapping_data)
+        {
+            for (const auto& [action2, keycode2] : key_mapping)
+            {
+                if (keycode == keycode2) {
+                    std::stringstream ss;
+                    ss << "\n\t" << action << " = " << (int)action2 << ",";
+                    file_2 << ss.str();
+                    break;
+                }
+            }
+        }
+
+       
+        file_2 << "\n}\n";
+        file_2.close();
+
+    }
+
+
+#endif
+
     void InputManager::codegen_deseralise() {
         //deseralise keyaction.hpp
         //checking to be more safe
@@ -821,6 +902,6 @@ namespace EngineFramework
 
     }
 
-#endif
+
 
 }
