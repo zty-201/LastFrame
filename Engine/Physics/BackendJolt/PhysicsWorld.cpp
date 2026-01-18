@@ -220,12 +220,22 @@ JPH::ShapeRefC CreateJoltShapeFromCollider(const ColliderComponent& collider, co
         {
             case ColliderShape::Box:
             {
+                // 1. Get Base
                 glm::vec3 halfExt = shapeData.boxHalfExtents;
-                
-                halfExt.x = std::max(halfExt.x, MIN_DIMENSION);
-                halfExt.x = std::max(halfExt.y, MIN_DIMENSION);
-                halfExt.x = std::max(halfExt.z, MIN_DIMENSION);
 
+                // 2. Apply Scale
+                halfExt *= absScale;
+
+                // 3. SANITIZE (Handle NaN and Zero)
+                // If scale is 0, this becomes 0. If scale is uninitialized, might be garbage.
+                // We force it to be at least 0.05f (5cm) to be safe.
+                float safeMin = 0.05f;
+
+                halfExt.x = (std::isnan(halfExt.x) || halfExt.x < safeMin) ? safeMin : halfExt.x;
+                halfExt.y = (std::isnan(halfExt.y) || halfExt.y < safeMin) ? safeMin : halfExt.y;
+                halfExt.z = (std::isnan(halfExt.z) || halfExt.z < safeMin) ? safeMin : halfExt.z;
+
+                // 4. Create
                 singleShape = new JPH::BoxShape(JPH::Vec3(halfExt.x, halfExt.y, halfExt.z));
                 break;
             }
