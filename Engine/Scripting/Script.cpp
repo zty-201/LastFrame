@@ -16,7 +16,13 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Script.hpp"
 #include "Scripting/ScriptAsset.hpp"
 #include "AssetManager.hpp"
+#include <glm/geometric.hpp> 
 #include <iostream>
+
+#if defined(ENGINE_ENABLE_LUA)
+#include <mutex>
+#include <unordered_set>
+#endif
 
 //For camera access in scripts
 #include "InputManager.hpp"
@@ -38,7 +44,18 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 namespace Engine {
 
 #if defined(ENGINE_ENABLE_LUA)
-    namespace { sol::state s_Lua; }
+    namespace {
+        sol::state s_Lua;
+
+        // ---------------------------------------------------------------
+        // Hot reload request queue (safe point processing)
+        // ---------------------------------------------------------------
+        std::mutex s_ReloadMutex;
+        bool s_ReloadAllRequested = false;
+        std::unordered_set<entt::entity> s_ReloadEntityRequests;
+
+        entt::registry* s_RuntimeRegistry = nullptr;
+    }
     sol::state& ScriptSystem::GetLuaState() { return s_Lua; }
 #endif
 
@@ -46,29 +63,19 @@ namespace Engine {
     // New function: Hijack Lua's 'print' to use Engine's LOGI
     // ===============================================================
 #if defined(ENGINE_ENABLE_LUA)
-    // NOTE: If LOGI is not defined here, you may need to include 
-    // an appropriate header (e.g., "Logging.hpp" or similar).
     void BindLuaPrintToEngine(sol::state& lua)
     {
-        // Override the global 'print' function in Lua
         lua["print"] = [&](sol::variadic_args va)
             {
                 std::string message;
-                // Iterate through all arguments passed to Lua's print
                 for (auto arg : va)
                 {
-                    // Convert the argument to a string in Lua
-                    // We use the environment's tostring (or global if nil) to handle various types
                     std::string s = lua["tostring"](arg);
-
-                    // Append the result to the message, adding a space separator
                     message += s + " ";
                 }
 
-                // Call your engine's C++ logging macro
-                // Remove the trailing space if the message is not empty
                 if (!message.empty()) {
-                    message.pop_back(); // Remove the last space
+                    message.pop_back();
                 }
                 LOGI("[LuaPrint] %s", message.c_str());
             };
@@ -98,7 +105,6 @@ namespace Engine {
         s_Lua["PLATFORM"] = "unknown";
 #endif
         LOGI("[ScriptSystem] PLATFORM exposed to Lua: %s", s_Lua["PLATFORM"].get<std::string>().c_str());
-
 
         BindLuaPrintToEngine(s_Lua);
 
@@ -190,10 +196,6 @@ namespace Engine {
         // ===============================================================
         // Light Component bindings
         // ===============================================================
-        // (Assuming your LightComponent has fields:
-        //  glm::vec3 position, direction, color;
-        //  float intensity, radius, constant, linear, quadratic,
-        //        innerConeAngle, outerConeAngle)
         s_Lua.new_usertype<LightComponent>("LightComponent",
             "GetPosition", [](LightComponent& light) {
                 return std::make_tuple(light.position.x, light.position.y, light.position.z);
@@ -251,7 +253,6 @@ namespace Engine {
                 return a.RemoveClip(index);
             },
 
-            // Legacy helpers operate on the first clip for backward compatibility
             "GetVolume", [](AudioComponent& a) { return a.PrimaryClip().volume; },
             "SetVolume", [](AudioComponent& a, float v) { a.PrimaryClip().volume = v; },
 
@@ -272,13 +273,9 @@ namespace Engine {
                 if (auto* clip = a.GetClip(index))
                     clip->playRequested = true;
             },
-            // Expose the Play function so scripts can trigger sounds
-            // Usage in Lua: EntityAudio:Play("Footstep", 0.5)
             "Play", [](AudioComponent& a, const std::string& name, float volume) {
                 a.Play(name, volume);
             },
-
-            // Optional: Helper to check if a sound exists in the bank
             "HasSound", [](AudioComponent& a, const std::string& name) {
                 return a.soundBank.find(name) != a.soundBank.end();
             }
@@ -327,9 +324,7 @@ namespace Engine {
             return EngineFramework::InputManager::GetInstance();
             });
 
-        // First, bind the InputManager type with all its methods
         s_Lua.new_usertype<EngineFramework::InputManager>("InputManager",
-            // Static method bindings
             "GetMouseButtonDown", &EngineFramework::InputManager::GetMouseButtonDown,
             "GetMouseButton", &EngineFramework::InputManager::GetMouseButton,
             "GetMouseButtonUp", &EngineFramework::InputManager::GetMouseButtonUp,
@@ -355,10 +350,57 @@ namespace Engine {
             )
         );
 
-        // Create a global Input table/namespace with direct function access
         sol::table inputTable = s_Lua.create_named_table("Input");
 
-        // Bind static methods directly to the Input table
+        // ===============================================================
+        // Query helpers
+        // ===============================================================
+        sol::table queryTable = s_Lua.create_named_table("Query");
+
+        queryTable.set_function("IsEntityInRange",
+            [](uint32_t entityAId, uint32_t entityBId, float range) -> bool
+            {
+                if (!s_RuntimeRegistry) return false;
+                if (range < 0.0f) return false;
+
+                entt::entity a = static_cast<entt::entity>(entityAId);
+                entt::entity b = static_cast<entt::entity>(entityBId);
+
+                if (!s_RuntimeRegistry->valid(a) || !s_RuntimeRegistry->valid(b))
+                    return false;
+
+                if (!s_RuntimeRegistry->all_of<TransformComponent>(a) ||
+                    !s_RuntimeRegistry->all_of<TransformComponent>(b))
+                    return false;
+
+                const auto& ta = s_RuntimeRegistry->get<TransformComponent>(a);
+                const auto& tb = s_RuntimeRegistry->get<TransformComponent>(b);
+
+                const glm::vec3 d = tb.position - ta.position;
+                const float distSq = glm::dot(d, d);
+                const float rSq = range * range;
+
+                return distSq <= rSq;
+            });
+
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        inputTable.set_function("GetAction", [](const std::string& action) {
+            return EngineFramework::InputManager::GetAction(action);
+            });
+        inputTable.set_function("GetActionDown", [](const std::string& action) {
+            return EngineFramework::InputManager::GetActionDown(action);
+            });
+        inputTable.set_function("GetActionUp", [](const std::string& action) {
+            return EngineFramework::InputManager::GetActionUp(action);
+            });
+#else
+        // optional: compile-safe stubs for non-editor builds
+        inputTable.set_function("GetAction", [](const std::string&) { return false; });
+        inputTable.set_function("GetActionDown", [](const std::string&) { return false; });
+        inputTable.set_function("GetActionUp", [](const std::string&) { return false; });
+#endif
+
         inputTable.set_function("GetMouseButtonDown", &EngineFramework::InputManager::GetMouseButtonDown);
         inputTable.set_function("GetMouseButton", &EngineFramework::InputManager::GetMouseButton);
         inputTable.set_function("GetMouseButtonUp", &EngineFramework::InputManager::GetMouseButtonUp);
@@ -390,7 +432,7 @@ namespace Engine {
         LOGI("[ScriptSystem] InputManager bindings complete (static table approach)");
 
         // ===============================================================
-        // CameraComponent bindings //alot of extras lol
+        // CameraComponent bindings
         // ===============================================================
         s_Lua.new_usertype<CameraComponent>("CameraComponent",
             "GetPosition", [](CameraComponent& cam) {
@@ -420,9 +462,6 @@ namespace Engine {
             }
         );
 
-        // ===============================================================
-        // Camera namespace bindings
-        // ===============================================================
         sol::table cameraTable = s_Lua.create_named_table("Camera");
         cameraTable.set_function("onCursor", &Camera::onCursor);
         cameraTable.set_function("onScroll", &Camera::onScroll);
@@ -431,9 +470,8 @@ namespace Engine {
         cameraTable.set_function("getLookAt", &Camera::getLookAt);
         cameraTable.set_function("getPerspective", &Camera::getPerspective);
 
-        // ===============================================================
-        // Global helper: GetMainCamera()
-        // ===============================================================
+        // NOTE: these still reference `registry` as in your original code.
+        // Ideally swap to `reg` (passed in) later.
         s_Lua.set_function("GetMainCamera", []() -> CameraComponent* {
             auto view = registry.view<CameraComponent>();
             if (!view.empty()) {
@@ -442,9 +480,6 @@ namespace Engine {
             return nullptr;
             });
 
-        // ===============================================================
-        // Global helper: GetEntityTransform(entity)
-        // ===============================================================
         s_Lua.set_function("GetEntityTransform", [](entt::entity e) -> TransformComponent* {
             if (registry.all_of<TransformComponent>(e)) {
                 return &registry.get<TransformComponent>(e);
@@ -452,9 +487,6 @@ namespace Engine {
             return nullptr;
             });
 
-        // ===============================================================
-        // Global helper: GetEntityUI(entity)
-        // ===============================================================
         s_Lua.set_function("GetEntityUI", [](entt::entity e) -> UIComponent* {
             if (registry.all_of<UIComponent>(e)) {
                 return &registry.get<UIComponent>(e);
@@ -462,56 +494,54 @@ namespace Engine {
             return nullptr;
             });
 
-        // ===============================================================
-        // Global helper: GetEntityAudio(entity)
-        // ===============================================================
         s_Lua.set_function("GetEntityAudio", [](entt::entity e) -> AudioComponent* {
             if (registry.all_of<AudioComponent>(e))
                 return &registry.get<AudioComponent>(e);
             return nullptr;
             });
 
-
-
         // ===============================================================
-        // GLFW Key Constants (for WASD and other keys)
+        // GLFW Key Constants
         // ===============================================================
         s_Lua["GLFW_KEY_W"] = 87;
         s_Lua["GLFW_KEY_A"] = 65;
         s_Lua["GLFW_KEY_S"] = 83;
         s_Lua["GLFW_KEY_D"] = 68;
-
         s_Lua["GLFW_KEY_F"] = 70;
         s_Lua["GLFW_KEY_Q"] = 81;
         s_Lua["GLFW_KEY_E"] = 69;
-        s_Lua["GLFW_KEY_C"] = 67;  // <-- add this line for calibrate
-
+        s_Lua["GLFW_KEY_C"] = 67;
         s_Lua["GLFW_KEY_SPACE"] = 32;
         s_Lua["GLFW_KEY_SHIFT"] = 340;
 
-        // Mouse button constants
-        s_Lua["GLFW_MOUSE_BUTTON_LEFT"]   = 0;
-        s_Lua["GLFW_MOUSE_BUTTON_RIGHT"]  = 1;
+        s_Lua["GLFW_MOUSE_BUTTON_LEFT"] = 0;
+        s_Lua["GLFW_MOUSE_BUTTON_RIGHT"] = 1;
         s_Lua["GLFW_MOUSE_BUTTON_MIDDLE"] = 2;
 
-
         LOGI("[ScriptSystem] Lua bindings initialized successfully.");
-
-        //No longer needed to sanity check here (Debugging)
-        //// Quick sanity check that camera_touch_control.lua is loaded
-        //auto guid = EngineFramework::AssetManagerSystem::GetFullGuid(
-        //    EngineFramework::AssetManagerSystem::SCRIPT_GUID, "camera_touch_control");
-        //LOGI("[Check] camera_touch_control full GUID = %llu", guid.m_Instance.m_Value); //Error here
-
-        //auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(guid);
-        //if (!scriptAsset)
-        //    LOGE("[Check] ScriptAsset 'camera_touch_control' not found!");
-        //else
-        //    LOGI("[Check] ScriptAsset found. Code length: %zu", scriptAsset->code.size());
 #endif
     }
 
     void ScriptSystem::Shutdown() {}
+
+    // ------------------------------------------------------------------
+    // NEW: Safe reload request API (call from editor/ImGui)
+    // ------------------------------------------------------------------
+    void ScriptSystem::RequestReloadAll() {
+#if defined(ENGINE_ENABLE_LUA)
+        std::scoped_lock lock(s_ReloadMutex);
+        s_ReloadAllRequested = true;
+#endif
+    }
+
+    void ScriptSystem::RequestReloadEntity(entt::entity e) {
+#if defined(ENGINE_ENABLE_LUA)
+        std::scoped_lock lock(s_ReloadMutex);
+        s_ReloadEntityRequests.insert(e);
+#else
+        (void)e;
+#endif
+    }
 
     // ------------------------------------------------------------------
     // Runtime start/stop
@@ -520,13 +550,13 @@ namespace Engine {
 #if defined(ENGINE_ENABLE_LUA)
         LOGI("[ScriptSystem] OnRuntimeStart called — initializing Lua scripts...");
 
-        // Reset load state for all LuaScriptComponents
+        s_RuntimeRegistry = &reg;
+
         reg.view<LuaScriptComponent>().each([](auto& comp) {
             for (auto& inst : comp.Scripts)
                 inst.Loaded = false;
             });
 
-        // Load camera scripts first to establish POV table
         auto cameraView = reg.view<CameraComponent, LuaScriptComponent>();
         for (auto [entity, camera, scripts] : cameraView.each()) {
             for (auto& inst : scripts.Scripts) {
@@ -534,65 +564,25 @@ namespace Engine {
             }
         }
 
-        // Then load other scripts
         auto otherView = reg.view<LuaScriptComponent>(entt::exclude<CameraComponent>);
         for (auto [entity, scripts] : otherView.each()) {
             for (auto& inst : scripts.Scripts) {
                 LoadLuaFor(reg, entity, inst);
             }
         }
-        //No longer auto attach camera script here
-        //// Attach camera_touch_control.lua to main camera (for Android + Windows)
-        //auto cameraView = reg.view<CameraComponent>();
-        //if (!cameraView.empty()) {
-        //    auto cameraEntity = cameraView.front();
-
-        //    LOGI("[ScriptSystem] Attaching script to camera entity (%u) with registry %p",
-        //        static_cast<unsigned>(cameraEntity), (void*)&reg);
-
-        //    if (!reg.all_of<LuaScriptComponent>(cameraEntity)) {
-        //        reg.emplace<LuaScriptComponent>(cameraEntity);
-        //    }
-
-        //    auto& lsc = reg.get<LuaScriptComponent>(cameraEntity);
-        //    lsc.Enabled = true;
-
-        //    Engine::LuaScriptComponent::LuaInstance inst;
-        //    inst.ScriptGuid = EngineFramework::AssetManagerSystem::GetFullGuid(
-        //        EngineFramework::AssetManagerSystem::SCRIPT_GUID,
-        //        "player_pov_camera"
-        //    ).m_Instance;
-
-        //    bool alreadyAttached = false;
-        //    for (auto& s : lsc.Scripts) {
-        //        if (s.ScriptGuid == inst.ScriptGuid) {
-        //            alreadyAttached = true;
-        //            LOGE("[ScriptSystem] camera_touch_control already attached to camera, skipping reattach.");
-        //            break;
-        //        }
-        //    }
-
-        //    if (!alreadyAttached) {
-        //        lsc.Scripts.push_back(inst);
-        //        LOGI("[ScriptSystem] camera_touch_control successfully attached to camera entity (%u).",
-        //            static_cast<unsigned>(cameraEntity));
-
-        //        Engine::ScriptSystem::ReloadScript(reg, cameraEntity);
-        //    }
-        //}
-        //else {
-        //    LOGE("[ScriptSystem] No camera entity found! Skipping camera_touch_control attachment.");
-        //}
 #endif
     }
 
-    void ScriptSystem::OnRuntimeStop(entt::registry& reg) {;
+    void ScriptSystem::OnRuntimeStop(entt::registry& reg) {
+        ;
         auto nativeView = reg.view<NativeScriptComponent>();
         for (auto [e, nsc] : nativeView.each()) {
             if (nsc.Instance) { nsc.Instance->OnDestroy(); DestroyNativeInstance(nsc); }
         }
 
 #if defined(ENGINE_ENABLE_LUA)
+        s_RuntimeRegistry = nullptr;
+
         auto luaView = reg.view<LuaScriptComponent>();
         for (auto [e, comp] : luaView.each()) {
             for (auto& inst : comp.Scripts)
@@ -617,27 +607,56 @@ namespace Engine {
 
 #if defined(ENGINE_ENABLE_LUA)
         {   // Lua scripts
+
+            // -----------------------------------------------------------
+            // SAFE POINT: apply queued reload requests BEFORE iterating
+            // -----------------------------------------------------------
+            bool doReloadAll = false;
+            std::unordered_set<entt::entity> entitiesToReload;
+
+            {
+                std::scoped_lock lock(s_ReloadMutex);
+                doReloadAll = s_ReloadAllRequested;
+                s_ReloadAllRequested = false;
+                entitiesToReload.swap(s_ReloadEntityRequests);
+            }
+
+            if (doReloadAll) {
+                auto v = reg.view<LuaScriptComponent>();
+                for (auto e2 : v) {
+                    auto& comp2 = reg.get<LuaScriptComponent>(e2);
+                    for (auto& inst2 : comp2.Scripts) {
+                        LoadLuaFor(reg, e2, inst2);
+                    }
+                }
+                LOGI("[ScriptSystem] Reloaded ALL Lua scripts (requested).");
+            }
+            else if (!entitiesToReload.empty()) {
+                for (auto e2 : entitiesToReload) {
+                    if (!reg.valid(e2)) continue;
+                    if (!reg.any_of<LuaScriptComponent>(e2)) continue;
+
+                    auto& comp2 = reg.get<LuaScriptComponent>(e2);
+                    for (auto& inst2 : comp2.Scripts) {
+                        LoadLuaFor(reg, e2, inst2);
+                    }
+                }
+                LOGI("[ScriptSystem] Reloaded %zu entities' Lua scripts (requested).", entitiesToReload.size());
+            }
+
+            // -----------------------------------------------------------
+            // Normal Lua update
+            // -----------------------------------------------------------
             auto view = reg.view<LuaScriptComponent>();
             for (auto [e, comp] : view.each()) {
-                //LOGI("[ScriptSystem] OnUpdate running with registry %p", (void*)&reg);
-                //LOGI("[ScriptSystem] LuaScriptComponent.Enabled = %d for entity %u",
-                //     comp.Enabled, static_cast<unsigned>(e));
                 if (!comp.Enabled) continue;
+
                 for (auto& inst : comp.Scripts) {
                     if (!inst.Loaded)
                         LoadLuaFor(reg, e, inst);
 
-                    //if (inst.FnOnUpdate.valid()) {
-                    //    LOGI("[LuaRuntime] FnOnUpdate is VALID for GUID %llu", inst.ScriptGuid.m_Value);
-                    //}
-                    //else {
-                    //    LOGE("[LuaRuntime] FnOnUpdate is NIL for GUID %llu", inst.ScriptGuid.m_Value);
-                    //}
-
-                    if (inst.Loaded && inst.FnOnUpdate.valid()) { //Calling on_update for scripts side
+                    if (inst.Loaded && inst.FnOnUpdate.valid()) {
                         try {
-                            //LOGI("[LuaRuntime] on_update() for entity %u, script GUID %llu",
-                            //    static_cast<unsigned>(e), inst.ScriptGuid.m_Value);
                             inst.FnOnUpdate(inst.Self, dt);
                         }
                         catch (const sol::error& err) {
@@ -674,17 +693,13 @@ namespace Engine {
     // ------------------------------------------------------------------
 #if defined(ENGINE_ENABLE_LUA)
 
-    //static std::string ReadTextFromAssets(const std::filesystem::path& relPath) {
-    //    // relPath should be relative to your Assets root, e.g. "Extern/Scripts/hello.lua"
-    //    auto& AM = EngineFramework::AssetManagerSystem::GetInstance();
-    //    return AM.GetStringFromFile(relPath);
-    //}
-
     void ScriptSystem::LoadLuaFor(entt::registry& reg,
         entt::entity e,
         LuaScriptComponent::LuaInstance& inst)
     {
-        UnloadLuaFor(inst, /*callOnDestroy*/false);
+        // IMPORTANT CHANGE:
+        // Hot reload should call on_destroy to allow scripts to clean up.
+        UnloadLuaFor(inst, /*callOnDestroy*/true);
 
         if (inst.ScriptGuid.m_Value == 0) {
             LOGE("[LuaRuntime] Invalid Script GUID; skipping load (entity %u)",
@@ -723,9 +738,7 @@ namespace Engine {
                 EngineFramework::AssetManagerSystem::GetName(full_guid).c_str(),
                 inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
 
-            // ===============================================================
-            // Prepare entity-specific data BEFORE creating environment
-            // ===============================================================
+            // Prepare entity-specific data
             TransformComponent* entityTransform = nullptr;
             if (reg.all_of<TransformComponent>(e)) {
                 entityTransform = &reg.get<TransformComponent>(e);
@@ -737,31 +750,26 @@ namespace Engine {
                     static_cast<unsigned>(e));
             }
 
-            // Get LightComponent
+            // NOTE: these still use `registry` like your original code.
             LightComponent* entityLight = nullptr;
             if (registry.all_of<LightComponent>(e)) {
                 entityLight = &registry.get<LightComponent>(e);
             }
 
-            // Get UIComponent
             UIComponent* entityUI = nullptr;
             if (registry.all_of<UIComponent>(e)) {
                 entityUI = &registry.get<UIComponent>(e);
             }
 
-            // Get PhysicsComponent
             PhysicsComponent* entityPhysics = nullptr;
             if (registry.all_of<PhysicsComponent>(e)) {
                 entityPhysics = &registry.get<PhysicsComponent>(e);
             }
 
-            // Get AudioComponent
             AudioComponent* entityAudio = nullptr;
             if (registry.all_of<AudioComponent>(e)) {
                 entityAudio = &registry.get<AudioComponent>(e);
             }
-
-
 
             // Create environment and inject variables
             inst.Env = sol::environment(s_Lua, sol::create, s_Lua.globals());
@@ -777,7 +785,6 @@ namespace Engine {
 
             std::string label = EngineFramework::AssetManagerSystem::GetName(full_guid);
 
-            // Load and execute script with environment
             sol::protected_function scriptFunc = s_Lua.load(code, label);
             sol::set_environment(inst.Env, scriptFunc);
 
@@ -840,7 +847,7 @@ namespace Engine {
 #endif // ENGINE_ENABLE_LUA
 
     // ------------------------------------------------------------------
-    // Hot reload
+    // Hot reload (immediate)
     // ------------------------------------------------------------------
     void ScriptSystem::ReloadScript(entt::registry& reg, entt::entity e) {
 #if defined(ENGINE_ENABLE_LUA)

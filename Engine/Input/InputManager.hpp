@@ -17,6 +17,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #define INPUT_MANAGER_H
 
 #include <unordered_map>
+#include <string>   // <-- ADDED (for std::string)
+#include <map>      // <-- ADDED (for std::map)
 #include "ISystem.hpp"
 #include "Key_Action.hpp"
 
@@ -65,6 +67,13 @@ namespace EngineFramework
         static bool GetKeyDown(Key_Actions action);   // true on press
         static bool GetKeyUp(Key_Actions action);     // true on release
 
+        // --- NEW: String-based action API (editor key mapping -> gameplay) ---
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        static bool GetAction(const std::string& action);       // true while held
+        static bool GetActionDown(const std::string& action);   // true on press
+        static bool GetActionUp(const std::string& action);     // true on release
+#endif
+
         // --- Mouse API ---
         static bool GetMouseButton(int button);
         static bool GetMouseButtonDown(int button);
@@ -110,9 +119,6 @@ namespace EngineFramework
 #endif
         void initialise_keymapping();
 
-
-
-
     private:
 #ifdef PLATFORM_WINDOWS
         // --- GLFW Callbacks ---
@@ -125,7 +131,6 @@ namespace EngineFramework
         static void ErrorCallback(int error, const char* description);
 
         // --- State storage ---
-
         static std::unordered_map<int, KeyState> mouseButtonStates;
 
         static double mouseX, mouseY;
@@ -138,7 +143,7 @@ namespace EngineFramework
         static long long lastGyroTimestamp;
 
 
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)   
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 
         bool editor_simulation_running;
         bool editor_running;
