@@ -104,8 +104,14 @@ function on_update(self, dt)
     ------------------------------------------------------------
     -- INTERACTION
     ------------------------------------------------------------
-    if Input.GetKeyDown(GLFW_KEY_E) then
-        print("[AllenKey] INTERACTED!")
+    local SH     = rawget(_G, "SHARED")
+    local uiReq  = SH and SH.UI and SH.UI.actionRequested
+    if uiReq then
+        SH.UI.actionRequested = false
+    end
+
+    if Input.GetKeyDown(GLFW_KEY_E) or uiReq then
+        print("[AllenKey] PICKED UP ALLEN KEY!")
 
         --------------------------------------------------------
         -- INVENTORY LOGIC

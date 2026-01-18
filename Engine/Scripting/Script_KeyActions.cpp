@@ -49,7 +49,7 @@ namespace Engine {
 
     void ScriptSystem::Init_Keyaction() {
 
-#if defined(ENGINE_ENABLE_LUA)
+#if defined(ENGINE_ENABLE_LUA) && defined(PLATFORM_WINDOWS)
         // ===============================================================
             // KeyActions bindings
             // ===============================================================

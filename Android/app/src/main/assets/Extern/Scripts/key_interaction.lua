@@ -99,7 +99,13 @@ function on_update(self, dt)
     SHARED.interactableType = "key"
     SHARED.interactableDist = dist
 
-    if Input.GetKeyDown(GLFW_KEY_E) then
+    local SH     = rawget(_G, "SHARED")
+    local uiReq  = SH and SH.UI and SH.UI.actionRequested
+    if uiReq then
+        SH.UI.actionRequested = false
+    end
+
+    if Input.GetKeyDown(GLFW_KEY_E) or uiReq then
         print("[KeyInteraction] PICKED UP KEY!")
 
         --------------------------------------------------------

@@ -58,6 +58,7 @@ namespace EngineFramework
         static InputManager& GetInstance() { return *this_class; }
         static inline InputManager* this_class = nullptr;
 
+#if defined(PLATFORM_WINDOWS) //these keys are windows only
         // --- Keyboard API ---
         static bool GetKey(int key);       // true while held
         static bool GetKeyDown(int key);   // true on press
@@ -68,7 +69,6 @@ namespace EngineFramework
         static bool GetKeyUp(Key_Actions action);     // true on release
 
         // --- NEW: String-based action API (editor key mapping -> gameplay) ---
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         static bool GetAction(const std::string& action);       // true while held
         static bool GetActionDown(const std::string& action);   // true on press
         static bool GetActionUp(const std::string& action);     // true on release
@@ -117,10 +117,10 @@ namespace EngineFramework
         static std::map <std::string, int> key_mapping_data; //json file data
         void codegen_deseralise();
         void initialise_keymapping();
+        void seralise(); //coding in release build (might change the structure in src files too, so better to keep it here)
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)     
         //saving of new keys only happens in debug - level editor
-        void seralise();  
         void key_mapping_codegen_script(); //avoid using it FOR NOW (I am still testing)
         void key_mapping_codegen(); //write to initialise_keymapping
 #endif

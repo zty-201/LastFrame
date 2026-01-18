@@ -371,6 +371,11 @@ namespace Engine {
                 static_cast<bool(*)(int)>(&EngineFramework::InputManager::GetKeyUp),
                 static_cast<bool(*)(EngineFramework::Key_Actions)>(&EngineFramework::InputManager::GetKeyUp)
             )
+            /*"GetAction", sol::overload(
+                static_cast<bool(*)(int)>(&EngineFramework::InputManager::GetAction),
+                static_cast<bool(*)(const std::string&)>(&EngineFramework::InputManager::GetAction)
+            )*/
+
         );
 
         sol::table inputTable = s_Lua.create_named_table("Input");
@@ -409,7 +414,7 @@ namespace Engine {
             });
 
 
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+#if /*defined(DEBUG) && */defined(PLATFORM_WINDOWS)
         /*inputTable.set_function("GetAction", [](const std::string& action) {
             return EngineFramework::InputManager::GetAction(action);
             });
