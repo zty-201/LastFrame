@@ -18,9 +18,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetWindow.hpp"
 #include "Assets/System/AssetManager.hpp"
 #include "FileDialog.hpp"
-//#include <stb_image.h>
-//#include <glad/glad.h>
 #include "HistorySystem.hpp"
+#include "stb_image.h"
+#include <cctype>
+#include <system_error>
 
 namespace EngineFramework
 {
@@ -34,6 +35,14 @@ namespace EngineFramework
             using namespace entt::literals;
             return meta.func("emplace"_hs) && meta.func("get_ref"_hs);
         }
+
+        static bool is_image_extension(const std::string& extension) {
+            std::string lower = extension;
+            std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c) {
+                return static_cast<char>(std::tolower(c));
+            });
+            return lower == ".png" || lower == ".jpg" || lower == ".jpeg";
+        }
     }
 	AssetWindow::AssetWindow()
 	{
@@ -43,7 +52,7 @@ namespace EngineFramework
 
 	AssetWindow::~AssetWindow()
 	{
-        //UnloadTextures();
+        ClearThumbnailCache();
 	}
 
 	void AssetWindow::Initialize()
@@ -97,6 +106,7 @@ namespace EngineFramework
             if (ImGui::Button("Refresh", ImVec2(buttonWidth, 0))) {
                 AssetManagerSystem::GetInstance().RemoveAllResources();
                 AssetManagerSystem::GetInstance().LoadAllResources();
+                ClearThumbnailCache();
             }
             ImGui::SameLine();
             if (ImGui::Button("Link Component")) {
@@ -148,10 +158,20 @@ namespace EngineFramework
                     ImGui::PushID(fileName.c_str());
 
                     std::string extension = entry.path().extension().string();
+                    bool isTextureFile = is_image_extension(extension);
+                    unsigned int thumbnailId = isTextureFile ? GetThumbnailTexture(entry.path()) : 0;
+                    ImTextureID previewHandle = thumbnailId ? static_cast<ImTextureID>(thumbnailId) : ImTextureID_Invalid;
+                    ImTextureRef previewRef = (previewHandle != ImTextureID_Invalid) ? ImTextureRef(previewHandle) : ImTextureRef();
 
-                    // Draw simple button
-                    if (ImGui::Button(extension.c_str(), {thumbnailSize, thumbnailSize})) {
-                        selectedAsset = entry.path();
+                    if (previewHandle != ImTextureID_Invalid) {
+                        if (ImGui::ImageButton("##Thumbnail", previewRef, { thumbnailSize, thumbnailSize }, ImVec2(0, 1), ImVec2(1, 0))) {
+                            selectedAsset = entry.path();
+                        }
+                    }
+                    else {
+                        if (ImGui::Button(extension.c_str(), { thumbnailSize, thumbnailSize })) {
+                            selectedAsset = entry.path();
+                        }
                     }
 
                     // Begin drag-drop source for all file types
@@ -163,17 +183,18 @@ namespace EngineFramework
                         //*****Set payload type for targets with specific requirements*****
                         const char* payloadType;
                         if (extension == ".png") payloadType = "Textures";
-                        //else if (extension == ".xyz" || extension == ".abc") payloadType = "defghi";
                         else payloadType = "GENERAL";
 
                         ImGui::SetDragDropPayload(payloadType, pathStr.c_str(), pathStr.size() + 1);
 
-                        // Preview text + placeholder thumbnail
+                        // Preview text + thumbnail when available
                         ImGui::TextUnformatted(fileName.c_str());
-                        ImGui::Image((ImTextureID)0, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
+                        if (previewHandle != ImTextureID_Invalid) {
+                            ImGui::Image(previewRef, ImVec2(50, 50), ImVec2(0, 1), ImVec2(1, 0));
+                        }
                         ImGui::EndDragDropSource();
                     }
-                    
+
 
                     ImGui::TextWrapped("%s", fileName.c_str());
 
@@ -436,12 +457,107 @@ namespace EngineFramework
                     }
                 }
             }
-        }
+    }
 
-        
+
 
     }
-    
+
+    // To get the thumbnail texture as it is the cache entry point
+    // Given a file path it will query the file last write time and look up to the existing entry within the cache
+    // If the cache entry is valid, it will return the stored GL texture id, otherwise it deletes the old GL texture, remove entry and calls for LoadThumbnail to rebuild a new one
+    // Then store the new entry back in to the cache before returning the texture id
+    unsigned int AssetWindow::GetThumbnailTexture(const std::filesystem::path& path) {
+        std::error_code ec;
+        auto writeTime = std::filesystem::last_write_time(path, ec);
+        if (ec) {
+            return 0;
+        }
+
+        const std::string key = path.string();
+        auto it = thumbnail_cache.find(key);
+        if (it != thumbnail_cache.end()) {
+            auto& entry = it->second;
+            if (!entry.failed && entry.textureId != 0 && entry.lastWrite == writeTime) {
+                return entry.textureId;
+            }
+
+            if (entry.failed && entry.lastWrite == writeTime) {
+                return 0;
+            }
+
+            if (entry.textureId != 0) {
+                GLuint tex = entry.textureId;
+                glDeleteTextures(1, &tex);
+            }
+            thumbnail_cache.erase(it);
+        }
+
+        ThumbnailEntry newEntry{};
+        newEntry.lastWrite = writeTime;
+
+        if (!LoadThumbnailTexture(path, newEntry)) {
+            newEntry.failed = true;
+            thumbnail_cache.emplace(key, newEntry);
+            return 0;
+        }
+
+        thumbnail_cache.emplace(key, newEntry);
+        return newEntry.textureId;
+    }
+
+    // Use stbi_load to decode large image into rgba pixels and create a GL texture, set linear flitering + clamp wrap and uploads these pixels via glTexImage2D
+    // Then restore the unpacked alignment and frees up the cpu buffer
+    // Next, fill up the thumbnail entry with the generated texture id and report success or failure
+    bool AssetWindow::LoadThumbnailTexture(const std::filesystem::path& path, ThumbnailEntry& outEntry) {
+        int width = 0;
+        int height = 0;
+        int channels = 0;
+        stbi_uc* data = stbi_load(path.string().c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        if (!data) {
+            LOGW("[AssetWindow] Failed to load thumbnail for %s: %s", path.string().c_str(), stbi_failure_reason());
+            return false;
+        }
+
+        GLuint texture = 0;
+        glGenTextures(1, &texture);
+        if (texture == 0) {
+            LOGW("[AssetWindow] Failed to create OpenGL texture for thumbnail: %s", path.string().c_str());
+            stbi_image_free(data);
+            return false;
+        }
+
+        GLint previousAlignment = 0;
+        glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
+
+        stbi_image_free(data);
+
+        outEntry.textureId = texture;
+        outEntry.failed = false;
+        return true;
+    }
+
+    // Destroying the assetwindow or refreshing it will clear the cache
+    void AssetWindow::ClearThumbnailCache() {
+        for (auto& [_, entry] : thumbnail_cache) {
+            if (entry.textureId != 0) {
+                GLuint tex = entry.textureId;
+                glDeleteTextures(1, &tex);
+            }
+        }
+        thumbnail_cache.clear();
+    }
 
     /*
     * return false if the component's variable does not exists in the component mapping

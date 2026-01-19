@@ -1,23 +1,35 @@
 {
     "gameplay_keys": [
         {
+            "glfw_key": 81,
+            "key_action": "FLASHLIGHT"
+        },
+        {
+            "glfw_key": 69,
+            "key_action": "INTERACT"
+        },
+        {
+            "glfw_key": 73,
+            "key_action": "INVENTORY"
+        },
+        {
             "glfw_key": 32,
             "key_action": "JUMP"
         },
         {
-            "glfw_key": 75,
+            "glfw_key": 83,
             "key_action": "MOVE_BACK"
         },
         {
-            "glfw_key": 73,
+            "glfw_key": 87,
             "key_action": "MOVE_FORWARD"
         },
         {
-            "glfw_key": 74,
+            "glfw_key": 65,
             "key_action": "MOVE_LEFT"
         },
         {
-            "glfw_key": 76,
+            "glfw_key": 68,
             "key_action": "MOVE_RIGHT"
         },
         {

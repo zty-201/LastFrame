@@ -16,6 +16,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Script.hpp"
 #include "Scripting/ScriptAsset.hpp"
 #include "AssetManager.hpp"
+#include <glm/geometric.hpp> 
 #include <iostream>
 
 #if defined(ENGINE_ENABLE_LUA)
@@ -52,6 +53,8 @@ namespace Engine {
         std::mutex s_ReloadMutex;
         bool s_ReloadAllRequested = false;
         std::unordered_set<entt::entity> s_ReloadEntityRequests;
+
+        entt::registry* s_RuntimeRegistry = nullptr;
     }
     sol::state& ScriptSystem::GetLuaState() { return s_Lua; }
 #endif
@@ -79,6 +82,26 @@ namespace Engine {
     }
 #endif
     // ===============================================================
+
+    //void ScriptSystem::Init_Keyaction() {
+
+    //    // ===============================================================
+    //    // KeyActions bindings
+    //    // ===============================================================
+
+    //    sol::table keyActions = s_Lua.create_named_table("Key_Actions");
+
+    //    keyActions["FLASHLIGHT"] = (int)EngineFramework::Key_Actions::FLASHLIGHT;
+    //    keyActions["INTERACT"] = (int)EngineFramework::Key_Actions::INTERACT;
+    //    keyActions["INVENTORY"] = (int)EngineFramework::Key_Actions::INVENTORY;
+    //    keyActions["JUMP"] = (int)EngineFramework::Key_Actions::JUMP;
+    //    keyActions["MOVE_BACK"] = (int)EngineFramework::Key_Actions::MOVE_BACK;
+    //    keyActions["MOVE_FORWARD"] = (int)EngineFramework::Key_Actions::MOVE_FORWARD;
+    //    keyActions["MOVE_LEFT"] = (int)EngineFramework::Key_Actions::MOVE_LEFT;
+    //    keyActions["MOVE_RIGHT"] = (int)EngineFramework::Key_Actions::MOVE_RIGHT;
+    //    keyActions["OPEN_EDITOR"] = (int)EngineFramework::Key_Actions::OPEN_EDITOR;
+
+    //}
 
     void ScriptSystem::Init() {
 #if defined(ENGINE_ENABLE_LUA)
@@ -317,9 +340,12 @@ namespace Engine {
         // ===============================================================
         // InputManager bindings
         // ===============================================================
+
         s_Lua.set_function("Input", []() -> EngineFramework::InputManager& {
             return EngineFramework::InputManager::GetInstance();
             });
+
+        ScriptSystem::Init_Keyaction();
 
         s_Lua.new_usertype<EngineFramework::InputManager>("InputManager",
             "GetMouseButtonDown", &EngineFramework::InputManager::GetMouseButtonDown,
@@ -349,12 +375,52 @@ namespace Engine {
                 auto [w, h] = im.GetWindowSize();
                 return std::make_tuple(w, h);
             }
+            
+            /*"GetAction", sol::overload(
+                static_cast<bool(*)(int)>(&EngineFramework::InputManager::GetAction),
+                static_cast<bool(*)(const std::string&)>(&EngineFramework::InputManager::GetAction)
+            )*/
+
         );
 
         sol::table inputTable = s_Lua.create_named_table("Input");
 
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-        inputTable.set_function("GetAction", [](const std::string& action) {
+        
+
+        // ===============================================================
+        // Query helpers
+        // ===============================================================
+        sol::table queryTable = s_Lua.create_named_table("Query");
+
+        queryTable.set_function("IsEntityInRange",
+            [](uint32_t entityAId, uint32_t entityBId, float range) -> bool
+            {
+                if (!s_RuntimeRegistry) return false;
+                if (range < 0.0f) return false;
+
+                entt::entity a = static_cast<entt::entity>(entityAId);
+                entt::entity b = static_cast<entt::entity>(entityBId);
+
+                if (!s_RuntimeRegistry->valid(a) || !s_RuntimeRegistry->valid(b))
+                    return false;
+
+                if (!s_RuntimeRegistry->all_of<TransformComponent>(a) ||
+                    !s_RuntimeRegistry->all_of<TransformComponent>(b))
+                    return false;
+
+                const auto& ta = s_RuntimeRegistry->get<TransformComponent>(a);
+                const auto& tb = s_RuntimeRegistry->get<TransformComponent>(b);
+
+                const glm::vec3 d = tb.position - ta.position;
+                const float distSq = glm::dot(d, d);
+                const float rSq = range * range;
+
+                return distSq <= rSq;
+            });
+
+
+#if /*defined(DEBUG) && */defined(PLATFORM_WINDOWS)
+        /*inputTable.set_function("GetAction", [](const std::string& action) {
             return EngineFramework::InputManager::GetAction(action);
             });
         inputTable.set_function("GetActionDown", [](const std::string& action) {
@@ -362,7 +428,35 @@ namespace Engine {
             });
         inputTable.set_function("GetActionUp", [](const std::string& action) {
             return EngineFramework::InputManager::GetActionUp(action);
-            });
+            });*/
+
+        inputTable.set_function("GetAction", sol::overload(
+            [](const std::string& action) {
+                return EngineFramework::InputManager::GetAction(action);
+            },
+            [](int action) {
+                return EngineFramework::InputManager::GetAction(action);
+            }
+        ));
+
+        inputTable.set_function("GetActionDown", sol::overload(
+            [](const std::string& action) {
+                return EngineFramework::InputManager::GetActionDown(action);
+            },
+            [](int action) {
+                return EngineFramework::InputManager::GetActionDown(action);
+            }
+        ));
+
+        inputTable.set_function("GetActionUp", sol::overload(
+            [](const std::string& action) {
+                return EngineFramework::InputManager::GetActionUp(action);
+            },
+            [](int action) {
+                return EngineFramework::InputManager::GetActionUp(action);
+            }
+        ));
+
 #else
         // optional: compile-safe stubs for non-editor builds
         inputTable.set_function("GetAction", [](const std::string&) { return false; });
@@ -403,6 +497,13 @@ namespace Engine {
          });
 
         LOGI("[ScriptSystem] InputManager bindings complete (static table approach)");
+
+
+
+
+        
+
+
 
         // ===============================================================
         // CameraComponent bindings
@@ -523,6 +624,8 @@ namespace Engine {
 #if defined(ENGINE_ENABLE_LUA)
         LOGI("[ScriptSystem] OnRuntimeStart called — initializing Lua scripts...");
 
+        s_RuntimeRegistry = &reg;
+
         reg.view<LuaScriptComponent>().each([](auto& comp) {
             for (auto& inst : comp.Scripts)
                 inst.Loaded = false;
@@ -552,6 +655,8 @@ namespace Engine {
         }
 
 #if defined(ENGINE_ENABLE_LUA)
+        s_RuntimeRegistry = nullptr;
+
         auto luaView = reg.view<LuaScriptComponent>();
         for (auto [e, comp] : luaView.each()) {
             for (auto& inst : comp.Scripts)

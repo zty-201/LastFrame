@@ -1,14 +1,14 @@
 -- ============================================================
--- ui_action.lua
+-- ui_action.lua  (Windows + Android, flashlight-style hitbox)
 -- Big action icon (bottom-right)
 -- ============================================================
 
-local ICON_SIZE = 350.0   -- big icon
-local ANCHOR_X  = 0.90    -- 0 = left, 1 = right
-local ANCHOR_Y  = 0.22    -- 0 = bottom, 1 = top
+local ICON_SIZE = 200.0
+local ANCHOR_X  = 0.80
+local ANCHOR_Y  = 0.22
 local prevEDown = false
 
-local screenWidth, screenHeight = 3088, 1440
+local screenWidth, screenHeight = 2340, 1080
 
 local UI = nil
 
@@ -23,6 +23,9 @@ local function ensureUIShared()
     return SH.UI
 end
 
+-- ============================================================
+-- Hitbox: same as ui_flashlight
+-- ============================================================
 local function isPointerOver()
     if not UI then
         UI = EntityUI
@@ -32,22 +35,19 @@ local function isPointerOver()
     local uiShared = ensureUIShared()
     if not uiShared then return false end
 
-    -- Mouse position in input space (top-left origin)
     local mx, rawMy = Input.GetMousePosition()
+    local virtualH   = uiShared.joyScreenHeight or 1440.0
+    local my         = virtualH - rawMy   -- SAME as ui_flashlight
 
-    -- Convert Y into the same bottom-left space as UI (same as joystick)
-    local virtualH = uiShared.joyScreenHeight or 1440.0
-    local my       = virtualH - rawMy
-
-    -- Rect of this icon in UI space (bottom-left origin)
     local x, y = UI:GetPosition()
     local w, h = UI:GetSize()
 
-    return mx >= x and mx <= x + w
-       and my >= y and my <= y + h
+    return mx >= x and mx <= x + w and my >= y and my <= y + h
 end
 
-
+-- ============================================================
+-- on_create
+-- ============================================================
 function on_create(self)
     UI = EntityUI
     if not UI then
@@ -55,7 +55,6 @@ function on_create(self)
         return
     end
 
-    -- initial layout in virtual screen space
     local centerX = ANCHOR_X * screenWidth
     local centerY = ANCHOR_Y * screenHeight
 
@@ -64,32 +63,37 @@ function on_create(self)
     UI:SetVisible(true)
 end
 
+-- ============================================================
+-- on_update
+-- ============================================================
 function on_update(self, dt)
     if not UI then return end
 
-    -- ===========================
-    -- MOUSE/TAP ON ICON
-    -- ===========================
+    local uiShared = ensureUIShared()
+    if not uiShared then return end
+
+    ------------------------------------------------------------
+    -- CLICK / TAP ON ICON (Windows + Android)
+    ------------------------------------------------------------
     local downMouse = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
+
     if downMouse and isPointerOver() then
-        -- Placeholder – actual action will be wired later
-        print("[ui_action] Icon pressed (no gameplay hooked yet)")
+        print("[ui_action] Icon pressed")
+        uiShared.actionRequested = true
     end
 
-    -- ===========================
-    -- WINDOWS KEYBOARD: E to "press" action
-    -- ===========================
-    if PLATFORM == "windows" then
+    ------------------------------------------------------------
+    -- KEYBOARD E (Windows)
+    ------------------------------------------------------------
+    local SH = getShared()
+    if SH and SH.PLATFORM == "windows" then
         local isEDown = Input.GetKey(GLFW_KEY_E)
 
-        -- Edge-detect: only fire once per key press
         if isEDown and not prevEDown then
-            -- Same behaviour as clicking the button
-            print("[ui_action] E pressed (action button)")
-            -- later you can also set SHARED.UI.actionRequested = true here
+            print("[ui_action] E pressed (action)")
+            uiShared.actionRequested = true
         end
 
         prevEDown = isEDown
     end
 end
-

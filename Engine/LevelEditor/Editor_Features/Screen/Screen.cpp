@@ -1807,6 +1807,7 @@ namespace EngineFramework
         editor_toggled.is_enabled = true;
         event_dispatcher.trigger<Event_Level_Editor_Simulation>(std::move(editor_toggled));
 
+        Engine::ScriptSystem::OnRuntimeStart(registry);
 
         json_backup = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances();
 

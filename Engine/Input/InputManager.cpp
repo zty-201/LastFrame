@@ -46,9 +46,9 @@ namespace EngineFramework
     std::unordered_map<Key_Actions, int> InputManager::key_mapping;
 
 
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+//#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
     std::map <std::string, int> InputManager::key_mapping_data;
-#endif   
+//#endif   
 
     std::unordered_map<int, KeyState> InputManager::mouseButtonStates;
 
@@ -260,13 +260,14 @@ namespace EngineFramework
         LOGE("GLFW Error: %s", description);
     }
 
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_WINDOWS)
 
     bool InputManager::GetAction(const std::string& action)
     {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
             return false;
-
+#endif
         auto it = key_mapping_data.find(action);
         if (it == key_mapping_data.end()) return false;
         return GetKey(it->second);
@@ -274,8 +275,10 @@ namespace EngineFramework
 
     bool InputManager::GetActionDown(const std::string& action)
     {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
             return false;
+#endif
 
         auto it = key_mapping_data.find(action);
         if (it == key_mapping_data.end()) return false;
@@ -284,15 +287,53 @@ namespace EngineFramework
 
     bool InputManager::GetActionUp(const std::string& action)
     {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
             return false;
+#endif
 
         auto it = key_mapping_data.find(action);
         if (it == key_mapping_data.end()) return false;
         return GetKeyUp(it->second);
     }
 
+    //KEY ACTION ENUM CALLING
+
+    bool InputManager::GetAction(int action)
+    {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
+            return false;
 #endif
+
+        auto it = key_mapping.find(static_cast<EngineFramework::Key_Actions>(action));
+        if (it == key_mapping.end()) return false;
+        return GetKey(it->second);
+    }
+
+    bool InputManager::GetActionDown(int action)
+    {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
+            return false;
+#endif
+
+        auto it = key_mapping.find(static_cast<EngineFramework::Key_Actions>(action));
+        if (it == key_mapping.end()) return false;
+        return GetKeyDown(it->second);
+    }
+
+    bool InputManager::GetActionUp(int action)
+    {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running))
+            return false;
+#endif
+
+        auto it = key_mapping.find(static_cast<EngineFramework::Key_Actions>(action));
+        if (it == key_mapping.end()) return false;
+        return GetKeyUp(it->second);
+    }
 
     bool InputManager::GetKey(int key)
     {
@@ -376,6 +417,7 @@ namespace EngineFramework
         return it != key_mapping.end() && GetKeyUp(it->second);
 
     }
+#endif
 
     bool InputManager::GetMouseButton(int button)
     {
@@ -419,7 +461,7 @@ namespace EngineFramework
     {
         windowWidth = GraphicsSystem::GetInstance().GetWindowSize().first;
         windowHeight = GraphicsSystem::GetInstance().GetWindowSize().second;
-        initialise_keymapping();
+        //initialise_keymapping();
 
 
 
@@ -427,6 +469,9 @@ namespace EngineFramework
 
         event_dispatcher.sink<Event_Level_Editor_Simulation>().connect<&InputManager::HANDLE_EVENT_LevelEditor_Simulation>(this);
         event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&InputManager::HANDLE_EVENT_LevelEditorToggled>(this);
+#endif
+#if defined(PLATFORM_WINDOWS)  
+        initialise_keymapping();
         codegen_deseralise();
         seralise();
 #endif        
@@ -600,36 +645,7 @@ namespace EngineFramework
     /*ONLY AVAILABLE IN DEBUG WHERE LEVEL EDITOR IS OPENED*/
 
 
-    void InputManager::seralise() {
-        //STORE DATA FROM KEY_MAPPING_DATA TO JSON FILE
-        //logging purpose, does not key data
-        nlohmann::json data; // root JSON object
-        data["gameplay_keys"] = nlohmann::json::array();
-
-        // Loop through your map and build JSON entries
-        for (const auto& [key_action, glfw_key] : key_mapping_data)
-        {
-            nlohmann::json entry;
-            entry["key_action"] = key_action;
-            entry["glfw_key"] = glfw_key;
-
-            data["gameplay_keys"].push_back(entry);
-        }
-
-        // Write to file
-        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Input/key_mapping_data.json";
-
-        std::ofstream file(path);
-        if (!file.is_open())
-        {
-            LOGE("Failed to open file for writing: %s", path.c_str());
-            return;
-        }
-
-        file << data.dump(4);
-        file.close();
-
-    }
+    
 
     void InputManager::key_mapping_codegen() {
 
@@ -681,6 +697,80 @@ namespace EngineFramework
         file_2 << "\n#endif\n";
 
         file_2.close();
+
+    }
+
+    void InputManager::key_mapping_codegen_script() {
+
+        
+        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scripts/A1.txt";
+
+        std::ofstream file_2(path);
+        if (!file_2.is_open())
+        {
+            LOGE("Failed to open file for writing: %s", path.c_str());
+            return;
+        }
+
+        if (key_mapping.empty() || key_mapping_data.empty())return;
+
+
+        file_2 << "\n-- ============================================================\n";
+        file_2 << "--Key_Actions.lua(Inputs)\n";
+        file_2 << "-- ============================================================\n";
+   
+        file_2 << "\nKey_Actions = {\n";
+
+        for (const auto& [action, keycode] : key_mapping_data)
+        {
+            for (const auto& [action2, keycode2] : key_mapping)
+            {
+                if (keycode == keycode2) {
+                    std::stringstream ss;
+                    ss << "\n\t" << action << " = " << (int)action2 << ",";
+                    file_2 << ss.str();
+                    break;
+                }
+            }
+        }
+
+       
+        file_2 << "\n}\n";
+        file_2.close();
+
+    }
+
+
+#endif
+
+    void InputManager::seralise() {
+        //STORE DATA FROM KEY_MAPPING_DATA TO JSON FILE
+        //logging purpose, does not key data
+        nlohmann::json data; // root JSON object
+        data["gameplay_keys"] = nlohmann::json::array();
+
+        // Loop through your map and build JSON entries
+        for (const auto& [key_action, glfw_key] : key_mapping_data)
+        {
+            nlohmann::json entry;
+            entry["key_action"] = key_action;
+            entry["glfw_key"] = glfw_key;
+
+            data["gameplay_keys"].push_back(entry);
+        }
+
+        // Write to file
+        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Input/key_mapping_data.json";
+
+        std::ofstream file(path);
+        if (!file.is_open())
+        {
+            LOGE("Failed to open file for writing: %s", path.c_str());
+            return;
+        }
+
+        file << data.dump(4);
+        file.close();
 
     }
 
@@ -821,6 +911,6 @@ namespace EngineFramework
 
     }
 
-#endif
+
 
 }

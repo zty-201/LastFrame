@@ -4,9 +4,9 @@
 
 local ANCHOR_X = 0.15
 local ANCHOR_Y = 0.30
-local BG_SIZE  = 550.0
+local BG_SIZE  = 350.0
 
-local screenWidth, screenHeight = 3088, 1440
+local screenWidth, screenHeight = 2340, 1080
 
 local UI = nil
 
