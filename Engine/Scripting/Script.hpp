@@ -93,6 +93,7 @@ namespace Engine {
     class ScriptSystem {
     public:
         static void Init();
+        static void Init_Keyaction();
         static void Shutdown();
 
         static void OnRuntimeStart(entt::registry& reg);

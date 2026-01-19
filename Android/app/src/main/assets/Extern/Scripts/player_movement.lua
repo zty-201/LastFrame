@@ -101,15 +101,15 @@ function on_update(self, dt)
     end
 
     -- ========================================================
-    -- WINDOWS MOVEMENT (JOYSTICK-ONLY)
+    -- WINDOWS MOVEMENT (WASD only)
     -- ========================================================
     if PLATFORM == "windows" then   
         local moveX, moveZ = 0.0, 0.0
-
-        if Input.GetKey(GLFW_KEY_W) then print("[MOVE] W pressed") moveZ = moveZ + 1 end
-        if Input.GetKey(GLFW_KEY_S) then print("[MOVE] S pressed") moveZ = moveZ - 1 end
-        if Input.GetKey(GLFW_KEY_A) then print("[MOVE] A pressed") moveX = moveX + 1 end
-        if Input.GetKey(GLFW_KEY_D) then print("[MOVE] D pressed") moveX = moveX - 1 end
+        --Key_Actions.MOVE_FORWARD
+        if Input.GetAction(Key_Actions.MOVE_FORWARD) then print("[MOVE] W pressed") moveZ = moveZ + 1 end
+        if Input.GetAction("MOVE_BACK") then print("[MOVE] S pressed") moveZ = moveZ - 1 end
+        if Input.GetAction("MOVE_LEFT")  then print("[MOVE] A pressed") moveX = moveX + 1 end
+        if Input.GetAction("MOVE_RIGHT") then print("[MOVE] D pressed") moveX = moveX - 1 end
 
         -- Joystick input (from UI only)
         if SHARED and SHARED.UI then

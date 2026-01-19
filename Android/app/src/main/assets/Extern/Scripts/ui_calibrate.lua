@@ -3,12 +3,12 @@
 -- Calibrate / re-center camera icon (centre bottom)
 -- ============================================================
 
-local ICON_SIZE = 100.0   -- very small icon
+local ICON_SIZE = 75.0   -- very small icon
 local ANCHOR_X  = 0.50    -- centre horizontally
 local ANCHOR_Y  = 0.13  -- close to bottom
 local prevCDown = false
 
-local screenWidth, screenHeight = 3088, 1440
+local screenWidth, screenHeight = 2340, 1080
 
 local UI = nil
 

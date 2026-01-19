@@ -7,8 +7,8 @@ local started = false
 local UI      = nil
 
 -- Pixel 6 Pro landscape resolution
-local SCREEN_W = 3120
-local SCREEN_H = 1440
+local SCREEN_W = 2340
+local SCREEN_H = 1080
 
 -- ---------------------------------------------------------------
 -- on_create : setup + center the UI

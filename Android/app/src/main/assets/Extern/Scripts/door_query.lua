@@ -115,7 +115,13 @@ function on_update(Self, dt)
     ----------------------------------------------------------------
     -- E PRESSED = OPEN DOOR
     ----------------------------------------------------------------
-    if Input.GetKeyDown(GLFW_KEY_E) and PlayerHasKey() then
+    local SH     = rawget(_G, "SHARED")
+    local uiReq  = SH and SH.UI and SH.UI.actionRequested
+    if uiReq then
+        SH.UI.actionRequested = false
+    end
+
+    if Input.GetKeyDown(GLFW_KEY_E) or uiReq and PlayerHasKey() then
         print("[DoorQuery] E pressed → opening door")
 
         --------------------------------------------------------
