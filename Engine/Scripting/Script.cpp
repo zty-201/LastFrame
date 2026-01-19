@@ -457,11 +457,31 @@ namespace Engine {
             }
         ));
 
+        inputTable.set_function("SetCursorLocked", sol::overload(
+            [](bool locked) {
+                EngineFramework::InputManager::SetCursorLocked(locked);
+            },
+            [](int locked) {
+                EngineFramework::InputManager::SetCursorLocked(locked != 0);
+            }
+        ));
+
+        inputTable.set_function("SetCursorVisible", sol::overload(
+            [](bool visible) {
+                EngineFramework::InputManager::SetCursorVisible(visible);
+            },
+            [](int visible) {
+                EngineFramework::InputManager::SetCursorVisible(visible != 0);
+            }
+        ));
+
 #else
         // optional: compile-safe stubs for non-editor builds
         inputTable.set_function("GetAction", [](const std::string&) { return false; });
         inputTable.set_function("GetActionDown", [](const std::string&) { return false; });
         inputTable.set_function("GetActionUp", [](const std::string&) { return false; });
+        inputTable.set_function("SetCursorLocked", [](bool) {});
+        inputTable.set_function("SetCursorVisible", [](bool) {});
 #endif
 
         inputTable.set_function("GetMouseButtonDown", &EngineFramework::InputManager::GetMouseButtonDown);
