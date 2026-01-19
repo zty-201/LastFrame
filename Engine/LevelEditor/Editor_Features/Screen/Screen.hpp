@@ -25,48 +25,84 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "System_LevelEditor.hpp"
 #include "LFeature.hpp"
 #include "HistorySystem.hpp"
+#include "Editor_Features/CameraController/EditorCameraController.hpp"
 
 namespace EngineFramework
 {
-    struct iEditorView; //forward declaration
+	struct iEditorView; //forward declaration
 
-    class Screen : public LFeature
-    {
-    public:
+	/*struct Entity_Info {
+		xresource::instance_guid archtype_guid{};
+		std::map <std::string, std::map<std::string, entt::meta_any>> components_variables;
+	};*/
 
-        Screen();
-        ~Screen() override;
+	class Screen : public LFeature
+	{
+	public:
 
-        void Initialize() override;
-        void Run() override;
-        void Close() override;
+		//bool is_meta_component(const entt::meta_type& meta) {
+		//    if (!meta || !meta.is_class()) {
+		//        return false;
+		//    }
+		//    using namespace entt::literals;
+		//    return meta.func("emplace"_hs) && (/*meta.func("get_ref"_hs) ||*/ meta.func("get"_hs));
+		//}
 
-        static Screen& GetInstance();
+		Screen();
+		~Screen() override;
 
-        static bool is_control_open;
-        static bool is_simulator_running;
-        static bool gizmos_IS_hovering;
-        static bool gizmos_IS_dragged;
-        
+		void Initialize() override;
+		void Run() override;
+		void Close() override;
 
-    private:
+		static Screen& GetInstance();
 
-        std::unique_ptr<HistorySystem> history;
-        void display_screen();
-        void gizmos();
-        void triggerbox();
-        void camera_controls_outside_screen();
-        void camera_controls_in_screen_only();
-        void control_window();
-        void drop_target();
+		static bool is_control_open;
+		static bool is_simulator_running;
+		static bool gizmos_IS_hovering;
+		static bool gizmos_IS_dragged;
+		static bool is_adjusting_lights;
+		static bool is_adjusting_triggerbox;
 
+		glm::vec3 saved_cam_pos_before_sim{};
+		glm::vec3 saved_cam_target_before_sim{};
+		bool has_saved_cam_before_sim = false;
 
-        void play_simulation();
-        void stop_simulation();
-        std::string simulation_buffer;
+		static bool s_DrawColliders;
+		static bool s_DrawAllColliders;
 
-        static inline Screen* this_instance{};
-    };
+		private:
+
+			std::unique_ptr<HistorySystem> history;
+			void display_screen();
+			void gizmos();
+			void triggerbox();
+			void camera_controls_outside_screen();
+			void camera_controls_in_screen_only();
+			void control_window();
+			void drop_target();
+			void adjust_triggerbox();
+			void colliderbox();
+			void entity_shortcut_menu();
+			bool delete_selected_entity();
+
+		float camera_speed;
+		float scrolling_speed;
+
+		entt::entity FindPlayerEntity();
+		bool m_snapEnabled = false;
+		float m_snapStep = 1.0f;
+
+		void play_simulation();
+		void stop_simulation();
+		std::string simulation_buffer;
+		EditorCameraController m_editorCamera;
+		/* std::map<entt::entity, Entity_Info> backup_before_simulation;*/
+
+		void clear_backup();
+		static std::string json_backup;
+		static inline Screen* this_instance{};
+	};
 
 }
 

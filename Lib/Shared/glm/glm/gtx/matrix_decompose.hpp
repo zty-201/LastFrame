@@ -11,7 +11,7 @@
 /// Decomposes a model matrix to translations, rotation and scale components
 
 #pragma once
-
+#define GLM_ENABLE_EXPERIMENTAL
 // Dependencies
 #include "../mat4x4.hpp"
 #include "../vec3.hpp"

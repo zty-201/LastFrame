@@ -84,6 +84,8 @@
 #include "nlohmann/json.hpp"
 #include "entt/meta/meta.hpp"
 #include "entt/meta/resolve.hpp"
+#include "Animation.hpp"
+#include "AnimationImporter.hpp"
 
 #ifdef PLATFORM_ANDROID
 #include <android/asset_manager.h>
@@ -97,6 +99,7 @@ namespace EngineFramework {
 
 	class AssetWindow;//forward declaration
 	class ModelManager;
+	class ObjectManager;
 #endif
 
 	/*
@@ -195,7 +198,6 @@ namespace EngineFramework {
 
 		/*
 			Return full guid of an asset given its name and type_guid.
-			Also adds <guid, name> mapping if not already done.
 		*/
 		static xresource::full_guid GetFullGuid(const xresource::type_guid& type_guid, std::string asset_name);
 
@@ -216,6 +218,7 @@ namespace EngineFramework {
 		static inline constexpr const char AUDIO[6]{ "audio" };
 		//static inline constexpr const char SCRIPT[7]{ "script" };
 		static inline constexpr const char ARCHTYPE[9]{ "archtype" };
+		static inline constexpr const char ANIMATION[10]{ "animation" };
 		/*
 			Precomputed type guids.
 		*/
@@ -226,6 +229,7 @@ namespace EngineFramework {
 		static inline constexpr xresource::type_guid AUDIO_GUID{ AUDIO };
 		//static inline constexpr xresource::type_guid SCRIPT_GUID{ SCRIPT };
 		static inline constexpr xresource::type_guid ARCHTYPE_GUID{ ARCHTYPE };
+		static inline constexpr xresource::type_guid ANIMATION_GUID{ ANIMATION };
 
 	private:
 
@@ -233,6 +237,7 @@ namespace EngineFramework {
 
 		friend AssetWindow;
 		friend ModelManager;
+		friend ObjectManager;
 #endif
 		
 		//== Functions that Level Editor can use.
@@ -296,6 +301,8 @@ namespace EngineFramework {
 		static bool LoadAudio(const std::filesystem::path&);
 		static bool LoadScript(const std::filesystem::path&);
 		static bool LoadArchtype(const std::filesystem::path&);
+		static bool LoadAnimation(const std::filesystem::path&);
+
 
 		static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer
 #ifdef PLATFORM_ANDROID
@@ -320,6 +327,7 @@ namespace EngineFramework {
 		// This is used to get guids from human-readable names, like for anything "hardcoded", e.g. using a "Basic" shader. 
 		// Note that type_guid is requested jic there are different asset types with the same name.
 		static inline std::unordered_map<xresource::type_guid, std::unordered_map<std::string, xresource::instance_guid>> name_guid_map{};
+
 	};
 
 } // namespace EngineFramework

@@ -24,22 +24,7 @@
 #include "scene.h"
 #include "InstancingSystem.h"
 
-struct VolumetricUBO
-{
-    glm::mat4 view;
-    glm::mat4 projection;
-    glm::mat4 view_proj;
-    glm::mat4 prev_view_proj;
-    glm::mat4 light_view_proj;
-    glm::mat4 inv_view_proj;
-    glm::vec4 light_direction;
-    glm::vec4 light_color;
-    glm::vec4 camera_position;
-    glm::vec4 bias_near_far_pow; // x: bias, y: near, z: far, w: power
-    glm::vec4 aniso_density_scattering_absorption;
-    glm::vec4 time; // x: current time
-    glm::ivec4 width_height;
-};
+
 
 namespace EngineFramework
 {
@@ -50,11 +35,12 @@ namespace EngineFramework
         const int MESH_NORMAL_UNIT = 1;
         const int MESH_METALLIC_UNIT = 2;
         const int MESH_ROUGHNESS_UNIT = 3;
-        const int SHADOW_MAP_UNIT = 4;
-        const int VOLUMETRIC_VOXEL_GRID_UNIT = 5;
-        const int SKYBOX_CUBEMAP_UNIT = 6;
-        const int VOLUMETRIC_BLUE_NOISE_UNIT = 7;
-        const int VOLUMETRIC_HISTORY_UNIT = 8;
+        const int VOLUMETRIC_VOXEL_GRID_UNIT = 4;
+        const int SKYBOX_CUBEMAP_UNIT = 5;
+        const int VOLUMETRIC_BLUE_NOISE_UNIT = 6;
+        const int VOLUMETRIC_HISTORY_UNIT = 7;
+		const int SHADOW_MAP_UNIT = 8;
+		const int POINT_SHADOW_MAP_UNIT = 9;
     }
 
     class GraphicsSystem : public ISystem
@@ -77,11 +63,12 @@ namespace EngineFramework
         void SetDebugStatus(bool enable) { show_debugDraw = enable; }
         bool GetDebugStatus() { return show_debugDraw; }
 
+		void UploadBonePalettes(const std::vector<glm::mat4>& boneMatrices);
+
 		// Accessor for the scene
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* GetGLFWwindow() { return pWindow; }
 #endif
-		std::unique_ptr<Scene>& GetScene() { return pScene; }
 		GLuint GetSceneTextureID() const { return sceneTextureID; }
         std::pair<int, int> GetWindowSize() const { return std::pair<int, int>(static_cast<int>(screen.x), static_cast<int>(screen.y)); }
 
@@ -149,56 +136,106 @@ namespace EngineFramework
 
     private:
 
+        // Debug Mode
+        int debugMode = 0;
+
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* pWindow = nullptr;
 #endif
 
+		// Resource Structs
+        struct VolumetricUBO
+        {
+            glm::mat4 view;
+            glm::mat4 projection;
+            glm::mat4 view_proj;
+            glm::mat4 prev_view_proj;
+            glm::mat4 inv_view_proj;
+            glm::mat4 cascade_view_proj[4];  // Array of cascade matrices
+            glm::vec4 cascade_splits;        // x,y,z,w = split distances
+            glm::vec4 cascade_biases;
+            glm::vec4 light_direction;
+            glm::vec4 light_color;
+            glm::vec4 camera_position;
+            glm::vec4 bias_near_far_pow; // x: bias, y: near, z: far, w: power
+            glm::vec4 aniso_density_scattering_absorption;
+            glm::vec4 time; // x: current time
+            glm::ivec4 width_height;
+        };
+
+        struct PointLightSSBO {
+            glm::vec4 position_radius;      // .xyz = position, .w = radius
+            glm::vec4 color_intensity;      // .xyz = color, .w = intensity
+            glm::vec4 attenuation_type;     // .x = constant, .y = linear, .z = quadratic, .w = TYPE (1.0=Point, 2.0=Spot)
+            glm::vec4 direction_shadow;     // .xyz = direction, .w = shadow_index
+            glm::vec4 spot_cutoffs;         // .x = cos(inner), .y = cos(outer), .z,w = paddingE
+        };
+
         //std::unique_ptr<InstancingSystem> m_instancingSystem;
-        // A map to cache loaded mesh data (VAO, index count)
+        
+		// Shader GUIDs
         xresource::full_guid mesh_shader_guid;
         xresource::full_guid skybox_shader_guid;
         xresource::full_guid shadow_shader_guid;
+		xresource::full_guid point_shadow_shader_guid;
         xresource::full_guid light_injection_shader_guid;
         xresource::full_guid ray_march_shader_guid;
+		xresource::full_guid ui_shader_guid;
 
+		// UBOs
         GLuint m_volumetricUBO = 0;
 
+		// Cached resources
         std::unordered_map<std::string, std::shared_ptr<Mesh::MeshData>> meshCache;
         std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCacheWire;
 
-        std::unique_ptr<Scene> pScene;
+		// Shadow mapping resources
+        static const int CASCADE_COUNT = 4;
+        GLuint m_csmTextureArray = 0;  // 2D texture array for cascades
+        std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
+        std::array<float, CASCADE_COUNT + 1> m_cascadeSplits;
+		std::array<float, CASCADE_COUNT> m_cascadeBiases;
 
+		// Framebuffer Objects
         FBO mainFBO;
         FBO m_shadowFBO;
+		FBO m_pointShadowFBO;
 
+		// FBO texture attachments
         GLuint sceneTextureID;
-        GLuint m_shadowMapTextureID;
-        
+        std::vector<GLuint> m_pointShadowMapTextures;
+
+        // SSBOs
+		GLuint m_pointLightSSBO = 0;
+        std::vector<PointLightSSBO> m_pointLightData;
+
         // 3D textures for volumetric fog passes
         GLuint m_ray_march_voxel_grid = 0;
         GLuint m_temporal_integration_voxel_grid[2] = { 0, 0 };
-
         GLuint m_defaultWhiteTexture = 0;
         GLuint m_defaultNormalTexture = 0;
         std::vector<GLuint> m_blue_noise_textures;
         
         // Fog control parameters
-        float m_anisotropy = 0.8f;
-        float m_density = 0.15f;
-        float m_scattering = 0.12f;
-        float m_absorption = 0.005f; 
-        float m_shadow_bias = 0.005f;
+        float m_anisotropy = 0.6f;      // Slightly forward scattering
+        float m_density = 0.01f;         // Much lower density (was 0.15)
+        float m_scattering = 0.0f;
+        float m_absorption = 0.0f; 
+        float m_shadow_bias = 0.001f;
         float m_depth_power = 1.0f; // For exponential depth mapping
-        float m_ambient_light_intensity = 0.01f;
+        float m_ambient_light_intensity = 0.1f;
         bool m_temporal_accumulation = true;
         bool m_tricubic_filtering = false;
         int m_frame_idx = 0;
         bool m_ping_pong = false;
-        glm::mat4 m_prev_view_projection;
-        glm::mat4 m_lightSpaceMatrix;
 
+		// Previous frame matrices for temporal reprojection
+        glm::mat4 m_prev_view_projection;
+        
+		// Screen dimensions
         glm::vec2 screen = { WIDTH,HEIGHT };
         
+		// Other flags
         bool show_debugDraw = false;
         bool m_isRenderingToFBO = false;
 
@@ -212,15 +249,33 @@ namespace EngineFramework
         void SkyboxPass();
         void VolumetricLightInjectionPass();
         void VolumetricRayMarchPass();
+        void RenderUI();
+
+		// Update methods
         void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
+		void UpdatePointLightSSBO(const CameraComponent& camera, const glm::mat4& viewProj);
+
+		// Helper methods
         void PreGeneratePrimitives();
         void LoadBlueNoiseTextures();
+		void RenderDirectionalShadow();
+		void RenderPointLightShadows();
+        void RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius);
+        void CalculateCascadeSplits(float nearPlane, float farPlane);
+        bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
+        bool WorldToScreen(const glm::vec3& worldPos, glm::vec2& outScreenPos, float& outScale);
+        std::vector<glm::vec3> GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ);
 
         //==Event Handlers, one for each type of event.
         void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);
 
         static inline GraphicsSystem* this_graphics_ptr = nullptr;
+
+        // Animation stuffs
+
+        GLuint skinningUBO = 0;
+        int maxBones = 256;
     };
 }
 

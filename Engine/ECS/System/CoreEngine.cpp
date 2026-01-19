@@ -8,7 +8,6 @@
 #include "CoreEngine.hpp"
 #include "PhysicsRuntimeSystem.hpp"
 #include "Diagnostics/ProfilerEngine.hpp" // To auto-profile every system from one place
-
 namespace EngineFramework
 {
 	//Singleton pattern: Everyone shares the only instance of the core engine.

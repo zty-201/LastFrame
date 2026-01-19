@@ -25,12 +25,11 @@
 #include "SoundAsset.hpp"
 #include "Archtype.hpp"
 
-
 namespace EngineFramework {
 
 	// -------- lifecycle --------
-	AssetManagerSystem::AssetManagerSystem() { 
-		s_instance = this; 
+	AssetManagerSystem::AssetManagerSystem() {
+		s_instance = this;
 		/*
 			Check for location of asset folder, prioritising the top-level folder first.
 			This is because running from VS uses the current VS build folder, executable uses the current executable folder.
@@ -251,7 +250,6 @@ namespace EngineFramework {
 
 	/*
 			Return full guid of an asset given its name and type_guid.
-			Also adds <guid, name> mapping if not already done.
 		*/
 	xresource::full_guid AssetManagerSystem::GetFullGuid(const xresource::type_guid& type_guid, std::string asset_name)
 	{
@@ -259,7 +257,7 @@ namespace EngineFramework {
 		//Name guid map is set during loading of the respective asset.
 		if (it == name_guid_map[type_guid].end())
 		{
-			LOGE("%s %s", "[AssetManager] No Asset with this name found in name_guid_map", asset_name.c_str());
+			LOGI("%s %s", "[AssetManager] No Asset with this name found in name_guid_map", asset_name.c_str());
 			return {};
 		}
 		return xresource::full_guid{ it->second, type_guid };
@@ -370,9 +368,9 @@ namespace EngineFramework {
 		}
 		for (int i = 0; i < resource_arr.size(); i++)
 		{
-			xresource::instance_guid &instance_guid = guid_mapping[i];
-			xresource::full_guid asset_guid{instance_guid, type_guid};
-			const std::string &name = name_arr[i];
+			xresource::instance_guid& instance_guid = guid_mapping[i];
+			xresource::full_guid asset_guid{ instance_guid, type_guid };
+			const std::string& name = name_arr[i];
 
 			//	Add resource to the resource map.
 			AddResource(asset_guid, resource_arr[i]);
@@ -388,6 +386,7 @@ namespace EngineFramework {
 		//==Add function loaders for each type==//
 		asset_loader_map[TEXTURE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadTexture);
 		asset_loader_map[CUBEMAP] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadCubemap);
+		asset_loader_map[ANIMATION] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAnimation);
 		asset_loader_map[MESH] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadMesh);
 		asset_loader_map[SHADER] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadShader);
 		asset_loader_map[AUDIO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAudio);
@@ -411,7 +410,7 @@ namespace EngineFramework {
 
 	}
 
-	
+
 	/*
 		Reads the config file located at ASSET_CONFIG_FILE, and calls the respective asset function loaders for each folder/config path.
 		Will write into the resource maps.
@@ -533,7 +532,7 @@ namespace EngineFramework {
 		LOGI("Loading Mesh");
 
 		// Acceptable files that can be loaded as a mesh.
-		std::vector<std::string> mesh_extensions{ ".obj" };
+		std::vector<std::string> mesh_extensions{ ".obj", ".fbx" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, mesh_extensions);
 
 		/*
@@ -551,6 +550,7 @@ namespace EngineFramework {
 			// Try catch guard for loading mesh
 			try {
 				LOGI("Loading Mesh: %s", path.string().c_str());
+
 				loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
 				asset_names.emplace_back(name); // Done if resource loading is a success.
 			}
@@ -638,7 +638,7 @@ namespace EngineFramework {
 				{
 					std::string compute_shader_path = shader_filepaths["compute"];
 					std::string compute_source = LoadShaderSourceWithIncludes(compute_shader_path);
-					if (compute_source.empty()) throw std::runtime_error("Failed to load compute shader.");
+					if (compute_source.empty()) throw std::runtime_error("Failed to load compute shader from " + compute_shader_path);
 
 					loaded_resources.emplace_back(new ShaderProgram(compute_source.c_str()));
 					asset_names.emplace_back(shader_name);
@@ -651,7 +651,7 @@ namespace EngineFramework {
 
 					std::string vertex_source = LoadShaderSourceWithIncludes(vertex_shader_path);
 					std::string fragment_source = LoadShaderSourceWithIncludes(fragment_shader_path);
-					if (vertex_source.empty() || fragment_source.empty()) throw std::runtime_error("Failed to load graphics shaders.");
+					if (vertex_source.empty() || fragment_source.empty()) throw std::runtime_error("Failed to load graphics shaders from " + vertex_shader_path + " or " + fragment_shader_path);
 
 					// Call the new constructor that takes source code
 					loaded_resources.emplace_back(new ShaderProgram(vertex_source.c_str(), fragment_source.c_str(), true));
@@ -684,7 +684,7 @@ namespace EngineFramework {
 		std::vector< std::shared_ptr<SoundAsset>> loaded_resources{};
 		/*
 			There are two ways to load audio
-			1. Specified in Config File: Allows audio to be loaded in loop or non-loop modes. 
+			1. Specified in Config File: Allows audio to be loaded in loop or non-loop modes.
 			2. Not Specified in Config File: Loads audio not in config file as non-looped.
 		*/
 
@@ -695,7 +695,7 @@ namespace EngineFramework {
 		//Reading all filepaths for audio files in the current directory.
 		std::filesystem::path folder_path = config_file.parent_path();
 		//Acceptable files that can be loaded as an audio asset.
-		std::vector<std::string> audio_extensions{ ".mp3", ".wav"};
+		std::vector<std::string> audio_extensions{ ".mp3", ".wav" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, audio_extensions);
 
 		//Iterate through all audio files in config file.
@@ -761,7 +761,7 @@ namespace EngineFramework {
 	{
 		LOGD("Loading Script");
 		//Acceptable files that can be loaded as a texture.
-		std::vector<std::string> script_extensions{ ".lua"};
+		std::vector<std::string> script_extensions{ ".lua" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, script_extensions);
 
 		/*
@@ -837,6 +837,41 @@ namespace EngineFramework {
 		return true;
 	}
 
+	bool AssetManagerSystem::LoadAnimation(const std::filesystem::path& folder_path)
+	{
+		LOGD("Loading Animation");
+		//Acceptable files that can be loaded as a texture.
+		std::vector<std::string> animation_extensions{ ".fbx" };
+		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, animation_extensions);
+
+		/*
+			Asset names used for mapping to guid.
+			Resources are kept in an array until guid mappings are read.
+		*/
+		std::vector<std::string> asset_names{};
+		std::vector< std::shared_ptr<animImport>> loaded_resources{};
+
+		//Iterate through all texture files
+		for (const std::filesystem::path& path : files)
+		{
+			std::string name = path.stem().string();
+			//Allocate resource
+			try
+			{
+				loaded_resources.emplace_back(new animImport(OFBXAnimationImporter::importFromFile(path.string())));
+				asset_names.emplace_back(name); //Done if resource loading is a success.
+			}
+			catch (std::exception& e)
+			{
+				LOGE("%s %s %s", "Unable to Load Animation", name.c_str(), e.what());
+			}
+		}
+
+		SetMappings(ANIMATION_GUID, asset_names, loaded_resources, folder_path);
+
+		return true;
+	}
+
 
 	//Delete all resources from the map, calling their destructors.
 	void AssetManagerSystem::RemoveAllResources()
@@ -893,18 +928,22 @@ namespace EngineFramework {
 		}
 		std::string config_json_string = GetStringFromFile(std::filesystem::path(ASSET_CONFIG_FILE));
 		nlohmann::json config_json = nlohmann::json::parse(config_json_string);
-		if (!config_json.contains(type))
+
+		std::string folderpath_string;
+		for (auto& json_pair : config_json)
 		{
-			LOGE("Asset Manager ReloadAllResourceOfType: No such resource type %s in asset config file", type.c_str());
+			if (!json_pair.contains("type") || json_pair["type"] != type) continue;
+			if (!json_pair.contains("path")) continue;
+			folderpath_string = json_pair["path"];
+			break;
+		}
+
+		if (folderpath_string.empty())
+		{
+			LOGE("Asset Manager ReloadAllResourceOfType: No such resource type or no folderpath for resource type %s in asset config file", type.c_str());
 			return;
 		}
-		std::string folderpath_string = config_json[type];
-		if(folderpath_string.empty())
-		{
-			LOGE("Asset Manager ReloadAllResourceOfType: No folderpath for resource type %s in asset config file", type.c_str());
-			return;
-		}
-		
+
 
 		//==From each of the 3 maps, remove every asset corresponding to type.
 		for (auto it = resource_map.begin(); it != resource_map.end(); )
@@ -930,7 +969,6 @@ namespace EngineFramework {
 		//==Load again.
 		std::filesystem::path folder_path{ folderpath_string };
 
-		
 
 		//Call the asset loader for that respective asset type, and pass in the folderpath.
 		if (!asset_loader_map[type](folder_path))
@@ -938,6 +976,6 @@ namespace EngineFramework {
 			LOGE("Unable to load assets of type: %s", type.c_str());
 		}
 	}
-	
+
 } // namespace EngineFramework
 

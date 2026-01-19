@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include "Archtype.hpp"
 #include "ReflectionRegister.hpp"
+#include "AudioComponentSerialization.hpp"
 
 namespace EngineFramework
 {
@@ -34,6 +35,12 @@ namespace EngineFramework
 		{
 			//Not a model.
 			if (comp_name == "model_type") continue;
+
+			if (comp_name == "AudioComponent")
+			{
+				NormalizeAudioComponentJson(comp_data_json);
+			}
+
 			//Creation of component.
 			entt::meta_type comp_type = entt::resolve(GetID(comp_name));
 			entt::meta_any comp_data = comp_type.construct();

@@ -8,6 +8,46 @@
             "variable": "Scripts"
         },
         {
+            "component": "MaterialComponent",
+            "tags": [
+                ".jpg",
+                ".png"
+            ],
+            "variable": "albedoMap"
+        },
+        {
+            "component": "MaterialComponent",
+            "tags": [
+                ".jpg",
+                ".png"
+            ],
+            "variable": "ambientOcclusionMap"
+        },
+        {
+            "component": "MaterialComponent",
+            "tags": [
+                ".jpg",
+                ".png"
+            ],
+            "variable": "metallicMap"
+        },
+        {
+            "component": "MaterialComponent",
+            "tags": [
+                ".jpg",
+                ".png"
+            ],
+            "variable": "normalMap"
+        },
+        {
+            "component": "MaterialComponent",
+            "tags": [
+                ".jpg",
+                ".png"
+            ],
+            "variable": "roughnessMap"
+        },
+        {
             "component": "MeshComponent",
             "tags": [
                 ".jpeg"

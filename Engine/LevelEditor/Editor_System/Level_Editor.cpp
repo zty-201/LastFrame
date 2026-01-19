@@ -50,6 +50,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 // /Debug
 #include "Profiler.hpp"
 
+// Script hot reloading
+#include "Script.hpp" // Engine::ScriptSystem::RequestReloadAll / RequestReloadEntity
+
 #include "PropertyManager.hpp"
 #include "GameplayKeyManager.hpp"
 
@@ -70,9 +73,9 @@ namespace EngineFramework
 		//to_open = false;
 		to_close = false;
 
-		variables.selected_modelID = entt::null; //zero means none selected
+		variables.selected_modelID = {}; //zero means none selected
 		variables.selected_objectID = entt::null; //zero means none selected
-
+		variables.latest_selected = iEditorView::Latest_Selected::NONE;
 		LOGI("LevelEditor() constructor");
 	}
 	LevelEditor::~LevelEditor() {
@@ -411,6 +414,20 @@ namespace EngineFramework
 					}
 
 					ImGui::PopStyleColor();
+
+					ImGui::Separator();
+
+					// Reload ALL Lua scripts (safe queued request)
+					if (ImGui::MenuItem("Reload ALL Lua Scripts")) {
+						Engine::ScriptSystem::RequestReloadAll();
+					}
+
+					// Reload selected entity's Lua scripts (safe queued request)
+					if (variables.selected_objectID != entt::null) {
+						if (ImGui::MenuItem("Reload Selected Entity Lua Scripts")) {
+							Engine::ScriptSystem::RequestReloadEntity(variables.selected_objectID);
+						}
+					}
 
 					ImGui::EndMenu();
 				}

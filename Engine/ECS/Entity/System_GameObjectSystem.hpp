@@ -76,6 +76,12 @@ namespace EngineFramework
 
 		static std::string GetEntityName(entt::entity entity);
 
+		static xresource::instance_guid GetAttachedArchtype(entt::entity entity) {
+			auto it = entity_archtype_map.find(entity);
+			if (it == entity_archtype_map.end()) return {};
+			return it->second;
+		}
+
 		//Quick Call function to load scene and destroy current scene.
 		void LoadScene(const std::string& json_input);
 		
@@ -90,6 +96,29 @@ namespace EngineFramework
 		*/
 		entt::entity CreateInstance(std::string archtype, const TransformComponent& transform);
 
+		/*
+			Duplicates an existing entity by copying all of its reflected components.
+		*/
+		entt::entity DuplicateInstance(entt::entity entity);
+
+		/*
+			Returns an archtype created from an instance
+			Does not modify asset manager or entity_archtype_map.
+
+			Throws invalid argument if entity is not valid.
+		*/
+		static Archtype CreateArchtypeFromInstance(entt::entity entity, const std::string& model_type);
+
+		static void AssignArchtypeToInstance(entt::entity entity, xresource::instance_guid archtype_guid);
+		
+		//Clears all entities in the scene
+		void ClearAllInstances();
+		/*
+			Write gameobject instances to a json string using reflection.
+			Returns a json string that can be written to a scene file.
+		*/
+		std::string SerializeAllEntityInstances();
+
 		// Getter for registry
 		static entt::registry& GetRegistry() { return registry; }
 
@@ -97,8 +126,7 @@ namespace EngineFramework
 		void Initialize() override;
 		void Update(float delta_time) override;
 		
-		//Clears all entities in the scene
-		void ClearAllInstances();
+		
 		
 		/*
 		 	Write to json strings using reflection.
@@ -106,12 +134,6 @@ namespace EngineFramework
 			their file. Use the archetype name as the file name when saving.
 		*/
 		std::vector<std::pair<std::string, std::string>> SerializeAllEntityArchtypes();
-
-		/*
-			Write gameobject instances to a json string using reflection.
-			Returns a json string that can be written to a scene file.
-		*/
-		std::string SerializeAllEntityInstances();
 
 		/*
 			Read gameobject instances from json string using reflection.
@@ -126,7 +148,7 @@ namespace EngineFramework
 			Creates an entt::entity instance with an archtype.
 			entity_id is the id to instantiate with.
 		*/
-		static entt::entity Instantiate(std::shared_ptr<Archtype> archtype, const xresource::instance_guid& archtype_instance_guid);
+		static entt::entity Instantiate(std::shared_ptr<Archtype> archtype, const xresource::instance_guid& archtype_instance_guid, entt::entity entity);
 
 		//<entity_id, archtype_instance_guid> mapping, used when serializing instances back to scene file.
 		static inline std::unordered_map<entt::entity, xresource::instance_guid> entity_archtype_map{};

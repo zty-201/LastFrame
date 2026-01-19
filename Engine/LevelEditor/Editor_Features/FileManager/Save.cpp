@@ -125,6 +125,7 @@ namespace EngineFramework
 
         InputManager::GetInstance().key_mapping_codegen();
         InputManager::GetInstance().seralise();
+        InputManager::GetInstance().key_mapping_codegen_script();
         AssetWindow::GetInstance().seralise();
 
         return true;

@@ -14,6 +14,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #ifndef ENGINE_AUDIO_HPP
 #define ENGINE_AUDIO_HPP
 
+#include <cstddef>
 #include <string>
 #include <unordered_map>
 #include <functional>
@@ -25,6 +26,10 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "fmod_errors.h"
 #include "SoundAsset.hpp"
 #endif
+
+struct AudioComponent;
+struct AudioListenerComponent;
+struct TransformComponent;
 
 namespace EngineFramework
 {
@@ -103,6 +108,19 @@ namespace EngineFramework
         bool Play(const std::shared_ptr<SoundAsset>& sound,
             float volume = 1.0f,
             bool paused = false,
+            AudioGroup group = AudioGroup::SFX);
+
+        bool PlayFromComponent(const AudioComponent& comp,
+            std::size_t clipIndex,
+            const glm::vec3& worldPos,
+            AudioGroup group = AudioGroup::SFX);
+        bool PlayOneShot(const std::string& guid,
+            const glm::vec3& worldPos,
+            float volume = 1.0f,
+            bool is3D = true,
+            bool loop = false,
+            float minDist = 1.0f,
+            float maxDist = 50.0f,
             AudioGroup group = AudioGroup::SFX);
 
         // ===== 3D Functions =====
@@ -205,6 +223,8 @@ namespace EngineFramework
 
         // Testing purpose
         //void DebugPlayTestSound();
+        // 
+        void DebugStereoPanTest();
 
         void DebugMainMenuAutoPlay();
         void DebugMainMenuHandleKeys();

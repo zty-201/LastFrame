@@ -1,179 +1,199 @@
 -- ============================================================
--- player_touch_gyro_camera.lua
--- Android: joystick move + gyro look
--- Windows: WASD move + mouse look
+-- player_pov_camera.lua
+-- Handles FPS Look (mouse/gyro) only
+-- MUST BE LOADED FIRST (before player_movement.lua)
 -- ============================================================
 
-local moveSpeed       = 50.0
-local deadZone        = 20.0
-local yaw, pitch      = 0.0, 0.0
-local gyroSensitivity = 5.0
-local mouseSensitivity = 0.2
-local pitchLimit      = 89.0
-local gyroEnabled     = true
-local camera          = nil
+local mouseSensitivity = 0.08
+local gyroSensitivity  = 5.0
+local pitchLimit       = 89.0
+local gyroEnabled      = true
 
--- Movement state (for Android)
-local moveTouchActive = false
-local moveStartX, moveStartY = 0.0, 0.0
-local moveCurX, moveCurY     = 0.0, 0.0
+local camera      = nil
+local transform   = nil
+local yaw, pitch  = 0.0, 0.0
 
--- Screen layout (fallback default, s23 ultra)
-local screenWidth, screenHeight = 3088, 1440
--- if Input.GetScreenSize then
---     screenWidth, screenHeight = Input.GetScreenSize()
--- end
-local moveAreaRight   = screenWidth * 0.4
-local moveAreaBottom  = screenHeight * 0.5
+-- Recenter smoothing
+local recenterActive        = false
+local recenterTime          = 0.0
+local recenterDuration      = 0.25   -- seconds for smooth return
+local recenterStartYaw      = 0.0
+local recenterStartPitch    = 0.0
+local recenterTargetYaw     = 0.0    -- where "centre" faces
+local recenterTargetPitch   = 0.0
 
 -- ============================================================
-function on_create()
-    print(string.format("[player_touch_gyro_camera.lua] Initialized (%s)", PLATFORM or "unknown"))
-    camera = GetMainCamera()
-    if not camera then
-        print("[Lua] ERROR: No camera found!")
-    else
-        print("[Lua] Camera successfully linked.")
-    end
+-- Access true global table
+-- ============================================================
+local function getGlobalShared()
+    return rawget(_G, "SHARED")
 end
 
 -- ============================================================
-function on_update(self, dt)
-    if not camera then return end
+function on_create(self)
+    transform = EntityTransform
+    camera = GetMainCamera()
 
-    -- ============================================================
-    -- WINDOWS CONTROLS (WASD + Mouse)
-    -- ============================================================
-    if PLATFORM == "windows" then
-        -- Mouse look
-        local dx, dy = Input.GetMouseDelta()
-        yaw   = yaw + dx * mouseSensitivity
-        pitch = pitch - dy * mouseSensitivity
-        if pitch > pitchLimit then pitch = pitchLimit end
-        if pitch < -pitchLimit then pitch = -pitchLimit end
+    if not transform then 
+        print("[player_pov_camera ERROR] Transform missing")
+    end
+    if not camera then 
+        print("[player_pov_camera ERROR] Camera missing")
+    end
 
-        local radYaw   = math.rad(yaw)
-        local radPitch = math.rad(pitch)
-        local cosPitch = math.cos(radPitch)
+    pitch = 0.0
+    yaw   = 0.0
 
-        local forward = {
-            x = cosPitch * math.sin(radYaw),
-            y = math.sin(radPitch),
-            z = cosPitch * math.cos(radYaw)
-        }
-
-        local camX, camY, camZ = camera:GetPosition()
-        camera:LookAt(camX + forward.x, camY + forward.y, camZ + forward.z)
-
-        -- WASD movement
-        local moveX, moveZ = 0.0, 0.0
-        if Input.GetKey("W") then moveZ = moveZ + 1 end
-        if Input.GetKey("S") then moveZ = moveZ - 1 end
-        if Input.GetKey("A") then moveX = moveX - 1 end
-        if Input.GetKey("D") then moveX = moveX + 1 end
-
-        local len = math.sqrt(moveX^2 + moveZ^2)
-        if len > 0 then
-            moveX, moveZ = moveX / len, moveZ / len
-            local forwardX = math.sin(radYaw)
-            local forwardZ = math.cos(radYaw)
-            local rightX   = math.sin(radYaw - math.pi / 2)
-            local rightZ   = math.cos(radYaw - math.pi / 2)
-
-            local worldMoveX = rightX * moveX + forwardX * moveZ
-            local worldMoveZ = rightZ * moveX + forwardZ * moveZ
-
-            local posX, posY, posZ = camera:GetPosition()
-            posX = posX + worldMoveX * moveSpeed * dt
-            posZ = posZ + worldMoveZ * moveSpeed * dt
-            camera:SetPosition(posX, posY, posZ)
-        end
-
+    -- Setup SHARED.POV
+    local SHARED = rawget(_G, "SHARED")
+    if not SHARED then
+        print("[player_pov_camera ERROR] Missing SHARED global!")
         return
     end
 
-    -- ============================================================
-    -- ANDROID CONTROLS (Joystick + Gyroscope)
-    -- ============================================================
-    if PLATFORM == "android" then
-        -- ---------------------------
-        -- GYROSCOPE LOOK
-        -- ---------------------------
-        if gyroEnabled then
-            local gyroX, gyroY, gyroZ = Input.GetGyroscopeRotatioRate()
-            if math.abs(gyroX) > 0.001 or math.abs(gyroY) > 0.001 then
-                local tempYaw   =  math.deg(gyroX) * dt * gyroSensitivity
-                local tempPitch = -math.deg(gyroY) * dt * gyroSensitivity
-                yaw   = yaw + tempYaw
-                pitch = pitch + tempPitch
+    if not SHARED.POV then
+        SHARED.POV = {}
+        print("[player_pov_camera] Created SHARED.POV")
+    end
+
+    SHARED.POV.yaw   = yaw
+    SHARED.POV.pitch = pitch
+    SHARED.POV.cam   = camera   -- <<<<<< THE FIX
+
+    print("[player_pov_camera] Initialized. yaw=", yaw, " pitch=", pitch)
+end
+
+
+
+-- ============================================================
+-- Apply rotation + smoothing
+-- ============================================================
+local function applyLook()
+    -- Clamp pitch
+    if pitch > pitchLimit then pitch = pitchLimit end
+    if pitch < -pitchLimit then pitch = -pitchLimit end
+
+    -- Player position
+    local x, y, z = transform:GetPosition()
+
+    -- Compute forward vector
+    local radYaw   = math.rad(yaw)
+    local radPitch = math.rad(pitch)
+    local cosPitch = math.cos(radPitch)
+
+    local fx = cosPitch * math.sin(radYaw)
+    local fy = math.sin(radPitch)
+    local fz = cosPitch * math.cos(radYaw)
+
+    -- -------------------------------
+    -- Smoothed camera follow
+    -- -------------------------------
+    local smooth = 1.0
+
+    local cx, cy, cz = camera:GetPosition()
+    local nx = cx + (x - cx) * smooth
+    local ny = cy + (y - cy) * smooth
+    local nz = cz + (z - cz) * smooth
+
+    camera:SetPosition(nx, ny, nz)
+    camera:LookAt(nx + fx, ny + fy, nz + fz)
+
+    -- <<<<<< UPDATE SHARED.POV EVERY FRAME
+    local SHARED = rawget(_G, "SHARED")
+    if SHARED and SHARED.POV then
+        SHARED.POV.yaw   = yaw
+        SHARED.POV.pitch = pitch
+        SHARED.POV.cam   = camera   -- <<<<<< REQUIRED for raycast
+    end
+end
+
+function on_update(self, dt)
+    if not camera or not transform then return end
+
+    local SHARED = getGlobalShared()
+
+    -- ======================================
+    -- HANDLE RECENTER REQUEST FROM UI
+    -- ======================================
+    if SHARED and SHARED.UI and SHARED.UI.recenterRequested then
+        -- Start a smooth recenter animation from current yaw/pitch
+        recenterActive      = true
+        recenterTime        = 0.0
+        recenterStartYaw    = yaw
+        recenterStartPitch  = pitch
+        recenterTargetYaw   = 0.0   -- change these if your "centre" is different
+        recenterTargetPitch = 0.0
+
+        SHARED.UI.recenterRequested = false
+    end
+
+    -- ======================================
+    -- WINDOWS LOOK CONTROL
+    -- ======================================
+    if PLATFORM == "windows" then
+
+        if recenterActive then
+            -- Progress smoothing
+            recenterTime = recenterTime + dt
+            local t = recenterTime / recenterDuration
+            if t >= 1.0 then
+                t = 1.0
+                recenterActive = false
             end
-        end
-        if pitch > pitchLimit then pitch = pitchLimit end
-        if pitch < -pitchLimit then pitch = -pitchLimit end
 
-        local radYaw   = math.rad(yaw)
-        local radPitch = math.rad(pitch)
-        local cosPitch = math.cos(radPitch)
+            -- Smoothstep (nicer than linear)
+            local s = t * t * (3.0 - 2.0 * t)
 
-        local forward = {
-            x = cosPitch * math.sin(radYaw),
-            y = math.sin(radPitch),
-            z = cosPitch * math.cos(radYaw)
-        }
+            yaw   = recenterStartYaw   + (recenterTargetYaw   - recenterStartYaw)   * s
+            pitch = recenterStartPitch + (recenterTargetPitch - recenterStartPitch) * s
 
-        local camX, camY, camZ = camera:GetPosition()
-        camera:LookAt(
-            camX + forward.x,
-            camY + forward.y,
-            camZ + forward.z
-        )
-
-        -- ---------------------------
-        -- TOUCH MOVEMENT (Joystick)
-        -- ---------------------------
-        local touchDown = Input.GetMouseButtonDown(0)
-        local touchHeld = Input.GetMouseButton(0)
-        local touchUp   = Input.GetMouseButtonUp(0)
-        local mx, my    = Input.GetMousePosition()
-
-        if touchDown and mx < moveAreaRight and my > moveAreaBottom then
-            moveTouchActive = true
-            moveStartX, moveStartY = mx, my
-            moveCurX, moveCurY = mx, my
+            applyLook()
+            return
         end
 
-        if moveTouchActive and touchHeld then
-            moveCurX, moveCurY = mx, my
-            local dx = moveCurX - moveStartX
-            local dy = moveCurY - moveStartY
-
-            if math.abs(dx) < deadZone then dx = 0 end
-            if math.abs(dy) < deadZone then dy = 0 end
-
-            local moveX = dx / (screenWidth * 0.25)
-            local moveZ = -dy / (screenHeight * 0.25)
-            local len = math.sqrt(moveX^2 + moveZ^2)
-            if len > 1.0 then moveX, moveZ = moveX / len, moveZ / len end
-
-            local forwardX = math.sin(radYaw)
-            local forwardZ = math.cos(radYaw)
-            local rightX   = math.sin(radYaw - math.pi / 2)
-            local rightZ   = math.cos(radYaw - math.pi / 2)
-
-            local worldMoveX = rightX * moveX + forwardX * moveZ
-            local worldMoveZ = rightZ * moveX + forwardZ * moveZ
-
-            local posX, posY, posZ = camera:GetPosition()
-            posX = posX + worldMoveX * moveSpeed * dt
-            posZ = posZ + worldMoveZ * moveSpeed * dt
-            camera:SetPosition(posX, posY, posZ)
+        -- Normal mouse look when not recentering
+        local dx, dy = Input.GetMouseDelta()
+        if dx ~= 0 or dy ~= 0 then
+            yaw   = yaw + dx * mouseSensitivity
+            pitch = pitch - dy * mouseSensitivity
         end
 
-        if touchUp then moveTouchActive = false end
+        applyLook()
+        return
+    end
+
+    -- ======================================
+    -- ANDROID GYRO LOOK
+    -- ======================================
+    if PLATFORM == "android" and gyroEnabled then
+
+        if recenterActive then
+            recenterTime = recenterTime + dt
+            local t = recenterTime / recenterDuration
+            if t >= 1.0 then
+                t = 1.0
+                recenterActive = false
+            end
+
+            local s = t * t * (3.0 - 2.0 * t)
+
+            yaw   = recenterStartYaw   + (recenterTargetYaw   - recenterStartYaw)   * s
+            pitch = recenterStartPitch + (recenterTargetPitch - recenterStartPitch) * s
+
+            applyLook()
+            return
+        end
+
+        local gx, gy, gz = Input.GetGyroscopeRotatioRate()
+
+        yaw   = yaw   + math.deg(gx) * dt * gyroSensitivity
+        pitch = pitch - math.deg(gy) * dt * gyroSensitivity
+
+        applyLook()
     end
 end
 
 -- ============================================================
 function on_destroy()
-    print("[player_touch_gyro_camera.lua] Destroyed")
+    print("[player_pov_camera] Destroyed (entity " .. tostring(EntityID) .. ")")
 end

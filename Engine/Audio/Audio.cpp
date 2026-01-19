@@ -14,12 +14,26 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "Audio.hpp"
 #include "InputManager.hpp"
 #include "SoundAsset.hpp"
+#include "System_GameObjectSystem.hpp"
+#include "TransformComponent.h"
+#include "AudioComponent.h"
+#include "AudioListenerComponent.h"
+
+
+#include <entt/entt.hpp>
 
 #ifdef PLATFORM_ANDROID
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #endif
 #include "AssetManager.hpp"
+
+
+/*
+* Listener: Any entity with [AudioListenerComponent] + [TransformComponent]
+* Sources: Any entity with [AudioComponent] + [TransformComponent]
+ * Trigger: set [AudioClip::playRequested = true] in Lua or C++ and the sound will play once
+*/
 
 namespace EngineFramework
 {
@@ -39,12 +53,23 @@ namespace EngineFramework
 
 	FMOD_MODE AudioSystem::modeFor(bool looped, bool is3D, AudioRolloff rolloff) const
 	{
-		(void)is3D;
-		(void)rolloff;
+		FMOD_MODE mode = FMOD_DEFAULT;
 
-		// For short SFX we keep fully decoded. For long music you could add FMOD_CREATESTREAM.
-		return looped ? (FMOD_DEFAULT | FMOD_LOOP_NORMAL)
-			: (FMOD_DEFAULT | FMOD_LOOP_OFF);
+		if (looped)
+			mode |= FMOD_LOOP_NORMAL;
+		else
+			mode |= FMOD_LOOP_OFF;
+
+		mode |= is3D ? FMOD_3D : FMOD_2D;
+
+		switch (rolloff)
+		{
+		case AudioRolloff::Linear:   mode |= FMOD_3D_LINEARROLLOFF;   break;
+		case AudioRolloff::Inverse:  mode |= FMOD_3D_INVERSEROLLOFF;  break;
+			// etc
+		}
+
+		return mode;
 	}
 #endif // !DISABLE_FMOD
 
@@ -138,18 +163,123 @@ namespace EngineFramework
 
 	void AudioSystem::Update(float delta_time)
 	{
-		(void)delta_time;
+		(void)delta_time; // currently unused
+
 #ifndef DISABLE_FMOD
-		if (!m_initialized || m_system == NULL)
+		if (!m_initialized || m_system == nullptr)
 			return;
 
+		// --- ECS bridge: Listener + sources ---
+		{
+			auto& ecsRegistry = EngineFramework::GameObjectSystem::GetRegistry();
+
+			// 1) Listener: use first active AudioListenerComponent
+			{
+				auto viewListener = ecsRegistry.view<TransformComponent, AudioListenerComponent>();
+
+				bool listenerSet = false;
+
+				viewListener.each(
+					[&](entt::entity /*entity*/,
+						TransformComponent& tf,
+						AudioListenerComponent& listener)
+					{
+						if (listenerSet)
+							return; // already set one listener
+
+						if (!listener.active)
+							return;
+
+						glm::vec3 pos = tf.position;
+
+						// 1. Convert Euler angles (degrees) to a Quaternion
+		// Note: Assuming tf.rotation is in degrees. If radians, remove glm::radians.
+						glm::quat q = glm::quat(glm::radians(tf.rotation));
+
+						// 2. Rotate the default world vectors by the player's rotation
+						// Default OpenGL Forward is -Z, Up is +Y
+						glm::vec3 forward = q * glm::vec3(0.0f, 0.0f, -1.0f);
+						glm::vec3 up = q * glm::vec3(0.0f, 1.0f, 0.0f);
+
+						// --- NEW CODE END ---
+
+						glm::vec3 vel(0.0f);
+
+						FMOD_VECTOR fPos{ pos.x, pos.y, pos.z };
+						FMOD_VECTOR fVel{ vel.x, vel.y, vel.z };
+						FMOD_VECTOR fFwd{ forward.x, forward.y, forward.z };
+						FMOD_VECTOR fUp{ up.x, up.y, up.z };
+
+						m_system->set3DListenerAttributes(0, &fPos, &fVel, &fFwd, &fUp);
+						listenerSet = true;
+					});
+			}
+
+			// 2) Sources: entities with AudioComponent + TransformComponent
+			{
+				auto view = ecsRegistry.view<TransformComponent, AudioComponent>();
+
+				view.each(
+					[&](entt::entity /*entity*/,
+						TransformComponent& tf,
+						AudioComponent& comp)
+					{
+						const std::size_t clipCount = comp.GetClipCount();
+						for (std::size_t clipIndex = 0; clipIndex < clipCount; ++clipIndex)
+						{
+							auto* clip = comp.GetClip(clipIndex);
+							if (!clip || !clip->playRequested)
+								continue;
+
+							if (PlayFromComponent(comp, clipIndex, tf.position, AudioGroup::SFX))
+							{
+								// one-shot consumed
+								clip->playRequested = false;
+							}
+						}
+
+						// ---------------------------------------------------------
+						// 2. PROCESS REQUEST QUEUE
+						// ---------------------------------------------------------
+						for (const auto& req : comp.requestQueue)
+						{
+							// Find the asset path/guid from the logical name (e.g. "BGM")
+							auto it = comp.soundBank.find(req.clipName);
+							if (it == comp.soundBank.end()) continue;
+
+							std::string guid = it->second;
+
+							// Play the sound using your helper
+							PlayOneShot(guid, tf.position, req.volume, req.is3D, req.loop, req.minDistance, req.maxDistance);
+						}
+
+						// Clear queue after processing so sounds don't repeat forever
+						comp.requestQueue.clear();
+					});
+			}
+		}
+
+		// --- FMOD internal update ---
 		FMOD_RESULT r = m_system->update();
 		logFmodError(r, "System::update");
-		
-		//DebugPlayTestSound();
-		DebugMainMenuAutoPlay();
-		DebugMainMenuHandleKeys();
+
+		//DebugMainMenuAutoPlay();
+		//DebugMainMenuHandleKeys();
+
 #endif
+
+//		(void)delta_time;
+//#ifndef DISABLE_FMOD
+//		if (!m_initialized || m_system == NULL)
+//			return;
+//
+//		FMOD_RESULT r = m_system->update();
+//		logFmodError(r, "System::update");
+//		
+//		//DebugPlayTestSound();
+//		DebugMainMenuAutoPlay();
+//		DebugMainMenuHandleKeys();
+//#endif
 	}
 
 	void AudioSystem::PostUpdate(float delta_time)
@@ -252,7 +382,7 @@ namespace EngineFramework
 
 #ifdef PLATFORM_ANDROID
 		// Example policy: add streaming on mobile for big files if desired
-		// mode |= FMOD_CREATESTREAM;
+		// mode |= FMOD_CREATESAMPLE;
 
 		std::string loadPath = resolved;
 		/*if (m_androidAssetMgr != NULL)
@@ -330,6 +460,118 @@ namespace EngineFramework
 #endif
 	}
 
+	bool AudioSystem::PlayFromComponent(const AudioComponent& comp,
+		std::size_t clipIndex,
+		const glm::vec3& worldPos,
+		AudioGroup group)
+	{
+		if (!m_initialized || m_system == nullptr)
+			return false;
+
+#ifndef DISABLE_FMOD
+		const AudioComponent::AudioClip* clip = comp.GetClip(clipIndex);
+		if (clip == nullptr)
+			return false;
+
+		using EngineFramework::AssetManagerSystem;
+		std::shared_ptr<SoundAsset> sound =
+			AssetManagerSystem::GetResource<SoundAsset>(clip->audio_guid);
+		if (!sound || !sound->sound)
+			return false;
+
+		FMOD::Channel* channel = nullptr;
+		FMOD_RESULT r = m_system->playSound(sound->sound, nullptr, true, &channel);
+		logFmodError(r, "System::playSound (PlayFromComponent)");
+		if (r != FMOD_OK || channel == nullptr)
+			return false;
+
+		if (FMOD::ChannelGroup* grp = pickGroup(group))
+			channel->setChannelGroup(grp);
+
+		// Clamp and apply volume
+		float volume = clip->volume;
+		if (volume < 0.0f) volume = 0.0f;
+		if (volume > 1.0f) volume = 1.0f;
+		channel->setVolume(volume);
+
+		// Configure spatial settings
+		if (clip->is3D)
+		{
+			channel->setMode(FMOD_3D);
+			FMOD_VECTOR pos{ worldPos.x, worldPos.y, worldPos.z };
+			FMOD_VECTOR vel{ 0.0f, 0.0f, 0.0f };
+			channel->set3DAttributes(&pos, &vel);
+			channel->set3DMinMaxDistance(clip->minDistance, clip->maxDistance);
+		}
+		else
+		{
+			channel->setMode(FMOD_2D);
+		}
+
+		// Apply loop behaviour without stomping the dimensional flag
+		FMOD_MODE loopMode = clip->loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
+		channel->setMode(loopMode | (clip->is3D ? FMOD_3D : FMOD_2D));
+
+		channel->setPaused(false);
+		return true;
+#else
+		(void)comp; (void)clipIndex; (void)worldPos; (void)group;
+		return true;
+#endif
+	}
+
+	bool AudioSystem::PlayOneShot(const std::string& guid,
+		const glm::vec3& worldPos,
+		float volume,
+		bool is3D,
+		bool loop,
+		float minDist,
+		float maxDist,
+		AudioGroup group)
+	{
+		if (!m_initialized || m_system == nullptr)
+			return false;
+
+#ifndef DISABLE_FMOD
+		using EngineFramework::AssetManagerSystem;
+		auto fullID = AssetManagerSystem::GetFullGuid(AssetManagerSystem::AUDIO_GUID, guid);
+		std::shared_ptr<SoundAsset> sound = AssetManagerSystem::GetResource<SoundAsset>(fullID);
+		if (!sound || !sound->sound)
+			return false;
+
+		FMOD::Channel* channel = nullptr;
+		FMOD_RESULT r = m_system->playSound(sound->sound, nullptr, true, &channel);
+		logFmodError(r, "System::playSound (PlayOneShot)");
+		if (r != FMOD_OK || channel == nullptr)
+			return false;
+
+		if (FMOD::ChannelGroup* grp = pickGroup(group))
+			channel->setChannelGroup(grp);
+
+		channel->setVolume(std::clamp(volume, 0.0f, 1.0f));
+
+		if (is3D)
+		{
+			channel->setMode(FMOD_3D);
+			FMOD_VECTOR pos{ worldPos.x, worldPos.y, worldPos.z };
+			FMOD_VECTOR vel{ 0.0f, 0.0f, 0.0f };
+			channel->set3DAttributes(&pos, &vel);
+			channel->set3DMinMaxDistance(minDist, maxDist);
+		}
+		else
+		{
+			channel->setMode(FMOD_2D);
+		}
+
+		channel->setMode((loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF) | (is3D ? FMOD_3D : FMOD_2D));
+		channel->setPaused(false);
+		return true;
+#else
+		(void)guid; (void)worldPos; (void)volume; (void)is3D; (void)loop; (void)minDist; (void)maxDist; (void)group;
+		return true;
+#endif
+	}
+
 	void AudioSystem::StopAll()
 	{
 		if (!m_initialized) return;
@@ -392,131 +634,131 @@ namespace EngineFramework
 		}
 	}*/
 
-	void AudioSystem::DebugMainMenuAutoPlay()
-	{
-		if (!m_initialized || m_debugMainMenuStarted) return;
-		using EF_AM = AssetManagerSystem;
-		//Don't use static, call getresource every frame just in case the asset updates.
-		std::shared_ptr<SoundAsset> main_menu_bgm = EF_AM::GetResource<SoundAsset>(EF_AM::GetFullGuid(EF_AM::AUDIO_GUID, "mainmenu_loop"));
-		if (!main_menu_bgm)
-		{
-			throw std::runtime_error("mainmenu_loop audio asset has not been loaded and can't be played.");
-		}
-		const bool ok = Play(main_menu_bgm, 1.0f, false, AudioGroup::Music);
-		if (ok)
-		{
-			if (m_groupMusic) m_groupMusic->setVolume(0.5f);
-			m_debugMainMenuStarted = true;
-			//Only output once to avoid clogging up console.
-			static bool doOnce = []() {LOGI("[AudioSystem] Main Menu music is playing."); return true;}();
-		}
-		else
-		{
-			LOGI("[AudioSystem] Failed to play Main Menu music.");
-		}
-	}
+	//void AudioSystem::DebugMainMenuAutoPlay()
+	//{
+	//	if (!m_initialized || m_debugMainMenuStarted) return;
+	//	using EF_AM = AssetManagerSystem;
+	//	//Don't use static, call getresource every frame just in case the asset updates.
+	//	std::shared_ptr<SoundAsset> main_menu_bgm = EF_AM::GetResource<SoundAsset>(EF_AM::GetFullGuid(EF_AM::AUDIO_GUID, "mainmenu_loop"));
+	//	if (!main_menu_bgm)
+	//	{
+	//		throw std::runtime_error("mainmenu_loop audio asset has not been loaded and can't be played.");
+	//	}
+	//	const bool ok = Play(main_menu_bgm, 1.0f, false, AudioGroup::Music);
+	//	if (ok)
+	//	{
+	//		if (m_groupMusic) m_groupMusic->setVolume(0.5f);
+	//		m_debugMainMenuStarted = true;
+	//		//Only output once to avoid clogging up console.
+	//		static bool doOnce = []() {LOGI("[AudioSystem] Main Menu music is playing."); return true;}();
+	//	}
+	//	else
+	//	{
+	//		LOGI("[AudioSystem] Failed to play Main Menu music.");
+	//	}
+	//}
 
-	void AudioSystem::DebugMainMenuHandleKeys()
-	{
-		if (!m_initialized || !m_groupMusic) return;
+	//void AudioSystem::DebugMainMenuHandleKeys()
+	//{
+	//	if (!m_initialized || !m_groupMusic) return;
 
-		// --------------------------
-		// Pause / Resume toggle (F)
-		// --------------------------
-		if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_F))
-		{
-			bool paused = false;
-			m_groupMusic->getPaused(&paused);
-			m_groupMusic->setPaused(!paused);
-			LOGI(paused ? "[AudioSystem] Music Status: Resuming."
-						: "[AudioSystem] Music Status: Pausing.");
-		}
+	//	// --------------------------
+	//	// Pause / Resume toggle (F)
+	//	// --------------------------
+	//	if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_F))
+	//	{
+	//		bool paused = false;
+	//		m_groupMusic->getPaused(&paused);
+	//		m_groupMusic->setPaused(!paused);
+	//		LOGI(paused ? "[AudioSystem] Music Status: Resuming."
+	//					: "[AudioSystem] Music Status: Pausing.");
+	//	}
 
-		// ---------------------------------------
-		// Play / Resume (G) ?Avoids double-play
-		// ---------------------------------------
-		if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_G))
-		{
-			// If group is paused, just unpause
-			bool paused = false;
-			m_groupMusic->getPaused(&paused);
-			if (paused)
-			{
-				m_groupMusic->setPaused(false);
-				LOGI("[AudioSystem] Music Status: Resuming (unpaused).");
-			}
-			else
-			{
-				// Check if any channel in the Music group is already playing
-				int numCh = 0;
-				m_groupMusic->getNumChannels(&numCh);
+	//	// ---------------------------------------
+	//	// Play / Resume (G) ?Avoids double-play
+	//	// ---------------------------------------
+	//	if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_G))
+	//	{
+	//		// If group is paused, just unpause
+	//		bool paused = false;
+	//		m_groupMusic->getPaused(&paused);
+	//		if (paused)
+	//		{
+	//			m_groupMusic->setPaused(false);
+	//			LOGI("[AudioSystem] Music Status: Resuming (unpaused).");
+	//		}
+	//		else
+	//		{
+	//			// Check if any channel in the Music group is already playing
+	//			int numCh = 0;
+	//			m_groupMusic->getNumChannels(&numCh);
 
-				bool anyPlaying = false;
-				for (int i = 0; i < numCh; ++i)
-				{
-					FMOD::Channel* ch = nullptr;
-					if (m_groupMusic->getChannel(i, &ch) == FMOD_OK && ch)
-					{
-						bool isPlaying = false;
-						if (ch->isPlaying(&isPlaying) == FMOD_OK && isPlaying)
-						{
-							anyPlaying = true;
-							break;
-						}
-					}
-				}
+	//			bool anyPlaying = false;
+	//			for (int i = 0; i < numCh; ++i)
+	//			{
+	//				FMOD::Channel* ch = nullptr;
+	//				if (m_groupMusic->getChannel(i, &ch) == FMOD_OK && ch)
+	//				{
+	//					bool isPlaying = false;
+	//					if (ch->isPlaying(&isPlaying) == FMOD_OK && isPlaying)
+	//					{
+	//						anyPlaying = true;
+	//						break;
+	//					}
+	//				}
+	//			}
 
-				if (!anyPlaying)
-				{
-					using EF_AM = AssetManagerSystem;
-					//Don't use static, call getresource every frame just in case the asset updates.
-					std::shared_ptr<SoundAsset> main_menu_bgm = EF_AM::GetResource<SoundAsset>(EF_AM::GetFullGuid(EF_AM::AUDIO_GUID, "mainmenu_loop"));
+	//			if (!anyPlaying)
+	//			{
+	//				using EF_AM = AssetManagerSystem;
+	//				//Don't use static, call getresource every frame just in case the asset updates.
+	//				std::shared_ptr<SoundAsset> main_menu_bgm = EF_AM::GetResource<SoundAsset>(EF_AM::GetFullGuid(EF_AM::AUDIO_GUID, "mainmenu_loop"));
 
-					if (main_menu_bgm && main_menu_bgm->sound)
-					{
-						// Start playback on the Music bus
-						Play(main_menu_bgm, /*volume=*/1.0f, /*paused=*/false, AudioGroup::Music);
-						LOGI("[AudioSystem] Music Status: Playing.");
-						m_debugMainMenuStarted = true;
-					}
-					else
-					{
-						LOGI("[AudioSystem] Music: Failed to play (audio file missing?).");
-					}
-				}
-				else
-				{
-					LOGI("[AudioSystem] Music Status: Already playing; not starting another instance.");
-				}
-			}
-		}
+	//				if (main_menu_bgm && main_menu_bgm->sound)
+	//				{
+	//					// Start playback on the Music bus
+	//					Play(main_menu_bgm, /*volume=*/1.0f, /*paused=*/false, AudioGroup::Music);
+	//					LOGI("[AudioSystem] Music Status: Playing.");
+	//					m_debugMainMenuStarted = true;
+	//				}
+	//				else
+	//				{
+	//					LOGI("[AudioSystem] Music: Failed to play (audio file missing?).");
+	//				}
+	//			}
+	//			else
+	//			{
+	//				LOGI("[AudioSystem] Music Status: Already playing; not starting another instance.");
+	//			}
+	//		}
+	//	}
 
-		// --------------------------------
-		// Volume Up (Y) / Down (H)
-		// --------------------------------
-		float vol = 1.0f;
-		m_groupMusic->getVolume(&vol);
+	//	// --------------------------------
+	//	// Volume Up (Y) / Down (H)
+	//	// --------------------------------
+	//	float vol = 1.0f;
+	//	m_groupMusic->getVolume(&vol);
 
-		const float step = 0.05f;
-		bool changed = false;
+	//	const float step = 0.05f;
+	//	bool changed = false;
 
-		if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_Y))
-		{
-			vol += step;
-			if (vol > 1.0f) vol = 1.0f; changed = true;
-		}
+	//	if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_Y))
+	//	{
+	//		vol += step;
+	//		if (vol > 1.0f) vol = 1.0f; changed = true;
+	//	}
 
-		if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_H))
-		{
-			vol -= step;
-			if (vol < 0.0f) vol = 0.0f; changed = true;
-		}
+	//	if (EngineFramework::InputManager::GetKeyDown(GLFW_KEY_H))
+	//	{
+	//		vol -= step;
+	//		if (vol < 0.0f) vol = 0.0f; changed = true;
+	//	}
 
-		if (changed)
-		{
-			m_groupMusic->setVolume(vol);
-			LOGI("[AudioSystem] Music Volume: %f", vol);
-		}
-	}
+	//	if (changed)
+	//	{
+	//		m_groupMusic->setVolume(vol);
+	//		LOGI("[AudioSystem] Music Volume: %f", vol);
+	//	}
+	//}
 
 } // namespace EngineFramework

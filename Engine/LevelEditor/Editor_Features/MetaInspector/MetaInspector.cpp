@@ -19,16 +19,21 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "MetaInspector.hpp"
 #include "CameraComponent.h" // Testing purposes of property manager
 #include "MeshComponent.h"
+#include "AnimationComponent.h"
 #include "LightComponent.h"
 #include "TransformComponent.h"
 #include "MaterialComponent.h"
 #include "AssetManager.hpp"
 #include "SoundAsset.hpp"
 #include "scene.h"
+#include "HistorySystem.hpp"
+#include "AudioComponent.h"
 #if defined(ENGINE_ENABLE_LUA)
 #include "Scripting/Script.hpp"
 #include "Scripting/ScriptAsset.hpp"
 #endif
+#include <unordered_map>
+#include <unordered_set>
 #include <string_view>
 #include <imgui.h>
 #include <array>
@@ -36,9 +41,74 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <sstream>
 #include <filesystem>
 #include <cstring>
+#include <memory>
+#include <utility>
+#include <PhysicsBuildSystem.hpp>
 
 // FILE TO HANDLE THE META DATA OF THE ENTITIY
 namespace EditorFeatures {
+
+	static void FitShapeToMesh(entt::registry& reg, entt::entity entity, ColliderData& shape)
+	{
+		// 1. Check for MeshComponent
+		if (!reg.all_of<MeshComponent>(entity)) return;
+		const auto& meshComp = reg.get<MeshComponent>(entity);
+
+		// 2. Get Mesh Resource
+		auto meshGuid = EngineFramework::AssetManagerSystem::GetFullGuid(
+			EngineFramework::AssetManagerSystem::MESH_GUID,
+			meshComp.meshName
+		);
+
+		if (!EngineFramework::AssetManagerSystem::HasResource(meshGuid)) return;
+		auto meshData = EngineFramework::AssetManagerSystem::GetResource<Mesh::MeshData>(meshGuid);
+		if (!meshData) return;
+
+		// 3. Get Bounds
+		const auto& aabb = meshData->GetAABB();
+
+		// 4. Apply to THIS shape instance
+		shape.type = static_cast<int>(ColliderShape::Box); // Reset to Box
+		shape.boxHalfExtents = aabb.halfExtents();
+		shape.offsetPosition = aabb.center();
+		shape.offsetRotation = glm::vec3(0.0f); // Reset rotation
+	}
+
+	void RecalculateGlobalBounds(ColliderComponent& col)
+	{
+		// Start with inverted infinity
+		constexpr float maxFloat = std::numeric_limits<float>::max();
+		col.minBounds = glm::vec3(maxFloat);
+		col.maxBounds = glm::vec3(-maxFloat);
+
+		for (const auto& shape : col.shapes)
+		{
+			glm::vec3 extent(0.0f);
+
+			// Determine size based on shape type
+			if (static_cast<ColliderShape>(shape.type) == ColliderShape::Box) {
+				extent = shape.boxHalfExtents;
+			}
+			else if (static_cast<ColliderShape>(shape.type) == ColliderShape::Sphere) {
+				extent = glm::vec3(shape.sphereRadius);
+			}
+			else { // Capsule
+				float r = shape.capsuleRadius;
+				float h = shape.capsuleHeight * 0.5f;
+				extent = glm::vec3(r, h, r);
+			}
+
+			// Calculate LOCAL bounds for this shape
+			// Note: This ignores rotation for simplicity (AABB of OBB), 
+			// but ensures the box is large enough.
+			glm::vec3 shapeMin = shape.offsetPosition - extent;
+			glm::vec3 shapeMax = shape.offsetPosition + extent;
+
+			// Merge into global component bounds
+			col.minBounds = glm::min(col.minBounds, shapeMin);
+			col.maxBounds = glm::max(col.maxBounds, shapeMax);
+		}
+	}
 
 	// Add on to this map if want to hide any fields
 	static const std::unordered_map<std::string_view, std::unordered_set<std::string_view>> hidden_fields = {
@@ -54,6 +124,76 @@ namespace EditorFeatures {
 		return s;
 	}
 
+	static std::unordered_map<ImGuiID, std::unique_ptr<EngineFramework::Record>> active_field_records;
+
+	static void update_field_history(entt::entity entity, const char* component_name, const entt::meta_data& data, entt::meta_any& obj) {
+		if (!EngineFramework::HistorySystem::this_class) {
+			return;
+		}
+		const char* field_name = data.name();
+		if (!field_name || field_name[0] == '\0') {
+			return;
+		}
+
+		ImGuiID item_id = ImGui::GetItemID();
+		if (item_id == 0) {
+			return;
+		}
+
+		auto& history = EngineFramework::HistorySystem::GetInstance();
+
+		if (ImGui::IsItemActivated()) {
+			if (active_field_records.find(item_id) == active_field_records.end()) {
+				const char* component_label = (component_name && component_name[0]) ? component_name : "";
+				auto record = history.start_track(entity, component_label, field_name);
+				if (record) {
+					active_field_records.emplace(item_id, std::move(record));
+				}
+			}
+		}
+
+		const auto it = active_field_records.find(item_id);
+		if (it == active_field_records.end()) {
+			return;
+		}
+
+		if (ImGui::IsItemDeactivatedAfterEdit()) {
+			entt::meta_any latest_value = data.get(obj);
+			history.end_track(it->second, latest_value);
+			active_field_records.erase(it);
+		}
+		else if (ImGui::IsItemDeactivated()) {
+			active_field_records.erase(it);
+		}
+	}
+
+	template<typename ApplyFunc>
+	static void commit_instant_history(entt::entity entity, const char* component_name, const entt::meta_data& data, entt::meta_any& obj, ApplyFunc&& apply) {
+		const char* field_name = data.name();
+		if (!field_name || field_name[0] == '\0') {
+			return;
+		}
+
+		const bool history_available = (EngineFramework::HistorySystem::this_class != nullptr);
+		std::unique_ptr<EngineFramework::Record> record{};
+		if (history_available) {
+			auto& history = EngineFramework::HistorySystem::GetInstance();
+			const char* component_label = (component_name && component_name[0]) ? component_name : "";
+			record = history.start_track(entity, component_label, field_name);
+			if (record && record->Type == EngineFramework::Record_Type::INVALID) {
+				record.reset();
+			}
+		}
+
+		apply();
+
+		if (record) {
+			auto& history = EngineFramework::HistorySystem::GetInstance();
+			entt::meta_any latest_value = data.get(obj);
+			history.end_track(record, latest_value);
+		}
+	}
+
 
 	static std::string label_for(const entt::meta_data &data, entt::id_type id) {
 		if (const char* n = data.name(); n && *n) {
@@ -64,11 +204,14 @@ namespace EditorFeatures {
 		return std::string(buffer);
 	}
 
-	static inline void draw_vec3_drag(const char* label, glm::vec3& v, float speed = 0.05f) {
+	static inline bool draw_vec3_drag(const char* label, glm::vec3& v, float speed = 0.05f) {
 		float a[3]{ v.x, v.y, v.z };
+		bool changed = false;
 		if (ImGui::DragFloat3(label, a, speed)) {
 			v = { a[0], a[1], a[2] };
+			changed = true;
 		}
+		return changed;
 	}
 
 	static inline void draw_vec4_drag(const char* label, glm::vec4& v, float speed = 0.05f) {
@@ -282,8 +425,44 @@ namespace EditorFeatures {
 		return false;
 	}
 
-	static void draw_lua_script_component(Engine::LuaScriptComponent& component) {
-		ImGui::Checkbox("Enabled", &component.Enabled);
+	static void draw_lua_script_component(entt::entity entity, const char* component_name, entt::meta_any& obj) {
+		auto& component = obj.cast<Engine::LuaScriptComponent&>();
+		const char* component_label = (component_name && component_name[0]) ? component_name : "LuaScriptComponent";
+
+		const entt::meta_type component_meta = entt::resolve<Engine::LuaScriptComponent>();
+		const entt::meta_data enabled_data = component_meta.data(entt::hashed_string{ "Enabled" }.value());
+		const entt::meta_data scripts_data = component_meta.data(entt::hashed_string{ "Scripts" }.value());
+
+		auto apply_enabled_edit = [&](auto&& fn) {
+			if (enabled_data) {
+				commit_instant_history(entity, component_label, enabled_data, obj, [&]() {
+					fn();
+					enabled_data.set(obj, component.Enabled);
+				});
+			}
+			else {
+				fn();
+			}
+		};
+
+		auto apply_scripts_edit = [&](auto&& fn) {
+			if (scripts_data) {
+				commit_instant_history(entity, component_label, scripts_data, obj, [&]() {
+					fn();
+					scripts_data.set(obj, component.Scripts);
+				});
+			}
+			else {
+				fn();
+			}
+		};
+
+		bool enabled = component.Enabled;
+		if (ImGui::Checkbox("Enabled", &enabled)) {
+			apply_enabled_edit([&]() {
+				component.Enabled = enabled;
+			});
+		}
 		ImGui::Spacing();
 
 		const auto descriptor = make_asset_picker_descriptor(AssetPickerKind::Script);
@@ -325,8 +504,11 @@ namespace EditorFeatures {
 						std::string picker_label = "##LuaScriptPicker" + std::to_string(idx);
 						if (draw_asset_guid_picker(picker_label.c_str(), full, AssetPickerKind::Script, descriptor.none_label, descriptor.sources, descriptor.formatter)) {
 							if (inst.ScriptGuid != full.m_Instance) {
-								inst.ScriptGuid = full.m_Instance;
-								inst.Loaded = false;
+								const xresource::instance_guid new_guid = full.m_Instance;
+								apply_scripts_edit([&]() {
+									inst.ScriptGuid = new_guid;
+									inst.Loaded = false;
+								});
 							}
 						}
 					}
@@ -347,12 +529,17 @@ namespace EditorFeatures {
 		}
 
 		for (auto it = to_remove.rbegin(); it != to_remove.rend(); ++it) {
-			component.Scripts.erase(component.Scripts.begin() + static_cast<long long>(*it));
+			const std::size_t remove_index = *it;
+			apply_scripts_edit([&]() {
+				component.Scripts.erase(component.Scripts.begin() + static_cast<long long>(remove_index));
+			});
 		}
 
 		if (ImGui::Button("Add Script")) {
-			component.Scripts.emplace_back();
-			component.Scripts.back().Loaded = false;
+			apply_scripts_edit([&]() {
+				auto& inst = component.Scripts.emplace_back();
+				inst.Loaded = false;
+			});
 		}
 
 		ImGui::Spacing();
@@ -376,10 +563,12 @@ namespace EditorFeatures {
 							return existing.ScriptGuid == new_guid;
 						});
 					if (!already_present) {
-						Engine::LuaScriptComponent::LuaInstance inst{};
-						inst.ScriptGuid = new_guid;
-						inst.Loaded = false;
-						component.Scripts.emplace_back(std::move(inst));
+						apply_scripts_edit([&]() {
+							Engine::LuaScriptComponent::LuaInstance inst{};
+							inst.ScriptGuid = new_guid;
+							inst.Loaded = false;
+							component.Scripts.emplace_back(std::move(inst));
+						});
 					}
 				}
 				ImGui::EndDragDropTarget();
@@ -625,25 +814,232 @@ namespace EditorFeatures {
 	
 	// Main function to view/edit property
 	// Takes a mneta type and the corresponding instance and writes the edited values back through entt::meta_data::set
-	void DrawMetaObject(entt::meta_type& mt, entt::meta_any& obj) {
+	bool DrawMetaObject(entt::entity entity, const char* component_name, entt::meta_type& mt, entt::meta_any& obj) {
 		//const char* typeName = mt.name();
+		bool any_change = false;
 
 		auto t = obj.type();
 
 #if defined(ENGINE_ENABLE_LUA)
 		if (mt == entt::resolve<Engine::LuaScriptComponent>()) {
 			if (obj.allow_cast<Engine::LuaScriptComponent&>()) {
-				auto& component = obj.cast<Engine::LuaScriptComponent&>();
-				draw_lua_script_component(component);
+				draw_lua_script_component(entity, component_name, obj);
 			}
-			return;
+			return false;
 		}
 #endif
+
+		// CUSTOM UI FOR AUDIO COMPONENT
+		// Allows edtor to manage multiple audio clips per entity, assign audio assets and configure playback settings in the editor directly
+		// Also provides a logical sound bank that maps certain names such as BGM to audio assets, support selecting a sound to play automatically on start with
+		// configurable options and includes tools to test, add and remove sounds
+			if (mt == entt::resolve<AudioComponent>())
+			{
+				auto& comp = obj.cast<AudioComponent&>();
+				using EF_AM = EngineFramework::AssetManagerSystem;
+				using EF_AUD = EngineFramework::AudioSystem;
+
+				if (comp.GetClipCount() == 0)
+				{
+					comp.AddClip();
+				}
+
+				const auto audioDescriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
+				const bool has_sources = !audioDescriptor.sources.empty();
+
+				for (std::size_t clipIdx = 0; clipIdx < comp.GetClipCount(); ++clipIdx)
+				{
+					auto* clip = comp.GetClip(clipIdx);
+					if (!clip)
+						continue;
+
+					ImGui::PushID(static_cast<int>(clipIdx));
+					std::string header = "Audio Clip " + std::to_string(clipIdx + 1);
+					if (ImGui::CollapsingHeader(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						if (comp.GetClipCount() > 1)
+						{
+							if (ImGui::Button("Remove Clip"))
+							{
+								comp.RemoveClip(clipIdx);
+								--clipIdx;
+								ImGui::PopID();
+								continue;
+							}
+						}
+
+						std::shared_ptr<SoundAsset> sound = nullptr;
+						if (has_sources)
+						{
+							xresource::full_guid full = clip->audio_guid;
+							if (draw_asset_guid_picker("Audio",
+								full,
+								AssetPickerKind::Audio,
+								audioDescriptor.none_label,
+								audioDescriptor.sources,
+								audioDescriptor.formatter))
+							{
+								clip->audio_guid = full;
+							}
+						}
+						else
+						{
+							ImGui::TextDisabled("Audio: (no audio assets available)");
+						}
+
+						if (!clip->audio_guid.empty())
+						{
+							sound = EF_AM::GetResource<SoundAsset>(clip->audio_guid);
+						}
+
+						ImGui::Checkbox("Loop", &clip->loop);
+						ImGui::SameLine();
+						ImGui::Checkbox("Play On Start", &clip->playOnStart);
+
+						ImGui::Checkbox("3D Audio", &clip->is3D);
+						if (clip->is3D)
+						{
+							if (clip->minDistance < 0.0f) clip->minDistance = 0.0f;
+							if (clip->maxDistance < clip->minDistance)
+								clip->maxDistance = clip->minDistance + 0.1f;
+
+							ImGui::DragFloat("Min Distance", &clip->minDistance, 0.1f, 0.0f, 1000.0f);
+							ImGui::DragFloat("Max Distance", &clip->maxDistance, 0.1f, 0.0f, 1000.0f);
+						}
+
+						clip->volume = std::clamp(clip->volume, 0.0f, 1.0f);
+						ImGui::SliderFloat("Volume", &clip->volume, 0.0f, 1.0f);
+
+						if (ImGui::Button("Play"))
+						{
+							if (sound)
+							{
+								EF_AUD::GetInstance().Play(
+									sound,
+									clip->volume,
+									clip->loop,
+									EngineFramework::AudioGroup::Music);
+							}
+						}
+						ImGui::SameLine();
+						if (ImGui::Button("Stop"))
+							EF_AUD::GetInstance().StopAll();
+
+						ImGui::SameLine();
+						if (ImGui::Button("Pause"))
+							EF_AUD::GetInstance().PauseAll(true);
+
+						if (ImGui::Button("Play 3D (ECS)"))
+						{
+							clip->playRequested = true;
+						}
+					}
+					ImGui::PopID();
+				}
+
+				if (ImGui::Button("Add Clip"))
+				{
+					comp.AddClip();
+				}
+
+				ImGui::Text("Audio Sound Bank");
+				ImGui::TextDisabled("Map Logical Names (e.g. 'BGM') to Assets");
+				ImGui::Separator();
+
+				// 1. ADD NEW SOUNDS
+				static char nameBuffer[64] = "";
+				ImGui::InputText("Logical Name", nameBuffer, 64);
+
+				static xresource::full_guid tempGuid;
+				draw_asset_guid_picker("Asset",
+					tempGuid,
+					AssetPickerKind::Audio,
+					audioDescriptor.none_label,
+					audioDescriptor.sources,
+					audioDescriptor.formatter);
+
+				if (ImGui::Button("Add to Bank"))
+				{
+					if (strlen(nameBuffer) > 0 && !tempGuid.empty())
+					{
+						// Convert GUID to string name for storage
+						std::string assetName = EF_AM::GetName(tempGuid);
+						if (assetName.empty()) assetName = "Unknown_Audio";
+
+						comp.soundBank[std::string(nameBuffer)] = assetName;
+						memset(nameBuffer, 0, 64);
+						tempGuid = {};
+					}
+				}
+
+			ImGui::Separator();
+
+			// 2. PLAY ON START SETTINGS (Background Music)
+			if (ImGui::BeginCombo("Play On Start", comp.playOnStartName.empty() ? "(None)" : comp.playOnStartName.c_str()))
+			{
+				if (ImGui::Selectable("(None)", comp.playOnStartName.empty()))
+					comp.playOnStartName = "";
+
+				for (auto& [key, value] : comp.soundBank)
+				{
+					bool isSelected = (comp.playOnStartName == key);
+					if (ImGui::Selectable(key.c_str(), isSelected))
+						comp.playOnStartName = key;
+
+					if (isSelected) ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+
+			if (!comp.playOnStartName.empty())
+			{
+				ImGui::Checkbox("Loop##Start", &comp.playOnStartLoop);
+				ImGui::SameLine();
+				ImGui::Checkbox("3D##Start", &comp.playOnStart3D);
+				ImGui::SliderFloat("Volume##Start", &comp.playOnStartVolume, 0.0f, 1.0f);
+			}
+
+			ImGui::Separator();
+
+			// 3. SOUND LIST
+			std::string toRemove;
+			if (ImGui::BeginTable("SoundBankTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+			{
+				ImGui::TableSetupColumn("Name");
+				ImGui::TableSetupColumn("Asset");
+				ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+				ImGui::TableHeadersRow();
+
+				for (auto& [key, value] : comp.soundBank)
+				{
+					ImGui::PushID(key.c_str());
+					ImGui::TableNextRow();
+					ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted(key.c_str());
+					ImGui::TableSetColumnIndex(1); ImGui::TextDisabled("%s", value.c_str());
+					ImGui::TableSetColumnIndex(2);
+
+					if (ImGui::SmallButton("Test")) {
+						// Simple test play
+						EF_AUD::GetInstance().PlayOneShot(value, glm::vec3(0.f), 1.0f, false);
+					}
+					ImGui::SameLine();
+					if (ImGui::SmallButton("Del")) {
+						toRemove = key;
+					}
+					ImGui::PopID();
+				}
+				ImGui::EndTable();
+			}
+			if (!toRemove.empty()) comp.soundBank.erase(toRemove);
+
+			return false;
+		}
 		
 		// Each entry is pair<entt::id_type, entt::meta_data> - for self reference
 		for (auto&& pair : mt.data()) {
 			const entt::id_type id = pair.first;
 			const entt::meta_data data = pair.second;
+			entt::meta_any field = obj.get(pair.first);
 
 			const std::string label = label_for(data, id);
 			const char* type_name = mt.name();
@@ -656,14 +1052,16 @@ namespace EditorFeatures {
 
 			ImGui::PushID(reinterpret_cast<void*>(static_cast<uintptr_t>(id)));
 
-			entt::meta_any field = data.get(obj);
 
 			// Skip the hidden fields
 
 			if (field.type() == entt::resolve<int>()) {
 				int& v = field.cast<int&>();
-				if (ImGui::DragInt(label.c_str(), &v, 1.0f)) {
+				const bool interacted = ImGui::DragInt(label.c_str(), &v, 1.0f);
+				update_field_history(entity, component_name, data, obj);
+				if (interacted) {
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 			else if (field.type().is_enum()) {
@@ -688,11 +1086,40 @@ namespace EditorFeatures {
 					}
 
 					if (static_cast<int>(value) != current) {
-						value = static_cast<CameraComponent::CameraType>(current);
-						data.set(obj, value);
+						const auto new_value = static_cast<CameraComponent::CameraType>(current);
+						commit_instant_history(entity, component_name, data, obj, [&]() {
+							value = new_value;
+							data.set(obj, value);
+							any_change = true;
+						});
 					}
 				}
 
+				else if (field.type() == entt::resolve<LightComponent::Type>()) {
+					auto& value = field.cast<LightComponent::Type&>();
+					int current = static_cast<int>(value);
+
+					if (ImGui::RadioButton("Directional", current == static_cast<int>(LightComponent::Type::DIRECTIONAL))) {
+						current = static_cast<int>(LightComponent::Type::DIRECTIONAL);
+					}
+					ImGui::SameLine();
+					if (ImGui::RadioButton("Point", current == static_cast<int>(LightComponent::Type::POINT))) {
+						current = static_cast<int>(LightComponent::Type::POINT);
+					}
+					ImGui::SameLine();
+					if (ImGui::RadioButton("Spot", current == static_cast<int>(LightComponent::Type::SPOT))) {
+						current = static_cast<int>(LightComponent::Type::SPOT);
+					}
+
+					if (static_cast<int>(value) != current) {
+						const auto new_value = static_cast<LightComponent::Type>(current);
+						commit_instant_history(entity, component_name, data, obj, [&]() {
+							value = new_value;
+							data.set(obj, value);
+							any_change = true;
+							});
+					}
+				}
 				// Temp test
 				//int raw = tmp.cast<int>();
 				//if (ImGui::DragInt(label.c_str(), &raw, 1.f)) {
@@ -709,29 +1136,42 @@ namespace EditorFeatures {
 				constexpr const char* options[] = { "Orbiting", "Walking" };
 
 				if (ImGui::Combo(label.c_str(), &current, options, IM_ARRAYSIZE(options))) {
-					value = static_cast<CameraComponent::CameraType>(current);
-					data.set(obj, value);
+					const auto new_value = static_cast<CameraComponent::CameraType>(current);
+					commit_instant_history(entity, component_name, data, obj, [&]() {
+						value = new_value;
+						data.set(obj, value);
+						any_change = true;
+					});
 				}
 			}
 
 			else if (field.type() == entt::resolve<float>()) {
 				float& v = field.cast<float&>();
+				//const bool interacted = ImGui::DragFloat(label.c_str(), &v, 0.01f);
 				if (ImGui::DragFloat(label.c_str(), &v, 0.01f)) {
+					update_field_history(entity, component_name, data, obj);
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 
 			else if (field.type() == entt::resolve<double>()) {
 				double& v = field.cast<double&>();
-				if (ImGui::InputDouble(label.c_str(), &v)) {
+				const bool interacted = ImGui::InputDouble(label.c_str(), &v);
+				update_field_history(entity, component_name, data, obj);
+				if (interacted) {
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 
 			else if (field.type() == entt::resolve<bool>()) {
 				bool& v = field.cast<bool&>();
 				if (ImGui::Checkbox(label.c_str(), &v)) {
-					data.set(obj, v);
+					commit_instant_history(entity, component_name, data, obj, [&]() {
+						data.set(obj, v);
+						any_change = true;
+					});
 				}
 			}
 
@@ -739,8 +1179,11 @@ namespace EditorFeatures {
 				std::string& s = field.cast<std::string&>();
 				char buffer[512];
 				std::snprintf(buffer, sizeof(buffer), "%s", s.c_str());
-				if (ImGui::InputText(label.c_str(), buffer, sizeof(buffer))) {
+				const bool interacted = ImGui::InputText(label.c_str(), buffer, sizeof(buffer));
+				update_field_history(entity, component_name, data, obj);
+				if (interacted) {
 					data.set(obj, std::string{ buffer });
+					any_change = true;
 				}
 			}
 
@@ -763,9 +1206,11 @@ namespace EditorFeatures {
 						const bool is_none_selected = normalized.empty();
 						if (ImGui::Selectable("No Script", is_none_selected)) {
 							if (!is_none_selected) {
-								path.clear();
-								data.set(obj, path);
-								normalized.clear();
+								commit_instant_history(entity, component_name, data, obj, [&]() {
+									path.clear();
+									data.set(obj, path);
+									normalized.clear();
+								});
 							}
 						}
 
@@ -781,10 +1226,12 @@ namespace EditorFeatures {
 							const bool selected = (!current_value.empty() && current_value == script_rel_str);
 							if (ImGui::Selectable(row_label.c_str(), selected)) {
 								if (!selected) {
-									path = script_rel;
-									path = path.lexically_normal();
-									data.set(obj, path);
-									normalized = path;
+									commit_instant_history(entity, component_name, data, obj, [&]() {
+										path = script_rel;
+										path = path.lexically_normal();
+										data.set(obj, path);
+										normalized = path;
+									});
 								}
 							}
 							if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort) && !script_rel_str.empty()) {
@@ -817,9 +1264,11 @@ namespace EditorFeatures {
 							if (ext == ".lua") {
 								std::filesystem::path relative = make_relative_to_assets(dropped_path);
 								if (!relative.empty()) {
-									path = relative.lexically_normal();
-									data.set(obj, path);
-									normalized = path;
+									commit_instant_history(entity, component_name, data, obj, [&]() {
+										path = relative.lexically_normal();
+										data.set(obj, path);
+										normalized = path;
+									});
 								}
 							}
 						}
@@ -827,16 +1276,27 @@ namespace EditorFeatures {
 					}
 				}
 				else {
-					std::string current = path.generic_string();
-					char buffer[512];
-					std::snprintf(buffer, sizeof(buffer), "%s", current.c_str());
-					if (ImGui::InputText(label.c_str(), buffer, sizeof(buffer))) {
-						path = std::filesystem::path{ buffer };
-						data.set(obj, path);
-					}
+				std::string current = path.generic_string();
+				char buffer[512];
+				std::snprintf(buffer, sizeof(buffer), "%s", current.c_str());
+				const bool interacted = ImGui::InputText(label.c_str(), buffer, sizeof(buffer));
+				update_field_history(entity, component_name, data, obj);
+				if (interacted) {
+					path = std::filesystem::path{ buffer };
+					data.set(obj, path);
 				}
 			}
-
+			}
+			else if (field.type() == entt::resolve<glm::vec2>()) {
+				glm::vec2& v = field.cast<glm::vec2&>();
+				float values[2]{ v.x, v.y };
+				const bool edited = ImGui::DragFloat2(label.c_str(), values, 0.01f);
+				update_field_history(entity, component_name, data, obj);
+				if (edited) {
+					v = { values[0], values[1] };
+					data.set(obj, v);
+				}
+			}
 			else if (field.type() == entt::resolve<glm::vec3>()) {
 				glm::vec3& v = field.cast<glm::vec3&>();
 
@@ -846,14 +1306,21 @@ namespace EditorFeatures {
 
 				if (colorish) {
 					float color[3]{ v.x, v.y, v.z };
-					if (ImGui::ColorEdit3(label.c_str(), color)) {
+					const bool interacted = ImGui::ColorEdit3(label.c_str(), color);
+					update_field_history(entity, component_name, data, obj);
+					if (interacted) {
 						v = { color[0], color[1], color[2] };
 						data.set(obj, v);
+						any_change = true;
 					}
 				}
 				else {
-					draw_vec3_drag(label.c_str(), v);
-					data.set(obj, v);
+					if (draw_vec3_drag(label.c_str(), v))
+					{
+						update_field_history(entity, component_name, data, obj);
+						data.set(obj, v);
+						any_change = true;
+					}
 				}
 			}
 			else if (field.type() == entt::resolve<glm::vec4>()) {
@@ -864,13 +1331,17 @@ namespace EditorFeatures {
 
 				if (colorish) {
 					float color[4]{ v.x, v.y, v.z, v.w };
-					if (ImGui::ColorEdit4(label.c_str(), color)) {
+					const bool interacted = ImGui::ColorEdit4(label.c_str(), color);
+					update_field_history(entity, component_name, data, obj);
+					if (interacted) {
 						v = { color[0], color[1], color[2], color[3] };
 						data.set(obj, v);
+						any_change = true;
 					}
 				}
 				else {
 					draw_vec4_drag(label.c_str(), v);
+					update_field_history(entity, component_name, data, obj);
 					data.set(obj, v);
 				}
 			}
@@ -880,7 +1351,9 @@ namespace EditorFeatures {
 					if (const auto tag = static_cast<const AssetPickerTag*>(data.custom())) {
 						const auto descriptor = make_asset_picker_descriptor(tag->kind);
 						if (!descriptor.sources.empty() && draw_asset_guid_picker(label.c_str(), guid, tag->kind, descriptor.none_label, descriptor.sources, descriptor.formatter)) {
-							data.set(obj, guid);
+							commit_instant_history(entity, component_name, data, obj, [&]() {
+								data.set(obj, guid);
+							});
 						}
 					}
 				else {
@@ -888,11 +1361,102 @@ namespace EditorFeatures {
 				}
 			}
 
+			else if (field.type().is_sequence_container())
+			{
+				if (ImGui::TreeNode(label.c_str()))
+				{
+					auto view = field.as_sequence_container();
+					int index = 0;
+					bool vector_modified = false;
+					for (auto it = view.begin(); it != view.end(); ++it)
+					{
+						ImGui::PushID(index);
+
+						entt::meta_any element = *it;
+						std::string element_label = "Element " + std::to_string(index);
+
+						if (ImGui::TreeNode(element_label.c_str()))
+						{
+							entt::meta_type element_type = element.type();
+							if (DrawMetaObject(entity, component_name, element_type, element))
+							{
+								vector_modified = true;
+							}
+							ImGui::TreePop();
+						}
+
+						if (element.type() == entt::resolve<ColliderData>())
+						{
+							ImGui::SameLine();
+							if (ImGui::Button("Reset"))
+							{
+								if (ColliderData* shapeData = element.try_cast<ColliderData>())
+								{
+									FitShapeToMesh(registry, entity, *shapeData);
+									data.set(obj, field);
+									vector_modified = true;
+								}
+							}
+						}
+
+						ImGui::SameLine();
+						if (ImGui::SmallButton("X"))
+						{
+							view.erase(it);
+							data.set(obj, field);
+							ImGui::PopID();
+							vector_modified = true;
+							break;
+						}
+
+						ImGui::PopID();
+						++index;
+					}
+
+					if (ImGui::Button(" + Add Element "))
+					{
+						entt::meta_type inner_type = view.value_type();
+
+						if (inner_type) {
+							entt::meta_any new_element = inner_type.construct();
+							if (new_element) {
+								if(new_element.type() == entt::resolve<ColliderData>())
+								{
+									ColliderData& shapeRef = new_element.cast<ColliderData&>();
+									FitShapeToMesh(registry, entity, shapeRef);
+								}
+
+								view.insert(view.end(), new_element);
+								data.set(obj, field);
+								vector_modified = true;
+							}
+						}
+					}
+
+					if (vector_modified)
+					{
+						data.set(obj, field);
+						if (obj.type() == entt::resolve<ColliderComponent>())
+						{
+							auto& collider = obj.cast<ColliderComponent&>();
+							RecalculateGlobalBounds(collider);
+						}
+						any_change = true;
+					}
+
+					ImGui::TreePop();
+				}
+			}
+
 			else if (field.type().is_class()) {
 				// Nested struct: recurse
 				if (ImGui::TreeNode(label.c_str())) {
 					auto f = field.type();
-					DrawMetaObject(f, field);
+					if (DrawMetaObject(entity, component_name, f, field))
+					{
+						data.set(obj, field);
+						any_change = true;
+					}
 					ImGui::TreePop();
 				}
 			}
@@ -902,6 +1466,7 @@ namespace EditorFeatures {
 
 			ImGui::PopID();
 		}
+		return any_change;
 	}
 }
 

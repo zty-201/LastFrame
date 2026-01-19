@@ -52,6 +52,34 @@ function on_update(self, dt)
         return 
     end
 
+    -- Handle recenter request from UI
+    local SHARED = rawget(_G, "SHARED")
+    if SHARED and SHARED.UI and SHARED.UI.recenterRequested then
+        -- Reset yaw/pitch to zero
+        yaw = 0.0
+        pitch = 0.0
+
+        -- Reposition camera instantly
+        local radYaw   = math.rad(yaw)
+        local radPitch = math.rad(pitch)
+        local cosPitch = math.cos(radPitch)
+
+        local x = target.x + distance * cosPitch * math.sin(radYaw)
+        local y = target.y + distance * math.sin(radPitch)
+        local z = target.z + distance * cosPitch * math.cos(radYaw)
+
+        camera:SetPosition(x, y, z)
+        camera:LookAt(target.x, target.y, target.z)
+
+        -- Also update SHARED.POV for flashlight / movement
+        SHARED.POV = SHARED.POV or {}
+        SHARED.POV.yaw   = yaw
+        SHARED.POV.pitch = pitch
+
+        -- Clear the one-frame flag
+        SHARED.UI.recenterRequested = false
+    end
+
     -- ---Input Accumulation Initialization ---
     local deltaYaw = 0.0
     local deltaPitch = 0.0
@@ -104,38 +132,37 @@ function on_update(self, dt)
         --print("[Lua] Started dragging")
     end
     
--- Handle drag motion
-if dragging and Input.GetMouseButton(0) then
-    local deltaX = mx - lastX
-    local deltaY = my - lastY
+    -- Handle drag motion
+    if dragging and Input.GetMouseButton(0) then
+        local deltaX = mx - lastX
+        local deltaY = my - lastY
 
-    if deltaX ~= 0 or deltaY ~= 0 then
-        -- Invert rotation direction here 👇
-        yaw = yaw - deltaX * sensitivity
-        pitch = pitch + deltaY * sensitivity
+        if deltaX ~= 0 or deltaY ~= 0 then
+            -- Invert rotation direction here 👇
+            yaw = yaw - deltaX * sensitivity
+            pitch = pitch + deltaY * sensitivity
 
-        -- Clamp pitch
-        if pitch > pitchLimit then pitch = pitchLimit end
-        if pitch < -pitchLimit then pitch = -pitchLimit end
+            -- Clamp pitch
+            if pitch > pitchLimit then pitch = pitchLimit end
+            if pitch < -pitchLimit then pitch = -pitchLimit end
 
-        --print(string.format("[Lua] Camera rotation: yaw=%.2f pitch=%.2f", yaw, pitch))
+            --print(string.format("[Lua] Camera rotation: yaw=%.2f pitch=%.2f", yaw, pitch))
 
-        -- Update camera position (spherical to Cartesian)
-        local radYaw = math.rad(yaw)
-        local radPitch = math.rad(pitch)
+            -- Update camera position (spherical to Cartesian)
+            local radYaw = math.rad(yaw)
+            local radPitch = math.rad(pitch)
 
-        local x = target.x + distance * math.cos(radPitch) * math.sin(radYaw)
-        local y = target.y + distance * math.sin(radPitch)
-        local z = target.z + distance * math.cos(radPitch) * math.cos(radYaw)
+            local x = target.x + distance * math.cos(radPitch) * math.sin(radYaw)
+            local y = target.y + distance * math.sin(radPitch)
+            local z = target.z + distance * math.cos(radPitch) * math.cos(radYaw)
 
-        camera:SetPosition(x, y, z)
-        camera:LookAt(target.x, target.y, target.z)
+            camera:SetPosition(x, y, z)
+            camera:LookAt(target.x, target.y, target.z)
+        end
+
+        lastX, lastY = mx, my
     end
 
-    lastX, lastY = mx, my
-end
-
-    
     -- Handle release
     if dragging and not isDraggingTouch then
         dragging = false
@@ -186,6 +213,15 @@ end
         
         camera:SetPosition(x, y, z)
         camera:LookAt(target.x, target.y, target.z)
+    end
+
+        -- --- UPDATE SHARED POV (for flashlight, UI, movement) ---
+        local SHARED = rawget(_G, "SHARED") or {}
+        _G.SHARED = SHARED
+
+        SHARED.POV = SHARED.POV or {}
+        SHARED.POV.yaw   = yaw
+        SHARED.POV.pitch = pitch
     end
 end
 

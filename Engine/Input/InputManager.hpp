@@ -7,7 +7,7 @@
 \date   September 2025
 \brief
 This file contains the declarations of the functions that are needed for
-handling the inputs in the system. 
+handling the inputs in the system.
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
@@ -17,20 +17,23 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #define INPUT_MANAGER_H
 
 #include <unordered_map>
+#include <string>   // <-- ADDED (for std::string)
+#include <map>      // <-- ADDED (for std::map)
 #include "ISystem.hpp"
 #include "Key_Action.hpp"
 
 #ifdef PLATFORM_WINDOWS
-    #include "GLFW/glfw3.h"
+#include "GLFW/glfw3.h"
 #endif
 
 #if defined(DEBUG)
-    #include "KeyMapping.hpp"
+#include "KeyMapping.hpp"
+#include "event_structures.hpp"
 #endif
 
 #ifdef PLATFORM_ANDROID
-    #include <android/native_activity.h>
-    #include <android/input.h>
+#include <android/native_activity.h>
+#include <android/input.h>
 #endif
 
 namespace EngineFramework
@@ -53,8 +56,9 @@ namespace EngineFramework
 
         InputManager() { this_class = this; }
         static InputManager& GetInstance() { return *this_class; }
-        static inline InputManager *this_class = nullptr;
+        static inline InputManager* this_class = nullptr;
 
+#if defined(PLATFORM_WINDOWS) //these keys are windows only
         // --- Keyboard API ---
         static bool GetKey(int key);       // true while held
         static bool GetKeyDown(int key);   // true on press
@@ -63,6 +67,17 @@ namespace EngineFramework
         static bool GetKey(Key_Actions action);       // true while held
         static bool GetKeyDown(Key_Actions action);   // true on press
         static bool GetKeyUp(Key_Actions action);     // true on release
+
+        // --- NEW: String-based action API (editor key mapping -> gameplay) ---
+        static bool GetAction(const std::string& action);       // true while held
+        static bool GetActionDown(const std::string& action);   // true on press
+        static bool GetActionUp(const std::string& action);     // true on release
+
+        static bool GetAction(int action);       // true while held
+        static bool GetActionDown(int action);   // true on press
+        static bool GetActionUp(int action);     // true on release
+
+#endif
 
         // --- Mouse API ---
         static bool GetMouseButton(int button);
@@ -99,22 +114,21 @@ namespace EngineFramework
 
         static glm::vec3 GetGyroscopeRotationRate();
         static std::unordered_map<Key_Actions, int> key_mapping;
-
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         static std::map <std::string, int> key_mapping_data; //json file data
-        
-        void seralise();
         void codegen_deseralise();
+        void initialise_keymapping();
+        void seralise(); //coding in release build (might change the structure in src files too, so better to keep it here)
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)     
+        //saving of new keys only happens in debug - level editor
+        void key_mapping_codegen_script(); //avoid using it FOR NOW (I am still testing)
         void key_mapping_codegen(); //write to initialise_keymapping
 #endif
-        void initialise_keymapping();
         
-        
-
 
     private:
 #ifdef PLATFORM_WINDOWS
-// --- GLFW Callbacks ---
+        // --- GLFW Callbacks ---
         static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
         static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
@@ -124,16 +138,38 @@ namespace EngineFramework
         static void ErrorCallback(int error, const char* description);
 
         // --- State storage ---
-        
         static std::unordered_map<int, KeyState> mouseButtonStates;
 
         static double mouseX, mouseY;
         static double lastMouseX, lastMouseY;
         static double scrollX, scrollY;
+        static double offset_MouseX, offset_MouseY;
         static int windowWidth, windowHeight;
 
         static glm::vec3 currentGyroRate; //Store angular velocity (rad/s)
         static long long lastGyroTimestamp;
+
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+
+        bool editor_simulation_running;
+        bool editor_running;
+
+    public:
+        void HANDLE_EVENT_LevelEditor_Simulation(Event_Level_Editor_Simulation& play)
+        {
+            //Only draw the scene to the framebuffer if in level editor.
+            editor_simulation_running = play.is_enabled;
+        }
+
+        void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled& editor_toggled)
+        {
+            //Only draw the scene to the framebuffer if in level editor.
+            editor_running = editor_toggled.is_enabled;
+        }
+#endif
+
+
     };
 
 }

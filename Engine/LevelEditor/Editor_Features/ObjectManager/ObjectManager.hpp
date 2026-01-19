@@ -42,6 +42,15 @@ namespace EngineFramework
         void top_buttons();
 
         static bool feature_enabled;
+    private:
+        //Set when user wants to create an archtype from instance, which will open up a popup menu to input additional information.
+        //Setting entity data in the tuple will trigger create archtype from instance event.
+        entt::entity instance_to_create_archtype = entt::null;
+
+        /*
+            Creates an archtype file + asset, reloads archtype assets, then assigns the archtype to the entity.
+        */
+        void CreateArchtypeFromInstance(entt::entity entity, const std::string& name, const std::string& model_type);
     };
 }
 

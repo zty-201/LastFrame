@@ -6,21 +6,22 @@
 
 #include "TransformComponent.h"
 #include "PhysicsComponent.h"
+#include "PhysicsMaterialComponent.h"
 #include "PhysicsWorld.hpp"
 #include "ColliderComponent.h"
 
 void PhysicsSyncSystem::Update(entt::registry& ecs)
 {
-    auto view = ecs.view<TransformComponent, PhysicsComponent, ColliderComponent>();
+    auto view = ecs.view<TransformComponent, PhysicsComponent, PhysicsMaterialComponent, ColliderComponent>();
 
-    for (auto&& [ent, transform, physics, collider] : view.each())
+    for (auto&& [ent, transform, physics, material, collider] : view.each())
     {
         if (!PhysicsWorld::Get().HasBody(ent))
             continue;
 
-        if (collider.isStatic)
+        if (material.isStatic)
         {
-            const glm::quat q_editor = glm::quat(transform.rotation); // Transform stores Euler
+            const glm::quat q_editor = glm::quat(glm::radians(transform.rotation));
             PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q_editor, /*activate=*/false);
             PhysicsWorld::Get().SetLinearVelocity(ent, glm::vec3(0.0f)); // ensure no drift
             // no gravity for static bodies; skip the rest
@@ -31,26 +32,40 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
         if (physics.useGravity && !physics._prevUseGravity)
         {
             // Push ECS transform to Jolt so the body starts where you placed it
-            glm::quat q = glm::quat(transform.rotation); // your Transform stores Euler
+            glm::quat q = glm::quat(glm::radians(transform.rotation));
             PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q, /*activate=*/true);
 
-            // Clear old motion so it doesn't “remember” a velocity from before
+            // Clear old motion so it doesn't ï¿½rememberï¿½ a velocity from before
             PhysicsWorld::Get().SetLinearVelocity(ent, glm::vec3(0.0f));
         }
 
         if (physics.editorOverride)
         {
-            glm::quat q = glm::quat(transform.rotation);
+            glm::quat q = glm::quat(glm::radians(transform.rotation));
             PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q, true);
             PhysicsWorld::Get().SetLinearVelocity(ent, glm::vec3(0.0f));
             physics.editorOverride = false; // consume flag so it only happens once
             continue; // skip normal Jolt -> ECS pull this frame
         }
 
+        // Always pull latest position from physics
         transform.position = PhysicsWorld::Get().GetBodyPosition(ent);
 
-        const glm::quat jq = PhysicsWorld::Get().GetBodyRotation(ent);
-        transform.rotation = glm::eulerAngles(jq);
+        if (physics.lockRotation)
+        {
+            // Force the body to stay upright: zero rotation
+            glm::vec3 uprightEuler{0.0f, 0.0f, 0.0f};
+            transform.rotation = uprightEuler;
+
+            glm::quat uprightQ = glm::quat(glm::radians(uprightEuler));
+            // Write this rotation back into Jolt so the collider never tips
+            PhysicsWorld::Get().SetPositionRotation(ent, transform.position, uprightQ, /*activate=*/false);
+        }
+        else
+        {
+            const glm::quat jq = PhysicsWorld::Get().GetBodyRotation(ent);
+            transform.rotation = glm::degrees(glm::eulerAngles(jq));
+        }
 
         physics.velocity = PhysicsWorld::Get().GetBodyVelocity(ent);
 

@@ -13,6 +13,7 @@
 /// Setup strings for GLM type values
 
 #pragma once
+#define GLM_ENABLE_EXPERIMENTAL
 
 // Dependency:
 #include "../glm.hpp"

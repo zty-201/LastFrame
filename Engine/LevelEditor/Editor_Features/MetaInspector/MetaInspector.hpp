@@ -57,6 +57,6 @@ namespace EditorFeatures {
 		AssetPickerKind kind;
 	};
 
-	void DrawMetaObject(entt::meta_type& mt, entt::meta_any& obj);
+	bool DrawMetaObject(entt::entity entity, const char* component_name, entt::meta_type& mt, entt::meta_any& obj);
 }
 
