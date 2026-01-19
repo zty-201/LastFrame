@@ -31,8 +31,8 @@ in vec2 FS_IN_TexCoord;
 in vec3 FS_IN_Tangent;
 in vec3 FS_IN_Bitangent;
 
-in flat float FS_IN_Roughness;
-in flat float FS_IN_Metallic;
+//in flat float FS_IN_Roughness;
+//in flat float FS_IN_Metallic;
 
 // ------------------------------------------------------------------
 // UNIFORMS ---------------------------------------------------------

@@ -60,20 +60,20 @@ namespace EngineFramework
 				continue;
 			}
 
-			// Step 1 � Advance animation time
+			// Step 1 Advance animation time
 			anim.player.update(deltaTime);
 
-			// Step 2 � Compute world matrix
+			// Step 2 Compute world matrix
 			glm::mat4 world;
 			ComputeWorldMatrix(transform, world);
 
-			// Step 3 � Resize palette buffer if needed
+			// Step 3 Resize palette buffer if needed
 			int boneCount = anim.skeleton->count();
 			if (anim.paletteMatrices.size() != (size_t)boneCount) {
 				anim.paletteMatrices.resize(boneCount);
 			}
 
-			// Step 4 � Build bone palette
+			// Step 4 Build bone palette
 			anim.player.computeMatrices(anim.paletteMatrices, anim.globalAnimationTransform, *anim.skeleton);
 
 			// Find bone indices

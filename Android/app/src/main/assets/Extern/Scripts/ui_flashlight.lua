@@ -3,11 +3,11 @@
 -- Flashlight toggle icon (bottom-right, left of action icon)
 -- ============================================================
 
-local ICON_SIZE = 200.0   -- smaller than action icon
-local ANCHOR_X  = 0.80    -- slightly left of action_icon
+local ICON_SIZE = 100.0   -- smaller than action icon
+local ANCHOR_X  = 0.70    -- slightly left of action_icon
 local ANCHOR_Y  = 0.17    -- align vertically with action_icon
 
-local screenWidth, screenHeight = 3088, 1440
+local screenWidth, screenHeight = 2340, 1080
 
 local UI = nil
 

@@ -899,6 +899,12 @@ namespace EngineFramework
                 shader->setUniform("u_AlbedoFactor", material.albedoFactor);
                 shader->setUniform("u_RoughnessFactor", material.roughnessFactor);
                 shader->setUniform("u_MetallicFactor", material.metallicFactor);
+                shader->setUniform("u_UVTransform", glm::vec4(
+                    material.uvTiling.x,
+                    material.uvTiling.y,
+                    material.uvOffset.x,
+                    material.uvOffset.y
+                ));
 
                 // Albedo
                 auto albedoTex = AssetManagerSystem::GetResource<Scene::Texture>(material.albedoMap);

@@ -160,6 +160,20 @@ namespace EngineFramework
 						duplicate_and_select(copied_entity);
 					}
 				}
+
+				// Pressing F2 opens the rename popup for the currently selected entity
+				if (ImGui::Shortcut(ImGuiKey_F2, copy_paste_flags)) {
+					if (selected_entity != entt::null && registry.valid(selected_entity)) {
+						rename_target = selected_entity;
+						std::string current_name = GameObjectSystem::GetEntityName(selected_entity);
+						std::snprintf(rename_buffer, sizeof(rename_buffer), "%s", current_name.c_str());
+						rename_buffer[sizeof(rename_buffer) - 1] = '\0';
+						open_rename_popup = true;
+					}
+					else {
+						LOGW("[ObjectManager] No valid entity selected to rename");
+					}
+				}
 			}
 
 			int incrementing_imgui_id{};

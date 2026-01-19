@@ -61,4 +61,4 @@ echo.
 
 echo.
 echo Press any key to exit...
-pause >nul
+IF NOT "%1"=="/nopause" pause
