@@ -103,7 +103,7 @@ namespace EngineFramework
 	void GameObjectSystem::Initialize()
 	{
 		// Load a Scene
-		std::string start_scene = AssetManagerSystem::GetStringFromFile("Extern/Scenes/M3_Level.json");
+		std::string start_scene = AssetManagerSystem::GetStringFromFile("Extern/Scenes/M4_Level.json");
 		LoadScene(start_scene);
 	}
 	void GameObjectSystem::Update(float delta_time)
