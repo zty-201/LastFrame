@@ -508,7 +508,7 @@ namespace Engine {
             static_cast<bool(*)(EngineFramework::Key_Actions)>(&EngineFramework::InputManager::GetKeyUp)
         ));
         inputTable.set_function("GetGyroscopeRotatioRate", []() {
-            glm::vec3 rate = EngineFramework::InputManager::GetGyroscopeRotatioRate();
+            glm::vec3 rate = EngineFramework::InputManager::GetGyroscopeRotationRate();
             return std::make_tuple(rate.x, rate.y, rate.z);
         });
         inputTable.set_function("GetWindowSize", []() {

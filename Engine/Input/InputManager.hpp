@@ -19,6 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <unordered_map>
 #include <string>   // <-- ADDED (for std::string)
 #include <map>      // <-- ADDED (for std::map)
+#include <glm/glm.hpp>
 #include "ISystem.hpp"
 #include "Key_Action.hpp"
 
@@ -114,7 +115,7 @@ namespace EngineFramework
 
         static std::unordered_map<int, KeyState> keyStates;
 
-        static glm::vec3 GetGyroscopeRotatioRate();
+        static glm::vec3 GetGyroscopeRotationRate();
         static std::unordered_map<Key_Actions, int> key_mapping;
         static std::map <std::string, int> key_mapping_data; //json file data
         void codegen_deseralise();

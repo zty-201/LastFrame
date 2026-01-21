@@ -668,7 +668,7 @@ namespace EngineFramework
         lastMouseY = mouseY;
     }
 
-    glm::vec3 InputManager::GetGyroscopeRotatioRate()
+    glm::vec3 InputManager::GetGyroscopeRotationRate()
     {
         return currentGyroRate;
     }
