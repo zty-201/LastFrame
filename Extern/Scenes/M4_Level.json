@@ -1,0 +1,2599 @@
+{
+	"0": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				11438888438506422279,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "ENV_Floor"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1000.0,
+				10.0,
+				1000.0
+			]
+		}
+	},
+	"1": {
+		"LightComponent": {
+			"color": [
+				1.0,
+				0.9200000166893005,
+				0.8500000238418579
+			],
+			"constant": 0.0,
+			"direction": [
+				0.05582098662853241,
+				-0.9310559034347534,
+				0.3605816960334778
+			],
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"linear": 0.0,
+			"outerConeAngle": 17.5,
+			"position": [
+				-10.0,
+				80.0,
+				50.0
+			],
+			"quadratic": 0.0,
+			"radius": 0.0,
+			"type": 0
+		},
+		"NameComponent": {
+			"name": "DirectionalLight"
+		}
+	},
+	"10": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6719529442629517315
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "UI_Joystick"
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				166.0,
+				54.0
+			],
+			"size": [
+				180.0,
+				180.0
+			],
+			"textureid": [
+				3601763066940784643,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
+	"11": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_05"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				200.0,
+				10.0,
+				-600.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"115": {
+		"ColliderComponent": {
+			"maxBounds": [
+				108.09515380859375,
+				371.6498718261719,
+				7.194403648376465
+			],
+			"minBounds": [
+				-98.74581909179688,
+				0.34539794921875,
+				-0.7218952178955078
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						103.42048645019531,
+						185.65223693847656,
+						3.9581494331359863
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.6746673583984375,
+						185.9976348876953,
+						3.2362542152404785
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_plain"
+		},
+		"NameComponent": {
+			"name": "Wall_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				0.0,
+				0.0,
+				-400.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"12": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 17128755557071454211
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "UI_Calibrate"
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				1242.5,
+				106.5
+			],
+			"size": [
+				75.0,
+				75.0
+			],
+			"textureid": [
+				8518163340552814593,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
+	"13": {
+		"AudioComponent": {
+			"Clips": [
+				{
+					"audio_guid": [
+						0,
+						0
+					],
+					"is3D": true,
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"playOnStart": false,
+					"volume": 1.0
+				}
+			],
+			"playOnStart3D": false,
+			"playOnStartLoop": true,
+			"playOnStartName": "",
+			"playOnStartVolume": 0.5,
+			"soundBank": {}
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 5023079758699560965
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "UI_Flashlight"
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				1998.0,
+				94.0
+			],
+			"size": [
+				100.0,
+				100.0
+			],
+			"textureid": [
+				14675252536616468483,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
+	"14": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 5599540511002984449
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "UI_Action"
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				2204.0,
+				44.0
+			],
+			"size": [
+				200.0,
+				200.0
+			],
+			"textureid": [
+				3146037490547998731,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
+	"15": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_06"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				200.0,
+				10.0,
+				-400.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"16": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_07"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				200.0,
+				10.0,
+				-200.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"17": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_08"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				200.0,
+				10.0,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"18": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_09"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				400.0,
+				10.0,
+				-600.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"19": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_10"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				400.0,
+				10.0,
+				-400.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"2": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				8652294881921892357,
+				4431689612682600001
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Skybox",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "SkyBox"
+		},
+		"NameComponent": {
+			"name": "Skybox"
+		},
+		"SkyboxRenderPass": null
+	},
+	"20": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_11"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				400.0,
+				10.0,
+				-400.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"21": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_12"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				400.0,
+				10.0,
+				-200.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"22": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_13"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				400.0,
+				10.0,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"23": {
+		"ColliderComponent": {
+			"maxBounds": [
+				108.09515380859375,
+				371.6498718261719,
+				7.194403648376465
+			],
+			"minBounds": [
+				-98.74581909179688,
+				0.34539794921875,
+				-0.7218952178955078
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						103.42048645019531,
+						185.65223693847656,
+						3.9581494331359863
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.6746673583984375,
+						185.9976348876953,
+						3.2362542152404785
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_plain"
+		},
+		"NameComponent": {
+			"name": "Wall_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				200.0,
+				0.0,
+				-700.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"24": {
+		"ColliderComponent": {
+			"maxBounds": [
+				108.09515380859375,
+				371.6498718261719,
+				7.194403648376465
+			],
+			"minBounds": [
+				-98.74581909179688,
+				0.34539794921875,
+				-0.7218952178955078
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						103.42048645019531,
+						185.65223693847656,
+						3.9581494331359863
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.6746673583984375,
+						185.9976348876953,
+						3.2362542152404785
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_plain"
+		},
+		"NameComponent": {
+			"name": "Wall_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				400.0,
+				0.0,
+				-700.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"25": {
+		"ColliderComponent": {
+			"maxBounds": [
+				108.09515380859375,
+				371.6498718261719,
+				7.194403648376465
+			],
+			"minBounds": [
+				-98.74581909179688,
+				0.34539794921875,
+				-0.7218952178955078
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						103.42048645019531,
+						185.65223693847656,
+						3.9581494331359863
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.6746673583984375,
+						185.9976348876953,
+						3.2362542152404785
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_plain"
+		},
+		"NameComponent": {
+			"name": "Wall_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				0.0,
+				0.0,
+				-574.09326171875
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"3": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				0.0,
+				10.0,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"4": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				0.10000000894069672,
+				0.10000000149011612
+			],
+			"albedoMap": [
+				7230819861274968067,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 0.20000000298023224,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "RedMetalSphere",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 0.800000011920929,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "Sphere"
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-330.47100830078125,
+				323.11920166015625,
+				-300.6734313964844
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"archtype": 11270566386067177473
+	},
+	"5": {
+		"AudioListenerComponent": {
+			"active": true
+		},
+		"ColliderComponent": {
+			"maxBounds": [
+				10.0,
+				10.0,
+				10.0
+			],
+			"minBounds": [
+				5.0,
+				5.0,
+				5.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						15.0,
+						80.0,
+						15.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.5,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"LightComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"constant": 1.0,
+			"direction": [
+				-0.5932623744010925,
+				-0.06557729095220566,
+				0.8023337125778198
+			],
+			"innerConeAngle": 15.0,
+			"intensity": 10000.0,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"position": [
+				23.46025276184082,
+				89.46076965332031,
+				181.97047424316406
+			],
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 2
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 10742246650198540289
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 11740093013966520321
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 15968805962367582209
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 17584542703313420289
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 5490970403712286721
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				0.10000000894069672,
+				0.10000000149011612
+			],
+			"albedoMap": [
+				12382137438329683979,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 0.20000000298023224,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Player",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 0.800000011920929,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"NameComponent": {
+			"name": "Player"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": true,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 10.0,
+			"mass": 10.0,
+			"useGravity": true,
+			"velocity": [
+				0.0,
+				0.02808959223330021,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": false,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": false,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				0.0,
+				90.0,
+				-900.0
+			],
+			"rotation": [
+				-179.99989318847656,
+				-5.008955668017734e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				1.0,
+				0.9999989867210388,
+				0.9999994039535522
+			]
+		}
+	},
+	"6": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				0.0,
+				10.0,
+				-200.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"7": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				0.0,
+				10.0,
+				-400.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"8": {
+		"ColliderComponent": {
+			"maxBounds": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"minBounds": [
+				-1.0,
+				-1.0,
+				-1.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cube"
+		},
+		"NameComponent": {
+			"name": "Floor_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				0.0,
+				10.0,
+				-600.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				4.0,
+				100.0
+			]
+		}
+	},
+	"9": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 13060597717967175685
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "UI_JoystickBG"
+		},
+		"UIComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				81.0,
+				-31.0
+			],
+			"size": [
+				350.0,
+				350.0
+			],
+			"textureid": [
+				13373202070917185537,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	}
+}
