@@ -370,7 +370,12 @@ namespace Engine {
             "GetKeyUp", sol::overload(
                 static_cast<bool(*)(int)>(&EngineFramework::InputManager::GetKeyUp),
                 static_cast<bool(*)(EngineFramework::Key_Actions)>(&EngineFramework::InputManager::GetKeyUp)
-            )
+            ),
+            "GetWindowSize", [](EngineFramework::InputManager& im) {
+                auto [w, h] = im.GetWindowSize();
+                return std::make_tuple(w, h);
+            }
+            
             /*"GetAction", sol::overload(
                 static_cast<bool(*)(int)>(&EngineFramework::InputManager::GetAction),
                 static_cast<bool(*)(const std::string&)>(&EngineFramework::InputManager::GetAction)
@@ -452,11 +457,31 @@ namespace Engine {
             }
         ));
 
+        inputTable.set_function("SetCursorLocked", sol::overload(
+            [](bool locked) {
+                EngineFramework::InputManager::SetCursorLocked(locked);
+            },
+            [](int locked) {
+                EngineFramework::InputManager::SetCursorLocked(locked != 0);
+            }
+        ));
+
+        inputTable.set_function("SetCursorVisible", sol::overload(
+            [](bool visible) {
+                EngineFramework::InputManager::SetCursorVisible(visible);
+            },
+            [](int visible) {
+                EngineFramework::InputManager::SetCursorVisible(visible != 0);
+            }
+        ));
+
 #else
         // optional: compile-safe stubs for non-editor builds
         inputTable.set_function("GetAction", [](const std::string&) { return false; });
         inputTable.set_function("GetActionDown", [](const std::string&) { return false; });
         inputTable.set_function("GetActionUp", [](const std::string&) { return false; });
+        inputTable.set_function("SetCursorLocked", [](bool) {});
+        inputTable.set_function("SetCursorVisible", [](bool) {});
 #endif
 
         inputTable.set_function("GetMouseButtonDown", &EngineFramework::InputManager::GetMouseButtonDown);
@@ -485,7 +510,11 @@ namespace Engine {
         inputTable.set_function("GetGyroscopeRotatioRate", []() {
             glm::vec3 rate = EngineFramework::InputManager::GetGyroscopeRotatioRate();
             return std::make_tuple(rate.x, rate.y, rate.z);
-            });
+        });
+        inputTable.set_function("GetWindowSize", []() {
+            auto [w, h] = EngineFramework::InputManager::GetInstance().GetWindowSize();
+            return std::make_tuple(w, h);
+         });
 
         LOGI("[ScriptSystem] InputManager bindings complete (static table approach)");
 
