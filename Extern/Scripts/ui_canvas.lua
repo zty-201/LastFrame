@@ -11,17 +11,23 @@ local function getShared()
 end
 
 local function ensureUIShared()
-    local SH = getShared()
-    if not SH then
-        SH = {}
-        _G.SHARED = SH
+    local Shared = getShared()
+    if not Shared then
+        Shared = {}
+        _G.SHARED = Shared
     end
-    SH.UI = SH.UI or {}
-    return SH.UI
+    Shared.UI = Shared.UI or {}
+    return Shared.UI
 end
 
 local function updateUISize()
     local ui = ensureUIShared()
+
+    local Shared = getShared()
+    if Shared then
+        -- Centralize platform in one place for all scripts
+        ui.platform = Shared.PLATFORM or PLATFORM
+    end
 
     local realW, realH = Input.GetWindowSize()
     if not realW or not realH or realW <= 0 or realH <= 0 then
@@ -30,13 +36,17 @@ local function updateUISize()
 
     local aspect = realW / realH
 
-    -- Real window pixels (engine)
+    -- Real window/framebuffer pixels (engine)
     ui.realW = realW
     ui.realH = realH
 
     -- Virtual UI coordinates (Lua/UI scripts)
     ui.screenH = DESIGN_HEIGHT
     ui.screenW = DESIGN_HEIGHT * aspect
+
+    -- Scale between real pixels and virtual UI units
+    ui.scaleX = ui.screenW / ui.realW
+    ui.scaleY = ui.screenH / ui.realH
 
     -- Optional safe padding (keep 0 for now)
     ui.safeLeft, ui.safeRight, ui.safeTop, ui.safeBottom = 0, 0, 0, 0
@@ -52,9 +62,16 @@ local function updateUISize()
         return (cx - w * 0.5), (cy - h * 0.5)
     end
 
-    -- Convert raw mouse Y (top-left origin) into UI Y (bottom-left origin)
+    -- Convert raw input (real pixels) into UI space (virtual units)
+    ui.ToUIX = function(rawMx)
+        return rawMx * ui.scaleX
+    end
+
     ui.ToUIY = function(rawMy)
-        return ui.screenH - rawMy
+        -- rawMy is typically "pixels from top"
+        -- Convert to UI units and flip to bottom-left origin
+        local y_ui_top = rawMy * ui.scaleY
+        return ui.screenH - y_ui_top
     end
 end
 
@@ -63,6 +80,5 @@ function on_create(self)
 end
 
 function on_update(self, dt)
-    -- Keep it robust for resize/orientation changes
     updateUISize()
 end

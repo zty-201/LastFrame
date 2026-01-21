@@ -15,17 +15,17 @@ local function getShared()
 end
 
 local function ensurePOVShared()
-    local SH = getShared()
-    if not SH then return nil end
-    SH.POV = SH.POV or {}
-    return SH.POV
+    local Shared = getShared()
+    if not Shared then return nil end
+    Shared.POV = Shared.POV or {}
+    return Shared.POV
 end
 
 local function ensureUIShared()
-    local SH = getShared()
-    if not SH then return nil end
-    SH.UI = SH.UI or {}
-    return SH.UI
+    local Shared = getShared()
+    if not Shared then return nil end
+    Shared.UI = Shared.UI or {}
+    return Shared.UI
 end
 
 local function getCanvasSize(ui)
@@ -62,17 +62,14 @@ end
 
 
 local function Calibrate_View_Center()
-    local SH = getShared()
-    if not SH then
+    local Shared = getShared()
+    if not Shared then
         print("[ui_calibrate] WARNING: SHARED missing")
         return
     end
 
-    -- Ensure UI table exists
-    SH.UI = SH.UI or {}
-
-    -- Ask the camera scripts to recenter on the next frame
-    SH.UI.recenterRequested = true
+    Shared.UI = Shared.UI or {}
+    Shared.UI.recenterRequested = true
 
     print("[ui_calibrate] Recenter requested")
 end
@@ -84,6 +81,16 @@ function on_create(self)
         return
     end
 
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
+
+    -- Windows: hide the button UI (keyboard handles this)
+    if platform == "windows" then
+        UI:SetVisible(false)
+        return
+    end
+
+    -- Android: show + position
     local uiShared = ensureUIShared()
     local screenW, screenH = getCanvasSize(uiShared)
 
@@ -96,27 +103,32 @@ function on_create(self)
 end
 
 function on_update(self, dt)
-    if not UI then return end
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
 
-    -- ===========================
-    -- MOUSE/TAP ON ICON
-    -- ===========================
-    local downMouse = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
-    if downMouse and isPointerOver() then
-        Calibrate_View_Center()
-    end
-
-    -- ===========================
-    -- WINDOWS KEYBOARD: C to calibrate
-    -- ===========================
-    if PLATFORM == "windows" then
+    ------------------------------------------------------------
+    -- Windows: keyboard only (UI hidden)
+    ------------------------------------------------------------
+    if platform == "windows" then
         local isCDown = Input.GetKey(GLFW_KEY_C)
 
-        -- Edge-detect: only fire once per key press
         if isCDown and not prevCDown then
             Calibrate_View_Center()
         end
 
         prevCDown = isCDown
+        return
+    end
+
+    ------------------------------------------------------------
+    -- Android: tap icon only
+    ------------------------------------------------------------
+    if not UI then UI = EntityUI end
+    if not UI then return end
+    if not UI:IsVisible() then return end
+
+    local downMouse = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
+    if downMouse and isPointerOver() then
+        Calibrate_View_Center()
     end
 end

@@ -18,12 +18,16 @@ local function getShared()
 end
 
 local function ensureUIShared()
-    local SH = getShared()
-    SH.UI = SH.UI or {}
-    local u = SH.UI
+    local Shared = getShared()
+    if not Shared then return nil end
+
+    Shared.UI = Shared.UI or {}
+    local u = Shared.UI
+
     u.joystickX      = u.joystickX      or 0
     u.joystickY      = u.joystickY      or 0
     u.joystickActive = u.joystickActive or false
+
     return u
 end
 
@@ -41,9 +45,22 @@ function on_create(self)
         return
     end
 
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
+
+    -- Windows: hide joystick UI
+    if platform == "windows" then
+        UI:SetVisible(false)
+        return
+    end
+
+    -- Android: show + init
+    UI:SetVisible(true)
     UI:SetSize(KNOB_SIZE, KNOB_SIZE)
 
     local uiShared = ensureUIShared()
+    if not uiShared then return end
+
     -- joyCenterX / joyCenterY set by bg script
     knobCenterX = uiShared.joyCenterX or 0
     knobCenterY = uiShared.joyCenterY or 0
@@ -54,14 +71,27 @@ function on_create(self)
     )
 end
 
+
 -- ============================================================
 -- on_update
 -- ============================================================
 function on_update(self, dt)
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
+
+    -- Windows: do nothing (UI hidden)
+    if platform == "windows" then
+        return
+    end
+
+    if not UI then UI = EntityUI end
     if not UI then return end
+    if not UI:IsVisible() then return end
 
     local uiShared = ensureUIShared()
-    local radius   = uiShared.joyRadius or 200.0
+    if not uiShared then return end
+
+    local radius = uiShared.joyRadius or 200.0
 
     ------------------------------------------------------------
     -- Current visual centre of the knob
@@ -87,7 +117,7 @@ function on_update(self, dt)
     if uiShared.ToUIY then
         my = uiShared.ToUIY(rawMy)
     else
-        my = virtualH - rawMy   -- fallback (same convention as before)
+        my = virtualH - rawMy
     end
 
     local down = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
@@ -125,13 +155,11 @@ function on_update(self, dt)
             clampedDY = dy * k
         end
 
-        -- Place knob sprite
         UI:SetPosition(
             knobCenterX + clampedDX - KNOB_SIZE * 0.5,
             knobCenterY + clampedDY - KNOB_SIZE * 0.5
         )
 
-        -- Normalized joystick direction
         local nx = clampedDX / radius
         local ny = clampedDY / radius
 
@@ -143,19 +171,17 @@ function on_update(self, dt)
             ny = ny / mag
         end
 
-        uiShared.joystickX      = -nx   -- X inverted to match your movement logic
+        uiShared.joystickX      = -nx
         uiShared.joystickY      = ny
         uiShared.joystickActive = (nx ~= 0 or ny ~= 0)
     end
 
     ------------------------------------------------------------
-    -- Release: handle both proper "up" and the case where
-    -- the touch stops reporting but Up isn't fired (Android).
+    -- Release (Android-safe)
     ------------------------------------------------------------
     if (up or (not held and not down)) and isDragging then
         isDragging = false
 
-        -- Snap back to rest center
         UI:SetPosition(
             knobCenterX - KNOB_SIZE * 0.5,
             knobCenterY - KNOB_SIZE * 0.5

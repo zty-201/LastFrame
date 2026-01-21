@@ -20,10 +20,10 @@ local function getShared()
 end
 
 local function ensureUIShared()
-    local SH = getShared()
-    if not SH then return nil end
-    SH.UI = SH.UI or {}
-    return SH.UI
+    local Shared = getShared()
+    if not Shared then return nil end
+    Shared.UI = Shared.UI or {}
+    return Shared.UI
 end
 
 local function isPointerOver()
@@ -60,6 +60,16 @@ function on_create(self)
         return
     end
 
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
+
+    -- Windows: hide the button UI
+    if platform == "windows" then
+        UI:SetVisible(false)
+        return
+    end
+
+    -- Android: show + position
     local uiShared = ensureUIShared()
     local screenW, screenH = getCanvasSize(uiShared)
 
@@ -71,19 +81,26 @@ function on_create(self)
     UI:SetVisible(true)
 end
 
+
 function on_update(self, dt)
-    if not UI then
-        UI = EntityUI
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
+
+    -- Windows: nothing (UI hidden, flashlight probably on a key)
+    if platform == "windows" then
+        return
     end
+
+    if not UI then UI = EntityUI end
     if not UI then return end
+    if not UI:IsVisible() then return end
 
     local down = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
     if down and isPointerOver() then
-        -- Send a toggle request through SHARED.FLASHLIGHT
-        local SH = getShared()
-        if SH then
-            SH.FLASHLIGHT = SH.FLASHLIGHT or {}
-            SH.FLASHLIGHT.requestToggle = true
+        Shared = getShared()
+        if Shared then
+            Shared.FLASHLIGHT = Shared.FLASHLIGHT or {}
+            Shared.FLASHLIGHT.requestToggle = true
         end
     end
 end
