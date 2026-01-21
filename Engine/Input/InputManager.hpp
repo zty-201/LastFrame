@@ -19,6 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <unordered_map>
 #include <string>   // <-- ADDED (for std::string)
 #include <map>      // <-- ADDED (for std::map)
+#include <glm/glm.hpp>
 #include "ISystem.hpp"
 #include "Key_Action.hpp"
 
