@@ -77,8 +77,6 @@ namespace EngineFramework
         static bool GetActionDown(int action);   // true on press
         static bool GetActionUp(int action);     // true on release
 
-        static void SetCursorLocked(bool locked);       // hide cursor in-game
-        static void SetCursorVisible(bool visible);     // hide cursor in-game 
 #endif
 
         // --- Mouse API ---
@@ -136,7 +134,6 @@ namespace EngineFramework
         static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
         static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
         static void WindowSizeCallback(GLFWwindow* window, int width, int height);
-        static inline GLFWwindow* s_Window = nullptr;
 #endif
         static void ErrorCallback(int error, const char* description);
 

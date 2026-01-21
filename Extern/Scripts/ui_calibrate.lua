@@ -4,9 +4,11 @@
 -- ============================================================
 
 local ICON_SIZE = 75.0   -- very small icon
-local ANCHOR_X  = 0.5    -- centre horizontally
-local ANCHOR_Y  = 0.1  -- close to bottom
+local ANCHOR_X  = 0.50    -- centre horizontally
+local ANCHOR_Y  = 0.13  -- close to bottom
 local prevCDown = false
+
+local screenWidth, screenHeight = 2340, 1080
 
 local UI = nil
 
@@ -15,23 +17,17 @@ local function getShared()
 end
 
 local function ensurePOVShared()
-    local Shared = getShared()
-    if not Shared then return nil end
-    Shared.POV = Shared.POV or {}
-    return Shared.POV
+    local SH = getShared()
+    if not SH then return nil end
+    SH.POV = SH.POV or {}
+    return SH.POV
 end
 
 local function ensureUIShared()
-    local Shared = getShared()
-    if not Shared then return nil end
-    Shared.UI = Shared.UI or {}
-    return Shared.UI
-end
-
-local function getCanvasSize(ui)
-    local w = (ui and ui.screenW) or (ui and ui.joyScreenWidth) or 2560.0
-    local h = (ui and ui.screenH) or (ui and ui.joyScreenHeight) or 1440.0
-    return w, h
+    local SH = getShared()
+    if not SH then return nil end
+    SH.UI = SH.UI or {}
+    return SH.UI
 end
 
 local function isPointerOver()
@@ -44,14 +40,8 @@ local function isPointerOver()
     if not uiShared then return false end
 
     local mx, rawMy = Input.GetMousePosition()
-    local _, screenH = getCanvasSize(uiShared)
-
-    local my
-    if uiShared.ToUIY then
-        my = uiShared.ToUIY(rawMy)
-    else
-        my = screenH - rawMy
-    end
+    local virtualH   = uiShared.joyScreenHeight or 1440.0
+    local my         = virtualH - rawMy
 
     local x, y = UI:GetPosition()
     local w, h = UI:GetSize()
@@ -62,14 +52,17 @@ end
 
 
 local function Calibrate_View_Center()
-    local Shared = getShared()
-    if not Shared then
+    local SH = getShared()
+    if not SH then
         print("[ui_calibrate] WARNING: SHARED missing")
         return
     end
 
-    Shared.UI = Shared.UI or {}
-    Shared.UI.recenterRequested = true
+    -- Ensure UI table exists
+    SH.UI = SH.UI or {}
+
+    -- Ask the camera scripts to recenter on the next frame
+    SH.UI.recenterRequested = true
 
     print("[ui_calibrate] Recenter requested")
 end
@@ -81,21 +74,8 @@ function on_create(self)
         return
     end
 
-    local Shared = getShared()
-    local platform = (Shared and Shared.PLATFORM) or PLATFORM
-
-    -- Windows: hide the button UI (keyboard handles this)
-    if platform == "windows" then
-        UI:SetVisible(false)
-        return
-    end
-
-    -- Android: show + position
-    local uiShared = ensureUIShared()
-    local screenW, screenH = getCanvasSize(uiShared)
-
-    local centerX = ANCHOR_X * screenW
-    local centerY = ANCHOR_Y * screenH
+    local centerX = ANCHOR_X * screenWidth
+    local centerY = ANCHOR_Y * screenHeight
 
     UI:SetSize(ICON_SIZE, ICON_SIZE)
     UI:SetPosition(centerX - ICON_SIZE * 0.5, centerY - ICON_SIZE * 0.5)
@@ -103,32 +83,27 @@ function on_create(self)
 end
 
 function on_update(self, dt)
-    local Shared = getShared()
-    local platform = (Shared and Shared.PLATFORM) or PLATFORM
+    if not UI then return end
 
-    ------------------------------------------------------------
-    -- Windows: keyboard only (UI hidden)
-    ------------------------------------------------------------
-    if platform == "windows" then
+    -- ===========================
+    -- MOUSE/TAP ON ICON
+    -- ===========================
+    local downMouse = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
+    if downMouse and isPointerOver() then
+        Calibrate_View_Center()
+    end
+
+    -- ===========================
+    -- WINDOWS KEYBOARD: C to calibrate
+    -- ===========================
+    if PLATFORM == "windows" then
         local isCDown = Input.GetKey(GLFW_KEY_C)
 
+        -- Edge-detect: only fire once per key press
         if isCDown and not prevCDown then
             Calibrate_View_Center()
         end
 
         prevCDown = isCDown
-        return
-    end
-
-    ------------------------------------------------------------
-    -- Android: tap icon only
-    ------------------------------------------------------------
-    if not UI then UI = EntityUI end
-    if not UI then return end
-    if not UI:IsVisible() then return end
-
-    local downMouse = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
-    if downMouse and isPointerOver() then
-        Calibrate_View_Center()
     end
 end

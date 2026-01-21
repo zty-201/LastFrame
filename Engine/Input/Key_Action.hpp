@@ -4,15 +4,17 @@
 namespace EngineFramework
 {
 	enum class Key_Actions{
+		
 		FLASHLIGHT,
-		INTERACT,
 		INVENTORY,
+		INTERACT,
 		JUMP,
-		MOVE_BACK,
 		MOVE_FORWARD,
+		MOVE_BACK,
 		MOVE_LEFT,
 		MOVE_RIGHT,
 		OPEN_EDITOR,
+		
 	};
 }
 #endif

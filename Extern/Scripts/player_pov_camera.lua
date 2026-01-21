@@ -22,21 +22,11 @@ local recenterStartPitch    = 0.0
 local recenterTargetYaw     = 0.0    -- where "centre" faces
 local recenterTargetPitch   = 0.0
 
--- FPS mouse look (desktop)
-local holdToLook   = true
-local lookButton   = GLFW_MOUSE_BUTTON_RIGHT
-local prevLookHeld = false
-
 -- ============================================================
 -- Access true global table
 -- ============================================================
 local function getGlobalShared()
     return rawget(_G, "SHARED")
-end
-
-local function setMouseLookActive(active)
-    Input.SetCursorLocked(active)       -- FPS: lock + unlimited deltas
-    Input.SetCursorVisible(not active)  -- hide cursor while locked
 end
 
 -- ============================================================
@@ -162,26 +152,11 @@ function on_update(self, dt)
         end
 
         -- Normal mouse look when not recentering
-        
-        -- FPS-style mouse look (hold RMB to look)
-        local lookHeld = true
-        if holdToLook then
-            lookHeld = Input.GetMouseButton(lookButton)
-        end
-
-        -- Toggle cursor lock/visibility when state changes
-        if lookHeld ~= prevLookHeld then
-            setMouseLookActive(lookHeld)
-            prevLookHeld = lookHeld
-        end
-
-        -- Apply look while locked
-        if lookHeld then
-            local dx, dy = Input.GetMouseDelta()
+        local dx, dy = Input.GetMouseDelta()
+        if dx ~= 0 or dy ~= 0 then
             yaw   = yaw + dx * mouseSensitivity
             pitch = pitch - dy * mouseSensitivity
         end
-
 
         applyLook()
         return
@@ -220,9 +195,5 @@ end
 
 -- ============================================================
 function on_destroy()
-    if PLATFORM == "windows" then
-        Input.SetCursorLocked(false)
-        Input.SetCursorVisible(true)
-    end
     print("[player_pov_camera] Destroyed (entity " .. tostring(EntityID) .. ")")
 end

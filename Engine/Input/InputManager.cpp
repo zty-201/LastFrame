@@ -72,8 +72,6 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
     void InputManager::RegisterCallbacks(GLFWwindow* window)
     {
-        s_Window = window; //[BEN] store it so we can call glfwSetInputMode later
-
         glfwSetKeyCallback(window, KeyCallback);
         glfwSetMouseButtonCallback(window, MouseButtonCallback);
         glfwSetCursorPosCallback(window, CursorPosCallback);
@@ -297,37 +295,6 @@ namespace EngineFramework
         auto it = key_mapping_data.find(action);
         if (it == key_mapping_data.end()) return false;
         return GetKeyUp(it->second);
-    }
-
-    void InputManager::SetCursorLocked(bool locked)
-{
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) return;
-#endif
-        if (!s_Window) return;
-
-        glfwSetInputMode(s_Window, GLFW_CURSOR, locked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
-
-        // Optional but recommended: reset mouse baseline to avoid a big delta spike
-        double x, y;
-        glfwGetCursorPos(s_Window, &x, &y);
-        mouseX = lastMouseX = x;
-        mouseY = lastMouseY = y;
-        offset_MouseX = 0.0;
-        offset_MouseY = 0.0;
-    }
-
-    void InputManager::SetCursorVisible(bool visible)
-    {
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) return;
-#endif
-        if (!s_Window) return;
-
-        // NOTE:
-        // - If you are using GLFW_CURSOR_DISABLED for FPS lock, it already hides the cursor.
-        // - This function is still useful for menus (HIDDEN) vs NORMAL.
-        glfwSetInputMode(s_Window, GLFW_CURSOR, visible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
     }
 
     //KEY ACTION ENUM CALLING
