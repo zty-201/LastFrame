@@ -93,6 +93,9 @@ namespace EngineFramework
 
         // --- Window events ---
         static std::pair<int, int> GetWindowSize();
+
+        //Unified function to get device screen size
+        static std::pair<int, int> GetScreenSize();
 #ifdef PLATFORM_WINDOWS
         static void RegisterCallbacks(GLFWwindow* window);
 #endif

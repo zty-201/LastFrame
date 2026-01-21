@@ -19,6 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "GraphicsSystem.h"
 
 
+
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
 #include <nlohmann/json.hpp>
@@ -488,6 +489,25 @@ namespace EngineFramework
     std::pair<int, int> InputManager::GetWindowSize()
     {
         return { windowWidth, windowHeight };
+    }
+
+    std::pair<int, int> InputManager::GetScreenSize()
+    {
+#if defined(PLATFORM_ANDROID)
+        return { windowWidth, windowHeight };
+
+#elif defined(PLATFORM_WINDOWS)
+        if (s_Window)
+        {
+            int w, h;
+            glfwGetWindowSize(s_Window, &w, &h);
+            return { w, h };
+        }
+        // Fallback
+        return { windowWidth, windowHeight };
+#else
+        return { 0, 0 };
+#endif
     }
 
     void InputManager::Initialize()
