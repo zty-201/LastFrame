@@ -23,6 +23,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <sstream>
 #include <map>
 #include <memory>
+#include <vector>
+#include <algorithm>
 #include "entt/entity/registry.hpp"
 #define IMGUI_IMPL_OPENGL_ES3
 #include "imgui.h"
@@ -59,8 +61,41 @@ namespace EngineFramework
 			- Should be set whenever model or instance is selected.
 		*/
 		Latest_Selected latest_selected = Latest_Selected::NONE;
-		entt::entity selected_objectID;
+		entt::entity selected_objectID = entt::null;
 		xresource::full_guid selected_modelID;
+		std::vector<entt::entity> selected_entities;
+
+		bool HasEntitySelection() const { return !selected_entities.empty(); }
+		bool IsEntitySelected(entt::entity entity) const {
+			return std::find(selected_entities.begin(), selected_entities.end(), entity) != selected_entities.end();
+		}
+		void ClearEntitySelection() {
+			selected_entities.clear();
+			selected_objectID = entt::null;
+		}
+		void SetEntitySelection(entt::entity entity) {
+			selected_entities.clear();
+			if (entity != entt::null) {
+				selected_entities.push_back(entity);
+			}
+			selected_objectID = entity;
+		}
+		void AddEntitySelection(entt::entity entity) {
+			if (entity == entt::null) return;
+			if (!IsEntitySelected(entity)) {
+				selected_entities.push_back(entity);
+			}
+			selected_objectID = entity;
+		}
+		void RemoveEntitySelection(entt::entity entity) {
+			auto it = std::remove(selected_entities.begin(), selected_entities.end(), entity);
+			if (it != selected_entities.end()) {
+				selected_entities.erase(it, selected_entities.end());
+			}
+			if (selected_objectID == entity) {
+				selected_objectID = selected_entities.empty() ? entt::null : selected_entities.back();
+			}
+		}
 		
 	};
 

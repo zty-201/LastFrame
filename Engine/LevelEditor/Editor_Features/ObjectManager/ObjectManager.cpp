@@ -95,13 +95,14 @@ namespace EngineFramework
 			top_buttons();
 			ImGui::Text("Scene Hierarchy");
 			static bool open_popup_once{};
-			static entt::entity selected_entity = entt::null;
 			static entt::entity copied_entity = entt::null;
 
 			// For renaming purposes
 			static bool open_rename_popup{};
 			static entt::entity rename_target = entt::null;
 			static char rename_buffer[128]{};
+
+			iEditorView& selection_state = LevelEditor::GetInstance().variables;
 
 
 			auto duplicate_and_select = [&](entt::entity source_entity) -> entt::entity {
@@ -121,9 +122,8 @@ namespace EngineFramework
 					history_system.end_track(record);
 				}
 
-				selected_entity = duplicated_entity;
-				LevelEditor::GetInstance().variables.selected_objectID = duplicated_entity;
-				LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+				selection_state.SetEntitySelection(duplicated_entity);
+				selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
 				return duplicated_entity;
 			};
 
@@ -138,8 +138,9 @@ namespace EngineFramework
 			// Ctrl + C caches the currently selected entity in copied_entity
 			if (allow_copy_paste) {
 				if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_C, copy_paste_flags)) {
-					if (selected_entity != entt::null && registry.valid(selected_entity)) {
-						copied_entity = selected_entity;
+					entt::entity active_entity = selection_state.selected_objectID;
+					if (active_entity != entt::null && registry.valid(active_entity)) {
+						copied_entity = active_entity;
 					}
 					else {
 						LOGW("[ObjectManager] No valid entity selected to copy");
@@ -163,9 +164,10 @@ namespace EngineFramework
 
 				// Pressing F2 opens the rename popup for the currently selected entity
 				if (ImGui::Shortcut(ImGuiKey_F2, copy_paste_flags)) {
-					if (selected_entity != entt::null && registry.valid(selected_entity)) {
-						rename_target = selected_entity;
-						std::string current_name = GameObjectSystem::GetEntityName(selected_entity);
+					entt::entity active_entity = selection_state.selected_objectID;
+					if (active_entity != entt::null && registry.valid(active_entity)) {
+						rename_target = active_entity;
+						std::string current_name = GameObjectSystem::GetEntityName(active_entity);
 						std::snprintf(rename_buffer, sizeof(rename_buffer), "%s", current_name.c_str());
 						rename_buffer[sizeof(rename_buffer) - 1] = '\0';
 						open_rename_popup = true;
@@ -184,46 +186,65 @@ namespace EngineFramework
 				//ImGui::Text("%s", label.c_str());
 
 				// Determine if this entity is selected
-				bool is_selected = (entity == selected_entity);
+				bool is_selected = selection_state.IsEntitySelected(entity);
 
 				// Make the entity a selectable item
 				if (ImGui::Selectable(label.c_str(), is_selected)) {
-					selected_entity = entity;
-					LevelEditor::GetInstance().variables.selected_objectID = selected_entity;
-					LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
-					LOGI(("Selected Entity: " + std::to_string((uint32_t)selected_entity)).c_str());
+					ImGuiIO& io = ImGui::GetIO();
+					bool ctrl_down = io.KeyCtrl;
+					bool shift_down = io.KeyShift;
 
-					if (registry.all_of<MeshComponent>(selected_entity)) {
-						const auto& mc = registry.get<MeshComponent>(selected_entity);
-
-						// Build object-space AABB from MeshComponent authoring values
-						Mesh::AABB obj{};
-						obj.minV = glm::vec3(mc.localMin[0], mc.localMin[1], mc.localMin[2]);
-						obj.maxV = glm::vec3(mc.localMax[0], mc.localMax[1], mc.localMax[2]);
-
-						// World-space if we also have a transform
-						if (registry.all_of<TransformComponent>(selected_entity)) {
-							const auto& tf = registry.get<TransformComponent>(selected_entity);
-							const Mesh::AABB world = TransformAABB(obj, tf.modelMatrix);
-
-							LOGI("[AABB] ent=%u  "
-								"objMin(%.3f,%.3f,%.3f) objMax(%.3f,%.3f,%.3f)  "
-								"worldMin(%.3f,%.3f,%.3f) worldMax(%.3f,%.3f,%.3f)",
-								(uint32_t)selected_entity,
-								obj.minV.x, obj.minV.y, obj.minV.z,
-								obj.maxV.x, obj.maxV.y, obj.maxV.z,
-								world.minV.x, world.minV.y, world.minV.z,
-								world.maxV.x, world.maxV.y, world.maxV.z);
-						}
-						else {
-							LOGI("[AABB] ent=%u  objMin(%.3f,%.3f,%.3f) objMax(%.3f,%.3f,%.3f)  (no TransformComponent)",
-								(uint32_t)selected_entity,
-								obj.minV.x, obj.minV.y, obj.minV.z,
-								obj.maxV.x, obj.maxV.y, obj.maxV.z);
+					if (ctrl_down) {
+						if (is_selected) {
+							selection_state.RemoveEntitySelection(entity);
+							if (!selection_state.HasEntitySelection()) {
+								selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
+							}
 						}
 					}
 					else {
-						LOGI("[AABB] ent=%u  (no MeshComponent)", (uint32_t)selected_entity);
+						if (shift_down) {
+							selection_state.AddEntitySelection(entity);
+						}
+						else {
+							selection_state.SetEntitySelection(entity);
+						}
+
+						selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+						LOGI(("Selected Entity: " + std::to_string((uint32_t)entity)).c_str());
+
+						if (registry.all_of<MeshComponent>(entity)) {
+							const auto& mc = registry.get<MeshComponent>(entity);
+
+							// Build object-space AABB from MeshComponent authoring values
+							Mesh::AABB obj{};
+							obj.minV = glm::vec3(mc.localMin[0], mc.localMin[1], mc.localMin[2]);
+							obj.maxV = glm::vec3(mc.localMax[0], mc.localMax[1], mc.localMax[2]);
+
+							// World-space if we also have a transform
+							if (registry.all_of<TransformComponent>(entity)) {
+								const auto& tf = registry.get<TransformComponent>(entity);
+								const Mesh::AABB world = TransformAABB(obj, tf.modelMatrix);
+
+								LOGI("[AABB] ent=%u  "
+									"objMin(%.3f,%.3f,%.3f) objMax(%.3f,%.3f,%.3f)  "
+									"worldMin(%.3f,%.3f,%.3f) worldMax(%.3f,%.3f,%.3f)",
+									(uint32_t)entity,
+									obj.minV.x, obj.minV.y, obj.minV.z,
+									obj.maxV.x, obj.maxV.y, obj.maxV.z,
+									world.minV.x, world.minV.y, world.minV.z,
+									world.maxV.x, world.maxV.y, world.maxV.z);
+							}
+							else {
+								LOGI("[AABB] ent=%u  objMin(%.3f,%.3f,%.3f) objMax(%.3f,%.3f,%.3f)  (no TransformComponent)",
+									(uint32_t)entity,
+									obj.minV.x, obj.minV.y, obj.minV.z,
+									obj.maxV.x, obj.maxV.y, obj.maxV.z);
+							}
+						}
+						else {
+							LOGI("[AABB] ent=%u  (no MeshComponent)", (uint32_t)entity);
+						}
 					}
 				}
 
@@ -239,7 +260,8 @@ namespace EngineFramework
 				if (ImGui::BeginPopupContextItem(popupID.c_str())) { // <-- Use the unique ID here!
 
 					// This is safe: sets the context to the currently right-clicked entity
-					selected_entity = entity;
+					selection_state.SetEntitySelection(entity);
+					selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
 
 					// Add the actions to be tracked by history system to ensure the redo/undo works for duplicating and delete etc
 					std::string duplicateLabel = "Duplicate Entity##" + std::to_string((uint32_t)entity);
@@ -269,8 +291,9 @@ namespace EngineFramework
 						}
 
 						// 2. Clear selection
-						if (LevelEditor::GetInstance().variables.selected_objectID == entity) {
-							LevelEditor::GetInstance().variables.selected_objectID = entt::null;
+						selection_state.RemoveEntitySelection(entity);
+						if (!selection_state.HasEntitySelection()) {
+							selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
 						}
 
 						ImGui::EndPopup();
