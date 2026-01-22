@@ -273,7 +273,7 @@ namespace EngineFramework
 #if defined(PLATFORM_WINDOWS)
 		is_simulator_running = false;
 #endif
-        camera_speed = 0.5f; // as default
+        camera_speed = 5.0f; // as default
         scrolling_speed = 10.f; // default
 
         Event_Level_Editor_Simulation editor_toggled{};
