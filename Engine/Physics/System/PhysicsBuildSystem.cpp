@@ -156,5 +156,6 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
         }
 
         material._prevIsStatic = material.isStatic;
+		material._prevScale    = transform.scale;
     }
 }

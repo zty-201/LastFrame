@@ -19,6 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <unordered_map>
 #include <string>   // <-- ADDED (for std::string)
 #include <map>      // <-- ADDED (for std::map)
+#include <glm/glm.hpp>
 #include "ISystem.hpp"
 #include "Key_Action.hpp"
 
@@ -77,6 +78,8 @@ namespace EngineFramework
         static bool GetActionDown(int action);   // true on press
         static bool GetActionUp(int action);     // true on release
 
+        static void SetCursorLocked(bool locked);       // hide cursor in-game
+        static void SetCursorVisible(bool visible);     // hide cursor in-game 
 #endif
 
         // --- Mouse API ---
@@ -90,6 +93,9 @@ namespace EngineFramework
 
         // --- Window events ---
         static std::pair<int, int> GetWindowSize();
+
+        //Unified function to get device screen size
+        static std::pair<int, int> GetScreenSize();
 #ifdef PLATFORM_WINDOWS
         static void RegisterCallbacks(GLFWwindow* window);
 #endif
@@ -112,7 +118,7 @@ namespace EngineFramework
 
         static std::unordered_map<int, KeyState> keyStates;
 
-        static glm::vec3 GetGyroscopeRotatioRate();
+        static glm::vec3 GetGyroscopeRotationRate();
         static std::unordered_map<Key_Actions, int> key_mapping;
         static std::map <std::string, int> key_mapping_data; //json file data
         void codegen_deseralise();
@@ -134,6 +140,7 @@ namespace EngineFramework
         static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
         static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
         static void WindowSizeCallback(GLFWwindow* window, int width, int height);
+        static inline GLFWwindow* s_Window = nullptr;
 #endif
         static void ErrorCallback(int error, const char* description);
 

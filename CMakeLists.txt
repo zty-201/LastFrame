@@ -337,6 +337,7 @@ if(WIN32)
 elseif(ANDROID)
   target_sources(jnicpp PUBLIC ${ENGINE_SOURCE} ${APPLICATION_SOURCE})
   target_include_directories(jnicpp PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES})
+  target_include_directories(jnicpp PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Extern/glm")
 endif()
 
 #Adding /bigobj for Script.cpp as it's too big
