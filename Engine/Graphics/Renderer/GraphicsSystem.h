@@ -223,7 +223,7 @@ namespace EngineFramework
         float m_absorption = 0.0f; 
         float m_shadow_bias = 0.001f;
         float m_depth_power = 1.0f; // For exponential depth mapping
-        float m_ambient_light_intensity = 0.1f;
+        float m_ambient_light_intensity = 0.4f;
         bool m_temporal_accumulation = true;
         bool m_tricubic_filtering = false;
         int m_frame_idx = 0;

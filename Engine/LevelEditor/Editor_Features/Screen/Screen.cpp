@@ -658,7 +658,7 @@ namespace EngineFramework
         entt::entity camEnt = camera_view.front();
         auto& cam = camera_view.get<CameraComponent>(camEnt);
 
-        // We don�t use mouse or focus here (outside viewport).
+        // We dont use mouse or focus here (outside viewport).
         entt::entity selected = static_cast<entt::entity>(editor_ptr->selected_objectID);
 
         m_editorCamera.Update(cam, input, registry, selected);
@@ -1799,7 +1799,7 @@ namespace EngineFramework
         }
         else
         {
-            LOGE("[Simulation] Player entity not found � ensure player_pov_camera.lua is attached!");
+            LOGE("[Simulation] Player entity not found ensure player_pov_camera.lua is attached!");
         }
 
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoKeyboard;

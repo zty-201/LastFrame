@@ -642,7 +642,7 @@ namespace Engine {
     // ------------------------------------------------------------------
     void ScriptSystem::OnRuntimeStart(entt::registry& reg) {
 #if defined(ENGINE_ENABLE_LUA)
-        LOGI("[ScriptSystem] OnRuntimeStart called — initializing Lua scripts...");
+        LOGI("[ScriptSystem] OnRuntimeStart called - initializing Lua scripts...");
 
         s_RuntimeRegistry = &reg;
 
