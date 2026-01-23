@@ -215,6 +215,41 @@ namespace Engine {
                 return std::make_tuple(v.x, v.y, v.z);
             });
 
+        s_Lua.set_function("Physics_ApplyImpulse",
+            [](uint32_t entityId, float x, float y, float z)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                PhysicsWorld::Get().ApplyImpulse(e, x, y, z);
+            });
+
+        s_Lua.set_function("Physics_ExplodeGroup",
+            [](sol::table parts, float strength)
+            {
+                std::vector<entt::entity> entities;
+                for (auto pair : parts)
+                {
+                    if (pair.second.is<uint32_t>())
+                    {
+                        entities.push_back(static_cast<entt::entity>(pair.second.as<uint32_t>()));
+                    }
+                }
+                PhysicsWorld::Get().ExplodeGroup(entities, strength);
+            });
+
+        s_Lua.set_function("Physics_RadialExplosion",
+            [](sol::table parts, float x, float y, float z, float strength)
+            {
+                std::vector<entt::entity> entities;
+                for (auto pair : parts)
+                {
+                    if (pair.second.is<uint32_t>())
+                    {
+                        entities.push_back(static_cast<entt::entity>(pair.second.as<uint32_t>()));
+                    }
+                }
+                PhysicsWorld::Get().ApplyRadialExplosion(entities, x, y, z, strength);
+            });
+
         // ===============================================================
         // Light Component bindings
         // ===============================================================

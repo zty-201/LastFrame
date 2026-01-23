@@ -804,3 +804,63 @@ bool PhysicsWorld::Raycast(const glm::vec3& origin, const glm::vec3& direction, 
     outHit.hasHit = false;
     return false;
 }
+
+void PhysicsWorld::ApplyImpulse(entt::entity entity, float x, float y, float z)
+{
+    if (m_entityToBody.find(entity) == m_entityToBody.end()) return; //Body doesnt exist
+
+    JPH::BodyID bodyID = m_entityToBody[entity];
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterface();
+
+    bodyInterface.ActivateBody(bodyID); //Have to wake body to apply physics
+
+    bodyInterface.AddImpulse(bodyID, JPH::Vec3(x, y, z)); //Apply impulse force
+}
+
+void PhysicsWorld::ExplodeGroup(const std::vector<entt::entity>& parts, float strength)
+{
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterface();
+
+    for (entt::entity part : parts)
+    {
+        //Locate entity physics body
+        if (m_entityToBody.find(part) == m_entityToBody.end()) continue;
+        JPH::BodyID bodyID = m_entityToBody[part];
+
+        //Generate Random Direction
+        float rx = ((float)rand() / RAND_MAX) * 2.f - 1.f; //-1 to 1 (left - right)
+        float ry = ((float)rand() / RAND_MAX);             //0 to 2 (only upwards)
+        float rz = ((float)rand() / RAND_MAX) * 2.f - 1.f; //-1 ot 1 (forwards - backwards)
+
+        //Normalize
+        float length = std::sqrt(rx * rx + ry * ry + rz * rz);
+        if (length > 0) { rx /= length; ry /= length; rz /= length; }
+
+        bodyInterface.ActivateBody(bodyID);
+        bodyInterface.AddImpulse(bodyID, JPH::Vec3(rx, ry, rz) * strength);
+    }
+}
+
+void PhysicsWorld::ApplyRadialExplosion(const std::vector<entt::entity>& parts, float centerX, float centerY, float centerZ, float strength)
+{
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterface();
+    JPH::Vec3 center(centerX, centerY, centerZ);
+
+    for (entt::entity part : parts)
+    {
+        if (m_entityToBody.find(part) == m_entityToBody.end()) continue;
+
+        JPH::BodyID bodyID = m_entityToBody[part];
+
+        //Get position and rotation of part
+        JPH::Vec3 partPos = bodyInterface.GetPosition(bodyID);
+        JPH::Vec3 dir = partPos - center;
+
+        //Normalize
+        if (dir.Length() < 0.001f) dir = JPH::Vec3(0, 1, 0);
+        else dir = dir.Normalized();
+
+        bodyInterface.ActivateBody(bodyID);
+        bodyInterface.AddImpulse(bodyID, dir * strength);
+    }
+}
