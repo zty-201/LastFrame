@@ -454,6 +454,8 @@ namespace EngineFramework
                         RaycastHit hit;
                         if (PhysicsWorld::Get().Raycast(rayOrigin, rayDir, 1000.f, hit))
                         {
+                            // To select multiple entities using shift
+                            // To deselect entities using ctrl
                             LOGI("Mouse Picked Entity: %u", (uint32_t)hit.entity);
                             iEditorView& selection_state = LevelEditor::GetInstance().variables;
                             ImGuiIO& io = ImGui::GetIO();
@@ -1191,6 +1193,8 @@ namespace EngineFramework
             glm::vec3 prev_rotation = object.rotation;
             glm::vec3 prev_scale = object.scale;
             bool has_multi_selection = transform_entities.size() > 1;
+
+            // Responsible for editing of all guizmo for allselected entities
 
             ImGuizmo::BeginFrame();
             ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());

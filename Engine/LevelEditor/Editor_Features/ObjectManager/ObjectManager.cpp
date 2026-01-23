@@ -257,9 +257,9 @@ namespace EngineFramework
 				std::string popupID = "EntityContextMenu##" + std::to_string((uint32_t)entity);
 
 				// Check for right-click on the selectable item AND start the menu
-				if (ImGui::BeginPopupContextItem(popupID.c_str())) { // <-- Use the unique ID here!
+				if (ImGui::BeginPopupContextItem(popupID.c_str())) {
 
-					// This is safe: sets the context to the currently right-clicked entity
+					// Set the context to the current selected entity
 					selection_state.SetEntitySelection(entity);
 					selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
 
@@ -271,8 +271,6 @@ namespace EngineFramework
 						break;
 					}
 
-					// --- 2. UNIQUE MENU ITEM LABEL ---
-					// Optional: Ensure the delete text itself is unique for clarity, though not mandatory
 					std::string deleteLabel = "Delete Entity##" + std::to_string((uint32_t)entity);
 
 					if (ImGui::MenuItem(deleteLabel.c_str())) {
