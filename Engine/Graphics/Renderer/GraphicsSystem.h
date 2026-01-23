@@ -213,6 +213,7 @@ namespace EngineFramework
         GLuint m_ray_march_voxel_grid = 0;
         GLuint m_temporal_integration_voxel_grid[2] = { 0, 0 };
         GLuint m_defaultWhiteTexture = 0;
+        GLuint m_defaultBlackTexture = 0;
         GLuint m_defaultNormalTexture = 0;
         std::vector<GLuint> m_blue_noise_textures;
         
