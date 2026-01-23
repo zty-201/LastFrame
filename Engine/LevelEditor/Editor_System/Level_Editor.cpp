@@ -74,7 +74,7 @@ namespace EngineFramework
 		to_close = false;
 
 		variables.selected_modelID = {}; //zero means none selected
-		variables.selected_objectID = entt::null; //zero means none selected
+		variables.ClearEntitySelection();
 		variables.latest_selected = iEditorView::Latest_Selected::NONE;
 		LOGI("LevelEditor() constructor");
 	}
