@@ -295,7 +295,7 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
     if (HasBody(entity)) return;
 
     if (collider.shapes.empty()) {
-        LOGI("[JOLT] Entity %u has ColliderComponent but no shapes defined. Skipping body creation.", (unsigned)entity);
+        //LOGI("[JOLT] Entity %u has ColliderComponent but no shapes defined. Skipping body creation.", (unsigned)entity);
         return;
     }
 
