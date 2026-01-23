@@ -105,6 +105,8 @@ namespace EngineFramework
 
         bool IsInitialized() const;
 
+        void SetSimulationMode(bool enabled);
+
         AudioSystem();
         ~AudioSystem() override;
 
@@ -187,6 +189,8 @@ namespace EngineFramework
         std::vector<ActiveInstance> m_active;
 
         std::unordered_map<entt::entity, bool> m_playOnStartDone;
+
+        bool m_inSimulation = false;
 
         static AudioSystem* this_system;
 

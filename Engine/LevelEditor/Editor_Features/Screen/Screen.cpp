@@ -64,6 +64,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "SceneManager.hpp"
 #include "PhysicsWorld.hpp"
 
+//Audio
+#include "Audio.hpp"
+
 namespace EngineFramework
 {
     using namespace entt::literals;
@@ -1752,6 +1755,7 @@ namespace EngineFramework
         if (is_simulator_running) return;
         //std::cout << "play_simulation\n";
         is_simulator_running = true;
+        EngineFramework::AudioSystem::GetInstance().SetSimulationMode(true);
 
         // ============================
         // SAVE CURRENT CAMERA POSITION
@@ -1961,6 +1965,7 @@ namespace EngineFramework
             has_saved_cam_before_sim = false;
         }
 
+        EngineFramework::AudioSystem::GetInstance().SetSimulationMode(false);
         is_simulator_running = false;
 
     }

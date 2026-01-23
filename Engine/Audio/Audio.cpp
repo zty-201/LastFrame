@@ -148,7 +148,7 @@ namespace EngineFramework
 	}
 
 	// -----------------------------
-	// New API: enqueue commands
+	// Enqueue commands
 	// -----------------------------
 	void AudioSystem::PlayEntitySlot(entt::entity entity, const std::string& slotId)
 	{
@@ -209,12 +209,15 @@ namespace EngineFramework
 
 					m_system->set3DListenerAttributes(0, &fPos, &fVel, &fFwd, &fUp);
 					listenerSet = true;
+
+					LOGI("[Audio] Listener rot = (%.3f, %.3f, %.3f)", tf.rotation.x, tf.rotation.y, tf.rotation.z);
 				});
 		}
 #endif
 
-		// 2) playOnStart slots (no component runtime flags)
-		HandlePlayOnStart(ecs);
+		// 2) playOnStart slots
+		if(m_inSimulation)
+			HandlePlayOnStart(ecs);
 
 		// 3) Process queued play/stop commands
 		ProcessCommands(ecs);
@@ -225,6 +228,16 @@ namespace EngineFramework
 #ifndef DISABLE_FMOD
 		// 5) FMOD internal update
 		auto r = m_system->update();
+
+		// Cleanup playOnStart guard for destroyed entities (prevents entity-id reuse bugs)
+		for (auto it = m_playOnStartDone.begin(); it != m_playOnStartDone.end(); )
+		{
+			if (!ecs.valid(it->first))
+				it = m_playOnStartDone.erase(it);
+			else
+				++it;
+		}
+
 		logFmodError(r, "System::update");
 #endif
 	}
@@ -236,15 +249,30 @@ namespace EngineFramework
 
 	void AudioSystem::HandlePlayOnStart(entt::registry& ecs)
 	{
+		static bool printedOnce = false;
+		if (!printedOnce)
+		{
+			LOGI("[Audio] HandlePlayOnStart() is running");
+			printedOnce = true;
+		}
+
 		auto view = ecs.view<AudioComponent>();
 		view.each([&](entt::entity e, AudioComponent& comp)
 			{
+				LOGI("[Audio] Found AudioComponent on entity %u, Slots=%zu",
+					(uint32_t)e, comp.Slots.size());
+
 				if (m_playOnStartDone[e]) return;
 
 				for (const auto& slot : comp.Slots)
 				{
 					if (slot.playOnStart && !slot.id.empty())
+					{
+						LOGI("[Audio] Queuing playOnStart slot '%s' for entity %u",
+							slot.id.c_str(), (uint32_t)e);
+
 						PlayEntitySlot(e, slot.id);
+					}
 				}
 
 				m_playOnStartDone[e] = true;
@@ -549,6 +577,28 @@ namespace EngineFramework
 	bool AudioSystem::IsInitialized() const
 	{
 		return m_initialized;
+	}
+
+	void AudioSystem::SetSimulationMode(bool enabled)
+	{
+		if (m_inSimulation == enabled)
+			return;
+
+		m_inSimulation = enabled;
+
+		if (m_inSimulation)
+		{
+			// Entering simulator: allow playOnStart to trigger again
+			m_playOnStartDone.clear();
+		}
+		else
+		{
+			// Leaving simulator: stop anything that is playing from the simulator
+			StopAll();
+			m_active.clear();
+			m_commands.clear();
+			m_playOnStartDone.clear();
+		}
 	}
 
 } // namespace EngineFramework
