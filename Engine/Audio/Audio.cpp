@@ -210,7 +210,7 @@ namespace EngineFramework
 					m_system->set3DListenerAttributes(0, &fPos, &fVel, &fFwd, &fUp);
 					listenerSet = true;
 
-					LOGI("[Audio] Listener rot = (%.3f, %.3f, %.3f)", tf.rotation.x, tf.rotation.y, tf.rotation.z);
+					//LOGI("[Audio] Listener rot = (%.3f, %.3f, %.3f)", tf.rotation.x, tf.rotation.y, tf.rotation.z);
 				});
 		}
 #endif
