@@ -25,6 +25,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <algorithm>
 
 //Entt reflection system
 #include <entt/meta/meta.hpp>
@@ -82,6 +83,12 @@ namespace EngineFramework
 
     bool gizmos_started_drag = false;
     std::unique_ptr<Record> current_record = nullptr;
+    struct GizmoSelectionRecord
+    {
+        entt::entity entity = entt::null;
+        std::unique_ptr<Record> record{};
+    };
+    static std::vector<GizmoSelectionRecord> multi_gizmo_records;
     
     //set these to default first
     static ImGuizmo::OPERATION operation = ImGuizmo::TRANSLATE;
@@ -447,15 +454,41 @@ namespace EngineFramework
                         RaycastHit hit;
                         if (PhysicsWorld::Get().Raycast(rayOrigin, rayDir, 1000.f, hit))
                         {
+                            // To select multiple entities using shift
+                            // To deselect entities using ctrl
                             LOGI("Mouse Picked Entity: %u", (uint32_t)hit.entity);
-                            LevelEditor::GetInstance().variables.selected_objectID = hit.entity;
-                            LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+                            iEditorView& selection_state = LevelEditor::GetInstance().variables;
+                            ImGuiIO& io = ImGui::GetIO();
+                            bool shift_down = io.KeyShift;
+                            bool ctrl_down = io.KeyCtrl;
+
+                            if (ctrl_down && selection_state.IsEntitySelected(hit.entity))
+                            {
+                                selection_state.RemoveEntitySelection(hit.entity);
+                                if (!selection_state.HasEntitySelection())
+                                {
+                                    selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
+                                }
+                            }
+                            else
+                            {
+                                if (shift_down)
+                                {
+                                    selection_state.AddEntitySelection(hit.entity);
+                                }
+                                else
+                                {
+                                    selection_state.SetEntitySelection(hit.entity);
+                                }
+                                selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+                            }
                         }
                         else
                         {
                             //Deselect if clicking empty space
-                            LevelEditor::GetInstance().variables.selected_objectID = entt::null;
-                            LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::NONE;
+                            iEditorView& selection_state = LevelEditor::GetInstance().variables;
+                            selection_state.ClearEntitySelection();
+                            selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
 
                             LOGI("Selection cleared.");
                         }
@@ -1116,7 +1149,7 @@ namespace EngineFramework
 
 
         //do not use gizmos if nothing is being selected, because what are you referrring to?
-        if (editor_ptr->selected_objectID == entt::null) {
+        if (!editor_ptr || !editor_ptr->HasEntitySelection()) {
             //std::cout << "nothing is selected\n";
             return;
         }
@@ -1132,10 +1165,36 @@ namespace EngineFramework
             only usw gizmos if the object have a TransformComponent
         */
 
+        std::vector<entt::entity> selected_entities = editor_ptr->selected_entities;
+        selected_entities.erase(std::remove(selected_entities.begin(), selected_entities.end(), entt::null), selected_entities.end());
+        std::vector<entt::entity> transform_entities;
+        transform_entities.reserve(selected_entities.size());
+        for (entt::entity selected_id : selected_entities) {
+            if (selected_id == entt::null || !registry.valid(selected_id)) {
+                continue;
+            }
+            if (registry.all_of<TransformComponent>(selected_id)) {
+                transform_entities.push_back(selected_id);
+            }
+        }
+        if (transform_entities.empty()) {
+            return;
+        }
+
         entt::entity id = static_cast<entt::entity>(editor_ptr->selected_objectID);
+        if (!registry.valid(id) || !registry.all_of<TransformComponent>(id)) {
+            id = transform_entities.front();
+        }
+
         if (registry.all_of<TransformComponent>(id)) {
 
             auto& object = registry.get<TransformComponent>(id);
+            glm::vec3 prev_position = object.position;
+            glm::vec3 prev_rotation = object.rotation;
+            glm::vec3 prev_scale = object.scale;
+            bool has_multi_selection = transform_entities.size() > 1;
+
+            // Responsible for editing of all guizmo for allselected entities
 
             ImGuizmo::BeginFrame();
             ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
@@ -1204,10 +1263,53 @@ namespace EngineFramework
                     translation[2] = snap(translation[2]);
                 }
 
+                glm::vec3 new_position = { translation[0], translation[1], translation[2] };
+                glm::vec3 new_rotation = { rotation[0], rotation[1], rotation[2] };
+                glm::vec3 new_scale = { scale[0], scale[1], scale[2] };
+
+                glm::vec3 position_delta = new_position - prev_position;
+                glm::vec3 rotation_delta = new_rotation - prev_rotation;
+                glm::vec3 scale_delta = new_scale - prev_scale;
+                glm::vec3 scale_ratio = glm::vec3(1.0f);
+                for (int axis = 0; axis < 3; ++axis) {
+                    if (std::abs(prev_scale[axis]) > 1e-5f) {
+                        scale_ratio[axis] = new_scale[axis] / prev_scale[axis];
+                    }
+                }
+
                 // Update the TransformComponent values
-                object.position = glm::vec3(translation[0], translation[1], translation[2]);
-                object.rotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
-                object.scale = glm::vec3(scale[0], scale[1], scale[2]);
+                object.position = new_position;
+                object.rotation = new_rotation;
+                object.scale = new_scale;
+
+                if (has_multi_selection) {
+                    for (entt::entity target_id : transform_entities) {
+                        if (target_id == id) {
+                            continue;
+                        }
+                        if (!registry.valid(target_id) || !registry.all_of<TransformComponent>(target_id)) {
+                            continue;
+                        }
+
+                        auto& target_transform = registry.get<TransformComponent>(target_id);
+                        if (operation == ImGuizmo::TRANSLATE) {
+                            target_transform.position += position_delta;
+                        }
+                        else if (operation == ImGuizmo::ROTATE) {
+                            target_transform.rotation += rotation_delta;
+                        }
+                        else if (operation == ImGuizmo::SCALE) {
+                            for (int axis = 0; axis < 3; ++axis) {
+                                if (std::abs(prev_scale[axis]) > 1e-5f) {
+                                    target_transform.scale[axis] *= scale_ratio[axis];
+                                }
+                                else {
+                                    target_transform.scale[axis] += scale_delta[axis];
+                                }
+                            }
+                        }
+                    }
+                }
 
                 // No need to manually update the modelMatrix as it will be recalculated next frame
                 // based on the updated position, rotation, and scale values
@@ -1217,16 +1319,35 @@ namespace EngineFramework
             * History Tracking
             */
 
-            if (!gizmos_started_drag && gizmos_IS_dragged) {
-
+            auto track_variable_name = [&]() -> const char*
+            {
                 if (operation == ImGuizmo::TRANSLATE) {
-                    current_record = history->start_track(id, "TransformComponent", "position");
+                    return "position";
                 }
-                else if (operation == ImGuizmo::SCALE) {
-                    current_record = history->start_track(id, "TransformComponent", "scale");
+                if (operation == ImGuizmo::SCALE) {
+                    return "scale";
                 }
-                else if (operation == ImGuizmo::ROTATE) {
-                    current_record = history->start_track(id, "TransformComponent", "rotation");
+                if (operation == ImGuizmo::ROTATE) {
+                    return "rotation";
+                }
+                return nullptr;
+            };
+
+            if (!gizmos_started_drag && gizmos_IS_dragged) {
+                const char* variable = track_variable_name();
+                if (variable) {
+                    if (!has_multi_selection) {
+                        current_record = history->start_track(id, "TransformComponent", variable);
+                    }
+                    else {
+                        multi_gizmo_records.clear();
+                        for (entt::entity tracked_id : transform_entities) {
+                            GizmoSelectionRecord entry{};
+                            entry.entity = tracked_id;
+                            entry.record = history->start_track(tracked_id, "TransformComponent", variable);
+                            multi_gizmo_records.emplace_back(std::move(entry));
+                        }
+                    }
                 }
 
                 //std::cout << "Begin track\n";
@@ -1234,17 +1355,41 @@ namespace EngineFramework
 
             if (gizmos_started_drag && !gizmos_IS_dragged) {
 
-                if (operation == ImGuizmo::TRANSLATE) {
-                    history->end_track(current_record, object.position);
-                }
-                else if (operation == ImGuizmo::SCALE) {
-                    history->end_track(current_record, object.scale);
-                }
-                else if (operation == ImGuizmo::ROTATE) {
-                    history->end_track(current_record, object.rotation);
-                }
+                if (!has_multi_selection) {
+                    if (operation == ImGuizmo::TRANSLATE) {
+                        history->end_track(current_record, object.position);
+                    }
+                    else if (operation == ImGuizmo::SCALE) {
+                        history->end_track(current_record, object.scale);
+                    }
+                    else if (operation == ImGuizmo::ROTATE) {
+                        history->end_track(current_record, object.rotation);
+                    }
 
-                current_record = nullptr;
+                    current_record = nullptr;
+                }
+                else {
+                    for (auto& record_entry : multi_gizmo_records) {
+                        if (!record_entry.record) {
+                            continue;
+                        }
+                        if (!registry.valid(record_entry.entity) || !registry.all_of<TransformComponent>(record_entry.entity)) {
+                            continue;
+                        }
+
+                        auto& tracked_transform = registry.get<TransformComponent>(record_entry.entity);
+                        if (operation == ImGuizmo::TRANSLATE) {
+                            history->end_track(record_entry.record, tracked_transform.position);
+                        }
+                        else if (operation == ImGuizmo::SCALE) {
+                            history->end_track(record_entry.record, tracked_transform.scale);
+                        }
+                        else if (operation == ImGuizmo::ROTATE) {
+                            history->end_track(record_entry.record, tracked_transform.rotation);
+                        }
+                    }
+                    multi_gizmo_records.clear();
+                }
                 //std::cout << "End track\n";
             }
             gizmos_started_drag = gizmos_IS_dragged;
@@ -1280,7 +1425,10 @@ namespace EngineFramework
             history_system->end_track(entity_history);
         }
 
-        editor_ptr->selected_objectID = entt::null;
+        editor_ptr->RemoveEntitySelection(selected);
+        if (!editor_ptr->HasEntitySelection()) {
+            editor_ptr->latest_selected = iEditorView::Latest_Selected::NONE;
+        }
         return true;
     }
 
@@ -1307,7 +1455,7 @@ namespace EngineFramework
                 {
                     if (editor_ptr)
                     {
-                        editor_ptr->selected_objectID = duplicated;
+                        editor_ptr->SetEntitySelection(duplicated);
                         editor_ptr->latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
                     }
                     if (history)
@@ -1707,7 +1855,7 @@ namespace EngineFramework
                 entt::entity created_entity = GameObjectSystem::GetInstance().CreateInstance(archtype_name, instance_transform);
                 if (created_entity != entt::null)
                 {
-                    LevelEditor::GetInstance().variables.selected_objectID = created_entity;
+                    LevelEditor::GetInstance().variables.SetEntitySelection(created_entity);
                     LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
                 }
             }

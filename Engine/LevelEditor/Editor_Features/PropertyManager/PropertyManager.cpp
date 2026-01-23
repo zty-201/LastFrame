@@ -62,7 +62,8 @@ namespace EngineFramework {
         if (selected_var.latest_selected == iEditorView::Latest_Selected::NONE || (!isEntityValid && !isModelValid))
         {
             //Pick a random entity.
-            selected_var.selected_objectID = pick_any_entity(reg); //May be null, but let the panel be drawn anyways.
+            entt::entity fallback = pick_any_entity(reg); //May be null, but let the panel be drawn anyways.
+            selected_var.SetEntitySelection(fallback);
             selected_var.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
         }
         //For instance_selected, if entity is not valid but model is then default to model.
@@ -96,7 +97,7 @@ namespace EngineFramework {
             reg.emplace<CameraComponent>(ent);
         }
 
-        LevelEditor::GetInstance().variables.selected_objectID = ent;
+        LevelEditor::GetInstance().variables.SetEntitySelection(ent);
         LevelEditor::GetInstance().variables.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
     }
 
