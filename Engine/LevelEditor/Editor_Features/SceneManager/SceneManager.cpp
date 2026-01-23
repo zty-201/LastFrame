@@ -24,7 +24,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 namespace EngineFramework
 {
 	//defualt scene to load
-	std::string defaultScene = "M3_Level.json";
+	std::string defaultScene = "M4_Level.json";
 	bool SceneManager::is_file_loaded = false;
 
 

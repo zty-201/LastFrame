@@ -19,6 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "GraphicsSystem.h"
 
 
+
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
 #include <nlohmann/json.hpp>
@@ -72,6 +73,8 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
     void InputManager::RegisterCallbacks(GLFWwindow* window)
     {
+        s_Window = window; //[BEN] store it so we can call glfwSetInputMode later
+
         glfwSetKeyCallback(window, KeyCallback);
         glfwSetMouseButtonCallback(window, MouseButtonCallback);
         glfwSetCursorPosCallback(window, CursorPosCallback);
@@ -297,6 +300,37 @@ namespace EngineFramework
         return GetKeyUp(it->second);
     }
 
+    void InputManager::SetCursorLocked(bool locked)
+{
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) return;
+#endif
+        if (!s_Window) return;
+
+        glfwSetInputMode(s_Window, GLFW_CURSOR, locked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+
+        // Optional but recommended: reset mouse baseline to avoid a big delta spike
+        double x, y;
+        glfwGetCursorPos(s_Window, &x, &y);
+        mouseX = lastMouseX = x;
+        mouseY = lastMouseY = y;
+        offset_MouseX = 0.0;
+        offset_MouseY = 0.0;
+    }
+
+    void InputManager::SetCursorVisible(bool visible)
+    {
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) return;
+#endif
+        if (!s_Window) return;
+
+        // NOTE:
+        // - If you are using GLFW_CURSOR_DISABLED for FPS lock, it already hides the cursor.
+        // - This function is still useful for menus (HIDDEN) vs NORMAL.
+        glfwSetInputMode(s_Window, GLFW_CURSOR, visible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+    }
+
     //KEY ACTION ENUM CALLING
 
     bool InputManager::GetAction(int action)
@@ -455,6 +489,25 @@ namespace EngineFramework
     std::pair<int, int> InputManager::GetWindowSize()
     {
         return { windowWidth, windowHeight };
+    }
+
+    std::pair<int, int> InputManager::GetScreenSize()
+    {
+#if defined(PLATFORM_ANDROID)
+        return { windowWidth, windowHeight };
+
+#elif defined(PLATFORM_WINDOWS)
+        if (s_Window)
+        {
+            int w, h;
+            glfwGetWindowSize(s_Window, &w, &h);
+            return { w, h };
+        }
+        // Fallback
+        return { windowWidth, windowHeight };
+#else
+        return { 0, 0 };
+#endif
     }
 
     void InputManager::Initialize()
@@ -635,7 +688,7 @@ namespace EngineFramework
         lastMouseY = mouseY;
     }
 
-    glm::vec3 InputManager::GetGyroscopeRotatioRate()
+    glm::vec3 InputManager::GetGyroscopeRotationRate()
     {
         return currentGyroRate;
     }

@@ -319,7 +319,7 @@ namespace EngineFramework {
 		// <resource_type, func> that maps a resource type to a function. The function loads all assets within the directory, and sets guid_name_map and name_guid_map as well.
 		static inline std::unordered_map<std::string, std::function<bool(const std::filesystem::path&)>> asset_loader_map{};
 
-		//==Asset storage and reference maps
+		// ==Asset storage and reference maps
 		// <full_guid, resource_type> that maps a guid to a resource.
 		static inline std::unordered_map<xresource::full_guid, entt::meta_any> resource_map{};
 		// This is used to get human-readable names from instance_guid, like for level editor usage.
