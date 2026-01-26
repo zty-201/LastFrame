@@ -1630,6 +1630,131 @@
 			]
 		}
 	},
+	"109": {
+		"ColliderComponent": {
+			"maxBounds": [
+				77.08733367919922,
+				199.78700256347656,
+				36.09086227416992
+			],
+			"minBounds": [
+				-77.00142669677734,
+				3.8549957275390625,
+				-35.9033088684082
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						77.04438018798828,
+						97.96600341796875,
+						35.99708557128906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0429534912109375,
+						101.82099914550781,
+						0.09377670288085938
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "office_table_broken"
+		},
+		"NameComponent": {
+			"name": "Playroom_Table"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				548.9500122070313,
+				13.0,
+				-564.5593872070313
+			],
+			"rotation": [
+				-179.99989318847656,
+				30.000001907348633,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999921321868896,
+				1.0,
+				0.9999921321868896
+			]
+		}
+	},
 	"11": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -3527,7 +3652,7 @@
 			"position": [
 				695.0,
 				0.0,
-				1000.0
+				1003.8375244140625
 			],
 			"rotation": [
 				0.0,
@@ -3535,7 +3660,7 @@
 				0.0
 			],
 			"scale": [
-				0.9999996423721313,
+				1.0049999952316284,
 				1.0,
 				0.9999992847442627
 			]
@@ -6088,7 +6213,7 @@
 			"meshName": "bed_bunk"
 		},
 		"NameComponent": {
-			"name": "Bedroom_BunkBed_01"
+			"name": "Bedroom_BunkBed_04"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -6118,13 +6243,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-165.93704223632813,
+				527.40673828125,
 				14.350997924804688,
 				1010.392333984375
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				10.949999809265137,
 				0.0
 			],
 			"scale": [
@@ -7210,7 +7335,7 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_window"
 		},
 		"NameComponent": {
 			"name": "Wall_52"
@@ -7245,7 +7370,7 @@
 			"position": [
 				695.0,
 				0.0,
-				1200.0
+				1211.6304931640625
 			],
 			"rotation": [
 				0.0,
@@ -7370,7 +7495,7 @@
 			"position": [
 				695.0,
 				0.0,
-				1400.0
+				1395.336181640625
 			],
 			"rotation": [
 				0.0,
@@ -8762,29 +8887,29 @@
 	"163": {
 		"ColliderComponent": {
 			"maxBounds": [
-				1.0,
-				1.0,
-				1.0
+				38.170021057128906,
+				212.74798583984375,
+				93.20150756835938
 			],
 			"minBounds": [
-				-1.0,
-				-1.0,
-				-1.0
+				-38.170021057128906,
+				-0.9762420654296875,
+				-92.81558227539063
 			],
 			"mode": 0,
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						1.0,
-						1.0,
-						1.0
+						38.170021057128906,
+						106.86211395263672,
+						93.008544921875
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
 					"offsetPosition": [
 						0.0,
-						0.0,
-						0.0
+						105.88587188720703,
+						0.19296646118164063
 					],
 					"offsetRotation": [
 						0.0,
@@ -8835,10 +8960,10 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_1"
+			"meshName": "shelf_storeroom"
 		},
 		"NameComponent": {
-			"name": "Bedroom_BunkBed_01"
+			"name": "Storeroom_Shelf_05"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -8868,19 +8993,19 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				557.930419921875,
-				14.350997924804688,
-				128.359375
+				596.2996826171875,
+				13.162858963012695,
+				142.6274871826172
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				89.9999771118164,
 				0.0
 			],
 			"scale": [
-				0.9999998211860657,
+				0.9999996423721313,
 				1.0,
-				0.9999998211860657
+				0.9999996423721313
 			]
 		}
 	},
@@ -12303,6 +12428,381 @@
 			]
 		}
 	},
+	"187": {
+		"ColliderComponent": {
+			"maxBounds": [
+				33.5832633972168,
+				192.01199340820313,
+				33.3906364440918
+			],
+			"minBounds": [
+				-27.40853500366211,
+				12.012001037597656,
+				-39.18290328979492
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						30.495899200439453,
+						90.0,
+						36.28676986694336
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						3.0873641967773438,
+						102.01200103759766,
+						-2.8961334228515625
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "office_chair_broken"
+		},
+		"NameComponent": {
+			"name": "Playroom_Chair"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				575.262451171875,
+				13.0,
+				-623.3682861328125
+			],
+			"rotation": [
+				0.00010427398228785023,
+				-29.99997901916504,
+				0.00010427398228785023
+			],
+			"scale": [
+				0.9999894499778748,
+				1.0,
+				0.9999894499778748
+			]
+		}
+	},
+	"188": {
+		"ColliderComponent": {
+			"maxBounds": [
+				66.10580444335938,
+				235.00827026367188,
+				26.9227352142334
+			],
+			"minBounds": [
+				-64.9033203125,
+				0.0050811767578125,
+				-27.356966018676758
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						65.50456237792969,
+						117.50159454345703,
+						27.139850616455078
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.6012420654296875,
+						117.50667572021484,
+						-0.2171154022216797
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cabinet_tall_break_1"
+		},
+		"NameComponent": {
+			"name": "Playroom_Shelf_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				324.93475341796875,
+				12.972848892211914,
+				-661.1077270507813
+			],
+			"rotation": [
+				0.0,
+				4.749997138977051,
+				0.0
+			],
+			"scale": [
+				0.9999913573265076,
+				1.0,
+				0.9999913573265076
+			]
+		}
+	},
+	"189": {
+		"ColliderComponent": {
+			"maxBounds": [
+				62.02959442138672,
+				235.00827026367188,
+				24.534000396728516
+			],
+			"minBounds": [
+				-78.39759063720703,
+				0.0050811767578125,
+				-26.173999786376953
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						70.21359252929688,
+						117.50159454345703,
+						25.354000091552734
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-8.184000015258789,
+						117.50667572021484,
+						-0.8199999928474426
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cabinet_tall_break_2"
+		},
+		"NameComponent": {
+			"name": "Playroom_Shelf_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				187.369384765625,
+				12.972848892211914,
+				-649.65771484375
+			],
+			"rotation": [
+				0.0,
+				19.699995040893555,
+				0.0
+			],
+			"scale": [
+				0.9999910593032837,
+				1.0,
+				0.9999910593032837
+			]
+		}
+	},
 	"19": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -12425,6 +12925,1256 @@
 				100.0,
 				4.0,
 				100.0
+			]
+		}
+	},
+	"190": {
+		"ColliderComponent": {
+			"maxBounds": [
+				33.22308349609375,
+				235.00827026367188,
+				52.755470275878906
+			],
+			"minBounds": [
+				-35.30926513671875,
+				0.0050811767578125,
+				-26.93085479736328
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						34.26617431640625,
+						117.50159454345703,
+						39.843162536621094
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.0430908203125,
+						117.50667572021484,
+						12.912307739257813
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cabinet_tall_break_3"
+		},
+		"NameComponent": {
+			"name": "Playroom_Shelf_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				431.3887634277344,
+				12.972848892211914,
+				-664.529296875
+			],
+			"rotation": [
+				0.0,
+				7.949999809265137,
+				0.0
+			],
+			"scale": [
+				0.999990701675415,
+				1.0,
+				0.999990701675415
+			]
+		}
+	},
+	"191": {
+		"ColliderComponent": {
+			"maxBounds": [
+				74.19206237792969,
+				127.42453002929688,
+				23.634477615356445
+			],
+			"minBounds": [
+				-70.72000122070313,
+				2.4249610900878906,
+				-56.69309997558594
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						72.4560317993164,
+						62.49978256225586,
+						40.163787841796875
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.7360305786132813,
+						64.92474365234375,
+						-16.52931022644043
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "baby_crib"
+		},
+		"NameComponent": {
+			"name": "Playroom_BabyCradle"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				626.388916015625,
+				12.972848892211914,
+				-301.3880920410156
+			],
+			"rotation": [
+				0.0,
+				-89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.999990701675415,
+				1.0,
+				0.999990701675415
+			]
+		}
+	},
+	"192": {
+		"ColliderComponent": {
+			"maxBounds": [
+				66.10580444335938,
+				235.00827026367188,
+				26.9227352142334
+			],
+			"minBounds": [
+				-64.9033203125,
+				0.0050811767578125,
+				-27.356966018676758
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						65.50456237792969,
+						117.50159454345703,
+						27.139850616455078
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.6012420654296875,
+						117.50667572021484,
+						-0.2171154022216797
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cabinet_tall_break_1"
+		},
+		"NameComponent": {
+			"name": "Playroom_Shelf_05"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				262.991943359375,
+				12.972848892211914,
+				-80.33622741699219
+			],
+			"rotation": [
+				-179.99989318847656,
+				-5.008955668017734e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999910593032837,
+				1.0,
+				0.9999910593032837
+			]
+		}
+	},
+	"193": {
+		"ColliderComponent": {
+			"maxBounds": [
+				62.02959442138672,
+				235.00827026367188,
+				24.534000396728516
+			],
+			"minBounds": [
+				-78.39759063720703,
+				0.0050811767578125,
+				-26.173999786376953
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						70.21359252929688,
+						117.50159454345703,
+						25.354000091552734
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-8.184000015258789,
+						117.50667572021484,
+						-0.8199999928474426
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cabinet_tall_break_2"
+		},
+		"NameComponent": {
+			"name": "Playroom_Shelf_06"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				399.8746032714844,
+				12.972848892211914,
+				-89.18865966796875
+			],
+			"rotation": [
+				177.39999389648438,
+				10.850000381469727,
+				-179.99989318847656
+			],
+			"scale": [
+				1.0000039339065552,
+				1.0,
+				1.000003695487976
+			]
+		}
+	},
+	"194": {
+		"ColliderComponent": {
+			"maxBounds": [
+				33.22308349609375,
+				235.00827026367188,
+				52.755470275878906
+			],
+			"minBounds": [
+				-35.30926513671875,
+				0.0050811767578125,
+				-26.93085479736328
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						34.26617431640625,
+						117.50159454345703,
+						39.843162536621094
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.0430908203125,
+						117.50667572021484,
+						12.912307739257813
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cabinet_tall_break_3"
+		},
+		"NameComponent": {
+			"name": "Playroom_Shelf_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				154.82728576660156,
+				12.972848892211914,
+				-75.50712585449219
+			],
+			"rotation": [
+				-179.99989318847656,
+				19.199989318847656,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999903440475464,
+				1.0,
+				0.9999903440475464
+			]
+		}
+	},
+	"195": {
+		"ColliderComponent": {
+			"maxBounds": [
+				66.10580444335938,
+				235.00827026367188,
+				26.9227352142334
+			],
+			"minBounds": [
+				-64.9033203125,
+				0.0050811767578125,
+				-27.356966018676758
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						65.50456237792969,
+						117.50159454345703,
+						27.139850616455078
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.6012420654296875,
+						117.50667572021484,
+						-0.2171154022216797
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cabinet_tall_break_1"
+		},
+		"NameComponent": {
+			"name": "Playroom_Shelf_08"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				615.4179077148438,
+				12.972848892211914,
+				33.87004089355469
+			],
+			"rotation": [
+				-179.99989318847656,
+				-15.49999713897705,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999909400939941,
+				1.0,
+				0.9999909400939941
+			]
+		}
+	},
+	"196": {
+		"ColliderComponent": {
+			"maxBounds": [
+				33.22308349609375,
+				235.00827026367188,
+				40.955162048339844
+			],
+			"minBounds": [
+				-35.30926513671875,
+				0.0050811767578125,
+				-38.731163024902344
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						34.26617431640625,
+						117.50159454345703,
+						39.843162536621094
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.0430908203125,
+						117.50667572021484,
+						1.1119999885559082
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "cabinet_tall_break_3"
+		},
+		"NameComponent": {
+			"name": "Playroom_Shelf_07"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				504.4386291503906,
+				12.972848892211914,
+				56.45003890991211
+			],
+			"rotation": [
+				-179.99989318847656,
+				-5.008955668017734e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999910593032837,
+				1.0,
+				0.9999910593032837
+			]
+		}
+	},
+	"197": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				77.23096466064453,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				1.0200347900390625,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						38.105464935302734,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wooden_chair_kid"
+		},
+		"NameComponent": {
+			"name": "Playroom_KidChair_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				310.05328369140625,
+				12.972848892211914,
+				-291.7610778808594
+			],
+			"rotation": [
+				0.0,
+				180.0,
+				0.0
+			],
+			"scale": [
+				0.9999908804893494,
+				1.0,
+				0.9999908804893494
+			]
+		}
+	},
+	"198": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				77.23096466064453,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				1.0200347900390625,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						38.105464935302734,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wooden_chair_kid"
+		},
+		"NameComponent": {
+			"name": "Playroom_KidChair_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				327.0260314941406,
+				12.972848892211914,
+				-342.2955017089844
+			],
+			"rotation": [
+				0.0,
+				135.0,
+				0.0
+			],
+			"scale": [
+				0.9999908804893494,
+				1.0,
+				0.9999908804893494
+			]
+		}
+	},
+	"199": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				77.23096466064453,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				1.0200347900390625,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						38.105464935302734,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wooden_chair_kid"
+		},
+		"NameComponent": {
+			"name": "Playroom_KidChair_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				375.80078125,
+				12.972848892211914,
+				-361.46234130859375
+			],
+			"rotation": [
+				0.0,
+				90.0,
+				0.0
+			],
+			"scale": [
+				0.999990701675415,
+				1.0,
+				0.999990701675415
 			]
 		}
 	},
@@ -12600,6 +14350,1256 @@
 			]
 		}
 	},
+	"200": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				77.23096466064453,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				1.0200347900390625,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						38.105464935302734,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wooden_chair_kid"
+		},
+		"NameComponent": {
+			"name": "Playroom_KidChair_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				423.91986083984375,
+				12.972848892211914,
+				-342.02099609375
+			],
+			"rotation": [
+				0.0,
+				45.000003814697266,
+				0.0
+			],
+			"scale": [
+				0.9999906420707703,
+				1.0,
+				0.9999906420707703
+			]
+		}
+	},
+	"201": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				77.23096466064453,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				1.0200347900390625,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						38.105464935302734,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wooden_chair_kid"
+		},
+		"NameComponent": {
+			"name": "Playroom_KidChair_05"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				447.0632019042969,
+				12.972848892211914,
+				-290.4486083984375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999906420707703,
+				1.0,
+				0.9999906420707703
+			]
+		}
+	},
+	"202": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				77.23096466064453,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				1.0200347900390625,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						38.105464935302734,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wooden_chair_kid"
+		},
+		"NameComponent": {
+			"name": "Playroom_KidChair_06"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				425.95159912109375,
+				12.972848892211914,
+				-241.6686553955078
+			],
+			"rotation": [
+				0.0,
+				-45.000003814697266,
+				0.0
+			],
+			"scale": [
+				0.9999906420707703,
+				1.0,
+				0.9999906420707703
+			]
+		}
+	},
+	"203": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				77.23096466064453,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				1.0200347900390625,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						38.105464935302734,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wooden_chair_kid"
+		},
+		"NameComponent": {
+			"name": "Playroom_KidChair_07"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				380.2550048828125,
+				12.972848892211914,
+				-220.79098510742188
+			],
+			"rotation": [
+				0.0,
+				-89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999904632568359,
+				1.0,
+				0.9999904632568359
+			]
+		}
+	},
+	"204": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				77.23096466064453,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				1.0200347900390625,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						38.105464935302734,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wooden_chair_kid"
+		},
+		"NameComponent": {
+			"name": "Playroom_KidChair_08"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				331.07135009765625,
+				12.972848892211914,
+				-243.82452392578125
+			],
+			"rotation": [
+				-179.99989318847656,
+				-44.99997329711914,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999906420707703,
+				1.0,
+				0.9999906420707703
+			]
+		}
+	},
+	"205": {
+		"ColliderComponent": {
+			"maxBounds": [
+				29.31341552734375,
+				62.71736145019531,
+				49.03504943847656
+			],
+			"minBounds": [
+				-20.827713012695313,
+				-1.413848876953125,
+				-16.80760955810547
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						25.07056427001953,
+						32.06560516357422,
+						32.921329498291016
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.242851257324219,
+						30.651756286621094,
+						16.113719940185547
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_frog"
+		},
+		"NameComponent": {
+			"name": "Playroom_SoftToy_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				314.2614440917969,
+				48.5312614440918,
+				-294.8951110839844
+			],
+			"rotation": [
+				0.0,
+				-89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.6000000238418579,
+				0.6000000238418579,
+				0.6000000238418579
+			]
+		}
+	},
+	"206": {
+		"ColliderComponent": {
+			"maxBounds": [
+				29.31341552734375,
+				62.71736145019531,
+				49.03504943847656
+			],
+			"minBounds": [
+				-20.827713012695313,
+				-1.413848876953125,
+				-16.80760955810547
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						25.07056427001953,
+						32.06560516357422,
+						32.921329498291016
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.242851257324219,
+						30.651756286621094,
+						16.113719940185547
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_frog"
+		},
+		"NameComponent": {
+			"name": "Playroom_SoftToy_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				331.3486328125,
+				48.5312614440918,
+				-338.5712585449219
+			],
+			"rotation": [
+				-179.99989318847656,
+				-45.000003814697266,
+				-179.99989318847656
+			],
+			"scale": [
+				0.6000000238418579,
+				0.6000000238418579,
+				0.6000000238418579
+			]
+		}
+	},
+	"207": {
+		"ColliderComponent": {
+			"maxBounds": [
+				29.31341552734375,
+				62.71736145019531,
+				49.03504943847656
+			],
+			"minBounds": [
+				-20.827713012695313,
+				-1.413848876953125,
+				-16.80760955810547
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						25.07056427001953,
+						32.06560516357422,
+						32.921329498291016
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.242851257324219,
+						30.651756286621094,
+						16.113719940185547
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_frog"
+		},
+		"NameComponent": {
+			"name": "Playroom_SoftToy_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				376.4274597167969,
+				48.5312614440918,
+				-356.0641174316406
+			],
+			"rotation": [
+				-179.99989318847656,
+				-5.008955668017734e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				0.6000000238418579,
+				0.6000000238418579,
+				0.6000000238418579
+			]
+		}
+	},
+	"208": {
+		"ColliderComponent": {
+			"maxBounds": [
+				29.31341552734375,
+				62.71736145019531,
+				49.03504943847656
+			],
+			"minBounds": [
+				-20.827713012695313,
+				-1.413848876953125,
+				-16.80760955810547
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						25.07056427001953,
+						32.06560516357422,
+						32.921329498291016
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.242851257324219,
+						30.651756286621094,
+						16.113719940185547
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_frog"
+		},
+		"NameComponent": {
+			"name": "Playroom_SoftToy_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				419.62481689453125,
+				48.5312614440918,
+				-338.03314208984375
+			],
+			"rotation": [
+				-179.99989318847656,
+				45.000003814697266,
+				-179.99989318847656
+			],
+			"scale": [
+				0.6000000238418579,
+				0.6000000238418579,
+				0.6000000238418579
+			]
+		}
+	},
+	"209": {
+		"ColliderComponent": {
+			"maxBounds": [
+				29.31341552734375,
+				62.71736145019531,
+				49.03504943847656
+			],
+			"minBounds": [
+				-20.827713012695313,
+				-1.413848876953125,
+				-16.80760955810547
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						25.07056427001953,
+						32.06560516357422,
+						32.921329498291016
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.242851257324219,
+						30.651756286621094,
+						16.113719940185547
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_frog"
+		},
+		"NameComponent": {
+			"name": "Playroom_SoftToy_05"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				440.8073425292969,
+				48.5312614440918,
+				-287.3689270019531
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.6000000238418579,
+				0.6000000238418579,
+				0.6000000238418579
+			]
+		}
+	},
 	"21": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -12722,6 +15722,1256 @@
 				100.0,
 				4.0,
 				100.0
+			]
+		}
+	},
+	"210": {
+		"ColliderComponent": {
+			"maxBounds": [
+				29.31341552734375,
+				62.71736145019531,
+				49.03504943847656
+			],
+			"minBounds": [
+				-20.827713012695313,
+				-1.413848876953125,
+				-16.80760955810547
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						25.07056427001953,
+						32.06560516357422,
+						32.921329498291016
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.242851257324219,
+						30.651756286621094,
+						16.113719940185547
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_frog"
+		},
+		"NameComponent": {
+			"name": "Playroom_SoftToy_06"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				417.4443359375,
+				48.5312614440918,
+				-242.98355102539063
+			],
+			"rotation": [
+				0.0,
+				45.0,
+				0.0
+			],
+			"scale": [
+				0.6000000238418579,
+				0.6000000238418579,
+				0.6000000238418579
+			]
+		}
+	},
+	"211": {
+		"ColliderComponent": {
+			"maxBounds": [
+				29.31341552734375,
+				62.71736145019531,
+				49.03504943847656
+			],
+			"minBounds": [
+				-20.827713012695313,
+				-1.413848876953125,
+				-16.80760955810547
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						25.07056427001953,
+						32.06560516357422,
+						32.921329498291016
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.242851257324219,
+						30.651756286621094,
+						16.113719940185547
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_frog"
+		},
+		"NameComponent": {
+			"name": "Playroom_SoftToy_07"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				377.1318359375,
+				48.5312614440918,
+				-227.86219787597656
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.6000000238418579,
+				0.6000000238418579,
+				0.6000000238418579
+			]
+		}
+	},
+	"212": {
+		"ColliderComponent": {
+			"maxBounds": [
+				29.31341552734375,
+				62.71736145019531,
+				49.03504943847656
+			],
+			"minBounds": [
+				-20.827713012695313,
+				-1.413848876953125,
+				-16.80760955810547
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						25.07056427001953,
+						32.06560516357422,
+						32.921329498291016
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.242851257324219,
+						30.651756286621094,
+						16.113719940185547
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_frog"
+		},
+		"NameComponent": {
+			"name": "Playroom_SoftToy_08"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				333.4193420410156,
+				48.5312614440918,
+				-251.352783203125
+			],
+			"rotation": [
+				0.0,
+				-45.0,
+				0.0
+			],
+			"scale": [
+				0.6000000238418579,
+				0.6000000238418579,
+				0.6000000238418579
+			]
+		}
+	},
+	"213": {
+		"ColliderComponent": {
+			"maxBounds": [
+				29.31341552734375,
+				62.71736145019531,
+				49.03504943847656
+			],
+			"minBounds": [
+				-20.827713012695313,
+				-1.413848876953125,
+				-16.80760955810547
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						25.07056427001953,
+						32.06560516357422,
+						32.921329498291016
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.242851257324219,
+						30.651756286621094,
+						16.113719940185547
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_monkey"
+		},
+		"NameComponent": {
+			"name": "Playroom_SoftToy_Crib"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				657.2461547851563,
+				39.162628173828125,
+				-255.12998962402344
+			],
+			"rotation": [
+				-179.99989318847656,
+				-4.949877738952637,
+				-179.99989318847656
+			],
+			"scale": [
+				1.0000079870224,
+				1.0,
+				1.0000079870224
+			]
+		}
+	},
+	"214": {
+		"ColliderComponent": {
+			"maxBounds": [
+				69.60296630859375,
+				168.95169067382813,
+				45.62599563598633
+			],
+			"minBounds": [
+				-30.57201385498047,
+				3.250518798828125,
+				-57.4111213684082
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						50.08749008178711,
+						82.8505859375,
+						51.518558502197266
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						19.51547622680664,
+						86.10110473632813,
+						-5.8925628662109375
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_playtent"
+		},
+		"NameComponent": {
+			"name": "Playroom_Playtent"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				625.00439453125,
+				9.422731399536133,
+				-146.36871337890625
+			],
+			"rotation": [
+				0.00010427436063764617,
+				-0.0,
+				0.00010427436063764617
+			],
+			"scale": [
+				1.0000076293945313,
+				1.0,
+				1.0000076293945313
+			]
+		}
+	},
+	"215": {
+		"ColliderComponent": {
+			"maxBounds": [
+				177.75259399414063,
+				-13.920248985290527,
+				140.47076416015625
+			],
+			"minBounds": [
+				-174.20602416992188,
+				-16.09975242614746,
+				-77.23114013671875
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						175.97930908203125,
+						1.0897514820098877,
+						108.8509521484375
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.7732772827148438,
+						-15.010000228881836,
+						31.619815826416016
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				12516524183053975555,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "puzzle_mat"
+		},
+		"NameComponent": {
+			"name": "Playroom_PuzzleMat"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				356.3226318359375,
+				13.33376693725586,
+				-480.25927734375
+			],
+			"rotation": [
+				0.00010427436063764617,
+				-0.0,
+				0.00010427436063764617
+			],
+			"scale": [
+				1.0000076293945313,
+				1.0,
+				1.0000076293945313
+			]
+		}
+	},
+	"216": {
+		"ColliderComponent": {
+			"maxBounds": [
+				45.960472106933594,
+				77.89363861083984,
+				38.05809020996094
+			],
+			"minBounds": [
+				-45.960487365722656,
+				0.0,
+				-38.05809020996094
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						45.960479736328125,
+						38.94681930541992,
+						38.05809020996094
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-9.5367431640625e-06,
+						38.94681930541992,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "kid_sofa"
+		},
+		"NameComponent": {
+			"name": "Playroom_KidSofa"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				183.24227905273438,
+				13.33376693725586,
+				-218.63597106933594
+			],
+			"rotation": [
+				-179.99989318847656,
+				69.9499740600586,
+				-179.99989318847656
+			],
+			"scale": [
+				1.0000057220458984,
+				1.0,
+				1.0000057220458984
+			]
+		}
+	},
+	"217": {
+		"ColliderComponent": {
+			"maxBounds": [
+				45.960472106933594,
+				77.89363861083984,
+				38.05809020996094
+			],
+			"minBounds": [
+				-45.960487365722656,
+				0.0,
+				-38.05809020996094
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						45.960479736328125,
+						38.94681930541992,
+						38.05809020996094
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-9.5367431640625e-06,
+						38.94681930541992,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "baby_dresser"
+		},
+		"NameComponent": {
+			"name": "Playroom_BabyDresser"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				643.553466796875,
+				13.33376693725586,
+				-436.5340270996094
+			],
+			"rotation": [
+				0.0,
+				-81.34998321533203,
+				0.0
+			],
+			"scale": [
+				1.0000025033950806,
+				1.0,
+				1.0000025033950806
+			]
+		}
+	},
+	"218": {
+		"ColliderComponent": {
+			"maxBounds": [
+				31.210418701171875,
+				72.31126403808594,
+				11.6331787109375
+			],
+			"minBounds": [
+				-78.83167266845703,
+				7.277824401855469,
+				-11.352859497070313
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						55.02104568481445,
+						32.516719818115234,
+						11.493019104003906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-23.810626983642578,
+						39.7945442199707,
+						0.14016008377075195
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wallshelf_cute"
+		},
+		"NameComponent": {
+			"name": "Playroom_WallShelf_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				570.780517578125,
+				128.91592407226563,
+				-686.4857177734375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.000002145767212,
+				1.0,
+				1.000002145767212
+			]
+		}
+	},
+	"219": {
+		"ColliderComponent": {
+			"maxBounds": [
+				31.210418701171875,
+				72.31126403808594,
+				11.6331787109375
+			],
+			"minBounds": [
+				-78.83167266845703,
+				7.277824401855469,
+				-11.352859497070313
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						55.02104568481445,
+						32.516719818115234,
+						11.493019104003906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-23.810626983642578,
+						39.7945442199707,
+						0.14016008377075195
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wallshelf_cute"
+		},
+		"NameComponent": {
+			"name": "Playroom_WallShelf_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				686.7386474609375,
+				134.95370483398438,
+				-535.7661743164063
+			],
+			"rotation": [
+				0.0,
+				-89.9999771118164,
+				0.0
+			],
+			"scale": [
+				1.000002145767212,
+				1.0,
+				1.000002145767212
 			]
 		}
 	},
@@ -12850,6 +17100,1250 @@
 			]
 		}
 	},
+	"220": {
+		"ColliderComponent": {
+			"maxBounds": [
+				31.210418701171875,
+				72.31126403808594,
+				11.6331787109375
+			],
+			"minBounds": [
+				-78.83167266845703,
+				7.277824401855469,
+				-11.352859497070313
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						55.02104568481445,
+						32.516719818115234,
+						11.493019104003906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-23.810626983642578,
+						39.7945442199707,
+						0.14016008377075195
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wallshelf_cute"
+		},
+		"NameComponent": {
+			"name": "Playroom_WallShelf_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				686.7386474609375,
+				129.53524780273438,
+				-416.7082824707031
+			],
+			"rotation": [
+				0.0,
+				-89.9999771118164,
+				0.0
+			],
+			"scale": [
+				1.0000017881393433,
+				1.0,
+				1.0000017881393433
+			]
+		}
+	},
+	"221": {
+		"ColliderComponent": {
+			"maxBounds": [
+				24.41899871826172,
+				191.13365173339844,
+				61.99870300292969
+			],
+			"minBounds": [
+				-24.41901397705078,
+				-108.86634826660156,
+				-61.99870300292969
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						24.41900634765625,
+						150.0,
+						61.99870300292969
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-6.67572021484375e-06,
+						41.13364791870117,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "rocking_horse"
+		},
+		"NameComponent": {
+			"name": "Playroom_Horse"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				293.14886474609375,
+				14.823064804077148,
+				-497.83062744140625
+			],
+			"rotation": [
+				0.0,
+				45.0,
+				0.0
+			],
+			"scale": [
+				1.000002145767212,
+				1.0,
+				1.000002145767212
+			]
+		}
+	},
+	"222": {
+		"ColliderComponent": {
+			"maxBounds": [
+				31.210418701171875,
+				72.31126403808594,
+				11.6331787109375
+			],
+			"minBounds": [
+				-78.83167266845703,
+				7.277824401855469,
+				-11.352859497070313
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						55.02104568481445,
+						32.516719818115234,
+						11.493019104003906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-23.810626983642578,
+						39.7945442199707,
+						0.14016008377075195
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wallshelf_cute"
+		},
+		"NameComponent": {
+			"name": "Playroom_WallShelf_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				128.01429748535156,
+				129.53524780273438,
+				-237.22540283203125
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				1.0000014305114746,
+				1.0,
+				1.0000014305114746
+			]
+		}
+	},
+	"223": {
+		"ColliderComponent": {
+			"maxBounds": [
+				19.50222396850586,
+				57.86842346191406,
+				21.47201156616211
+			],
+			"minBounds": [
+				-13.1278715133667,
+				0.3153953552246094,
+				-18.76683807373047
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						16.315048217773438,
+						28.776514053344727,
+						20.11942481994629
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						3.1871767044067383,
+						29.091909408569336,
+						1.3525867462158203
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "music_box"
+		},
+		"NameComponent": {
+			"name": "Playroom_MusicBox"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				583.9207763671875,
+				106.37364196777344,
+				-530.3419189453125
+			],
+			"rotation": [
+				0.0,
+				60.0,
+				0.0
+			],
+			"scale": [
+				1.0000020265579224,
+				1.0,
+				1.0000020265579224
+			]
+		}
+	},
+	"224": {
+		"ColliderComponent": {
+			"maxBounds": [
+				88.76774597167969,
+				125.567626953125,
+				91.71553039550781
+			],
+			"minBounds": [
+				-89.04957580566406,
+				0.43238067626953125,
+				-92.08045959472656
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						88.90866088867188,
+						62.567623138427734,
+						91.89799499511719
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.1409149169921875,
+						63.000003814697266,
+						-0.18246078491210938
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "canteen_tablechair_adult"
+		},
+		"NameComponent": {
+			"name": "Canteen_Table_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				237.6524200439453,
+				16.93464469909668,
+				550.7432250976563
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0000020265579224,
+				1.0,
+				1.0000020265579224
+			]
+		}
+	},
+	"225": {
+		"ColliderComponent": {
+			"maxBounds": [
+				88.76774597167969,
+				125.567626953125,
+				91.71553039550781
+			],
+			"minBounds": [
+				-89.04957580566406,
+				0.43238067626953125,
+				-92.08045959472656
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						88.90866088867188,
+						62.567623138427734,
+						91.89799499511719
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.1409149169921875,
+						63.000003814697266,
+						-0.18246078491210938
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "canteen_tablechair_adult"
+		},
+		"NameComponent": {
+			"name": "Canteen_Table_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-48.649147033691406,
+				12.966506958007813,
+				550.5971069335938
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0000020265579224,
+				1.0,
+				1.0000020265579224
+			]
+		}
+	},
+	"226": {
+		"ColliderComponent": {
+			"maxBounds": [
+				88.76774597167969,
+				125.567626953125,
+				91.71553039550781
+			],
+			"minBounds": [
+				-89.04957580566406,
+				0.43238067626953125,
+				-92.08045959472656
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						88.90866088867188,
+						62.567623138427734,
+						91.89799499511719
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.1409149169921875,
+						63.000003814697266,
+						-0.18246078491210938
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "canteen_tablechair_adult"
+		},
+		"NameComponent": {
+			"name": "Canteen_Table_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				256.24871826171875,
+				12.966506958007813,
+				258.9894104003906
+			],
+			"rotation": [
+				-179.99989318847656,
+				54.99993133544922,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999954700469971,
+				1.0,
+				0.9999954700469971
+			]
+		}
+	},
+	"227": {
+		"ColliderComponent": {
+			"maxBounds": [
+				88.76774597167969,
+				125.567626953125,
+				91.71553039550781
+			],
+			"minBounds": [
+				-89.04957580566406,
+				0.43238067626953125,
+				-92.08045959472656
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						88.90866088867188,
+						62.567623138427734,
+						91.89799499511719
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.1409149169921875,
+						63.000003814697266,
+						-0.18246078491210938
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "canteen_tablechair_adult"
+		},
+		"NameComponent": {
+			"name": "Canteen_Table_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-76.91188049316406,
+				12.966506958007813,
+				205.6041717529297
+			],
+			"rotation": [
+				-179.99989318847656,
+				50.00000762939453,
+				-179.99989318847656
+			],
+			"scale": [
+				1.0000011920928955,
+				1.0,
+				1.0000011920928955
+			]
+		}
+	},
+	"228": {
+		"ColliderComponent": {
+			"maxBounds": [
+				38.170021057128906,
+				212.74798583984375,
+				93.20150756835938
+			],
+			"minBounds": [
+				-38.170021057128906,
+				-0.9762420654296875,
+				-92.81558227539063
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						38.170021057128906,
+						106.86211395263672,
+						93.008544921875
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						105.88587188720703,
+						0.19296646118164063
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "shelf_storeroom"
+		},
+		"NameComponent": {
+			"name": "Storeroom_Shelf_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				451.31402587890625,
+				13.162858963012695,
+				407.3149108886719
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"229": {
+		"ColliderComponent": {
+			"maxBounds": [
+				38.170021057128906,
+				212.74798583984375,
+				93.20150756835938
+			],
+			"minBounds": [
+				-38.170021057128906,
+				-0.9762420654296875,
+				-92.81558227539063
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						38.170021057128906,
+						106.86211395263672,
+						93.008544921875
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						105.88587188720703,
+						0.19296646118164063
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "shelf_storeroom"
+		},
+		"NameComponent": {
+			"name": "Storeroom_Shelf_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				451.31402587890625,
+				13.162858963012695,
+				200.40501403808594
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
 	"23": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -12975,6 +18469,1298 @@
 			]
 		}
 	},
+	"230": {
+		"ColliderComponent": {
+			"maxBounds": [
+				38.170021057128906,
+				212.74798583984375,
+				93.20150756835938
+			],
+			"minBounds": [
+				-38.170021057128906,
+				-0.9762420654296875,
+				-92.81558227539063
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						38.170021057128906,
+						106.86211395263672,
+						93.008544921875
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						105.88587188720703,
+						0.19296646118164063
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "shelf_storeroom"
+		},
+		"NameComponent": {
+			"name": "Storeroom_Shelf_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				652.2489624023438,
+				13.162858963012695,
+				575.5801391601563
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999996423721313,
+				1.0,
+				0.9999996423721313
+			]
+		}
+	},
+	"231": {
+		"ColliderComponent": {
+			"maxBounds": [
+				38.170021057128906,
+				212.74798583984375,
+				93.20150756835938
+			],
+			"minBounds": [
+				-38.170021057128906,
+				-0.9762420654296875,
+				-92.81558227539063
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						38.170021057128906,
+						106.86211395263672,
+						93.008544921875
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						105.88587188720703,
+						0.19296646118164063
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "shelf_storeroom"
+		},
+		"NameComponent": {
+			"name": "Storeroom_Shelf_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				652.2489624023438,
+				13.162858963012695,
+				376.6911926269531
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999996423721313,
+				1.0,
+				0.9999996423721313
+			]
+		}
+	},
+	"232": {
+		"ColliderComponent": {
+			"maxBounds": [
+				108.09515380859375,
+				371.6498718261719,
+				7.194403648376465
+			],
+			"minBounds": [
+				-98.74581909179688,
+				0.34539794921875,
+				-0.7218952178955078
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						103.42048645019531,
+						185.65223693847656,
+						3.9581494331359863
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.6746673583984375,
+						185.9976348876953,
+						3.2362542152404785
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_plain"
+		},
+		"NameComponent": {
+			"name": "Wall_78"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				685.0316772460938,
+				0.0,
+				700.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"233": {
+		"ColliderComponent": {
+			"maxBounds": [
+				65.43600463867188,
+				249.14151000976563,
+				11.579151153564453
+			],
+			"minBounds": [
+				-59.66400146484375,
+				-3.0125274658203125,
+				-10.101615905761719
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						4.0,
+						126.07701873779297,
+						10.840383529663086
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						61.43600082397461,
+						123.06449127197266,
+						0.7387676239013672
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				},
+				{
+					"boxHalfExtents": [
+						4.0,
+						126.07701873779297,
+						10.840383529663086
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-55.66400146484375,
+						123.06449127197266,
+						0.7387676239013672
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "room_doorframe"
+		},
+		"NameComponent": {
+			"name": "Storeroom_DoorFrame"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				520.0414428710938,
+				0.0,
+				697.758544921875
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"234": {
+		"ColliderComponent": {
+			"maxBounds": [
+				53.677001953125,
+				128.31700134277344,
+				3.827028512954712
+			],
+			"minBounds": [
+				-46.322998046875,
+				126.31700134277344,
+				1.827028512954712
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						50.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						3.677000045776367,
+						127.31700134277344,
+						2.827028512954712
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "room_doortopwall"
+		},
+		"NameComponent": {
+			"name": "Storeroom_TopWall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				520.0414428710938,
+				242.99188232421875,
+				699.4486083984375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"235": {
+		"ColliderComponent": {
+			"maxBounds": [
+				59.077880859375,
+				241.2906951904297,
+				14.371514320373535
+			],
+			"minBounds": [
+				-54.989227294921875,
+				-0.941680908203125,
+				-9.411751747131348
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						57.03355407714844,
+						121.1161880493164,
+						11.891633033752441
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						2.0443267822265625,
+						120.17450714111328,
+						2.4798812866210938
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "room_door"
+		},
+		"NameComponent": {
+			"name": "Storeroom_Door"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				474.58380126953125,
+				0.0,
+				649.9414672851563
+			],
+			"rotation": [
+				0.0,
+				79.99999237060547,
+				0.0
+			],
+			"scale": [
+				0.9999988675117493,
+				1.0,
+				0.9999988675117493
+			]
+		}
+	},
+	"236": {
+		"ColliderComponent": {
+			"maxBounds": [
+				65.43600463867188,
+				249.14151000976563,
+				11.579151153564453
+			],
+			"minBounds": [
+				-59.66400146484375,
+				-3.0125274658203125,
+				-10.101615905761719
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						4.0,
+						126.07701873779297,
+						10.840383529663086
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						61.43600082397461,
+						123.06449127197266,
+						0.7387676239013672
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				},
+				{
+					"boxHalfExtents": [
+						4.0,
+						126.07701873779297,
+						10.840383529663086
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-55.66400146484375,
+						123.06449127197266,
+						0.7387676239013672
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "room_doorframe"
+		},
+		"NameComponent": {
+			"name": "Bedroom_DoorFrame"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-394.1650695800781,
+				0.0,
+				896.9210205078125
+			],
+			"rotation": [
+				-179.99989318847656,
+				-5.008956122765085e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"237": {
+		"ColliderComponent": {
+			"maxBounds": [
+				53.677001953125,
+				128.31700134277344,
+				3.827028512954712
+			],
+			"minBounds": [
+				-46.322998046875,
+				126.31700134277344,
+				1.827028512954712
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						50.0,
+						1.0,
+						1.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						3.677000045776367,
+						127.31700134277344,
+						2.827028512954712
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "room_doortopwall"
+		},
+		"NameComponent": {
+			"name": "Bedroom_TopWall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-393.6603698730469,
+				242.99188232421875,
+				901.6241455078125
+			],
+			"rotation": [
+				-179.99989318847656,
+				-5.008956122765085e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"238": {
+		"ColliderComponent": {
+			"maxBounds": [
+				108.09515380859375,
+				371.6498718261719,
+				7.194403648376465
+			],
+			"minBounds": [
+				-98.74581909179688,
+				0.34539794921875,
+				-0.7218952178955078
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						103.42048645019531,
+						185.65223693847656,
+						3.9581494331359863
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.6746673583984375,
+						185.9976348876953,
+						3.2362542152404785
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				0.05999999865889549,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_plain"
+		},
+		"NameComponent": {
+			"name": "Wall_79"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-478.3605041503906,
+				0.0,
+				895.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.15000000596046448,
+				1.0,
+				0.999999463558197
+			]
+		}
+	},
+	"239": {
+		"ColliderComponent": {
+			"maxBounds": [
+				108.09515380859375,
+				371.6498718261719,
+				7.194403648376465
+			],
+			"minBounds": [
+				-98.74581909179688,
+				0.34539794921875,
+				-0.7218952178955078
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						103.42048645019531,
+						185.65223693847656,
+						3.9581494331359863
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						4.6746673583984375,
+						185.9976348876953,
+						3.2362542152404785
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				0.05999999865889549,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_plain"
+		},
+		"NameComponent": {
+			"name": "Wall_80"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-316.19232177734375,
+				0.0,
+				895.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.17000000178813934,
+				1.0,
+				0.999999463558197
+			]
+		}
+	},
 	"24": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -13097,6 +19883,1256 @@
 				1.0,
 				1.0,
 				1.0
+			]
+		}
+	},
+	"240": {
+		"ColliderComponent": {
+			"maxBounds": [
+				59.077880859375,
+				241.2906951904297,
+				14.371514320373535
+			],
+			"minBounds": [
+				-54.989227294921875,
+				-0.941680908203125,
+				-9.411751747131348
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						57.03355407714844,
+						121.1161880493164,
+						11.891633033752441
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						2.0443267822265625,
+						120.17450714111328,
+						2.4798812866210938
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "room_door"
+		},
+		"NameComponent": {
+			"name": "Bedroom_Door"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-440.4840087890625,
+				0.0,
+				948.0262451171875
+			],
+			"rotation": [
+				0.0001042765288730152,
+				-79.99999237060547,
+				0.00010427721281303093
+			],
+			"scale": [
+				0.9999986290931702,
+				1.0,
+				0.9999986290931702
+			]
+		}
+	},
+	"241": {
+		"ColliderComponent": {
+			"maxBounds": [
+				53.6231689453125,
+				204.90023803710938,
+				98.8104476928711
+			],
+			"minBounds": [
+				-50.61083984375,
+				1.7488861083984375,
+				-99.94120025634766
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						52.11700439453125,
+						101.57567596435547,
+						99.37582397460938
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.50616455078125,
+						103.3245620727539,
+						-0.5653762817382813
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bed_bunk"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BunkBed_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-187.84400939941406,
+				14.350997924804688,
+				1016.299072265625
+			],
+			"rotation": [
+				0.0,
+				-3.799999952316284,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"242": {
+		"ColliderComponent": {
+			"maxBounds": [
+				53.6231689453125,
+				204.90023803710938,
+				98.8104476928711
+			],
+			"minBounds": [
+				-50.61083984375,
+				1.7488861083984375,
+				-99.94120025634766
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						52.11700439453125,
+						101.57567596435547,
+						99.37582397460938
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.50616455078125,
+						103.3245620727539,
+						-0.5653762817382813
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bed_bunk"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BunkBed_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				46.40467071533203,
+				14.350997924804688,
+				1010.392333984375
+			],
+			"rotation": [
+				0.0,
+				11.449999809265137,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"243": {
+		"ColliderComponent": {
+			"maxBounds": [
+				53.6231689453125,
+				204.90023803710938,
+				98.8104476928711
+			],
+			"minBounds": [
+				-50.61083984375,
+				1.7488861083984375,
+				-99.94120025634766
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						52.11700439453125,
+						101.57567596435547,
+						99.37582397460938
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.50616455078125,
+						103.3245620727539,
+						-0.5653762817382813
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bed_bunk"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BunkBed_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				289.3521423339844,
+				14.350997924804688,
+				1010.392333984375
+			],
+			"rotation": [
+				0.0,
+				-5.25,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"244": {
+		"ColliderComponent": {
+			"maxBounds": [
+				53.6231689453125,
+				204.90023803710938,
+				98.8104476928711
+			],
+			"minBounds": [
+				-50.61083984375,
+				1.7488861083984375,
+				-99.94120025634766
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						52.11700439453125,
+						101.57567596435547,
+						99.37582397460938
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.50616455078125,
+						103.3245620727539,
+						-0.5653762817382813
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bed_bunk"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BunkBed_05"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				527.40673828125,
+				14.350997924804688,
+				1398.02392578125
+			],
+			"rotation": [
+				-179.99989318847656,
+				-18.649999618530273,
+				-179.99989318847656
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"245": {
+		"ColliderComponent": {
+			"maxBounds": [
+				53.6231689453125,
+				204.90023803710938,
+				98.8104476928711
+			],
+			"minBounds": [
+				-50.61083984375,
+				1.7488861083984375,
+				-99.94120025634766
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						52.11700439453125,
+						101.57567596435547,
+						99.37582397460938
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.50616455078125,
+						103.3245620727539,
+						-0.5653762817382813
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bed_bunk"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BunkBed_06"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				293.96600341796875,
+				14.350997924804688,
+				1402.4248046875
+			],
+			"rotation": [
+				-179.99989318847656,
+				1.2499995231628418,
+				-179.99989318847656
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"246": {
+		"ColliderComponent": {
+			"maxBounds": [
+				53.6231689453125,
+				204.90023803710938,
+				98.8104476928711
+			],
+			"minBounds": [
+				-50.61083984375,
+				1.7488861083984375,
+				-99.94120025634766
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						52.11700439453125,
+						101.57567596435547,
+						99.37582397460938
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.50616455078125,
+						103.3245620727539,
+						-0.5653762817382813
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bed_bunk"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BunkBed_07"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				172.45362854003906,
+				66.05504608154297,
+				1431.3658447265625
+			],
+			"rotation": [
+				-132.04995727539063,
+				-1.707547198748216e-06,
+				-89.99994659423828
+			],
+			"scale": [
+				0.9999985694885254,
+				0.9999990463256836,
+				0.9999992251396179
+			]
+		}
+	},
+	"247": {
+		"ColliderComponent": {
+			"maxBounds": [
+				53.6231689453125,
+				204.90023803710938,
+				98.8104476928711
+			],
+			"minBounds": [
+				-50.61083984375,
+				1.7488861083984375,
+				-99.94120025634766
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						52.11700439453125,
+						101.57567596435547,
+						99.37582397460938
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.50616455078125,
+						103.3245620727539,
+						-0.5653762817382813
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bed_bunk"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BunkBed_08"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-154.81036376953125,
+				14.350997924804688,
+				1396.2333984375
+			],
+			"rotation": [
+				-179.99989318847656,
+				14.899970054626465,
+				-179.99989318847656
+			],
+			"scale": [
+				1.0000009536743164,
+				1.0,
+				1.0000009536743164
+			]
+		}
+	},
+	"248": {
+		"ColliderComponent": {
+			"maxBounds": [
+				53.6231689453125,
+				204.90023803710938,
+				98.8104476928711
+			],
+			"minBounds": [
+				-50.61083984375,
+				1.7488861083984375,
+				-99.94120025634766
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						52.11700439453125,
+						101.57567596435547,
+						99.37582397460938
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.50616455078125,
+						103.3245620727539,
+						-0.5653762817382813
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bed_bunk"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BunkBed_09"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-376.1211853027344,
+				14.350997924804688,
+				1383.7764892578125
+			],
+			"rotation": [
+				-179.99989318847656,
+				-6.149986743927002,
+				-179.99989318847656
+			],
+			"scale": [
+				1.0000009536743164,
+				1.0,
+				1.0000009536743164
+			]
+		}
+	},
+	"249": {
+		"ColliderComponent": {
+			"maxBounds": [
+				116.45756530761719,
+				273.4981384277344,
+				25.622262954711914
+			],
+			"minBounds": [
+				-88.48908996582031,
+				16.813720703125,
+				-1.7066020965576172
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						102.47332763671875,
+						128.3422088623047,
+						13.664432525634766
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						13.984233856201172,
+						145.1559295654297,
+						11.957830429077148
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "curtain"
+		},
+		"NameComponent": {
+			"name": "Bedroom_Curtain"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				694.7434692382813,
+				14.350997924804688,
+				1188.004150390625
+			],
+			"rotation": [
+				0.0,
+				-89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999996423721313,
+				1.0,
+				0.9999996423721313
 			]
 		}
 	},
@@ -13242,6 +21278,881 @@
 				1.0,
 				1.0,
 				1.0
+			]
+		}
+	},
+	"250": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				139.12550354003906,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				-60.8745002746582,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						100.0,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wooden_chair_kid"
+		},
+		"NameComponent": {
+			"name": "Bedroom_Chair"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				646.3323974609375,
+				14.350997924804688,
+				1202.2054443359375
+			],
+			"rotation": [
+				-179.99989318847656,
+				5.008956122765085e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"251": {
+		"ColliderComponent": {
+			"maxBounds": [
+				20.74808120727539,
+				56.69184875488281,
+				44.615543365478516
+			],
+			"minBounds": [
+				-23.681381225585938,
+				0.236175537109375,
+				-25.593196868896484
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						22.214731216430664,
+						28.22783660888672,
+						35.1043701171875
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.4666500091552734,
+						28.464012145996094,
+						9.5111722946167
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_monkey"
+		},
+		"NameComponent": {
+			"name": "Bedroom_Toy"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				646.3682861328125,
+				48.55950927734375,
+				1200.7281494140625
+			],
+			"rotation": [
+				-180.0,
+				-59.99999237060547,
+				-180.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"252": {
+		"ColliderComponent": {
+			"maxBounds": [
+				74.19206237792969,
+				127.42453002929688,
+				23.634477615356445
+			],
+			"minBounds": [
+				-70.72000122070313,
+				2.4249610900878906,
+				-56.69309997558594
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						72.4560317993164,
+						62.49978256225586,
+						40.163787841796875
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.7360305786132813,
+						64.92474365234375,
+						-16.52931022644043
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "baby_crib"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BabyCrib_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-602.9410400390625,
+				14.350997924804688,
+				1404.48828125
+			],
+			"rotation": [
+				-179.99989318847656,
+				73.79999542236328,
+				-179.99989318847656
+			],
+			"scale": [
+				1.0000005960464478,
+				1.0,
+				1.0000005960464478
+			]
+		}
+	},
+	"253": {
+		"ColliderComponent": {
+			"maxBounds": [
+				74.19206237792969,
+				127.42453002929688,
+				23.634477615356445
+			],
+			"minBounds": [
+				-70.72000122070313,
+				2.4249610900878906,
+				-56.69309997558594
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						72.4560317993164,
+						62.49978256225586,
+						40.163787841796875
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.7360305786132813,
+						64.92474365234375,
+						-16.52931022644043
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "baby_crib"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BabyCrib_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-612.0792236328125,
+				14.350997924804688,
+				1234.5679931640625
+			],
+			"rotation": [
+				-179.99989318847656,
+				81.80000305175781,
+				-179.99989318847656
+			],
+			"scale": [
+				1.0000005960464478,
+				1.0,
+				1.0000005960464478
+			]
+		}
+	},
+	"254": {
+		"ColliderComponent": {
+			"maxBounds": [
+				74.19206237792969,
+				127.42453002929688,
+				23.634477615356445
+			],
+			"minBounds": [
+				-70.72000122070313,
+				2.4249610900878906,
+				-56.69309997558594
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						72.4560317993164,
+						62.49978256225586,
+						40.163787841796875
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.7360305786132813,
+						64.92474365234375,
+						-16.52931022644043
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "baby_crib"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BabyCrib_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-666.0599365234375,
+				41.48265075683594,
+				1055.7855224609375
+			],
+			"rotation": [
+				90.0,
+				73.54998779296875,
+				0.0
+			],
+			"scale": [
+				1.0000004768371582,
+				0.9999992251396179,
+				1.0000004768371582
+			]
+		}
+	},
+	"255": {
+		"ColliderComponent": {
+			"maxBounds": [
+				48.169715881347656,
+				104.1718978881836,
+				28.078815460205078
+			],
+			"minBounds": [
+				-47.683372497558594,
+				-0.21605682373046875,
+				-21.160781860351563
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						47.926544189453125,
+						52.19397735595703,
+						24.61979866027832
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.24317169189453125,
+						51.97792053222656,
+						3.459016799926758
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "baby_dresser"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BabyDresser_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-628.6043090820313,
+				13.5333251953125,
+				939.5377197265625
+			],
+			"rotation": [
+				0.0,
+				3.1500000953674316,
+				0.0
+			],
+			"scale": [
+				1.0000004768371582,
+				0.9999992251396179,
+				1.0000004768371582
+			]
+		}
+	},
+	"256": {
+		"ColliderComponent": {
+			"maxBounds": [
+				48.169715881347656,
+				104.1718978881836,
+				28.078815460205078
+			],
+			"minBounds": [
+				-47.683372497558594,
+				-0.21605682373046875,
+				-21.160781860351563
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						47.926544189453125,
+						52.19397735595703,
+						24.61979866027832
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.24317169189453125,
+						51.97792053222656,
+						3.459016799926758
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17203495961540657167,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Floor",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "baby_dresser"
+		},
+		"NameComponent": {
+			"name": "Bedroom_BabyDresser_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-526.0292358398438,
+				13.5333251953125,
+				939.5377197265625
+			],
+			"rotation": [
+				0.0,
+				10.300000190734863,
+				0.0
+			],
+			"scale": [
+				1.0000004768371582,
+				0.9999992251396179,
+				1.0000004768371582
 			]
 		}
 	},
@@ -16545,7 +25456,7 @@
 			"position": [
 				0.0,
 				155.0,
-				252.65933227539063
+				-432.9350891113281
 			],
 			"rotation": [
 				-179.99989318847656,
@@ -19396,7 +28307,7 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				400.0,
+				352.5777893066406,
 				0.0,
 				700.0
 			],
@@ -21539,19 +30450,19 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-400.0,
+				-437.8931579589844,
 				0.0,
-				210.0
+				266.4315490722656
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-74.99996948242188,
 				0.0
 			],
 			"scale": [
-				0.9999996423721313,
+				0.9999989867210388,
 				1.0,
-				0.9999996423721313
+				0.9999989867210388
 			]
 		}
 	},
