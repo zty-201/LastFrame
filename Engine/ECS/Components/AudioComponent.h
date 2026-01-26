@@ -1,118 +1,133 @@
 #pragma once
 
 #include "xresource_guid.h"
+#include "Audio.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
-#include <unordered_map>
 #include <vector>
-
-struct AudioRequest
-{
-	std::string clipName;
-	float volume = 1.0f;
-	bool is3D = true;
-	bool loop = false;
-	float minDistance = 1.0f;
-	float maxDistance = 50.0f;
-};
 
 struct AudioComponent
 {
-	// Each clip holds the GUID that points to the sound asset
-	// Alongside with the playback attributes
-	struct AudioClip
+
+	// Explicit spatial mode for readability
+	enum class SpatialMode : uint8_t
 	{
-		// Which sound to play (linked to SoundAsset via this GUID)
+		TwoD = 0,
+		ThreeD
+	};
+
+	using AudioCategory = EngineFramework::AudioCategory;
+
+	// A 'Slot' is a designer-authored "audio" in an entity
+	/* 
+	* Eg. "Pickup", "Footstep"
+	* In LUA, call for AudioSystem like:
+	* - Audio.Play(entity."Pickup")
+	* - Audio.Play(entity."Footstep")
+	*/
+	struct Slot
+	{
+		// Identifiers used by Editor/Lua
+		std::string id = "NewSlot";
+
+		// Link to SoundAsset via GUID
 		xresource::full_guid audio_guid{};
 
 		// Basic playback controls
-		float volume = 1.0f;
-		bool loop = false;
+		float volume	= 1.0f;
+		float pitch		= 1.0f;
+		bool loop		= false;
+
+		AudioCategory category = AudioCategory::SFX;
+
+		// 2D / 3D Behaviour
+		SpatialMode spatial = SpatialMode::ThreeD;
+
+		// Only when spatial == ThreeD
+		float minDistance = 1.0f;
+		float maxDistance = 25.0f;
+
+		// Auto-play when entity becomes active
 		bool playOnStart = false;
-
-		// 2D / 3D behaviour
-		bool is3D = true;          // true = spatialized, false = pure 2D
-		float minDistance = 1.0f;  // for 3D rolloff
-		float maxDistance = 25.0f; // for 3D rolloff
-
-		bool playRequested = false; // set by Lua / editor, consumed by AudioSystem
 	};
-	
-	// Stores per-entity sound clips plus the logical sound bank used by scripts and designers.
-	std::vector<AudioClip> Clips;
 
-	// 1. CONFIG: Map "Logical Name" -> "File Path" (or GUID)
-	std::unordered_map<std::string, std::string> soundBank;
-
-	// 2. STATE: The list of sounds to play this frame
-	std::vector<AudioRequest> requestQueue;
-
-	// 3. PLAY ON START CONFIGURATION
-	std::string playOnStartName;
-	bool playOnStartLoop = true;
-	bool playOnStart3D = false;
-	float playOnStartVolume = 0.5f;
-
-	// 4. RUNTIME STATE
-	bool _hasStarted = false; // Prevents it from restarting every frame
+	// Keep at least one slot for editor UX
+	std::vector<Slot> Slots;
 
 	AudioComponent()
-		: Clips(1) {}
+		: Slots(1) {}
 
-	std::size_t GetClipCount() const { return Clips.size(); }
+	std::size_t GetSlotCount() const { return Slots.size(); }
 
-	AudioClip* GetClip(std::size_t index)
+	Slot* GetSlot(std::size_t index)
 	{
-		if (index >= Clips.size())
+		if (index >= Slots.size())
 			return nullptr;
-		return &Clips[index];
+		return &Slots[index];
 	}
 
-	const AudioClip* GetClip(std::size_t index) const
+	Slot& PrimarySlot()
 	{
-		if (index >= Clips.size())
-			return nullptr;
-		return &Clips[index];
+		if (Slots.empty())
+			Slots.emplace_back();
+		return Slots.front();
 	}
 
-	AudioClip& PrimaryClip()
+	const Slot& PrimarySlot() const
 	{
-		if (Clips.empty())
-			Clips.emplace_back();
-		return Clips.front();
-	}
-
-	const AudioClip& PrimaryClip() const
-	{
-		if (Clips.empty())
+		if (Slots.empty())
 		{
-			static AudioClip defaultClip{};
-			return defaultClip;
+			static Slot defaultSlot{};
+			return defaultSlot;
 		}
-		return Clips.front();
+		return Slots.front();
 	}
 
-	AudioClip& AddClip()
+	Slot& AddSlot(const std::string& suggestedId = "NewSlot")
 	{
-		Clips.emplace_back();
-		return Clips.back();
+		Slots.emplace_back();
+		Slots.back().id = suggestedId;
+		return Slots.back();
 	}
 
-	bool RemoveClip(std::size_t index)
+	bool RemoveSlot(std::size_t index)
 	{
-		if (Clips.size() <= 1 || index >= Clips.size())
+		if (Slots.size() <= 1 || index >= Slots.size())
 			return false;
 
-		Clips.erase(Clips.begin() + static_cast<std::vector<AudioClip>::difference_type>(index));
+		Slots.erase(Slots.begin() + static_cast<std::vector<Slot>::difference_type>(index));
 		return true;
 	}
 
-	void Play(const std::string& name, float vol = 1.0f)
+	// Find a slot by its ID
+	// Return nullptr if not found
+	Slot* FindSlot(const std::string& slotId)
 	{
-		AudioRequest req;
-		req.clipName = name;
-		req.volume = vol;
-		requestQueue.push_back(req);
+		for (auto& s : Slots)
+		{
+			if (s.id == slotId)
+				return &s;
+		}
+
+		return nullptr;
 	}
+
+	const Slot* FindSlot(const std::string& slotId) const
+	{
+		for (const auto& s : Slots)
+		{
+			if (s.id == slotId)
+				return &s;
+		}
+
+		return nullptr;
+	}
+
+	bool HasSlot(const std::string& slotId) const
+	{
+		return FindSlot(slotId) != nullptr;
+	}
+
 };

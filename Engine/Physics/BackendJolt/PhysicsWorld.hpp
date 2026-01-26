@@ -211,6 +211,30 @@ public:
 
     bool Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& putHit);
 
+    /*************************************************
+    * This function applies an impulse force on a singular entity.
+    * This is method 1 of 3 to explode items.
+    * More control over where you want parts to fly, but you have more code
+    * to write; you have to calculate direction yourself.
+    *************************************************/
+    void ApplyImpulse(entt::entity entity, float x, float y, float z);
+
+    /*************************************************
+    * This function applies impulse forces on all parts of the item.
+    * This is method 2 of 3 to explode items.
+    * Less control over where you wants parts to fly, but you will have
+    * less code to write; you just need to pass the list of parts and how
+    * strong you want the explosion to be.
+    *************************************************/
+    void ExplodeGroup(const std::vector<entt::entity>& parts, float strength);
+
+    /*************************************************
+    * This function applies force in the most "natrual" way as
+    * an explosion would take place; outwards. Just pass in list
+    * of parts and the origin of explosion. Strength of explosion as well.
+    *************************************************/
+    void ApplyRadialExplosion(const std::vector<entt::entity>& parts, float centerX, float centerY, float centerZ, float strength);
+
 private:
     PhysicsWorld() = default;
     ~PhysicsWorld() = default;

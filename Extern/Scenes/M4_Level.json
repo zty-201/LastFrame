@@ -4418,25 +4418,23 @@
 	},
 	"13": {
 		"AudioComponent": {
-			"Clips": [
+			"Slots": [
 				{
 					"audio_guid": [
 						0,
 						0
 					],
-					"is3D": true,
+					"category": 0,
+					"id": "Slot1",
 					"loop": false,
 					"maxDistance": 25.0,
 					"minDistance": 1.0,
+					"pitch": 1.0,
 					"playOnStart": false,
+					"spatial": 1,
 					"volume": 1.0
 				}
-			],
-			"playOnStart3D": false,
-			"playOnStartLoop": true,
-			"playOnStartName": "",
-			"playOnStartVolume": 0.5,
-			"soundBank": {}
+			]
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -21137,6 +21135,25 @@
 		}
 	},
 	"25": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						2608860144851107843,
+						11537445004664754516
+					],
+					"category": 1,
+					"id": "music",
+					"loop": true,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": true,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				94.9800033569336,
@@ -25296,6 +25313,25 @@
 		}
 	},
 	"5": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						17135044766221647873,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Footstep",
+					"loop": true,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 0.20800000429153442
+				}
+			]
+		},
 		"AudioListenerComponent": {
 			"active": true
 		},

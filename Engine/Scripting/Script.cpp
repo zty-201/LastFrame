@@ -36,7 +36,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "PhysicsComponent.h"
 #include "PhysicsWorld.hpp"
 
+// For Audio
 #include "AudioComponent.h"
+#include "Audio.hpp"
 
 //For platform android vs windows
 #include "Platform.h"
@@ -213,6 +215,41 @@ namespace Engine {
                 return std::make_tuple(v.x, v.y, v.z);
             });
 
+        s_Lua.set_function("Physics_ApplyImpulse",
+            [](uint32_t entityId, float x, float y, float z)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                PhysicsWorld::Get().ApplyImpulse(e, x, y, z);
+            });
+
+        s_Lua.set_function("Physics_ExplodeGroup",
+            [](sol::table parts, float strength)
+            {
+                std::vector<entt::entity> entities;
+                for (auto pair : parts)
+                {
+                    if (pair.second.is<uint32_t>())
+                    {
+                        entities.push_back(static_cast<entt::entity>(pair.second.as<uint32_t>()));
+                    }
+                }
+                PhysicsWorld::Get().ExplodeGroup(entities, strength);
+            });
+
+        s_Lua.set_function("Physics_RadialExplosion",
+            [](sol::table parts, float x, float y, float z, float strength)
+            {
+                std::vector<entt::entity> entities;
+                for (auto pair : parts)
+                {
+                    if (pair.second.is<uint32_t>())
+                    {
+                        entities.push_back(static_cast<entt::entity>(pair.second.as<uint32_t>()));
+                    }
+                }
+                PhysicsWorld::Get().ApplyRadialExplosion(entities, x, y, z, strength);
+            });
+
         // ===============================================================
         // Light Component bindings
         // ===============================================================
@@ -242,64 +279,106 @@ namespace Engine {
         // ===============================================================
         // AudioComponent bindings
         // ===============================================================
-        s_Lua.new_usertype<AudioComponent::AudioClip>("AudioClip",
-            "GetVolume", [](AudioComponent::AudioClip& clip) { return clip.volume; },
-            "SetVolume", [](AudioComponent::AudioClip& clip, float v) { clip.volume = v; },
+        sol::table audioEnums = s_Lua.create_named_table("Audio");
 
-            "GetLoop", [](AudioComponent::AudioClip& clip) { return clip.loop; },
-            "SetLoop", [](AudioComponent::AudioClip& clip, bool v) { clip.loop = v; },
+        audioEnums["Category_SFX"] = (int)AudioComponent::AudioCategory::SFX;
+        audioEnums["Category_BGM"] = (int)AudioComponent::AudioCategory::BGM;
+        audioEnums["Category_UI"] = (int)AudioComponent::AudioCategory::UI;
+        audioEnums["Category_Ambience"] = (int)AudioComponent::AudioCategory::Ambience;
 
-            "GetPlayOnStart", [](AudioComponent::AudioClip& clip) { return clip.playOnStart; },
-            "SetPlayOnStart", [](AudioComponent::AudioClip& clip, bool v) { clip.playOnStart = v; },
+        audioEnums["Spatial_2D"] = (int)AudioComponent::SpatialMode::TwoD;
+        audioEnums["Spatial_3D"] = (int)AudioComponent::SpatialMode::ThreeD;
 
-            "GetIs3D", [](AudioComponent::AudioClip& clip) { return clip.is3D; },
-            "SetIs3D", [](AudioComponent::AudioClip& clip, bool v) { clip.is3D = v; },
+        // Bind Slot (formerly AudioClip)
+        s_Lua.new_usertype<AudioComponent::Slot>("AudioSlot",
+            // ID
+            "GetID", [](AudioComponent::Slot& s) { return s.id; },
+            "SetID", [](AudioComponent::Slot& s, const std::string& v) { s.id = v; },
 
-            "SetMinDistance", [](AudioComponent::AudioClip& clip, float d) { clip.minDistance = d; },
-            "SetMaxDistance", [](AudioComponent::AudioClip& clip, float d) { clip.maxDistance = d; },
+            // Volume / Pitch / Loop
+            "GetVolume", [](AudioComponent::Slot& s) { return s.volume; },
+            "SetVolume", [](AudioComponent::Slot& s, float v) { s.volume = v; },
 
-            "RequestPlay", [](AudioComponent::AudioClip& clip) { clip.playRequested = true; }
+            "GetPitch", [](AudioComponent::Slot& s) { return s.pitch; },
+            "SetPitch", [](AudioComponent::Slot& s, float v) { s.pitch = v; },
+
+            "GetLoop", [](AudioComponent::Slot& s) { return s.loop; },
+            "SetLoop", [](AudioComponent::Slot& s, bool v) { s.loop = v; },
+
+            // PlayOnStart
+            "GetPlayOnStart", [](AudioComponent::Slot& s) { return s.playOnStart; },
+            "SetPlayOnStart", [](AudioComponent::Slot& s, bool v) { s.playOnStart = v; },
+
+            // Category / Spatial (as ints in Lua)
+            "GetCategory", [](AudioComponent::Slot& s) { return (int)s.category; },
+            "SetCategory", [](AudioComponent::Slot& s, int v) { s.category = (AudioComponent::AudioCategory)v; },
+
+            "GetSpatial", [](AudioComponent::Slot& s) { return (int)s.spatial; },
+            "SetSpatial", [](AudioComponent::Slot& s, int v) { s.spatial = (AudioComponent::SpatialMode)v; },
+
+            // 3D distances
+            "GetMinDistance", [](AudioComponent::Slot& s) { return s.minDistance; },
+            "SetMinDistance", [](AudioComponent::Slot& s, float d) { s.minDistance = d; },
+
+            "GetMaxDistance", [](AudioComponent::Slot& s) { return s.maxDistance; },
+            "SetMaxDistance", [](AudioComponent::Slot& s, float d) { s.maxDistance = d; }
         );
 
+        // Bind AudioComponent itself
         s_Lua.new_usertype<AudioComponent>("AudioComponent",
-            "GetClipCount", [](AudioComponent& a) { return static_cast<int>(a.GetClipCount()); },
-            "GetClip", [](AudioComponent& a, std::size_t index) -> AudioComponent::AudioClip* {
-                return a.GetClip(index);
-            },
-            "AddClip", [](AudioComponent& a) -> AudioComponent::AudioClip* {
-                return &a.AddClip();
-            },
-            "RemoveClip", [](AudioComponent& a, std::size_t index) {
-                return a.RemoveClip(index);
+            "GetSlotCount", [](AudioComponent& a) { return (int)a.Slots.size(); },
+
+            "GetSlot", [](AudioComponent& a, std::size_t index) -> AudioComponent::Slot* {
+                if (index >= a.Slots.size()) return nullptr;
+                return &a.Slots[index];
             },
 
-            "GetVolume", [](AudioComponent& a) { return a.PrimaryClip().volume; },
-            "SetVolume", [](AudioComponent& a, float v) { a.PrimaryClip().volume = v; },
-
-            "GetLoop", [](AudioComponent& a) { return a.PrimaryClip().loop; },
-            "SetLoop", [](AudioComponent& a, bool v) { a.PrimaryClip().loop = v; },
-
-            "GetPlayOnStart", [](AudioComponent& a) { return a.PrimaryClip().playOnStart; },
-            "SetPlayOnStart", [](AudioComponent& a, bool v) { a.PrimaryClip().playOnStart = v; },
-
-            "GetIs3D", [](AudioComponent& a) { return a.PrimaryClip().is3D; },
-            "SetIs3D", [](AudioComponent& a, bool v) { a.PrimaryClip().is3D = v; },
-
-            "SetMinDistance", [](AudioComponent& a, float d) { a.PrimaryClip().minDistance = d; },
-            "SetMaxDistance", [](AudioComponent& a, float d) { a.PrimaryClip().maxDistance = d; },
-
-            "RequestPlay", [](AudioComponent& a) { a.PrimaryClip().playRequested = true; },
-            "RequestPlayClip", [](AudioComponent& a, std::size_t index) {
-                if (auto* clip = a.GetClip(index))
-                    clip->playRequested = true;
+            "FindSlot", [](AudioComponent& a, const std::string& id) -> AudioComponent::Slot* {
+                return a.FindSlot(id);
             },
-            "Play", [](AudioComponent& a, const std::string& name, float volume) {
-                a.Play(name, volume);
+
+            "AddSlot", [](AudioComponent& a, const std::string& id) -> AudioComponent::Slot* {
+                return &a.AddSlot(id);
             },
-            "HasSound", [](AudioComponent& a, const std::string& name) {
-                return a.soundBank.find(name) != a.soundBank.end();
+
+            "RemoveSlot", [](AudioComponent& a, std::size_t index) {
+                a.RemoveSlot(index);
             }
         );
+
+        // ===============================================================
+        // AudioSystem bindings (play/stop by entity + slot ID)
+        // ===============================================================
+
+        // Use global functions (recommended) so scripts can trigger audio reliably
+        s_Lua.set_function("Audio_PlaySlot",
+            [](uint32_t entityId, const std::string& slotId)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                EngineFramework::AudioSystem::GetInstance().PlayEntitySlot(e, slotId);
+            });
+
+        s_Lua.set_function("Audio_StopSlot",
+            [](uint32_t entityId, const std::string& slotId)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                EngineFramework::AudioSystem::GetInstance().StopEntitySlot(e, slotId);
+            });
+
+        s_Lua.set_function("Audio_StopAllForEntity",
+            [](uint32_t entityId)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                EngineFramework::AudioSystem::GetInstance().StopAllForEntity(e);
+            });
+
+        // Optional: mixer controls from Lua (useful for settings menus)
+        s_Lua.set_function("Audio_SetGroupVolume",
+            [](int group, float vol)
+            {
+                EngineFramework::AudioSystem::GetInstance().SetGroupVolume(
+                    (EngineFramework::AudioGroup)group, vol);
+            });
 
         // ===============================================================
         // UIComponent bindings
@@ -642,7 +721,7 @@ namespace Engine {
     // ------------------------------------------------------------------
     void ScriptSystem::OnRuntimeStart(entt::registry& reg) {
 #if defined(ENGINE_ENABLE_LUA)
-        LOGI("[ScriptSystem] OnRuntimeStart called — initializing Lua scripts...");
+        LOGI("[ScriptSystem] OnRuntimeStart called - initializing Lua scripts...");
 
         s_RuntimeRegistry = &reg;
 

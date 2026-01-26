@@ -28,6 +28,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "Diagnostics/ProfilerEngine.hpp" // For the profiler - engine side
 #include "UnitTestManager.hpp"
 #include "AssetManager.hpp"
+#include "UISystem.hpp"
 #include "Audio/Audio.hpp"
 #include "PhysicsRuntimeSystem.hpp"
 #include "AnimationSystem.h"
@@ -184,11 +185,22 @@ void Game_Initialize(void* android_asset_manager)
 			2   // Destruct Order
 		);
 
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+		// 6. LevelEditorSystem: Controls rendering when active.
+		core_engine.AddSystem(
+			"UI_System",
+			std::make_unique<EngineFramework::UI_System>(),
+			7,  // Init Order: after AssetManager, before GameObjectSystem
+			2,  // Update Order: after Input, before GameObjectSystem & Graphics
+			3   // Destruct Order: before GameObjectSystem/Graphics are gone
+		);
+#endif
+
 		// 5. AnimationSystem: For animation to work.
 		core_engine.AddSystem(
 			"AnimationSystem",
 			std::make_unique<EngineFramework::AnimationSystem>(),
-			7,	// Init Order
+			8,	// Init Order
 			4,	// Update Order
 			7	// Destruct Order
 		);

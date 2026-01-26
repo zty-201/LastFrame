@@ -203,6 +203,13 @@ namespace EngineFramework
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         LOGI("Created default normal texture: %u", m_defaultNormalTexture);
 
+        glGenTextures(1, &m_defaultBlackTexture);
+        glBindTexture(GL_TEXTURE_2D, m_defaultBlackTexture);
+        unsigned char black[] = { 0, 0, 0, 255 }; // R=0, G=0, B=0, A=1
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, black);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
         glBindTexture(GL_TEXTURE_2D, 0);
 
         // Volumetric UBO
@@ -927,7 +934,7 @@ namespace EngineFramework
                 // Metallic
                 auto metalTex = AssetManagerSystem::GetResource<Scene::Texture>(material.metallicMap);
                 glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_METALLIC_UNIT);
-                glBindTexture(GL_TEXTURE_2D, (metalTex && metalTex->id != 0) ? metalTex->id : m_defaultWhiteTexture);
+                glBindTexture(GL_TEXTURE_2D, (metalTex && metalTex->id != 0) ? metalTex->id : m_defaultBlackTexture);
                 shader->setUniform("s_Metallic", TextureUnits::MESH_METALLIC_UNIT);
 
                 static bool logged_first = false;
