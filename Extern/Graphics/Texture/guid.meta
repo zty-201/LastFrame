@@ -103,6 +103,12 @@
     "action_icon_01": 6467187126722199553,
     "action_icon_02": 16267019915880398851,
     "action_icon_03": 12149384054227566593,
+    "cabinet_short_break_1_1001_AO": 10305775819258560513,
+    "cabinet_short_break_1_1001_BaseColor": 8576393562348290051,
+    "cabinet_short_break_1_1001_Metallic": 12035158076168830981,
+    "cabinet_short_break_1_1001_Normal": 6847011305438019591,
+    "cabinet_short_break_1_1001_RGB": 13739884884389249025,
+    "cabinet_short_break_1_1001_Roughness": 16070383342292795401,
     "calibrate_icon": 8518163340552814593,
     "circle": 3601763066940784641,
     "circle_resized": 2834189601574060033,
@@ -123,5 +129,11 @@
     "normal_map_brick": 12778480549089984513,
     "ogre_diffuse": 7230819861274968067,
     "ogre_normalmap": 3772055347454427141,
-    "red_brick_diff_4k": 8346912172205719579
+    "red_brick_diff_4k": 8346912172205719579,
+    "toy_frog_1001_AO": 17198649398227697675,
+    "toy_frog_1001_BaseColour": 3407079227054718977,
+    "toy_frog_1001_Metallic": 8551738113665728515,
+    "toy_frog_1001_Normal": 6822355856755458053,
+    "toy_frog_1001_RGB": 18351570902823927815,
+    "toy_frog_1001_Roughness": 18351570902823927817
 }
