@@ -1,0 +1,19 @@
+
+-- ============================================================
+--Key_Actions.lua(Inputs)
+-- ============================================================
+
+Key_Actions = {
+
+	HELLO = 1,
+	FLASHLIGHT = 0,
+	INVENTORY = 3,
+	INTERACT = 2,
+	JUMP = 4,
+	MOVE_FORWARD = 6,
+	MOVE_BACK = 5,
+	MOVE_LEFT = 7,
+	MOVE_RIGHT = 8,
+	OPEN_EDITOR = 9,
+	YO = 10,
+}

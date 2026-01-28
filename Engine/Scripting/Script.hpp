@@ -93,12 +93,19 @@ namespace Engine {
     class ScriptSystem {
     public:
         static void Init();
+        static void Init_Keyaction();
         static void Shutdown();
 
         static void OnRuntimeStart(entt::registry& reg);
         static void OnRuntimeStop(entt::registry& reg);
         static void OnUpdate(entt::registry& reg, float dt);
+
+        // Existing immediate reload (still kept)
         static void ReloadScript(entt::registry& reg, entt::entity e);
+
+        // NEW: safe queued reload requests (recommended to call from ImGui/editor)
+        static void RequestReloadAll();
+        static void RequestReloadEntity(entt::entity e);
 
 #if defined(ENGINE_ENABLE_LUA)
         static sol::state& GetLuaState();

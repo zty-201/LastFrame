@@ -87,7 +87,7 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
             PhysicsWorld::Get().RemoveBody(ent);
         }
 
-        if (!hasBody || tagChanged)
+        if (!hasBody || tagChanged || scaleChanged)
         {
             //FitColliderToMeshAABB(ecs, ent);
 
@@ -156,5 +156,6 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
         }
 
         material._prevIsStatic = material.isStatic;
+		material._prevScale    = transform.scale;
     }
 }

@@ -16,6 +16,11 @@ local pitch = 0.0
 local distance = 5.0       -- fixed distance from target
 local target = { x = 0.0, y = 0.0, z = 0.0 } -- camera look-at point
 
+-- Gryoscope config
+local GYRO_SENSITIVITY = 15.0
+local GYRO_ACTIVE = false; --flag to track if device has gyroscope
+local RAD_TO_DEG = 57.29578
+
 -- Camera reference (provided by engine binding)
 local camera = nil
 
@@ -38,10 +43,7 @@ function on_update(self, dt)
     --print(string.format("[Lua] Current dt: %.6f", dt))
     counter = counter + 1
     
-    -- Only print every 60 frames to avoid spam
-    if counter % 60 == 0 then
-        --print(string.format("[Lua] on_update frame=%d dt=%.4f", counter, dt))
-    end
+    if not camera then return end
 
     if not camera then 
         if counter % 60 == 0 then
@@ -93,7 +95,37 @@ function on_update(self, dt)
             --tostring(mouseDown), mx, my, dx, dy))
     end
 
-    -- Handle touch/mouse down
+    -- ============================================================
+    -- 1. GYROSCOPE CONTROL (Runs only on Android AND when NOT dragging)
+    -- ============================================================
+    local gyroRateX, gyroRateY, gyroRateZ = Input.GetGyroRotationRate()
+
+    -- Check for Android/Gyroscope availability
+    if (gyroRateX or 0) ~= 0 or (gyroRateY or 0) ~= 0 or (gyroRateZ or 0) ~= 0 then
+        GYRO_ACTIVE = true
+    end
+    
+    -- Gyroscope logic takes effect if active and the screen is not being touched.
+    if GYRO_ACTIVE and not isDraggingTouch then
+        -- Gyro data is rad/s. Multiply by dt to get the displacement in radians.
+        -- We multiply by GYRO_SENSITIVITY and RAD_TO_DEG to get a usable degree delta.
+        
+        -- Gyro Y-rate (Rotation around Y-axis) affects Yaw
+        local gyroYawDelta = -gyroRateY * dt * GYRO_SENSITIVITY
+        
+        -- Gyro X-rate (Rotation around X-axis) affects Pitch
+        local gyroPitchDelta = -gyroRateX * dt * GYRO_SENSITIVITY
+
+        yaw = yaw + gyroYawDelta
+        pitch = pitch + gyroPitchDelta
+        
+        -- Clear the delta to prevent touch drag from being processed below
+        dx, dy = 0, 0 
+    end
+    
+    -- ============================================================
+    -- 2. MOUSE/TOUCH DELTA CONTROL (Takes priority when touching)
+    -- ============================================================
     if mouseDown then
         dragging = true
         lastX, lastY = mx, my
@@ -132,7 +164,7 @@ function on_update(self, dt)
     end
 
     -- Handle release
-    if dragging and not Input.GetMouseButton(0) then
+    if dragging and not isDraggingTouch then
         dragging = false
         --print("[Lua] Stopped dragging")
     end

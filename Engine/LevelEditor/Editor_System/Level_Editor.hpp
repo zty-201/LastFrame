@@ -23,6 +23,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <sstream>
 #include <map>
 #include <memory>
+#include <vector>
+#include <algorithm>
 #include "entt/entity/registry.hpp"
 #define IMGUI_IMPL_OPENGL_ES3
 #include "imgui.h"
@@ -53,14 +55,57 @@ namespace EngineFramework
 		
 		/*
 			Represents what type was the latest selected.
-			Intended behaviour:
-			- When model is selected, it overrides old instance selection and vice versa.
-			- If a type is selected but its ID is invalid, then the other type is used.
-			- Should be set whenever model or instance is selected.
+			When model is selected, it overrides old instance selection and vice versa.
+			If a type is selected but its ID is invalid, then the other type is used.
+			Should be set whenever model or instance is selected.
 		*/
 		Latest_Selected latest_selected = Latest_Selected::NONE;
-		entt::entity selected_objectID;
+		entt::entity selected_objectID = entt::null;
 		xresource::full_guid selected_modelID;
+		std::vector<entt::entity> selected_entities;
+
+		bool HasEntitySelection() const { return !selected_entities.empty(); }
+		bool IsEntitySelected(entt::entity entity) const {
+			return std::find(selected_entities.begin(), selected_entities.end(), entity) != selected_entities.end();
+		}
+
+		// To clear the vector of selected entities with a single call
+		void ClearEntitySelection() {
+			selected_entities.clear();
+			selected_objectID = entt::null;
+		}
+
+		// To set the entity that has been selected and replaces the single entity selection
+		void SetEntitySelection(entt::entity entity) {
+			selected_entities.clear();
+			if (entity != entt::null) {
+				selected_entities.push_back(entity);
+			}
+			selected_objectID = entity;
+		}
+
+		// Pushes back the selected entity to the vector of selected entities
+		// And update the selected object id so user will know which entity is current active
+		void AddEntitySelection(entt::entity entity) {
+			if (entity == entt::null) return;
+			if (!IsEntitySelected(entity)) {
+				selected_entities.push_back(entity);
+			}
+			selected_objectID = entity;
+		}
+
+		// To remove the selected entity by erasing it from the vector of selected entity
+		// If active id is removed, backfill the selected id from the last remaininge ntity of the vector
+		// Or null if the vector of selected entity is empty
+		void RemoveEntitySelection(entt::entity entity) {
+			auto it = std::remove(selected_entities.begin(), selected_entities.end(), entity);
+			if (it != selected_entities.end()) {
+				selected_entities.erase(it, selected_entities.end());
+			}
+			if (selected_objectID == entity) {
+				selected_objectID = selected_entities.empty() ? entt::null : selected_entities.back();
+			}
+		}
 		
 	};
 

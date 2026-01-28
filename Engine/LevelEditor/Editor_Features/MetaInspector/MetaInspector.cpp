@@ -833,207 +833,226 @@ namespace EditorFeatures {
 		// Allows edtor to manage multiple audio clips per entity, assign audio assets and configure playback settings in the editor directly
 		// Also provides a logical sound bank that maps certain names such as BGM to audio assets, support selecting a sound to play automatically on start with
 		// configurable options and includes tools to test, add and remove sounds
-			if (mt == entt::resolve<AudioComponent>())
-			{
-				auto& comp = obj.cast<AudioComponent&>();
-				using EF_AM = EngineFramework::AssetManagerSystem;
-				using EF_AUD = EngineFramework::AudioSystem;
+		if (mt == entt::resolve<AudioComponent>())
+		{
+			auto& comp = obj.cast<AudioComponent&>();
+			using EF_AM = EngineFramework::AssetManagerSystem;
+			using EF_AUD = EngineFramework::AudioSystem;
 
-				if (comp.GetClipCount() == 0)
+			// Ensure at least 1 slot exists
+			if (comp.Slots.empty())
+				comp.AddSlot("NewSlot");
+
+			const auto audioDescriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
+			const bool has_sources = !audioDescriptor.sources.empty();
+			
+			// ----- GLOBAL MIXER CONTROLS -----
+			if (ImGui::CollapsingHeader("Audio Mixer (Preview)", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				static float master = 1.0f;
+				static float BGM = 1.0f;
+				static float SFX = 1.0f;
+				static float UI = 1.0f;
+				static float Ambience = 1.0f;
+
+				if (ImGui::SliderFloat("Master", &master, 0.0f, 1.0f))
+					EF_AUD::GetInstance().SetGroupVolume(EngineFramework::AudioGroup::Master, master);
+				if (ImGui::SliderFloat("BGM", &BGM, 0.0f, 1.0f))
+					EF_AUD::GetInstance().SetGroupVolume(EngineFramework::AudioGroup::BGM, BGM);
+				if (ImGui::SliderFloat("SFX", &SFX, 0.0f, 1.0f))
+					EF_AUD::GetInstance().SetGroupVolume(EngineFramework::AudioGroup::SFX, SFX);
+				if (ImGui::SliderFloat("UI", &UI, 0.0f, 1.0f))
+					EF_AUD::GetInstance().SetGroupVolume(EngineFramework::AudioGroup::UI, UI);
+				if (ImGui::SliderFloat("Ambience", &Ambience, 0.0f, 1.0f))
+					EF_AUD::GetInstance().SetGroupVolume(EngineFramework::AudioGroup::Ambience, Ambience);
+
+				ImGui::Separator();
+			}
+
+			// ----- SLOTS -----
+			ImGui::TextUnformatted("Audio Slots");
+			ImGui::TextDisabled("Use slot IDs like 'Footsteps'");
+			ImGui::Separator();
+
+			auto draw_category_combo = [](const char* label, AudioComponent::AudioCategory& cat)
+			{
+				const char* preview = "SFX";
+					
+				switch (cat)
 				{
-					comp.AddClip();
+					case AudioComponent::AudioCategory::BGM:		preview = "BGM";		break;
+					case AudioComponent::AudioCategory::SFX:		preview = "SFX";		break;
+					case AudioComponent::AudioCategory::UI:			preview = "UI";			break;
+					case AudioComponent::AudioCategory::Ambience:	preview = "Ambience";	break;
+					default:										preview = "SFX";		break;
 				}
 
-				const auto audioDescriptor = make_asset_picker_descriptor(AssetPickerKind::Audio);
-				const bool has_sources = !audioDescriptor.sources.empty();
-
-				for (std::size_t clipIdx = 0; clipIdx < comp.GetClipCount(); ++clipIdx)
+				if (ImGui::BeginCombo(label, preview))
 				{
-					auto* clip = comp.GetClip(clipIdx);
-					if (!clip)
-						continue;
-
-					ImGui::PushID(static_cast<int>(clipIdx));
-					std::string header = "Audio Clip " + std::to_string(clipIdx + 1);
-					if (ImGui::CollapsingHeader(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+					auto pick = [&](AudioComponent::AudioCategory v, const char* name)
 					{
-						if (comp.GetClipCount() > 1)
+						bool selected = (cat == v);
+						if (ImGui::Selectable(name, selected)) cat = v;
+						if (selected) ImGui::SetItemDefaultFocus();
+					};
+
+					pick(AudioComponent::AudioCategory::BGM, "BGM");
+					pick(AudioComponent::AudioCategory::SFX, "SFX");
+					pick(AudioComponent::AudioCategory::UI, "UI");
+					pick(AudioComponent::AudioCategory::Ambience, "Ambience");
+
+					ImGui::EndCombo();
+				}
+			};
+
+			auto draw_spatial_combo = [](const char* label, AudioComponent::SpatialMode& mode)
+			{
+				const char* preview = (mode == AudioComponent::SpatialMode::ThreeD) ? "3D" : "2D";
+				if (ImGui::BeginCombo(label, preview))
+				{
+					{
+						bool selected = (mode == AudioComponent::SpatialMode::TwoD);
+						if (ImGui::Selectable("2D", selected)) mode = AudioComponent::SpatialMode::TwoD;
+						if (selected) ImGui::SetItemDefaultFocus();
+					}
+					{
+						bool selected = (mode == AudioComponent::SpatialMode::ThreeD);
+						if (ImGui::Selectable("3D", selected)) mode = AudioComponent::SpatialMode::ThreeD;
+					}
+					ImGui::EndCombo();
+				}
+			};
+
+			for (std::size_t i = 0; i < comp.Slots.size(); ++i)
+			{
+				auto& slot = comp.Slots[i];
+
+				ImGui::PushID(static_cast<int>(i));
+
+				std::string header = slot.id.empty()
+					? ("Audio Slot " + std::to_string(i + 1) + " (unnamed)")
+					: ("Audio Slot " + slot.id);
+
+				if (ImGui::CollapsingHeader(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					// Remove slot button
+					if (comp.Slots.size() > 1)
+					{
+						if (ImGui::Button("Remove Slot"))
 						{
-							if (ImGui::Button("Remove Clip"))
-							{
-								comp.RemoveClip(clipIdx);
-								--clipIdx;
-								ImGui::PopID();
-								continue;
-							}
-						}
-
-						std::shared_ptr<SoundAsset> sound = nullptr;
-						if (has_sources)
-						{
-							xresource::full_guid full = clip->audio_guid;
-							if (draw_asset_guid_picker("Audio",
-								full,
-								AssetPickerKind::Audio,
-								audioDescriptor.none_label,
-								audioDescriptor.sources,
-								audioDescriptor.formatter))
-							{
-								clip->audio_guid = full;
-							}
-						}
-						else
-						{
-							ImGui::TextDisabled("Audio: (no audio assets available)");
-						}
-
-						if (!clip->audio_guid.empty())
-						{
-							sound = EF_AM::GetResource<SoundAsset>(clip->audio_guid);
-						}
-
-						ImGui::Checkbox("Loop", &clip->loop);
-						ImGui::SameLine();
-						ImGui::Checkbox("Play On Start", &clip->playOnStart);
-
-						ImGui::Checkbox("3D Audio", &clip->is3D);
-						if (clip->is3D)
-						{
-							if (clip->minDistance < 0.0f) clip->minDistance = 0.0f;
-							if (clip->maxDistance < clip->minDistance)
-								clip->maxDistance = clip->minDistance + 0.1f;
-
-							ImGui::DragFloat("Min Distance", &clip->minDistance, 0.1f, 0.0f, 1000.0f);
-							ImGui::DragFloat("Max Distance", &clip->maxDistance, 0.1f, 0.0f, 1000.0f);
-						}
-
-						clip->volume = std::clamp(clip->volume, 0.0f, 1.0f);
-						ImGui::SliderFloat("Volume", &clip->volume, 0.0f, 1.0f);
-
-						if (ImGui::Button("Play"))
-						{
-							if (sound)
-							{
-								EF_AUD::GetInstance().Play(
-									sound,
-									clip->volume,
-									clip->loop,
-									EngineFramework::AudioGroup::Music);
-							}
-						}
-						ImGui::SameLine();
-						if (ImGui::Button("Stop"))
-							EF_AUD::GetInstance().StopAll();
-
-						ImGui::SameLine();
-						if (ImGui::Button("Pause"))
-							EF_AUD::GetInstance().PauseAll(true);
-
-						if (ImGui::Button("Play 3D (ECS)"))
-						{
-							clip->playRequested = true;
+							comp.RemoveSlot(i);
+							ImGui::PopID();
+							--i;
+							continue;
 						}
 					}
-					ImGui::PopID();
 				}
 
-				if (ImGui::Button("Add Clip"))
+				// ----- SLOT ID -----
+				char idBuf[128];
+				std::snprintf(idBuf, sizeof(idBuf), "%s", slot.id.c_str());
+
+				if (ImGui::InputText("Slot ID", idBuf, sizeof(idBuf)))
 				{
-					comp.AddClip();
+					slot.id = idBuf;
 				}
 
-				ImGui::Text("Audio Sound Bank");
-				ImGui::TextDisabled("Map Logical Names (e.g. 'BGM') to Assets");
+				// Warn in case of empty or duplicate
+				if (slot.id.empty())
+				{
+					ImGui::TextColored(ImVec4(1, 0.5f, 0.3f, 1), "Warning: Slot ID is empty. Unable to call this slot.");
+				}
+				else
+				{
+					// Duplicate check
+					int duplicates = 0;
+					for (const auto& s : comp.Slots)
+						if (s.id == slot.id) duplicates++;
+
+					if (duplicates > 1)
+					{
+						ImGui::TextColored(ImVec4(1, 0.5f, 0.3f, 1), "Warning: Duplicate Slot ID found (%d). Only first match will be used.", duplicates);
+					}
+				}
+
+				// ----- CATEGORY -----
+				draw_category_combo("Category", slot.category);
+
+				// ----- ASSET PICKER -----
+				if (has_sources)
+				{
+					xresource::full_guid full = slot.audio_guid;
+					if (draw_asset_guid_picker(
+						"Audio",
+						full,
+						AssetPickerKind::Audio,
+						audioDescriptor.none_label,
+						audioDescriptor.sources,
+						audioDescriptor.formatter))
+					{
+						slot.audio_guid = full;
+					}
+				}
+				else
+				{
+					ImGui::TextDisabled("Audio: (no audio assets available)");
+				}
+
+				// ----- PLAYBACK -----
+				ImGui::Checkbox("Loop", &slot.loop);
+				ImGui::SameLine();
+				ImGui::Checkbox("Play On Start", &slot.playOnStart);
+
+				// ----- VOLUME -----
+				if (slot.volume < 0.0f) slot.volume = 0.0f;
+				ImGui::SliderFloat("Volume", &slot.volume, 0.0f, 1.0f);
+
+				// ----- SPATIAL -----
+				draw_spatial_combo("Spatial", slot.spatial);
+				if (slot.spatial == AudioComponent::SpatialMode::ThreeD)
+				{
+					if (slot.minDistance < 0.0f) slot.minDistance = 0.0f;
+					if (slot.maxDistance < slot.minDistance) slot.maxDistance = slot.minDistance + 0.1f;
+
+					ImGui::DragFloat("Minimum Distance", &slot.minDistance, 0.1f, 0.0f, 1000.0f);
+					ImGui::DragFloat("Maximum Distance", &slot.maxDistance, 0.1f, 0.0f, 1000.0f);
+				}
+
 				ImGui::Separator();
 
-				// 1. ADD NEW SOUNDS
-				static char nameBuffer[64] = "";
-				ImGui::InputText("Logical Name", nameBuffer, 64);
-
-				static xresource::full_guid tempGuid;
-				draw_asset_guid_picker("Asset",
-					tempGuid,
-					AssetPickerKind::Audio,
-					audioDescriptor.none_label,
-					audioDescriptor.sources,
-					audioDescriptor.formatter);
-
-				if (ImGui::Button("Add to Bank"))
+				// ----- PREVIEW BUTTONS -----
+				if (ImGui::Button("Play Slot"))
 				{
-					if (strlen(nameBuffer) > 0 && !tempGuid.empty())
-					{
-						// Convert GUID to string name for storage
-						std::string assetName = EF_AM::GetName(tempGuid);
-						if (assetName.empty()) assetName = "Unknown_Audio";
-
-						comp.soundBank[std::string(nameBuffer)] = assetName;
-						memset(nameBuffer, 0, 64);
-						tempGuid = {};
-					}
+					if (!slot.id.empty())
+						EF_AUD::GetInstance().PlayEntitySlot(entity, slot.id);
 				}
 
-			ImGui::Separator();
-
-			// 2. PLAY ON START SETTINGS (Background Music)
-			if (ImGui::BeginCombo("Play On Start", comp.playOnStartName.empty() ? "(None)" : comp.playOnStartName.c_str()))
-			{
-				if (ImGui::Selectable("(None)", comp.playOnStartName.empty()))
-					comp.playOnStartName = "";
-
-				for (auto& [key, value] : comp.soundBank)
-				{
-					bool isSelected = (comp.playOnStartName == key);
-					if (ImGui::Selectable(key.c_str(), isSelected))
-						comp.playOnStartName = key;
-
-					if (isSelected) ImGui::SetItemDefaultFocus();
-				}
-				ImGui::EndCombo();
-			}
-
-			if (!comp.playOnStartName.empty())
-			{
-				ImGui::Checkbox("Loop##Start", &comp.playOnStartLoop);
 				ImGui::SameLine();
-				ImGui::Checkbox("3D##Start", &comp.playOnStart3D);
-				ImGui::SliderFloat("Volume##Start", &comp.playOnStartVolume, 0.0f, 1.0f);
-			}
 
-			ImGui::Separator();
-
-			// 3. SOUND LIST
-			std::string toRemove;
-			if (ImGui::BeginTable("SoundBankTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
-			{
-				ImGui::TableSetupColumn("Name");
-				ImGui::TableSetupColumn("Asset");
-				ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 100.0f);
-				ImGui::TableHeadersRow();
-
-				for (auto& [key, value] : comp.soundBank)
+				if (ImGui::Button("Stop Slot"))
 				{
-					ImGui::PushID(key.c_str());
-					ImGui::TableNextRow();
-					ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted(key.c_str());
-					ImGui::TableSetColumnIndex(1); ImGui::TextDisabled("%s", value.c_str());
-					ImGui::TableSetColumnIndex(2);
-
-					if (ImGui::SmallButton("Test")) {
-						// Simple test play
-						EF_AUD::GetInstance().PlayOneShot(value, glm::vec3(0.f), 1.0f, false);
-					}
-					ImGui::SameLine();
-					if (ImGui::SmallButton("Del")) {
-						toRemove = key;
-					}
-					ImGui::PopID();
+					if (!slot.id.empty())
+						EF_AUD::GetInstance().StopEntitySlot(entity, slot.id);
 				}
-				ImGui::EndTable();
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Stop All (This entity)"))
+					EF_AUD::GetInstance().StopAllForEntity(entity);
+
+				ImGui::PopID();
 			}
-			if (!toRemove.empty()) comp.soundBank.erase(toRemove);
+
+			if (ImGui::Button("Add Slot"))
+			{
+				std::string newID = "Slot" + std::to_string(comp.Slots.size() + 1);
+				comp.AddSlot(newID);
+			}
 
 			return false;
+
 		}
+
 		
 		// Each entry is pair<entt::id_type, entt::meta_data> - for self reference
 		for (auto&& pair : mt.data()) {

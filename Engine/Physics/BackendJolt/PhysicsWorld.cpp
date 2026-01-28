@@ -220,12 +220,22 @@ JPH::ShapeRefC CreateJoltShapeFromCollider(const ColliderComponent& collider, co
         {
             case ColliderShape::Box:
             {
+                // 1. Get Base
                 glm::vec3 halfExt = shapeData.boxHalfExtents;
-                
-                halfExt.x = std::max(halfExt.x, MIN_DIMENSION);
-                halfExt.x = std::max(halfExt.y, MIN_DIMENSION);
-                halfExt.x = std::max(halfExt.z, MIN_DIMENSION);
 
+                // 2. Apply Scale
+                halfExt *= absScale;
+
+                // 3. SANITIZE (Handle NaN and Zero)
+                // If scale is 0, this becomes 0. If scale is uninitialized, might be garbage.
+                // We force it to be at least 0.05f (5cm) to be safe.
+                float safeMin = 0.05f;
+
+                halfExt.x = (std::isnan(halfExt.x) || halfExt.x < safeMin) ? safeMin : halfExt.x;
+                halfExt.y = (std::isnan(halfExt.y) || halfExt.y < safeMin) ? safeMin : halfExt.y;
+                halfExt.z = (std::isnan(halfExt.z) || halfExt.z < safeMin) ? safeMin : halfExt.z;
+
+                // 4. Create
                 singleShape = new JPH::BoxShape(JPH::Vec3(halfExt.x, halfExt.y, halfExt.z));
                 break;
             }
@@ -285,7 +295,7 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
     if (HasBody(entity)) return;
 
     if (collider.shapes.empty()) {
-        LOGI("[JOLT] Entity %u has ColliderComponent but no shapes defined. Skipping body creation.", (unsigned)entity);
+        //LOGI("[JOLT] Entity %u has ColliderComponent but no shapes defined. Skipping body creation.", (unsigned)entity);
         return;
     }
 
@@ -326,7 +336,7 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
 
     if (motionType == JPH::EMotionType::Dynamic)
     {
-        //bodySettings.mMotionQuality = JPH::EMotionQuality::LinearCast;
+        bodySettings.mMotionQuality = JPH::EMotionQuality::LinearCast;
 
         JPH::MassProperties massProperties;
         JPH::MassProperties shapeMassProps = finalShape->GetMassProperties();
@@ -392,7 +402,7 @@ void PhysicsWorld::CreatePhysicsBody(entt::entity entity, const glm::vec3& pos, 
 //    JPH::BodyCreationSettings bodySettings(
 //        shape, jPos, jRot, motionType, GetObjectLayerForIsStatic(isStatic)
 //    );
-//    bodySettings.mIsSensor = isTrigger; // <— make it a trigger/sensor if requested
+//    bodySettings.mIsSensor = isTrigger; // <?make it a trigger/sensor if requested
 //
 //    if (!isStatic)
 //    {
@@ -594,6 +604,42 @@ void PhysicsWorld::RemoveBody(entt::entity entity)
     m_entityToBody.erase(it);
 }
 
+void PhysicsWorld::DestroyAllBodies()
+{
+    if (!m_physicsSystem) return;
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterface();
+
+    std::vector<JPH::BodyID> toRemove;
+    for (auto& [entity, bodyID] : m_entityToBody)
+    {
+        toRemove.push_back(bodyID);
+    }
+
+    if (!toRemove.empty()) {
+        bodyInterface.RemoveBodies(toRemove.data(), static_cast<int>(toRemove.size()));
+        bodyInterface.DestroyBodies(toRemove.data(), static_cast<int>(toRemove.size()));
+    }
+
+    m_entityToBody.clear();
+    m_bodyToEntity.clear();
+}
+
+glm::vec3 PhysicsWorld::GetCenterOfMassOffset(entt::entity entity) const
+{
+    auto it = m_entityToBody.find(entity);
+    if (it == m_entityToBody.end()) return glm::vec3(0.0f);
+
+    const JPH::BodyLockInterfaceNoLock& lockInterface = m_physicsSystem->GetBodyLockInterfaceNoLock();
+    JPH::BodyLockRead bodyLock(lockInterface, it->second);
+
+    if (bodyLock.Succeeded()) {
+        const JPH::Body& body = bodyLock.GetBody();
+        JPH::Vec3 com = body.GetShape()->GetCenterOfMass();
+        return glm::vec3(com.GetX(), com.GetY(), com.GetZ());
+    }
+    return glm::vec3(0.0f);
+}
+
 // ------------------------------------------------------------
 // 10. Queries / setters stubs
 // ------------------------------------------------------------
@@ -757,4 +803,64 @@ bool PhysicsWorld::Raycast(const glm::vec3& origin, const glm::vec3& direction, 
 
     outHit.hasHit = false;
     return false;
+}
+
+void PhysicsWorld::ApplyImpulse(entt::entity entity, float x, float y, float z)
+{
+    if (m_entityToBody.find(entity) == m_entityToBody.end()) return; //Body doesnt exist
+
+    JPH::BodyID bodyID = m_entityToBody[entity];
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterface();
+
+    bodyInterface.ActivateBody(bodyID); //Have to wake body to apply physics
+
+    bodyInterface.AddImpulse(bodyID, JPH::Vec3(x, y, z)); //Apply impulse force
+}
+
+void PhysicsWorld::ExplodeGroup(const std::vector<entt::entity>& parts, float strength)
+{
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterface();
+
+    for (entt::entity part : parts)
+    {
+        //Locate entity physics body
+        if (m_entityToBody.find(part) == m_entityToBody.end()) continue;
+        JPH::BodyID bodyID = m_entityToBody[part];
+
+        //Generate Random Direction
+        float rx = ((float)rand() / RAND_MAX) * 2.f - 1.f; //-1 to 1 (left - right)
+        float ry = ((float)rand() / RAND_MAX);             //0 to 2 (only upwards)
+        float rz = ((float)rand() / RAND_MAX) * 2.f - 1.f; //-1 ot 1 (forwards - backwards)
+
+        //Normalize
+        float length = std::sqrt(rx * rx + ry * ry + rz * rz);
+        if (length > 0) { rx /= length; ry /= length; rz /= length; }
+
+        bodyInterface.ActivateBody(bodyID);
+        bodyInterface.AddImpulse(bodyID, JPH::Vec3(rx, ry, rz) * strength);
+    }
+}
+
+void PhysicsWorld::ApplyRadialExplosion(const std::vector<entt::entity>& parts, float centerX, float centerY, float centerZ, float strength)
+{
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->GetBodyInterface();
+    JPH::Vec3 center(centerX, centerY, centerZ);
+
+    for (entt::entity part : parts)
+    {
+        if (m_entityToBody.find(part) == m_entityToBody.end()) continue;
+
+        JPH::BodyID bodyID = m_entityToBody[part];
+
+        //Get position and rotation of part
+        JPH::Vec3 partPos = bodyInterface.GetPosition(bodyID);
+        JPH::Vec3 dir = partPos - center;
+
+        //Normalize
+        if (dir.Length() < 0.001f) dir = JPH::Vec3(0, 1, 0);
+        else dir = dir.Normalized();
+
+        bodyInterface.ActivateBody(bodyID);
+        bodyInterface.AddImpulse(bodyID, dir * strength);
+    }
 }

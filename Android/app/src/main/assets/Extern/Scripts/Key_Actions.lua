@@ -1,0 +1,17 @@
+-- -- ============================================================
+-- -- Key_Actions.lua  (Inputs)
+-- -- ============================================================
+
+-- Key_Actions = {
+
+-- 	FLASHLIGHT = 0,
+-- 	INTERACT = 1,
+-- 	INVENTORY = 2,
+-- 	JUMP = 3,
+-- 	MOVE_BACK = 4,
+-- 	MOVE_FORWARD = 5,
+-- 	MOVE_LEFT = 6,
+-- 	MOVE_RIGHT = 7,
+-- 	OPEN_EDITOR = 8,
+-- 	YO = 9,
+-- }
