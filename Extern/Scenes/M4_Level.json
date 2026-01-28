@@ -22173,6 +22173,69 @@
 			]
 		}
 	},
+	"257": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3407079227054718977,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				17198649398227697675,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				8551738113665728515,
+				3711223656383638553
+			],
+			"name": "",
+			"normalMap": [
+				6822355856755458053,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				18351570902823927817,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_frog"
+		},
+		"NameComponent": {
+			"name": "Frog"
+		},
+		"TransformComponent": {
+			"position": [
+				540.9343872070313,
+				15.133138656616211,
+				-380.97064208984375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
 	"26": {
 		"ColliderComponent": {
 			"maxBounds": [
