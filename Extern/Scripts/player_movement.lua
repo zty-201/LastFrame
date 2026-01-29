@@ -106,10 +106,10 @@ function on_update(self, dt)
     if PLATFORM == "windows" then   
         local moveX, moveZ = 0.0, 0.0
         --Key_Actions.MOVE_FORWARD
-        if Input.GetAction(Key_Actions.MOVE_FORWARD) then print("[MOVE] W pressed") moveZ = moveZ + 1 end
-        if Input.GetAction("MOVE_BACK") then print("[MOVE] S pressed") moveZ = moveZ - 1 end
-        if Input.GetAction("MOVE_LEFT")  then print("[MOVE] A pressed") moveX = moveX + 1 end
-        if Input.GetAction("MOVE_RIGHT") then print("[MOVE] D pressed") moveX = moveX - 1 end
+        if Input.GetAction(Key_Actions.MOVE_FORWARD) then moveZ = moveZ + 1 end
+        if Input.GetAction("MOVE_BACK") then moveZ = moveZ - 1 end
+        if Input.GetAction("MOVE_LEFT")  then moveX = moveX + 1 end
+        if Input.GetAction("MOVE_RIGHT") then moveX = moveX - 1 end
 
         -- Joystick input (from UI only)
         if SHARED and SHARED.UI then

@@ -64,6 +64,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -247,6 +255,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -364,6 +380,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -610,6 +634,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -727,6 +759,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -844,6 +884,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -961,6 +1009,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -1078,6 +1134,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -1159,6 +1223,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -1234,6 +1306,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -1351,6 +1431,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -1468,6 +1556,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -1557,6 +1653,15 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 18038570721330823171
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -1585,6 +1690,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -1621,9 +1734,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				200.0,
+				333.57745361328125,
 				0.0,
-				-700.0
+				-122.02018737792969
 			],
 			"rotation": [
 				0.0,
@@ -1702,6 +1815,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -1819,6 +1940,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -1936,6 +2065,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -2017,6 +2154,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -2129,6 +2274,14 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 5490970403712286721
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 18038570721330823171
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 1897669656834965509
 				}
 			]
 		},
@@ -2160,6 +2313,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"NameComponent": {
@@ -2274,6 +2435,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -2391,6 +2560,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
@@ -2508,6 +2685,14 @@
 			"roughnessMap": [
 				0,
 				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
 			]
 		},
 		"MeshComponent": {
