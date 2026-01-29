@@ -22236,6 +22236,69 @@
 			]
 		}
 	},
+	"258": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				9041399021183254529,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				4429713002755866627,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				17688310305734606853,
+				3711223656383638553
+			],
+			"name": "",
+			"normalMap": [
+				5582634507362713607,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				2123869993542172681,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "dinnerware_bowl"
+		},
+		"NameComponent": {
+			"name": "Dinner Bowl"
+		},
+		"TransformComponent": {
+			"position": [
+				-330.47100830078125,
+				332.528564453125,
+				-300.6734313964844
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
 	"26": {
 		"ColliderComponent": {
 			"maxBounds": [
