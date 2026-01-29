@@ -109,33 +109,37 @@ struct adl_serializer<xresource::instance_guid> {
 };
 
 template<>
-struct adl_serializer<AudioComponent::AudioClip> {
-	static void to_json(json& j, const AudioComponent::AudioClip& clip) {
+struct adl_serializer<AudioComponent::Slot> {
+	static void to_json(json& j, const AudioComponent::Slot& s) {
 		j = json::object();
-		j["audio_guid"] = clip.audio_guid;
-		j["volume"] = clip.volume;
-		j["loop"] = clip.loop;
-		j["playOnStart"] = clip.playOnStart;
-		j["is3D"] = clip.is3D;
-		j["minDistance"] = clip.minDistance;
-		j["maxDistance"] = clip.maxDistance;
+		j["id"] = s.id;
+		j["audio_guid"] = s.audio_guid;
+		j["volume"] = s.volume;
+		j["pitch"] = s.pitch;
+		j["loop"] = s.loop;
+		j["playOnStart"] = s.playOnStart;
+		j["minDistance"] = s.minDistance;
+		j["maxDistance"] = s.maxDistance;
+		j["category"] = static_cast<int>(s.category);
+		j["spatial"] = static_cast<int>(s.spatial);
 	}
 
-	static void from_json(const json& j, AudioComponent::AudioClip& clip) {
-		if (j.contains("audio_guid") && !j["audio_guid"].is_null()) {
-			clip.audio_guid = j["audio_guid"].get<xresource::full_guid>();
-		}
-		else {
-			clip.audio_guid = xresource::full_guid{};
-		}
+	static void from_json(const json& j, AudioComponent::Slot& s) {
+		s.id = j.value("id", std::string("NewSlot"));
 
-		clip.volume = j.value("volume", 1.0f);
-		clip.loop = j.value("loop", false);
-		clip.playOnStart = j.value("playOnStart", false);
-		clip.is3D = j.value("is3D", true);
-		clip.minDistance = j.value("minDistance", 1.0f);
-		clip.maxDistance = j.value("maxDistance", 25.0f);
-		clip.playRequested = j.value("playRequested", false);
+		if (j.contains("audio_guid") && !j["audio_guid"].is_null())
+			s.audio_guid = j["audio_guid"].get<xresource::full_guid>();
+		else
+			s.audio_guid = xresource::full_guid{};
+
+		s.volume = j.value("volume", 1.0f);
+		s.pitch = j.value("pitch", 1.0f);
+		s.loop = j.value("loop", false);
+		s.playOnStart = j.value("playOnStart", false);
+		s.minDistance = j.value("minDistance", 1.0f);
+		s.maxDistance = j.value("maxDistance", 25.0f);
+		s.category = static_cast<AudioComponent::AudioCategory>(j.value("category", 0));
+		s.spatial = static_cast<AudioComponent::SpatialMode>(j.value("spatial", 1));	// Default to 3D
 	}
 };
 
@@ -313,7 +317,7 @@ namespace EngineFramework
 					MetaEntry<std::vector<int>>(),
 					MetaEntry<std::vector<float>>(),
 					MetaEntry<std::vector<std::string>>(),
-					MetaEntry<std::vector<AudioComponent::AudioClip>>(),
+					MetaEntry<std::vector<AudioComponent::Slot>>(),
 					MetaEntry<CameraComponent::CameraType>(),
 					MetaEntry<LightComponent::Type>(),
 					MetaEntry<std::filesystem::path>(),
@@ -327,7 +331,9 @@ namespace EngineFramework
 					MetaEntry<std::vector<ColliderData>>(),
 					MetaEntry<ColliderComponent::Mode>(),
 					MetaEntry<xresource::instance_guid>(),
-					MetaEntry<SoundBankMap>()
+					MetaEntry<AudioComponent::AudioCategory>(),
+					MetaEntry<AudioComponent::SpatialMode>(),
+					MetaEntry<AudioComponent::Slot>()
 				};
 #if defined(ENGINE_ENABLE_LUA)
 				temp.insert({
@@ -374,7 +380,7 @@ namespace EngineFramework
 					JsonEntry<std::vector<int>>(),
 					JsonEntry<std::vector<float>>(),
 					JsonEntry<std::vector<std::string>>(),
-					JsonEntry<std::vector<AudioComponent::AudioClip>>(),
+					JsonEntry<std::vector<AudioComponent::Slot>>(),
 					JsonEntry<CameraComponent::CameraType>(),
 					JsonEntry<LightComponent::Type>(),
 					JsonEntry<std::filesystem::path>(),
@@ -388,7 +394,9 @@ namespace EngineFramework
 					JsonEntry<std::vector<ColliderData>>(),
 					JsonEntry<ColliderComponent::Mode>(),
 					JsonEntry<xresource::instance_guid>(),
-					JsonEntry<SoundBankMap>()
+					JsonEntry<AudioComponent::AudioCategory>(),
+					JsonEntry<AudioComponent::SpatialMode>(),
+					JsonEntry<AudioComponent::Slot>()
 				};
 #if defined(ENGINE_ENABLE_LUA)
 				temp.insert({
@@ -532,7 +540,10 @@ namespace EngineFramework
 		REGISTER_ARBITRARY_TYPE(std::vector<ColliderData>);
 		REGISTER_ARBITRARY_TYPE(::ColliderComponent::Mode);
 		REGISTER_ARBITRARY_TYPE(ColliderComponent::Mode);
-		REGISTER_ARBITRARY_TYPE(SoundBankMap);
+		REGISTER_ARBITRARY_TYPE(AudioComponent::AudioCategory);
+		REGISTER_ARBITRARY_TYPE(AudioComponent::SpatialMode);
+		REGISTER_ARBITRARY_TYPE(AudioComponent::Slot);
+		REGISTER_ARBITRARY_TYPE(std::vector<AudioComponent::Slot>);
 #if defined(ENGINE_ENABLE_LUA)
 		REGISTER_ARBITRARY_TYPE(Engine::LuaScriptComponent::LuaInstance);
 		REGISTER_ARBITRARY_TYPE(std::vector<Engine::LuaScriptComponent::LuaInstance>);
@@ -659,26 +670,22 @@ namespace EngineFramework
 		//	.func<&GetRef<AudioComponent>>("get_ref");
 
 		// === Register AudioComponent ===
-		entt::meta_factory<AudioComponent::AudioClip>()
-			.type("AudioClip")
-			.data<&AudioComponent::AudioClip::audio_guid>("audio_guid")
-			.data<&AudioComponent::AudioClip::volume>("volume")
-			.data<&AudioComponent::AudioClip::loop>("loop")
-			.data<&AudioComponent::AudioClip::playOnStart>("playOnStart")
-			.data<&AudioComponent::AudioClip::is3D>("is3D")
-			.data<&AudioComponent::AudioClip::minDistance>("minDistance")
-			.data<&AudioComponent::AudioClip::maxDistance>("maxDistance");
+		entt::meta_factory<AudioComponent::Slot>()
+			.type("AudioSlot")
+			.data<&AudioComponent::Slot::id>("id")
+			.data<&AudioComponent::Slot::audio_guid>("audio_guid")
+			.data<&AudioComponent::Slot::volume>("volume")
+			.data<&AudioComponent::Slot::pitch>("pitch")
+			.data<&AudioComponent::Slot::loop>("loop")
+			.data<&AudioComponent::Slot::playOnStart>("playOnStart")
+			.data<&AudioComponent::Slot::category>("category")
+			.data<&AudioComponent::Slot::spatial>("spatial")
+			.data<&AudioComponent::Slot::maxDistance>("maxDistance")
+			.data<&AudioComponent::Slot::maxDistance>("maxDistance");
 
 		entt::meta_factory<AudioComponent>()
 			.type("AudioComponent")
-			.data<&AudioComponent::Clips>("Clips")
-			// We only save the Sound Bank now. The requestQueue is temporary and doesn't need saving.
-			.data<&AudioComponent::soundBank>("soundBank")
-
-			.data<&AudioComponent::playOnStartName>("playOnStartName")
-			.data<&AudioComponent::playOnStartLoop>("playOnStartLoop")
-			.data<&AudioComponent::playOnStart3D>("playOnStart3D")
-			.data<&AudioComponent::playOnStartVolume>("playOnStartVolume")
+			.data<&AudioComponent::Slots>("Slots")
 
 			.func<&Emplacer<AudioComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<AudioComponent>::RemoveComponent>("remove")

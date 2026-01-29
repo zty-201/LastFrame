@@ -83,6 +83,13 @@ local function applyLook()
     if pitch > pitchLimit then pitch = pitchLimit end
     if pitch < -pitchLimit then pitch = -pitchLimit end
 
+    -- Make player model face where camera is yawing (keep existing pitch/roll)
+    local rx, ry, rz = transform:GetRotation()
+
+    -- Common convention: yaw around Y axis
+    -- If your model faces the wrong direction, add +/-90 or 180 offset.
+    transform:SetRotation(rx, yaw, rz)
+
     -- Player position
     local x, y, z = transform:GetPosition()
 

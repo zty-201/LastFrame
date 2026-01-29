@@ -35,7 +35,7 @@ void PhysicsSyncSystem::Update(entt::registry& ecs)
             glm::quat q = glm::quat(glm::radians(transform.rotation));
             PhysicsWorld::Get().SetPositionRotation(ent, transform.position, q, /*activate=*/true);
 
-            // Clear old motion so it doesn't �remember� a velocity from before
+            // Clear old motion so it doesn't remember a velocity from before
             PhysicsWorld::Get().SetLinearVelocity(ent, glm::vec3(0.0f));
         }
 
