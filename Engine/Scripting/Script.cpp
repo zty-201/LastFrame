@@ -586,47 +586,47 @@ namespace Engine {
         // Audio Bindings
         sol::table audioTable = s_Lua.create_named_table("Audio");
 
-        // Play selected clip index for entity
-        audioTable.set_function("Play",
-            [](uint32_t entityId, int clipIndex)
-            {
-                if (!s_RuntimeRegistry) return;
+        //// Play selected clip index for entity
+        //audioTable.set_function("Play",
+        //    [](uint32_t entityId, int clipIndex)
+        //    {
+        //        if (!s_RuntimeRegistry) return;
 
-                entt::entity e = static_cast<entt::entity>(entityId);
-                if (!s_RuntimeRegistry->valid(e)) return;
-                if (!s_RuntimeRegistry->all_of<AudioComponent>(e)) return;
+        //        entt::entity e = static_cast<entt::entity>(entityId);
+        //        if (!s_RuntimeRegistry->valid(e)) return;
+        //        if (!s_RuntimeRegistry->all_of<AudioComponent>(e)) return;
 
-                auto& ac = s_RuntimeRegistry->get<AudioComponent>(e);
+        //        auto& ac = s_RuntimeRegistry->get<AudioComponent>(e);
 
-                if (clipIndex < 0) return;
-                auto* clip = ac.GetClip(static_cast<std::size_t>(clipIndex));
-                if (!clip) return;
+        //        if (clipIndex < 0) return;
+        //        auto* clip = ac.GetClip(static_cast<std::size_t>(clipIndex));
+        //        if (!clip) return;
 
-                clip->playRequested = true; // your AudioSystem will consume this
-            });
+        //        clip->playRequested = true; // your AudioSystem will consume this
+        //    });
 
-        // Set volume for selected clip index
-        audioTable.set_function("SetVolume",
-            [](uint32_t entityId, int clipIndex, float v)
-            {
-                if (!s_RuntimeRegistry) return;
+        //// Set volume for selected clip index
+        //audioTable.set_function("SetVolume",
+        //    [](uint32_t entityId, int clipIndex, float v)
+        //    {
+        //        if (!s_RuntimeRegistry) return;
 
-                entt::entity e = static_cast<entt::entity>(entityId);
-                if (!s_RuntimeRegistry->valid(e)) return;
-                if (!s_RuntimeRegistry->all_of<AudioComponent>(e)) return;
+        //        entt::entity e = static_cast<entt::entity>(entityId);
+        //        if (!s_RuntimeRegistry->valid(e)) return;
+        //        if (!s_RuntimeRegistry->all_of<AudioComponent>(e)) return;
 
-                auto& ac = s_RuntimeRegistry->get<AudioComponent>(e);
+        //        auto& ac = s_RuntimeRegistry->get<AudioComponent>(e);
 
-                if (clipIndex < 0) return;
-                auto* clip = ac.GetClip(static_cast<std::size_t>(clipIndex));
-                if (!clip) return;
+        //        if (clipIndex < 0) return;
+        //        auto* clip = ac.GetClip(static_cast<std::size_t>(clipIndex));
+        //        if (!clip) return;
 
-                // clamp if you want
-                if (v < 0.0f) v = 0.0f;
-                if (v > 1.0f) v = 1.0f;
+        //        // clamp if you want
+        //        if (v < 0.0f) v = 0.0f;
+        //        if (v > 1.0f) v = 1.0f;
 
-                clip->volume = v;
-            });
+        //        clip->volume = v;
+        //    });
 
 
 #if /*defined(DEBUG) && */defined(PLATFORM_WINDOWS)
