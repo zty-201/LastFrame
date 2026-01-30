@@ -1,14 +1,6 @@
-newmtl canteen_table_kidsSG
+newmtl lambert2SG
 illum 4
-Kd 0.37 0.37 0.37
+Kd 0.50 0.50 0.50
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
-newmtl canteen_table_kidsSG1
-illum 4
-Kd 0.00 0.00 0.00
-Ka 0.00 0.00 0.00
-Tf 1.00 1.00 1.00
-Ni 1.00
-Ks 0.25 0.25 0.25
-Ns 98.00

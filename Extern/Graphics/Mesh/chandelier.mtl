@@ -1,12 +1,12 @@
-newmtl candle_wall_flameSG
+newmtl Chandelier:ChandelierSG
 illum 4
-Kd 0.26 0.26 0.26
+Kd 0.31 0.31 0.31
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00
-newmtl chandelier:ChandelierSG
+newmtl Chandelier:candle_wall_flameSG
 illum 4
-Kd 0.31 0.31 0.31
+Kd 0.26 0.26 0.26
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 Ni 1.00

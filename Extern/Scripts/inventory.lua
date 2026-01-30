@@ -5,24 +5,11 @@
 local DEBUG_UPDATE = true
 
 ----------------------------------------------------------------
--- on_create
+-- Inventory Script
 ----------------------------------------------------------------
-function on_create(Self)
-    print("[Inventory] Initialized for entity:", EntityID)
 
-    Self.inventory = {
-        items = {}
-    }
-
-    SHARED.player_inventory_ref  = Self.inventory
-    SHARED.player_inventory_self = Self
-end
-
-
-----------------------------------------------------------------
--- Add item
-----------------------------------------------------------------
-function AddItem(Self, itemId, itemName, amount)
+-- local helpers (avoid global collisions)
+local function AddItem(Self, itemId, itemName, amount)
     amount = amount or 1
     local inv = Self.inventory.items
 
@@ -35,10 +22,7 @@ function AddItem(Self, itemId, itemName, amount)
     end
 end
 
-----------------------------------------------------------------
--- Remove item
-----------------------------------------------------------------
-function RemoveItem(Self, itemId, amount)
+local function RemoveItem(Self, itemId, amount)
     amount = amount or 1
     local inv = Self.inventory.items
 
@@ -50,27 +34,21 @@ function RemoveItem(Self, itemId, amount)
     inv[itemId].qty = inv[itemId].qty - amount
 
     if inv[itemId].qty <= 0 then
-        print("[Inventory] Removed ALL:", inv[itemId].name)
+        print("[Inventory] Removed ALL:", itemId)
         inv[itemId] = nil
     else
-        print("[Inventory] Removed:", inv[itemId].name, "x"..amount)
+        print("[Inventory] Removed:", itemId, "x"..amount)
     end
 
     return true
 end
 
-----------------------------------------------------------------
--- Get quantity
-----------------------------------------------------------------
-function GetQuantity(Self, itemId)
+local function GetQuantity(Self, itemId)
     local item = Self.inventory.items[itemId]
-    if item then return item.qty else return 0 end
+    return item and item.qty or 0
 end
 
-----------------------------------------------------------------
--- Debug print
-----------------------------------------------------------------
-function PrintInventory(Self)
+local function PrintInventory(Self)
     print("====== INVENTORY ======")
     for id, data in pairs(Self.inventory.items) do
         print("ID:", id, "| Name:", data.name, "| Qty:", data.qty)
@@ -78,12 +56,52 @@ function PrintInventory(Self)
 end
 
 ----------------------------------------------------------------
--- on_update (working)
+-- on_create
+----------------------------------------------------------------
+function on_create(Self)
+    print("[Inventory] Initialized for entity:", EntityID)
+
+    Self.inventory = { items = {} }
+
+    SHARED.Inventory = SHARED.Inventory or {}
+    SHARED.Inventory._self = Self
+
+    function SHARED.Inventory.Add(itemId, itemName, amount)
+        local s = SHARED.Inventory._self
+        if not s then return end
+        AddItem(s, itemId, itemName, amount)
+    end
+
+    function SHARED.Inventory.Remove(itemId, amount)
+        local s = SHARED.Inventory._self
+        if not s then return false end
+        return RemoveItem(s, itemId, amount)
+    end
+
+    function SHARED.Inventory.Count(itemId)
+        local s = SHARED.Inventory._self
+        if not s then return 0 end
+        return GetQuantity(s, itemId)
+    end
+
+    function SHARED.Inventory.Print()
+        local s = SHARED.Inventory._self
+        if not s then return end
+        PrintInventory(s)
+    end
+
+    -- optional: UI can read items
+    function SHARED.Inventory.GetItems()
+        local s = SHARED.Inventory._self
+        return (s and s.inventory and s.inventory.items) or {}
+    end
+end
+
+----------------------------------------------------------------
+-- on_update
 ----------------------------------------------------------------
 function on_update(Self, dt)
-
-    -- Print inventory
-    if Input.GetKeyDown(84) then  -- T key
+    if Input.GetKeyDown(84) then -- T
         PrintInventory(Self)
     end
 end
@@ -91,4 +109,9 @@ end
 ----------------------------------------------------------------
 function on_destroy(Self)
     print("[Inventory] on_destroy() for entity:", EntityID)
+
+    -- optional safety: clear shared owner if this entity was the owner
+    if SHARED.Inventory and SHARED.Inventory._self == Self then
+        SHARED.Inventory._self = nil
+    end
 end
