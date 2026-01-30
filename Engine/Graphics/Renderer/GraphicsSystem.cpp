@@ -850,6 +850,7 @@ namespace EngineFramework
         for (auto [entity, meshComp, transformComp] : view.each())
         {
             if (meshComp.meshName == "SkyBox") continue;
+			if (!meshComp.visibility) continue;
 
             // Upload bone palette  
             const std::vector<glm::mat4>* paletteToUse = nullptr;
