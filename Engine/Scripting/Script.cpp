@@ -250,6 +250,14 @@ namespace Engine {
                 PhysicsWorld::Get().ApplyRadialExplosion(entities, x, y, z, strength);
             });
 
+        s_Lua.set_function("Physics_CheckCollision",
+            [](uint32_t idA, uint32_t idB) -> bool
+            {
+                entt::entity eA = static_cast<entt::entity>(idA);
+                entt::entity eB = static_cast<entt::entity>(idB);
+                return PhysicsWorld::Get().AreEntitiesColliding(eA, eB);
+            });
+
         // ===============================================================
         // Light Component bindings
         // ===============================================================

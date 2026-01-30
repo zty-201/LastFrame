@@ -455,46 +455,99 @@ namespace EngineFramework
                         );
 
                         RaycastHit hit;
+                        bool hitSomething = false;
+
                         if (PhysicsWorld::Get().Raycast(rayOrigin, rayDir, 1000.f, hit))
                         {
-                            // To select multiple entities using shift
-                            // To deselect entities using ctrl
+                            hitSomething = true;
+                        }
+#if defined(PLATFORM_WINDOWS) || defined(DEBUG)
+                        else if (PhysicsWorld::Get().RaycastAgainstColliders(rayOrigin, rayDir, 1000.f, hit))
+                        {
+                            hitSomething = true;
+                        }
+#endif
+                        if (hitSomething)
+                        {
                             LOGI("Mouse Picked Entity: %u", (uint32_t)hit.entity);
                             iEditorView& selection_state = LevelEditor::GetInstance().variables;
                             ImGuiIO& io = ImGui::GetIO();
-                            bool shift_down = io.KeyShift;
-                            bool ctrl_down = io.KeyCtrl;
+                            bool shift_down = io.KeyShift || ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
+                            bool ctrl_down = io.KeyCtrl || ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
 
-                            if (ctrl_down && selection_state.IsEntitySelected(hit.entity))
+                            bool isAlreadySelected = selection_state.IsEntitySelected(hit.entity);
+
+                            if (ctrl_down)
                             {
-                                selection_state.RemoveEntitySelection(hit.entity);
-                                if (!selection_state.HasEntitySelection())
-                                {
-                                    selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
-                                }
+                                if (isAlreadySelected) selection_state.RemoveEntitySelection(hit.entity);
+                                else selection_state.AddEntitySelection(hit.entity);
+                            }
+                            else if (shift_down)
+                            {
+                                if (!isAlreadySelected) selection_state.AddEntitySelection(hit.entity);
                             }
                             else
                             {
-                                if (shift_down)
-                                {
-                                    selection_state.AddEntitySelection(hit.entity);
-                                }
-                                else
+                                if (!isAlreadySelected)
                                 {
                                     selection_state.SetEntitySelection(hit.entity);
                                 }
+                            }
+
+                            if (selection_state.IsEntitySelected(hit.entity))
+                            {
                                 selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
                             }
                         }
                         else
                         {
-                            //Deselect if clicking empty space
                             iEditorView& selection_state = LevelEditor::GetInstance().variables;
-                            selection_state.ClearEntitySelection();
-                            selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
-
-                            LOGI("Selection cleared.");
+                            if (!ImGui::GetIO().KeyCtrl && !ImGui::GetIO().KeyShift)
+                            {
+                                selection_state.ClearEntitySelection();
+                                selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
+                            }
                         }
+                        //if (PhysicsWorld::Get().Raycast(rayOrigin, rayDir, 1000.f, hit))
+                        //{
+                        //    // To select multiple entities using shift
+                        //    // To deselect entities using ctrl
+                        //    LOGI("Mouse Picked Entity: %u", (uint32_t)hit.entity);
+                        //    iEditorView& selection_state = LevelEditor::GetInstance().variables;
+                        //    ImGuiIO& io = ImGui::GetIO();
+                        //    bool shift_down = io.KeyShift;
+                        //    bool ctrl_down = io.KeyCtrl;
+
+                        //    if (ctrl_down && selection_state.IsEntitySelected(hit.entity))
+                        //    {
+                        //        selection_state.RemoveEntitySelection(hit.entity);
+                        //        if (!selection_state.HasEntitySelection())
+                        //        {
+                        //            selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
+                        //        }
+                        //    }
+                        //    else
+                        //    {
+                        //        if (shift_down)
+                        //        {
+                        //            selection_state.AddEntitySelection(hit.entity);
+                        //        }
+                        //        else
+                        //        {
+                        //            selection_state.SetEntitySelection(hit.entity);
+                        //        }
+                        //        selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    //Deselect if clicking empty space
+                        //    iEditorView& selection_state = LevelEditor::GetInstance().variables;
+                        //    selection_state.ClearEntitySelection();
+                        //    selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
+
+                        //    LOGI("Selection cleared.");
+                        //}
                     }
                 }
 
