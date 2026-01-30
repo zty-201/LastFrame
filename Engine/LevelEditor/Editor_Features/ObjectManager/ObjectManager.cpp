@@ -143,7 +143,7 @@ namespace EngineFramework
 						copied_entity = active_entity;
 					}
 					else {
-						LOGW("[ObjectManager] No valid entity selected to copy");
+						LOGW("[ObjectManager] No valid entity selected to copy"); 
 					}
 				}
 

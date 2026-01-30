@@ -44,6 +44,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "ImGuizmo.h"
 #include "TriggerBoxComponent.h"
 #include "MeshComponent.h"
+#include "Editor_Features/MetaInspector/XResourceGuidTags.hpp"
+#include "MaterialComponent.h"
 #include "ColliderComponent.h"
 #include "TriggerSystem.hpp"
 #include "TriggerEvents.hpp"
@@ -107,6 +109,68 @@ namespace EngineFramework
         0.f, 1.f, 0.f, 0.f,
         0.f, 0.f, 1.f, 0.f,
         0.f, 0.f, 0.f, 1.f };
+
+    static bool ResolveTextureGuidFromPath(const std::filesystem::path& dropped_path, xresource::full_guid& out_guid)
+    {
+        if (dropped_path.empty()) {
+            return false;
+        }
+
+        const std::string asset_name = dropped_path.stem().string();
+        if (asset_name.empty()) {
+            return false;
+        }
+
+        auto guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, asset_name);
+        if (guid.empty()) {
+            guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::CUBEMAP_GUID, asset_name);
+        }
+
+        if (guid.empty()) {
+            LOGW("[Screen] Unable to resolve texture asset '%s' from drop payload.", asset_name.c_str());
+            return false;
+        }
+
+        out_guid = guid;
+        return true;
+    }
+
+    static bool ApplyTextureGuidToSelection(const xresource::full_guid& texture_guid)
+    {
+        if (texture_guid.empty()) {
+            return false;
+        }
+
+        iEditorView& selection_state = LevelEditor::GetInstance().variables;
+        if (!selection_state.HasEntitySelection()) {
+            return false;
+        }
+
+        bool applied = false;
+        HistorySystem* history_system = HistorySystem::this_class ? &HistorySystem::GetInstance() : nullptr;
+
+        for (entt::entity entity : selection_state.selected_entities) {
+            if (entity == entt::null || !registry.valid(entity)) {
+                continue;
+            }
+            if (!registry.all_of<MaterialComponent>(entity)) {
+                continue;
+            }
+
+            std::unique_ptr<Record> record = history_system ? history_system->start_track(entity, "MaterialComponent", "albedoMap") : nullptr;
+            registry.get<MaterialComponent>(entity).albedoMap = texture_guid;
+            if (history_system) {
+                history_system->end_track(record, entt::meta_any{ texture_guid });
+            }
+            applied = true;
+        }
+
+        if (!applied) {
+            LOGW("[Screen] Texture drop ignored because no selected entities have MaterialComponent.");
+        }
+
+        return applied;
+    }
 
     Screen::Screen() {
         this_instance = this;
@@ -1828,10 +1892,13 @@ namespace EngineFramework
         {
             CALL_AT_END(imgui_enddragdrop, ImGui::EndDragDropTarget(););
 
+            bool payloadHandled = false;
+
             // Create instance with default transform at camera forward position. 
             // Accept path payload (std::string*)
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SELECTED_MODEL_NAME"))
             {
+                payloadHandled = true;
                 if (payload->DataSize == 0) return;
                 std::string archtype_name = static_cast<const char*>(payload->Data);
                 if (archtype_name.empty())
@@ -1863,6 +1930,33 @@ namespace EngineFramework
                 }
             }
 
+            if (!payloadHandled)
+            {
+                const char* payload_types[] = { "Textures", "GENERAL" };
+                for (const char* payload_type : payload_types)
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(payload_type))
+                    {
+                        payloadHandled = true;
+                        if (payload->Data && payload->DataSize > 0)
+                        {
+                            const char* raw = static_cast<const char*>(payload->Data);
+                            std::string dropped(raw, raw + payload->DataSize - 1);
+                            std::filesystem::path dropped_path = std::filesystem::path{ dropped }.lexically_normal();
+                            xresource::full_guid texture_guid{};
+                            if (ResolveTextureGuidFromPath(dropped_path, texture_guid))
+                            {
+                                if (ApplyTextureGuidToSelection(texture_guid))
+                                {
+                                    LOGI("[Screen] Applied texture '%s' to selected entities via viewport drop.",
+                                        dropped_path.filename().string().c_str());
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
 
