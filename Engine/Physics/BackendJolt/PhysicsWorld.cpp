@@ -882,6 +882,60 @@ bool PhysicsWorld::Raycast(const glm::vec3& origin, const glm::vec3& direction, 
     return false;
 }
 
+bool PhysicsWorld::AreEntitiesColliding(entt::entity entityA, entt::entity entityB)
+{
+    if (!registry.valid(entityA) || !registry.valid(entityB)) return false;
+    JPH::AABox boundsA, boundsB;
+
+    auto GetEntityBounds = [&](entt::entity e, JPH::AABox& outBounds) -> bool
+    {
+        //Jolt check first
+        if (m_entityToBody.find(e) != m_entityToBody.end())
+        {
+            JPH::BodyID bodyID = m_entityToBody[e];
+            JPH::BodyLockRead lock(m_physicsSystem->GetBodyLockInterface(), bodyID);
+            if (lock.Succeeded())
+            {
+                const JPH::Body& body = lock.GetBody();
+                outBounds = body.GetWorldSpaceBounds();
+                return true;
+            }
+        }
+        //if fail, manual check
+        if (registry.all_of<TransformComponent, ColliderComponent>(e))
+        {
+            const auto& tf = registry.get<TransformComponent>(e);
+            const auto& col = registry.get<ColliderComponent>(e);
+
+            glm::vec3 localSize = col.maxBounds - col.minBounds;
+            glm::vec3 worldSize = localSize * tf.scale;
+            glm::vec3 localCenter = (col.minBounds + col.maxBounds) * 0.5f;
+            glm::vec3 worldCenter = tf.position + (localCenter * tf.scale);
+
+            JPH::Vec3 jMin(
+                worldCenter.x - std::abs(worldSize.x) * 0.5f,
+                worldCenter.y - std::abs(worldSize.y) * 0.5f,
+                worldCenter.z - std::abs(worldSize.z) * 0.5f
+            );
+            JPH::Vec3 jMax(
+                worldCenter.x + std::abs(worldSize.x) * 0.5f,
+                worldCenter.y + std::abs(worldSize.y) * 0.5f,
+                worldCenter.z + std::abs(worldSize.z) * 0.5f
+            );
+
+            outBounds = JPH::AABox(jMin, jMax);
+            return true;
+        }
+
+        return false;
+    };
+
+    if (!GetEntityBounds(entityA, boundsA)) return false;
+    if (!GetEntityBounds(entityB, boundsB)) return false;
+
+    return boundsA.Overlaps(boundsB);
+}
+
 void PhysicsWorld::ApplyImpulse(entt::entity entity, float x, float y, float z)
 {
     if (m_entityToBody.find(entity) == m_entityToBody.end()) return; //Body doesnt exist

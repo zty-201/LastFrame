@@ -214,6 +214,8 @@ public:
 #endif
     bool Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit);
 
+    bool AreEntitiesColliding(entt::entity entityA, entt::entity entityB);
+
     /*************************************************
     * This function applies an impulse force on a singular entity.
     * This is method 1 of 3 to explode items.
