@@ -110,6 +110,7 @@ namespace EngineFramework
         0.f, 0.f, 1.f, 0.f,
         0.f, 0.f, 0.f, 1.f };
 
+    // To get the texture guid from the path - to be used when dragging texture in to viewport directly
     static bool ResolveTextureGuidFromPath(const std::filesystem::path& dropped_path, xresource::full_guid& out_guid)
     {
         if (dropped_path.empty()) {
@@ -135,6 +136,7 @@ namespace EngineFramework
         return true;
     }
 
+    // To apply the selected texture to the selected entity - for the dragging of texture to entity via viewport
     static bool ApplyTextureGuidToSelection(const xresource::full_guid& texture_guid)
     {
         if (texture_guid.empty()) {
@@ -1908,14 +1910,15 @@ namespace EngineFramework
                 }
                 TransformComponent instance_transform{};
 
-                //Find the position in front of where the camera is looking.
+                // Find the position in front of where the camera is looking.
                 entt::entity camera = GraphicsSystem::GetInstance().GetFirstActiveCamera();
                 if (camera != entt::null)
                 {
                     CameraComponent& cam_comp = registry.get<CameraComponent>(camera);
                     instance_transform.position = Camera::GetFowardLookPosition(cam_comp, 0.5f);
 
-                }//Otherwise if no active camera found then use default position at 0,0,0.
+                } 
+                // Otherwise if no active camera found then use default position at 0,0,0.
                 else
                 {
                     LOGD("%s", "No Active Camera Found, creating entity at(0, 0, 0)");
@@ -1930,6 +1933,7 @@ namespace EngineFramework
                 }
             }
 
+            // For the drag and drop of textures to viewport for selected entity
             if (!payloadHandled)
             {
                 const char* payload_types[] = { "Textures", "GENERAL" };
