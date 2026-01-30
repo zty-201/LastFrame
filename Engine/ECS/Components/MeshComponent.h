@@ -33,6 +33,8 @@ struct MeshComponent {
     // temp bounds
     float localMin[3] = { -0.5f, -0.5f, -0.5f };
     float localMax[3] = { +0.5f, +0.5f, +0.5f };
+
+	bool visibility = true;
 };
 
 #endif
