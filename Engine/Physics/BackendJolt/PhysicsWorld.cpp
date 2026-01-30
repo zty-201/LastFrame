@@ -16,10 +16,13 @@
 #include <Jolt/Physics/Body/MassProperties.h>
 #include <cassert>
 #include <iostream>
+#include "TransformComponent.h"
 #include "ColliderComponent.h"
 #include "PhysicsMaterialComponent.h"
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/CastResult.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <algorithm>
 
 //TEST VALUES ONLY
 const float TEST_DENSITY = 1000.0f;
@@ -742,6 +745,80 @@ void PhysicsWorld::AddForce(entt::entity entity, const glm::vec3& force)
         bodyID,
         JPH::Vec3(force.x, force.y, force.z)
     );
+}
+
+
+bool PhysicsWorld::RaycastAgainstColliders(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit)
+{
+    auto view = registry.view<TransformComponent, ColliderComponent>();
+
+    bool foundHit = false;
+    float closestT = maxDistance;
+
+    for (auto [entity, transform, collider] : view.each())
+    {
+        //Construct model matrix
+        glm::mat4 model = glm::mat4(1.f);
+        model = glm::translate(model, transform.position);
+
+        //Apply rotation
+        model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0, 1, 0));
+        model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1, 0, 0));
+        model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0, 0, 1));
+
+        model = glm::scale(model, transform.scale);
+
+        glm::mat4 invModel = glm::inverse(model);
+
+        //Transform ray to local space
+        //Position affects origin (w = 1)
+        glm::vec4 localOriginV4 = invModel * glm::vec4(origin, 1.f);
+        glm::vec3 localOrigin = glm::vec3(localOriginV4);
+
+        //Direction affects vector (w = 0), to normalize after scaling
+        glm::vec4 localDirV4 = invModel * glm::vec4(direction, 0.f);
+        glm::vec3 localDir = glm::normalize(localDirV4);
+
+        //Slab Test against local aabb
+        glm::vec3 aabbMin = collider.minBounds;
+        glm::vec3 aabbMax = collider.maxBounds;
+
+        if (aabbMin == aabbMax) continue;
+
+        float t1 = (aabbMin.x - localOrigin.x) / localDir.x;
+        float t2 = (aabbMax.x - localOrigin.x) / localDir.x;
+        float t3 = (aabbMin.y - localOrigin.y) / localDir.y;
+        float t4 = (aabbMax.y - localOrigin.y) / localDir.y;
+        float t5 = (aabbMin.z - localOrigin.z) / localDir.z;
+        float t6 = (aabbMax.z - localOrigin.z) / localDir.z;
+
+        float tmin = std::max(std::max(std::min(t1, t2), std::min(t3, t4)), std::min(t5, t6));
+        float tmax = std::min(std::min(std::max(t1, t2), std::max(t3, t4)), std::max(t5, t6));
+
+        //tmax >= 0 means intersection is not behind us
+        //tmin <= tmax means ray pass through box
+        if (tmax >= 0 && tmin <= tmax)
+        {
+            //Convert local dist back to world dist
+            glm::vec3 localHitPos = localOrigin + (localDir * tmin);
+
+            //transform to world space
+            glm::vec4 worldHitPos = model * glm::vec4(localHitPos, 1.f);
+            float dist = glm::distance(origin, glm::vec3(worldHitPos));
+
+            if (dist < closestT && dist > 0.f)
+            {
+                closestT = dist;
+                outHit.hasHit = true;
+                outHit.entity = entity;
+                outHit.distance = closestT;
+                outHit.position = glm::vec3(worldHitPos);
+                foundHit = true;
+            }
+        }
+    }
+
+    return foundHit;
 }
 
 bool PhysicsWorld::Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit)
