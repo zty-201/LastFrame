@@ -1,6 +1,7 @@
 {
 	"MeshComponent": {
-		"meshName": "Sphere"
+		"meshName": "Sphere",
+		"visibility": true
 	},
 	"model_type": "temp"
 }

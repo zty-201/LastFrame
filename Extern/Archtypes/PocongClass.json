@@ -42,7 +42,8 @@
 		]
 	},
 	"MeshComponent": {
-		"meshName": "PocongTest.obj"
+		"meshName": "PocongTest.obj",
+		"visibility": true
 	},
 	"SceneRenderPass": null,
 	"TransformComponent": {
