@@ -44,6 +44,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "ImGuizmo.h"
 #include "TriggerBoxComponent.h"
 #include "MeshComponent.h"
+#include "Editor_Features/MetaInspector/XResourceGuidTags.hpp"
+#include "MaterialComponent.h"
 #include "ColliderComponent.h"
 #include "TriggerSystem.hpp"
 #include "TriggerEvents.hpp"
@@ -107,6 +109,70 @@ namespace EngineFramework
         0.f, 1.f, 0.f, 0.f,
         0.f, 0.f, 1.f, 0.f,
         0.f, 0.f, 0.f, 1.f };
+
+    // To get the texture guid from the path - to be used when dragging texture in to viewport directly
+    static bool ResolveTextureGuidFromPath(const std::filesystem::path& dropped_path, xresource::full_guid& out_guid)
+    {
+        if (dropped_path.empty()) {
+            return false;
+        }
+
+        const std::string asset_name = dropped_path.stem().string();
+        if (asset_name.empty()) {
+            return false;
+        }
+
+        auto guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::TEXTURE_GUID, asset_name);
+        if (guid.empty()) {
+            guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::CUBEMAP_GUID, asset_name);
+        }
+
+        if (guid.empty()) {
+            LOGW("[Screen] Unable to resolve texture asset '%s' from drop payload.", asset_name.c_str());
+            return false;
+        }
+
+        out_guid = guid;
+        return true;
+    }
+
+    // To apply the selected texture to the selected entity - for the dragging of texture to entity via viewport
+    static bool ApplyTextureGuidToSelection(const xresource::full_guid& texture_guid)
+    {
+        if (texture_guid.empty()) {
+            return false;
+        }
+
+        iEditorView& selection_state = LevelEditor::GetInstance().variables;
+        if (!selection_state.HasEntitySelection()) {
+            return false;
+        }
+
+        bool applied = false;
+        HistorySystem* history_system = HistorySystem::this_class ? &HistorySystem::GetInstance() : nullptr;
+
+        for (entt::entity entity : selection_state.selected_entities) {
+            if (entity == entt::null || !registry.valid(entity)) {
+                continue;
+            }
+            if (!registry.all_of<MaterialComponent>(entity)) {
+                continue;
+            }
+
+            std::unique_ptr<Record> record = history_system ? history_system->start_track(entity, "MaterialComponent", "albedoMap") : nullptr;
+            registry.get<MaterialComponent>(entity).albedoMap = texture_guid;
+            if (history_system) {
+                history_system->end_track(record, entt::meta_any{ texture_guid });
+            }
+            applied = true;
+        }
+
+        if (!applied) {
+            LOGW("[Screen] Texture drop ignored because no selected entities have MaterialComponent.");
+        }
+
+        return applied;
+    }
 
     Screen::Screen() {
         this_instance = this;
@@ -455,46 +521,98 @@ namespace EngineFramework
                         );
 
                         RaycastHit hit;
+                        bool hitSomething = false;
+
                         if (PhysicsWorld::Get().Raycast(rayOrigin, rayDir, 1000.f, hit))
                         {
-                            // To select multiple entities using shift
-                            // To deselect entities using ctrl
+                            hitSomething = true;
+                        }
+#if defined(PLATFORM_WINDOWS) || defined(DEBUG)
+                        else if (PhysicsWorld::Get().RaycastAgainstColliders(rayOrigin, rayDir, 1000.f, hit))
+                        {
+                            hitSomething = true;
+                        }
+#endif
+                        if (hitSomething)
+                        {
                             LOGI("Mouse Picked Entity: %u", (uint32_t)hit.entity);
                             iEditorView& selection_state = LevelEditor::GetInstance().variables;
-                            ImGuiIO& io = ImGui::GetIO();
-                            bool shift_down = io.KeyShift;
-                            bool ctrl_down = io.KeyCtrl;
+                            bool shift_down = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
+                            bool ctrl_down = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
+                            LOGI("Selection Modifier Check -> Ctrl: %d, Shift: %d", ctrl_down, shift_down);
+                            bool isAlreadySelected = selection_state.IsEntitySelected(hit.entity);
 
-                            if (ctrl_down && selection_state.IsEntitySelected(hit.entity))
+                            if (ctrl_down)
                             {
-                                selection_state.RemoveEntitySelection(hit.entity);
-                                if (!selection_state.HasEntitySelection())
-                                {
-                                    selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
-                                }
+                                if (isAlreadySelected) selection_state.RemoveEntitySelection(hit.entity);
+                                else selection_state.AddEntitySelection(hit.entity);
+                            }
+                            else if (shift_down)
+                            {
+                                if (!isAlreadySelected) selection_state.AddEntitySelection(hit.entity);
                             }
                             else
                             {
-                                if (shift_down)
-                                {
-                                    selection_state.AddEntitySelection(hit.entity);
-                                }
-                                else
+                                if (!isAlreadySelected)
                                 {
                                     selection_state.SetEntitySelection(hit.entity);
                                 }
+                            }
+
+                            if (selection_state.IsEntitySelected(hit.entity))
+                            {
                                 selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
                             }
                         }
                         else
                         {
-                            //Deselect if clicking empty space
                             iEditorView& selection_state = LevelEditor::GetInstance().variables;
-                            selection_state.ClearEntitySelection();
-                            selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
-
-                            LOGI("Selection cleared.");
+                            if (!ImGui::GetIO().KeyCtrl && !ImGui::GetIO().KeyShift)
+                            {
+                                selection_state.ClearEntitySelection();
+                                selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
+                            }
                         }
+                        //if (PhysicsWorld::Get().Raycast(rayOrigin, rayDir, 1000.f, hit))
+                        //{
+                        //    // To select multiple entities using shift
+                        //    // To deselect entities using ctrl
+                        //    LOGI("Mouse Picked Entity: %u", (uint32_t)hit.entity);
+                        //    iEditorView& selection_state = LevelEditor::GetInstance().variables;
+                        //    ImGuiIO& io = ImGui::GetIO();
+                        //    bool shift_down = io.KeyShift;
+                        //    bool ctrl_down = io.KeyCtrl;
+
+                        //    if (ctrl_down && selection_state.IsEntitySelected(hit.entity))
+                        //    {
+                        //        selection_state.RemoveEntitySelection(hit.entity);
+                        //        if (!selection_state.HasEntitySelection())
+                        //        {
+                        //            selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
+                        //        }
+                        //    }
+                        //    else
+                        //    {
+                        //        if (shift_down)
+                        //        {
+                        //            selection_state.AddEntitySelection(hit.entity);
+                        //        }
+                        //        else
+                        //        {
+                        //            selection_state.SetEntitySelection(hit.entity);
+                        //        }
+                        //        selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    //Deselect if clicking empty space
+                        //    iEditorView& selection_state = LevelEditor::GetInstance().variables;
+                        //    selection_state.ClearEntitySelection();
+                        //    selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
+
+                        //    LOGI("Selection cleared.");
+                        //}
                     }
                 }
 
@@ -1653,10 +1771,8 @@ namespace EngineFramework
     void EngineFramework::Screen::triggerbox()
     {
         if (!s_DrawColliders) return;
-
         if (is_adjusting_lights) return;
         if (is_simulator_running) return;
-        
 
         // Use same camera math as gizmos()
         auto camera_view = registry.view<CameraComponent>();
@@ -1677,14 +1793,19 @@ namespace EngineFramework
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
 
+        auto& selection_state = LevelEditor::GetInstance().variables;
+
         // Draw a wire box for every entity that has a TriggerBoxComponent
         auto v = registry.view<TransformComponent, TriggerBoxComponent>();
-        v.each([&](const TransformComponent& tf,
-            const TriggerBoxComponent& trg)   // removed entt::entity e (no warning)
+        v.each([&](entt::entity e, const TransformComponent& tf,
+            const TriggerBoxComponent& trg)
             {
                 if (!trg.enabled) return;
 
                 const glm::mat4 model = tf.modelMatrix;
+
+                bool isSelected = selection_state.IsEntitySelected(e);
+                if (!s_DrawAllColliders && !isSelected) return;
 
                 // Local center & size come from the trigger itself
                 glm::vec3 centerLocal = trg.localPosition;
@@ -1706,12 +1827,21 @@ namespace EngineFramework
                 }
 
                 const glm::quat qLocal = EulerDegToQuat(trg.localEulerDeg);
-
                 const glm::mat4 triggerM = model * TRS(centerLocal, qLocal, sizeLocal);
 
-                ImU32 color = trg.highlightedEntities.empty()
-                    ? IM_COL32(0, 255, 0, 255)      // green (normal)
-                    : IM_COL32(255, 255, 0, 255);   // yellow (highlight)
+                ImU32 color;
+                if (isSelected)
+                {
+                    color = IM_COL32(255, 165, 0, 255);
+                }
+                else if (!trg.highlightedEntities.empty())
+                {
+                    color = IM_COL32(255, 255, 0, 255);
+                }
+                else
+                {
+                    color = IM_COL32(0, 255, 0, 255);
+                }
 
                 DrawWireOBB(triggerM, view, proj, screen_pos, available_size,
                     color, 2.5f);
@@ -1723,7 +1853,6 @@ namespace EngineFramework
     void EngineFramework::Screen::colliderbox()
     {
         if (!s_DrawColliders) return;
-
         if (is_adjusting_lights) return;
         if (is_simulator_running) return;
 
@@ -1744,98 +1873,84 @@ namespace EngineFramework
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
 
-        entt::entity selected = LevelEditor::GetInstance().variables.selected_objectID;
+        //Get selection state manager
+        auto& selected_state = LevelEditor::GetInstance().variables;
 
+        //Iterate ALL entities that have collider component
         auto v = registry.view<TransformComponent, ColliderComponent>();
-        v.each([&](entt::entity e, const TransformComponent& tf,
-            const ColliderComponent& col)
-            {
-                if (!s_DrawAllColliders && e != selected)
-                {
-                    return;
-                }
+        v.each([&](entt::entity e, const TransformComponent& tf, const ColliderComponent& col)
+        {
+                bool isSelected = selected_state.IsEntitySelected(e);
 
-                // If the selected entity lacks collider shapes, render a yellow wireframe using the helper function before skipping the collider drawing block
+                if (!s_DrawAllColliders && !isSelected) return;
+
+                //For colliders with no shapes
                 if (col.shapes.empty())
                 {
-                    if (e == selected)
+                    if (isSelected)
                     {
                         glm::mat4 highlightM;
                         if (BuildSelectionOBB(e, highlightM))
                         {
-                            DrawWireOBB(highlightM, view, proj, screen_pos, available_size,
-                                IM_COL32(255, 255, 0, 255), 2.0f);
+                            //Yellow
+                            DrawWireOBB(highlightM, view, proj, screen_pos, available_size, IM_COL32(255, 255, 0, 255), 2.f);
                         }
                     }
                     return;
                 }
 
+                //Draw AABB bounds
                 const glm::mat4 model = tf.modelMatrix;
-
                 glm::vec3 aabbCenter = (col.minBounds + col.maxBounds) * 0.5f;
                 glm::vec3 aabbSize = col.maxBounds - col.minBounds;
-                glm::mat4 aabbLocalM = glm::translate(glm::mat4(1.0f), aabbCenter) * glm::scale(glm::mat4(1.0f), aabbSize);
+                glm::mat4 aabbLocalM = glm::translate(glm::mat4(1.f), aabbCenter) * glm::scale(glm::mat4(1.f), aabbSize);
                 glm::mat4 aabbWorldM = model * aabbLocalM;
-                DrawWireOBB(aabbWorldM, view, proj, screen_pos, available_size, IM_COL32(0, 255, 255, 255), 1.0f);
+                //Cyan
+                DrawWireOBB(aabbWorldM, view, proj, screen_pos, available_size, IM_COL32(0, 255, 255, 255), 1.f);
 
-                glm::vec3 entPos, entScale, entSkew;
-                glm::vec4 entPersp;
-                glm::quat entRot;
-                glm::decompose(model, entScale, entRot, entPos, entSkew, entPersp);
-
+                //Draw individual shapes
                 for (const auto& shape : col.shapes)
                 {
-                    glm::vec3 sizeLocal(1.0f);
+                    glm::vec3 sizeLocal(1.f);
 
                     switch (static_cast<ColliderShape>(shape.type))
                     {
                     case ColliderShape::Box:
-                        sizeLocal = shape.boxHalfExtents * 2.0f;
+                        sizeLocal = shape.boxHalfExtents * 2.f;
                         break;
                     case ColliderShape::Sphere:
-                        sizeLocal = glm::vec3(shape.sphereRadius * 2.0f);
+                        sizeLocal = glm::vec3(shape.sphereRadius * 2.f);
                         break;
                     case ColliderShape::Capsule:
-                        sizeLocal = glm::vec3(
-                            shape.capsuleRadius * 2.0f,
-                            shape.capsuleHeight,
-                            shape.capsuleRadius * 2.0f);
+                        sizeLocal = glm::vec3(shape.capsuleRadius * 2.f, shape.capsuleHeight, shape.capsuleRadius * 2.f);
                         break;
                     }
-                    glm::vec3 finalSize = sizeLocal * entScale;
-                    glm::quat qShape = entRot * EulerDegToQuat(shape.offsetRotation);
-                    glm::vec3 finalPos = entPos + (entRot * (shape.offsetPosition * entScale));
-                    glm::mat4 shapeTransform = TRS(finalPos, qShape, finalSize);
 
-                    DrawWireOBB(shapeTransform, view, proj, screen_pos, available_size,
-                        IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
+                    glm::mat4 shapeLocal = glm::translate(glm::mat4(1.f), shape.offsetPosition);
+                    shapeLocal *= glm::mat4_cast(EulerDegToQuat(shape.offsetRotation));
+                    shapeLocal = glm::scale(shapeLocal, sizeLocal);
+                    glm::mat4 shapeTransform = model * shapeLocal;
+                    //Red
+                    DrawWireOBB(shapeTransform, view, proj, screen_pos, available_size, IM_COL32(255, 0, 0, 255), 1.6f);
                 }
-                //const ColliderData& shape = col.shapes[0];
+        });
 
-                //// only draw boxes for now
-                //if (shape.type != (int)ColliderShape::Box)
-                //    return;
-
-                //glm::vec3 centerLocal = shape.offsetPosition;
-                //glm::vec3 sizeLocal = 2.0f * shape.boxHalfExtents;
-
-                //glm::quat qLocal = EulerDegToQuat(glm::vec3(0.0f)); // if you later use offsetRotation, convert it here
-                //glm::mat4 colliderM = model * TRS(centerLocal, qLocal, sizeLocal);
-
-                //DrawWireOBB(colliderM, view, proj, screen_pos, available_size,
-                //    IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
-            });
-
-        // If the selected entity doesnt have a collider component, shows a wireframe that highlights regardless of collider data
-        if (selected != entt::null &&
-            registry.valid(selected) &&
-            !registry.all_of<ColliderComponent>(selected))
+        //Iterate Selection List
+        if (selected_state.HasEntitySelection())
         {
-            glm::mat4 highlightM;
-            if (BuildSelectionOBB(selected, highlightM))
+            const auto& selectedList = selected_state.GetSelectedEntities();
+
+            for (entt::entity e : selectedList)
             {
-                DrawWireOBB(highlightM, view, proj, screen_pos, available_size,
-                    IM_COL32(255, 255, 0, 255), 2.0f);
+                if (!registry.valid(e)) return;
+                if (registry.all_of<ColliderComponent>(e)) continue;
+                if (!registry.all_of<TransformComponent>(e)) continue;
+
+                glm::mat4 highlightM;
+                if (BuildSelectionOBB(e, highlightM))
+                {
+                    DrawWireOBB(highlightM, view, proj, screen_pos, available_size, IM_COL32(255, 255, 0, 255), 2.f);
+                }
             }
         }
     }
@@ -1849,10 +1964,13 @@ namespace EngineFramework
         {
             CALL_AT_END(imgui_enddragdrop, ImGui::EndDragDropTarget(););
 
+            bool payloadHandled = false;
+
             // Create instance with default transform at camera forward position. 
             // Accept path payload (std::string*)
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SELECTED_MODEL_NAME"))
             {
+                payloadHandled = true;
                 if (payload->DataSize == 0) return;
                 std::string archtype_name = static_cast<const char*>(payload->Data);
                 if (archtype_name.empty())
@@ -1862,14 +1980,15 @@ namespace EngineFramework
                 }
                 TransformComponent instance_transform{};
 
-                //Find the position in front of where the camera is looking.
+                // Find the position in front of where the camera is looking.
                 entt::entity camera = GraphicsSystem::GetInstance().GetFirstActiveCamera();
                 if (camera != entt::null)
                 {
                     CameraComponent& cam_comp = registry.get<CameraComponent>(camera);
                     instance_transform.position = Camera::GetFowardLookPosition(cam_comp, 0.5f);
 
-                }//Otherwise if no active camera found then use default position at 0,0,0.
+                } 
+                // Otherwise if no active camera found then use default position at 0,0,0.
                 else
                 {
                     LOGD("%s", "No Active Camera Found, creating entity at(0, 0, 0)");
@@ -1884,6 +2003,34 @@ namespace EngineFramework
                 }
             }
 
+            // For the drag and drop of textures to viewport for selected entity
+            if (!payloadHandled)
+            {
+                const char* payload_types[] = { "Textures", "GENERAL" };
+                for (const char* payload_type : payload_types)
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(payload_type))
+                    {
+                        payloadHandled = true;
+                        if (payload->Data && payload->DataSize > 0)
+                        {
+                            const char* raw = static_cast<const char*>(payload->Data);
+                            std::string dropped(raw, raw + payload->DataSize - 1);
+                            std::filesystem::path dropped_path = std::filesystem::path{ dropped }.lexically_normal();
+                            xresource::full_guid texture_guid{};
+                            if (ResolveTextureGuidFromPath(dropped_path, texture_guid))
+                            {
+                                if (ApplyTextureGuidToSelection(texture_guid))
+                                {
+                                    LOGI("[Screen] Applied texture '%s' to selected entities via viewport drop.",
+                                        dropped_path.filename().string().c_str());
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
 

@@ -250,6 +250,14 @@ namespace Engine {
                 PhysicsWorld::Get().ApplyRadialExplosion(entities, x, y, z, strength);
             });
 
+        s_Lua.set_function("Physics_CheckCollision",
+            [](uint32_t idA, uint32_t idB) -> bool
+            {
+                entt::entity eA = static_cast<entt::entity>(idA);
+                entt::entity eB = static_cast<entt::entity>(idB);
+                return PhysicsWorld::Get().AreEntitiesColliding(eA, eB);
+            });
+
         // ===============================================================
         // Light Component bindings
         // ===============================================================
@@ -497,6 +505,137 @@ namespace Engine {
                 return distSq <= rSq;
             });
 
+        queryTable.set_function("GetCameraForward",
+            [](uint32_t entityId)
+            {
+                if (!s_RuntimeRegistry)
+                    return std::make_tuple(0.f, 0.f, 1.f);
+
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!s_RuntimeRegistry->valid(e))
+                    return std::make_tuple(0.f, 0.f, 1.f);
+
+                if (!s_RuntimeRegistry->all_of<CameraComponent>(e))
+                    return std::make_tuple(0.f, 0.f, 1.f);
+
+                const auto& cam = s_RuntimeRegistry->get<CameraComponent>(e);
+
+                glm::vec3 fwd = cam.target - cam.position;
+
+                if (glm::length(fwd) < 0.00001f)
+                    fwd = glm::vec3(0, 0, 1);
+
+                fwd = glm::normalize(fwd);
+                return std::make_tuple(fwd.x, fwd.y, fwd.z);
+            });
+
+
+        queryTable.set_function("IsCameraLookingAt",
+            [](uint32_t cameraId, uint32_t targetId, float fovDegrees) -> bool
+            {
+                if (!s_RuntimeRegistry)
+                    return false;
+
+                entt::entity camE = static_cast<entt::entity>(cameraId);
+                entt::entity tgtE = static_cast<entt::entity>(targetId);
+
+                if (!s_RuntimeRegistry->valid(camE) || !s_RuntimeRegistry->valid(tgtE))
+                    return false;
+
+                if (!s_RuntimeRegistry->all_of<CameraComponent>(camE) ||
+                    !s_RuntimeRegistry->all_of<TransformComponent>(tgtE))
+                    return false;
+
+                const auto& cam = s_RuntimeRegistry->get<CameraComponent>(camE);
+                const auto& tgt = s_RuntimeRegistry->get<TransformComponent>(tgtE);
+
+                glm::vec3 forward = cam.target - cam.position;
+                if (glm::length(forward) < 0.00001f)
+                    return false;
+                forward = glm::normalize(forward);
+
+                glm::vec3 toTarget = tgt.position - cam.position;
+                if (glm::length(toTarget) < 0.00001f)
+                    return true;
+                toTarget = glm::normalize(toTarget);
+
+                float cosAngle = glm::dot(forward, toTarget);
+
+                float halfRad = glm::radians(fovDegrees * 0.5f);
+                float threshold = cosf(halfRad);
+
+                return cosAngle >= threshold;
+            });
+
+
+        queryTable.set_function("GetTransform",
+            [](uint32_t entityId) -> TransformComponent*
+            {
+                if (!s_RuntimeRegistry) return nullptr;
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!s_RuntimeRegistry->valid(e)) return nullptr;
+                if (!s_RuntimeRegistry->all_of<TransformComponent>(e)) return nullptr;
+                return &s_RuntimeRegistry->get<TransformComponent>(e);
+            });
+
+        queryTable.set_function("GetAudio",
+            [](uint32_t entityId) -> AudioComponent*
+            {
+                if (!s_RuntimeRegistry) return nullptr;
+
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!s_RuntimeRegistry->valid(e)) return nullptr;
+                if (!s_RuntimeRegistry->all_of<AudioComponent>(e)) return nullptr;
+
+                return &s_RuntimeRegistry->get<AudioComponent>(e);
+            });
+
+
+        // Audio Bindings
+        sol::table audioTable = s_Lua.create_named_table("Audio");
+
+        //// Play selected clip index for entity
+        //audioTable.set_function("Play",
+        //    [](uint32_t entityId, int clipIndex)
+        //    {
+        //        if (!s_RuntimeRegistry) return;
+
+        //        entt::entity e = static_cast<entt::entity>(entityId);
+        //        if (!s_RuntimeRegistry->valid(e)) return;
+        //        if (!s_RuntimeRegistry->all_of<AudioComponent>(e)) return;
+
+        //        auto& ac = s_RuntimeRegistry->get<AudioComponent>(e);
+
+        //        if (clipIndex < 0) return;
+        //        auto* clip = ac.GetClip(static_cast<std::size_t>(clipIndex));
+        //        if (!clip) return;
+
+        //        clip->playRequested = true; // your AudioSystem will consume this
+        //    });
+
+        //// Set volume for selected clip index
+        //audioTable.set_function("SetVolume",
+        //    [](uint32_t entityId, int clipIndex, float v)
+        //    {
+        //        if (!s_RuntimeRegistry) return;
+
+        //        entt::entity e = static_cast<entt::entity>(entityId);
+        //        if (!s_RuntimeRegistry->valid(e)) return;
+        //        if (!s_RuntimeRegistry->all_of<AudioComponent>(e)) return;
+
+        //        auto& ac = s_RuntimeRegistry->get<AudioComponent>(e);
+
+        //        if (clipIndex < 0) return;
+        //        auto* clip = ac.GetClip(static_cast<std::size_t>(clipIndex));
+        //        if (!clip) return;
+
+        //        // clamp if you want
+        //        if (v < 0.0f) v = 0.0f;
+        //        if (v > 1.0f) v = 1.0f;
+
+        //        clip->volume = v;
+        //    });
+
 
 #if /*defined(DEBUG) && */defined(PLATFORM_WINDOWS)
         /*inputTable.set_function("GetAction", [](const std::string& action) {
@@ -596,12 +735,6 @@ namespace Engine {
          });
 
         LOGI("[ScriptSystem] InputManager bindings complete (static table approach)");
-
-
-
-
-        
-
 
 
         // ===============================================================

@@ -16,10 +16,14 @@
 #include <Jolt/Physics/Body/MassProperties.h>
 #include <cassert>
 #include <iostream>
+#include "TransformComponent.h"
 #include "ColliderComponent.h"
+#include "TriggerBoxComponent.h"
 #include "PhysicsMaterialComponent.h"
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/CastResult.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <algorithm>
 
 //TEST VALUES ONLY
 const float TEST_DENSITY = 1000.0f;
@@ -744,6 +748,153 @@ void PhysicsWorld::AddForce(entt::entity entity, const glm::vec3& force)
     );
 }
 
+static inline glm::quat EulerDegToQuat(const glm::vec3& deg) {
+    return glm::quat(glm::radians(deg));
+}
+
+bool PhysicsWorld::RaycastAgainstColliders(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit)
+{
+    auto view = registry.view<TransformComponent, ColliderComponent>();
+
+    bool foundHit = false;
+    float closestT = maxDistance;
+
+    for (auto [entity, transform, collider] : view.each())
+    {
+        //Construct model matrix
+        glm::mat4 model = glm::mat4(1.f);
+        model = glm::translate(model, transform.position);
+
+        //Apply rotation
+        model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0, 1, 0));
+        model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1, 0, 0));
+        model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0, 0, 1));
+
+        model = glm::scale(model, transform.scale);
+
+        glm::mat4 invModel = glm::inverse(model);
+
+        //Transform ray to local space
+        //Position affects origin (w = 1)
+        glm::vec4 localOriginV4 = invModel * glm::vec4(origin, 1.f);
+        glm::vec3 localOrigin = glm::vec3(localOriginV4);
+
+        //Direction affects vector (w = 0), to normalize after scaling
+        glm::vec4 localDirV4 = invModel * glm::vec4(direction, 0.f);
+        glm::vec3 localDir = glm::normalize(localDirV4);
+
+        //Slab Test against local aabb
+        glm::vec3 aabbMin = collider.minBounds;
+        glm::vec3 aabbMax = collider.maxBounds;
+
+        if (aabbMin == aabbMax) continue;
+
+        float t1 = (aabbMin.x - localOrigin.x) / localDir.x;
+        float t2 = (aabbMax.x - localOrigin.x) / localDir.x;
+        float t3 = (aabbMin.y - localOrigin.y) / localDir.y;
+        float t4 = (aabbMax.y - localOrigin.y) / localDir.y;
+        float t5 = (aabbMin.z - localOrigin.z) / localDir.z;
+        float t6 = (aabbMax.z - localOrigin.z) / localDir.z;
+
+        float tmin = std::max(std::max(std::min(t1, t2), std::min(t3, t4)), std::min(t5, t6));
+        float tmax = std::min(std::min(std::max(t1, t2), std::max(t3, t4)), std::max(t5, t6));
+
+        //tmax >= 0 means intersection is not behind us
+        //tmin <= tmax means ray pass through box
+        if (tmax >= 0 && tmin <= tmax)
+        {
+            //Convert local dist back to world dist
+            glm::vec3 localHitPos = localOrigin + (localDir * tmin);
+
+            //transform to world space
+            glm::vec4 worldHitPos = model * glm::vec4(localHitPos, 1.f);
+            float dist = glm::distance(origin, glm::vec3(worldHitPos));
+
+            if (dist < closestT && dist > 0.f)
+            {
+                closestT = dist;
+                outHit.hasHit = true;
+                outHit.entity = entity;
+                outHit.distance = closestT;
+                outHit.position = glm::vec3(worldHitPos);
+                foundHit = true;
+            }
+        }
+    }
+
+    auto viewTrig = registry.view<TransformComponent, TriggerBoxComponent>();
+    for (auto [entity, transform, trigger] : viewTrig.each())
+    {
+        if (!trigger.enabled) continue;
+
+        glm::mat4 model = glm::mat4(1.f);
+        model = glm::translate(model, transform.position);
+        model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0, 1, 0));
+        model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1, 0, 0));
+        model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0, 0, 1));
+        model = glm::scale(model, transform.scale);
+
+        glm::mat4 triggerLocal = glm::translate(glm::mat4(1.0f), trigger.localPosition);
+        triggerLocal *= glm::mat4_cast(EulerDegToQuat(trigger.localEulerDeg));
+
+        glm::mat4 totalTransform = model * triggerLocal;
+        glm::mat4 invTotal = glm::inverse(totalTransform);
+
+        glm::vec3 localOrigin = glm::vec3(invTotal * glm::vec4(origin, 1.0f));
+        glm::vec3 localDir = glm::normalize(glm::vec3(invTotal * glm::vec4(direction, 0.0f)));
+        glm::vec3 minB(0.0f), maxB(0.0f);
+
+        switch (trigger.type)
+        {
+        case TriggerShapeType::Box:
+            minB = -trigger.halfExtents;
+            maxB = trigger.halfExtents;
+            break;
+        case TriggerShapeType::Sphere:
+            minB = glm::vec3(-trigger.radius);
+            maxB = glm::vec3(trigger.radius);
+            break;
+        case TriggerShapeType::Capsule:
+            //Approximate capsule as a Box for selection click
+            //Width/Depth = Radius, Height = HalfHeight + Radius
+            float h = trigger.capHalfHeight + trigger.capRadius;
+            float r = trigger.capRadius;
+            minB = glm::vec3(-r, -h, -r);
+            maxB = glm::vec3(r, h, r);
+            break;
+        }
+
+        float t1 = (minB.x - localOrigin.x) / localDir.x;
+        float t2 = (maxB.x - localOrigin.x) / localDir.x;
+        float t3 = (minB.y - localOrigin.y) / localDir.y;
+        float t4 = (maxB.y - localOrigin.y) / localDir.y;
+        float t5 = (minB.z - localOrigin.z) / localDir.z;
+        float t6 = (maxB.z - localOrigin.z) / localDir.z;
+
+        float tmin = std::max(std::max(std::min(t1, t2), std::min(t3, t4)), std::min(t5, t6));
+        float tmax = std::min(std::min(std::max(t1, t2), std::max(t3, t4)), std::max(t5, t6));
+        if (tmax >= 0 && tmin <= tmax)
+        {
+            // Convert back to World Space for distance check
+            glm::vec3 localHitPos = localOrigin + (localDir * tmin);
+            glm::vec4 worldHitPos = totalTransform * glm::vec4(localHitPos, 1.0f);
+            float dist = glm::distance(origin, glm::vec3(worldHitPos));
+
+            if (dist < closestT && dist > 0.0f)
+            {
+                closestT = dist;
+                outHit.hasHit = true;
+                outHit.entity = entity;
+                outHit.distance = closestT;
+                outHit.position = glm::vec3(worldHitPos);
+                foundHit = true;
+            }
+        }
+    }
+
+    return foundHit;
+}
+
 bool PhysicsWorld::Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit)
 {
     if (!m_physicsSystem) return false;
@@ -803,6 +954,60 @@ bool PhysicsWorld::Raycast(const glm::vec3& origin, const glm::vec3& direction, 
 
     outHit.hasHit = false;
     return false;
+}
+
+bool PhysicsWorld::AreEntitiesColliding(entt::entity entityA, entt::entity entityB)
+{
+    if (!registry.valid(entityA) || !registry.valid(entityB)) return false;
+    JPH::AABox boundsA, boundsB;
+
+    auto GetEntityBounds = [&](entt::entity e, JPH::AABox& outBounds) -> bool
+    {
+        //Jolt check first
+        if (m_entityToBody.find(e) != m_entityToBody.end())
+        {
+            JPH::BodyID bodyID = m_entityToBody[e];
+            JPH::BodyLockRead lock(m_physicsSystem->GetBodyLockInterface(), bodyID);
+            if (lock.Succeeded())
+            {
+                const JPH::Body& body = lock.GetBody();
+                outBounds = body.GetWorldSpaceBounds();
+                return true;
+            }
+        }
+        //if fail, manual check
+        if (registry.all_of<TransformComponent, ColliderComponent>(e))
+        {
+            const auto& tf = registry.get<TransformComponent>(e);
+            const auto& col = registry.get<ColliderComponent>(e);
+
+            glm::vec3 localSize = col.maxBounds - col.minBounds;
+            glm::vec3 worldSize = localSize * tf.scale;
+            glm::vec3 localCenter = (col.minBounds + col.maxBounds) * 0.5f;
+            glm::vec3 worldCenter = tf.position + (localCenter * tf.scale);
+
+            JPH::Vec3 jMin(
+                worldCenter.x - std::abs(worldSize.x) * 0.5f,
+                worldCenter.y - std::abs(worldSize.y) * 0.5f,
+                worldCenter.z - std::abs(worldSize.z) * 0.5f
+            );
+            JPH::Vec3 jMax(
+                worldCenter.x + std::abs(worldSize.x) * 0.5f,
+                worldCenter.y + std::abs(worldSize.y) * 0.5f,
+                worldCenter.z + std::abs(worldSize.z) * 0.5f
+            );
+
+            outBounds = JPH::AABox(jMin, jMax);
+            return true;
+        }
+
+        return false;
+    };
+
+    if (!GetEntityBounds(entityA, boundsA)) return false;
+    if (!GetEntityBounds(entityB, boundsB)) return false;
+
+    return boundsA.Overlaps(boundsB);
 }
 
 void PhysicsWorld::ApplyImpulse(entt::entity entity, float x, float y, float z)

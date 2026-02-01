@@ -20,6 +20,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <cstdio>
+#include <algorithm>
+#include <cctype>
+#include <cstdlib>
 
 //Entt reflection system
 #include <entt/meta/meta.hpp>
@@ -93,7 +96,38 @@ namespace EngineFramework
 		if (ImGui::Begin("Object Manager", &is_enabled)) {
 			//Buttons at the top
 			top_buttons();
+
+			// For the searching of object in object manager
 			ImGui::Text("Scene Hierarchy");
+
+			// Keep a static buffer to read the user's query
+			static char search_buffer[128]{};
+			float button_width = ImGui::CalcTextSize("Clear##ObjectSearch").x + ImGui::GetStyle().FramePadding.x * 2.0f;
+			float available_width = ImGui::GetContentRegionAvail().x;
+			float search_width = std::max(available_width - button_width - ImGui::GetStyle().ItemSpacing.x, 120.0f);
+			ImGui::SetNextItemWidth(search_width);
+			ImGui::InputTextWithHint("##ObjectSearch", "Search by name", search_buffer, sizeof(search_buffer));
+			ImGui::SameLine();
+			if (ImGui::SmallButton("Clear##ObjectSearch") && search_buffer[0] != '\0') {
+				search_buffer[0] = '\0';
+			}
+			const std::string search_query_raw = search_buffer;
+			const bool has_search_query = std::any_of(search_query_raw.begin(), search_query_raw.end(), [](unsigned char c) { return !std::isspace(c); });
+
+			// Lowercase all the search queries input by the users so that the comparisons are case insensitive to prevent typo errors
+			std::string search_query_lower = has_search_query ? search_query_raw : std::string{};
+			if (has_search_query) {
+				std::transform(search_query_lower.begin(), search_query_lower.end(), search_query_lower.begin(), [](unsigned char c) {
+					return static_cast<char>(std::tolower(c));
+					});
+			}
+			const bool numeric_search = has_search_query && std::all_of(search_query_raw.begin(), search_query_raw.end(), [](unsigned char c) {
+				return std::isdigit(c);
+				});
+			uint32_t search_id = 0;
+			if (numeric_search) {
+				search_id = static_cast<uint32_t>(std::strtoul(search_query_raw.c_str(), nullptr, 10));
+			}
 			static bool open_popup_once{};
 			static entt::entity copied_entity = entt::null;
 
@@ -143,7 +177,7 @@ namespace EngineFramework
 						copied_entity = active_entity;
 					}
 					else {
-						LOGW("[ObjectManager] No valid entity selected to copy");
+						LOGW("[ObjectManager] No valid entity selected to copy"); 
 					}
 				}
 
@@ -178,11 +212,30 @@ namespace EngineFramework
 				}
 			}
 
+			// Iterate through here to allow the search of object name
 			int incrementing_imgui_id{};
 			for (auto entity : entities) {
+				std::string label = GameObjectSystem::GetEntityName(entity);
+				bool passes_search = true;
+				if (has_search_query) {
+					const bool id_match = numeric_search && static_cast<uint32_t>(entity) == search_id;
+					bool name_match = false;
+
+					// Only entities whose name contains the substring remain visibile, if query is empty then just shows the entire object manager as per usual
+					if (!search_query_lower.empty()) {
+						std::string label_lower = label;
+						std::transform(label_lower.begin(), label_lower.end(), label_lower.begin(), [](unsigned char c) {
+							return static_cast<char>(std::tolower(c));
+							});
+						name_match = label_lower.find(search_query_lower) != std::string::npos;
+					}
+					passes_search = id_match || name_match;
+				}
+				if (!passes_search) {
+					continue;
+				}
 				ImGui::PushID(incrementing_imgui_id++);
 				CALL_AT_END(imgui_popid, ImGui::PopID(););
-				std::string label = GameObjectSystem::GetEntityName(entity);
 				//ImGui::Text("%s", label.c_str());
 
 				// Determine if this entity is selected

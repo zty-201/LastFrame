@@ -588,6 +588,7 @@ namespace EngineFramework
 		entt::meta_factory<MeshComponent>()
 			.type("MeshComponent")
 			.data<&MeshComponent::meshName>("meshName")
+			.data<&MeshComponent::visibility>("visibility")
 			.func<&Emplacer<MeshComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<MeshComponent>::RemoveComponent>("remove")
 			.func<&Getter<MeshComponent>::GetComponent>("get")
