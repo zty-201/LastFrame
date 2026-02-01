@@ -335,7 +335,7 @@ namespace Mesh {
                     glm::vec3 c2 = glm::cross(vertex.Normal, glm::vec3(0.0f, 1.0f, 0.0f));
                     glm::vec3 t = glm::length(c1) > glm::length(c2) ? c1 : c2;
                     vertex.Tangent = glm::vec4(glm::normalize(t), 1.0f);
-                    LOGE("Mesh '%s' missing tangents, using generated fallback", mesh->mName.C_Str());
+                    //LOGE("Mesh '%s' missing tangents, using generated fallback", mesh->mName.C_Str());
                 }
 
                 // Add skinning data

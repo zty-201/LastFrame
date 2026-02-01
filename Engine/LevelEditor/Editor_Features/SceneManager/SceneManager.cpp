@@ -20,6 +20,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <iostream>
 #include "AssetManager.hpp"
 #include "Screen.hpp"
+#include "UISystem.hpp"
 
 namespace EngineFramework
 {
@@ -93,7 +94,7 @@ namespace EngineFramework
 					std::string sceneString = AssetManagerSystem::GetStringFromFile("Extern/Scenes/" + scene);
 					GameObjectSystem::GetInstance().LoadScene(sceneString);
 					currentScene = scene;
-
+					UI_System::GetInstance().Initialize();
 					Screen::GetInstance().is_enabled = true;
 					is_file_loaded = true;
 				}

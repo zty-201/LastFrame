@@ -55,25 +55,31 @@ namespace EngineFramework
 
     public:
 
+        UI_Menu(const std::string& name) : menu_name(name) {};
+        ~UI_Menu(){
+            AllElements_in_this_overlay.clear();
+        };
         std::string menu_name;
         void Initialize();
         void Update();
         void Clean();
-        void Seralise(); //Writing to files
-        void Deseralise(); //Reading from files
+        bool Deseralise(std::string); //Reading from files
+        std::unordered_set<entt::entity> Seralise();
         void Add_Element(entt::entity e);
         void Remove_Element(entt::entity e);
 
         bool is_menu_active;
+        void draw_elements(bool value = true); //draw if overlay is active
+        
 
     private:
 
-        static std::vector<entt::entity> AllElements_in_this_overlay; //entities with overlaycomponent
+        std::vector<entt::entity> AllElements_in_this_overlay; //entities with overlaycomponent
         void update_Buttons();
-        void update_Button_State(); //update the button state based on input_manager
-        void Trigger_Button_Event();
-
-        void draw_elements(); //draw if overlay is active
+        void update_Button_State(ButtonComponent& button, entt::entity e); //update the button state based on input_manager
+        void Trigger_Button_Event(ButtonComponent& button, BUTTON_STATE state);
+        bool check_touch(entt::entity e);
+        
 
     };
 
@@ -90,15 +96,26 @@ namespace EngineFramework
         static UI_System& GetInstance() { return *this_class; }
         static inline UI_System* this_class = nullptr;
 
+        //important! test button class first
+        std::unique_ptr<UI_Menu> menu_test;
 
-        static std::unordered_map<std::string, UI_Menu> Menu_Mapping;
+        //after testing uibuttons first
+        static std::unordered_map<std::string, std::pair<std::unique_ptr<UI_Menu>,bool>> Menu_Mapping;
         std::string current_menu;
 
+        void DeserializeAllOverlays();
+        std::unordered_set<entt::entity> Seralise_AllMenus();
+        bool DeserializeOverlay(std::string);
+
+        void displayMenu(std::string menu);
+        void closeMenu(); //this is current menu
+        void closeMenu(std::string menu);
+        void closeAllMenu();
 
     private:
 
         static void ErrorCallback(int error, const char* description);
-        void activate_current_menu();
+        
 
     };
 #endif

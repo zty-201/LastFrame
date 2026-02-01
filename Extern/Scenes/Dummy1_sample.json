@@ -1,0 +1,802 @@
+{
+	"0": {
+		"ColliderComponent": {
+			"maxBounds": [
+				2.545584201812744,
+				3.045584201812744,
+				2.545584201812744
+			],
+			"minBounds": [
+				-2.545584201812744,
+				-2.045584201812744,
+				-2.545584201812744
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						2.545584201812744,
+						2.545584201812744,
+						2.545584201812744
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.5,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": false,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": false,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"archtype": 1531488210877235207
+	},
+	"1": {
+		"LightComponent": {
+			"color": [
+				1.0,
+				0.9200000166893005,
+				0.8500000238418579
+			],
+			"constant": 0.0,
+			"direction": [
+				0.05582098662853241,
+				-0.9310559034347534,
+				0.3605816960334778
+			],
+			"innerConeAngle": 12.5,
+			"intensity": 50.0,
+			"linear": 0.0,
+			"outerConeAngle": 17.5,
+			"position": [
+				-10.0,
+				80.0,
+				50.0
+			],
+			"quadratic": 0.0,
+			"radius": 0.0,
+			"type": 0
+		}
+	},
+	"10": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6719529442629517315
+				}
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				40.0,
+				40.0
+			],
+			"size": [
+				90.0,
+				90.0
+			],
+			"textureid": [
+				3601763066940784643,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"1000": {
+		"CameraComponent": {
+			"camType": 1,
+			"farPlane": 3000.0,
+			"fieldOfView": 75.0,
+			"is_active": true,
+			"nearPlane": 1.5,
+			"position": [
+				-15.929680824279785,
+				336.05120849609375,
+				0.6462521553039551
+			],
+			"target": [
+				-16.19768714904785,
+				335.7760314941406,
+				-0.2768867015838623
+			]
+		}
+	},
+	"11": {
+		"LightComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"constant": 1.0,
+			"direction": [
+				0.0,
+				0.0,
+				1.0
+			],
+			"innerConeAngle": 15.0,
+			"intensity": 10000.0,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"position": [
+				-808.864990234375,
+				487.2690124511719,
+				-621.8790283203125
+			],
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 2
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-808.8648681640625,
+				487.2690734863281,
+				-621.87890625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				10.0,
+				10.0,
+				10.0
+			]
+		}
+	},
+	"114": {
+		"UIComponent": {
+			"Overlay_name": "Menu_1",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				500.0,
+				200.0
+			],
+			"size": [
+				200.0,
+				200.0
+			],
+			"textureid": [
+				10640027270492504069,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
+	"12": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				1122364430668251137,
+				3711223656383638553
+			],
+			"event_hover": "i am hovering",
+			"event_trigger": "i am triggering",
+			"hover_texture": [
+				9192814962916179971,
+				3711223656383638553
+			],
+			"idle_texture": [
+				14380961733646991365,
+				3711223656383638553
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "Menu_1",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				1469.0,
+				500.0
+			],
+			"size": [
+				150.0,
+				150.0
+			],
+			"textureid": [
+				14380961733646991365,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
+	"13": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 5023079758699560965
+				}
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				2098.360107421875,
+				191.8000030517578
+			],
+			"size": [
+				250.0,
+				250.0
+			],
+			"textureid": [
+				3330016569822003203,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"14": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 5599540511002984449
+				}
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				2449.800048828125,
+				141.8000030517578
+			],
+			"size": [
+				350.0,
+				350.0
+			],
+			"textureid": [
+				12149384054227566593,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"15": {
+		"TransformComponent": {
+			"position": [
+				-250.48245239257813,
+				595.2950439453125,
+				204.22714233398438
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"size": [
+				500.0,
+				500.0
+			],
+			"textureid": [
+				3601763066940784643,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
+	"2": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				8652294881921892357,
+				4431689612682600001
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Skybox",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "SkyBox"
+		},
+		"SkyboxRenderPass": null
+	},
+	"3": {
+		"MeshComponent": {
+			"meshName": "sponza"
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"4": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				0.10000000894069672,
+				0.10000000149011612
+			],
+			"albedoMap": [
+				7230819861274968067,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 0.20000000298023224,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "RedMetalSphere",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 0.800000011920929,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "Sphere"
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-330.47100830078125,
+				323.11920166015625,
+				-300.6734313964844
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"archtype": 11270566386067177473
+	},
+	"5": {
+		"LightComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"constant": 1.0,
+			"direction": [
+				0.0,
+				0.0,
+				1.0
+			],
+			"innerConeAngle": 15.0,
+			"intensity": 10000.0,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"position": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 2
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 10742246650198540289
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 11740093013966520321
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 17584542703313420289
+				},
+				{
+					"Loaded": false,
+					"ScriptGuid": 10481855918384840705
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 15968805962367582209
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				0.10000000894069672,
+				0.10000000149011612
+			],
+			"albedoMap": [
+				12382137438329683979,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 0.20000000298023224,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "RedMetalSphere",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 0.800000011920929,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "Sphere"
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-1303.4921875,
+				639.0392456054688,
+				-544.962646484375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
+	"6": {
+		"LightComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"constant": 1.0,
+			"direction": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"innerConeAngle": 12.5,
+			"intensity": 10000.0,
+			"linear": 0.8999999761581421,
+			"outerConeAngle": 17.5,
+			"position": [
+				-1351.93505859375,
+				737.1110229492188,
+				-582.885986328125
+			],
+			"quadratic": 0.03200000151991844,
+			"radius": 500.0,
+			"type": 1
+		}
+	},
+	"7": {
+		"LightComponent": {
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"constant": 1.0,
+			"direction": [
+				0.0,
+				0.0,
+				1.0
+			],
+			"innerConeAngle": 15.0,
+			"intensity": 10000.0,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"position": [
+				1240.1729736328125,
+				753.0570068359375,
+				-562.68798828125
+			],
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 2
+		}
+	},
+	"8": {
+		"ColliderComponent": {
+			"maxBounds": [
+				10.0,
+				10.0,
+				10.0
+			],
+			"minBounds": [
+				-10.0,
+				-10.0,
+				-10.0
+			],
+			"mode": 1,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						2.545584201812744,
+						2.545584201812744,
+						2.545584201812744
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.5,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": false,
+					"ScriptGuid": 17941734448800677889
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 9610224672507002881
+				}
+			]
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-1168.0958251953125,
+				626.1656494140625,
+				-373.8829345703125
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				10.0,
+				10.0,
+				10.0
+			]
+		}
+	},
+	"9": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 13060597717967175685
+				}
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				10.0,
+				10.0
+			],
+			"size": [
+				150.0,
+				150.0
+			],
+			"textureid": [
+				4470148554707877889,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	}
+}

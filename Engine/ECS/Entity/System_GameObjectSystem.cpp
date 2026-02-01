@@ -37,7 +37,7 @@
 
 //For printing instance/type_guids in error messages
 #include <inttypes.h>
-
+#include "UIComponent.h"
 
 namespace EngineFramework
 {
@@ -192,11 +192,82 @@ namespace EngineFramework
 		entity_archtype_map[entity] = archtype_guid;
 	}
 
+	std::string GameObjectSystem::SerializeSingleEntity(entt::entity e) {
+
+
+		nlohmann::json save_data{};
+
+		if (!registry.valid(e))
+			return save_data.dump(1, '\t'); // "{}"
+
+		nlohmann::json entity_save_data{};
+
+		static std::vector<entt::meta_type> archtype_components{};
+		archtype_components.clear();
+
+		// Store the associated archtype if available.
+		if (entity_archtype_map.contains(e))
+		{
+			xresource::instance_guid archtype_guid = entity_archtype_map[e];
+			std::shared_ptr<Archtype> archtype =
+				AssetManagerSystem::GetResource<Archtype>({ archtype_guid, AssetManagerSystem::ARCHTYPE_GUID });
+
+			if (archtype)
+			{
+				entity_save_data[AssetManagerSystem::ARCHTYPE] = archtype_guid.m_Value;
+
+				// Record which components belong to the archtype so they don't get duplicate serialized.
+				for (const entt::meta_any& archtype_comp : archtype->component_arr)
+				{
+					archtype_components.emplace_back(archtype_comp.type());
+				}
+			}
+		}
+
+		// Iterate over all component storages in registry; serialize those present on entity e.
+		for (auto&& comp_storage : registry.storage())
+		{
+			if (!comp_storage.second.contains(e)) continue;
+
+			entt::meta_type component_type = entt::resolve(comp_storage.second.info());
+			if (!component_type) continue;
+
+			// Only serialize components (skip registered non-component types)
+			if (component_type.traits<REGISTERED_TYPE>() == REGISTERED_TYPE::NON_COMPONENT) continue;
+
+			// Skip components that belong to the archtype (avoid duplication)
+			if (std::find(archtype_components.begin(), archtype_components.end(), component_type) != archtype_components.end())
+				continue;
+
+			nlohmann::json component_save_data{};
+
+			entt::meta_any component_data = component_type.func("get"_hs).invoke({}, e);
+
+			for (auto&& member : component_type.data())
+			{
+				SetJsonWithMetaAny(component_save_data, member.second, component_data.get(member.first));
+			}
+
+			entity_save_data[component_type.name()] = component_save_data;
+		}
+
+		if (entity_save_data.empty())
+		{
+			LOGD("[GameObjectSystem] No archtypes or components detected for entity, it will not be serialized. Was its components registered?");
+			return save_data.dump(1, '\t'); // "{}"
+		}
+
+		// Put this single entity into the top-level json, same format as your AllEntities version
+		save_data[std::to_string(entt::to_entity(e))] = entity_save_data;
+
+		return save_data.dump(1, '\t');
+	}
+
 
 	/*
 		Save gameobject instances to a specified level file using reflection.
 	*/
-	std::string GameObjectSystem::SerializeAllEntityInstances()
+	std::string GameObjectSystem::SerializeAllEntityInstances(std::unordered_set<entt::entity> except)
 	{
 		/*
 		{
@@ -236,6 +307,11 @@ namespace EngineFramework
 			if (!registry.valid(entity)) {
 				continue;
 			}
+			//do not seralise entities from the except list.
+			if (except.contains(entity)) {
+				continue;
+			}
+
 			nlohmann::json entity_save_data{};
 			static std::vector<entt::meta_type> archtype_components{};
 			archtype_components.clear();
@@ -316,12 +392,171 @@ namespace EngineFramework
 		return save_data.dump(1, '\t');
 	}
 
+	
+
+	//void GameObjectSystem::DeSerializeAllEntityInstances(const std::string& json_input)
+	//{
+	//	
+	//	nlohmann::json json_scene = nlohmann::json::parse(json_input);
+	//	/*
+	//		Deserialization process is similar to archtype.
+	//		- It is instantiated from an archtype (if none, then an entity is simply created)
+	//		- Additional component data can be read, where they are first read into a meta_any object
+	//		before its registered emplace function is called.
+	//	*/
+	//	for (auto& [key, entity_json] : json_scene.items())
+	//	{
+	//		/*
+	//			1. Instantiate from archtype, or from scratch otherwise.
+	//		*/
+	//		entt::entity entity_id = registry.create(entt::entity(std::stoul(key)));
+	//		if (entity_json.contains("archtype"))
+	//		{
+	//			xresource::instance_guid archtype_guid{ entity_json["archtype"].get<uint64_t>() };
+	//			std::shared_ptr<Archtype> archtype = AssetManagerSystem::GetResource<Archtype>({ archtype_guid, AssetManagerSystem::ARCHTYPE_GUID });
+	//			if (archtype)
+	//			{
+	//				entity_id = GameObjectSystem::Instantiate(archtype, archtype_guid, entity_id);
+	//			}
+	//			else
+	//			{
+	//				//Fail silently, in the case where archtype is not loaded and/or is deleted. Instance is loaded without the archtype.
+	//				LOGE("[GameObjectSystem] Deserialization: No archtype loaded for %" PRIu64 "guid, instance cannot be instantiated from it", archtype_guid.m_Value);
+	//			}
+	//		}
+	//		//Else if there's no archtype, then don't do anything and start off with no components.
+
+	//		//Iterate over additional components for that entity and emplace them into the entity (registry).
+	//		for (auto& [comp_name, comp_data_json] : entity_json.items())
+	//		{
+	//			//Already read the archtype. it's not a component to emplace.
+	//			if (comp_name == "archtype") continue;
+
+	//			if (comp_name == "AudioComponent")
+	//			{
+	//				NormalizeAudioComponentJson(comp_data_json);
+	//			}
+
+	//			//Creation of component.
+	//			entt::meta_type comp_type = entt::resolve(GetID(comp_name));
+	//			entt::meta_any comp_data = comp_type.construct();
+
+	//			//Iterate over component data members and set values. If empty it does nothing.
+	//			for (auto& [data_name, data_val_json] : comp_data_json.items())
+	//			{
+	//				entt::id_type data_type_id = GetID(data_name);
+	//				entt::meta_data data_type = comp_type.data(data_type_id);
+	//				//Ensure it is a data member. It could be a function for example.
+	//				if (!data_type) continue;
+	//				//Set the data member.
+	//				SetMetaAnyWithJson(comp_data, data_type, data_val_json);
+	//			}
+
+	//			//==Emplace component data into map, by calling the "emplace" function registered with this type. All components must have emplace function.
+	//			auto func = comp_data.type().func("emplace"_hs);
+	//			if (!func)
+	//			{
+	//				throw std::runtime_error((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp_data.type().name()).c_str());
+	//			}
+	//			entt::meta_any success = func.invoke({}, entity_id, static_cast<const void*>(&comp_data));
+	//			//Duplicate component already present inside.
+	//			if (!success.cast<bool>())
+	//			{
+	//				//Silently give an error. 
+	//				LOGE("[GameObjectSystem] Duplicate component %s already present in Instance, will be ignored", comp_data.type().name());
+	//			}
+	//		}
+
+	//		
+	//	}
+	//	
+	//	//LOGD("Successfully Deserialized %s", json_input.c_str());
+	//}
+
+	void GameObjectSystem::DeSerializeAllEntityInstances(const std::string& json_input)
+	{
+		nlohmann::json json_scene = nlohmann::json::parse(json_input);
+		/*
+		  Deserialization process is similar to archtype.
+		  - It is instantiated from an archtype (if none, then an entity is simply created)
+		  - Additional component data can be read, where they are first read into a meta_any object
+		  before its registered emplace function is called.
+		*/
+		for (auto& [key, entity_json] : json_scene.items())
+		{
+			/*
+			  1. Instantiate from archtype, or from scratch otherwise.
+			*/
+			entt::entity entity_id = registry.create(entt::entity(std::stoul(key)));
+			if (entity_json.contains("archtype"))
+			{
+				xresource::instance_guid archtype_guid{ entity_json["archtype"].get<uint64_t>() };
+				std::shared_ptr<Archtype> archtype = AssetManagerSystem::GetResource<Archtype>({ archtype_guid, AssetManagerSystem::ARCHTYPE_GUID });
+				if (archtype)
+				{
+					entity_id = GameObjectSystem::Instantiate(archtype, archtype_guid, entity_id);
+				}
+				else
+				{
+					//Fail silently, in the case where archtype is not loaded and/or is deleted. Instance is loaded without the archtype.
+					LOGE("[GameObjectSystem] Deserialization: No archtype loaded for %" PRIu64 "guid, instance cannot be instantiated from it", archtype_guid.m_Value);
+				}
+			}
+			//Else if there's no archtype, then don't do anything and start off with no components.
+
+			//Iterate over additional components for that entity and emplace them into the entity (registry).
+			for (auto& [comp_name, comp_data_json] : entity_json.items())
+			{
+				//Already read the archtype. it's not a component to emplace.
+				if (comp_name == "archtype") continue;
+
+				if (comp_name == "AudioComponent")
+				{
+					NormalizeAudioComponentJson(comp_data_json);
+				}
+
+				//Creation of component.
+				entt::meta_type comp_type = entt::resolve(GetID(comp_name));
+				entt::meta_any comp_data = comp_type.construct();
+
+				//Iterate over component data members and set values. If empty it does nothing.
+				for (auto& [data_name, data_val_json] : comp_data_json.items())
+				{
+					entt::id_type data_type_id = GetID(data_name);
+					entt::meta_data data_type = comp_type.data(data_type_id);
+					//Ensure it is a data member. It could be a function for example.
+					if (!data_type) continue;
+					//Set the data member.
+					SetMetaAnyWithJson(comp_data, data_type, data_val_json);
+				}
+
+				//==Emplace component data into map, by calling the "emplace" function registered with this type. All components must have emplace function.
+				auto func = comp_data.type().func("emplace"_hs);
+				if (!func)
+				{
+					throw std::runtime_error((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp_data.type().name()).c_str());
+				}
+				entt::meta_any success = func.invoke({}, entity_id, static_cast<const void*>(&comp_data));
+				//Duplicate component already present inside.
+				if (!success.cast<bool>())
+				{
+					//Silently give an error. 
+					LOGE("[GameObjectSystem] Duplicate component %s already present in Instance, will be ignored", comp_data.type().name());
+				}
+			}
+
+		}
+		//LOGD("Successfully Deserialized %s", json_input.c_str());
+	}
+
+
 	/*
 		Read gameobject instances from a specified level file using reflection.
 		Before this, all archtypes need to be read.
 	*/
-	void GameObjectSystem::DeSerializeAllEntityInstances(const std::string& json_input)
+	void GameObjectSystem::DeSerializeAllEntityInstances(const std::string& json_input, std::vector<entt::entity> &return_list)
 	{
+		std::vector<entt::entity> list;
 		nlohmann::json json_scene = nlohmann::json::parse(json_input);
 		/*
 			Deserialization process is similar to archtype.
@@ -392,9 +627,29 @@ namespace EngineFramework
 				}
 			}
 
+			list.emplace_back(entity_id);
+
 		}
+		return_list = list;
 		//LOGD("Successfully Deserialized %s", json_input.c_str());
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	entt::entity GameObjectSystem::Instantiate(std::shared_ptr<Archtype> archtype, const xresource::instance_guid& archtype_instance_guid, entt::entity entity)
 	{

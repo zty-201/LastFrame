@@ -62,6 +62,8 @@ namespace EngineFramework
 	{
 		UNREFERENCED_PARAMETER(delta_time);
 
+		if (!application)return;
+
 		//only check for this if the editor state is not true
 		if (!application->Get_Editor_State()) {
 			//std::cout << "yo\n";

@@ -37,6 +37,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "System_GameObjectSystem.hpp"
 #include "InputManager.hpp"
 #include "AssetWindow.hpp"
+#include "UISystem.hpp"
 namespace EngineFramework
 {
     Save::Save() {
@@ -122,11 +123,13 @@ namespace EngineFramework
 
         if (!save_Archtypes()) return false;
         if (!save_Instances(filename)) return false;
+        
 
         InputManager::GetInstance().key_mapping_codegen();
         InputManager::GetInstance().seralise();
         InputManager::GetInstance().key_mapping_codegen_script();
         AssetWindow::GetInstance().seralise();
+        
 
         return true;
 
@@ -162,6 +165,8 @@ namespace EngineFramework
 
     bool Save::save_Instances(std::string filename) {
 
+        std::unordered_set <entt::entity> except_list = 
+            UI_System::GetInstance().Seralise_AllMenus();
         std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scenes/" + filename;
         std::ofstream Out_File(path);
 
@@ -174,7 +179,7 @@ namespace EngineFramework
 
         */
 
-        std::string json = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances();
+        std::string json = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances(except_list);
 
         ss << json;
 

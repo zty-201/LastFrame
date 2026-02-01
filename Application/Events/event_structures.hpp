@@ -21,5 +21,14 @@ struct Event_Level_Editor_Simulation
 	bool is_enabled{};
 };
 
+struct Button_Event {
+	std::string Event_Name;
+};
+
+struct Menu_Event {
+	std::string Menu_Name;
+	std::string Event_Name;
+};
+
 
 #endif

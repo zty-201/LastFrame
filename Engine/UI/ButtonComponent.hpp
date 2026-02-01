@@ -11,17 +11,20 @@
 
 
 enum BUTTON_STATE {
-    IDLE, HOVER, CLICKED, RELEASED
+    NO_STATE, IDLE, HOVER, CLICKED, RELEASED, TRIGGERED
 };
 
 struct ButtonComponent {
 
-    BUTTON_STATE button_state;
+    BUTTON_STATE curr_button_state;
+    BUTTON_STATE prev_button_state;
 
-    std::string idle_texture;
-    std::string hover_texture;
-    std::string clicked_texture;
-    std::string event; //name of the event, maybe theres a better way insteaad of string?
+    xresource::full_guid idle_texture;
+    xresource::full_guid hover_texture;
+    xresource::full_guid clicked_texture;
+    std::string event_trigger;
+    std::string event_hover;
+    
 
     bool is_hover;
     bool is_clicked;
@@ -34,7 +37,7 @@ struct ButtonComponent {
     * pause the clickability when simulation is not running
     * only in editor (debug)
     */
-    bool is_clickable;
+    bool is_functioning;
 #endif
 
 

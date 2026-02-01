@@ -25,7 +25,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
-
+#include "UISystem.hpp"
 #endif
 
 #include "AssetManager.hpp"
@@ -105,6 +105,24 @@ namespace EngineFramework
             // Keep it as Down (held)
             keyStates[key] = KeyState::Down;
             break;
+        }
+
+
+        if (action == GLFW_PRESS && key == GLFW_KEY_U) {
+
+            UI_System::GetInstance().displayMenu("Menu_1");
+
+        }else if (action == GLFW_PRESS && key == GLFW_KEY_I) {
+            UI_System::GetInstance().displayMenu("Menu_2");
+        }
+        else if (action == GLFW_PRESS && key == GLFW_KEY_O) {
+            UI_System::GetInstance().closeMenu();
+        }
+        else if (action == GLFW_PRESS && key == GLFW_KEY_P) {
+            UI_System::GetInstance().closeMenu("Menu_1");
+        }
+        else if (action == GLFW_PRESS && key == GLFW_KEY_L) {
+            UI_System::GetInstance().closeAllMenu();
         }
     }
 

@@ -23,6 +23,8 @@
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
 #include "MetaInspector.hpp"
 #include "NameComponent.h"
+#include "ButtonComponent.hpp"
+
 
 /*
 	This is for third-party types.
@@ -563,6 +565,25 @@ namespace EngineFramework
 			.func<&Getter<TransformComponent>::GetComponent>("get")
 			.func<&GetRef<TransformComponent>>("get_ref");
 
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+		
+		// === Register TransformComponent ===
+		entt::meta_factory<ButtonComponent>()
+			.type("ButtonComponent")
+			.data<&ButtonComponent::clicked_texture>("clicked_texture")
+			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
+			.data<&ButtonComponent::hover_texture>("hover_texture")
+			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
+			.data<&ButtonComponent::idle_texture>("idle_texture")
+			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
+			.data<&ButtonComponent::event_hover>("event_hover")
+			.data<&ButtonComponent::event_trigger>("event_trigger")
+			.func<&Emplacer<ButtonComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<ButtonComponent>::RemoveComponent>("remove")
+			.func<&Getter<ButtonComponent>::GetComponent>("get")
+			.func<&GetRef<ButtonComponent>>("get_ref");
+#endif	
 		// === Register MeshComponent ===
 		entt::meta_factory<MeshComponent>()
 			.type("MeshComponent")
@@ -822,6 +843,9 @@ namespace EngineFramework
 			.data<&UIComponent::visible>("visible")
 			.data<&UIComponent::luminance>("luminance")
 			.data<&UIComponent::layer>("layer")
+			.data<&UIComponent::Overlay_name>("Overlay_name")
+			.data<&UIComponent::event_received>("event_received")
+			.data<&UIComponent::hide_first>("hide_first")
 			.func<&Emplacer<UIComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<UIComponent>::RemoveComponent>("remove")
 			.func<&Getter<UIComponent>::GetComponent>("get")

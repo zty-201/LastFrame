@@ -550,6 +550,27 @@ namespace EngineFramework
         LOGI("Screen closed");
     }
 
+    glm::vec2 Screen::GetMouseInSceneUI() const {
+
+        const auto [mxD, myD] = InputManager::GetInstance().GetMousePosition();
+        const float mx = static_cast<float>(mxD);
+        const float my = static_cast<float>(myD);
+
+        float localX = mx - screen_pos.x;
+        float localY = my - screen_pos.y;
+
+        if (localX < 0.0f || localY < 0.0f ||
+            localX > available_size.x || localY > available_size.y)
+        {
+            return { -1.0f, -1.0f };
+        }
+
+        float uiY = available_size.y - localY;
+
+        return { localX, uiY };
+
+    }
+
     void Screen::display_screen() {
 
         screen_pos = ImGui::GetCursorScreenPos();

@@ -52,7 +52,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 // Script hot reloading
 #include "Script.hpp" // Engine::ScriptSystem::RequestReloadAll / RequestReloadEntity
-
+#include "MenuManager.hpp"
 #include "PropertyManager.hpp"
 #include "GameplayKeyManager.hpp"
 
@@ -275,7 +275,8 @@ namespace EngineFramework
 		addFeature("ModelManager", std::make_unique<ModelManager>());//
 		addFeature("Gameplay_KeyManager", std::make_unique<Gameplay_KeyManager>());
 		addFeature("PropertyManager", std::make_unique<LFeature_PropertyManager>(), true);
-		
+		addFeature("MenuManager", std::make_unique<MenuManager>());
+		//
 
 		SceneManager::GetInstance().ScanScenes(AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scenes");//
 
@@ -342,6 +343,9 @@ namespace EngineFramework
 					ImGui::Separator();*/
 					ImGui::MenuItem("Open Scene", NULL, &featureFlag("SceneManager"));
 					ImGui::Separator();
+					ImGui::MenuItem("Menu Manager", NULL, &featureFlag("MenuManager"));
+					ImGui::Separator();
+
 					if (ImGui::MenuItem("Save", NULL)) {
 						Save::GetInstance().SAVEFILE(SceneManager::GetInstance().GetCurrentScene());
 					}
@@ -431,6 +435,8 @@ namespace EngineFramework
 
 					ImGui::EndMenu();
 				}
+
+				
 				//if (ImGui::BeginMenu("Property Manager")) {
 				//	bool* enabledPtr = nullptr;
 

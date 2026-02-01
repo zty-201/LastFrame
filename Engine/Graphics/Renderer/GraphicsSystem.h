@@ -74,6 +74,12 @@ namespace EngineFramework
 
         //==Camera Manipulation
 
+        
+        glm::vec2 Getscreen() {
+
+            return screen;
+        };
+
         //Returns the active camera, or sets a random camera as active if none are. Returns entt::null if no camera found.
         entt::entity GetFirstActiveCamera()
         {
