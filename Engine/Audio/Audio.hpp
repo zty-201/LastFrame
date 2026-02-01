@@ -26,6 +26,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #ifndef DISABLE_FMOD
 #include "fmod.hpp"
 #include "fmod_errors.h"
+#include "fmod_dsp.h"
 #include "SoundAsset.hpp"
 #endif
 
@@ -166,6 +167,8 @@ namespace EngineFramework
         FMOD::ChannelGroup* m_groupSFX = nullptr;
         FMOD::ChannelGroup* m_groupUI = nullptr;
         FMOD::ChannelGroup* m_groupAmbience = nullptr;
+
+        FMOD::DSP* m_ambienceLowpass = nullptr;
 
 #else
         void* m_system = nullptr;

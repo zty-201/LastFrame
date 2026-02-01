@@ -82,6 +82,7 @@ namespace EngineFramework
 	AudioSystem::~AudioSystem()
 	{
 #ifndef DISABLE_FMOD
+		if (m_ambienceLowpass) { m_ambienceLowpass->release(); m_ambienceLowpass = nullptr; }
 		if (m_groupAmbience) { m_groupAmbience->release(); m_groupAmbience = nullptr; }
 		if (m_groupUI) { m_groupUI->release();       m_groupUI = nullptr; }
 		if (m_groupBGM) { m_groupBGM->release();    m_groupBGM = nullptr; }
@@ -120,17 +121,62 @@ namespace EngineFramework
 		r = m_system->createChannelGroup("Ambience", &m_groupAmbience); logFmodError(r, "createChannelGroup(Ambience)");   if (r != FMOD_OK) return;
 
 		// Attach to master
-		m_groupMaster->addGroup(m_groupBGM);
-		m_groupMaster->addGroup(m_groupSFX);
-		m_groupMaster->addGroup(m_groupUI);
-		m_groupMaster->addGroup(m_groupAmbience);
+		if (m_groupMaster)
+		{
+			if (m_groupBGM)
+			{
+				FMOD_RESULT rr = m_groupMaster->addGroup(m_groupBGM);
+				logFmodError(rr, "Master->addGroup(BGM)");
+			}
+			if (m_groupSFX)
+			{
+				FMOD_RESULT rr = m_groupMaster->addGroup(m_groupSFX);
+				logFmodError(rr, "Master->addGroup(SFX)");
+			}
+			if (m_groupUI)
+			{
+				FMOD_RESULT rr = m_groupMaster->addGroup(m_groupUI);
+				logFmodError(rr, "Master->addGroup(UI)");
+			}
+			if (m_groupAmbience)
+			{
+				FMOD_RESULT rr = m_groupMaster->addGroup(m_groupAmbience);
+				logFmodError(rr, "Master->addGroup(Ambience)");
+			}
+		}
 
 		// Default volumes
-		m_groupMaster->setVolume(1.0f);
-		m_groupBGM->setVolume(1.0f);
-		m_groupSFX->setVolume(1.0f);
-		m_groupUI->setVolume(1.0f);
-		m_groupAmbience->setVolume(1.0f);
+		if (m_groupMaster)   m_groupMaster->setVolume(1.0f);
+		if (m_groupBGM)      m_groupBGM->setVolume(1.0f);
+		if (m_groupSFX)      m_groupSFX->setVolume(1.0f);
+		if (m_groupUI)       m_groupUI->setVolume(1.0f);
+		if (m_groupAmbience) m_groupAmbience->setVolume(1.0f);
+
+		// Ambience LOWPASS DSP (Indoor muffling)
+		if (m_system && m_groupAmbience)
+		{
+			r = m_system->createDSPByType(FMOD_DSP_TYPE_LOWPASS, &m_ambienceLowpass);
+			logFmodError(r, "createDSPByType(LOWPASS)");
+
+			if (r == FMOD_OK && m_ambienceLowpass)
+			{
+				r = m_groupAmbience->addDSP(0, m_ambienceLowpass);
+				logFmodError(r, "Ambience addDSP(LOWPASS)");
+
+				if (r == FMOD_OK)
+				{
+					(void)m_ambienceLowpass->setParameterFloat(
+						FMOD_DSP_LOWPASS_CUTOFF, 20000.0f); // outdoors
+					(void)m_ambienceLowpass->setBypass(true);
+				}
+				else
+				{
+					m_ambienceLowpass->release();
+					m_ambienceLowpass = nullptr;
+				}
+			}
+		}
+
 #endif
 
 		m_initialized = true;
