@@ -12603,6 +12603,15 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 12745979154665619457
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -13737,6 +13746,15 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 2953913315913400323
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -14709,6 +14727,25 @@
 		}
 	},
 	"221": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						15134610902839312391,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Checkpoint1",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				24.41899871826172,
@@ -14742,6 +14779,15 @@
 					],
 					"sphereRadius": 0.5,
 					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16045129764821991425
 				}
 			]
 		},
@@ -14993,6 +15039,15 @@
 					],
 					"sphereRadius": 0.5,
 					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 4106834820520247297
 				}
 			]
 		},
@@ -20139,6 +20194,15 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 12745979154665619457
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -21515,7 +21579,7 @@
 			"position": [
 				187.42404174804688,
 				0.0,
-				95.0
+				94.0414047241211
 			],
 			"rotation": [
 				0.0,
