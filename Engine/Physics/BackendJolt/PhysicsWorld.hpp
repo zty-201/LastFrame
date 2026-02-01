@@ -209,7 +209,12 @@ public:
     void SetLinearVelocity(entt::entity entity, const glm::vec3& velocity);
     void AddForce(entt::entity entity, const glm::vec3& force);
 
-    bool Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& putHit);
+#if defined(PLATFORM_WINDOWS) || defined(DEBUG)
+    bool RaycastAgainstColliders(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit);
+#endif
+    bool Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit);
+
+    bool AreEntitiesColliding(entt::entity entityA, entt::entity entityB);
 
     /*************************************************
     * This function applies an impulse force on a singular entity.

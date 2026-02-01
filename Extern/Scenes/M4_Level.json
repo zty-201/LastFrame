@@ -75,7 +75,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "ENV_Floor"
@@ -234,27 +235,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -266,7 +267,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_41"
@@ -309,9 +311,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -359,27 +361,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -391,7 +393,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_42"
@@ -434,9 +437,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -484,27 +487,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -516,7 +519,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_43"
@@ -559,9 +563,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -609,39 +613,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_38"
@@ -1049,39 +1054,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				2566718094223622297,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				3719639598830469275,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				10637168626471551133,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				18131158406416056479,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				6601943360347586721,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "stairs_left_handle"
+			"meshName": "stairs_left_handle",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Stairs_01"
@@ -1174,27 +1180,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -1206,7 +1212,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_44"
@@ -1249,9 +1256,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -1299,27 +1306,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -1331,7 +1338,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_45"
@@ -1374,9 +1382,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -1424,27 +1432,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -1456,7 +1464,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_46"
@@ -1499,9 +1508,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -1549,27 +1558,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -1581,7 +1590,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_47"
@@ -1624,9 +1634,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -1674,27 +1684,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7710321449664430197,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				7710321449664430199,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				12322007468091818105,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				13474928972698665083,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				15204311229608935549,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -1706,7 +1716,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "office_table_broken"
+			"meshName": "office_table_broken",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Table"
@@ -1799,27 +1810,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -1831,7 +1842,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_05"
@@ -1874,9 +1886,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -1924,39 +1936,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_39"
@@ -2049,39 +2062,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_40"
@@ -2174,39 +2188,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_41"
@@ -2299,39 +2314,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_42"
@@ -2370,7 +2386,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -2424,39 +2440,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_43"
@@ -2495,7 +2512,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -2549,27 +2566,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -2581,7 +2598,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_04"
@@ -2674,39 +2692,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_44"
@@ -2799,39 +2818,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_45"
@@ -2924,39 +2944,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_46"
@@ -3049,39 +3070,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_47"
@@ -3210,39 +3232,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_48"
@@ -3335,39 +3358,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_49"
@@ -3460,39 +3484,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_50"
@@ -3531,7 +3556,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-90.0,
 				0.0
 			],
 			"scale": [
@@ -3585,39 +3610,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_51"
@@ -3656,7 +3682,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-90.0,
 				0.0
 			],
 			"scale": [
@@ -3710,27 +3736,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -3742,7 +3768,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_48"
@@ -3785,9 +3812,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -3835,27 +3862,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -3867,7 +3894,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_49"
@@ -3910,9 +3938,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -3960,27 +3988,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -3992,7 +4020,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_50"
@@ -4035,9 +4064,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -4085,27 +4114,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -4117,7 +4146,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_51"
@@ -4160,9 +4190,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -4210,27 +4240,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -4242,7 +4272,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_52"
@@ -4285,9 +4316,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -4335,27 +4366,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -4367,7 +4398,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_53"
@@ -4410,9 +4442,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -4515,27 +4547,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -4547,7 +4579,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_54"
@@ -4590,9 +4623,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -4640,27 +4673,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -4672,7 +4705,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_55"
@@ -4715,9 +4749,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -4765,27 +4799,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -4797,7 +4831,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_56"
@@ -4840,9 +4875,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -4890,27 +4925,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -4922,7 +4957,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_57"
@@ -4965,9 +5001,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -5015,27 +5051,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -5047,7 +5083,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_58"
@@ -5090,9 +5127,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -5140,27 +5177,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -5172,7 +5209,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_59"
@@ -5215,9 +5253,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -5265,27 +5303,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -5297,7 +5335,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_60"
@@ -5340,9 +5379,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -5390,27 +5429,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -5422,7 +5461,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_61"
@@ -5465,9 +5505,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -5515,27 +5555,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -5547,7 +5587,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_62"
@@ -5590,9 +5631,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -5640,27 +5681,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -5672,7 +5713,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_63"
@@ -5715,9 +5757,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -5801,27 +5843,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -5833,7 +5875,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_64"
@@ -5876,9 +5919,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -5926,27 +5969,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -5958,7 +6001,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_65"
@@ -6001,9 +6045,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -6051,27 +6095,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -6083,7 +6127,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_66"
@@ -6126,9 +6171,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -6176,27 +6221,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1875820171660410881,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				8793349199301492739,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				722898667053563909,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				722898667053563911,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				9369809951604916233,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -6208,7 +6253,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_04"
@@ -6301,27 +6347,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -6333,7 +6379,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_67"
@@ -6376,9 +6423,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -6426,27 +6473,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -6458,7 +6505,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_68"
@@ -6501,9 +6549,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -6551,27 +6599,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -6583,7 +6631,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_69"
@@ -6626,9 +6675,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -6676,27 +6725,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -6708,7 +6757,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_70"
@@ -6751,9 +6801,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -6801,27 +6851,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -6833,7 +6883,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_71"
@@ -6876,9 +6927,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -6926,27 +6977,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -6958,7 +7009,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_72"
@@ -7001,9 +7053,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -7051,27 +7103,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -7083,7 +7135,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_06"
@@ -7126,9 +7179,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -7176,27 +7229,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -7208,7 +7261,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_73"
@@ -7251,9 +7305,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -7301,39 +7355,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				15825315397202362561,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				5449021855740739779,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				7178404112651010245,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				8907786369561280711,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				3719639598830469321,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_window"
+			"meshName": "wall_window",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_52"
@@ -7372,7 +7427,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				90.0,
 				0.0
 			],
 			"scale": [
@@ -7426,39 +7481,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_53"
@@ -7497,7 +7553,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-90.0,
 				0.0
 			],
 			"scale": [
@@ -7551,39 +7607,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_54"
@@ -7622,7 +7679,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -7676,39 +7733,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_55"
@@ -7747,7 +7805,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -7801,39 +7859,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_56"
@@ -7872,7 +7931,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -7926,39 +7985,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_57"
@@ -7997,7 +8057,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -8051,27 +8111,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -8083,7 +8143,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_58"
@@ -8122,7 +8183,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -8176,27 +8237,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -8208,7 +8269,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_59"
@@ -8247,7 +8309,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -8301,27 +8363,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -8333,7 +8395,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_60"
@@ -8372,7 +8435,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -8426,27 +8489,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -8458,7 +8521,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_07"
@@ -8501,9 +8565,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -8551,27 +8615,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -8583,7 +8647,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_61"
@@ -8676,27 +8741,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -8708,7 +8773,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_62"
@@ -8801,27 +8867,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -8833,7 +8899,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_63"
@@ -8940,8 +9007,8 @@
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				11745546715788394629,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
@@ -8958,7 +9025,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "shelf_storeroom"
+			"meshName": "shelf_storeroom",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Shelf_05"
@@ -9051,39 +9119,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_64"
@@ -9122,7 +9191,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -9176,39 +9245,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_65"
@@ -9301,39 +9371,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_66"
@@ -9426,39 +9497,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_67"
@@ -9551,39 +9623,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_68"
@@ -9676,39 +9749,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_69"
@@ -9801,27 +9875,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -9833,7 +9907,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_08"
@@ -9876,9 +9951,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -9926,39 +10001,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_70"
@@ -9997,7 +10073,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -10051,39 +10127,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_71"
@@ -10122,7 +10199,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -10176,39 +10253,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_72"
@@ -10247,7 +10325,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -10301,39 +10379,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_73"
@@ -10372,7 +10451,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -10426,27 +10505,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -10458,7 +10537,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_74"
@@ -10501,9 +10581,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -10551,27 +10631,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -10583,7 +10663,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_75"
@@ -10618,7 +10699,7 @@
 			"position": [
 				-1000.0,
 				520.0,
-				870.0
+				827.5849609375
 			],
 			"rotation": [
 				0.0,
@@ -10626,9 +10707,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -10676,27 +10757,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -10708,7 +10789,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_76"
@@ -10743,7 +10825,7 @@
 			"position": [
 				-800.0,
 				520.0,
-				800.0
+				827.44384765625
 			],
 			"rotation": [
 				0.0,
@@ -10751,9 +10833,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -10801,27 +10883,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -10833,7 +10915,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_77"
@@ -10868,7 +10951,7 @@
 			"position": [
 				-600.0,
 				520.0,
-				800.0
+				827.8077392578125
 			],
 			"rotation": [
 				0.0,
@@ -10876,9 +10959,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -10926,27 +11009,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -10958,7 +11041,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_78"
@@ -10993,7 +11077,7 @@
 			"position": [
 				-400.0,
 				520.0,
-				800.0
+				828.8206176757813
 			],
 			"rotation": [
 				0.0,
@@ -11001,9 +11085,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -11051,39 +11135,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_74"
@@ -11122,7 +11207,7 @@
 			],
 			"rotation": [
 				0.0,
-				90.0,
+				-90.0,
 				0.0
 			],
 			"scale": [
@@ -11176,27 +11261,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -11208,7 +11293,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_09"
@@ -11251,9 +11337,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -11301,39 +11387,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_75"
@@ -11372,7 +11459,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-90.0,
 				0.0
 			],
 			"scale": [
@@ -11426,39 +11513,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_76"
@@ -11497,7 +11585,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-90.0,
 				0.0
 			],
 			"scale": [
@@ -11551,39 +11639,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_77"
@@ -11708,7 +11797,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_78"
@@ -11801,39 +11891,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				260875085009928325,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				3719639598830469255,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				17554697654112632969,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				6025482608044163211,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				11790090131078398093,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doorframe"
+			"meshName": "Room_door_frame",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Level2_DoorFrame"
@@ -11866,7 +11957,7 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-298.1236877441406,
+				-307.7841491699219,
 				510.090576171875,
 				790.5121459960938
 			],
@@ -11926,39 +12017,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1413796589616775311,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				12366550883381821585,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				16978236901809209491,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15248854644898939029,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				4296100351133892759,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_door"
+			"meshName": "Room_door_",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Level2_Door"
@@ -11991,7 +12083,7 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-301.35302734375,
+				-314.1912841796875,
 				510.090576171875,
 				787.5435791015625
 			],
@@ -12345,39 +12437,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				2566718094223622297,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				3719639598830469275,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				10637168626471551133,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				18131158406416056479,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				6601943360347586721,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "stairs_left_float"
+			"meshName": "stairs_left_handle",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Stairs_02"
@@ -12502,7 +12595,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "office_chair_broken"
+			"meshName": "office_chair_broken",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Chair"
@@ -12627,7 +12721,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_1"
+			"meshName": "cabinet_tall_break_1",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_01"
@@ -12752,7 +12847,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_short_break_1"
+			"meshName": "cabinet_short_break_1",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_02"
@@ -12845,27 +12941,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -12877,7 +12973,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_10"
@@ -12920,9 +13017,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -13002,7 +13099,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_3"
+			"meshName": "cabinet_tall_break_3",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_03"
@@ -13109,8 +13207,8 @@
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				14627850477265403921,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
@@ -13127,7 +13225,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_crib"
+			"meshName": "baby_crib",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_BabyCradle"
@@ -13252,7 +13351,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_1"
+			"meshName": "cabinet_tall_break_1",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_05"
@@ -13377,7 +13477,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_3"
+			"meshName": "cabinet_tall_break_3",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_06"
@@ -13502,7 +13603,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_3"
+			"meshName": "cabinet_tall_break_3",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_04"
@@ -13627,7 +13729,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_1"
+			"meshName": "cabinet_tall_break_1",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_08"
@@ -13752,7 +13855,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_3"
+			"meshName": "cabinet_tall_break_3",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_07"
@@ -13877,7 +13981,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_01"
@@ -14002,7 +14107,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_02"
@@ -14127,7 +14233,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_03"
@@ -14216,7 +14323,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "SkyBox"
+			"meshName": "SkyBox",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Skybox"
@@ -14267,27 +14375,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -14299,7 +14407,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_11"
@@ -14342,9 +14451,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -14424,7 +14533,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_04"
@@ -14549,7 +14659,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_05"
@@ -14674,7 +14785,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_06"
@@ -14799,7 +14911,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_07"
@@ -14924,7 +15037,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_08"
@@ -15049,7 +15163,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_01"
@@ -15174,7 +15289,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_02"
@@ -15299,7 +15415,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_03"
@@ -15424,7 +15541,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_04"
@@ -15549,7 +15667,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_05"
@@ -15642,27 +15761,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -15674,7 +15793,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_12"
@@ -15717,9 +15837,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -15799,7 +15919,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_06"
@@ -15924,7 +16045,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_07"
@@ -16049,7 +16171,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_08"
@@ -16174,7 +16297,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_monkey"
+			"meshName": "toy_monkey",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_Crib"
@@ -16299,7 +16423,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "puzzle_mat"
+			"meshName": "puzzle_mat",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_PuzzleMat"
@@ -16333,7 +16458,7 @@
 		"TransformComponent": {
 			"position": [
 				356.3226318359375,
-				13.33376693725586,
+				14.379150390625,
 				-480.25927734375
 			],
 			"rotation": [
@@ -16424,7 +16549,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "kid_sofa"
+			"meshName": "kid_sofa",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidSofa"
@@ -16531,8 +16657,8 @@
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				14627850477265403921,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
@@ -16549,7 +16675,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_dresser"
+			"meshName": "baby_dresser",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_BabyDresser"
@@ -16674,7 +16801,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wallshelf_cute"
+			"meshName": "wallshelf_cute",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_WallShelf_01"
@@ -16799,7 +16927,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wallshelf_cute"
+			"meshName": "wallshelf_cute",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_WallShelf_02"
@@ -16892,27 +17021,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -16924,7 +17053,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_13"
@@ -16967,9 +17097,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -17049,7 +17179,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wallshelf_cute"
+			"meshName": "wallshelf_cute",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_WallShelf_03"
@@ -17174,7 +17305,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "rocking_horse"
+			"meshName": "rocking_horse",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Horse"
@@ -17298,7 +17430,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wallshelf_cute"
+			"meshName": "wallshelf_cute",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_WallShelf_04"
@@ -17423,7 +17556,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "music_box"
+			"meshName": "music_box",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_MusicBox"
@@ -17547,7 +17681,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "canteen_table_adult"
+			"meshName": "canteen_table_adult",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_Table_01"
@@ -17671,7 +17806,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "canteen_table_adult"
+			"meshName": "canteen_table_adult",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_Table_02"
@@ -17795,7 +17931,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "canteen_table_adult"
+			"meshName": "canteen_table_adult",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_Table_03"
@@ -17919,7 +18056,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "canteen_table_adult"
+			"meshName": "canteen_table_adult",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_Table_04"
@@ -18043,7 +18181,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "shelf_storeroom"
+			"meshName": "shelf_storeroom",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Shelf_01"
@@ -18168,7 +18307,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "shelf_storeroom"
+			"meshName": "shelf_storeroom",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Shelf_02"
@@ -18261,27 +18401,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -18293,10 +18433,11 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Wall_01"
+			"name": "wall_01"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -18418,7 +18559,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "shelf_storeroom"
+			"meshName": "shelf_storeroom",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Shelf_03"
@@ -18543,7 +18685,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "shelf_storeroom"
+			"meshName": "shelf_storeroom",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Shelf_04"
@@ -18636,27 +18779,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -18668,7 +18811,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_78"
@@ -18782,27 +18926,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				260875085009928325,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				3719639598830469255,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				17554697654112632969,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				6025482608044163211,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				11790090131078398093,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -18814,7 +18958,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doorframe"
+			"meshName": "Room_door_frame",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_DoorFrame"
@@ -18850,131 +18995,6 @@
 				520.0414428710938,
 				0.0,
 				697.758544921875
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				0.9999998211860657,
-				1.0,
-				0.9999998211860657
-			]
-		}
-	},
-	"234": {
-		"ColliderComponent": {
-			"maxBounds": [
-				53.677001953125,
-				128.31700134277344,
-				3.827028512954712
-			],
-			"minBounds": [
-				-46.322998046875,
-				126.31700134277344,
-				1.827028512954712
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						50.0,
-						1.0,
-						1.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.677000045776367,
-						127.31700134277344,
-						2.827028512954712
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				17203495961540657167,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				0,
-				0
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				0,
-				0
-			],
-			"name": "Floor",
-			"normalMap": [
-				0,
-				0
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "room_doortopwall"
-		},
-		"NameComponent": {
-			"name": "Storeroom_TopWall"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				520.0414428710938,
-				242.99188232421875,
-				699.4486083984375
 			],
 			"rotation": [
 				0.0,
@@ -19032,27 +19052,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1413796589616775311,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				12366550883381821585,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				16978236901809209491,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15248854644898939029,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				4296100351133892759,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -19064,7 +19084,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_door"
+			"meshName": "Room_door_",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Door"
@@ -19178,27 +19199,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				260875085009928325,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				3719639598830469255,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				17554697654112632969,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				6025482608044163211,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				11790090131078398093,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -19210,7 +19231,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doorframe"
+			"meshName": "Room_door_frame",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_DoorFrame"
@@ -19246,131 +19268,6 @@
 				-394.1650695800781,
 				0.0,
 				896.9210205078125
-			],
-			"rotation": [
-				-179.99989318847656,
-				-5.008956122765085e-06,
-				-179.99989318847656
-			],
-			"scale": [
-				0.9999998211860657,
-				1.0,
-				0.9999998211860657
-			]
-		}
-	},
-	"237": {
-		"ColliderComponent": {
-			"maxBounds": [
-				53.677001953125,
-				128.31700134277344,
-				3.827028512954712
-			],
-			"minBounds": [
-				-46.322998046875,
-				126.31700134277344,
-				1.827028512954712
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						50.0,
-						1.0,
-						1.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.677000045776367,
-						127.31700134277344,
-						2.827028512954712
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				17203495961540657167,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				0,
-				0
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				0,
-				0
-			],
-			"name": "Floor",
-			"normalMap": [
-				0,
-				0
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "room_doortopwall"
-		},
-		"NameComponent": {
-			"name": "Bedroom_TopWall"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-393.6603698730469,
-				242.99188232421875,
-				901.6241455078125
 			],
 			"rotation": [
 				-179.99989318847656,
@@ -19428,39 +19325,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.05999999865889549,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_79"
@@ -19553,39 +19451,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.05999999865889549,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_80"
@@ -19678,27 +19577,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -19710,7 +19609,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_02"
@@ -19803,27 +19703,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1413796589616775311,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				12366550883381821585,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				16978236901809209491,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15248854644898939029,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				4296100351133892759,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -19835,7 +19735,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_door"
+			"meshName": "Room_door_",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_Door"
@@ -19928,27 +19829,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1875820171660410881,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				8793349199301492739,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				722898667053563909,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				722898667053563911,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				9369809951604916233,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -19960,7 +19861,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_01"
@@ -20053,27 +19955,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1875820171660410881,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				8793349199301492739,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				722898667053563909,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				722898667053563911,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				9369809951604916233,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -20085,7 +19987,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_02"
@@ -20178,27 +20081,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1875820171660410881,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				8793349199301492739,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				722898667053563909,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				722898667053563911,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				9369809951604916233,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -20210,7 +20113,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_03"
@@ -20303,27 +20207,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1875820171660410881,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				8793349199301492739,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				722898667053563909,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				722898667053563911,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				9369809951604916233,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -20335,7 +20239,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_05"
@@ -20428,27 +20333,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1875820171660410881,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				8793349199301492739,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				722898667053563909,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				722898667053563911,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				9369809951604916233,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -20460,7 +20365,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_06"
@@ -20553,27 +20459,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1875820171660410881,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				8793349199301492739,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				722898667053563909,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				722898667053563911,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				9369809951604916233,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -20585,7 +20491,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_07"
@@ -20678,27 +20585,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1875820171660410881,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				8793349199301492739,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				722898667053563909,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				722898667053563911,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				9369809951604916233,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -20710,7 +20617,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_08"
@@ -20803,27 +20711,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1875820171660410881,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				8793349199301492739,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				722898667053563909,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				722898667053563911,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				9369809951604916233,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -20835,7 +20743,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_09"
@@ -20960,7 +20869,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "curtain"
+			"meshName": "curtain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_Curtain"
@@ -21093,27 +21003,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				8331325617244684319,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				6025482608030990369,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				15825315397189189667,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				12366550883368648741,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				4872561103424143399,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -21125,7 +21035,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_frame"
+			"meshName": "maindoor_frame",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Main_Doorframe"
@@ -21249,7 +21160,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_Chair"
@@ -21374,7 +21286,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_monkey"
+			"meshName": "toy_monkey",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_Toy"
@@ -21499,7 +21412,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_crib"
+			"meshName": "baby_crib",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BabyCrib_01"
@@ -21624,7 +21538,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_crib"
+			"meshName": "baby_crib",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BabyCrib_02"
@@ -21749,7 +21664,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_crib"
+			"meshName": "baby_crib",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BabyCrib_03"
@@ -21874,7 +21790,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_dresser"
+			"meshName": "baby_dresser",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BabyDresser_01"
@@ -21999,7 +21916,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_dresser"
+			"meshName": "baby_dresser",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BabyDresser_02"
@@ -22048,132 +21966,6 @@
 			]
 		}
 	},
-	"257": {
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				3407079227054718977,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				17198649398227697675,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				8551738113665728515,
-				3711223656383638553
-			],
-			"name": "",
-			"normalMap": [
-				6822355856755458053,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				18351570902823927817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "toy_frog"
-		},
-		"NameComponent": {
-			"name": "Frog"
-		},
-		"TransformComponent": {
-			"position": [
-				540.9343872070313,
-				15.133138656616211,
-				-380.97064208984375
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
-		}
-	},
-	"258": {
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				9041399021183254529,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				4429713002755866627,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				17688310305734606853,
-				3711223656383638553
-			],
-			"name": "",
-			"normalMap": [
-				5582634507362713607,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2123869993542172681,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "dinnerware_bowl"
-		},
-		"NameComponent": {
-			"name": "Dinner Bowl"
-		},
-		"TransformComponent": {
-			"position": [
-				-330.47100830078125,
-				332.528564453125,
-				-300.6734313964844
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
-		}
-	},
 	"26": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -22218,7 +22010,7 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				15248854644885766185,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -22250,7 +22042,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_left"
+			"meshName": "maindoor_left",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Main_DoorLeft"
@@ -22374,7 +22167,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_right"
+			"meshName": "maindoor_right",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Main_DoorRight"
@@ -22466,27 +22260,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -22498,7 +22292,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_03"
@@ -22532,7 +22327,7 @@
 		"TransformComponent": {
 			"position": [
 				-97.0,
-				0.0,
+				-0.21588134765625,
 				-200.0
 			],
 			"rotation": [
@@ -22541,9 +22336,9 @@
 				0.0
 			],
 			"scale": [
-				0.9999998211860657,
+				0.9999996423721313,
 				1.0,
-				0.9999998211860657
+				0.9999996423721313
 			]
 		}
 	},
@@ -22601,7 +22396,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_topwall"
+			"meshName": "maindoor_topwall",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Main_DoorTop"
@@ -22693,7 +22489,7 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -22725,7 +22521,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_01"
@@ -22759,7 +22556,7 @@
 		"TransformComponent": {
 			"position": [
 				0.0,
-				10.0,
+				8.475543975830078,
 				0.0
 			],
 			"rotation": [
@@ -22768,9 +22565,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -22818,27 +22615,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -22850,7 +22647,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_05"
@@ -22943,27 +22741,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -22975,7 +22773,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_06"
@@ -23089,27 +22888,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				260875085009928325,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				3719639598830469255,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				17554697654112632969,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				6025482608044163211,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				11790090131078398093,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -23121,7 +22920,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doorframe"
+			"meshName": "Room_door_frame",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Hall_DoorFrame"
@@ -23214,27 +23014,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1413796589616775311,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				12366550883381821585,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				16978236901809209491,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15248854644898939029,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				4296100351133892759,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -23246,7 +23046,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_door"
+			"meshName": "Room_door_",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Hall_Door"
@@ -23295,109 +23096,6 @@
 			]
 		}
 	},
-	"34": {
-		"ColliderComponent": {
-			"maxBounds": [
-				-3.4028234663852886e+38,
-				-3.4028234663852886e+38,
-				-3.4028234663852886e+38
-			],
-			"minBounds": [
-				3.4028234663852886e+38,
-				3.4028234663852886e+38,
-				3.4028234663852886e+38
-			],
-			"mode": 0,
-			"shapes": []
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				17203495961540657167,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				0,
-				0
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				0,
-				0
-			],
-			"name": "Floor",
-			"normalMap": [
-				0,
-				0
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "room_doortopwall"
-		},
-		"NameComponent": {
-			"name": "Hall_DoorTop"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				100.0,
-				243.0,
-				-400.0
-			],
-			"rotation": [
-				0.0,
-				89.9999771118164,
-				0.0
-			],
-			"scale": [
-				0.9999998211860657,
-				1.0,
-				0.9999998211860657
-			]
-		}
-	},
 	"35": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -23442,27 +23140,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -23474,7 +23172,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_14"
@@ -23517,9 +23216,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -23567,27 +23266,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -23599,7 +23298,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_15"
@@ -23642,9 +23342,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -23692,27 +23392,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -23724,7 +23424,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_16"
@@ -23767,9 +23468,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -23817,27 +23518,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -23849,7 +23550,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_17"
@@ -23892,9 +23594,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -23942,27 +23644,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -23974,7 +23676,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_07"
@@ -24063,7 +23766,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "Sphere"
+			"meshName": "Sphere",
+			"visibility": true
 		},
 		"SceneRenderPass": null,
 		"TransformComponent": {
@@ -24129,27 +23833,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -24161,7 +23865,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_08"
@@ -24200,7 +23905,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				270.0,
 				0.0
 			],
 			"scale": [
@@ -24254,27 +23959,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -24286,7 +23991,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_09"
@@ -24325,7 +24031,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				270.0,
 				0.0
 			],
 			"scale": [
@@ -24379,27 +24085,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -24411,7 +24117,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_10"
@@ -24450,7 +24157,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				270.0,
 				0.0
 			],
 			"scale": [
@@ -24504,27 +24211,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -24536,7 +24243,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_11"
@@ -24575,7 +24283,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				270.0,
 				0.0
 			],
 			"scale": [
@@ -24629,27 +24337,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -24661,7 +24369,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_12"
@@ -24700,7 +24409,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -24754,27 +24463,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -24786,7 +24495,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_13"
@@ -24825,7 +24535,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
@@ -24889,7 +24599,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_frame"
+			"meshName": "maindoor_frame",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_14 hole"
@@ -24982,27 +24693,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -25014,7 +24725,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_15"
@@ -25107,27 +24819,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -25139,7 +24851,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_16"
@@ -25232,27 +24945,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -25264,7 +24977,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_18"
@@ -25307,9 +25021,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -25551,27 +25265,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -25583,7 +25297,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_19"
@@ -25626,9 +25341,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -25676,27 +25391,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -25708,7 +25423,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_20"
@@ -25751,9 +25467,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -25801,27 +25517,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -25833,7 +25549,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_21"
@@ -25876,9 +25593,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -25926,27 +25643,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -25958,7 +25675,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_22"
@@ -26001,9 +25719,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -26051,27 +25769,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -26083,7 +25801,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_23"
@@ -26126,9 +25845,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -26176,27 +25895,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -26208,7 +25927,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_24"
@@ -26251,9 +25971,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -26301,27 +26021,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -26333,7 +26053,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_25"
@@ -26376,9 +26097,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -26426,27 +26147,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -26458,7 +26179,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_26"
@@ -26501,9 +26223,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -26551,27 +26273,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -26583,7 +26305,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_27"
@@ -26626,9 +26349,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -26676,27 +26399,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -26708,7 +26431,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_28"
@@ -26751,9 +26475,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -26801,27 +26525,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -26833,7 +26557,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_02"
@@ -26876,9 +26601,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -26926,27 +26651,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -26958,7 +26683,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_29"
@@ -27001,9 +26727,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -27051,27 +26777,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -27083,7 +26809,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_17"
@@ -27122,7 +26849,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-90.0,
 				0.0
 			],
 			"scale": [
@@ -27176,27 +26903,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -27208,7 +26935,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_18"
@@ -27247,7 +26975,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-90.0,
 				0.0
 			],
 			"scale": [
@@ -27301,27 +27029,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -27333,7 +27061,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_19"
@@ -27372,7 +27101,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-90.0,
 				0.0
 			],
 			"scale": [
@@ -27426,27 +27155,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -27458,7 +27187,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_20"
@@ -27551,27 +27281,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -27583,7 +27313,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_21"
@@ -27622,7 +27353,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-90.0,
 				0.0
 			],
 			"scale": [
@@ -27676,27 +27407,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -27708,7 +27439,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_22"
@@ -27752,109 +27484,6 @@
 			],
 			"scale": [
 				0.9999998211860657,
-				1.0,
-				0.9999998211860657
-			]
-		}
-	},
-	"67": {
-		"ColliderComponent": {
-			"maxBounds": [
-				-3.4028234663852886e+38,
-				-3.4028234663852886e+38,
-				-3.4028234663852886e+38
-			],
-			"minBounds": [
-				3.4028234663852886e+38,
-				3.4028234663852886e+38,
-				3.4028234663852886e+38
-			],
-			"mode": 0,
-			"shapes": []
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				17203495961540657167,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				0,
-				0
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				0,
-				0
-			],
-			"name": "Floor",
-			"normalMap": [
-				0,
-				0
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "maindoor_topwall"
-		},
-		"NameComponent": {
-			"name": "Wall_14 holetop"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				205.0,
-				240.0,
-				98.0
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0499999523162842,
 				1.0,
 				0.9999998211860657
 			]
@@ -27904,27 +27533,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -27936,7 +27565,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_23"
@@ -28029,27 +27659,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -28061,7 +27691,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_24"
@@ -28154,27 +27785,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -28186,7 +27817,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_03"
@@ -28221,7 +27853,7 @@
 			"position": [
 				0.0,
 				10.0,
-				-400.0
+				-404.7974853515625
 			],
 			"rotation": [
 				0.0,
@@ -28229,9 +27861,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -28279,27 +27911,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -28311,7 +27943,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_25"
@@ -28404,27 +28037,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -28436,7 +28069,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_26"
@@ -28529,27 +28163,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -28561,7 +28195,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_27"
@@ -28654,27 +28289,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -28686,7 +28321,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_28"
@@ -28779,27 +28415,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -28811,7 +28447,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_30"
@@ -28854,9 +28491,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -28904,27 +28541,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -28936,7 +28573,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_31"
@@ -28979,9 +28617,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -29029,27 +28667,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -29061,7 +28699,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_32"
@@ -29104,9 +28743,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -29154,27 +28793,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -29186,7 +28825,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_29"
@@ -29279,27 +28919,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -29311,7 +28951,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_30"
@@ -29457,7 +29098,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_frame"
+			"meshName": "maindoor_frame",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_Doorframe"
@@ -29549,27 +29191,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -29581,7 +29223,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_04"
@@ -29624,9 +29267,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -29684,7 +29327,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_topwall"
+			"meshName": "maindoor_topwall",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_DoorTop"
@@ -29776,27 +29420,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -29808,7 +29452,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_31"
@@ -29901,27 +29546,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -29933,7 +29578,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_32"
@@ -30026,27 +29672,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -30058,7 +29704,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_33"
@@ -30151,27 +29798,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -30183,7 +29830,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_34"
@@ -30297,27 +29945,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				260875085009928325,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				3719639598830469255,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				17554697654112632969,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				6025482608044163211,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				11790090131078398093,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -30329,7 +29977,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doorframe"
+			"meshName": "Room_door_frame",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "HallEnd_DoorFrame"
@@ -30422,27 +30071,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1413796589616775311,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				12366550883381821585,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				16978236901809209491,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15248854644898939029,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				4296100351133892759,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -30454,7 +30103,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_door"
+			"meshName": "Room_door_",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "HallEnd_Door"
@@ -30547,27 +30197,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -30579,7 +30229,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_35"
@@ -30672,27 +30323,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7754864864954433709,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				9484247121864704175,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				13519472387988668593,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				5449021855740739763,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16978236901809209525,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -30704,7 +30355,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_36"
@@ -30807,7 +30459,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doortopwall"
+			"meshName": "room_doortopwall",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "HallEnd_DoorTop"
@@ -30936,27 +30589,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -30968,7 +30621,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_33"
@@ -31011,9 +30665,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -31061,27 +30715,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -31093,7 +30747,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_34"
@@ -31136,9 +30791,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -31186,27 +30841,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -31218,7 +30873,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_35"
@@ -31261,9 +30917,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -31311,39 +30967,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_37"
@@ -31376,14 +31033,14 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-600.0,
-				0.0,
-				300.0
+				-664.8103637695313,
+				16.185302734375,
+				297.63653564453125
 			],
 			"rotation": [
-				0.0,
-				-0.0,
-				0.0
+				-0.00010427393135614693,
+				-5.008955668017734e-06,
+				0.00010427393135614693
 			],
 			"scale": [
 				1.0,
@@ -31436,39 +31093,40 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				1990257341920198839,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				15248854644898939065,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				4872561103437316283,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				1413796589616775357,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				13519472387988668607,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
 				0.0
 			],
 			"uvTiling": [
-				0.4000000059604645,
+				1.0,
 				1.0
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_inside_outside",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_38"
@@ -31507,7 +31165,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -31561,27 +31219,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -31593,7 +31251,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_36"
@@ -31636,9 +31295,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -31686,27 +31345,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -31718,7 +31377,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_37"
@@ -31761,9 +31421,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -31811,27 +31471,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -31843,7 +31503,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_38"
@@ -31886,9 +31547,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -31936,27 +31597,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -31968,7 +31629,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_39"
@@ -32011,9 +31673,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -32061,27 +31723,27 @@
 				1.0
 			],
 			"albedoMap": [
-				17203495961540657167,
+				7178404112637837333,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				0,
-				0
+				260875084996755479,
+				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				0,
-				0
+				3719639598817296409,
+				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				0,
-				0
+				15825315397189189659,
+				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				16401776149492613149,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -32093,7 +31755,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "Floor",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_40"
@@ -32136,9 +31799,9 @@
 				0.0
 			],
 			"scale": [
-				100.0,
-				4.0,
-				100.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	}
