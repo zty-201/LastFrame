@@ -537,10 +537,9 @@ namespace EngineFramework
                         {
                             LOGI("Mouse Picked Entity: %u", (uint32_t)hit.entity);
                             iEditorView& selection_state = LevelEditor::GetInstance().variables;
-                            ImGuiIO& io = ImGui::GetIO();
-                            bool shift_down = io.KeyShift || ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
-                            bool ctrl_down = io.KeyCtrl || ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
-
+                            bool shift_down = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
+                            bool ctrl_down = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
+                            LOGI("Selection Modifier Check -> Ctrl: %d, Shift: %d", ctrl_down, shift_down);
                             bool isAlreadySelected = selection_state.IsEntitySelected(hit.entity);
 
                             if (ctrl_down)
@@ -1751,10 +1750,8 @@ namespace EngineFramework
     void EngineFramework::Screen::triggerbox()
     {
         if (!s_DrawColliders) return;
-
         if (is_adjusting_lights) return;
         if (is_simulator_running) return;
-        
 
         // Use same camera math as gizmos()
         auto camera_view = registry.view<CameraComponent>();
@@ -1775,14 +1772,19 @@ namespace EngineFramework
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
 
+        auto& selection_state = LevelEditor::GetInstance().variables;
+
         // Draw a wire box for every entity that has a TriggerBoxComponent
         auto v = registry.view<TransformComponent, TriggerBoxComponent>();
-        v.each([&](const TransformComponent& tf,
-            const TriggerBoxComponent& trg)   // removed entt::entity e (no warning)
+        v.each([&](entt::entity e, const TransformComponent& tf,
+            const TriggerBoxComponent& trg)
             {
                 if (!trg.enabled) return;
 
                 const glm::mat4 model = tf.modelMatrix;
+
+                bool isSelected = selection_state.IsEntitySelected(e);
+                if (!s_DrawAllColliders && !isSelected) return;
 
                 // Local center & size come from the trigger itself
                 glm::vec3 centerLocal = trg.localPosition;
@@ -1804,12 +1806,21 @@ namespace EngineFramework
                 }
 
                 const glm::quat qLocal = EulerDegToQuat(trg.localEulerDeg);
-
                 const glm::mat4 triggerM = model * TRS(centerLocal, qLocal, sizeLocal);
 
-                ImU32 color = trg.highlightedEntities.empty()
-                    ? IM_COL32(0, 255, 0, 255)      // green (normal)
-                    : IM_COL32(255, 255, 0, 255);   // yellow (highlight)
+                ImU32 color;
+                if (isSelected)
+                {
+                    color = IM_COL32(255, 165, 0, 255);
+                }
+                else if (!trg.highlightedEntities.empty())
+                {
+                    color = IM_COL32(255, 255, 0, 255);
+                }
+                else
+                {
+                    color = IM_COL32(0, 255, 0, 255);
+                }
 
                 DrawWireOBB(triggerM, view, proj, screen_pos, available_size,
                     color, 2.5f);
@@ -1821,7 +1832,6 @@ namespace EngineFramework
     void EngineFramework::Screen::colliderbox()
     {
         if (!s_DrawColliders) return;
-
         if (is_adjusting_lights) return;
         if (is_simulator_running) return;
 
@@ -1842,98 +1852,84 @@ namespace EngineFramework
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetRect(screen_pos.x, screen_pos.y, available_size.x, available_size.y);
 
-        entt::entity selected = LevelEditor::GetInstance().variables.selected_objectID;
+        //Get selection state manager
+        auto& selected_state = LevelEditor::GetInstance().variables;
 
+        //Iterate ALL entities that have collider component
         auto v = registry.view<TransformComponent, ColliderComponent>();
-        v.each([&](entt::entity e, const TransformComponent& tf,
-            const ColliderComponent& col)
-            {
-                if (!s_DrawAllColliders && e != selected)
-                {
-                    return;
-                }
+        v.each([&](entt::entity e, const TransformComponent& tf, const ColliderComponent& col)
+        {
+                bool isSelected = selected_state.IsEntitySelected(e);
 
-                // If the selected entity lacks collider shapes, render a yellow wireframe using the helper function before skipping the collider drawing block
+                if (!s_DrawAllColliders && !isSelected) return;
+
+                //For colliders with no shapes
                 if (col.shapes.empty())
                 {
-                    if (e == selected)
+                    if (isSelected)
                     {
                         glm::mat4 highlightM;
                         if (BuildSelectionOBB(e, highlightM))
                         {
-                            DrawWireOBB(highlightM, view, proj, screen_pos, available_size,
-                                IM_COL32(255, 255, 0, 255), 2.0f);
+                            //Yellow
+                            DrawWireOBB(highlightM, view, proj, screen_pos, available_size, IM_COL32(255, 255, 0, 255), 2.f);
                         }
                     }
                     return;
                 }
 
+                //Draw AABB bounds
                 const glm::mat4 model = tf.modelMatrix;
-
                 glm::vec3 aabbCenter = (col.minBounds + col.maxBounds) * 0.5f;
                 glm::vec3 aabbSize = col.maxBounds - col.minBounds;
-                glm::mat4 aabbLocalM = glm::translate(glm::mat4(1.0f), aabbCenter) * glm::scale(glm::mat4(1.0f), aabbSize);
+                glm::mat4 aabbLocalM = glm::translate(glm::mat4(1.f), aabbCenter) * glm::scale(glm::mat4(1.f), aabbSize);
                 glm::mat4 aabbWorldM = model * aabbLocalM;
-                DrawWireOBB(aabbWorldM, view, proj, screen_pos, available_size, IM_COL32(0, 255, 255, 255), 1.0f);
+                //Cyan
+                DrawWireOBB(aabbWorldM, view, proj, screen_pos, available_size, IM_COL32(0, 255, 255, 255), 1.f);
 
-                glm::vec3 entPos, entScale, entSkew;
-                glm::vec4 entPersp;
-                glm::quat entRot;
-                glm::decompose(model, entScale, entRot, entPos, entSkew, entPersp);
-
+                //Draw individual shapes
                 for (const auto& shape : col.shapes)
                 {
-                    glm::vec3 sizeLocal(1.0f);
+                    glm::vec3 sizeLocal(1.f);
 
                     switch (static_cast<ColliderShape>(shape.type))
                     {
                     case ColliderShape::Box:
-                        sizeLocal = shape.boxHalfExtents * 2.0f;
+                        sizeLocal = shape.boxHalfExtents * 2.f;
                         break;
                     case ColliderShape::Sphere:
-                        sizeLocal = glm::vec3(shape.sphereRadius * 2.0f);
+                        sizeLocal = glm::vec3(shape.sphereRadius * 2.f);
                         break;
                     case ColliderShape::Capsule:
-                        sizeLocal = glm::vec3(
-                            shape.capsuleRadius * 2.0f,
-                            shape.capsuleHeight,
-                            shape.capsuleRadius * 2.0f);
+                        sizeLocal = glm::vec3(shape.capsuleRadius * 2.f, shape.capsuleHeight, shape.capsuleRadius * 2.f);
                         break;
                     }
-                    glm::vec3 finalSize = sizeLocal * entScale;
-                    glm::quat qShape = entRot * EulerDegToQuat(shape.offsetRotation);
-                    glm::vec3 finalPos = entPos + (entRot * (shape.offsetPosition * entScale));
-                    glm::mat4 shapeTransform = TRS(finalPos, qShape, finalSize);
 
-                    DrawWireOBB(shapeTransform, view, proj, screen_pos, available_size,
-                        IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
+                    glm::mat4 shapeLocal = glm::translate(glm::mat4(1.f), shape.offsetPosition);
+                    shapeLocal *= glm::mat4_cast(EulerDegToQuat(shape.offsetRotation));
+                    shapeLocal = glm::scale(shapeLocal, sizeLocal);
+                    glm::mat4 shapeTransform = model * shapeLocal;
+                    //Red
+                    DrawWireOBB(shapeTransform, view, proj, screen_pos, available_size, IM_COL32(255, 0, 0, 255), 1.6f);
                 }
-                //const ColliderData& shape = col.shapes[0];
+        });
 
-                //// only draw boxes for now
-                //if (shape.type != (int)ColliderShape::Box)
-                //    return;
-
-                //glm::vec3 centerLocal = shape.offsetPosition;
-                //glm::vec3 sizeLocal = 2.0f * shape.boxHalfExtents;
-
-                //glm::quat qLocal = EulerDegToQuat(glm::vec3(0.0f)); // if you later use offsetRotation, convert it here
-                //glm::mat4 colliderM = model * TRS(centerLocal, qLocal, sizeLocal);
-
-                //DrawWireOBB(colliderM, view, proj, screen_pos, available_size,
-                //    IM_COL32(255, 0, 0, 255), 1.6f); // red box for collider
-            });
-
-        // If the selected entity doesnt have a collider component, shows a wireframe that highlights regardless of collider data
-        if (selected != entt::null &&
-            registry.valid(selected) &&
-            !registry.all_of<ColliderComponent>(selected))
+        //Iterate Selection List
+        if (selected_state.HasEntitySelection())
         {
-            glm::mat4 highlightM;
-            if (BuildSelectionOBB(selected, highlightM))
+            const auto& selectedList = selected_state.GetSelectedEntities();
+
+            for (entt::entity e : selectedList)
             {
-                DrawWireOBB(highlightM, view, proj, screen_pos, available_size,
-                    IM_COL32(255, 255, 0, 255), 2.0f);
+                if (!registry.valid(e)) return;
+                if (registry.all_of<ColliderComponent>(e)) continue;
+                if (!registry.all_of<TransformComponent>(e)) continue;
+
+                glm::mat4 highlightM;
+                if (BuildSelectionOBB(e, highlightM))
+                {
+                    DrawWireOBB(highlightM, view, proj, screen_pos, available_size, IM_COL32(255, 255, 0, 255), 2.f);
+                }
             }
         }
     }
