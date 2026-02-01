@@ -69,6 +69,11 @@ namespace EngineFramework
 			return std::find(selected_entities.begin(), selected_entities.end(), entity) != selected_entities.end();
 		}
 
+		//Get function
+		const std::vector<entt::entity>& GetSelectedEntities() const {
+			return selected_entities;
+		}
+
 		// To clear the vector of selected entities with a single call
 		void ClearEntitySelection() {
 			selected_entities.clear();
@@ -172,13 +177,7 @@ namespace EngineFramework
 	//Exception safe, guaranteed to call when out of scope.
 #define CALL_AT_END(name, function) ScopeGuard name{ []() {function} }
 
-
-
 }
 
-
-
-
 #endif
 #endif
-

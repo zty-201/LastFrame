@@ -305,8 +305,8 @@ namespace EngineFramework
 		auto view = ecs.view<AudioComponent>();
 		view.each([&](entt::entity e, AudioComponent& comp)
 			{
-				LOGI("[Audio] Found AudioComponent on entity %u, Slots=%zu",
-					(uint32_t)e, comp.Slots.size());
+				//LOGI("[Audio] Found AudioComponent on entity %u, Slots=%zu",
+				//	(uint32_t)e, comp.Slots.size());
 
 				if (m_playOnStartDone[e]) return;
 

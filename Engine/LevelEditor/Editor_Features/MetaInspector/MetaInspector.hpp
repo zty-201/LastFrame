@@ -22,13 +22,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <utility>
 #include <vector>
 #include "xresource_guid.h"
-
-// Ensure the tag types backing xresource GUIDs are complete when this header is included without pch.
-namespace xresource {
-	struct rsc_instance_guid_tag {};
-	struct rsc_instance_guid_large_tag {};
-	struct rsc_type_guid_tag {};
-}
+#include "XResourceGuidTags.hpp"
 
 namespace EditorFeatures {
 

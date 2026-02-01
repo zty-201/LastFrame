@@ -38,7 +38,8 @@
 		]
 	},
 	"MeshComponent": {
-		"meshName": "Sphere"
+		"meshName": "Sphere",
+		"visibility": true
 	},
 	"SceneRenderPass": null,
 	"TransformComponent": {

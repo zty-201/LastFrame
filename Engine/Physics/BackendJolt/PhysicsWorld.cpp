@@ -18,6 +18,7 @@
 #include <iostream>
 #include "TransformComponent.h"
 #include "ColliderComponent.h"
+#include "TriggerBoxComponent.h"
 #include "PhysicsMaterialComponent.h"
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/CastResult.h>
@@ -747,6 +748,9 @@ void PhysicsWorld::AddForce(entt::entity entity, const glm::vec3& force)
     );
 }
 
+static inline glm::quat EulerDegToQuat(const glm::vec3& deg) {
+    return glm::quat(glm::radians(deg));
+}
 
 bool PhysicsWorld::RaycastAgainstColliders(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit)
 {
@@ -807,6 +811,76 @@ bool PhysicsWorld::RaycastAgainstColliders(const glm::vec3& origin, const glm::v
             float dist = glm::distance(origin, glm::vec3(worldHitPos));
 
             if (dist < closestT && dist > 0.f)
+            {
+                closestT = dist;
+                outHit.hasHit = true;
+                outHit.entity = entity;
+                outHit.distance = closestT;
+                outHit.position = glm::vec3(worldHitPos);
+                foundHit = true;
+            }
+        }
+    }
+
+    auto viewTrig = registry.view<TransformComponent, TriggerBoxComponent>();
+    for (auto [entity, transform, trigger] : viewTrig.each())
+    {
+        if (!trigger.enabled) continue;
+
+        glm::mat4 model = glm::mat4(1.f);
+        model = glm::translate(model, transform.position);
+        model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0, 1, 0));
+        model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1, 0, 0));
+        model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0, 0, 1));
+        model = glm::scale(model, transform.scale);
+
+        glm::mat4 triggerLocal = glm::translate(glm::mat4(1.0f), trigger.localPosition);
+        triggerLocal *= glm::mat4_cast(EulerDegToQuat(trigger.localEulerDeg));
+
+        glm::mat4 totalTransform = model * triggerLocal;
+        glm::mat4 invTotal = glm::inverse(totalTransform);
+
+        glm::vec3 localOrigin = glm::vec3(invTotal * glm::vec4(origin, 1.0f));
+        glm::vec3 localDir = glm::normalize(glm::vec3(invTotal * glm::vec4(direction, 0.0f)));
+        glm::vec3 minB(0.0f), maxB(0.0f);
+
+        switch (trigger.type)
+        {
+        case TriggerShapeType::Box:
+            minB = -trigger.halfExtents;
+            maxB = trigger.halfExtents;
+            break;
+        case TriggerShapeType::Sphere:
+            minB = glm::vec3(-trigger.radius);
+            maxB = glm::vec3(trigger.radius);
+            break;
+        case TriggerShapeType::Capsule:
+            //Approximate capsule as a Box for selection click
+            //Width/Depth = Radius, Height = HalfHeight + Radius
+            float h = trigger.capHalfHeight + trigger.capRadius;
+            float r = trigger.capRadius;
+            minB = glm::vec3(-r, -h, -r);
+            maxB = glm::vec3(r, h, r);
+            break;
+        }
+
+        float t1 = (minB.x - localOrigin.x) / localDir.x;
+        float t2 = (maxB.x - localOrigin.x) / localDir.x;
+        float t3 = (minB.y - localOrigin.y) / localDir.y;
+        float t4 = (maxB.y - localOrigin.y) / localDir.y;
+        float t5 = (minB.z - localOrigin.z) / localDir.z;
+        float t6 = (maxB.z - localOrigin.z) / localDir.z;
+
+        float tmin = std::max(std::max(std::min(t1, t2), std::min(t3, t4)), std::min(t5, t6));
+        float tmax = std::min(std::min(std::max(t1, t2), std::max(t3, t4)), std::max(t5, t6));
+        if (tmax >= 0 && tmin <= tmax)
+        {
+            // Convert back to World Space for distance check
+            glm::vec3 localHitPos = localOrigin + (localDir * tmin);
+            glm::vec4 worldHitPos = totalTransform * glm::vec4(localHitPos, 1.0f);
+            float dist = glm::distance(origin, glm::vec3(worldHitPos));
+
+            if (dist < closestT && dist > 0.0f)
             {
                 closestT = dist;
                 outHit.hasHit = true;
