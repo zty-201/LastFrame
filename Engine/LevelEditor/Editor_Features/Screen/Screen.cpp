@@ -310,22 +310,22 @@ namespace EngineFramework
         return true;
     }
 
-    static void OnTriggerEnter(const Event_OnTriggerEnter& e)
+    static void OnTriggerEnter(const Event_OnTriggerEnter& )
     {
-        LOGI("[TriggerEnter] Trigger %u -> Entity %u",
-            (unsigned)e.trigger, (unsigned)e.other);
+        /*LOGI("[TriggerEnter] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);*/
     }
 
-    static void OnTriggerStay(const Event_OnTriggerStay& e)
+    static void OnTriggerStay(const Event_OnTriggerStay& )
     {
-        LOGI("[TriggerStay] Trigger %u -> Entity %u",
-            (unsigned)e.trigger, (unsigned)e.other);
+        /*LOGI("[TriggerStay] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);*/
     }
 
-    static void OnTriggerExit(const Event_OnTriggerExit& e)
+    static void OnTriggerExit(const Event_OnTriggerExit& )
     {
-        LOGI("[TriggerExit] Trigger %u -> Entity %u",
-            (unsigned)e.trigger, (unsigned)e.other);
+        /*LOGI("[TriggerExit] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);*/
     }
 
     void Screen::Initialize() {
@@ -487,7 +487,7 @@ namespace EngineFramework
                 bool hovered = ImGui::IsItemHovered();
 
                 gizmos();
-                //triggerbox();
+                triggerbox();
                 drop_target();
                 colliderbox();
 

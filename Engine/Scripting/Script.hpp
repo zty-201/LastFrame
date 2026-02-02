@@ -19,6 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <filesystem>
 #include <string>
 #include <vector>
+#include "TriggerEvents.hpp"
 
 #if defined(ENGINE_ENABLE_LUA)
 #include <sol/sol.hpp>
@@ -106,6 +107,10 @@ namespace Engine {
         // NEW: safe queued reload requests (recommended to call from ImGui/editor)
         static void RequestReloadAll();
         static void RequestReloadEntity(entt::entity e);
+
+        static void OnTriggerEnter(const struct Event_OnTriggerEnter& e);
+        static void OnTriggerExit(const struct Event_OnTriggerExit& e);
+        static void OnTriggerStay(const struct Event_OnTriggerStay& e);
 
 #if defined(ENGINE_ENABLE_LUA)
         static sol::state& GetLuaState();

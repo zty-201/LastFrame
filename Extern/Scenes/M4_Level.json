@@ -22610,75 +22610,23 @@
 		}
 	},
 	"259": {
-		"ColliderComponent": {
-			"maxBounds": [
-				800.0,
-				350.0,
-				600.0
-			],
-			"minBounds": [
-				0.5,
-				0.5,
-				0.5
-			],
-			"mode": 0,
-			"shapes": [
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
 				{
-					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
+					"Loaded": true,
+					"ScriptGuid": 596331687958085633
 				}
 			]
 		},
 		"NameComponent": {
 			"name": "Indoor_Detector_01"
 		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": false,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": false,
-			"layer": 1,
-			"restitution": 0.0
-		},
 		"TransformComponent": {
 			"position": [
-				-92.0,
-				0.0,
-				-700.0
+				325.89715576171875,
+				179.55563354492188,
+				-285.834716796875
 			],
 			"rotation": [
 				0.0,
@@ -22701,9 +22649,9 @@
 			],
 			"enabled": true,
 			"halfExtents": [
-				0.5,
-				0.5,
-				0.5
+				400.0,
+				200.0,
+				400.0
 			],
 			"localEulerDeg": [
 				0.0,
@@ -40762,10 +40710,6 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 5490970403712286721
-				},
-				{
-					"Loaded": true,
-					"ScriptGuid": 596331687958085633
 				}
 			]
 		},

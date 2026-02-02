@@ -18,6 +18,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetManager.hpp"
 #include <glm/geometric.hpp> 
 #include <iostream>
+#include "global.hpp"
 
 #if defined(ENGINE_ENABLE_LUA)
 #include <mutex>
@@ -104,6 +105,67 @@ namespace Engine {
     //    keyActions["OPEN_EDITOR"] = (int)EngineFramework::Key_Actions::OPEN_EDITOR;
 
     //}
+
+    void DispatchLuaEvent(entt::registry& reg, entt::entity entity, const std::string& funcName, entt::entity param)
+    {
+        if (!reg.valid(entity)) return;
+
+        auto* luaComp = reg.try_get<LuaScriptComponent>(entity);
+        if (!luaComp || !luaComp->Enabled) return;
+
+        for (auto& inst : luaComp->Scripts)
+        {
+            if (!inst.Loaded) continue;
+
+            if (inst.Env.lua_state() == nullptr) {
+                //LOGE("[LuaEvent] Script environment has NULL state! Skipping %s", funcName.c_str());
+                continue;
+            }
+
+            sol::optional<sol::protected_function> funcOption = inst.Env.get<sol::optional<sol::protected_function>>(funcName);
+            if (funcOption && funcOption.value().valid())
+            {
+                auto func = funcOption.value();
+                try {
+                    auto result = func(inst.Self, static_cast<uint32_t>(param));
+                    if (!result.valid())
+                    {
+                        sol::error err = result;
+                        LOGE("[LuaEvent Error] %s: %s", funcName.c_str(), err.what());
+                    }
+                }
+                catch (const sol::error& err)
+                {
+                    LOGE("[LuaEvent Exception] %s: %s", funcName.c_str(), err.what());
+                }
+            }
+        }
+    }
+
+    void ScriptSystem::OnTriggerEnter(const Event_OnTriggerEnter& e) {
+        if (!s_RuntimeRegistry) return;
+
+        //Something entered
+        DispatchLuaEvent(*s_RuntimeRegistry, e.trigger, "on_trigger_enter", e.other);
+        //Notify the Player "I entered a zone"
+        DispatchLuaEvent(*s_RuntimeRegistry, e.other, "on_trigger_enter", e.trigger);
+    }
+
+    void ScriptSystem::OnTriggerExit(const Event_OnTriggerExit& e) {
+        if (!s_RuntimeRegistry) return;
+
+        // Notify both
+        DispatchLuaEvent(*s_RuntimeRegistry, e.trigger, "on_trigger_exit", e.other);
+        DispatchLuaEvent(*s_RuntimeRegistry, e.other, "on_trigger_exit", e.trigger);
+    }
+
+    void ScriptSystem::OnTriggerStay(const Event_OnTriggerStay& e) {
+        if (!s_RuntimeRegistry) return;
+
+        // Notify both
+        DispatchLuaEvent(*s_RuntimeRegistry, e.trigger, "on_trigger_stay", e.other);
+        DispatchLuaEvent(*s_RuntimeRegistry, e.other, "on_trigger_stay", e.trigger);
+    }
 
     void ScriptSystem::Init() {
 #if defined(ENGINE_ENABLE_LUA)
@@ -876,6 +938,12 @@ namespace Engine {
                 LoadLuaFor(reg, entity, inst);
             }
         }
+
+        event_dispatcher.sink<Event_OnTriggerEnter>().connect<&ScriptSystem::OnTriggerEnter>();
+        event_dispatcher.sink<Event_OnTriggerExit>().connect<&ScriptSystem::OnTriggerExit>();
+        event_dispatcher.sink<Event_OnTriggerStay>().connect<&ScriptSystem::OnTriggerStay>();
+
+        LOGI("[ScriptSystem] Subscribed to Trigger Events.");
 #endif
     }
 
@@ -887,6 +955,10 @@ namespace Engine {
         }
 
 #if defined(ENGINE_ENABLE_LUA)
+        event_dispatcher.sink<Event_OnTriggerEnter>().disconnect<&ScriptSystem::OnTriggerEnter>();
+        event_dispatcher.sink<Event_OnTriggerExit>().disconnect<&ScriptSystem::OnTriggerExit>();
+        event_dispatcher.sink<Event_OnTriggerStay>().disconnect<&ScriptSystem::OnTriggerStay>();
+
         s_RuntimeRegistry = nullptr;
 
         auto luaView = reg.view<LuaScriptComponent>();
