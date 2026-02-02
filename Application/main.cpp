@@ -185,7 +185,7 @@ void Game_Initialize(void* android_asset_manager)
 			2   // Destruct Order
 		);
 
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+//#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 		// 6. LevelEditorSystem: Controls rendering when active.
 		core_engine.AddSystem(
 			"UI_System",
@@ -194,7 +194,7 @@ void Game_Initialize(void* android_asset_manager)
 			2,  // Update Order: after Input, before GameObjectSystem & Graphics
 			3   // Destruct Order: before GameObjectSystem/Graphics are gone
 		);
-#endif
+//#endif
 
 		// 5. AnimationSystem: For animation to work.
 		core_engine.AddSystem(

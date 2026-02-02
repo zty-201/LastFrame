@@ -49,7 +49,7 @@ namespace EngineFramework
     */
 
     //enable for window debug first (avoid android cause android now got issue)
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+//#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 
     class UI_Menu {
 
@@ -70,7 +70,9 @@ namespace EngineFramework
 
         bool is_menu_active;
         void draw_elements(bool value = true); //draw if overlay is active
-        
+        std::vector<entt::entity> get_Elements(){
+            return AllElements_in_this_overlay;
+        };
 
     private:
 
@@ -79,7 +81,7 @@ namespace EngineFramework
         void update_Button_State(ButtonComponent& button, entt::entity e); //update the button state based on input_manager
         void Trigger_Button_Event(ButtonComponent& button, BUTTON_STATE state);
         bool check_touch(entt::entity e);
-        
+       
 
     };
 
@@ -96,9 +98,6 @@ namespace EngineFramework
         static UI_System& GetInstance() { return *this_class; }
         static inline UI_System* this_class = nullptr;
 
-        //important! test button class first
-        std::unique_ptr<UI_Menu> menu_test;
-
         //after testing uibuttons first
         static std::unordered_map<std::string, std::pair<std::unique_ptr<UI_Menu>,bool>> Menu_Mapping;
         std::string current_menu;
@@ -111,6 +110,12 @@ namespace EngineFramework
         void closeMenu(); //this is current menu
         void closeMenu(std::string menu);
         void closeAllMenu();
+        std::vector<entt::entity> getMenu_Entities(std::string menu);
+        void create_overlay(std::string menu);
+        void add_entity_fromMenu(std::string menu, entt::entity e);
+        void remove_entity_fromMenu(std::string menu, entt::entity e);
+
+
 
     private:
 
@@ -118,7 +123,7 @@ namespace EngineFramework
         
 
     };
-#endif
+//#endif
 
 }
 #endif

@@ -7,7 +7,7 @@
 #include<cstddef>
 
 //enable for window debug first (avoid android cause android now got issue)
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+//#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 
 
 enum BUTTON_STATE {
@@ -46,5 +46,5 @@ struct ButtonComponent {
 #endif
 
 
-#endif
+//#endif
 

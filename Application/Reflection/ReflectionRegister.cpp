@@ -566,7 +566,7 @@ namespace EngineFramework
 			.func<&GetRef<TransformComponent>>("get_ref");
 
 
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+
 		
 		// === Register TransformComponent ===
 		entt::meta_factory<ButtonComponent>()
@@ -583,7 +583,7 @@ namespace EngineFramework
 			.func<&Remover<ButtonComponent>::RemoveComponent>("remove")
 			.func<&Getter<ButtonComponent>::GetComponent>("get")
 			.func<&GetRef<ButtonComponent>>("get_ref");
-#endif	
+	
 		// === Register MeshComponent ===
 		entt::meta_factory<MeshComponent>()
 			.type("MeshComponent")
@@ -846,7 +846,7 @@ namespace EngineFramework
 			.data<&UIComponent::layer>("layer")
 			.data<&UIComponent::Overlay_name>("Overlay_name")
 			.data<&UIComponent::event_received>("event_received")
-			.data<&UIComponent::hide_first>("hide_first")
+			//.data<&UIComponent::hide_first>("hide_first")
 			.func<&Emplacer<UIComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<UIComponent>::RemoveComponent>("remove")
 			.func<&Getter<UIComponent>::GetComponent>("get")

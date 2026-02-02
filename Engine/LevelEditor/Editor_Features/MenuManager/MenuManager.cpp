@@ -22,6 +22,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Screen.hpp"
 #include "UISystem.hpp"
 
+
 namespace EngineFramework
 {
 	//defualt scene to load
@@ -39,6 +40,7 @@ namespace EngineFramework
 		ScanMenus();	
 		currentMenu = "";
 		is_menu_running = false;
+		open_create_menu_popup = false;
 	}
 
 	MenuManager& MenuManager::GetInstance()
@@ -46,6 +48,13 @@ namespace EngineFramework
 		return *this_system;
 	}
 
+	void MenuManager::add_element(entt::entity e) {
+		UI_System::GetInstance().add_entity_fromMenu(currentMenu, e);
+	}
+
+	void MenuManager::remove_element(entt::entity e) {
+		UI_System::GetInstance().remove_entity_fromMenu(currentMenu,e);
+	}
 
 	void MenuManager::ScanMenus()
 	{
@@ -67,8 +76,9 @@ namespace EngineFramework
 
 	void MenuManager::Run()
 	{
-		if (!is_enabled) return; // only open if toggled
-
+		
+		if (!is_enabled) return; // only open if toggled		
+		
 		if (ImGui::Begin("Menu Manager", &is_enabled))
 		{
 			ImGui::Text("Available Menu:");
@@ -83,35 +93,103 @@ namespace EngineFramework
 					is_menu_running = true;
 					UI_System::GetInstance().closeAllMenu();
 					UI_System::GetInstance().displayMenu(menu);
+
+					//std::cout << "========= LIST OF ENTITIES HERE ============\n";
+					auto list = UI_System::GetInstance().getMenu_Entities(menu);
+
+					for (auto obj: list) {
+
+						if (!registry.valid(obj)) {
+							//std::cout << "Entity: " << (int)obj  << " | is not valid !registry.valid(entity) \n";		
+							
+						}
+						else {
+							//std::cout << "Entity: " << (int)obj << " |  is valid registry.valid(entity) \n";
+						}
+
+
+					}
 				}
 			}
 			ImGui::Separator();
 
 			if (ImGui::Button("Create New Menu"))
-			{			
+			{
+				open_create_menu_popup = true;          // request popup open this frame
+				ImGui::OpenPopup("Create New Menu");    // open modal
 
-				LOGD("New Menu created, bleh!");
+				//LOGD("New Menu created, bleh!");
 			}
 
 			ImGui::Separator();
 
-			if (ImGui::Button("Save/Close Menu Editor and Return to Scene"))
+			if (ImGui::Button("Close Menu Editor and Return to Scene"))
 			{
 				is_enabled = false;
 				is_menu_running = false;
 				currentMenu.clear();
 				UI_System::GetInstance().closeAllMenu();
-				UI_System::GetInstance().Seralise_AllMenus();
+				//UI_System::GetInstance().Seralise_AllMenus();
 
 				LOGD("Exited Menu Editor, returning to scene");
 			}
 
-			
-
+			create_new_menu();
 
 
 		}
 		ImGui::End();
+	}
+
+	void MenuManager::create_new_menu() {
+
+		//popup modal logic
+		if (open_create_menu_popup)
+		{
+			static char new_menu_name[128] = "";
+
+			ImGui::SetNextWindowSize(ImVec2(420, 0), ImGuiCond_Always);
+			ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
+				ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+			bool keep_open = true;
+			if (ImGui::BeginPopupModal("Create New Menu", &keep_open, ImGuiWindowFlags_AlwaysAutoResize)) {
+				ImGui::Text("Enter a menu name:");
+				ImGui::InputText("##MenuName", new_menu_name, IM_ARRAYSIZE(new_menu_name));
+				ImGui::Separator();
+
+
+				if (ImGui::Button("Create"))
+				{
+
+					open_create_menu_popup = false;
+					UI_System::GetInstance().create_overlay(std::string(new_menu_name));
+					ScanMenus(); //rescan again
+					new_menu_name[0] = '\0';
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::SameLine();
+
+				// Cancel
+				if (ImGui::Button("Cancel"))
+				{
+					new_menu_name[0] = '\0';
+					open_create_menu_popup = false;
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
+
+			if (!keep_open)
+			{
+				new_menu_name[0] = '\0';
+				open_create_menu_popup = false;
+				ImGui::CloseCurrentPopup();
+			}
+		}
+
 	}
 
 	void MenuManager::Close()

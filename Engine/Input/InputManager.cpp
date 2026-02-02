@@ -17,7 +17,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "global.hpp"
 #include "InputManager.hpp"
 #include "GraphicsSystem.h"
-
+#include "UISystem.hpp"
 
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
@@ -25,7 +25,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
-#include "UISystem.hpp"
+
 #endif
 
 #include "AssetManager.hpp"

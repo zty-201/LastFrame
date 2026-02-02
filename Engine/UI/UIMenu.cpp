@@ -35,14 +35,14 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 namespace EngineFramework
 {
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+//#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
     
     void UI_Menu::Initialize() {
 
         //menu_name = "Menu_1";
 
-        std::cout << "=========================================\n";
-        std::cout << "Initialize(): Menu Name = " << menu_name << std::endl;
+        //std::cout << "=========================================\n";
+        //std::cout << "Initialize(): Menu Name = " << menu_name << std::endl;
 
         std::vector <entt::entity> to_remove;
 
@@ -53,7 +53,7 @@ namespace EngineFramework
             */
 
             if (!registry.valid(entity)) {
-                std::cout << "!registry.valid(entity) \n";
+                //std::cout << "!registry.valid(entity) \n";
                 to_remove.emplace_back(entity);
                 continue;
             }
@@ -65,9 +65,9 @@ namespace EngineFramework
                 auto& ui = registry.get<UIComponent>(entity);
 
                 if (menu_name != ui.Overlay_name) {
-                    std::cout << "menu_name != ui.Overlay_name \n";
-                    std::cout << "menu_name = " << menu_name << std::endl;
-                    std::cout << "ui.Overlay_name = " << ui.Overlay_name << std::endl;
+                    //std::cout << "menu_name != ui.Overlay_name \n";
+                    //std::cout << "menu_name = " << menu_name << std::endl;
+                    //std::cout << "ui.Overlay_name = " << ui.Overlay_name << std::endl;
                     
                     to_remove.emplace_back(entity);
                     continue;
@@ -93,7 +93,7 @@ namespace EngineFramework
 
         if (!to_remove.empty()) {
 
-            std::cout << "I AM CLEARING THE RUBISH ENTITY\n";
+            //std::cout << "I AM CLEARING THE RUBISH ENTITY\n";
 
             AllElements_in_this_overlay.erase(
 
@@ -110,8 +110,8 @@ namespace EngineFramework
         }
         
             
-        std::cout << "UI_Menu::Initialize() | SIZE: " << AllElements_in_this_overlay.size() <<std::endl; //should be 1 for now
-        std::cout << "=========================================\n";
+        //std::cout << "UI_Menu::Initialize() | SIZE: " << AllElements_in_this_overlay.size() <<std::endl; //should be 1 for now
+        //std::cout << "=========================================\n";
 
     }
     void UI_Menu::Update() {
@@ -126,8 +126,10 @@ namespace EngineFramework
     
     bool UI_Menu::Deseralise(std::string filename) {
 
-
+        
         //menu_name = filename;
+
+        if (filename.empty()) return false;
 
         AllElements_in_this_overlay.clear();
         
@@ -135,24 +137,24 @@ namespace EngineFramework
         GameObjectSystem::GetInstance().DeSerializeAllEntityInstances(sceneString, AllElements_in_this_overlay);
 
 
-        std::cout << "=========================================\n";
-        std::cout << "Deseralise(): Menu Name = " << menu_name << std::endl;
+        //std::cout << "=========================================\n";
+        //std::cout << "Deseralise(): Menu Name = " << menu_name << std::endl;
 
-        for (auto entity : AllElements_in_this_overlay) {
+        //for (auto entity : AllElements_in_this_overlay) {
 
-            if (registry.all_of<UIComponent>(entity)) {       
+        //    if (registry.all_of<UIComponent>(entity)) {       
 
-                /*
-                    SWAPPING OF TEXTURES FOR UI COMPONENT
-                */
-                auto& ui = registry.get<UIComponent>(entity);
-                std::cout << "ui.Overlay_name =" << ui.Overlay_name << std::endl;
-            
-            }
+        //        /*
+        //            SWAPPING OF TEXTURES FOR UI COMPONENT
+        //        */
+        //        auto& ui = registry.get<UIComponent>(entity);
+        //        //std::cout << "entity: " << (int)entity << " | ui.Overlay_name =" << ui.Overlay_name << std::endl;
+        //    
+        //    }
    
-        }
+        //}
 
-        std::cout << "=========================================\n";
+        //std::cout << "=========================================\n";
 
         
         
@@ -210,12 +212,26 @@ namespace EngineFramework
 
     }
     void UI_Menu::Add_Element(entt::entity e) {
+        /*
+            NEW ENTITIES WITH NEW INITIALISED VALUE
+            SINCE, ENTITIES ARE ADDED TO THE MENU, IT MEANS ITS VISIBLE AH.
+        */
+        if (!registry.valid(e)) return; //DO NOT ADD IF ITS NOT VALID
 
-        UNREFERENCED_PARAMETER(e);
+        if (registry.all_of<UIComponent>(e)) {
+            auto& ui = registry.get<UIComponent>(e);
+            ui.belong_to_menu = true;
+            ui.Overlay_name = menu_name;      
+            ui.visible = true;
+            
+        }
 
+        AllElements_in_this_overlay.emplace_back(e);
     }
     void UI_Menu::Remove_Element(entt::entity e) {
-        UNREFERENCED_PARAMETER(e);
+
+        auto it = std::remove(AllElements_in_this_overlay.begin(), AllElements_in_this_overlay.end(), e);
+        AllElements_in_this_overlay.erase(it, AllElements_in_this_overlay.end());
     }
 
     void UI_Menu::update_Buttons() {
@@ -274,13 +290,13 @@ namespace EngineFramework
             if (check_touch(e)) {
                 button.curr_button_state = CLICKED;
                 button.is_clicked = true;
-                std::cout << "CLICKED!!!\n";
+                //std::cout << "CLICKED!!!\n";
             }
             
         }else if (InputManager::GetInstance().GetMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT)) {
             button.curr_button_state = RELEASED;  
             button.is_released = true;
-            std::cout << "RELEASED!!!\n";
+            //std::cout << "RELEASED!!!\n";
         }
         else if(check_touch(e)){
             button.curr_button_state = HOVER;
@@ -324,7 +340,7 @@ namespace EngineFramework
         
 #endif
 
-#if defined(RELEASE) && defined(PLATFORM_WINDOWS)
+#if defined(NDEBUG) && defined(PLATFORM_WINDOWS)
         float MouseX = static_cast<float>(InputManager::GetInstance().GetMousePosition().first);
         float MouseY = static_cast<float>(InputManager::GetInstance().GetMousePosition().second);
 
@@ -354,11 +370,11 @@ namespace EngineFramework
         }
         else if (state == HOVER) {
             event.Event_Name = button.event_hover; //every frame for now
-            std::cout << "BUTTON EVENT TRIGGER (Hover):   " << button.event_trigger << std::endl;
+            //std::cout << "BUTTON EVENT TRIGGER (Hover):   " << button.event_trigger << std::endl;
         }
         else if (state == TRIGGERED) {
             event.Event_Name = button.event_trigger;
-            std::cout << "BUTTON EVENT TRIGGER (Clicked): " << button.event_trigger << std::endl;
+            //std::cout << "BUTTON EVENT TRIGGER (Clicked): " << button.event_trigger << std::endl;
         }
         
         event_dispatcher.trigger<Button_Event>(std::move(event));
@@ -385,7 +401,5 @@ namespace EngineFramework
         }
     }
 
-
-
-#endif
+//#endif
 }

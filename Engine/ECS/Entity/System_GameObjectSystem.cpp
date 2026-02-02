@@ -558,6 +558,8 @@ namespace EngineFramework
 	{
 		std::vector<entt::entity> list;
 		nlohmann::json json_scene = nlohmann::json::parse(json_input);
+
+
 		/*
 			Deserialization process is similar to archtype.
 			- It is instantiated from an archtype (if none, then an entity is simply created)

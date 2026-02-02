@@ -1,12 +1,12 @@
 /*
 *****************************************************************/
 /*!
-\file   SceneManager.hpp
-\author Tang Yeun, Dean
-\par    y.tang\@digipen.edu
+\file   MenuManager.hpp
+\author Tan Yee Tong
+\par    yeetong.t\@digipen.edu
 \date   September 2025
 \brief
-This file allows the user to change scenes / levels
+This file allows the user to eit menu
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the
 prior written consent of DigiPen Institute of Technology is prohibited.
@@ -44,11 +44,15 @@ namespace EngineFramework
        
         void ScanMenus();
         const std::string& GetCurrentMenu() const;
-
+        void add_element(entt::entity e);
+        void remove_element(entt::entity e);
     private:
         static inline MenuManager* this_system{};
         std::vector<std::string> menuList;
         std::string currentMenu;
+
+        void create_new_menu();
+        bool open_create_menu_popup;
     };
 }
 

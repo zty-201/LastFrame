@@ -1,5 +1,5 @@
 {
-	"112": {
+	"262": {
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
 			"color": [
@@ -8,7 +8,6 @@
 				1.0
 			],
 			"event_received": "",
-			"hide_first": false,
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -23,10 +22,10 @@
 				10640027270492504069,
 				3711223656383638553
 			],
-			"visible": true
+			"visible": false
 		}
 	},
-	"115": {
+	"263": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				1122364430668251137,
@@ -51,7 +50,6 @@
 				1.0
 			],
 			"event_received": "",
-			"hide_first": false,
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -66,7 +64,7 @@
 				14380961733646991365,
 				3711223656383638553
 			],
-			"visible": true
+			"visible": false
 		}
 	}
 }

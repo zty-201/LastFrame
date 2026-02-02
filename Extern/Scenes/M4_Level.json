@@ -75,7 +75,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "ENV_Floor"
@@ -168,11 +169,13 @@
 			"name": "UI_Joystick"
 		},
 		"UIComponent": {
+			"Overlay_name": "",
 			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
+			"event_received": "",
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -266,7 +269,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_41"
@@ -391,7 +395,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_42"
@@ -516,7 +521,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_43"
@@ -641,7 +647,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_38"
@@ -1081,7 +1088,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "stairs_left_handle"
+			"meshName": "stairs_left_handle",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Stairs_01"
@@ -1206,7 +1214,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_44"
@@ -1331,7 +1340,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_45"
@@ -1456,7 +1466,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_46"
@@ -1581,7 +1592,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_47"
@@ -1706,7 +1718,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "office_table_broken"
+			"meshName": "office_table_broken",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Table"
@@ -1831,7 +1844,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_05"
@@ -1956,7 +1970,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_39"
@@ -2081,7 +2096,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_40"
@@ -2206,7 +2222,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_41"
@@ -2331,7 +2348,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_42"
@@ -2456,7 +2474,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_43"
@@ -2581,7 +2600,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_04"
@@ -2706,7 +2726,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_44"
@@ -2831,7 +2852,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_45"
@@ -2956,7 +2978,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_46"
@@ -3081,7 +3104,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_47"
@@ -3144,11 +3168,13 @@
 			"name": "UI_Calibrate"
 		},
 		"UIComponent": {
+			"Overlay_name": "",
 			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
+			"event_received": "",
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -3242,7 +3268,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_48"
@@ -3367,7 +3394,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_49"
@@ -3492,7 +3520,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_50"
@@ -3617,7 +3646,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_51"
@@ -3742,7 +3772,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_48"
@@ -3867,7 +3898,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_49"
@@ -3992,7 +4024,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_50"
@@ -4117,7 +4150,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_51"
@@ -4242,7 +4276,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_52"
@@ -4367,7 +4402,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_53"
@@ -4449,11 +4485,13 @@
 			"name": "UI_Flashlight"
 		},
 		"UIComponent": {
+			"Overlay_name": "",
 			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
+			"event_received": "",
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -4547,7 +4585,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_54"
@@ -4672,7 +4711,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_55"
@@ -4797,7 +4837,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_56"
@@ -4922,7 +4963,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_57"
@@ -5047,7 +5089,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_58"
@@ -5172,7 +5215,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_59"
@@ -5297,7 +5341,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_60"
@@ -5422,7 +5467,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_61"
@@ -5547,7 +5593,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_62"
@@ -5672,7 +5719,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_63"
@@ -5735,11 +5783,13 @@
 			"name": "UI_Action"
 		},
 		"UIComponent": {
+			"Overlay_name": "",
 			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
+			"event_received": "",
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -5833,7 +5883,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_64"
@@ -5958,7 +6009,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_65"
@@ -6083,7 +6135,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_66"
@@ -6208,7 +6261,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_04"
@@ -6333,7 +6387,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_67"
@@ -6458,7 +6513,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_68"
@@ -6583,7 +6639,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_69"
@@ -6708,7 +6765,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_70"
@@ -6833,7 +6891,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_71"
@@ -6958,7 +7017,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_72"
@@ -7083,7 +7143,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_06"
@@ -7208,7 +7269,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_73"
@@ -7333,7 +7395,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_window"
+			"meshName": "wall_window",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_52"
@@ -7458,7 +7521,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_53"
@@ -7583,7 +7647,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_54"
@@ -7708,7 +7773,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_55"
@@ -7833,7 +7899,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_56"
@@ -7958,7 +8025,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_57"
@@ -8083,7 +8151,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_58"
@@ -8208,7 +8277,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_59"
@@ -8333,7 +8403,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_60"
@@ -8458,7 +8529,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_07"
@@ -8583,7 +8655,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_61"
@@ -8708,7 +8781,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_62"
@@ -8833,7 +8907,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_63"
@@ -8958,7 +9033,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "shelf_storeroom"
+			"meshName": "shelf_storeroom",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Shelf_05"
@@ -9083,7 +9159,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_64"
@@ -9208,7 +9285,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_65"
@@ -9333,7 +9411,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_66"
@@ -9458,7 +9537,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_67"
@@ -9583,7 +9663,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_68"
@@ -9708,7 +9789,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_69"
@@ -9833,7 +9915,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_08"
@@ -9958,7 +10041,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_70"
@@ -10083,7 +10167,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_71"
@@ -10208,7 +10293,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_72"
@@ -10333,7 +10419,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_73"
@@ -10458,7 +10545,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_74"
@@ -10583,7 +10671,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_75"
@@ -10708,7 +10797,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_76"
@@ -10833,7 +10923,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_77"
@@ -10958,7 +11049,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_78"
@@ -11083,7 +11175,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_74"
@@ -11208,7 +11301,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_09"
@@ -11333,7 +11427,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_75"
@@ -11458,7 +11553,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_76"
@@ -11583,7 +11679,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_77"
@@ -11708,7 +11805,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_78"
@@ -11833,7 +11931,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doorframe"
+			"meshName": "room_doorframe",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Level2_DoorFrame"
@@ -11958,7 +12057,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_door"
+			"meshName": "room_door",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Level2_Door"
@@ -12377,7 +12477,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "stairs_left_float"
+			"meshName": "stairs_left_float",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Stairs_02"
@@ -12502,7 +12603,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "office_chair_broken"
+			"meshName": "office_chair_broken",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Chair"
@@ -12627,7 +12729,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_1"
+			"meshName": "cabinet_tall_break_1",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_01"
@@ -12752,7 +12855,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_2"
+			"meshName": "cabinet_tall_break_2",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_02"
@@ -12877,7 +12981,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_10"
@@ -13002,7 +13107,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_3"
+			"meshName": "cabinet_tall_break_3",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_03"
@@ -13127,7 +13233,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_crib"
+			"meshName": "baby_crib",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_BabyCradle"
@@ -13252,7 +13359,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_1"
+			"meshName": "cabinet_tall_break_1",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_05"
@@ -13377,7 +13485,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_2"
+			"meshName": "cabinet_tall_break_2",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_06"
@@ -13502,7 +13611,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_3"
+			"meshName": "cabinet_tall_break_3",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_04"
@@ -13627,7 +13737,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_1"
+			"meshName": "cabinet_tall_break_1",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_08"
@@ -13752,7 +13863,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cabinet_tall_break_3"
+			"meshName": "cabinet_tall_break_3",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Shelf_07"
@@ -13877,7 +13989,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_01"
@@ -14002,7 +14115,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_02"
@@ -14127,7 +14241,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_03"
@@ -14216,7 +14331,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "SkyBox"
+			"meshName": "SkyBox",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Skybox"
@@ -14299,7 +14415,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_11"
@@ -14424,7 +14541,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_04"
@@ -14549,7 +14667,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_05"
@@ -14674,7 +14793,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_06"
@@ -14799,7 +14919,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_07"
@@ -14924,7 +15045,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidChair_08"
@@ -15049,7 +15171,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_01"
@@ -15174,7 +15297,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_02"
@@ -15299,7 +15423,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_03"
@@ -15424,7 +15549,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_04"
@@ -15549,7 +15675,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_05"
@@ -15674,7 +15801,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_12"
@@ -15799,7 +15927,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_06"
@@ -15924,7 +16053,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_07"
@@ -16049,7 +16179,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_08"
@@ -16174,7 +16305,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_monkey"
+			"meshName": "toy_monkey",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_SoftToy_Crib"
@@ -16299,7 +16431,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_playtent"
+			"meshName": "toy_playtent",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Playtent"
@@ -16424,7 +16557,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "puzzle_mat"
+			"meshName": "puzzle_mat",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_PuzzleMat"
@@ -16549,7 +16683,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "kid_sofa"
+			"meshName": "kid_sofa",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_KidSofa"
@@ -16674,7 +16809,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_dresser"
+			"meshName": "baby_dresser",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_BabyDresser"
@@ -16799,7 +16935,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wallshelf_cute"
+			"meshName": "wallshelf_cute",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_WallShelf_01"
@@ -16924,7 +17061,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wallshelf_cute"
+			"meshName": "wallshelf_cute",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_WallShelf_02"
@@ -17049,7 +17187,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_13"
@@ -17174,7 +17313,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wallshelf_cute"
+			"meshName": "wallshelf_cute",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_WallShelf_03"
@@ -17299,7 +17439,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "rocking_horse"
+			"meshName": "rocking_horse",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_Horse"
@@ -17423,7 +17564,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wallshelf_cute"
+			"meshName": "wallshelf_cute",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_WallShelf_04"
@@ -17548,7 +17690,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "music_box"
+			"meshName": "music_box",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Playroom_MusicBox"
@@ -17672,7 +17815,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "canteen_tablechair_adult"
+			"meshName": "canteen_tablechair_adult",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_Table_01"
@@ -17796,7 +17940,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "canteen_tablechair_adult"
+			"meshName": "canteen_tablechair_adult",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_Table_02"
@@ -17920,7 +18065,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "canteen_tablechair_adult"
+			"meshName": "canteen_tablechair_adult",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_Table_03"
@@ -18044,7 +18190,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "canteen_tablechair_adult"
+			"meshName": "canteen_tablechair_adult",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_Table_04"
@@ -18168,7 +18315,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "shelf_storeroom"
+			"meshName": "shelf_storeroom",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Shelf_01"
@@ -18293,7 +18441,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "shelf_storeroom"
+			"meshName": "shelf_storeroom",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Shelf_02"
@@ -18418,7 +18567,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_01"
@@ -18543,7 +18693,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "shelf_storeroom"
+			"meshName": "shelf_storeroom",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Shelf_03"
@@ -18668,7 +18819,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "shelf_storeroom"
+			"meshName": "shelf_storeroom",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Shelf_04"
@@ -18793,7 +18945,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_78"
@@ -18939,7 +19092,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doorframe"
+			"meshName": "room_doorframe",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_DoorFrame"
@@ -19064,7 +19218,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doortopwall"
+			"meshName": "room_doortopwall",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_TopWall"
@@ -19189,7 +19344,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_door"
+			"meshName": "room_door",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_Door"
@@ -19335,7 +19491,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doorframe"
+			"meshName": "room_doorframe",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_DoorFrame"
@@ -19460,7 +19617,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doortopwall"
+			"meshName": "room_doortopwall",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_TopWall"
@@ -19585,7 +19743,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_79"
@@ -19710,7 +19869,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_80"
@@ -19835,7 +19995,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_02"
@@ -19960,7 +20121,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_door"
+			"meshName": "room_door",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_Door"
@@ -20085,7 +20247,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_01"
@@ -20210,7 +20373,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_02"
@@ -20335,7 +20499,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_03"
@@ -20460,7 +20625,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_05"
@@ -20585,7 +20751,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_06"
@@ -20710,7 +20877,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_07"
@@ -20835,7 +21003,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_08"
@@ -20960,7 +21129,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "bed_bunk"
+			"meshName": "bed_bunk",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BunkBed_09"
@@ -21085,7 +21255,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "curtain"
+			"meshName": "curtain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_Curtain"
@@ -21250,7 +21421,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_frame"
+			"meshName": "maindoor_frame",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Main_Doorframe"
@@ -21374,7 +21546,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wooden_chair_kid"
+			"meshName": "wooden_chair_kid",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_Chair"
@@ -21499,7 +21672,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_monkey"
+			"meshName": "toy_monkey",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_Toy"
@@ -21624,7 +21798,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_crib"
+			"meshName": "baby_crib",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BabyCrib_01"
@@ -21749,7 +21924,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_crib"
+			"meshName": "baby_crib",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BabyCrib_02"
@@ -21874,7 +22050,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_crib"
+			"meshName": "baby_crib",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BabyCrib_03"
@@ -21999,7 +22176,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_dresser"
+			"meshName": "baby_dresser",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BabyDresser_01"
@@ -22124,7 +22302,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "baby_dresser"
+			"meshName": "baby_dresser",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Bedroom_BabyDresser_02"
@@ -22213,7 +22392,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog"
+			"meshName": "toy_frog",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Frog"
@@ -22276,7 +22456,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "dinnerware_bowl"
+			"meshName": "dinnerware_bowl",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Dinner Bowl"
@@ -22375,7 +22556,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_left"
+			"meshName": "maindoor_left",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Main_DoorLeft"
@@ -22499,7 +22681,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_right"
+			"meshName": "maindoor_right",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Main_DoorRight"
@@ -22623,7 +22806,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_03"
@@ -22726,7 +22910,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_topwall"
+			"meshName": "maindoor_topwall",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Main_DoorTop"
@@ -22850,7 +23035,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_01"
@@ -22975,7 +23161,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_05"
@@ -23100,7 +23287,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_06"
@@ -23246,7 +23434,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doorframe"
+			"meshName": "room_doorframe",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Hall_DoorFrame"
@@ -23371,7 +23560,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_door"
+			"meshName": "room_door",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Hall_Door"
@@ -23474,7 +23664,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doortopwall"
+			"meshName": "room_doortopwall",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Hall_DoorTop"
@@ -23599,7 +23790,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_14"
@@ -23724,7 +23916,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_15"
@@ -23849,7 +24042,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_16"
@@ -23974,7 +24168,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_17"
@@ -24099,7 +24294,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_07"
@@ -24188,7 +24384,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "Sphere"
+			"meshName": "Sphere",
+			"visibility": true
 		},
 		"SceneRenderPass": null,
 		"TransformComponent": {
@@ -24286,7 +24483,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_08"
@@ -24411,7 +24609,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_09"
@@ -24536,7 +24735,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_10"
@@ -24661,7 +24861,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_11"
@@ -24786,7 +24987,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_12"
@@ -24911,7 +25113,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_13"
@@ -25014,7 +25217,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_frame"
+			"meshName": "maindoor_frame",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_14 hole"
@@ -25139,7 +25343,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_15"
@@ -25264,7 +25469,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_16"
@@ -25389,7 +25595,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_18"
@@ -25708,7 +25915,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_19"
@@ -25833,7 +26041,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_20"
@@ -25958,7 +26167,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_21"
@@ -26083,7 +26293,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_22"
@@ -26208,7 +26419,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_23"
@@ -26333,7 +26545,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_24"
@@ -26458,7 +26671,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_25"
@@ -26583,7 +26797,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_26"
@@ -26708,7 +26923,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_27"
@@ -26833,7 +27049,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_28"
@@ -26958,7 +27175,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_02"
@@ -27083,7 +27301,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_29"
@@ -27208,7 +27427,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_17"
@@ -27333,7 +27553,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_18"
@@ -27458,7 +27679,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_19"
@@ -27583,7 +27805,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_20"
@@ -27708,7 +27931,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_21"
@@ -27833,7 +28057,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_22"
@@ -27936,7 +28161,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_topwall"
+			"meshName": "maindoor_topwall",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_14 holetop"
@@ -28061,7 +28287,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_23"
@@ -28186,7 +28413,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_24"
@@ -28311,7 +28539,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_03"
@@ -28436,7 +28665,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_25"
@@ -28561,7 +28791,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_26"
@@ -28686,7 +28917,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_27"
@@ -28811,7 +29043,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_28"
@@ -28936,7 +29169,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_30"
@@ -29061,7 +29295,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_31"
@@ -29186,7 +29421,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_32"
@@ -29311,7 +29547,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_29"
@@ -29436,7 +29673,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_30"
@@ -29582,7 +29820,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_frame"
+			"meshName": "maindoor_frame",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_Doorframe"
@@ -29706,7 +29945,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_04"
@@ -29809,7 +30049,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "maindoor_topwall"
+			"meshName": "maindoor_topwall",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Canteen_DoorTop"
@@ -29933,7 +30174,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_31"
@@ -30058,7 +30300,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_32"
@@ -30183,7 +30426,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_33"
@@ -30308,7 +30552,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_34"
@@ -30454,7 +30699,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doorframe"
+			"meshName": "room_doorframe",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "HallEnd_DoorFrame"
@@ -30579,7 +30825,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_door"
+			"meshName": "room_door",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "HallEnd_Door"
@@ -30704,7 +30951,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_35"
@@ -30829,7 +31077,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_36"
@@ -30932,7 +31181,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "room_doortopwall"
+			"meshName": "room_doortopwall",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "HallEnd_DoorTop"
@@ -30995,11 +31245,13 @@
 			"name": "UI_JoystickBG"
 		},
 		"UIComponent": {
+			"Overlay_name": "",
 			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
+			"event_received": "",
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -31093,7 +31345,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_33"
@@ -31218,7 +31471,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_34"
@@ -31343,7 +31597,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_35"
@@ -31468,7 +31723,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_37"
@@ -31593,7 +31849,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "wall_plain"
+			"meshName": "wall_plain",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Wall_38"
@@ -31718,7 +31975,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_36"
@@ -31843,7 +32101,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_37"
@@ -31968,7 +32227,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_38"
@@ -32093,7 +32353,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_39"
@@ -32218,7 +32479,8 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "cube"
+			"meshName": "cube",
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Floor_40"

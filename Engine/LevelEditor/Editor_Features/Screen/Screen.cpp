@@ -66,7 +66,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "System_GameObjectSystem.hpp"
 #include "SceneManager.hpp"
 #include "PhysicsWorld.hpp"
-
+#include "MenuManager.hpp"
 //Audio
 #include "Audio.hpp"
 
@@ -499,7 +499,7 @@ namespace EngineFramework
                     tf.prevModelMatrix = tf.modelMatrix;
                 }
 
-                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && hovered && !ImGuizmo::IsOver())
+                if (!MenuManager::GetInstance().is_menu_running && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && hovered && !ImGuizmo::IsOver())
                 {
                     ImVec2 mousePos = ImGui::GetMousePos();
                     ImVec2 viewportPos = ImGui::GetItemRectMin();
