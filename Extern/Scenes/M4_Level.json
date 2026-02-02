@@ -21331,25 +21331,6 @@
 		}
 	},
 	"25": {
-		"AudioComponent": {
-			"Slots": [
-				{
-					"audio_guid": [
-						2608860144851107843,
-						11537445004664754516
-					],
-					"category": 1,
-					"id": "music",
-					"loop": true,
-					"maxDistance": 25.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": true,
-					"spatial": 1,
-					"volume": 1.0
-				}
-			]
-		},
 		"ColliderComponent": {
 			"maxBounds": [
 				94.9800033569336,
@@ -22625,132 +22606,6 @@
 				0.9999611973762512,
 				1.0,
 				0.9999611973762512
-			]
-		}
-	},
-	"259": {
-		"ColliderComponent": {
-			"maxBounds": [
-				21.22170639038086,
-				189.12550354003906,
-				20.108415603637695
-			],
-			"minBounds": [
-				-21.64395523071289,
-				-110.87449645996094,
-				-19.07728385925293
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						21.432830810546875,
-						150.0,
-						19.592849731445313
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						-0.21112346649169922,
-						39.1254997253418,
-						0.5155658721923828
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				3675096183540465801,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				1369253174326771851,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				5404478440450736269,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				5404478440450736271,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				17510154238822629521,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "wooden_chair_kid",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Canteen_KidChair_13"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-124.11756896972656,
-				10.0,
-				236.00088500976563
-			],
-			"rotation": [
-				-179.99989318847656,
-				11.5,
-				-179.99989318847656
-			],
-			"scale": [
-				0.9999644756317139,
-				1.0,
-				0.9999644756317139
 			]
 		}
 	},
@@ -39185,6 +39040,47 @@
 			]
 		}
 	},
+	"379": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						12476449099908300803,
+						11537445004664754516
+					],
+					"category": 3,
+					"id": "Wind",
+					"loop": true,
+					"maxDistance": 10.0,
+					"minDistance": 5.0,
+					"pitch": 1.0,
+					"playOnStart": true,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Wind_Ambience"
+		},
+		"TransformComponent": {
+			"position": [
+				0.0,
+				401.6575622558594,
+				-635.1781005859375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
 	"38": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -40866,6 +40762,10 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 5490970403712286721
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 596331687958085633
 				}
 			]
 		},
@@ -40940,7 +40840,7 @@
 			"position": [
 				0.0,
 				155.0,
-				-833.0786743164063
+				-823.5112915039063
 			],
 			"rotation": [
 				-179.99989318847656,
