@@ -169,11 +169,13 @@
 			"name": "UI_Joystick"
 		},
 		"UIComponent": {
+			"Overlay_name": "",
 			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
+			"event_received": "",
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -3164,11 +3166,13 @@
 			"name": "UI_Calibrate"
 		},
 		"UIComponent": {
+			"Overlay_name": "",
 			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
+			"event_received": "",
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -4478,11 +4482,13 @@
 			"name": "UI_Flashlight"
 		},
 		"UIComponent": {
+			"Overlay_name": "",
 			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
+			"event_received": "",
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -5774,11 +5780,13 @@
 			"name": "UI_Action"
 		},
 		"UIComponent": {
+			"Overlay_name": "",
 			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
+			"event_received": "",
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -39329,6 +39337,90 @@
 			"type": 0
 		}
 	},
+	"381": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 13011709128368078849
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "InteractionDetector"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"TransformComponent": {
+			"position": [
+				-234.16085815429688,
+				170.7839813232422,
+				-341.0154113769531
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				100.0,
+				100.0,
+				100.0
+			]
+		}
+	},
 	"39": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -40845,18 +40937,18 @@
 			],
 			"constant": 1.0,
 			"direction": [
-				-0.5932623744010925,
-				-0.06557729095220566,
-				0.8023337125778198
+				-0.08087199926376343,
+				-0.02373424917459488,
+				0.9964419007301331
 			],
 			"innerConeAngle": 15.0,
 			"intensity": 10000.0,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 35.0,
 			"position": [
-				23.46025276184082,
-				89.46076965332031,
-				181.97047424316406
+				-234.2012939453125,
+				169.98397827148438,
+				-370.5171813964844
 			],
 			"quadratic": 0.03200000151991844,
 			"radius": 1000.0,
@@ -40884,6 +40976,10 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 5490970403712286721
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 12304916665747210243
 				}
 			]
 		},
@@ -40940,9 +41036,9 @@
 			"mass": 10.0,
 			"useGravity": true,
 			"velocity": [
-				0.0,
-				0.02808959223330021,
-				0.0
+				8.640505200219195e-09,
+				-1.3216412853012116e-08,
+				-6.418971576493959e-09
 			]
 		},
 		"PhysicsMaterialComponent": {
@@ -40956,14 +41052,14 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				0.0,
-				155.0,
-				-823.5112915039063
+				-234.16085815429688,
+				169.98397827148438,
+				-371.0154113769531
 			],
 			"rotation": [
-				-179.99989318847656,
-				-5.008955668017734e-06,
-				-179.99989318847656
+				0.0,
+				0.0,
+				0.0
 			],
 			"scale": [
 				1.0,
@@ -46439,11 +46535,13 @@
 			"name": "UI_JoystickBG"
 		},
 		"UIComponent": {
+			"Overlay_name": "",
 			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
+			"event_received": "",
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
