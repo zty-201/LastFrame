@@ -71,6 +71,8 @@ namespace EngineFramework
 		static bool s_DrawColliders;
 		static bool s_DrawAllColliders;
 
+		glm::vec2 GetMouseInSceneUI() const;
+
 		private:
 
 			std::unique_ptr<HistorySystem> history;

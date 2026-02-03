@@ -66,7 +66,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "System_GameObjectSystem.hpp"
 #include "SceneManager.hpp"
 #include "PhysicsWorld.hpp"
-
+#include "MenuManager.hpp"
 //Audio
 #include "Audio.hpp"
 
@@ -499,7 +499,7 @@ namespace EngineFramework
                     tf.prevModelMatrix = tf.modelMatrix;
                 }
 
-                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && hovered && !ImGuizmo::IsOver())
+                if (!MenuManager::GetInstance().is_menu_running && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && hovered && !ImGuizmo::IsOver())
                 {
                     ImVec2 mousePos = ImGui::GetMousePos();
                     ImVec2 viewportPos = ImGui::GetItemRectMin();
@@ -666,6 +666,27 @@ namespace EngineFramework
     void Screen::Close() {
         clear_backup();
         LOGI("Screen closed");
+    }
+
+    glm::vec2 Screen::GetMouseInSceneUI() const {
+
+        const auto [mxD, myD] = InputManager::GetInstance().GetMousePosition();
+        const float mx = static_cast<float>(mxD);
+        const float my = static_cast<float>(myD);
+
+        float localX = mx - screen_pos.x;
+        float localY = my - screen_pos.y;
+
+        if (localX < 0.0f || localY < 0.0f ||
+            localX > available_size.x || localY > available_size.y)
+        {
+            return { -1.0f, -1.0f };
+        }
+
+        float uiY = available_size.y - localY;
+
+        return { localX, uiY };
+
     }
 
     void Screen::display_screen() {

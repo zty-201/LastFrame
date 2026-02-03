@@ -159,10 +159,12 @@ namespace EngineFramework
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 
+        public:
+
         bool editor_simulation_running;
         bool editor_running;
 
-    public:
+    
         void HANDLE_EVENT_LevelEditor_Simulation(Event_Level_Editor_Simulation& play)
         {
             //Only draw the scene to the framebuffer if in level editor.

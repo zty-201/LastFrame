@@ -1098,9 +1098,9 @@ namespace Engine {
 
         auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(full_guid);
         if (!scriptAsset) {
-            LOGE("[LuaRuntime] ScriptAsset not found for GUID %llu (entity %u)",
-                inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
-            inst.Loaded = false;
+            //LOGE("[LuaRuntime] ScriptAsset not found for GUID %llu (entity %u)",
+                //inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
+            //inst.Loaded = false;
             return;
         }
 
