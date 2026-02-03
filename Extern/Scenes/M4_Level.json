@@ -22624,8 +22624,8 @@
 		},
 		"TransformComponent": {
 			"position": [
-				325.89715576171875,
-				179.55563354492188,
+				300.0,
+				180.0,
 				-285.834716796875
 			],
 			"rotation": [
@@ -38988,6 +38988,122 @@
 			]
 		}
 	},
+	"377": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 596331687958085633
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Indoor_Detector_02"
+		},
+		"TransformComponent": {
+			"position": [
+				90.0,
+				200.0,
+				300.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				600.0,
+				200.0,
+				400.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
+		}
+	},
+	"378": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 596331687958085633
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Indoor_Detector_03"
+		},
+		"TransformComponent": {
+			"position": [
+				30.0,
+				200.0,
+				1100.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				700.0,
+				200.0,
+				400.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
+		}
+	},
 	"379": {
 		"AudioComponent": {
 			"Slots": [
@@ -39153,6 +39269,64 @@
 				1.0,
 				1.0
 			]
+		}
+	},
+	"380": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 596331687958085633
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Indoor_Detector_04"
+		},
+		"TransformComponent": {
+			"position": [
+				-700.0,
+				400.0,
+				600.0
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				400.0,
+				400.0,
+				300.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"39": {

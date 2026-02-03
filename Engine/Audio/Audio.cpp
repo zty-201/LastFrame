@@ -82,12 +82,19 @@ namespace EngineFramework
 	AudioSystem::~AudioSystem()
 	{
 #ifndef DISABLE_FMOD
+		if (m_ambienceLowpass)
+		{
+			m_ambienceLowpass->release();
+			m_ambienceLowpass = nullptr;
+		}
+
 		if (m_ambienceLowpass) { m_ambienceLowpass->release(); m_ambienceLowpass = nullptr; }
 		if (m_groupAmbience) { m_groupAmbience->release(); m_groupAmbience = nullptr; }
 		if (m_groupUI) { m_groupUI->release();       m_groupUI = nullptr; }
 		if (m_groupBGM) { m_groupBGM->release();    m_groupBGM = nullptr; }
 		if (m_groupSFX) { m_groupSFX->release();      m_groupSFX = nullptr; }
 		if (m_groupMaster) { m_groupMaster->release();   m_groupMaster = nullptr; }
+
 
 		if (m_system)
 		{
@@ -152,28 +159,20 @@ namespace EngineFramework
 		if (m_groupUI)       m_groupUI->setVolume(1.0f);
 		if (m_groupAmbience) m_groupAmbience->setVolume(1.0f);
 
-		// Ambience LOWPASS DSP (Indoor muffling)
+		// Ambience muffling DSP (lowpass), controlled by SetIndoorFactor()
 		if (m_system && m_groupAmbience)
 		{
-			r = m_system->createDSPByType(FMOD_DSP_TYPE_LOWPASS, &m_ambienceLowpass);
-			logFmodError(r, "createDSPByType(LOWPASS)");
+			FMOD_RESULT r2 = m_system->createDSPByType(FMOD_DSP_TYPE_LOWPASS, &m_ambienceLowpass);
+			logFmodError(r2, "createDSPByType(LOWPASS)");
 
-			if (r == FMOD_OK && m_ambienceLowpass)
+			if (r2 == FMOD_OK && m_ambienceLowpass)
 			{
-				r = m_groupAmbience->addDSP(0, m_ambienceLowpass);
-				logFmodError(r, "Ambience addDSP(LOWPASS)");
+				r2 = m_groupAmbience->addDSP(0, m_ambienceLowpass);
+				logFmodError(r2, "Ambience addDSP(LOWPASS)");
 
-				if (r == FMOD_OK)
-				{
-					(void)m_ambienceLowpass->setParameterFloat(
-						FMOD_DSP_LOWPASS_CUTOFF, 20000.0f); // outdoors
-					(void)m_ambienceLowpass->setBypass(true);
-				}
-				else
-				{
-					m_ambienceLowpass->release();
-					m_ambienceLowpass = nullptr;
-				}
+				// Start outdoors: no muffling
+				m_ambienceLowpass->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, 20000.0f);
+				m_ambienceLowpass->setBypass(true);
 			}
 		}
 
@@ -645,6 +644,24 @@ namespace EngineFramework
 			m_commands.clear();
 			m_playOnStartDone.clear();
 		}
+	}
+
+	void AudioSystem::SetIndoorFactor(float factor)
+	{
+		m_indoorFactor = std::clamp(factor, 0.0f, 1.0f);
+
+#ifndef DISABLE_FMOD
+		if (!m_ambienceLowpass) return;
+
+		// 0.0 outdoor = clear, 1.0 indoor = muffled
+		const float cutoffOutdoor = 20000.0f;
+		const float cutoffIndoor = 1200.0f;
+
+		const float cutoff = cutoffOutdoor + (cutoffIndoor - cutoffOutdoor) * m_indoorFactor;
+
+		m_ambienceLowpass->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoff);
+		m_ambienceLowpass->setBypass(m_indoorFactor < 0.01f);
+#endif
 	}
 
 } // namespace EngineFramework

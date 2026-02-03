@@ -450,6 +450,12 @@ namespace Engine {
                     (EngineFramework::AudioGroup)group, vol);
             });
 
+        s_Lua.set_function("Audio_SetIndoorFactor",
+            [](float factor)
+            {
+                EngineFramework::AudioSystem::GetInstance().SetIndoorFactor(factor);
+            });
+
         // ===============================================================
         // UIComponent bindings
         // ===============================================================

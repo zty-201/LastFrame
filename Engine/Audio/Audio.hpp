@@ -107,6 +107,7 @@ namespace EngineFramework
         bool IsInitialized() const;
 
         void SetSimulationMode(bool enabled);
+        void SetIndoorFactor(float factor); // 0.0 = outdoor, 1.0 = indoor
 
         AudioSystem();
         ~AudioSystem() override;
@@ -159,6 +160,8 @@ namespace EngineFramework
         void HandlePlayOnStart(entt::registry& ecsRegistry);
 
     private:
+        float m_indoorFactor = 0.0f;
+
 #ifndef DISABLE_FMOD
         FMOD::System* m_system = nullptr;
 
@@ -169,7 +172,6 @@ namespace EngineFramework
         FMOD::ChannelGroup* m_groupAmbience = nullptr;
 
         FMOD::DSP* m_ambienceLowpass = nullptr;
-
 #else
         void* m_system = nullptr;
         void* m_groupMaster = nullptr;
@@ -177,6 +179,7 @@ namespace EngineFramework
         void* m_groupSFX = nullptr;
         void* m_groupUI = nullptr;
         void* m_groupAmbience = nullptr;
+        void* m_ambienceLowpass = nullptr;
 #endif
 
         std::function<std::string(const std::string&)> m_pathResolver;
@@ -194,6 +197,8 @@ namespace EngineFramework
         std::unordered_map<entt::entity, bool> m_playOnStartDone;
 
         bool m_inSimulation = false;
+
+        
 
         static AudioSystem* this_system;
 
