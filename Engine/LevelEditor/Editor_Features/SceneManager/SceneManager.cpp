@@ -42,6 +42,7 @@ namespace EngineFramework
 
 		std::string sceneString = AssetManagerSystem::GetStringFromFile("Extern/Scenes/" + defaultScene);
 		GameObjectSystem::GetInstance().LoadScene(sceneString);
+		UI_System::GetInstance().Initialize();
 		currentScene = defaultScene;
 		Screen::GetInstance().is_enabled = true;
 		is_file_loaded = true;

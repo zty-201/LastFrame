@@ -79,7 +79,7 @@ namespace EngineFramework
 		
 		if (!is_enabled) return; // only open if toggled		
 		
-		if (ImGui::Begin("Menu Manager", &is_enabled))
+		if (ImGui::Begin("Menu Manager"))
 		{
 			ImGui::Text("Available Menu:");
 			ImGui::Separator();

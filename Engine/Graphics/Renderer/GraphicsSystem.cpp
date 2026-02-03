@@ -1050,9 +1050,24 @@ namespace EngineFramework
         // We sort them by 'layer' so background panels draw before text/icons
         auto view = registry.view<UIComponent>();
 
+        
+
+
         for (auto [entity, ui] : view.each())
         {
             if (!ui.visible) continue;
+
+            if (ui.is_NDC) {
+
+                ui.position.x = (ui.position_NDC.x + 1.0f) * 0.5f * screen.x;
+                ui.position.y = (1.0f - ui.position_NDC.y) * 0.5f * screen.y;
+
+                // shift from center to bottom-left anchor 
+                // (because scale starts from bottom left up so like we need to shift down)
+                ui.position.x -= ui.size.x * 0.5f;
+                ui.position.y -= ui.size.y * 0.5f;
+
+            }
 
             glm::vec2 finalPos = ui.position;
             glm::vec2 finalSize = ui.size;
@@ -1075,6 +1090,8 @@ namespace EngineFramework
                     continue; // Skip rendering if not on screen
                 }
             }
+
+            
 
 
             // --- CALCULATE MODEL MATRIX ---

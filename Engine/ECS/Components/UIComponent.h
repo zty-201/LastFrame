@@ -19,7 +19,8 @@ struct UIComponent
     bool visible = true;
 	float luminance = 1.0f; // Brightness multiplier
     int layer = 0;           // Optional: Render order (0=Back, 10=Front)
-
+    bool is_NDC = false;
+    glm::vec2 position_NDC;
 
     //================ extra stuff for overlays =====================
     bool belong_to_menu;

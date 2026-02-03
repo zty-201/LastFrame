@@ -839,6 +839,8 @@ namespace EngineFramework
 			.data<&UIComponent::textureid>("textureid")
 				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&UIComponent::position>("position")
+			.data<&UIComponent::is_NDC>("is_NDC")
+			.data<&UIComponent::position_NDC>("position_NDC")
 			.data<&UIComponent::size>("size")
 			.data<&UIComponent::color>("color")
 			.data<&UIComponent::visible>("visible")

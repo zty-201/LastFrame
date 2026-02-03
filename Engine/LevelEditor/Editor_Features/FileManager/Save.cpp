@@ -165,8 +165,7 @@ namespace EngineFramework
 
     bool Save::save_Instances(std::string filename) {
 
-        std::unordered_set <entt::entity> except_list = 
-            UI_System::GetInstance().Seralise_AllMenus();
+        std::unordered_set <entt::entity> except_list = UI_System::GetInstance().Seralise_AllMenus();
         std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Scenes/" + filename;
         std::ofstream Out_File(path);
 
