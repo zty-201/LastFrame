@@ -2070,13 +2070,14 @@ namespace EngineFramework
 
 
         MenuManager::GetInstance().close_menuEditor();
-        //UI_System::GetInstance().Seralise_AllMenus();
+        
 
         if (is_simulator_running) return;
 
         //std::cout << "play_simulation\n";
         is_simulator_running = true;
         EngineFramework::AudioSystem::GetInstance().SetSimulationMode(true);
+        
 
         // ============================
         // SAVE CURRENT CAMERA POSITION
@@ -2138,9 +2139,13 @@ namespace EngineFramework
             HERE IS THE PROBLEM
         */
 
-        //SAVE MENU FIRST BAH WHEN SIMULATION IS RUNNING
-        std::unordered_set<entt::entity> except_list = UI_System::GetInstance().Seralise_AllMenus();
+        //SAVE MENU FIRST WHEN SIMULATION IS RUNNING
+        std::unordered_set<entt::entity> except_list = UI_System::GetInstance().Seralise_AllMenus(); 
+        //SERALISE INTO A STRING FOR SCENE FILES NOT MENU ENTITIES
         json_backup = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances(except_list);
+        //LOAD START MENU OF OVERLAY
+        UI_System::GetInstance().Load_Start_Menu(); //load the first menu
+
 
         //get all entity
         //std::vector<entt::entity> entities;
@@ -2209,6 +2214,7 @@ namespace EngineFramework
         
         GameObjectSystem::GetInstance().LoadScene(json_backup);
         UI_System::GetInstance().Initialize();
+        UI_System::GetInstance().closeAllMenu(); //load the first menu
 
 
         json_backup = {};

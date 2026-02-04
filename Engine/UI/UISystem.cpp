@@ -74,6 +74,8 @@ namespace EngineFramework
         //std::cout << "=========================================\n";
         //std::cout << "   DONE     UI_System::Initialize()      \n";
         //std::cout << "=========================================\n";
+
+        Load_Start_Menu();
       
     }
 
@@ -246,6 +248,10 @@ namespace EngineFramework
 
         return set;
 
+    }
+
+    void UI_System::Load_Start_Menu() {
+        displayMenu("Menu_1");
     }
 
     void UI_System::displayMenu(std::string menuname) {

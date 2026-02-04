@@ -55,7 +55,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "MenuManager.hpp"
 #include "PropertyManager.hpp"
 #include "GameplayKeyManager.hpp"
-
+#include "UISystem.hpp"
 namespace
 {
 constexpr const char* kDefaultLayoutRelativePath = "Extern/LevelEditor/imgui_default.ini";
@@ -114,6 +114,8 @@ namespace EngineFramework
 
 	void LevelEditor::Initialize()
 	{
+		
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
@@ -315,10 +317,7 @@ namespace EngineFramework
 		//MAIN MENU SHOULD CONTAIN THE SUB MENUS
 
 		ImGuiIO& io = ImGui::GetIO();
-		//ImGuiIO& io = ImGui::GetIO();
-		io.FontGlobalScale = 1.0f;   // DEFAULT
-
-
+		
 		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
 
 		// Set the window at the top of the screen, full width, small height

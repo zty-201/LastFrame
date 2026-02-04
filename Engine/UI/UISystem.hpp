@@ -121,6 +121,7 @@ namespace EngineFramework
         void add_entity_fromMenu(std::string menu, entt::entity e);
         void remove_entity_fromMenu(std::string menu, entt::entity e);
 
+        void Load_Start_Menu();
 
 
     private:
