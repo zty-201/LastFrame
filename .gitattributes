@@ -1,1 +1,50 @@
 * text=auto eol=lf
+
+# Archives
+*.7z      binary
+*.gz      binary
+*.rar     binary
+*.tar     binary
+*.zip     binary
+
+# Images
+*.ai      binary
+*.bmp     binary
+*.gif     binary
+*.ico     binary
+*.jpeg    binary
+*.jpg     binary
+*.png     binary
+*.psd     binary
+*.svg     binary      
+*.webp    binary
+
+# Video/Audio
+*.flv     binary
+*.mov     binary
+*.mp3     binary
+*.mp4     binary
+*.ogg     binary
+*.wav     binary
+
+# Documents
+*.doc     binary
+*.docx    binary
+*.pdf     binary
+*.ppt     binary
+*.pptx    binary
+*.xls     binary
+*.xlsx    binary
+
+# Executables/Libraries
+*.dll     binary
+*.exe     binary
+*.o       binary
+*.so      binary
+
+# Fonts
+*.eot     binary
+*.otf     binary
+*.ttf     binary
+*.woff    binary
+*.woff2   binary
