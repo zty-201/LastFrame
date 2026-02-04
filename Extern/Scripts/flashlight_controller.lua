@@ -140,15 +140,10 @@ function on_update(self, dt)
     end
 
     -- =========================================
-    -- Keyboard test + flashlight toggle
+    -- Keyboard toggle + AUDIO PLAY
     -- =========================================
--- =========================================
--- Keyboard toggle + AUDIO PLAY
--- =========================================
-if PLATFORM == "windows" then
-        
-    if Input.GetKey(GLFW_KEY_Q) then
-        if not prevFDown then
+    if PLATFORM == "windows" then
+        if Input.GetKeyDown(GLFW_KEY_Q) then
             print("[FLASH] Q pressed")
 
             -- 1) toggle flashlight
@@ -163,11 +158,7 @@ if PLATFORM == "windows" then
                 print("[FLASH] NO AUDIO COMPONENT FOUND!")
             end
         end
-        prevFDown = true
-    else
-        prevFDown = false
     end
-end
 
 
     -- =========================================

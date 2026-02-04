@@ -15,6 +15,7 @@ local yaw = 0.0
 local pitch = 0.0
 local distance = 5.0       -- fixed distance from target
 local target = { x = 0.0, y = 0.0, z = 0.0 } -- camera look-at point
+local heightOffset = 1.2
 
 -- Gryoscope config
 local GYRO_SENSITIVITY = 15.0
@@ -65,11 +66,11 @@ function on_update(self, dt)
         local cosPitch = math.cos(radPitch)
 
         local x = target.x + distance * cosPitch * math.sin(radYaw)
-        local y = target.y + distance * math.sin(radPitch)
+        local y = (target.y + heightOffset) + distance * math.sin(radPitch)
         local z = target.z + distance * cosPitch * math.cos(radYaw)
 
         camera:SetPosition(x, y, z)
-        camera:LookAt(target.x, target.y, target.z)
+        camera:LookAt(target.x, target.y + heightOffset, target.z)
 
         -- Also update SHARED.POV for flashlight / movement
         SHARED.POV = SHARED.POV or {}
@@ -157,7 +158,7 @@ function on_update(self, dt)
             local z = target.z + distance * math.cos(radPitch) * math.cos(radYaw)
 
             camera:SetPosition(x, y, z)
-            camera:LookAt(target.x, target.y, target.z)
+            camera:LookAt(target.x, target.y + heightOffset, target.z)
         end
 
         lastX, lastY = mx, my
@@ -212,7 +213,7 @@ function on_update(self, dt)
         local z = target.z + distance * cosPitch * math.cos(radYaw)
         
         camera:SetPosition(x, y, z)
-        camera:LookAt(target.x, target.y, target.z)
+        camera:LookAt(target.x, target.y + heightOffset, target.z)
     end
 
         -- --- UPDATE SHARED POV (for flashlight, UI, movement) ---
