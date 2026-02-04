@@ -162,6 +162,8 @@ namespace EngineFramework
 
     }
 
+    
+
     std::unordered_set<entt::entity> UI_Menu::Seralise() {
 
 
@@ -399,6 +401,22 @@ namespace EngineFramework
 
             }
         }
+    }
+
+    void UI_Menu::removeAllEntities_Reg() {
+
+        for (auto entity : AllElements_in_this_overlay) {
+
+            if (!registry.valid(entity)) {
+                continue;
+            }
+
+            registry.destroy(entity);
+          
+        }
+
+        AllElements_in_this_overlay.clear();
+
     }
 
 //#endif

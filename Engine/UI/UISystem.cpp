@@ -77,6 +77,21 @@ namespace EngineFramework
       
     }
 
+    void UI_System::Clean_All() {
+
+        for (auto& [name, menu] : Menu_Mapping) {
+
+            if (menu.first) {
+                
+                menu.first->removeAllEntities_Reg(); //only update those active ones
+                
+            }
+        }
+
+        Menu_Mapping.clear();
+        current_menu.clear();
+    }
+
     void UI_System::DeserializeAllOverlays(){
 
         Menu_Mapping.clear();
@@ -213,6 +228,23 @@ namespace EngineFramework
         }
 
         return {};
+
+    }
+
+    std::unordered_set<entt::entity> UI_System::getAllMenu_Entities() {
+
+        std::unordered_set<entt::entity> set;
+
+        for (auto& [name, menu] : Menu_Mapping)
+        {
+            if (!menu.first) continue;
+
+            const auto& elems = menu.first->get_Elements();
+
+            set.insert(elems.begin(), elems.end());
+        }
+
+        return set;
 
     }
 

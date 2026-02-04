@@ -76,6 +76,13 @@ namespace EngineFramework
 
 	void MenuManager::Run()
 	{
+		/*
+		* simulation must be closed
+		*/
+		if (Screen::GetInstance().is_simulator_running) {
+			is_enabled = false;
+			return;
+		}
 		
 		if (!is_enabled) return; // only open if toggled		
 		
@@ -125,13 +132,7 @@ namespace EngineFramework
 
 			if (ImGui::Button("Close Menu Editor and Return to Scene"))
 			{
-				is_enabled = false;
-				is_menu_running = false;
-				currentMenu.clear();
-				UI_System::GetInstance().closeAllMenu();
-				//UI_System::GetInstance().Seralise_AllMenus();
-
-				LOGD("Exited Menu Editor, returning to scene");
+				close_menuEditor();
 			}
 
 			create_new_menu();
@@ -139,6 +140,18 @@ namespace EngineFramework
 
 		}
 		ImGui::End();
+	}
+
+	void MenuManager::close_menuEditor() {
+
+		is_enabled = false;
+		is_menu_running = false;
+		currentMenu.clear();
+		UI_System::GetInstance().closeAllMenu();
+		//UI_System::GetInstance().Seralise_AllMenus();
+
+		LOGD("Exited Menu Editor, returning to scene");
+
 	}
 
 	void MenuManager::create_new_menu() {

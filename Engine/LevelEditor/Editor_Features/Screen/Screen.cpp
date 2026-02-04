@@ -69,7 +69,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "MenuManager.hpp"
 //Audio
 #include "Audio.hpp"
-
+#include "UISystem.hpp"
 namespace EngineFramework
 {
     using namespace entt::literals;
@@ -2068,7 +2068,12 @@ namespace EngineFramework
 
     void Screen::play_simulation() {
 
+
+        MenuManager::GetInstance().close_menuEditor();
+        //UI_System::GetInstance().Seralise_AllMenus();
+
         if (is_simulator_running) return;
+
         //std::cout << "play_simulation\n";
         is_simulator_running = true;
         EngineFramework::AudioSystem::GetInstance().SetSimulationMode(true);
@@ -2129,7 +2134,13 @@ namespace EngineFramework
 
         Engine::ScriptSystem::OnRuntimeStart(registry);
 
-        json_backup = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances();
+        /*
+            HERE IS THE PROBLEM
+        */
+
+        //SAVE MENU FIRST BAH WHEN SIMULATION IS RUNNING
+        std::unordered_set<entt::entity> except_list = UI_System::GetInstance().Seralise_AllMenus();
+        json_backup = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances(except_list);
 
         //get all entity
         //std::vector<entt::entity> entities;
@@ -2191,7 +2202,14 @@ namespace EngineFramework
         ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoKeyboard;
         GameObjectSystem::GetInstance().ClearAllInstances();
 
+        /*
+            I MAKE SOME NEW CHANGES HERE
+        */
+
+        
         GameObjectSystem::GetInstance().LoadScene(json_backup);
+        UI_System::GetInstance().Initialize();
+
 
         json_backup = {};
 

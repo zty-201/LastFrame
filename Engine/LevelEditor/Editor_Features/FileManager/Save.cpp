@@ -38,6 +38,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "InputManager.hpp"
 #include "AssetWindow.hpp"
 #include "UISystem.hpp"
+#include "MenuManager.hpp"
 namespace EngineFramework
 {
     Save::Save() {
@@ -124,7 +125,7 @@ namespace EngineFramework
         if (!save_Archtypes()) return false;
         if (!save_Instances(filename)) return false;
         
-
+        
         InputManager::GetInstance().key_mapping_codegen();
         InputManager::GetInstance().seralise();
         InputManager::GetInstance().key_mapping_codegen_script();
@@ -137,7 +138,7 @@ namespace EngineFramework
 
     bool Save::save_Archtypes() {
 
-        
+        MenuManager::GetInstance().close_menuEditor();
         auto pairs = GameObjectSystem::GetInstance().SerializeAllEntityArchtypes();
         std::string base = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Archtypes/";
 
