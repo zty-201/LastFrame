@@ -349,6 +349,23 @@ namespace Engine {
         // ===============================================================
         // AudioComponent bindings
         // ===============================================================
+        // Overview
+        // --------
+        // Our audio is driven by an entity's AudioComponent, which contains multiple
+        // named "Slots". A Slot is one sound configuration (asset + settings) that can
+        // be triggered from Lua by slot ID.
+        //
+        // Typical workflow for designers
+        // ------------------------------
+        // 1) Add an AudioComponent to an entity in the editor.
+        // 2) Add one or more Slots (e.g. "Footstep", "Wind", "DoorOpen").
+        // 3) For each Slot, assign an Audio asset and settings:
+        //      - category: SFX / BGM / UI / Ambience
+        //      - spatial: 2D / 3D
+        //      - loop, volume, pitch
+        //      - min/max distance (for 3D)
+        //
+        // Then scripts can play/stop those slots by name.
         sol::table audioEnums = s_Lua.create_named_table("Audio");
 
         audioEnums["Category_SFX"] = (int)AudioComponent::AudioCategory::SFX;
@@ -359,7 +376,6 @@ namespace Engine {
         audioEnums["Spatial_2D"] = (int)AudioComponent::SpatialMode::TwoD;
         audioEnums["Spatial_3D"] = (int)AudioComponent::SpatialMode::ThreeD;
 
-        // Bind Slot (formerly AudioClip)
         s_Lua.new_usertype<AudioComponent::Slot>("AudioSlot",
             // ID
             "GetID", [](AudioComponent::Slot& s) { return s.id; },
@@ -450,6 +466,9 @@ namespace Engine {
                     (EngineFramework::AudioGroup)group, vol);
             });
 
+        // Muffle ambience while indoors (called by zone triggers):
+        //   Audio_SetIndoorFactor(1.0)  -- enter
+        //   Audio_SetIndoorFactor(0.0)  -- exit
         s_Lua.set_function("Audio_SetIndoorFactor",
             [](float factor)
             {
