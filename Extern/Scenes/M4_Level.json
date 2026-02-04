@@ -601,332 +601,17 @@
 	"104": {
 		"ColliderComponent": {
 			"maxBounds": [
-				78.1050033569336,
+				-48.345001220703125,
 				403.8202209472656,
 				155.54147338867188
 			],
 			"minBounds": [
-				-63.87800216674805,
-				-19.762001037597656,
-				-172.9340057373047
+				-60.21099853515625,
+				-3.11175537109375,
+				-168.52700805664063
 			],
 			"mode": 0,
 			"shapes": [
-				{
-					"boxHalfExtents": [
-						64.88300323486328,
-						18.766000747680664,
-						16.68400001525879
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						13.222000122070313,
-						-0.9959999918937683,
-						132.1999969482422
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						25.149999618530273,
-						110.80000305175781
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.121999979019165,
-						41.29999923706055,
-						80.0
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						60.0,
-						64.44999694824219
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						80.80000305175781,
-						40.70000076293945
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						100.0,
-						21.100000381469727
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						121.05000305175781,
-						-0.75
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						140.64999389648438,
-						-22.0
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						158.35000610351563,
-						-45.150001525878906
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						177.5500030517578,
-						-66.69999694824219
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						196.60000610351563,
-						-89.3499984741211
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						216.25,
-						-110.55000305175781
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						235.9499969482422,
-						-132.4499969482422
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						254.3000030517578,
-						-154.5500030517578
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						66.55000305175781,
-						123.26599884033203,
-						6.084000110626221
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						2.671999931335449,
-						122.00399780273438,
-						-166.85000610351563
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
 				{
 					"boxHalfExtents": [
 						5.933000087738037,
@@ -11143,311 +10828,17 @@
 	"186": {
 		"ColliderComponent": {
 			"maxBounds": [
-				78.1050033569336,
-				289.25,
+				-47.994998931884766,
+				248.92001342773438,
 				175.4409942626953
 			],
 			"minBounds": [
-				-61.87800598144531,
-				1.9379997253417969,
+				-58.7609977722168,
+				150.88800048828125,
 				-174.7270050048828
 			],
 			"mode": 0,
 			"shapes": [
-				{
-					"boxHalfExtents": [
-						64.88300323486328,
-						18.166000366210938,
-						16.68400001525879
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						13.222000122070313,
-						20.104000091552734,
-						132.1999969482422
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						38.150001525878906,
-						110.80000305175781
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.121999979019165,
-						57.70000076293945,
-						80.0
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						76.25,
-						64.44999694824219
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						94.19999694824219,
-						40.70000076293945
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						114.75,
-						21.100000381469727
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						135.89999389648438,
-						-0.75
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						18.0,
-						17.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						153.85000610351563,
-						-22.0
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						171.75,
-						-45.150001525878906
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						191.3000030517578,
-						-66.69999694824219
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						211.8000030517578,
-						-89.3499984741211
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						229.4499969482422,
-						-110.55000305175781
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						250.8000030517578,
-						-132.4499969482422
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
-				{
-					"boxHalfExtents": [
-						65.0,
-						19.600000381469727,
-						17.850000381469727
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.1219940185546875,
-						269.6499938964844,
-						-154.5500030517578
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				},
 				{
 					"boxHalfExtents": [
 						5.382999897003174,
@@ -40077,6 +39468,174 @@
 			]
 		}
 	},
+	"408": {
+		"ColliderComponent": {
+			"maxBounds": [
+				90.0,
+				319.20001220703125,
+				90.0
+			],
+			"minBounds": [
+				-90.0,
+				-319.20001220703125,
+				-90.0
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						90.0,
+						319.20001220703125,
+						90.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Stairs_01_FloorColl"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-800.0,
+				9.515430450439453,
+				375.5524597167969
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				45.749996185302734
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"409": {
+		"ColliderComponent": {
+			"maxBounds": [
+				77.30000305175781,
+				243.25,
+				11.300000190734863
+			],
+			"minBounds": [
+				-77.30000305175781,
+				-243.25,
+				-11.300000190734863
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						77.30000305175781,
+						243.25,
+						11.300000190734863
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Stairs_02_FloorColl"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-1000.6920166015625,
+				392.4898376464844,
+				573.1983642578125
+			],
+			"rotation": [
+				50.45000076293945,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				0.9999998807907104,
+				0.9999996423721313
+			]
+		}
+	},
 	"41": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -41183,41 +40742,26 @@
 		"AudioListenerComponent": {
 			"active": true
 		},
-		"ColliderComponent": {
-			"maxBounds": [
-				30.0,
-				190.0,
-				30.0
+		"CharacterControllerComponent": {
+			"controlVelocity": [
+				0.0,
+				0.0,
+				0.0
 			],
-			"minBounds": [
-				-30.0,
-				-160.0,
-				-30.0
+			"gravityFactor": 25.0,
+			"groundNormal": [
+				0.0,
+				1.0,
+				0.0
 			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						30.0,
-						175.0,
-						30.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						0.0,
-						15.0,
-						0.0
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
+			"height": 350.0,
+			"isGrounded": false,
+			"jumpStrength": 10.0,
+			"mass": 70.0,
+			"maxSlopeAngle": 50.0,
+			"maxSpeed": 6.0,
+			"radius": 30.0,
+			"stepHeight": 0.30000001192092896
 		},
 		"LightComponent": {
 			"color": [
@@ -41249,7 +40793,7 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 10742246650198540289
+					"ScriptGuid": 625024547570974721
 				},
 				{
 					"Loaded": true,
@@ -41314,37 +40858,12 @@
 		"NameComponent": {
 			"name": "Player"
 		},
-		"PhysicsComponent": {
-			"_prevUseGravity": true,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 25.0,
-			"mass": 10.0,
-			"useGravity": true,
-			"velocity": [
-				8.640505200219195e-09,
-				-1.3216412853012116e-08,
-				-6.418971576493959e-09
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": false,
-			"density": 1000.0,
-			"friction": 0.0,
-			"isStatic": false,
-			"layer": 1,
-			"restitution": 0.0
-		},
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				0.8581123352050781,
-				169.98397827148438,
-				-878.5956420898438
+				2.820924758911133,
+				169.984130859375,
+				-917.626953125
 			],
 			"rotation": [
 				0.0,

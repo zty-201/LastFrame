@@ -349,6 +349,14 @@ namespace Engine {
             return std::make_tuple(0.f, 0.f, 0.f);
             });
 
+        s_Lua.set_function("Character_SetGravityFactor", [&](uint32_t entityID, float factor) {
+            entt::entity e = (entt::entity)entityID;
+            if (registry.valid(e) && registry.any_of<CharacterControllerComponent>(e))
+            {
+                registry.get<CharacterControllerComponent>(e).gravityFactor = factor;
+            }
+            });
+
         // ===============================================================
         // Light Component bindings
         // ===============================================================

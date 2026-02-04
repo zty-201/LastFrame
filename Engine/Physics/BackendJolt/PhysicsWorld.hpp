@@ -247,7 +247,7 @@ public:
     //Character Controller API
     void CreateCharacter(entt::entity entity, const glm::vec3& pos, float height, float radius, float mass, float maxSlopeAngle, float jumpStrenght);
     void DestroyCharacter(entt::entity entity);
-    glm::vec3 UpdateCharacter(entt::entity entity, const glm::vec3& inputVelocity, float dt, bool& outIsGrounded, glm::vec3& outGroundNormal, glm::vec3& outVelocity);
+    glm::vec3 UpdateCharacter(entt::entity entity, const glm::vec3& inputVelocity, float dt, float gravityFactor, bool& outIsGrounded, glm::vec3& outGroundNormal, glm::vec3& outVelocity);
     bool HasCharacter(entt::entity entity) const;
     void SetCharacterSettings(entt::entity entity, float mass, float maxSlopeAngle);
 

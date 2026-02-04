@@ -76,6 +76,7 @@ namespace EngineFramework
                     entity,
                     character.controlVelocity, // Input from Lua scripts
                     delta_time,
+                    character.gravityFactor,
                     // Outputs
                     character.isGrounded,
                     character.groundNormal,

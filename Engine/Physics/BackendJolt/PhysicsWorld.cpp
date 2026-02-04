@@ -1107,19 +1107,21 @@ void PhysicsWorld::DestroyCharacter(entt::entity entity)
     }
 }
 
-glm::vec3 PhysicsWorld::UpdateCharacter(entt::entity entity, const glm::vec3& inputVelocity, float dt, bool& outIsGrounded, glm::vec3& outGroundNormal, glm::vec3& outVelocity)
+glm::vec3 PhysicsWorld::UpdateCharacter(entt::entity entity, const glm::vec3& inputVelocity, float dt, float gravityFactor, bool& outIsGrounded, glm::vec3& outGroundNormal, glm::vec3& outVelocity)
 {
     auto it = m_characters.find(entity);
     if (it == m_characters.end()) return glm::vec3(0.0f);
     JPH::CharacterVirtual* character = it->second;
     //Apply gravity and velocity
+    JPH::Vec3 globalGravity = m_physicsSystem->GetGravity();
     JPH::Vec3 currentVel = character->GetLinearVelocity();
     JPH::Vec3 targetVel(inputVelocity.x, inputVelocity.y, inputVelocity.z);
     
     bool wasGrounded = (character->GetGroundState() == JPH::CharacterVirtual::EGroundState::OnGround);
     if (!wasGrounded)
     {
-        targetVel.SetY(currentVel.GetY() + (-9.81f * dt));
+        JPH::Vec3 effectiveGravity = globalGravity * gravityFactor;
+        targetVel.SetY(currentVel.GetY() + (effectiveGravity.GetY() * dt));
     }
     else if (targetVel.GetY() < 0.1f)
     {
@@ -1133,7 +1135,7 @@ glm::vec3 PhysicsWorld::UpdateCharacter(entt::entity entity, const glm::vec3& in
     JPH::BodyFilter bodyFilter;
     JPH::ShapeFilter shapeFilter;
 
-    character->Update(dt, JPH::Vec3(0, -9.81f, 0), bpFilter, layerFilter, bodyFilter, shapeFilter, *m_tempAllocator);
+    character->Update(dt, globalGravity, bpFilter, layerFilter, bodyFilter, shapeFilter, *m_tempAllocator);
 
     JPH::RVec3 pos = character->GetPosition();
     JPH::Vec3 gn = character->GetGroundNormal();

@@ -23,6 +23,8 @@ struct CharacterControllerComponent
 	bool isGrounded = false;
 	glm::vec3 groundNormal = { 0.f, 1.f, 0.f };
 
+	float gravityFactor = 1.f;
+
 	//Internal Data
 	void* runtimeChar = nullptr;
 };

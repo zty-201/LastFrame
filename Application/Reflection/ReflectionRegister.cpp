@@ -790,6 +790,7 @@ namespace EngineFramework
 			.data<&CharacterControllerComponent::controlVelocity>("controlVelocity")
 			.data<&CharacterControllerComponent::isGrounded>("isGrounded")
 			.data<&CharacterControllerComponent::groundNormal>("groundNormal")
+			.data<&CharacterControllerComponent::gravityFactor>("gravityFactor")
 			.func<&Emplacer<CharacterControllerComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<CharacterControllerComponent>::RemoveComponent>("remove")
 			.func<&Getter<CharacterControllerComponent>::GetComponent>("get")
