@@ -67,7 +67,9 @@ namespace EngineFramework
    
         void removeAllEntities_Reg();
         bool Deseralise(std::string); //Reading from files
+#ifdef PLATFORM_WINDOWS  //Not used on android.
         std::unordered_set<entt::entity> Seralise();
+#endif
         void Add_Element(entt::entity e);
         void Remove_Element(entt::entity e);
 
@@ -107,7 +109,6 @@ namespace EngineFramework
 
         void Clean_All();
         void DeserializeAllOverlays();
-        std::unordered_set<entt::entity> Seralise_AllMenus();
         bool DeserializeOverlay(std::string);
 
         void displayMenu(std::string menu);
@@ -117,7 +118,11 @@ namespace EngineFramework
         std::vector<entt::entity> getMenu_Entities(std::string menu);
         std::unordered_set<entt::entity> getAllMenu_Entities();
         
+#ifdef PLATFORM_WINDOWS  //Not used on android.
+        std::unordered_set<entt::entity> Seralise_AllMenus();
         void create_overlay(std::string menu);
+#endif
+
         void add_entity_fromMenu(std::string menu, entt::entity e);
         void remove_entity_fromMenu(std::string menu, entt::entity e);
 
