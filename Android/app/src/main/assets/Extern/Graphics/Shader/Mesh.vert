@@ -44,7 +44,9 @@ layout(std140, binding = 0) uniform VolumetricUBO
     vec4  time;
     ivec4 width_height;
 };
+
 uniform mat4 u_Model;
+uniform vec4 u_UVTransform;
 
 // For Animation
 const int MAX_BONES = 128;
@@ -90,7 +92,7 @@ void main()
 
     vec4 world_pos = model * vec4(VS_IN_Position.xyz, 1.0f);
     FS_IN_WorldPos = world_pos.xyz;
-    FS_IN_TexCoord = VS_IN_TexCoord;
+    FS_IN_TexCoord = (VS_IN_TexCoord * u_UVTransform.xy) + u_UVTransform.zw;
 
     // Compute normal, tangent, bitangent in world space
     mat3 world3 = mat3(model);

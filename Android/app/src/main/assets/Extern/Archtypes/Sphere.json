@@ -27,10 +27,19 @@
 		"roughnessMap": [
 			0,
 			0
+		],
+		"uvOffset": [
+			0.0,
+			0.0
+		],
+		"uvTiling": [
+			1.0,
+			1.0
 		]
 	},
 	"MeshComponent": {
-		"meshName": "Sphere"
+		"meshName": "Sphere",
+		"visibility": true
 	},
 	"SceneRenderPass": null,
 	"TransformComponent": {

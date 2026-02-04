@@ -15,6 +15,7 @@
  */
 #ifndef MATERIAL_COMPONENT
 #define MATERIAL_COMPONENT
+#include "xresource/xresource_guid.h"
 struct MaterialComponent
 {
     std::string name;
