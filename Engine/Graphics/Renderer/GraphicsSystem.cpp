@@ -1059,6 +1059,9 @@ namespace EngineFramework
 
             if (ui.is_NDC) {
 
+                ui.size.x = ui.size_NDC.x * screen.x;
+                ui.size.y = ui.size_NDC.y * screen.y;
+
                 ui.position.x = (ui.position_NDC.x + 1.0f) * 0.5f * screen.x;
                 //ui.position.y = (1.0f - ui.position_NDC.y) * 0.5f * screen.y;
                 ui.position.y = (ui.position_NDC.y + 1.0f) * 0.5f * screen.y;

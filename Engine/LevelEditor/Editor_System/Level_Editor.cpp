@@ -315,6 +315,9 @@ namespace EngineFramework
 		//MAIN MENU SHOULD CONTAIN THE SUB MENUS
 
 		ImGuiIO& io = ImGui::GetIO();
+		//ImGuiIO& io = ImGui::GetIO();
+		io.FontGlobalScale = 1.0f;   // DEFAULT
+
 
 		ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // White bar
 
@@ -520,6 +523,9 @@ namespace EngineFramework
 		{
 			//UserInterface_System::DisableKeyboardInput();
 		}
+		ImGuiIO& io = ImGui::GetIO();
+		//ImGuiIO& io = ImGui::GetIO();
+		io.FontGlobalScale = 1.0f;   // DEFAULT
 
 		//DOCKING =================================================		
 		docking();

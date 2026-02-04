@@ -841,6 +841,7 @@ namespace EngineFramework
 			.data<&UIComponent::position>("position")
 			.data<&UIComponent::is_NDC>("is_NDC")
 			.data<&UIComponent::position_NDC>("position_NDC")
+			.data<&UIComponent::size_NDC>("size_NDC")
 			.data<&UIComponent::size>("size")
 			.data<&UIComponent::color>("color")
 			.data<&UIComponent::visible>("visible")

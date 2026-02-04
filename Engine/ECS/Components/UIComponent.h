@@ -21,6 +21,7 @@ struct UIComponent
     int layer = 0;           // Optional: Render order (0=Back, 10=Front)
     bool is_NDC = false;
     glm::vec2 position_NDC;
+    glm::vec2 size_NDC;
 
     //================ extra stuff for overlays =====================
     bool belong_to_menu;
