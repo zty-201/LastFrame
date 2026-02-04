@@ -163,7 +163,7 @@ namespace EngineFramework
     }
 
     
-
+#ifdef PLATFORM_WINDOWS
     std::unordered_set<entt::entity> UI_Menu::Seralise() {
 
 
@@ -213,6 +213,7 @@ namespace EngineFramework
         return entity_seralised;
 
     }
+#endif
     void UI_Menu::Add_Element(entt::entity e) {
         /*
             NEW ENTITIES WITH NEW INITIALISED VALUE

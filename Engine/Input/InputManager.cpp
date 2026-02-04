@@ -281,7 +281,7 @@ namespace EngineFramework
         LOGE("GLFW Error: %s", description);
     }
 
-#if defined(PLATFORM_WINDOWS)
+//#if defined(PLATFORM_WINDOWS)
 
     bool InputManager::GetAction(const std::string& action)
     {
@@ -323,6 +323,7 @@ namespace EngineFramework
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) return;
 #endif
+#if defined(PLATFORM_WINDOWS)
         if (!s_Window) return;
 
         glfwSetInputMode(s_Window, GLFW_CURSOR, locked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
@@ -334,6 +335,7 @@ namespace EngineFramework
         mouseY = lastMouseY = y;
         offset_MouseX = 0.0;
         offset_MouseY = 0.0;
+#endif
     }
 
     void InputManager::SetCursorVisible(bool visible)
@@ -341,12 +343,14 @@ namespace EngineFramework
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
         if (!(InputManager::GetInstance().editor_simulation_running || !InputManager::GetInstance().editor_running)) return;
 #endif
+#if defined(PLATFORM_WINDOWS)
         if (!s_Window) return;
 
         // NOTE:
         // - If you are using GLFW_CURSOR_DISABLED for FPS lock, it already hides the cursor.
         // - This function is still useful for menus (HIDDEN) vs NORMAL.
         glfwSetInputMode(s_Window, GLFW_CURSOR, visible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+#endif
     }
 
     //KEY ACTION ENUM CALLING
@@ -469,7 +473,7 @@ namespace EngineFramework
         return it != key_mapping.end() && GetKeyUp(it->second);
 
     }
-#endif
+//#endif
 
     bool InputManager::GetMouseButton(int button)
     {

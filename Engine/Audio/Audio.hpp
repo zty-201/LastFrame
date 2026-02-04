@@ -71,10 +71,6 @@ namespace EngineFramework
         void SetPathResolver(std::function<std::string(const std::string&)> resolver);
         std::string ResolvePath(const std::string& logicalOrPath) const;
 
-#ifdef PLATFORM_ANDROID
-        void SetAndroidAssetManager(void* android_asset_manager);
-#endif
-
         // Play a named slot on an entity
         void PlayEntitySlot(entt::entity entity, const std::string& slotId);
         // Stop a named slot on an entity

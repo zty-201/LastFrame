@@ -18,14 +18,31 @@ local screenWidth, screenHeight = 3088, 1440
 local moveAreaRight  = screenWidth * 0.4
 local moveAreaBottom = screenHeight * 0.5
 
+-- Footstep audio
+local footstepPlaying = false
+local footstepDeadzone = 0.05   -- for joystick threshold
+
 local function getGlobalShared()
     return rawget(_G, "SHARED")
+end
+
+local function safePlaySlot(slotId)
+    if type(Audio_PlaySlot) == "function" and type(slotId) == "string" then
+        Audio_PlaySlot(EntityID, slotId)
+    end
+end
+
+local function safeStopSlot(slotId)
+    if type(Audio_StopSlot) == "function" and type(slotId) == "string" then
+        Audio_StopSlot(EntityID, slotId)
+    end
 end
 
 -- ============================================================
 function on_create(self)
     print("[player_movement] on_create()")
-
+    SHARED.PlayerID = EntityID
+    print("[Player ID] = ", SHARED.PlayerID)
     transform = EntityTransform
     camera = GetMainCamera()
     physics   = EntityPhysics
@@ -48,6 +65,9 @@ function on_create(self)
     else
         print("[player_movement WARNING] No PhysicsComponent on this entity")
     end
+
+    print("[player_movement] Audio_PlaySlot type:", type(Audio_PlaySlot))
+    print("[player_movement] Audio_StopSlot type:", type(Audio_StopSlot))
 end
 
 -- ============================================================
@@ -90,6 +110,17 @@ local function stopHorizontal()
     end
 end
 
+-- ============================================================ 
+local function setFootstepsMoving(isMoving)
+    if isMoving and not footstepPlaying then
+        safePlaySlot("Footstep")
+        footstepPlaying = true
+    elseif (not isMoving) and footstepPlaying then
+        safeStopSlot("Footstep")
+        footstepPlaying = false
+    end
+end
+
 -- ============================================================
 function on_update(self, dt)
     if not transform then return end
@@ -106,10 +137,10 @@ function on_update(self, dt)
     if PLATFORM == "windows" then   
         local moveX, moveZ = 0.0, 0.0
         --Key_Actions.MOVE_FORWARD
-        if Input.GetAction(Key_Actions.MOVE_FORWARD) then print("[MOVE] W pressed") moveZ = moveZ + 1 end
-        if Input.GetAction("MOVE_BACK") then print("[MOVE] S pressed") moveZ = moveZ - 1 end
-        if Input.GetAction("MOVE_LEFT")  then print("[MOVE] A pressed") moveX = moveX + 1 end
-        if Input.GetAction("MOVE_RIGHT") then print("[MOVE] D pressed") moveX = moveX - 1 end
+        if Input.GetAction(Key_Actions.MOVE_FORWARD) then moveZ = moveZ + 1 end
+        if Input.GetAction("MOVE_BACK") then moveZ = moveZ - 1 end
+        if Input.GetAction("MOVE_LEFT")  then moveX = moveX + 1 end
+        if Input.GetAction("MOVE_RIGHT") then moveX = moveX - 1 end
 
         -- Joystick input (from UI only)
         if SHARED and SHARED.UI then
@@ -120,7 +151,32 @@ function on_update(self, dt)
         end
 
         local len = math.sqrt(moveX * moveX + moveZ * moveZ)
-        if len > 0 then
+        --     if len > 0 then
+        --         moveX, moveZ = moveX / len, moveZ / len
+    
+        --         local radYaw   = math.rad(yaw)
+        --         local forwardX = math.sin(radYaw)
+        --         local forwardZ = math.cos(radYaw)
+        --         local rightX   = math.cos(radYaw)
+        --         local rightZ   = -math.sin(radYaw)
+    
+        --         movePlayer(
+        --             rightX * moveX + forwardX * moveZ,
+        --             rightZ * moveX + forwardZ * moveZ,
+        --             dt
+        --         )
+        --     else
+        --         -- No WASD / joystick: stop horizontal movement
+        --         stopHorizontal()
+        --     end
+    
+        --     return
+        -- end
+        local isMoving = (len > footstepDeadzone)
+
+        setFootstepsMoving(isMoving)
+
+        if isMoving then
             moveX, moveZ = moveX / len, moveZ / len
 
             local radYaw   = math.rad(yaw)
@@ -135,7 +191,6 @@ function on_update(self, dt)
                 dt
             )
         else
-            -- No WASD / joystick: stop horizontal movement
             stopHorizontal()
         end
 
@@ -156,7 +211,29 @@ function on_update(self, dt)
         end
 
         local len = math.sqrt(moveX*moveX + moveZ*moveZ)
-        if len > 0 then
+        -- if len > 0 then
+        --     moveX, moveZ = moveX / len, moveZ / len
+
+        --     local radYaw = math.rad(yaw)
+        --     local forwardX = math.sin(radYaw)
+        --     local forwardZ = math.cos(radYaw)
+        --     local rightX   = math.cos(radYaw)
+        --     local rightZ   = -math.sin(radYaw)
+
+        --     movePlayer(
+        --         rightX * moveX + forwardX * moveZ,
+        --         rightZ * moveX + forwardZ * moveZ,
+        --         dt
+        --     )
+        -- else
+        --     -- No WASD / joystick: stop horizontal movement
+        --     stopHorizontal()
+        -- end
+        local isMoving = (len > footstepDeadzone)
+
+        setFootstepsMoving(isMoving)
+
+        if isMoving then
             moveX, moveZ = moveX / len, moveZ / len
 
             local radYaw = math.rad(yaw)
@@ -171,7 +248,6 @@ function on_update(self, dt)
                 dt
             )
         else
-            -- No WASD / joystick: stop horizontal movement
             stopHorizontal()
         end
         return
@@ -181,4 +257,8 @@ end
 -- ============================================================
 function on_destroy()
     print("[player_movement] Destroyed for entity:", EntityID)
+    if footstepPlaying then
+        safeStopSlot("Footstep")
+        footstepPlaying = false
+    end
 end
