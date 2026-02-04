@@ -394,11 +394,6 @@ namespace EngineFramework {
 		asset_loader_map[ARCHTYPE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadArchtype);
 		//=====================================//
 
-		//Set AAsetManager for android, in audio system.
-#ifdef PLATFORM_ANDROID
-		AudioSystem::GetInstance().SetAndroidAssetManager(static_cast<void*>(android_asset_manager));
-#endif
-
 		LoadAllResources();
 	}
 	void AssetManagerSystem::Update(float)

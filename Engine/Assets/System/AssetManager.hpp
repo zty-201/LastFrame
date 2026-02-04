@@ -207,7 +207,15 @@ namespace EngineFramework {
 		*/
 		static std::string GetName(xresource::full_guid asset_guid);
 
-		
+		/*
+			Cross-platform.
+			List files in the given directory.
+			Does not list files in subdirectories or directory names.
+
+			If an extension list is passed, only files matching these extensions will be returned.
+		*/
+		static std::vector<std::filesystem::path> ListFilesInDirectory(const std::filesystem::path& folder_path, const std::vector<std::string>& accepted_extensions = {});
+
 		/*
 			String names for each asset type, so they are consistent across the entire program.
 		*/
@@ -260,15 +268,7 @@ namespace EngineFramework {
 
 		//== Helper Functions
 
-		/*
-			Cross-platform.
-			List files in the given directory.
-			Does not list files in subdirectories or directory names.
-
-			If an extension list is passed, only files matching these extensions will be returned.
-		*/
-		static std::vector<std::filesystem::path> ListFilesInDirectory(const std::filesystem::path& folder_path, const std::vector<std::string>& accepted_extensions = {});
-
+		
 
 		/*
 			Reads name->guid mapping from the metadata file in the folder provided.

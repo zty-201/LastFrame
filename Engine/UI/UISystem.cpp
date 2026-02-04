@@ -97,16 +97,10 @@ namespace EngineFramework
     void UI_System::DeserializeAllOverlays(){
 
         Menu_Mapping.clear();
-        const std::filesystem::path dir = AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern/Overlays/";
+        std::vector<std::filesystem::path> valid_json_overlays = AssetManagerSystem::ListFilesInDirectory(AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern/Overlays", {".json"});
            
-        for (const auto& entry : std::filesystem::directory_iterator(dir)) {
-
-            if (!entry.is_regular_file()) continue;
-
-            const std::filesystem::path& path = entry.path();
-
-            if (path.extension() != ".json") continue;
-            const std::string menuName = path.stem().string();
+        for (const auto& entry : valid_json_overlays) {
+            const std::string menuName = entry.stem().string();
             
             DeserializeOverlay(menuName);
 
@@ -130,23 +124,7 @@ namespace EngineFramework
 
     }
 
-    std::unordered_set<entt::entity> UI_System::Seralise_AllMenus() {
-
-        std::unordered_set<entt::entity> combined;
-
-
-        for (auto& [name, menu] : Menu_Mapping) {
-
-            if (menu.first) {
-                std::unordered_set<entt::entity> entities = menu.first->Seralise();
-                combined.insert(entities.begin(), entities.end());
-                menu.second = false; //set to false, this var can only be called via the program not valjue based ah
-            }
-        }
-
-        return combined;
-        
-    }
+    
 
     void UI_System::Update(float deltaTime)
     {
@@ -192,9 +170,26 @@ namespace EngineFramework
 
     }
 
+#ifdef PLATFORM_WINDOWS //No need to create on android.
 
+    std::unordered_set<entt::entity> UI_System::Seralise_AllMenus() {
+
+        std::unordered_set<entt::entity> combined;
+
+
+        for (auto& [name, menu] : Menu_Mapping) {
+
+            if (menu.first) {
+                std::unordered_set<entt::entity> entities = menu.first->Seralise();
+                combined.insert(entities.begin(), entities.end());
+                menu.second = false; //set to false, this var can only be called via the program not valjue based ah
+            }
+        }
+
+        return combined;
+
+    }
     void UI_System::create_overlay(std::string menuName) {
-
         std::filesystem::path path = AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern/Overlays/" + menuName +".json";
 
         // Only create if it doesn't exist
@@ -212,11 +207,9 @@ namespace EngineFramework
         menu->Initialize();
         Menu_Mapping.emplace(menuName, std::pair(std::move(menu), false));
         //the list should be zero because, there are no entities yet in this list :<
-        
-
-
 
     }
+#endif
 
     std::vector<entt::entity> UI_System::getMenu_Entities(std::string menuname) {
 
