@@ -31,16 +31,6 @@ struct ButtonComponent {
     bool is_released; //trigger even when it is released
     bool is_active; //value to let dev know if its functioning (for debug purposes)
 
-
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-    /*
-    * pause the clickability when simulation is not running
-    * only in editor (debug)
-    */
-    bool is_functioning;
-#endif
-
-
 };
 
 #endif

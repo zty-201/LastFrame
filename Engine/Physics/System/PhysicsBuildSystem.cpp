@@ -158,4 +158,15 @@ void PhysicsBuildSystem::Update(entt::registry& ecs)
         material._prevIsStatic = material.isStatic;
 		material._prevScale    = transform.scale;
     }
+
+    auto charView = ecs.view<TransformComponent, CharacterControllerComponent>();
+    for (auto [entity, transform, character] : charView.each())
+    {
+        if (!PhysicsWorld::Get().HasCharacter(entity))
+        {
+            PhysicsWorld::Get().CreateCharacter(entity, transform.position,
+                character.height, character.radius, character.mass, character.maxSlopeAngle, character.jumpStrength);
+            character.runtimeChar = (void*)1;
+        }
+    }
 }

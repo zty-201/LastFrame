@@ -10,6 +10,9 @@
 #include <memory>
 #include <Jolt/Physics/Collision/ContactListener.h>
 #include <limits>
+#include "CharacterControllerComponent.h"
+#include <Jolt/Physics/Character/CharacterVirtual.h>
+#include <Jolt/Core/TempAllocator.h>
 
 using uint = unsigned int;
 
@@ -240,6 +243,14 @@ public:
     *************************************************/
     void ApplyRadialExplosion(const std::vector<entt::entity>& parts, float centerX, float centerY, float centerZ, float strength);
 
+
+    //Character Controller API
+    void CreateCharacter(entt::entity entity, const glm::vec3& pos, float height, float radius, float mass, float maxSlopeAngle, float jumpStrenght);
+    void DestroyCharacter(entt::entity entity);
+    glm::vec3 UpdateCharacter(entt::entity entity, const glm::vec3& inputVelocity, float dt, float gravityFactor, bool& outIsGrounded, glm::vec3& outGroundNormal, glm::vec3& outVelocity);
+    bool HasCharacter(entt::entity entity) const;
+    void SetCharacterSettings(entt::entity entity, float mass, float maxSlopeAngle);
+
 private:
     PhysicsWorld() = default;
     ~PhysicsWorld() = default;
@@ -255,6 +266,8 @@ private:
 
     std::unordered_map<entt::entity, JPH::BodyID> m_entityToBody;
     std::unordered_map<JPH::BodyID, entt::entity> m_bodyToEntity;
+
+    std::unordered_map<entt::entity, JPH::CharacterVirtual*> m_characters;
 
     class ContactListenerImpl final : public JPH::ContactListener {
     public:

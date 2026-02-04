@@ -162,6 +162,8 @@ namespace EngineFramework
 
     }
 
+    
+
     std::unordered_set<entt::entity> UI_Menu::Seralise() {
 
 
@@ -288,6 +290,7 @@ namespace EngineFramework
         if (InputManager::GetInstance().GetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {
 
             if (check_touch(e)) {
+
                 button.curr_button_state = CLICKED;
                 button.is_clicked = true;
                 //std::cout << "CLICKED!!!\n";
@@ -299,9 +302,13 @@ namespace EngineFramework
             //std::cout << "RELEASED!!!\n";
         }
         else if(check_touch(e)){
+
+#if defined(PLATFORM_WINDOWS) //ONLY WINDOWS HAVE THIS
             button.curr_button_state = HOVER;
             button.is_hover = true;
             /*std::cout << "HOVER!!!\n";*/
+#endif
+            
         }
         else {
             button.curr_button_state = IDLE;          
@@ -322,7 +329,7 @@ namespace EngineFramework
         if (!ui.visible) return false;
 
         
-        
+ //debug       
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 
         glm::vec2 mouseUI{};
@@ -340,11 +347,23 @@ namespace EngineFramework
         
 #endif
 
+        //release
 #if defined(NDEBUG) && defined(PLATFORM_WINDOWS)
         float MouseX = static_cast<float>(InputManager::GetInstance().GetMousePosition().first);
         float MouseY = static_cast<float>(InputManager::GetInstance().GetMousePosition().second);
 
         glm::vec2 mouseUI(MouseX, GraphicsSystem::GetInstance().Getscreen().y - MouseY);
+#endif
+     
+#if defined(PLATFORM_ANDROID)
+        /*
+        * PLEASE CHANGE THIS ACCORDINGLY TO ANDROID INPUT (NOT TOO SURE ON THIS)
+        */
+        float MouseX = static_cast<float>(InputManager::GetInstance().GetMousePosition().first);
+        float MouseY = static_cast<float>(InputManager::GetInstance().GetMousePosition().second);
+
+        glm::vec2 mouseUI(MouseX, GraphicsSystem::GetInstance().Getscreen().y - MouseY);
+
 #endif
 
         /*std::cout << "Screen X: " << GraphicsSystem::GetInstance().Getscreen().x << std::endl;
@@ -399,6 +418,22 @@ namespace EngineFramework
 
             }
         }
+    }
+
+    void UI_Menu::removeAllEntities_Reg() {
+
+        for (auto entity : AllElements_in_this_overlay) {
+
+            if (!registry.valid(entity)) {
+                continue;
+            }
+
+            registry.destroy(entity);
+          
+        }
+
+        AllElements_in_this_overlay.clear();
+
     }
 
 //#endif

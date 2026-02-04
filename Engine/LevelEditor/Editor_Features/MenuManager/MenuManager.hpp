@@ -46,6 +46,7 @@ namespace EngineFramework
         const std::string& GetCurrentMenu() const;
         void add_element(entt::entity e);
         void remove_element(entt::entity e);
+        void close_menuEditor();
     private:
         static inline MenuManager* this_system{};
         std::vector<std::string> menuList;

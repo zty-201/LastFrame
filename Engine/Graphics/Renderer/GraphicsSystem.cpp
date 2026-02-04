@@ -1059,13 +1059,19 @@ namespace EngineFramework
 
             if (ui.is_NDC) {
 
+                ui.size.x = ui.size_NDC.x * screen.x;
+                ui.size.y = ui.size_NDC.y * screen.y;
+
                 ui.position.x = (ui.position_NDC.x + 1.0f) * 0.5f * screen.x;
-                ui.position.y = (1.0f - ui.position_NDC.y) * 0.5f * screen.y;
+                //ui.position.y = (1.0f - ui.position_NDC.y) * 0.5f * screen.y;
+                ui.position.y = (ui.position_NDC.y + 1.0f) * 0.5f * screen.y;
+
 
                 // shift from center to bottom-left anchor 
                 // (because scale starts from bottom left up so like we need to shift down)
                 ui.position.x -= ui.size.x * 0.5f;
                 ui.position.y -= ui.size.y * 0.5f;
+                
 
             }
 

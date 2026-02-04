@@ -63,6 +63,9 @@ namespace EngineFramework
         void Initialize();
         void Update();
         void Clean();
+
+   
+        void removeAllEntities_Reg();
         bool Deseralise(std::string); //Reading from files
         std::unordered_set<entt::entity> Seralise();
         void Add_Element(entt::entity e);
@@ -102,6 +105,7 @@ namespace EngineFramework
         static std::unordered_map<std::string, std::pair<std::unique_ptr<UI_Menu>,bool>> Menu_Mapping;
         std::string current_menu;
 
+        void Clean_All();
         void DeserializeAllOverlays();
         std::unordered_set<entt::entity> Seralise_AllMenus();
         bool DeserializeOverlay(std::string);
@@ -111,10 +115,13 @@ namespace EngineFramework
         void closeMenu(std::string menu);
         void closeAllMenu();
         std::vector<entt::entity> getMenu_Entities(std::string menu);
+        std::unordered_set<entt::entity> getAllMenu_Entities();
+        
         void create_overlay(std::string menu);
         void add_entity_fromMenu(std::string menu, entt::entity e);
         void remove_entity_fromMenu(std::string menu, entt::entity e);
 
+        void Load_Start_Menu();
 
 
     private:

@@ -69,7 +69,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "MenuManager.hpp"
 //Audio
 #include "Audio.hpp"
-
+#include "UISystem.hpp"
 namespace EngineFramework
 {
     using namespace entt::literals;
@@ -1935,6 +1935,20 @@ namespace EngineFramework
                 }
         });
 
+        auto charView = registry.view<TransformComponent, CharacterControllerComponent>();
+        charView.each([&](entt::entity e, const TransformComponent& tf, const CharacterControllerComponent& character)
+            {
+                bool isSelected = selected_state.IsEntitySelected(e);
+                if (!s_DrawAllColliders && !isSelected) return;
+
+                glm::vec3 size = glm::vec3(character.radius * 2.f, character.height, character.radius * 2.f);
+                glm::mat4 model = glm::translate(glm::mat4(1.f), tf.position);
+                model *= glm::mat4_cast(glm::quat(glm::radians(tf.rotation)));
+                model = glm::scale(model, size);
+
+                DrawWireOBB(model, view, proj, screen_pos, available_size, IM_COL32(0, 255, 0, 255), 2.f);
+        });
+
         //Iterate Selection List
         if (selected_state.HasEntitySelection())
         {
@@ -1944,6 +1958,7 @@ namespace EngineFramework
             {
                 if (!registry.valid(e)) return;
                 if (registry.all_of<ColliderComponent>(e)) continue;
+                if (registry.all_of<CharacterControllerComponent>(e)) continue;
                 if (!registry.all_of<TransformComponent>(e)) continue;
 
                 glm::mat4 highlightM;
@@ -2068,10 +2083,16 @@ namespace EngineFramework
 
     void Screen::play_simulation() {
 
+
+        MenuManager::GetInstance().close_menuEditor();
+        
+
         if (is_simulator_running) return;
+
         //std::cout << "play_simulation\n";
         is_simulator_running = true;
         EngineFramework::AudioSystem::GetInstance().SetSimulationMode(true);
+        
 
         // ============================
         // SAVE CURRENT CAMERA POSITION
@@ -2129,7 +2150,17 @@ namespace EngineFramework
 
         Engine::ScriptSystem::OnRuntimeStart(registry);
 
-        json_backup = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances();
+        /*
+            HERE IS THE PROBLEM
+        */
+
+        //SAVE MENU FIRST WHEN SIMULATION IS RUNNING
+        std::unordered_set<entt::entity> except_list = UI_System::GetInstance().Seralise_AllMenus(); 
+        //SERALISE INTO A STRING FOR SCENE FILES NOT MENU ENTITIES
+        json_backup = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances(except_list);
+        //LOAD START MENU OF OVERLAY
+        UI_System::GetInstance().Load_Start_Menu(); //load the first menu
+
 
         //get all entity
         //std::vector<entt::entity> entities;
@@ -2191,7 +2222,15 @@ namespace EngineFramework
         ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoKeyboard;
         GameObjectSystem::GetInstance().ClearAllInstances();
 
+        /*
+            I MAKE SOME NEW CHANGES HERE
+        */
+
+        
         GameObjectSystem::GetInstance().LoadScene(json_backup);
+        UI_System::GetInstance().Initialize();
+        UI_System::GetInstance().closeAllMenu(); //load the first menu
+
 
         json_backup = {};
 
