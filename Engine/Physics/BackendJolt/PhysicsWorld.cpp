@@ -626,6 +626,11 @@ void PhysicsWorld::DestroyAllBodies()
 
     m_entityToBody.clear();
     m_bodyToEntity.clear();
+
+    for (auto& pair : m_characters) {
+        delete pair.second;
+    }
+    m_characters.clear();
 }
 
 glm::vec3 PhysicsWorld::GetCenterOfMassOffset(entt::entity entity) const
@@ -1067,5 +1072,91 @@ void PhysicsWorld::ApplyRadialExplosion(const std::vector<entt::entity>& parts, 
 
         bodyInterface.ActivateBody(bodyID);
         bodyInterface.AddImpulse(bodyID, dir * strength);
+    }
+}
+
+void PhysicsWorld::CreateCharacter(entt::entity entity, const glm::vec3& pos, float height, float radius, float mass, float maxSlopeAngle, float jumpStrength)
+{
+    if (HasCharacter(entity)) return;
+
+    float cylinderHalfHeight = (height * 0.5f) - radius;
+    if (cylinderHalfHeight < 0.01f) cylinderHalfHeight = 0.01f;
+
+    JPH::Ref<JPH::CapsuleShapeSettings> shapeSettings = new JPH::CapsuleShapeSettings(cylinderHalfHeight, radius);
+    JPH::Ref<JPH::CharacterVirtualSettings> charSettings = new JPH::CharacterVirtualSettings();
+    charSettings->mShape = shapeSettings->Create().Get();
+    charSettings->mMass = mass;
+    charSettings->mMaxSlopeAngle = glm::radians(maxSlopeAngle);
+    charSettings->mMaxStrength = jumpStrength;
+    charSettings->mUp = JPH::Vec3(0, 1, 0);
+    charSettings->mCharacterPadding = 0.02f;
+    charSettings->mPenetrationRecoverySpeed = 1.f;
+    charSettings->mPredictiveContactDistance = 0.1f;
+
+    JPH::CharacterVirtual* character = new JPH::CharacterVirtual(charSettings, JPH::RVec3(pos.x, pos.y, pos.z), JPH::Quat::sIdentity(), m_physicsSystem);
+    m_characters[entity] = character;
+}
+
+void PhysicsWorld::DestroyCharacter(entt::entity entity)
+{
+    auto it = m_characters.find(entity);
+    if (it != m_characters.end())
+    {
+        delete it->second;
+        m_characters.erase(it);
+    }
+}
+
+glm::vec3 PhysicsWorld::UpdateCharacter(entt::entity entity, const glm::vec3& inputVelocity, float dt, bool& outIsGrounded, glm::vec3& outGroundNormal, glm::vec3& outVelocity)
+{
+    auto it = m_characters.find(entity);
+    if (it == m_characters.end()) return glm::vec3(0.0f);
+    JPH::CharacterVirtual* character = it->second;
+    //Apply gravity and velocity
+    JPH::Vec3 currentVel = character->GetLinearVelocity();
+    JPH::Vec3 targetVel(inputVelocity.x, inputVelocity.y, inputVelocity.z);
+    
+    bool wasGrounded = (character->GetGroundState() == JPH::CharacterVirtual::EGroundState::OnGround);
+    if (!wasGrounded)
+    {
+        targetVel.SetY(currentVel.GetY() + (-9.81f * dt));
+    }
+    else if (targetVel.GetY() < 0.1f)
+    {
+        targetVel.SetY(std::max((float)targetVel.GetY(), -2.f));
+    }
+
+    character->SetLinearVelocity(targetVel);
+
+    JPH::DefaultBroadPhaseLayerFilter bpFilter(*m_objectVsBroadPhaseLayerFilter, Layers::DYNAMIC);
+    JPH::DefaultObjectLayerFilter layerFilter(*m_objectLayerPairFilter, Layers::DYNAMIC);
+    JPH::BodyFilter bodyFilter;
+    JPH::ShapeFilter shapeFilter;
+
+    character->Update(dt, JPH::Vec3(0, -9.81f, 0), bpFilter, layerFilter, bodyFilter, shapeFilter, *m_tempAllocator);
+
+    JPH::RVec3 pos = character->GetPosition();
+    JPH::Vec3 gn = character->GetGroundNormal();
+    JPH::Vec3 vel = character->GetLinearVelocity();
+
+    outIsGrounded = (character->GetGroundState() == JPH::CharacterVirtual::EGroundState::OnGround);
+    outGroundNormal = glm::vec3(gn.GetX(), gn.GetY(), gn.GetZ());
+    outVelocity = glm::vec3(vel.GetX(), vel.GetY(), vel.GetZ());
+
+    return glm::vec3(pos.GetX(), pos.GetY(), pos.GetZ());
+}
+
+bool PhysicsWorld::HasCharacter(entt::entity entity) const
+{
+    return m_characters.find(entity) != m_characters.end();
+}
+
+void PhysicsWorld::SetCharacterSettings(entt::entity entity, float mass, float maxSlopeAngle)
+{
+    auto it = m_characters.find(entity);
+    if (it != m_characters.end())
+    {
+        it->second->SetMass(mass);
+        it->second->SetMaxSlopeAngle(glm::radians(maxSlopeAngle));
     }
 }

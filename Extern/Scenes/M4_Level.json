@@ -39075,6 +39075,155 @@
 			]
 		}
 	},
+	"377": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				2566718094223622297,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				3719639598830469275,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				10637168626471551133,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				18131158406416056479,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				6601943360347586721,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "stairs_left_handle",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Test_Slope"
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-415.8564147949219,
+				0.0,
+				-836.3124389648438
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"378": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Slope_Coll"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": false,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-435.9538269042969,
+				117.00599670410156,
+				-837.0906372070313
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				50.20000076293945
+			],
+			"scale": [
+				50.0,
+				450.0,
+				145.0
+			]
+		}
+	},
 	"38": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -40673,41 +40822,25 @@
 		"AudioListenerComponent": {
 			"active": true
 		},
-		"ColliderComponent": {
-			"maxBounds": [
-				30.0,
-				190.0,
-				30.0
+		"CharacterControllerComponent": {
+			"controlVelocity": [
+				0.0,
+				0.0,
+				0.0
 			],
-			"minBounds": [
-				-30.0,
-				-160.0,
-				-30.0
+			"groundNormal": [
+				0.0,
+				1.0,
+				0.0
 			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						30.0,
-						175.0,
-						30.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						0.0,
-						15.0,
-						0.0
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
+			"height": 300.0,
+			"isGrounded": false,
+			"jumpStrength": 10.0,
+			"mass": 70.0,
+			"maxSlopeAngle": 50.0,
+			"maxSpeed": 100.0,
+			"radius": 10.0,
+			"stepHeight": 0.30000001192092896
 		},
 		"LightComponent": {
 			"color": [
@@ -40739,10 +40872,6 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 10742246650198540289
-				},
-				{
-					"Loaded": true,
 					"ScriptGuid": 11740093013966520321
 				},
 				{
@@ -40756,6 +40885,10 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 5490970403712286721
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 625024547570974721
 				}
 			]
 		},
@@ -40799,31 +40932,6 @@
 		},
 		"NameComponent": {
 			"name": "Player"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": true,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 25.0,
-			"mass": 10.0,
-			"useGravity": true,
-			"velocity": [
-				0.0,
-				0.02808959223330021,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": false,
-			"density": 1000.0,
-			"friction": 0.0,
-			"isStatic": false,
-			"layer": 1,
-			"restitution": 0.0
 		},
 		"SceneRenderPass": null,
 		"TransformComponent": {

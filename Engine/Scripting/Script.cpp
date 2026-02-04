@@ -34,6 +34,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 //For UI access in scripts
 #include "PhysicsComponent.h"
+#include "CharacterControllerComponent.h"
 #include "PhysicsWorld.hpp"
 
 // For Audio
@@ -256,6 +257,34 @@ namespace Engine {
                 entt::entity eA = static_cast<entt::entity>(idA);
                 entt::entity eB = static_cast<entt::entity>(idB);
                 return PhysicsWorld::Get().AreEntitiesColliding(eA, eB);
+            });
+
+        s_Lua.set_function("Character_SetVelocity", [&](uint32_t entityID, float x, float y, float z)
+            {
+                entt::entity e = (entt::entity)entityID;
+                if (registry.valid(e) && registry.any_of<CharacterControllerComponent>(e)) {
+                    auto& charCtrl = registry.get<CharacterControllerComponent>(e);
+                    charCtrl.controlVelocity = glm::vec3(x, y, z);
+                }
+            });
+
+        s_Lua.set_function("Character_IsGrounded", [&](uint32_t entityID) -> bool 
+            {
+                entt::entity e = (entt::entity)entityID;
+                if (registry.valid(e) && registry.any_of<CharacterControllerComponent>(e))
+                {
+                    return registry.get<CharacterControllerComponent>(e).isGrounded;
+                }
+                return false;
+            });
+
+        s_Lua.set_function("Character_GetVelocity", [&](uint32_t entityID) -> std::tuple<float, float, float> {
+            entt::entity e = (entt::entity)entityID;
+            if (registry.valid(e) && registry.any_of<CharacterControllerComponent>(e)) {
+                auto vel = registry.get<CharacterControllerComponent>(e).controlVelocity;
+                return std::make_tuple(vel.x, vel.y, vel.z);
+            }
+            return std::make_tuple(0.f, 0.f, 0.f);
             });
 
         // ===============================================================

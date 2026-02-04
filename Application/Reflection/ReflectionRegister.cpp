@@ -18,6 +18,7 @@
 #include "PhysicsMaterialComponent.h"
 #include "PhysicsComponent.h"
 #include "TriggerBoxComponent.h"
+#include "CharacterControllerComponent.h"
 #include "UIComponent.h"
 #include "Scripting/Script.hpp"
 #include "System_GameObjectSystem.hpp" //TODO: delete after testing.
@@ -755,6 +756,23 @@ namespace EngineFramework
 			.func<&Remover<PhysicsComponent>::RemoveComponent>("remove")
 			.func<&Getter<PhysicsComponent>::GetComponent>("get")
 			.func<&GetRef<PhysicsComponent>>("get_ref");
+
+		entt::meta_factory<CharacterControllerComponent>()
+			.type("CharacterControllerComponent")
+			.data<&CharacterControllerComponent::height>("height")
+			.data<&CharacterControllerComponent::radius>("radius")
+			.data<&CharacterControllerComponent::mass>("mass")
+			.data<&CharacterControllerComponent::maxSpeed>("maxSpeed")
+			.data<&CharacterControllerComponent::jumpStrength>("jumpStrength")
+			.data<&CharacterControllerComponent::maxSlopeAngle>("maxSlopeAngle")
+			.data<&CharacterControllerComponent::stepHeight>("stepHeight")
+			.data<&CharacterControllerComponent::controlVelocity>("controlVelocity")
+			.data<&CharacterControllerComponent::isGrounded>("isGrounded")
+			.data<&CharacterControllerComponent::groundNormal>("groundNormal")
+			.func<&Emplacer<CharacterControllerComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<CharacterControllerComponent>::RemoveComponent>("remove")
+			.func<&Getter<CharacterControllerComponent>::GetComponent>("get")
+			.func<&GetRef<CharacterControllerComponent>>("get_ref");
 
 		// === Register LuaScriptComponent and nested LuaInstance ===
 

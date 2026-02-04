@@ -1914,6 +1914,20 @@ namespace EngineFramework
                 }
         });
 
+        auto charView = registry.view<TransformComponent, CharacterControllerComponent>();
+        charView.each([&](entt::entity e, const TransformComponent& tf, const CharacterControllerComponent& character)
+            {
+                bool isSelected = selected_state.IsEntitySelected(e);
+                if (!s_DrawAllColliders && !isSelected) return;
+
+                glm::vec3 size = glm::vec3(character.radius * 2.f, character.height, character.radius * 2.f);
+                glm::mat4 model = glm::translate(glm::mat4(1.f), tf.position);
+                model *= glm::mat4_cast(glm::quat(glm::radians(tf.rotation)));
+                model = glm::scale(model, size);
+
+                DrawWireOBB(model, view, proj, screen_pos, available_size, IM_COL32(0, 255, 0, 255), 2.f);
+        });
+
         //Iterate Selection List
         if (selected_state.HasEntitySelection())
         {
@@ -1923,6 +1937,7 @@ namespace EngineFramework
             {
                 if (!registry.valid(e)) return;
                 if (registry.all_of<ColliderComponent>(e)) continue;
+                if (registry.all_of<CharacterControllerComponent>(e)) continue;
                 if (!registry.all_of<TransformComponent>(e)) continue;
 
                 glm::mat4 highlightM;

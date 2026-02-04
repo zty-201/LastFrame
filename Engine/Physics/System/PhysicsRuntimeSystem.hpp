@@ -65,6 +65,25 @@ namespace EngineFramework
             // 2) make sure ECS entities have Jolt bodies
             m_buildSystem.Update(registry);
 
+            auto charView = registry.view<CharacterControllerComponent, TransformComponent>();
+            for (auto [entity, character, transform] : charView.each())
+            {
+                // Optional: Sync runtime settings if you want to tweak them live
+                PhysicsWorld::Get().SetCharacterSettings(entity, character.mass, character.maxSlopeAngle);
+
+                // Update Position & Velocity via Jolt
+                glm::vec3 newPos = PhysicsWorld::Get().UpdateCharacter(
+                    entity,
+                    character.controlVelocity, // Input from Lua scripts
+                    delta_time,
+                    // Outputs
+                    character.isGrounded,
+                    character.groundNormal,
+                    character.controlVelocity
+                );
+                transform.position = newPos;
+            }
+
             // 3) step physics
             PhysicsWorld::Get().StepSimulation(delta_time);
 
