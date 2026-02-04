@@ -82,11 +82,19 @@ namespace EngineFramework
 	AudioSystem::~AudioSystem()
 	{
 #ifndef DISABLE_FMOD
+		if (m_ambienceLowpass)
+		{
+			m_ambienceLowpass->release();
+			m_ambienceLowpass = nullptr;
+		}
+
+		if (m_ambienceLowpass) { m_ambienceLowpass->release(); m_ambienceLowpass = nullptr; }
 		if (m_groupAmbience) { m_groupAmbience->release(); m_groupAmbience = nullptr; }
 		if (m_groupUI) { m_groupUI->release();       m_groupUI = nullptr; }
 		if (m_groupBGM) { m_groupBGM->release();    m_groupBGM = nullptr; }
 		if (m_groupSFX) { m_groupSFX->release();      m_groupSFX = nullptr; }
 		if (m_groupMaster) { m_groupMaster->release();   m_groupMaster = nullptr; }
+
 
 		if (m_system)
 		{
@@ -120,17 +128,54 @@ namespace EngineFramework
 		r = m_system->createChannelGroup("Ambience", &m_groupAmbience); logFmodError(r, "createChannelGroup(Ambience)");   if (r != FMOD_OK) return;
 
 		// Attach to master
-		m_groupMaster->addGroup(m_groupBGM);
-		m_groupMaster->addGroup(m_groupSFX);
-		m_groupMaster->addGroup(m_groupUI);
-		m_groupMaster->addGroup(m_groupAmbience);
+		if (m_groupMaster)
+		{
+			if (m_groupBGM)
+			{
+				FMOD_RESULT rr = m_groupMaster->addGroup(m_groupBGM);
+				logFmodError(rr, "Master->addGroup(BGM)");
+			}
+			if (m_groupSFX)
+			{
+				FMOD_RESULT rr = m_groupMaster->addGroup(m_groupSFX);
+				logFmodError(rr, "Master->addGroup(SFX)");
+			}
+			if (m_groupUI)
+			{
+				FMOD_RESULT rr = m_groupMaster->addGroup(m_groupUI);
+				logFmodError(rr, "Master->addGroup(UI)");
+			}
+			if (m_groupAmbience)
+			{
+				FMOD_RESULT rr = m_groupMaster->addGroup(m_groupAmbience);
+				logFmodError(rr, "Master->addGroup(Ambience)");
+			}
+		}
 
 		// Default volumes
-		m_groupMaster->setVolume(1.0f);
-		m_groupBGM->setVolume(1.0f);
-		m_groupSFX->setVolume(1.0f);
-		m_groupUI->setVolume(1.0f);
-		m_groupAmbience->setVolume(1.0f);
+		if (m_groupMaster)   m_groupMaster->setVolume(1.0f);
+		if (m_groupBGM)      m_groupBGM->setVolume(1.0f);
+		if (m_groupSFX)      m_groupSFX->setVolume(1.0f);
+		if (m_groupUI)       m_groupUI->setVolume(1.0f);
+		if (m_groupAmbience) m_groupAmbience->setVolume(1.0f);
+
+		// Ambience muffling DSP (lowpass), controlled by SetIndoorFactor()
+		if (m_system && m_groupAmbience)
+		{
+			FMOD_RESULT r2 = m_system->createDSPByType(FMOD_DSP_TYPE_LOWPASS, &m_ambienceLowpass);
+			logFmodError(r2, "createDSPByType(LOWPASS)");
+
+			if (r2 == FMOD_OK && m_ambienceLowpass)
+			{
+				r2 = m_groupAmbience->addDSP(0, m_ambienceLowpass);
+				logFmodError(r2, "Ambience addDSP(LOWPASS)");
+
+				// Start outdoors: no muffling
+				m_ambienceLowpass->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, 20000.0f);
+				m_ambienceLowpass->setBypass(true);
+			}
+		}
+
 #endif
 
 		m_initialized = true;
@@ -599,6 +644,24 @@ namespace EngineFramework
 			m_commands.clear();
 			m_playOnStartDone.clear();
 		}
+	}
+
+	void AudioSystem::SetIndoorFactor(float factor)
+	{
+		m_indoorFactor = std::clamp(factor, 0.0f, 1.0f);
+
+#ifndef DISABLE_FMOD
+		if (!m_ambienceLowpass) return;
+
+		// 0.0 outdoor = clear, 1.0 indoor = muffled
+		const float cutoffOutdoor = 20000.0f;
+		const float cutoffIndoor = 1200.0f;
+
+		const float cutoff = cutoffOutdoor + (cutoffIndoor - cutoffOutdoor) * m_indoorFactor;
+
+		m_ambienceLowpass->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoff);
+		m_ambienceLowpass->setBypass(m_indoorFactor < 0.01f);
+#endif
 	}
 
 } // namespace EngineFramework

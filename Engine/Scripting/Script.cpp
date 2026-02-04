@@ -18,6 +18,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetManager.hpp"
 #include <glm/geometric.hpp> 
 #include <iostream>
+#include "global.hpp"
 
 #if defined(ENGINE_ENABLE_LUA)
 #include <mutex>
@@ -105,6 +106,67 @@ namespace Engine {
     //    keyActions["OPEN_EDITOR"] = (int)EngineFramework::Key_Actions::OPEN_EDITOR;
 
     //}
+
+    void DispatchLuaEvent(entt::registry& reg, entt::entity entity, const std::string& funcName, entt::entity param)
+    {
+        if (!reg.valid(entity)) return;
+
+        auto* luaComp = reg.try_get<LuaScriptComponent>(entity);
+        if (!luaComp || !luaComp->Enabled) return;
+
+        for (auto& inst : luaComp->Scripts)
+        {
+            if (!inst.Loaded) continue;
+
+            if (inst.Env.lua_state() == nullptr) {
+                //LOGE("[LuaEvent] Script environment has NULL state! Skipping %s", funcName.c_str());
+                continue;
+            }
+
+            sol::optional<sol::protected_function> funcOption = inst.Env.get<sol::optional<sol::protected_function>>(funcName);
+            if (funcOption && funcOption.value().valid())
+            {
+                auto func = funcOption.value();
+                try {
+                    auto result = func(inst.Self, static_cast<uint32_t>(param));
+                    if (!result.valid())
+                    {
+                        sol::error err = result;
+                        LOGE("[LuaEvent Error] %s: %s", funcName.c_str(), err.what());
+                    }
+                }
+                catch (const sol::error& err)
+                {
+                    LOGE("[LuaEvent Exception] %s: %s", funcName.c_str(), err.what());
+                }
+            }
+        }
+    }
+
+    void ScriptSystem::OnTriggerEnter(const Event_OnTriggerEnter& e) {
+        if (!s_RuntimeRegistry) return;
+
+        //Something entered
+        DispatchLuaEvent(*s_RuntimeRegistry, e.trigger, "on_trigger_enter", e.other);
+        //Notify the Player "I entered a zone"
+        DispatchLuaEvent(*s_RuntimeRegistry, e.other, "on_trigger_enter", e.trigger);
+    }
+
+    void ScriptSystem::OnTriggerExit(const Event_OnTriggerExit& e) {
+        if (!s_RuntimeRegistry) return;
+
+        // Notify both
+        DispatchLuaEvent(*s_RuntimeRegistry, e.trigger, "on_trigger_exit", e.other);
+        DispatchLuaEvent(*s_RuntimeRegistry, e.other, "on_trigger_exit", e.trigger);
+    }
+
+    void ScriptSystem::OnTriggerStay(const Event_OnTriggerStay& e) {
+        if (!s_RuntimeRegistry) return;
+
+        // Notify both
+        DispatchLuaEvent(*s_RuntimeRegistry, e.trigger, "on_trigger_stay", e.other);
+        DispatchLuaEvent(*s_RuntimeRegistry, e.other, "on_trigger_stay", e.trigger);
+    }
 
     void ScriptSystem::Init() {
 #if defined(ENGINE_ENABLE_LUA)
@@ -316,6 +378,18 @@ namespace Engine {
         // ===============================================================
         // AudioComponent bindings
         // ===============================================================
+        // Used by scripts to configure AudioSlot behaviour.
+        //
+        // Categories control mixer routing and global volume sliders:
+        //   - SFX       : gameplay sounds (footsteps, doors, impacts)
+        //   - BGM       : background music
+        //   - UI        : menu / interface sounds
+        //   - Ambience  : environmental sounds (wind, rain, insects)
+        //
+        // Spatial modes:
+        //   - 2D : non-positional (UI, music)
+        //   - 3D : positional, follows entity transform
+        // ===============================================================
         sol::table audioEnums = s_Lua.create_named_table("Audio");
 
         audioEnums["Category_SFX"] = (int)AudioComponent::AudioCategory::SFX;
@@ -326,9 +400,17 @@ namespace Engine {
         audioEnums["Spatial_2D"] = (int)AudioComponent::SpatialMode::TwoD;
         audioEnums["Spatial_3D"] = (int)AudioComponent::SpatialMode::ThreeD;
 
-        // Bind Slot (formerly AudioClip)
+        // ===============================================================
+        // AudioSlot (Lua)
+        // ===============================================================
+        // A Slot represents ONE sound configuration inside an AudioComponent.
+        // Each slot is identified by a string ID (e.g. "Footstep", "Wind").
+        //
+        // Slots are authored in the editor and triggered from Lua.
+        // ===============================================================
         s_Lua.new_usertype<AudioComponent::Slot>("AudioSlot",
-            // ID
+            // Slot ID
+            // Used by Lua to play/stop this sound (string-based lookup).
             "GetID", [](AudioComponent::Slot& s) { return s.id; },
             "SetID", [](AudioComponent::Slot& s, const std::string& v) { s.id = v; },
 
@@ -342,18 +424,31 @@ namespace Engine {
             "GetLoop", [](AudioComponent::Slot& s) { return s.loop; },
             "SetLoop", [](AudioComponent::Slot& s, bool v) { s.loop = v; },
 
-            // PlayOnStart
+            // Play automatically when simulation starts
             "GetPlayOnStart", [](AudioComponent::Slot& s) { return s.playOnStart; },
             "SetPlayOnStart", [](AudioComponent::Slot& s, bool v) { s.playOnStart = v; },
 
-            // Category / Spatial (as ints in Lua)
+            // Routing & spatial behaviour
+            // Category affects mixer group (SFX / BGM / UI / Ambience)
             "GetCategory", [](AudioComponent::Slot& s) { return (int)s.category; },
             "SetCategory", [](AudioComponent::Slot& s, int v) { s.category = (AudioComponent::AudioCategory)v; },
 
             "GetSpatial", [](AudioComponent::Slot& s) { return (int)s.spatial; },
             "SetSpatial", [](AudioComponent::Slot& s, int v) { s.spatial = (AudioComponent::SpatialMode)v; },
 
-            // 3D distances
+            // 3D attenuation distances (only used for Spatial_3D)
+            // minDistance:
+            //   Distance (in world units) where the sound plays at FULL volume.
+            //   Within this range, volume does NOT fall off.
+            //
+            // maxDistance:
+            //   Distance where the sound becomes very quiet / near silent.
+            //   Volume fades smoothly between minDistance and maxDistance.
+            //
+            // Notes:
+            // - Larger minDistance = sound stays loud over a larger area
+            // - Smaller minDistance = sound drops off quickly
+            // - Ambience usually needs LARGE minDistance
             "GetMinDistance", [](AudioComponent::Slot& s) { return s.minDistance; },
             "SetMinDistance", [](AudioComponent::Slot& s, float d) { s.minDistance = d; },
 
@@ -361,33 +456,48 @@ namespace Engine {
             "SetMaxDistance", [](AudioComponent::Slot& s, float d) { s.maxDistance = d; }
         );
 
-        // Bind AudioComponent itself
+        // ===============================================================
+        // AudioComponent (Lua)
+        // ===============================================================
+        // Component that owns multiple AudioSlots.
+        // Usually configured in the editor, not created at runtime.
+        // ===============================================================
         s_Lua.new_usertype<AudioComponent>("AudioComponent",
+
+            // Number of slots on this component
             "GetSlotCount", [](AudioComponent& a) { return (int)a.Slots.size(); },
 
+            // Access slot by index (returns nil if out of range)
             "GetSlot", [](AudioComponent& a, std::size_t index) -> AudioComponent::Slot* {
                 if (index >= a.Slots.size()) return nullptr;
                 return &a.Slots[index];
             },
 
+            // Find slot by string ID
             "FindSlot", [](AudioComponent& a, const std::string& id) -> AudioComponent::Slot* {
                 return a.FindSlot(id);
             },
 
+            // Add or return a slot with the given ID
             "AddSlot", [](AudioComponent& a, const std::string& id) -> AudioComponent::Slot* {
                 return &a.AddSlot(id);
             },
 
+            // Remove slot by index
             "RemoveSlot", [](AudioComponent& a, std::size_t index) {
                 a.RemoveSlot(index);
             }
         );
 
         // ===============================================================
-        // AudioSystem bindings (play/stop by entity + slot ID)
+        // AudioSystem – Playback helpers (Lua)
+        // ===============================================================
+        // Recommended way to trigger audio from scripts.
+        // Uses entity + slot ID instead of raw sound assets.
         // ===============================================================
 
-        // Use global functions (recommended) so scripts can trigger audio reliably
+        // Play a slot on an entity's AudioComponent
+        // Example: Audio_PlaySlot(EntityID, "Footstep")
         s_Lua.set_function("Audio_PlaySlot",
             [](uint32_t entityId, const std::string& slotId)
             {
@@ -395,6 +505,7 @@ namespace Engine {
                 EngineFramework::AudioSystem::GetInstance().PlayEntitySlot(e, slotId);
             });
 
+        // Stop a specific slot on an entity
         s_Lua.set_function("Audio_StopSlot",
             [](uint32_t entityId, const std::string& slotId)
             {
@@ -402,6 +513,7 @@ namespace Engine {
                 EngineFramework::AudioSystem::GetInstance().StopEntitySlot(e, slotId);
             });
 
+        // Stop all playing slots for an entity
         s_Lua.set_function("Audio_StopAllForEntity",
             [](uint32_t entityId)
             {
@@ -409,12 +521,32 @@ namespace Engine {
                 EngineFramework::AudioSystem::GetInstance().StopAllForEntity(e);
             });
 
-        // Optional: mixer controls from Lua (useful for settings menus)
+        // ===============================================================
+        // AudioSystem – Mixer controls (Lua)
+        // ===============================================================
+        // Used for settings menus (volume sliders).
+        // ===============================================================
         s_Lua.set_function("Audio_SetGroupVolume",
             [](int group, float vol)
             {
                 EngineFramework::AudioSystem::GetInstance().SetGroupVolume(
                     (EngineFramework::AudioGroup)group, vol);
+            });
+
+        // ===============================================================
+        // AudioSystem – Environment controls (Lua)
+        // ===============================================================
+        // Controls ambience muffling based on environment.
+        //
+        // 0.0 = outdoor (clear ambience)
+        // 1.0 = indoor (muffled ambience)
+        //
+        // Typically driven by trigger zones.
+        // ===============================================================
+        s_Lua.set_function("Audio_SetIndoorFactor",
+            [](float factor)
+            {
+                EngineFramework::AudioSystem::GetInstance().SetIndoorFactor(factor);
             });
 
         // ===============================================================
@@ -905,6 +1037,12 @@ namespace Engine {
                 LoadLuaFor(reg, entity, inst);
             }
         }
+
+        event_dispatcher.sink<Event_OnTriggerEnter>().connect<&ScriptSystem::OnTriggerEnter>();
+        event_dispatcher.sink<Event_OnTriggerExit>().connect<&ScriptSystem::OnTriggerExit>();
+        event_dispatcher.sink<Event_OnTriggerStay>().connect<&ScriptSystem::OnTriggerStay>();
+
+        LOGI("[ScriptSystem] Subscribed to Trigger Events.");
 #endif
     }
 
@@ -916,6 +1054,10 @@ namespace Engine {
         }
 
 #if defined(ENGINE_ENABLE_LUA)
+        event_dispatcher.sink<Event_OnTriggerEnter>().disconnect<&ScriptSystem::OnTriggerEnter>();
+        event_dispatcher.sink<Event_OnTriggerExit>().disconnect<&ScriptSystem::OnTriggerExit>();
+        event_dispatcher.sink<Event_OnTriggerStay>().disconnect<&ScriptSystem::OnTriggerStay>();
+
         s_RuntimeRegistry = nullptr;
 
         auto luaView = reg.view<LuaScriptComponent>();
@@ -1049,9 +1191,9 @@ namespace Engine {
 
         auto scriptAsset = EngineFramework::AssetManagerSystem::GetResource<ScriptAsset>(full_guid);
         if (!scriptAsset) {
-            LOGE("[LuaRuntime] ScriptAsset not found for GUID %llu (entity %u)",
-                inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
-            inst.Loaded = false;
+            //LOGE("[LuaRuntime] ScriptAsset not found for GUID %llu (entity %u)",
+                //inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
+            //inst.Loaded = false;
             return;
         }
 

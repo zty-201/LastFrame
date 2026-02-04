@@ -41,7 +41,8 @@ end
 -- ============================================================
 function on_create(self)
     print("[player_movement] on_create()")
-
+    SHARED.PlayerID = EntityID
+    print("[Player ID] = ", SHARED.PlayerID)
     transform = EntityTransform
     camera = GetMainCamera()
     physics   = EntityPhysics

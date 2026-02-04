@@ -15,9 +15,11 @@
 #include "TransformComponent.h"
 namespace EngineFramework
 {
+	class UI_Menu;
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
 	class Save; //forward declaration
+	
 #endif
 	
 	
@@ -117,7 +119,10 @@ namespace EngineFramework
 			Write gameobject instances to a json string using reflection.
 			Returns a json string that can be written to a scene file.
 		*/
-		std::string SerializeAllEntityInstances();
+
+		std::string SerializeSingleEntity(entt::entity e);
+		std::string SerializeAllEntityInstances(std::unordered_set<entt::entity> except = {});
+		
 
 		// Getter for registry
 		static entt::registry& GetRegistry() { return registry; }
@@ -143,6 +148,7 @@ namespace EngineFramework
 			Ensure all archetypes are deserialized before calling this.
 		*/
 		void DeSerializeAllEntityInstances(const std::string& json_input);
+		void DeSerializeAllEntityInstances(const std::string& json_input, std::vector<entt::entity> &list);
 		
 		/*
 			Creates an entt::entity instance with an archtype.
@@ -155,6 +161,8 @@ namespace EngineFramework
 
 		//Keeps track of the one and only instance of this system, created by core engine.
 		static inline GameObjectSystem* this_system{};
+
+		friend UI_Menu;
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 
 		friend Save;

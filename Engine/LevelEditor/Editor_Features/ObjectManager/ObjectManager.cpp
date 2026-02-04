@@ -46,10 +46,11 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Mesh.h"
 #include "MeshComponent.h"
 #include "HistorySystem.hpp"
-
+#include "UISystem.hpp"
 // To rename objects
 #include "NameComponent.h"
-
+#include "MenuManager.hpp"
+#include "UIComponent.h"
 namespace EngineFramework
 {
 	ObjectManager::ObjectManager() {
@@ -156,6 +157,11 @@ namespace EngineFramework
 					history_system.end_track(record);
 				}
 
+				if (MenuManager::GetInstance().is_menu_running)
+				{					
+					MenuManager::GetInstance().add_element(duplicated_entity);
+				}
+
 				selection_state.SetEntitySelection(duplicated_entity);
 				selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
 				return duplicated_entity;
@@ -215,6 +221,24 @@ namespace EngineFramework
 			// Iterate through here to allow the search of object name
 			int incrementing_imgui_id{};
 			for (auto entity : entities) {
+
+				/*
+					DISPLAYING OF MENU ENTITIES ONLY WHEN MENU IS OPENED
+				*/
+				if (MenuManager::GetInstance().is_menu_running)
+				{
+					const auto& menu_entities = UI_System::GetInstance().getMenu_Entities(MenuManager::GetInstance().GetCurrentMenu());
+
+					// if entity NOT found in menu_entities skip
+					if (std::find(menu_entities.begin(),
+						menu_entities.end(),
+						entity) == menu_entities.end())
+					{
+						continue;
+					}
+				}
+
+
 				std::string label = GameObjectSystem::GetEntityName(entity);
 				bool passes_search = true;
 				if (has_search_query) {
@@ -337,6 +361,11 @@ namespace EngineFramework
 						// 1. Destroy the entity
 						registry.destroy(entity);
 
+						if (MenuManager::GetInstance().is_menu_running)
+						{
+							MenuManager::GetInstance().remove_element(entity);
+						}
+
 						if (history_system) {
 							history_system->end_track(entity_history);
 						}
@@ -351,15 +380,20 @@ namespace EngineFramework
 						break; // Exit the loop safely
 					}
 					// --- Create archtype from selected entity ---
-					std::string instance_archtype_label = "Create Archtype From Entity##" + std::to_string((uint32_t)entity);
-					if (ImGui::MenuItem(instance_archtype_label.c_str())) {
 
-						instance_to_create_archtype = entity;
-						open_popup_once = true;
-						ImGui::EndPopup();
-						break;
+					if (!MenuManager::GetInstance().is_menu_running)
+					{
+						std::string instance_archtype_label = "Create Archtype From Entity##" + std::to_string((uint32_t)entity);
+						if (ImGui::MenuItem(instance_archtype_label.c_str())) {
+
+							instance_to_create_archtype = entity;
+							open_popup_once = true;
+							ImGui::EndPopup();
+							break;
+						}
 					}
 
+					
 					// To rename the entity
 					// Will open a modal popup for user to edit the name
 					std::string rename_label = "Rename##" + std::to_string((uint32_t)entity);
@@ -520,21 +554,41 @@ namespace EngineFramework
 		if (ImGui::Button("Create Empty Object"))
 		{
 			entt::entity instance = registry.create();
-			TransformComponent instance_transform{};
 
-			//Find the position in front of where the camera is looking.
-			entt::entity camera = GraphicsSystem::GetInstance().GetFirstActiveCamera();
-			if (camera != entt::null)
+			if (MenuManager::GetInstance().is_menu_running)
 			{
-				CameraComponent& cam_comp = registry.get<CameraComponent>(camera);
-				instance_transform.position = Camera::GetFowardLookPosition(cam_comp, 0.5f);
+				UIComponent instance_ui;
+				instance_ui.position = { 500.f,500.f }; //just some default value
+				instance_ui.size = { 250.f,250.f }; //just some default value
+				instance_ui.visible = true; //so its visible when we add, but need to choose texture
+				instance_ui.belong_to_menu = true;
+				instance_ui.Overlay_name = MenuManager::GetInstance().GetCurrentMenu();		
 
-			}//Otherwise if no active camera found then use default position at 0,0,0.
-			else
-			{
-				LOGD("%s", "No Active Camera Found, creating entity at(0, 0, 0)");
+				registry.emplace<UIComponent>(instance, instance_ui);
+				MenuManager::GetInstance().add_element(instance);
+				
 			}
-			registry.emplace<TransformComponent>(instance, instance_transform);
+			else {
+
+				TransformComponent instance_transform{};
+
+				//Find the position in front of where the camera is looking.
+				entt::entity camera = GraphicsSystem::GetInstance().GetFirstActiveCamera();
+				if (camera != entt::null)
+				{
+					CameraComponent& cam_comp = registry.get<CameraComponent>(camera);
+					instance_transform.position = Camera::GetFowardLookPosition(cam_comp, 0.5f);
+
+				}//Otherwise if no active camera found then use default position at 0,0,0.
+				else
+				{
+					LOGD("%s", "No Active Camera Found, creating entity at(0, 0, 0)");
+				}
+				registry.emplace<TransformComponent>(instance, instance_transform);
+
+			}
+
+			
 		}
 	}
 

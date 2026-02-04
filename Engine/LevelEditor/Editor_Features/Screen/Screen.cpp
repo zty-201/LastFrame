@@ -66,10 +66,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "System_GameObjectSystem.hpp"
 #include "SceneManager.hpp"
 #include "PhysicsWorld.hpp"
-
+#include "MenuManager.hpp"
 //Audio
 #include "Audio.hpp"
-
+#include "UISystem.hpp"
 namespace EngineFramework
 {
     using namespace entt::literals;
@@ -310,22 +310,22 @@ namespace EngineFramework
         return true;
     }
 
-    static void OnTriggerEnter(const Event_OnTriggerEnter& e)
+    static void OnTriggerEnter(const Event_OnTriggerEnter& )
     {
-        LOGI("[TriggerEnter] Trigger %u -> Entity %u",
-            (unsigned)e.trigger, (unsigned)e.other);
+        /*LOGI("[TriggerEnter] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);*/
     }
 
-    static void OnTriggerStay(const Event_OnTriggerStay& e)
+    static void OnTriggerStay(const Event_OnTriggerStay& )
     {
-        LOGI("[TriggerStay] Trigger %u -> Entity %u",
-            (unsigned)e.trigger, (unsigned)e.other);
+        /*LOGI("[TriggerStay] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);*/
     }
 
-    static void OnTriggerExit(const Event_OnTriggerExit& e)
+    static void OnTriggerExit(const Event_OnTriggerExit& )
     {
-        LOGI("[TriggerExit] Trigger %u -> Entity %u",
-            (unsigned)e.trigger, (unsigned)e.other);
+        /*LOGI("[TriggerExit] Trigger %u -> Entity %u",
+            (unsigned)e.trigger, (unsigned)e.other);*/
     }
 
     void Screen::Initialize() {
@@ -487,7 +487,7 @@ namespace EngineFramework
                 bool hovered = ImGui::IsItemHovered();
 
                 gizmos();
-                //triggerbox();
+                triggerbox();
                 drop_target();
                 colliderbox();
 
@@ -499,7 +499,7 @@ namespace EngineFramework
                     tf.prevModelMatrix = tf.modelMatrix;
                 }
 
-                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && hovered && !ImGuizmo::IsOver())
+                if (!MenuManager::GetInstance().is_menu_running && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && hovered && !ImGuizmo::IsOver())
                 {
                     ImVec2 mousePos = ImGui::GetMousePos();
                     ImVec2 viewportPos = ImGui::GetItemRectMin();
@@ -666,6 +666,27 @@ namespace EngineFramework
     void Screen::Close() {
         clear_backup();
         LOGI("Screen closed");
+    }
+
+    glm::vec2 Screen::GetMouseInSceneUI() const {
+
+        const auto [mxD, myD] = InputManager::GetInstance().GetMousePosition();
+        const float mx = static_cast<float>(mxD);
+        const float my = static_cast<float>(myD);
+
+        float localX = mx - screen_pos.x;
+        float localY = my - screen_pos.y;
+
+        if (localX < 0.0f || localY < 0.0f ||
+            localX > available_size.x || localY > available_size.y)
+        {
+            return { -1.0f, -1.0f };
+        }
+
+        float uiY = available_size.y - localY;
+
+        return { localX, uiY };
+
     }
 
     void Screen::display_screen() {
@@ -2062,7 +2083,12 @@ namespace EngineFramework
 
     void Screen::play_simulation() {
 
+
+        MenuManager::GetInstance().close_menuEditor();
+        //UI_System::GetInstance().Seralise_AllMenus();
+
         if (is_simulator_running) return;
+
         //std::cout << "play_simulation\n";
         is_simulator_running = true;
         EngineFramework::AudioSystem::GetInstance().SetSimulationMode(true);
@@ -2123,7 +2149,13 @@ namespace EngineFramework
 
         Engine::ScriptSystem::OnRuntimeStart(registry);
 
-        json_backup = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances();
+        /*
+            HERE IS THE PROBLEM
+        */
+
+        //SAVE MENU FIRST BAH WHEN SIMULATION IS RUNNING
+        std::unordered_set<entt::entity> except_list = UI_System::GetInstance().Seralise_AllMenus();
+        json_backup = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances(except_list);
 
         //get all entity
         //std::vector<entt::entity> entities;
@@ -2185,7 +2217,14 @@ namespace EngineFramework
         ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoKeyboard;
         GameObjectSystem::GetInstance().ClearAllInstances();
 
+        /*
+            I MAKE SOME NEW CHANGES HERE
+        */
+
+        
         GameObjectSystem::GetInstance().LoadScene(json_backup);
+        UI_System::GetInstance().Initialize();
+
 
         json_backup = {};
 

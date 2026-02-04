@@ -47,11 +47,11 @@ namespace EngineFramework
     {
         auto tview = reg.view<TriggerBoxComponent>();
         for (auto ent : tview) {
-            auto& tbox = tview.get<TriggerBoxComponent>(ent);
-            tbox.highlightedEntities.clear();
+            tview.get<TriggerBoxComponent>(ent).highlightedEntities.clear();
         }
 
         auto triggers = reg.view<TransformComponent, TriggerBoxComponent>();
+        auto others = reg.view<TransformComponent>();
 
         triggers.each(
             [&](entt::entity triggerEnt,
@@ -69,11 +69,9 @@ namespace EngineFramework
                 glm::mat4 world = tf.modelMatrix * local;
 
                 glm::vec3 trigMin, trigMax;
-                ComputeAABB(world, box.halfExtents, trigMin, trigMax);
+                ComputeAABB(world, glm::vec3(0.5f), trigMin, trigMax);
 
                 std::unordered_set<entt::entity> insideNow;
-
-                auto others = reg.view<TransformComponent>();
                 for (auto otherEnt : others)
                 {
                     if (otherEnt == triggerEnt)
@@ -81,29 +79,28 @@ namespace EngineFramework
 
                     auto& otf = others.get<TransformComponent>(otherEnt);
 
-                    glm::vec3 half(0.25f);
-
+                    glm::vec3 half(0.5f);
                     glm::vec3 oMin, oMax;
                     ComputeAABB(otf.modelMatrix, half, oMin, oMax);
 
                     if (Overlap(trigMin, trigMax, oMin, oMax))
                     {
                         insideNow.insert(otherEnt);
-
                         box.highlightedEntities.insert(otherEnt);
-
-                        if (box.currentInside.find(otherEnt) == box.currentInside.end())
-                        {
-                            event_dispatcher.trigger(Event_OnTriggerEnter{ triggerEnt, otherEnt });
-                        }
-
-                        box.currentInside = std::move(insideNow);
-
-                        if (otf.modelMatrix != otf.prevModelMatrix) {
-                            event_dispatcher.trigger(Event_OnTriggerStay{ triggerEnt, otherEnt });
-                        }
                     }
                 }
+                for (auto ent : insideNow)
+                {
+                    if (box.currentInside.find(ent) == box.currentInside.end())
+                    {
+                        event_dispatcher.trigger(Event_OnTriggerEnter{ triggerEnt, ent });
+                    }
+                    else
+                    {
+                        event_dispatcher.trigger(Event_OnTriggerStay{ triggerEnt, ent });
+                    }
+                }
+
 
                 for (auto old : box.currentInside)
                 {
