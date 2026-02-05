@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
--- StateController_CP1_PlaySong1.lua  (UPDATED: scatter chair + drop entity 522)
--- CP1: Play audio once, wait, then shrink hidden door + scatter chair parts
+-- StateController_CP1_PlaySong1.lua
+-- CP1: Play audio once, wait, then shrink hidden door
 ----------------------------------------------------------------
 
 local DEBUG = true
@@ -18,7 +18,6 @@ function on_create(Self)
     Self.timer = 0.0
     Self.cp1Started = false
     Self.hiddenDoorDone = false
-    Self.scatterDone = false   -- ✅ NEW
 
     if DEBUG then
         print("[StateController] on_create EntityID:", EntityID, "state=IDLE")
@@ -36,7 +35,6 @@ function on_create(Self)
             s.timer = 0.0
             s.cp1Started = false
             s.hiddenDoorDone = false
-            s.scatterDone = false -- ✅ reset
 
             if DEBUG then
                 print("[StateController] TriggerCP1 -> state=CP1")
@@ -61,7 +59,7 @@ local function Checkpoint1(Self, dt)
     -- 2️⃣ Count time
     Self.timer = Self.timer + dt
 
-    -- 3️⃣ After song duration, shrink hidden door once + scatter chair once
+    -- 3️⃣ After song duration, shrink hidden door once
     if (not Self.hiddenDoorDone) and (Self.timer >= SONG_LENGTH_SECONDS) then
         Self.hiddenDoorDone = true
 
@@ -73,21 +71,6 @@ local function Checkpoint1(Self, dt)
             end
         else
             print("[StateController] CP1 ERROR: No Transform for hidden door id:", HIDDEN_DOOR_ID)
-        end
-
-        -- ✅ NEW: trigger chair scatter (if ChairScatter script exists)
-        if (not Self.scatterDone) then
-            Self.scatterDone = true
-
-            if SHARED.ChairScatter and SHARED.ChairScatter.Trigger then
-                SHARED.ChairScatter.Trigger()
-
-                if DEBUG then
-                    print("[StateController] CP1 -> triggered ChairScatter")
-                end
-            else
-                print("[StateController] CP1 WARN: ChairScatter not found (attach ChairScatter_CP1.lua somewhere)")
-            end
         end
     end
 end

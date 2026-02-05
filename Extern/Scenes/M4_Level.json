@@ -342,7 +342,7 @@
 				0.0
 			],
 			"size": [
-				1781.0,
+				1800.0,
 				1158.0
 			],
 			"size_NDC": [
@@ -350,7 +350,7 @@
 				1.0
 			],
 			"textureid": [
-				16044425988305469441,
+				15880757180321595405,
 				3711223656383638553
 			],
 			"visible": false
@@ -37462,96 +37462,6 @@
 			"type": 0
 		}
 	},
-	"378": {
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				2123869993542172683,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				17198649398227697675,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				8551738113665728515,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				6822355856755458053,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "toy_frog",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Playroom_SoftKnife_05"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				522.6199951171875,
-				11.943144798278809,
-				-340.4020690917969
-			],
-			"rotation": [
-				0.0,
-				53.649993896484375,
-				20.949996948242188
-			],
-			"scale": [
-				0.0,
-				0.0,
-				0.0
-			]
-		}
-	},
 	"379": {
 		"AudioComponent": {
 			"Slots": [
@@ -37704,95 +37614,6 @@
 				1.0,
 				1.0,
 				1.0
-			]
-		}
-	},
-	"380": {
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				15728883828058193951,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				2470286525079453729,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				18034726837271887907,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				2470286525079453733,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				8234894048113688615,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "dinnerware_knife",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Playroom_Knife_Toy"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"TransformComponent": {
-			"position": [
-				524.6563720703125,
-				44.594966888427734,
-				-356.4813537597656
-			],
-			"rotation": [
-				19.15000343322754,
-				30.14999771118164,
-				27.199996948242188
-			],
-			"scale": [
-				0.0,
-				0.0,
-				0.0
 			]
 		}
 	},
@@ -39524,10 +39345,6 @@
 				}
 			]
 		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": []
-		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -39606,42 +39423,15 @@
 				357.97357177734375
 			],
 			"rotation": [
-				-180.0,
-				-90.0,
-				-180.0
+				-179.99989318847656,
+				-6.300021648406982,
+				-179.99989318847656
 			],
 			"scale": [
 				0.9999829530715942,
 				1.0,
 				0.9999829530715942
 			]
-		},
-		"TriggerBoxComponent": {
-			"capHalfHeight": 0.5,
-			"capRadius": 0.5,
-			"debugColor": [
-				0.10000000149011612,
-				0.800000011920929,
-				0.20000000298023224
-			],
-			"enabled": true,
-			"halfExtents": [
-				70.0,
-				100.0,
-				10.0
-			],
-			"localEulerDeg": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"localPosition": [
-				50.0,
-				100.0,
-				0.0
-			],
-			"radius": 0.5,
-			"type": 0
 		}
 	},
 	"401": {
@@ -52232,9 +52022,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				443.9825744628906,
-				0.0,
-				-288.646240234375
+				447.6494445800781,
+				10.0,
+				-290.7821044921875
 			],
 			"rotation": [
 				0.0,
@@ -58706,15 +58496,6 @@
 				}
 			]
 		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 6781577181173088257
-				}
-			]
-		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -60546,7 +60327,7 @@
 				1.0
 			],
 			"textureid": [
-				16044425988305469441,
+				15880757180321595405,
 				3711223656383638553
 			],
 			"visible": false
@@ -60736,7 +60517,7 @@
 				1.0
 			],
 			"textureid": [
-				16044425988305469441,
+				15880757180321595405,
 				3711223656383638553
 			],
 			"visible": false
@@ -60929,134 +60710,6 @@
 			],
 			"textureid": [
 				15304296428018171923,
-				3711223656383638553
-			],
-			"visible": false
-		}
-	},
-	"614": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 8176611146165616643
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "MusicBoxGreyIcon"
-		},
-		"TransformComponent": {
-			"position": [
-				581.6229858398438,
-				146.1432342529297,
-				-528.1101684570313
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
-		},
-		"UIComponent": {
-			"Overlay_name": "",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 0,
-			"luminance": 1.0,
-			"position": [
-				0.0,
-				0.0
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				1781.0,
-				1158.0
-			],
-			"size_NDC": [
-				1.0,
-				1.0
-			],
-			"textureid": [
-				11269071161894207495,
-				3711223656383638553
-			],
-			"visible": false
-		}
-	},
-	"615": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 5870768136951922689
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "MusicBoxWhiteIcon"
-		},
-		"TransformComponent": {
-			"position": [
-				581.6229858398438,
-				146.1432342529297,
-				-528.1101684570313
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
-		},
-		"UIComponent": {
-			"Overlay_name": "",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 0,
-			"luminance": 1.0,
-			"position": [
-				0.0,
-				0.0
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				1781.0,
-				1158.0
-			],
-			"size_NDC": [
-				1.0,
-				1.0
-			],
-			"textureid": [
-				4351542134253125641,
 				3711223656383638553
 			],
 			"visible": false
