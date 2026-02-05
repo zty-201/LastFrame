@@ -1,4 +1,6 @@
 -- InteractionBox_InteractableOnly.lua
+-- (Your previous version + minimal additions for icon triggering)
+
 local PLAYER_ID = 5
 local FORWARD_MODE = "camera"
 local FORWARD_SOURCE_ID = PLAYER_ID
@@ -8,8 +10,11 @@ local OFFSET_Y = 0.8
 
 local LOG_EVERY_N_FRAMES = 30
 
-local inside = {}
+local inside = {}   -- [entityId] = true if inside trigger
 local frame = 0
+
+-- ✅ NEW: track last frame zone to hide when leaving
+local prev_zone = {} -- [entityId] = true
 
 local function get_player_transform()
     return Query.GetTransform(PLAYER_ID)
@@ -26,7 +31,6 @@ local function is_interactable(id)
     return SHARED.INTERACTABLE ~= nil and SHARED.INTERACTABLE[id] == true
 end
 
--- Returns ALL interactable IDs currently inside the box
 function GetInteractablesInZone()
     local list = {}
     for id, _ in pairs(inside) do
@@ -34,11 +38,10 @@ function GetInteractablesInZone()
             list[#list + 1] = id
         end
     end
-    table.sort(list, function(a,b) return tonumber(a) < tonumber(b) end)
+    table.sort(list, function(a, b) return tonumber(a) < tonumber(b) end)
     return list
 end
 
--- Returns ONE interactable ID (first after sorting), or nil
 function GetFirstInteractableInZone()
     local list = GetInteractablesInZone()
     if #list == 0 then return nil end
@@ -52,20 +55,31 @@ local function print_interactables(prefix)
         print(prefix .. " Interactables: (none)")
         return
     end
+
     local s = ""
-    for i=1,#list do
+    for i = 1, #list do
         s = s .. tostring(list[i])
         if i < #list then s = s .. ", " end
     end
     print(prefix .. " Interactables IDs: " .. s)
 end
 
+-- ✅ NEW: icon command bus helper
+local function send_icon_cmd(targetId, cmd)
+    SHARED.ICON_CMD = SHARED.ICON_CMD or {}
+    SHARED.ICON_CMD[targetId] = { cmd = cmd, by = PLAYER_ID }
+end
+
 function on_create(self)
     print("[InteractionBox] ready EntityID=" .. tostring(EntityID))
 
-    -- ✅ SAFE GUARD (does NOT change behaviour)
     SHARED.INTERACTABLE = SHARED.INTERACTABLE or {}
     SHARED.INTERACT_FN  = SHARED.INTERACT_FN  or {}
+
+    SHARED.INTERACT_IN_ZONE = {}
+
+    -- ✅ NEW
+    SHARED.ICON_CMD = SHARED.ICON_CMD or {}
 end
 
 function on_update(self, dt)
@@ -81,8 +95,34 @@ function on_update(self, dt)
         pz + fz * OFFSET_FORWARD
     )
 
+    -- publish ALL interactables currently in range
+    local zone = {}
+    for id, _ in pairs(inside) do
+        if is_interactable(id) then
+            zone[id] = true
+        end
+    end
+    SHARED.INTERACT_IN_ZONE = zone
+
     ----------------------------------------------------------------
-    -- 🔹 NEW: GLFW E press → interact
+    -- ✅ NEW: trigger icon scripts (no key needed)
+    -- Every frame: show for items in range
+    -- When something leaves range: hide
+    ----------------------------------------------------------------
+    for id, _ in pairs(prev_zone) do
+        if zone[id] ~= true then
+            send_icon_cmd(id, "hide")
+        end
+    end
+
+    for id, _ in pairs(zone) do
+        send_icon_cmd(id, "show")
+    end
+
+    prev_zone = zone
+
+    ----------------------------------------------------------------
+    -- (KEEP) E press → interact (toggle door)
     ----------------------------------------------------------------
     if Input.GetKeyDown(GLFW_KEY_E) then
         local targetId = GetFirstInteractableInZone()
@@ -96,8 +136,7 @@ function on_update(self, dt)
         end
     end
 
-    ----------------------------------------------------------------
-
+    -- periodic logging
     if LOG_EVERY_N_FRAMES and LOG_EVERY_N_FRAMES > 0 then
         frame = frame + 1
         if (frame % LOG_EVERY_N_FRAMES) == 0 then
@@ -108,9 +147,11 @@ end
 
 function on_trigger_enter(self, otherId)
     if otherId == nil then return end
+
+    local wasInside = inside[otherId] == true
     inside[otherId] = true
 
-    if is_interactable(otherId) then
+    if (not wasInside) and is_interactable(otherId) then
         print("[InteractionBox] ENTER interactable -> " .. tostring(otherId))
     end
 end
