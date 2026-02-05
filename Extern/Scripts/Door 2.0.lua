@@ -43,10 +43,19 @@ function on_update(Self, dt)
         SHARED.DOOR_CMD[EntityID] = nil   -- consume it
 
         -- 🚫 Already opened once → ignore everything forever
+        -- If already opened once:
+        -- allow CLOSE commands (for scripted events), but block toggle/open
         if hasOpenedOnce then
-            print("[Door] Ignored interaction (already opened once)")
+            if cmdObj.cmd == "close" then
+                isOpen = false
+                targetY = closedAngle
+                print("[Door] Scripted CLOSE allowed after one-time open")
+            else
+                print("[Door] Ignored interaction (already opened once)")
+            end
             return
         end
+
 
         -- Allow only first open / toggle
         if cmdObj.cmd == "open" or cmdObj.cmd == "toggle" then

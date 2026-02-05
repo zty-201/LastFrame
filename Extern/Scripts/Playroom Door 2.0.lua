@@ -3,7 +3,7 @@
 -- Requires playroom_key ONCE to unlock, then behaves like normal Door_SharedControlled.
 
 local closedAngle = 0.0
-local openAngle   = 80.0
+local openAngle   = 50.0
 local rotateSpeed = 180.0
 
 local isOpen = false

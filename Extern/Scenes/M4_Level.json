@@ -14627,15 +14627,6 @@
 				}
 			]
 		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 2953913315913400323
-				}
-			]
-		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -14711,7 +14702,7 @@
 			"position": [
 				657.2461547851563,
 				43.219783782958984,
-				-254.73117065429688
+				-250.08155822753906
 			],
 			"rotation": [
 				-179.99989318847656,
@@ -15265,6 +15256,19 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 12745979154665619457
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -15337,9 +15341,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-421.8670349121094,
+				-417.1707763671875,
 				100.32725524902344,
-				-9.66265869140625
+				-14.453009605407715
 			],
 			"rotation": [
 				179.99989318847656,
@@ -15351,6 +15355,33 @@
 				0.5,
 				0.5
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				40.0,
+				30.0,
+				60.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"219": {
@@ -15696,25 +15727,6 @@
 		}
 	},
 	"221": {
-		"AudioComponent": {
-			"Slots": [
-				{
-					"audio_guid": [
-						15134610902839312391,
-						11537445004664754516
-					],
-					"category": 0,
-					"id": "Checkpoint1",
-					"loop": false,
-					"maxDistance": 25.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"volume": 1.0
-				}
-			]
-		},
 		"ColliderComponent": {
 			"maxBounds": [
 				24.41899871826172,
@@ -15748,15 +15760,6 @@
 					],
 					"sphereRadius": 0.5,
 					"type": 0
-				}
-			]
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 16045129764821991425
 				}
 			]
 		},
@@ -15975,6 +15978,25 @@
 		}
 	},
 	"223": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						15134610902839312391,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Checkpoint1",
+					"loop": false,
+					"maxDistance": 50.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				19.50222396850586,
@@ -16017,6 +16039,14 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 4106834820520247297
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16045129764821991425
 				}
 			]
 		},
@@ -16106,6 +16136,33 @@
 				1.0,
 				1.0000020265579224
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				50.0,
+				50.0,
+				40.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"224": {
@@ -29545,7 +29602,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				90.0,
 				0.0
 			],
 			"scale": [
@@ -30847,7 +30904,11 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 12745979154665619457
+					"ScriptGuid": 5167801968469164033
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
 				}
 			]
 		},
@@ -30924,20 +30985,47 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				97.2374038696289,
+				98.86726379394531,
 				0.0,
-				-453.6704406738281
+				-460.6380310058594
 			],
 			"rotation": [
 				0.0,
-				-19.5,
-				0.0
+				90.0,
+				-0.3499999940395355
 			],
 			"scale": [
-				0.9999996423721313,
+				0.999999463558197,
 				1.0,
-				0.9999996423721313
+				0.999999463558197
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				70.0,
+				100.0,
+				10.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				55.0,
+				100.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"330": {
@@ -37625,9 +37713,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-19.985116958618164,
-				170.7831268310547,
-				-848.4735107421875
+				-94.65031433105469,
+				183.1243133544922,
+				-755.91845703125
 			],
 			"rotation": [
 				0.0,
@@ -37636,8 +37724,8 @@
 			],
 			"scale": [
 				100.0,
-				100.0,
-				100.0
+				150.0,
+				150.0
 			]
 		}
 	},
@@ -46046,7 +46134,7 @@
 			"position": [
 				187.42404174804688,
 				0.0,
-				94.0414047241211
+				90.8912582397461
 			],
 			"rotation": [
 				0.0,
@@ -49124,18 +49212,18 @@
 			],
 			"constant": 1.0,
 			"direction": [
-				0.022338269278407097,
-				-0.002792523242533207,
-				0.999746561050415
+				0.0,
+				0.0,
+				1.0
 			],
 			"innerConeAngle": 15.0,
 			"intensity": 10000.0,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 35.0,
 			"position": [
-				-19.973947525024414,
-				169.98312377929688,
-				-877.9736328125
+				-94.65031433105469,
+				182.32431030273438,
+				-785.41845703125
 			],
 			"quadratic": 0.03200000151991844,
 			"radius": 1000.0,
@@ -49220,7 +49308,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -49667,6 +49755,19 @@
 		}
 	},
 	"508": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 2953913315913400323
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -49740,20 +49841,47 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				657.2461547851563,
-				66.43758392333984,
-				-255.84117126464844
+				654.2114868164063,
+				57.27682876586914,
+				-263.1515197753906
 			],
 			"rotation": [
 				0.0,
-				-0.0,
-				-101.75
+				-0.05000000074505806,
+				-103.80000305175781
 			],
 			"scale": [
-				1.0000078678131104,
 				0.9999998807907104,
-				1.0000079870224
+				0.9999998807907104,
+				1.0
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				50.0,
+				60.0,
+				50.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"509": {
