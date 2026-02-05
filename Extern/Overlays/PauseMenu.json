@@ -495,6 +495,31 @@
 		}
 	},
 	"629": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "",
+			"event_trigger": "ReturnButton",
+			"hover_texture": [
+				0,
+				0
+			],
+			"idle_texture": [
+				0,
+				0
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 3817241056387874831
+				}
+			]
+		},
 		"NameComponent": {
 			"name": "ResumeBtn"
 		},
