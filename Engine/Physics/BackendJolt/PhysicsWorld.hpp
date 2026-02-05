@@ -202,6 +202,7 @@ public:
     void SetRotation(entt::entity e, const glm::quat& q, bool activate = true);
     void SetPositionRotation(entt::entity e, const glm::vec3& p, const glm::quat& q, bool activate = true);
     void ActivateBody(entt::entity e);
+    void SetCharacterRotation(entt::entity entity, const glm::quat& rotation);
 
     // Body state access
     bool HasBody(entt::entity entity) const;
