@@ -730,7 +730,17 @@ namespace EngineFramework
             float range = lightData.position_radius.w;
 
             // Use a wide FOV (e.g., 90 degrees) to cover the spotlight cone
-            float fov = glm::radians(90.0f);
+            // 1. Get cosine value (e.g., 0.9)
+            float outerCos = lightData.spot_cutoffs.y;
+
+            // 2. Convert to radians (Half Angle) -> acos(0.9) = ~25 degrees
+            float outerAngleRad = std::acos(outerCos);
+
+            // 3. Multiply by 2 for full Field of View -> 50 degrees
+            float fov = outerAngleRad * 2.0f;
+
+            // 4. Safety clamp (prevent crash if acos fails or angle is too wide)
+            fov = glm::clamp(fov, 0.1f, glm::radians(170.0f));
 
             glm::mat4 proj = glm::perspective(fov, 1.0f, 0.1f, range);
 
