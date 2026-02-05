@@ -32,7 +32,7 @@ struct FBO
         TextureHDR,        // High Dynamic Range (HDR) texture framebuffer
         TextureDepth,      // Depth-only texture framebuffer
         ShadowCube,
-		CSMTextureArray, // Cascaded Shadow Map texture array framebuffer
+		DepthTextureArray, // Cascaded Shadow Map texture array framebuffer
         Deferred           // Framebuffer for deferred rendering
 
     } type; // Specifies the type of framebuffer
@@ -90,8 +90,8 @@ struct FBO
         case ShadowCube:
             resetShadowMapCubeAsTarget(width, height);
             break;
-        case CSMTextureArray:
-			resetCSMTextureArrayAsTarget(width, height);
+        case DepthTextureArray:
+			resetDepthTextureArrayAsTarget(width, height);
 			break;
         }
     }
@@ -315,7 +315,7 @@ struct FBO
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void resetCSMTextureArrayAsTarget(int width, int height) {
+    void resetDepthTextureArrayAsTarget(int width, int height) {
         // Delete old FBO if it exists
         if (handle) {
             glDeleteFramebuffers(1, &handle);
