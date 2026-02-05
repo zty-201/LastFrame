@@ -472,7 +472,7 @@ namespace EngineFramework {
 
 		*/
 		//Acceptable files that can be loaded as a texture.
-		std::vector<std::string> texture_extensions{ ".png", ".dds", ".ktx", ".ktx2" };
+		std::vector<std::string> texture_extensions{ ".png", ".dds", ".ktx", ".ktx2", ".DDS"};
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, texture_extensions);
 
 		/*

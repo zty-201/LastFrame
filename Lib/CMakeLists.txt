@@ -15,6 +15,7 @@ add_subdirectory(Shared/xresource)
 add_subdirectory(Shared/lua)
 add_subdirectory(Shared/sol)
 add_subdirectory(Shared/OpenFBX)
+add_subdirectory(Shared/gli)
 
 # --- Assimp ---
 # Turn off parts we don't need
@@ -55,7 +56,6 @@ add_subdirectory(Shared/JoltPhysics/Build)
 
 # Windowsx64 Shared
 add_subdirectory(Windows_x64/Shared/glfw)
-add_subdirectory(Windows_x64/Shared/Compressonator)
 
 # Windowsx64 Debug
 add_subdirectory(Windows_x64/Debug/imgui)
