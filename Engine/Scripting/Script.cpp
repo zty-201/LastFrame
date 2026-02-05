@@ -109,6 +109,47 @@ namespace Engine {
 
     //}
 
+    void ScriptSystem::OnButtonEvent(const Button_Event& e) {
+        if (!s_RuntimeRegistry) return;
+
+        //LOGI("[ScriptSystem] Button event received: %s", e.Event_Name.c_str());
+
+        // Dispatch to all entities with Lua scripts
+        auto view = s_RuntimeRegistry->view<LuaScriptComponent>();
+        for (auto [entity, comp] : view.each()) {
+            if (!comp.Enabled) continue;
+
+            for (auto& inst : comp.Scripts) {
+                if (!inst.Loaded) continue;
+
+                if (inst.Env.lua_state() == nullptr) {
+                    continue;
+                }
+
+                // Build handler function name from event_trigger
+                // e.g., if event_trigger = "PlayButton", looks for on_button_PlayButton()
+                std::string handlerName = "on_button_" + e.Event_Name;
+
+                sol::optional<sol::protected_function> funcOption =
+                    inst.Env.get<sol::optional<sol::protected_function>>(handlerName);
+
+                if (funcOption && funcOption.value().valid()) {
+                    auto func = funcOption.value();
+                    try {
+                        auto result = func(inst.Self);
+                        if (!result.valid()) {
+                            sol::error err = result;
+                            LOGE("[ButtonEvent Error] %s: %s", handlerName.c_str(), err.what());
+                        }
+                    }
+                    catch (const sol::error& err) {
+                        LOGE("[ButtonEvent Exception] %s: %s", handlerName.c_str(), err.what());
+                    }
+                }
+            }
+        }
+    }
+
     void DispatchLuaEvent(entt::registry& reg, entt::entity entity, const std::string& funcName, entt::entity param)
     {
         if (!reg.valid(entity)) return;
@@ -1106,6 +1147,9 @@ namespace Engine {
         event_dispatcher.sink<Event_OnTriggerEnter>().connect<&ScriptSystem::OnTriggerEnter>();
         event_dispatcher.sink<Event_OnTriggerExit>().connect<&ScriptSystem::OnTriggerExit>();
         event_dispatcher.sink<Event_OnTriggerStay>().connect<&ScriptSystem::OnTriggerStay>();
+        LOGI("[ScriptSystem] About to subscribe to Button_Event...");
+        event_dispatcher.sink<Button_Event>().connect<&ScriptSystem::OnButtonEvent>();
+        LOGI("[ScriptSystem] Successfully subscribed to Button_Event!");
 
         LOGI("[ScriptSystem] Subscribed to Trigger Events.");
 #endif
@@ -1122,6 +1166,7 @@ namespace Engine {
         event_dispatcher.sink<Event_OnTriggerEnter>().disconnect<&ScriptSystem::OnTriggerEnter>();
         event_dispatcher.sink<Event_OnTriggerExit>().disconnect<&ScriptSystem::OnTriggerExit>();
         event_dispatcher.sink<Event_OnTriggerStay>().disconnect<&ScriptSystem::OnTriggerStay>();
+        event_dispatcher.sink<Button_Event>().disconnect<&ScriptSystem::OnButtonEvent>();
 
         s_RuntimeRegistry = nullptr;
 

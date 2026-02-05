@@ -300,10 +300,14 @@ namespace EngineFramework
 
     void UI_System::displayMenu(std::string menuname)
     {
+        std::cout << "[UI_System] displayMenu('" << menuname << "')\n";
+
         auto it = Menu_Mapping.find(menuname);
 
         if (it != Menu_Mapping.end() && it->second.first)
         {
+            std::cout << "[UI_System] displayMenu success: " << menuname << "\n";
+
             it->second.first->draw_elements();
             current_menu = menuname;
             it->second.second = true;
@@ -370,6 +374,10 @@ namespace EngineFramework
         float intervalSeconds,
         bool closeOthersFirst)
     {
+        std::cout << "[UI_System] StartCutsceneSequence() scenes:\n";
+        for (auto& s : sceneMenus)
+            std::cout << "  - " << s << (Menu_Mapping.count(s) ? " (FOUND)\n" : " (MISSING)\n");
+
         // Make a local copy for the controller (it stores a vector internally)
         std::vector<std::string> scenes = sceneMenus;
 
@@ -392,16 +400,18 @@ namespace EngineFramework
                 // OR trigger scene load / gameplay start etc.
                 // For now: return to StartMenu
                 closeAllMenu();
-                displayMenu("StartMenu");
+                //displayMenu("StartMenu");
             }
         );
     }
 
     void UI_System::StartPseudoCutscene()
     {
+        std::cout << "[UI_System] StartPseudoCutscene() called\n";
+
         // Your described chain: cutscene_1 -> cutscene_4, 1.5s interval
         StartCutsceneSequence(
-            { "cutscene_1", "cutscene_2", "cutscene_3", "cutscene_4" },
+            { "Cutscene_1", "Cutscene_2", "Cutscene_3", "Cutscene_4" },
             1.5f,
             true
         );
