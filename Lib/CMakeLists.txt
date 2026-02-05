@@ -55,6 +55,7 @@ add_subdirectory(Shared/JoltPhysics/Build)
 
 # Windowsx64 Shared
 add_subdirectory(Windows_x64/Shared/glfw)
+add_subdirectory(Windows_x64/Shared/Compressonator)
 
 # Windowsx64 Debug
 add_subdirectory(Windows_x64/Debug/imgui)

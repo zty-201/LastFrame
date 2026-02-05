@@ -12,12 +12,25 @@ macro(import_GTest)
     endif()
 endmacro()
 
+#GLI Texture Loader
+macro(import_GLI)
+    if(NOT TARGET gli)
+        FetchContent_Declare(
+        gli
+        GIT_REPOSITORY https://github.com/g-truc/gli.git
+        GIT_TAG master # Or use a specific commit hash
+        )
+        FetchContent_MakeAvailable(gli)
+    endif()
+endmacro()
 
 
 # Macro to import all dependencies
 macro(importDependencies)
     message("Importing Google Test...")
     import_GTest()
+    message("Importing GLI Texture Loading Library")
+    import_GLI()
     message("All dependencies in ImportDependencies.cmake imported successfully")
 endmacro()
 

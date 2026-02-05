@@ -207,6 +207,9 @@ namespace EngineFramework {
 		//Iterate through all files in directory until finished.
 		while ((filename = AAssetDir_getNextFileName(assetDir)) != nullptr) {
 			std::filesystem::path file_path = folder_path / filename;
+			std::string ext = file_path.extension().string();
+			//Skip any subdirectories or files with no extensions.
+			if (ext.empty()) continue;
 
 			// Check extensions to see if it matches the accepted extension list.
 			//If no accepted extensions passed, accept all files.
@@ -214,7 +217,6 @@ namespace EngineFramework {
 				file_list.push_back(file_path);
 			}
 			else {
-				std::string ext = file_path.extension().string();
 				if (std::find(accepted_extensions.begin(), accepted_extensions.end(), ext) != accepted_extensions.end()) {
 					file_list.push_back(file_path);
 				}
@@ -453,6 +455,23 @@ namespace EngineFramework {
 	//==Asset Loaders==//
 	bool AssetManagerSystem::LoadTexture(const std::filesystem::path& folder_path)
 	{
+		/*
+			Process:
+			1. Get list of all filepaths in directory
+			2. If file is not precompiled (non-precompiled extension) then compress it to ETC2 and (DXT5 or BC3)
+			- Compiled texture remains in directory.
+			- Original texture moves to sub-directory called "Source"
+			3. Load compiled textures.
+			- ETC2 for android platform
+			- DXT5 for windows
+
+			Compressonator used to load standard image formats and compress to ETC2 / DXT5 or BC3
+			- Mobile supports ETC2
+			- Desktop supports DXT5/BC3. It does not natively support ETC2, meaning there's a performance impact.
+
+
+
+		*/
 		LOGD("Loading Texture");
 		//Acceptable files that can be loaded as a texture.
 		std::vector<std::string> texture_extensions{ ".png" };
