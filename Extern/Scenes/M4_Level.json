@@ -23884,7 +23884,7 @@
 			],
 			"rotation": [
 				0.0,
-				-15.649994850158691,
+				-15.350000381469727,
 				0.0
 			],
 			"scale": [
@@ -39609,7 +39609,16 @@
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
-			"Scripts": []
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 6496363865058656257
+				}
+			]
 		},
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -60542,7 +60551,7 @@
 				0.0
 			],
 			"size": [
-				1800.0,
+				1715.0,
 				1158.0
 			],
 			"size_NDC": [
@@ -61189,6 +61198,70 @@
 			],
 			"textureid": [
 				4351542134253125641,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"616": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 5919903112755232771
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "CanteenDoorIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				-285.9753112792969,
+				130.78968811035156,
+				450.7685241699219
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1715.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				7810306648073666571,
 				3711223656383638553
 			],
 			"visible": false
