@@ -43768,7 +43768,7 @@
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-90.0,
 				0.0
 			],
 			"scale": [
@@ -45126,17 +45126,17 @@
 			"position": [
 				383.8970642089844,
 				69.81196594238281,
-				880.5808715820313
+				875.7274169921875
 			],
 			"rotation": [
 				-179.99989318847656,
-				-36.600006103515625,
+				-36.60000228881836,
 				-179.99989318847656
 			],
 			"scale": [
+				0.9999990463256836,
 				1.0,
-				1.0,
-				1.0
+				0.9999990463256836
 			]
 		}
 	},
@@ -49214,9 +49214,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-520.7538452148438,
+				-94.65031433105469,
 				182.32431030273438,
-				314.5509033203125
+				-785.91845703125
 			],
 			"rotation": [
 				0.0,
@@ -52345,6 +52345,1014 @@
 			"type": 0
 		}
 	},
+	"532": {
+		"ColliderComponent": {
+			"maxBounds": [
+				53.6231689453125,
+				204.90023803710938,
+				98.8104476928711
+			],
+			"minBounds": [
+				-50.61083984375,
+				1.7488861083984375,
+				-99.94120025634766
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						52.11700439453125,
+						101.57567596435547,
+						99.37582397460938
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						1.50616455078125,
+						103.3245620727539,
+						-0.5653762817382813
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				1875820171660410881,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				8793349199301492739,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				722898667053563909,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				722898667053563911,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				9369809951604916233,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bed_bunk",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_BunkBed_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-195.34901428222656,
+				14.350997924804688,
+				1016.299072265625
+			],
+			"rotation": [
+				0.0,
+				-3.799999952316284,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"533": {
+		"ColliderComponent": {
+			"maxBounds": [
+				27.673240661621094,
+				182.0,
+				28.63195037841797
+			],
+			"minBounds": [
+				-31.417213439941406,
+				-118.0,
+				-27.503990173339844
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						29.54522705078125,
+						150.0,
+						28.067970275878906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.8719863891601563,
+						32.0,
+						0.5639801025390625
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				216331669679816725,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11745546715748286487,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				9439703706534592537,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				18086614991085944859,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12322007468051709981,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bedside_table",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_BedsideTable_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-274.066162109375,
+				14.690498352050781,
+				928.915283203125
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"534": {
+		"ColliderComponent": {
+			"maxBounds": [
+				27.673240661621094,
+				182.0,
+				28.63195037841797
+			],
+			"minBounds": [
+				-31.417213439941406,
+				-118.0,
+				-27.503990173339844
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						29.54522705078125,
+						150.0,
+						28.067970275878906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.8719863891601563,
+						32.0,
+						0.5639801025390625
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				216331669679816725,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11745546715748286487,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				9439703706534592537,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				18086614991085944859,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12322007468051709981,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bedside_table",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_BedsideTable_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-55.484100341796875,
+				14.690498352050781,
+				928.915283203125
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"535": {
+		"ColliderComponent": {
+			"maxBounds": [
+				27.673240661621094,
+				182.0,
+				28.63195037841797
+			],
+			"minBounds": [
+				-31.417213439941406,
+				-118.0,
+				-27.503990173339844
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						29.54522705078125,
+						150.0,
+						28.067970275878906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.8719863891601563,
+						32.0,
+						0.5639801025390625
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				216331669679816725,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11745546715748286487,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				9439703706534592537,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				18086614991085944859,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12322007468051709981,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bedside_table",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_BedsideTable_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				207.8462371826172,
+				14.690498352050781,
+				932.3550415039063
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"536": {
+		"ColliderComponent": {
+			"maxBounds": [
+				27.673240661621094,
+				182.0,
+				28.63195037841797
+			],
+			"minBounds": [
+				-31.417213439941406,
+				-118.0,
+				-27.503990173339844
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						29.54522705078125,
+						150.0,
+						28.067970275878906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.8719863891601563,
+						32.0,
+						0.5639801025390625
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				216331669679816725,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11745546715748286487,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				9439703706534592537,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				18086614991085944859,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12322007468051709981,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bedside_table",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_BedsideTable_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				428.8578186035156,
+				14.690498352050781,
+				932.3550415039063
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"537": {
+		"ColliderComponent": {
+			"maxBounds": [
+				27.673240661621094,
+				182.0,
+				28.63195037841797
+			],
+			"minBounds": [
+				-31.417213439941406,
+				-118.0,
+				-27.503990173339844
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						29.54522705078125,
+						150.0,
+						28.067970275878906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.8719863891601563,
+						32.0,
+						0.5639801025390625
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				216331669679816725,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11745546715748286487,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				9439703706534592537,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				18086614991085944859,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12322007468051709981,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bedside_table",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_BedsideTable_09"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-296.72943115234375,
+				14.690498352050781,
+				1459.6407470703125
+			],
+			"rotation": [
+				-179.99989318847656,
+				-5.008956122765085e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"538": {
+		"ColliderComponent": {
+			"maxBounds": [
+				27.673240661621094,
+				182.0,
+				28.63195037841797
+			],
+			"minBounds": [
+				-31.417213439941406,
+				-118.0,
+				-27.503990173339844
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						29.54522705078125,
+						150.0,
+						28.067970275878906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.8719863891601563,
+						32.0,
+						0.5639801025390625
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				216331669679816725,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11745546715748286487,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				9439703706534592537,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				18086614991085944859,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12322007468051709981,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bedside_table",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_BedsideTable_05"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				646.5817260742188,
+				14.690498352050781,
+				1459.6407470703125
+			],
+			"rotation": [
+				-179.99989318847656,
+				-5.008956122765085e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"539": {
+		"ColliderComponent": {
+			"maxBounds": [
+				27.673240661621094,
+				182.0,
+				28.63195037841797
+			],
+			"minBounds": [
+				-31.417213439941406,
+				-118.0,
+				-27.503990173339844
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						29.54522705078125,
+						150.0,
+						28.067970275878906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.8719863891601563,
+						32.0,
+						0.5639801025390625
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				216331669679816725,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11745546715748286487,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				9439703706534592537,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				18086614991085944859,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12322007468051709981,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bedside_table",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_BedsideTable_06"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				379.9483642578125,
+				14.690498352050781,
+				1459.6407470703125
+			],
+			"rotation": [
+				-179.99989318847656,
+				-5.008956122765085e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
 	"54": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -52432,6 +53440,970 @@
 				1.0,
 				1.0,
 				1.0
+			]
+		}
+	},
+	"540": {
+		"ColliderComponent": {
+			"maxBounds": [
+				27.673240661621094,
+				182.0,
+				28.63195037841797
+			],
+			"minBounds": [
+				-31.417213439941406,
+				-118.0,
+				-27.503990173339844
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						29.54522705078125,
+						150.0,
+						28.067970275878906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.8719863891601563,
+						32.0,
+						0.5639801025390625
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				216331669679816725,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11745546715748286487,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				9439703706534592537,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				18086614991085944859,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12322007468051709981,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bedside_table",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_BedsideTable_07"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				138.96328735351563,
+				14.690498352050781,
+				1459.6407470703125
+			],
+			"rotation": [
+				-179.99989318847656,
+				-5.008956122765085e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"541": {
+		"ColliderComponent": {
+			"maxBounds": [
+				27.673240661621094,
+				182.0,
+				28.63195037841797
+			],
+			"minBounds": [
+				-31.417213439941406,
+				-118.0,
+				-27.503990173339844
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						29.54522705078125,
+						150.0,
+						28.067970275878906
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.8719863891601563,
+						32.0,
+						0.5639801025390625
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				216331669679816725,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11745546715748286487,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				9439703706534592537,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				18086614991085944859,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12322007468051709981,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "bedside_table",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_BedsideTable_08"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-89.21688079833984,
+				14.690498352050781,
+				1459.6407470703125
+			],
+			"rotation": [
+				-179.99989318847656,
+				-5.008956122765085e-06,
+				-179.99989318847656
+			],
+			"scale": [
+				0.9999998211860657,
+				1.0,
+				0.9999998211860657
+			]
+		}
+	},
+	"542": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				28.0115966796875,
+				165.0423583984375,
+				949.3067016601563
+			],
+			"rotation": [
+				0.0,
+				11.54999828338623,
+				0.0
+			],
+			"scale": [
+				0.9999868273735046,
+				1.0,
+				0.9999868273735046
+			]
+		}
+	},
+	"543": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				164443515865759855,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				13423040818844500081,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				3623208029686300787,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				9964276305023959157,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				11117197809630806135,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_2",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-195.37911987304688,
+				49.23198318481445,
+				956.4193115234375
+			],
+			"rotation": [
+				0.0,
+				13.849985122680664,
+				0.0
+			],
+			"scale": [
+				0.9999874830245972,
+				1.0,
+				0.9999874830245972
+			]
+		}
+	},
+	"544": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				37.775550842285156,
+				49.23198318481445,
+				953.8367919921875
+			],
+			"rotation": [
+				0.0,
+				-7.9499993324279785,
+				0.0
+			],
+			"scale": [
+				0.9999876022338867,
+				1.0,
+				0.9999876022338867
+			]
+		}
+	},
+	"545": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-194.7977752685547,
+				165.0423583984375,
+				954.1752319335938
+			],
+			"rotation": [
+				0.0,
+				-7.25,
+				0.0
+			],
+			"scale": [
+				0.9999876022338867,
+				1.0,
+				0.9999876022338867
+			]
+		}
+	},
+	"546": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				164443515865759855,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				13423040818844500081,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				3623208029686300787,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				9964276305023959157,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				11117197809630806135,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_2",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_05"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				283.1803283691406,
+				49.23198318481445,
+				1069.8065185546875
+			],
+			"rotation": [
+				0.0,
+				7.9499993324279785,
+				0.0
+			],
+			"scale": [
+				0.9999876022338867,
+				1.0,
+				0.9999876022338867
+			]
+		}
+	},
+	"547": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_06"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				293.2598876953125,
+				165.0423583984375,
+				959.8883056640625
+			],
+			"rotation": [
+				0.0,
+				-22.49999237060547,
+				0.0
+			],
+			"scale": [
+				0.9999864101409912,
+				1.0,
+				0.9999864101409912
+			]
+		}
+	},
+	"548": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_07"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				468.479248046875,
+				33.27433395385742,
+				978.4348754882813
+			],
+			"rotation": [
+				-3.3999972343444824,
+				-3.201650713435811e-07,
+				57.849979400634766
+			],
+			"scale": [
+				0.9999876022338867,
+				1.0,
+				0.9999848008155823
+			]
+		}
+	},
+	"549": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_08"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				533.6605834960938,
+				165.0423583984375,
+				1002.5493774414063
+			],
+			"rotation": [
+				0.0,
+				-62.79998779296875,
+				0.0
+			],
+			"scale": [
+				0.9999862909317017,
+				1.0,
+				0.9999862909317017
 			]
 		}
 	},
@@ -52525,6 +54497,896 @@
 			]
 		}
 	},
+	"550": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_09"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				285.3572998046875,
+				49.23198318481445,
+				1451.827392578125
+			],
+			"rotation": [
+				0.0,
+				7.9499993324279785,
+				0.0
+			],
+			"scale": [
+				0.9999876022338867,
+				1.0,
+				0.9999876022338867
+			]
+		}
+	},
+	"551": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_10"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				293.2598876953125,
+				165.0423583984375,
+				1334.0689697265625
+			],
+			"rotation": [
+				0.0,
+				10.349990844726563,
+				0.0
+			],
+			"scale": [
+				0.9999863505363464,
+				1.0,
+				0.9999863505363464
+			]
+		}
+	},
+	"552": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				164443515865759855,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				13423040818844500081,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				3623208029686300787,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				9964276305023959157,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				11117197809630806135,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_2",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_11"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				536.2843627929688,
+				49.23198318481445,
+				1409.3441162109375
+			],
+			"rotation": [
+				0.0,
+				43.900001525878906,
+				0.0
+			],
+			"scale": [
+				0.9999876022338867,
+				1.0,
+				0.9999876022338867
+			]
+		}
+	},
+	"553": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_12"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				540.62255859375,
+				165.0423583984375,
+				1421.2030029296875
+			],
+			"rotation": [
+				0.0,
+				31.499998092651367,
+				0.0
+			],
+			"scale": [
+				0.9999862909317017,
+				1.0,
+				0.9999862909317017
+			]
+		}
+	},
+	"554": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				164443515865759855,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				13423040818844500081,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				3623208029686300787,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				9964276305023959157,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				11117197809630806135,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_2",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_13"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				52.62743377685547,
+				9.878339767456055,
+				1402.1219482421875
+			],
+			"rotation": [
+				3.304760411992902e-07,
+				14.350005149841309,
+				-5.0999860763549805
+			],
+			"scale": [
+				0.9999871850013733,
+				0.999997079372406,
+				0.9999874830245972
+			]
+		}
+	},
+	"555": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				164443515865759855,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				13423040818844500081,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				3623208029686300787,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				9964276305023959157,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				11117197809630806135,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_2",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_14"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-59.27080154418945,
+				6.445937156677246,
+				1262.33349609375
+			],
+			"rotation": [
+				0.0,
+				-64.59999084472656,
+				0.0
+			],
+			"scale": [
+				0.9999829530715942,
+				0.9999949932098389,
+				0.9999794363975525
+			]
+		}
+	},
+	"556": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_15"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-177.63531494140625,
+				49.23198318481445,
+				1436.1473388671875
+			],
+			"rotation": [
+				0.0,
+				-33.24999237060547,
+				0.0
+			],
+			"scale": [
+				0.9999871850013733,
+				1.0,
+				0.9999871850013733
+			]
+		}
+	},
+	"557": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_16"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-203.4247283935547,
+				164.02947998046875,
+				1369.72265625
+			],
+			"rotation": [
+				0.0,
+				10.349987030029297,
+				0.0
+			],
+			"scale": [
+				0.9999863505363464,
+				1.0,
+				0.9999863505363464
+			]
+		}
+	},
+	"558": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_17"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-397.8548583984375,
+				49.23198318481445,
+				1311.5023193359375
+			],
+			"rotation": [
+				0.0,
+				8.999993324279785,
+				0.0
+			],
+			"scale": [
+				0.9999870657920837,
+				1.0,
+				0.9999870657920837
+			]
+		}
+	},
+	"559": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				164443515865759855,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				13423040818844500081,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				3623208029686300787,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				9964276305023959157,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				11117197809630806135,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_2",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_18"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-386.02685546875,
+				164.02947998046875,
+				1432.43115234375
+			],
+			"rotation": [
+				0.0,
+				10.349987030029297,
+				0.0
+			],
+			"scale": [
+				0.9999863505363464,
+				1.0,
+				0.9999863505363464
+			]
+		}
+	},
 	"56": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -52612,6 +55474,981 @@
 				1.0,
 				1.0,
 				1.0
+			]
+		}
+	},
+	"560": {
+		"ColliderComponent": {
+			"maxBounds": [
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38
+			],
+			"minBounds": [
+				3.4028234663852886e+38,
+				3.4028234663852886e+38,
+				3.4028234663852886e+38
+			],
+			"mode": 0,
+			"shapes": []
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				740904268169183353,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1317365020472606843,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				2470286525079453821,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				7081972543506841727,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				3623208029686300801,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_square",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_SquarePillow_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-588.92431640625,
+				19.61834716796875,
+				1051.495849609375
+			],
+			"rotation": [
+				0.0,
+				-21.150001525878906,
+				0.0
+			],
+			"scale": [
+				0.9999868869781494,
+				1.0,
+				0.9999868869781494
+			]
+		}
+	},
+	"561": {
+		"ColliderComponent": {
+			"maxBounds": [
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38
+			],
+			"minBounds": [
+				3.4028234663852886e+38,
+				3.4028234663852886e+38,
+				3.4028234663852886e+38
+			],
+			"mode": 0,
+			"shapes": []
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				740904268169183353,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1317365020472606843,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				2470286525079453821,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				7081972543506841727,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				3623208029686300801,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_square",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_SquarePillow_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-632.5084838867188,
+				50.33653259277344,
+				1188.1578369140625
+			],
+			"rotation": [
+				0.0,
+				-74.69999694824219,
+				0.0
+			],
+			"scale": [
+				0.9999867081642151,
+				1.0,
+				0.9999867081642151
+			]
+		}
+	},
+	"562": {
+		"ColliderComponent": {
+			"maxBounds": [
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38
+			],
+			"minBounds": [
+				3.4028234663852886e+38,
+				3.4028234663852886e+38,
+				3.4028234663852886e+38
+			],
+			"mode": 0,
+			"shapes": []
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				740904268169183353,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1317365020472606843,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				2470286525079453821,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				7081972543506841727,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				3623208029686300801,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_square",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_SquarePillow_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-614.6507568359375,
+				50.33653259277344,
+				1414.906494140625
+			],
+			"rotation": [
+				0.0,
+				-54.79999923706055,
+				0.0
+			],
+			"scale": [
+				0.9999867081642151,
+				1.0,
+				0.9999867081642151
+			]
+		}
+	},
+	"563": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4199668781989724261,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11693658561934229607,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				6505511791203418217,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				13423040818844500075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				12846580066541076589,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_rectangular_1",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Pillow_19"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-563.878173828125,
+				108.0525894165039,
+				936.590087890625
+			],
+			"rotation": [
+				18.100006103515625,
+				10.34996223449707,
+				2.1697383090213407e-06
+			],
+			"scale": [
+				0.9999862909317017,
+				0.9999995231628418,
+				0.9999862909317017
+			]
+		}
+	},
+	"564": {
+		"ColliderComponent": {
+			"maxBounds": [
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38
+			],
+			"minBounds": [
+				3.4028234663852886e+38,
+				3.4028234663852886e+38,
+				3.4028234663852886e+38
+			],
+			"mode": 0,
+			"shapes": []
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				740904268169183353,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1317365020472606843,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				2470286525079453821,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				7081972543506841727,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				3623208029686300801,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_square",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_SquarePillow_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-619.2730712890625,
+				76.02945709228516,
+				944.5492553710938
+			],
+			"rotation": [
+				0.0,
+				7.199995040893555,
+				0.0
+			],
+			"scale": [
+				0.999987006187439,
+				1.0,
+				0.999987006187439
+			]
+		}
+	},
+	"565": {
+		"ColliderComponent": {
+			"maxBounds": [
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38
+			],
+			"minBounds": [
+				3.4028234663852886e+38,
+				3.4028234663852886e+38,
+				3.4028234663852886e+38
+			],
+			"mode": 0,
+			"shapes": []
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				740904268169183353,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1317365020472606843,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				2470286525079453821,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				7081972543506841727,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				3623208029686300801,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_square",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_SquarePillow_05"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-527.5951538085938,
+				45.4463996887207,
+				945.195556640625
+			],
+			"rotation": [
+				0.0,
+				27.09998893737793,
+				0.0
+			],
+			"scale": [
+				0.9999868869781494,
+				1.0,
+				0.9999868869781494
+			]
+		}
+	},
+	"566": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				740904268169183233,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11117197809630806019,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				8234894048113688581,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				7081972543506841607,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				3046747277382877193,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "carpet",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Carpet_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				-306.8011169433594,
+				11.35116195678711,
+				1135.4964599609375
+			],
+			"rotation": [
+				0.0,
+				-34.64999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999867677688599,
+				1.0,
+				0.9999867677688599
+			]
+		}
+	},
+	"567": {
+		"ColliderComponent": {
+			"maxBounds": [
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38,
+				-3.4028234663852886e+38
+			],
+			"minBounds": [
+				3.4028234663852886e+38,
+				3.4028234663852886e+38,
+				3.4028234663852886e+38
+			],
+			"mode": 0,
+			"shapes": []
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				740904268169183353,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1317365020472606843,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				2470286525079453821,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				7081972543506841727,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				3623208029686300801,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "pillow_square",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_SquarePillow_06"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				176.66310119628906,
+				9.50897216796875,
+				1116.2843017578125
+			],
+			"rotation": [
+				0.0,
+				116.3499984741211,
+				0.0
+			],
+			"scale": [
+				0.9999868869781494,
+				1.0,
+				0.9999868869781494
+			]
+		}
+	},
+	"568": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				740904268169183233,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				11117197809630806019,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				8234894048113688581,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				7081972543506841607,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				3046747277382877193,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "carpet",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_Carpet_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"TransformComponent": {
+			"position": [
+				200.8852996826172,
+				11.35116195678711,
+				1194.2705078125
+			],
+			"rotation": [
+				0.0,
+				9.200002670288086,
+				0.0
+			],
+			"scale": [
+				0.9999867677688599,
+				1.0,
+				0.9999867677688599
+			]
+		}
+	},
+	"569": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				71.10761260986328,
+				-4.8549041748046875,
+				-385.1905212402344
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				0.9999890327453613,
+				0.9999991059303284,
+				0.9999943971633911
 			]
 		}
 	},
@@ -52705,6 +56542,906 @@
 			]
 		}
 	},
+	"570": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				390.1518859863281,
+				-4.8549041748046875,
+				-387.3909912109375
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				0.9999869465827942,
+				0.9999991059303284,
+				0.999992311000824
+			]
+		}
+	},
+	"571": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				387.00201416015625,
+				-5.355000019073486,
+				12.265999794006348
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				0.9999850392341614,
+				0.9999991059303284,
+				0.9999904036521912
+			]
+		}
+	},
+	"572": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				71.10761260986328,
+				-3.8550000190734863,
+				18.578651428222656
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				0.9999872446060181,
+				0.9999991059303284,
+				0.9999926090240479
+			]
+		}
+	},
+	"573": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_05"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-337.38494873046875,
+				1.5390739440917969,
+				201.01177978515625
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				0.9999784827232361,
+				0.9999991059303284,
+				0.9999838471412659
+			]
+		}
+	},
+	"574": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_06"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-129.52008056640625,
+				-3.8550000190734863,
+				421.0302429199219
+			],
+			"rotation": [
+				0.0,
+				90.0,
+				0.0
+			],
+			"scale": [
+				0.9999731779098511,
+				0.9999991059303284,
+				0.9999785423278809
+			]
+		}
+	},
+	"575": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_07"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				352.40301513671875,
+				-3.8550000190734863,
+				416.4800109863281
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				0.9999992847442627,
+				0.9999991059303284,
+				1.0999985933303833
+			]
+		}
+	},
+	"576": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_12"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-582.52880859375,
+				-3.8550000190734863,
+				1396.514404296875
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999729990959167,
+				0.9999991059303284,
+				0.9999783635139465
+			]
+		}
+	},
+	"577": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_08"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-129.52008056640625,
+				-3.8550000190734863,
+				821.8853149414063
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999729990959167,
+				0.9999991059303284,
+				0.9999783635139465
+			]
+		}
+	},
+	"578": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_09"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				352.40301513671875,
+				-3.8550000190734863,
+				821.1649169921875
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				0.999997615814209,
+				0.9999991059303284,
+				1.0999952554702759
+			]
+		}
+	},
+	"579": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_11"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				352.40301513671875,
+				-3.8550000190734863,
+				1227.7542724609375
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				0.9999966025352478,
+				0.9999991059303284,
+				1.0999932289123535
+			]
+		}
+	},
 	"58": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -52792,6 +57529,1012 @@
 				1.0,
 				1.0,
 				1.0
+			]
+		}
+	},
+	"580": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_10"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-129.52008056640625,
+				-3.8550000190734863,
+				1229.4169921875
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999729990959167,
+				0.9999991059303284,
+				0.9999783635139465
+			]
+		}
+	},
+	"581": {
+		"ColliderComponent": {
+			"maxBounds": [
+				311.2403869628906,
+				373.3909912109375,
+				310.9295654296875
+			],
+			"minBounds": [
+				-104.20068359375,
+				342.42462158203125,
+				-167.36444091796875
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						207.7205352783203,
+						15.483184814453125,
+						239.14700317382813
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						103.51985168457031,
+						357.9078063964844,
+						71.78256225585938
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_13"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-129.52008056640625,
+				-3.8550000190734863,
+				1631.3233642578125
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999729990959167,
+				0.9999991059303284,
+				0.9999783635139465
+			]
+		}
+	},
+	"582": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Ceiling_14"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				352.40301513671875,
+				-3.8550000190734863,
+				1629.59912109375
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				0.9999952912330627,
+				0.9999991059303284,
+				1.0999906063079834
+			]
+		}
+	},
+	"583": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "SF_Ceiling_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-596.3800048828125,
+				479.9953918457031,
+				606.652099609375
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999729990959167,
+				0.9999991059303284,
+				0.9999783635139465
+			]
+		}
+	},
+	"584": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "SF_Ceiling_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-596.3800048828125,
+				479.9953918457031,
+				1015.3284912109375
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999729990959167,
+				0.9999991059303284,
+				0.9999783635139465
+			]
+		}
+	},
+	"585": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "SF_Ceiling_03"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-1054.0057373046875,
+				479.9953918457031,
+				1015.3284912109375
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999729990959167,
+				0.9999991059303284,
+				0.9999783635139465
+			]
+		}
+	},
+	"586": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				3143178846513872907,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				14095933140278919181,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				1413796589603602447,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				6601943360334413841,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				5449021855727566867,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "SF_Ceiling_04"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-1054.0057373046875,
+				479.9953918457031,
+				610.7727661132813
+			],
+			"rotation": [
+				0.0,
+				89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999729990959167,
+				0.9999991059303284,
+				0.9999783635139465
+			]
+		}
+	},
+	"587": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				77.23096466064453,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				1.0200347900390625,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						38.105464935302734,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				14016284516665049099,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1334147965989732365,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				11133980755147931663,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				16898588278182166545,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				11710441507451355155,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling_fan",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Playroom_CeilingFan"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				394.7059020996094,
+				272.4681396484375,
+				-387.3834228515625
+			],
+			"rotation": [
+				0.0,
+				-89.9999771118164,
+				0.0
+			],
+			"scale": [
+				0.9999904632568359,
+				1.0,
+				0.9999904632568359
+			]
+		}
+	},
+	"588": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				77.23096466064453,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				1.0200347900390625,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						38.105464935302734,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				14016284516665049099,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1334147965989732365,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				11133980755147931663,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				16898588278182166545,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				11710441507451355155,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling_fan",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_CeilingFan_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				356.2350158691406,
+				272.4681396484375,
+				1229.2750244140625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999904632568359,
+				1.0,
+				0.9999904632568359
+			]
+		}
+	},
+	"589": {
+		"ColliderComponent": {
+			"maxBounds": [
+				21.22170639038086,
+				77.23096466064453,
+				20.108415603637695
+			],
+			"minBounds": [
+				-21.64395523071289,
+				1.0200347900390625,
+				-19.07728385925293
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						21.432830810546875,
+						38.105464935302734,
+						19.592849731445313
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.21112346649169922,
+						39.1254997253418,
+						0.5155658721923828
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				14016284516665049099,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1334147965989732365,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				11133980755147931663,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				16898588278182166545,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				11710441507451355155,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "ceiling_fan",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_CeilingFan_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-126.39347839355469,
+				272.4681396484375,
+				1229.2750244140625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.9999904632568359,
+				1.0,
+				0.9999904632568359
 			]
 		}
 	},
