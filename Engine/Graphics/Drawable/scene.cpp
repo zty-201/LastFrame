@@ -336,6 +336,20 @@ std::vector<unsigned char> Scene::Texture::CompressTexture(const char* filename,
 	options.SourceFormat = input_format;
 	options.DestFormat = output_format;
 
+	//ETC2 Cli --> CompressonatorCLI.exe -fd ETC2 -UseGPUDecompress  input.png output.ktx
+	//BC3 Cli --> CompressonatorCLI.exe -fd BC3 -quality 1.0 -threads 8 -refine 1 -srgba input.png output.dds
+	//BC3 Cli --> CompressonatorCLI.exe -fd BC3 -quality 1.0 -threads 8 -refine 1 -srgba "C:\input_folder\*.png" "C:\output_folder"
+	//BC3 or ETC2_RGBA  -ff <ext>,…,<ext> for png,jpg etc. -fx <ext> for dds,ktx etc. 
+	/*
+		-UseSRGBFrames -EncodeWith GPU   //Only if srgb
+		-fd ETC2_RGBA or BC3
+		-RefineSteps 2 -CompressionSpeed 0
+		-ff png,jpg
+		CompressonatorCLI.exe -fd ETC2_RGBA -EncodeWith GPU -ff png,jpg -UseSRGBFrames -RefineSteps 2 -CompressionSpeed 0 "../" "../"
+	*/
+
+	//Leave out -srgba if not srgba.
+
 	
 	//==========================
 	// Compress Texture
@@ -352,11 +366,10 @@ std::vector<unsigned char> Scene::Texture::CompressTexture(const char* filename,
 	//==========================
 	// Save Compressed Testure
 	//==========================
-	CMP_SaveTexture("", )
-		CMP_MipSet
+	
 
-	free(srcTexture.pData);
+	stbi_image_free(srcTexture.pData);
 	free(destTexture.pData);
-
+	return {}; //Temporary.
 }
 #endif
