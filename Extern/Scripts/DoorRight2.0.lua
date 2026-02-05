@@ -9,7 +9,6 @@ local isOpen = false
 local currentY = 0.0
 local targetY = 0.0
 
--- ✅ NEW: one-time open
 local hasOpenedOnce = false
 
 function on_create(Self)
@@ -27,6 +26,10 @@ function on_create(Self)
 
     SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
 
+    -- ✅ ADD (matches left door)
+    SHARED.DOOR_OPENED_ONCE = SHARED.DOOR_OPENED_ONCE or {}
+    SHARED.DOOR_OPENED_ONCE[EntityID] = false
+
     print(string.format("[DoorR] Start RotY=%.2f", currentY))
 end
 
@@ -38,26 +41,25 @@ function on_update(Self, dt)
         local cmdObj = SHARED.DOOR_CMD[EntityID]
         SHARED.DOOR_CMD[EntityID] = nil
 
-        -- ✅ already opened once -> ignore known commands forever
-        -- If already opened once:
-        -- allow CLOSE commands (for scripted events), but block toggle/open
         if hasOpenedOnce then
             if cmdObj.cmd == "close" then
                 isOpen = false
                 targetY = closedAngle
-                print("[Door] Scripted CLOSE allowed after one-time open")
+                print("[DoorR] Scripted CLOSE allowed after one-time open")
             else
-                print("[Door] Ignored interaction (already opened once)")
+                print("[DoorR] Ignored interaction (already opened once)")
             end
             return
         end
 
-
-        -- Only first open/toggle is allowed; force open
         if cmdObj.cmd == "open" or cmdObj.cmd == "toggle" then
             isOpen = true
             hasOpenedOnce = true
             targetY = openAngle
+
+            -- ✅ ADD: publish opened-once state
+            SHARED.DOOR_OPENED_ONCE = SHARED.DOOR_OPENED_ONCE or {}
+            SHARED.DOOR_OPENED_ONCE[EntityID] = true
 
             print(string.format(
                 "[DoorR] OPENED ONCE by=%s -> permanently disabled",
@@ -68,7 +70,6 @@ function on_update(Self, dt)
         end
     end
 
-    -- Rotation logic
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1

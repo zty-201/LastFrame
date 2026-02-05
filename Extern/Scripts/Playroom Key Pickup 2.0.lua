@@ -1,8 +1,10 @@
 ----------------------------------------------------------------
--- Playroom Key Pickup 2.0.lua  (MODIFIED: Shared-controlled)
+-- Playroom Key Pickup 2.0.lua  (MODIFIED)
 -- + Slam mainhall doors shut
 -- + Immediately hide entity 157
 -- + WAIT 3s, then fade hall lights intensity from 0 -> 500
+-- + ✅ Show key pickup icon when in range
+-- + ✅ After pickup, key icon never shows again
 ----------------------------------------------------------------
 
 local DEBUG = true
@@ -35,11 +37,6 @@ local lightDelayActive = false
 local lightDelayTime = 0.0
 local lightFading = false
 local lightTime = 0.0
-
-local function s(v)
-    if v == nil then return "nil" end
-    return tostring(v)
-end
 
 local function has_any_lights()
     if HALL_LIGHT_IDS == nil then return false end
@@ -87,20 +84,49 @@ local function send_light_set_all(value, byId)
     end
 end
 
+-- ✅ NEW: icon command bus for key pickup icon
+local function send_key_icon_cmd(keyId, cmd)
+    SHARED.KEY_ICON_CMD = SHARED.KEY_ICON_CMD or {}
+    SHARED.KEY_ICON_CMD[keyId] = { cmd = cmd, by = keyId }
+end
+
+local function key_in_range(keyId)
+    return SHARED
+        and SHARED.INTERACT_IN_ZONE
+        and SHARED.INTERACT_IN_ZONE[keyId] == true
+end
+
 function on_create(Self)
     if DEBUG then
         print("[Key_Shared] on_create EntityID:", EntityID)
     end
+
+    -- ensure tables exist
+    SHARED.KEY_ICON_CMD = SHARED.KEY_ICON_CMD or {}
+    SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
 end
 
 function on_update(Self, dt)
     local pickupId = (TARGET_ENTITY_ID ~= 0) and TARGET_ENTITY_ID or EntityID
 
     ----------------------------------------------------------------
+    -- ✅ NEW: drive pickup icon while not picked up
+    ----------------------------------------------------------------
+    if not pickedUp then
+        if key_in_range(pickupId) then
+            send_key_icon_cmd(pickupId, "show")
+        else
+            send_key_icon_cmd(pickupId, "hide")
+        end
+    else
+        -- once picked up: force hidden forever
+        send_key_icon_cmd(pickupId, "hide")
+    end
+
+    ----------------------------------------------------------------
     -- After pickup: wait, then fade lights
     ----------------------------------------------------------------
     if pickedUp then
-        -- Delay phase
         if lightDelayActive and has_any_lights() then
             lightDelayTime = lightDelayTime + dt
             if lightDelayTime >= LIGHT_DELAY_SECONDS then
@@ -116,10 +142,8 @@ function on_update(Self, dt)
             end
         end
 
-        -- Fade phase
         if lightFading and has_any_lights() then
             lightTime = lightTime + dt
-
             local t = lightTime / math.max(LIGHT_FADE_SECONDS, 0.001)
             if t > 1.0 then t = 1.0 end
 
@@ -136,7 +160,8 @@ function on_update(Self, dt)
     end
 
     ----------------------------------------------------------------
-    -- Wait for InteractionBox command
+    -- Wait for InteractionBox "pickup/use" command
+    -- (you currently reuse SHARED.DOOR_CMD for pickups)
     ----------------------------------------------------------------
     if not SHARED.DOOR_CMD then return end
 
@@ -157,18 +182,18 @@ function on_update(Self, dt)
     ----------------------------------------------------------------
     -- 2) Immediately hide entity 157
     ----------------------------------------------------------------
-    local okImmediate = hide_entity(IMMEDIATE_HIDE_ENTITY_ID)
-    if DEBUG then
-        print("[Key_Shared] Immediate hide entity 157 ->", okImmediate)
-    end
+    hide_entity(IMMEDIATE_HIDE_ENTITY_ID)
 
     ----------------------------------------------------------------
-    -- 3) Slam the mainhall doors shut
+    -- 3) Slam the mainhall doors shut + show lock icons
     ----------------------------------------------------------------
     SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
+    SHARED.LOCK_ICON_CMD = SHARED.LOCK_ICON_CMD or {}
+
     for _, doorId in ipairs(MAINHALL_DOOR_IDS) do
         if doorId ~= 0 then
             SHARED.DOOR_CMD[doorId] = { cmd = "close", by = pickupId }
+            SHARED.LOCK_ICON_CMD[doorId] = { cmd = "show", by = pickupId }
         end
     end
 
@@ -180,14 +205,14 @@ function on_update(Self, dt)
         lightDelayTime = 0.0
         lightFading = false
         lightTime = 0.0
-
         send_light_set_all(0.0, pickupId)
     end
 
     ----------------------------------------------------------------
-    -- 5) Hide the key entity itself
+    -- 5) Hide key entity + permanently hide icon
     ----------------------------------------------------------------
     hide_entity(pickupId)
+    send_key_icon_cmd(pickupId, "hide")
 
     pickedUp = true
 end
