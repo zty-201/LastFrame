@@ -1,13 +1,10 @@
--- Door_InRange_Working.lua
+-- Door_SharedControlled.lua
 -- Attach to Door entity
--- Opens/closes with E when player is in range
+-- Opens/closes when commanded via SHARED (from InteractionBox / DoorTrigger)
 
 local closedAngle = 0.0
 local openAngle   = 80.0
 local rotateSpeed = 180.0
-local interactRange = 250.0   -- BIGGER range, as requested
-
-local PLAYER_ID = 5         -- confirmed by you
 
 local isOpen = false
 local currentY = 0.0
@@ -26,6 +23,9 @@ function on_create(Self)
     currentY = ry
     targetY = ry
 
+    -- Ensure shared table exists
+    SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
+
     print(string.format("[Door] Start RotY=%.2f", currentY))
 end
 
@@ -33,28 +33,35 @@ function on_update(Self, dt)
     local tr = Query.GetTransform(EntityID)
     if tr == nil then return end
 
-    -- ONLY difference: add in-range gate
-    if Input.GetKeyDown(GLFW_KEY_E) then
-        local inRange = Query.IsEntityInRange(EntityID, PLAYER_ID, interactRange)
+    ----------------------------------------------------------------
+    -- NEW: consume interaction command from SHARED
+    ----------------------------------------------------------------
+    if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
+        local cmdObj = SHARED.DOOR_CMD[EntityID]
+        SHARED.DOOR_CMD[EntityID] = nil   -- consume it (IMPORTANT)
+
+        if cmdObj.cmd == "toggle" then
+            isOpen = not isOpen
+        elseif cmdObj.cmd == "open" then
+            isOpen = true
+        elseif cmdObj.cmd == "close" then
+            isOpen = false
+        end
+
+        targetY = isOpen and openAngle or closedAngle
 
         print(string.format(
-            "[Door] E pressed. inRange=%s (range=%.1f)",
-            tostring(inRange),
-            interactRange
+            "[Door] CMD=%s by=%s -> isOpen=%s targetY=%.2f",
+            tostring(cmdObj.cmd),
+            tostring(cmdObj.by),
+            tostring(isOpen),
+            targetY
         ))
-
-        if inRange then
-            isOpen = not isOpen
-            targetY = isOpen and openAngle or closedAngle
-            print(string.format(
-                "[Door] TOGGLE -> isOpen=%s targetY=%.2f",
-                tostring(isOpen),
-                targetY
-            ))
-        end
     end
 
-    -- Rotation logic UNCHANGED
+    ----------------------------------------------------------------
+    -- Rotation logic (UNCHANGED from your original)
+    ----------------------------------------------------------------
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1
