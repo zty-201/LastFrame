@@ -524,7 +524,7 @@ namespace EngineFramework
 		}
 		ImGuiIO& io = ImGui::GetIO();
 		//ImGuiIO& io = ImGui::GetIO();
-		io.FontGlobalScale = 1.0f;   // DEFAULT
+		io.FontGlobalScale = 2.0f;   // DEFAULT
 
 		//DOCKING =================================================		
 		docking();
