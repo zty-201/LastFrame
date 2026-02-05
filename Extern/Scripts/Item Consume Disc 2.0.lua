@@ -15,6 +15,22 @@ local ITEM_QTY = 1
 -- set this to that entity id. Otherwise leave 0 (auto uses EntityID).
 local TARGET_ENTITY_ID = 0
 
+-- 3D SFX
+local DISC_INSERT_SFX_ID = "DiscInsert"
+local DISC_INSERT_DELAY_SECONDS = 0.8  -- tune this
+
+-- Insert delay state
+local insertPending = false
+local insertTimer = 0.0
+
+local function play_3d_sfx_from(entityId, slotId)
+    if type(Audio_PlaySlot) == "function" and entityId ~= nil and slotId ~= nil then
+        Audio_PlaySlot(entityId, slotId)
+        return true
+    end
+    return false
+end
+
 local function s(v) return (v == nil) and "nil" or tostring(v) end
 
 local function consume_shared_cmd(cmdTable, id)
@@ -47,7 +63,25 @@ function on_create(Self)
 end
 
 function on_update(Self, dt)
+    dt = dt or 0.016
     local targetId = (TARGET_ENTITY_ID ~= 0) and TARGET_ENTITY_ID or EntityID
+
+    -- If we're waiting for DiscInsert to finish, count down then start music
+    if insertPending then
+        insertTimer = insertTimer + dt
+        if insertTimer >= DISC_INSERT_DELAY_SECONDS then
+            insertPending = false
+            insertTimer = 0.0
+
+            -- Trigger CP1 AFTER insert sound
+            if SHARED.StateController and SHARED.StateController.TriggerCP1 then
+                SHARED.StateController.TriggerCP1()
+            else
+                print("[Test_ConsumeDisc_Shared] WARNING: StateController.TriggerCP1 not found")
+            end
+        end
+        return
+    end
 
     if not SHARED.DOOR_CMD then return end
 
@@ -96,10 +130,13 @@ function on_update(Self, dt)
         end
     end
 
-    -- Trigger CP1
-    if SHARED.StateController and SHARED.StateController.TriggerCP1 then
-        SHARED.StateController.TriggerCP1()
-    else
-        print("[Test_ConsumeDisc_Shared] WARNING: StateController.TriggerCP1 not found")
+    -- Play DiscInsert first (3D from the disc player entity),
+    -- then trigger CP1 after delay
+    local played = play_3d_sfx_from(targetId, DISC_INSERT_SFX_ID)
+    if DEBUG then
+        print(string.format("[Test_ConsumeDisc_Shared] DiscInsert play=%s (slot=%s)", tostring(played), DISC_INSERT_SFX_ID))
     end
+
+    insertPending = true
+    insertTimer = 0.0
 end

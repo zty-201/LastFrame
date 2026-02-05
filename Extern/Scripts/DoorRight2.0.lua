@@ -4,7 +4,7 @@
 
 local closedAngle = 0.0
 local openAngle   = 80.0
-local rotateSpeed = 20.0
+local rotateSpeed = 40.0
 
 local isOpen = false
 local currentY = 0.0

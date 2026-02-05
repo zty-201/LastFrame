@@ -16,6 +16,21 @@ local TARGET_ENTITY_ID = 0
 
 local pickedUp = false
 
+-- 3D pickup SFX (slot ID)
+local DISC_PICKUP_SFX_ID = "DiscPickup"
+
+local function safePlaySlotFrom(entityId, slotId)
+    if type(Audio_PlaySlot) == "function" and type(slotId) == "string" and entityId ~= nil then
+        -- Force retrigger for one-shots (optional but helps some engines)
+        if type(Audio_StopSlot) == "function" then
+            Audio_StopSlot(entityId, slotId)
+        end
+        Audio_PlaySlot(entityId, slotId)
+        return true
+    end
+    return false
+end
+
 local function s(v)
     if v == nil then return "nil" end
     return tostring(v)
@@ -105,6 +120,12 @@ function on_update(Self, dt)
 
     if DEBUG then
         print("[Test_AddMusicDisc_Shared] Received interact cmd for id=", s(pickupId))
+    end
+
+    -- Play 3D pickup sound FROM the disc entity
+    local played = safePlaySlotFrom(pickupId, DISC_PICKUP_SFX_ID)
+    if DEBUG then
+        print("[Test_AddMusicDisc_Shared] DiscPickup played=", tostring(played), " from id=", s(pickupId))
     end
 
     -- 1) Add item

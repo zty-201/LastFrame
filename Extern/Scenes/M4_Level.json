@@ -16077,6 +16077,21 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"volume": 1.0
+				},
+				{
+					"audio_guid": [
+						16135386481470406667,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "DiscInsert",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
 				}
 			]
 		},
@@ -31010,6 +31025,55 @@
 		}
 	},
 	"33": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						1147406921581395983,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "DoorLocked",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				},
+				{
+					"audio_guid": [
+						8064935949222477843,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "DoorUnlock",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				},
+				{
+					"audio_guid": [
+						17288307986077253649,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "DoorOpen",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				113.95817565917969,
@@ -42848,17 +42912,17 @@
 			"position": [
 				194.42698669433594,
 				0.0,
-				92.0530014038086
+				90.83226776123047
 			],
 			"rotation": [
-				0.09999996423721313,
+				0.09999995678663254,
 				-0.0,
 				0.0
 			],
 			"scale": [
 				1.0,
-				0.9999977350234985,
-				0.5
+				0.9999956488609314,
+				0.49999895691871643
 			]
 		}
 	},
@@ -46156,26 +46220,26 @@
 				1.0
 			],
 			"albedoMap": [
-				7754864864954433709,
+				3627738027797708801,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				9484247121864704175,
+				14004031569259331587,
 				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				13519472387988668593,
+				1898355770887438341,
 				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				5449021855740739763,
+				4204198780101132295,
 				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				16978236901809209525,
+				11121727807742214153,
 				3711223656383638553
 			],
 			"uvOffset": [
@@ -46222,19 +46286,19 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				194.42698669433594,
+				207.1090545654297,
 				0.0,
-				92.35299682617188
+				96.60900115966797
 			],
 			"rotation": [
-				0.09999996423721313,
+				0.09999995678663254,
 				-0.0,
 				0.0
 			],
 			"scale": [
 				1.0,
-				0.9999977350234985,
-				0.5
+				0.9999961256980896,
+				0.4000000059604645
 			]
 		}
 	},
@@ -50009,6 +50073,25 @@
 		}
 	},
 	"508": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						16135386481470406669,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "DiscPickup",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -50158,7 +50241,7 @@
 				},
 				{
 					"audio_guid": [
-						11523700463043018791,
+						11523700463043018775,
 						11537445004664754516
 					],
 					"category": 0,
