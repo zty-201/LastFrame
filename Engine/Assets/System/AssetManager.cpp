@@ -11,6 +11,7 @@
 #include "Audio.hpp"
 #include "Scripting/ScriptAsset.hpp" //For script asset type registration.
 #include <system_error>
+#include <mutex>
 
 //For guid metadata file reading.
 #ifdef PLATFORM_WINDOWS
@@ -24,6 +25,8 @@
 #include "Audio.hpp"
 #include "SoundAsset.hpp"
 #include "Archtype.hpp"
+
+#include <mutex>
 
 namespace EngineFramework {
 
@@ -472,7 +475,7 @@ namespace EngineFramework {
 
 		*/
 		//Acceptable files that can be loaded as a texture.
-		std::vector<std::string> texture_extensions{ ".png", ".dds", ".ktx", ".ktx2", ".DDS"};
+		std::vector<std::string> texture_extensions{ ".png", ".dds", ".ktx", ".ktx2", ".DDS" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, texture_extensions);
 
 		/*
@@ -554,23 +557,49 @@ namespace EngineFramework {
 		std::vector<std::string> asset_names{};
 		std::vector< std::shared_ptr<Mesh::MeshData>> loaded_resources{};
 
+		std::mutex mesh_mutex;
+		std::vector<std::thread> thread_arr{};
+		std::vector<std::shared_ptr<Mesh::MeshData>> temp_ptr_arr{}; //Keep ptrs to do a final function call after join.
+
 		// Collect the names and loop through all mesh files
 		for (const std::filesystem::path& path : files) {
 			// Obtain the name of the mesh from the file name (without extension)
 			std::string name = path.stem().string();
+			auto create_append_thread = [path, &mesh_mutex, &temp_ptr_arr, name] {
+				// Try catch guard for loading mesh
+				try {
+					LOGI("Loading Mesh: %s", path.string().c_str());
+					std::shared_ptr<Mesh::MeshData> mesh_data{ new Mesh::MeshData(path.string()) };
+					mesh_data->name = name;
+					//Lock-guard to prevent race conditions for multi-threading.
+					std::lock_guard<std::mutex> mesh_lock(mesh_mutex);
+					temp_ptr_arr.emplace_back(mesh_data);
+				}
+				catch (std::exception& e) {
+					LOGE("%s %s %s", "Unable to Load Mesh", name.c_str(), e.what());
+				}
 
-			// Try catch guard for loading mesh
+				};
+
+			thread_arr.emplace_back(create_append_thread);
+
+		}
+		//Wait for all mesh loaders
+		for (std::thread& thread : thread_arr)
+		{
+			thread.join();
+		}
+		for (std::shared_ptr<Mesh::MeshData> incomplete_mesh : temp_ptr_arr)
+		{
 			try {
-				LOGI("Loading Mesh: %s", path.string().c_str());
-
-				loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
-				asset_names.emplace_back(name); // Done if resource loading is a success.
+				incomplete_mesh->LoadWithFilename_AfterThreadJoinCall(); //Can only be done on main thread.
+				loaded_resources.emplace_back(incomplete_mesh);
+				asset_names.emplace_back(incomplete_mesh->name); // Done if resource loading is a success.
 			}
 			catch (std::exception& e) {
-				LOGE("%s %s %s", "Unable to Load Mesh", name.c_str(), e.what());
+				LOGE("%s %s %s", "Unable to Load Mesh", incomplete_mesh->name.c_str(), e.what());
 			}
 		}
-
 		// Set Mapping with mesh GUID
 		SetMappings(MESH_GUID, asset_names, loaded_resources, folder_path);
 
