@@ -1,14 +1,16 @@
 -- Door_SharedControlled_Right.lua
--- Attach to RIGHT Door entity
--- Opens/closes when commanded via SHARED.DOOR_CMD[EntityID]
+-- RIGHT door opens ONCE, then permanently ignores interaction.
 
 local closedAngle = 0.0
-local openAngle   = -80.0      -- RIGHT door usually swings the opposite way
+local openAngle   = -80.0
 local rotateSpeed = 180.0
 
 local isOpen = false
 local currentY = 0.0
 local targetY = 0.0
+
+-- ✅ NEW: one-time open
+local hasOpenedOnce = false
 
 function on_create(Self)
     print("[DoorR] on_create EntityID:", EntityID)
@@ -32,31 +34,32 @@ function on_update(Self, dt)
     local tr = Query.GetTransform(EntityID)
     if tr == nil then return end
 
-    -- Consume command from SHARED
     if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
         local cmdObj = SHARED.DOOR_CMD[EntityID]
         SHARED.DOOR_CMD[EntityID] = nil
 
-        if cmdObj.cmd == "toggle" then
-            isOpen = not isOpen
-        elseif cmdObj.cmd == "open" then
-            isOpen = true
-        elseif cmdObj.cmd == "close" then
-            isOpen = false
+        -- ✅ already opened once -> ignore known commands forever
+        if hasOpenedOnce then
+            print("[DoorR] Ignored interaction (already opened once)")
+            return
         end
 
-        targetY = isOpen and openAngle or closedAngle
+        -- Only first open/toggle is allowed; force open
+        if cmdObj.cmd == "open" or cmdObj.cmd == "toggle" then
+            isOpen = true
+            hasOpenedOnce = true
+            targetY = openAngle
 
-        print(string.format(
-            "[DoorR] CMD=%s by=%s -> isOpen=%s targetY=%.2f",
-            tostring(cmdObj.cmd),
-            tostring(cmdObj.by),
-            tostring(isOpen),
-            targetY
-        ))
+            print(string.format(
+                "[DoorR] OPENED ONCE by=%s -> permanently disabled",
+                tostring(cmdObj.by)
+            ))
+        else
+            print("[DoorR] Ignored cmd before first open:", tostring(cmdObj.cmd))
+        end
     end
 
-    -- Rotation logic (same as left door)
+    -- Rotation logic
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1
