@@ -101,8 +101,6 @@ function Flashlight_Toggle()
     end
 end
 
-
-
 function on_update(self, dt)
     if not camera then return end
     local FL = ensureSharedFlashlight()

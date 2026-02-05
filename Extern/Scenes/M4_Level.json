@@ -15284,6 +15284,25 @@
 		}
 	},
 	"218": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						13829543472256712737,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "KeyPickup",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				6.588799476623535,
@@ -21129,6 +21148,70 @@
 		}
 	},
 	"26": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						17288307986077253649,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "OpenDoor",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				},
+				{
+					"audio_guid": [
+						11523700463043018791,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "OpenMaindoor",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				},
+				{
+					"audio_guid": [
+						6912014444615630885,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "CloseMaindoor",
+					"loop": false,
+					"maxDistance": 300.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				},
+				{
+					"audio_guid": [
+						5759092940008783901,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "GirlGiggle",
+					"loop": false,
+					"maxDistance": 300.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				96.80011749267578,
@@ -37421,7 +37504,7 @@
 			"position": [
 				300.0,
 				180.0,
-				-1116.904296875
+				-1192.671142578125
 			],
 			"rotation": [
 				0.0,
@@ -49227,7 +49310,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"volume": 0.2919999957084656
+					"volume": 0.1080000028014183
 				},
 				{
 					"audio_guid": [
@@ -49242,7 +49325,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"volume": 0.3100000023841858
+					"volume": 0.11400000005960464
 				},
 				{
 					"audio_guid": [
@@ -49257,7 +49340,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"volume": 0.29899999499320984
+					"volume": 0.10599999874830246
 				},
 				{
 					"audio_guid": [
@@ -49272,7 +49355,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"volume": 0.27900001406669617
+					"volume": 0.10599999874830246
 				},
 				{
 					"audio_guid": [
@@ -49287,7 +49370,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"volume": 0.28600001335144043
+					"volume": 0.1080000028014183
 				},
 				{
 					"audio_guid": [
@@ -49302,7 +49385,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"volume": 0.2879999876022339
+					"volume": 0.09399999678134918
 				},
 				{
 					"audio_guid": [
@@ -49317,7 +49400,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"volume": 0.27900001406669617
+					"volume": 0.1080000028014183
 				},
 				{
 					"audio_guid": [
@@ -49332,7 +49415,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"volume": 0.26100000739097595
+					"volume": 0.1120000034570694
 				},
 				{
 					"audio_guid": [
@@ -49347,7 +49430,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"volume": 0.8769999742507935
+					"volume": 0.24500000476837158
 				}
 			]
 		},
@@ -50056,6 +50139,55 @@
 		}
 	},
 	"509": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						17288307986077253649,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "OpenDoor",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				},
+				{
+					"audio_guid": [
+						11523700463043018791,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "OpenMaindoor",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				},
+				{
+					"audio_guid": [
+						6912014444615630885,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "CloseMaindoor",
+					"loop": false,
+					"maxDistance": 300.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				2.9301071166992188,
@@ -60255,8 +60387,8 @@
 				0.0
 			],
 			"size": [
-				1800.0,
-				1158.0
+				1295.0,
+				1024.0
 			],
 			"size_NDC": [
 				1.0,
