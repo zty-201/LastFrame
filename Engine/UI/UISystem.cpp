@@ -97,7 +97,7 @@ namespace EngineFramework
     void UI_System::DeserializeAllOverlays(){
 
         Menu_Mapping.clear();
-        std::vector<std::filesystem::path> valid_json_overlays = AssetManagerSystem::ListFilesInDirectory(AssetManagerSystem::GetInstance().GetAssetFolderPrefix().string() + "Extern/Overlays", {".json"});
+        std::vector<std::filesystem::path> valid_json_overlays = AssetManagerSystem::ListFilesInDirectory("Extern/Overlays", {".json"});
            
         for (const auto& entry : valid_json_overlays) {
             const std::string menuName = entry.stem().string();
