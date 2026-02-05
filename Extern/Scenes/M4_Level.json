@@ -31055,7 +31055,7 @@
 			],
 			"rotation": [
 				0.0,
-				-90.0,
+				90.0,
 				-0.6000000238418579
 			],
 			"scale": [
@@ -49355,16 +49355,16 @@
 			],
 			"constant": 1.0,
 			"direction": [
-				-0.004188777878880501,
 				0.0,
-				0.999991238117218
+				0.0,
+				1.0
 			],
 			"innerConeAngle": 15.0,
 			"intensity": 10000.0,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 35.0,
 			"position": [
-				7.650869846343994,
+				7.652964115142822,
 				184.99998474121094,
 				-823.8157958984375
 			],
@@ -49451,7 +49451,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.23999999463558197,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -60610,6 +60610,70 @@
 			],
 			"size": [
 				1780.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15304296428018171923,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"613": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 1535191478468313091
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayroomDiscIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				655.3428955078125,
+				83.59370422363281,
+				-256.51318359375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1781.0,
 				1158.0
 			],
 			"size_NDC": [
