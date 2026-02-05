@@ -1,19 +1,19 @@
 {
-	"619": {
+	"628": {
 		"ButtonComponent": {
 			"clicked_texture": [
-				10640027270492504069,
-				3711223656383638553
+				0,
+				0
 			],
 			"event_hover": "poopoo",
 			"event_trigger": "PlayButton",
 			"hover_texture": [
-				3146037490547998721,
+				13562766767143288835,
 				3711223656383638553
 			],
 			"idle_texture": [
-				0,
-				0
+				13562766767143288835,
+				3711223656383638553
 			]
 		},
 		"LuaScriptComponent": {
@@ -21,7 +21,7 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 17260037342949638145
+					"ScriptGuid": 5982082694360776705
 				}
 			]
 		},
@@ -56,13 +56,29 @@
 				0.10000000149011612
 			],
 			"textureid": [
-				0,
-				0
+				13562766767143288835,
+				3711223656383638553
 			],
 			"visible": false
 		}
 	},
-	"620": {
+	"629": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "",
+			"event_trigger": "",
+			"hover_texture": [
+				12986306014839865345,
+				3711223656383638553
+			],
+			"idle_texture": [
+				12986306014839865345,
+				3711223656383638553
+			]
+		},
 		"NameComponent": {
 			"name": "HowToPlayBtn"
 		},
@@ -94,13 +110,29 @@
 				0.10000000149011612
 			],
 			"textureid": [
-				0,
-				0
+				12986306014839865345,
+				3711223656383638553
 			],
 			"visible": false
 		}
 	},
-	"621": {
+	"630": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "",
+			"event_trigger": "",
+			"hover_texture": [
+				15292149024053559303,
+				3711223656383638553
+			],
+			"idle_texture": [
+				15292149024053559303,
+				3711223656383638553
+			]
+		},
 		"NameComponent": {
 			"name": "SettingsBtn"
 		},
@@ -132,13 +164,29 @@
 				0.10000000149011612
 			],
 			"textureid": [
-				0,
-				0
+				15292149024053559303,
+				3711223656383638553
 			],
 			"visible": false
 		}
 	},
-	"622": {
+	"631": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "",
+			"event_trigger": "",
+			"hover_texture": [
+				14139227519446712325,
+				3711223656383638553
+			],
+			"idle_texture": [
+				14139227519446712325,
+				3711223656383638553
+			]
+		},
 		"NameComponent": {
 			"name": "QuitBtn"
 		},
@@ -170,8 +218,43 @@
 				0.10000000149011612
 			],
 			"textureid": [
-				0,
-				0
+				14139227519446712325,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"632": {
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				747.0,
+				490.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				16486605679922642945,
+				3711223656383638553
 			],
 			"visible": false
 		}
