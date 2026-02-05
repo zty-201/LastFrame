@@ -239,6 +239,12 @@ namespace EngineFramework {
 		static inline constexpr xresource::type_guid ARCHTYPE_GUID{ ARCHTYPE };
 		static inline constexpr xresource::type_guid ANIMATION_GUID{ ANIMATION };
 
+		// Editor-only convenience: re-read all .lua files and rebuild ScriptAsset::code
+		void ReloadScriptsFromDisk()
+		{
+			ReloadAllResourcesOfType(SCRIPT, SCRIPT_GUID);
+		}
+
 	private:
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
