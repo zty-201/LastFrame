@@ -3,14 +3,11 @@ print("[IndoorAudio] script file loaded")
 
 -- Mark which TriggerBox entity IDs count as indoor
 local indoorZones = {
-    [259] = true,
-    [377] = true,
-    [378] = true,
-    [380] = true,
+    [259] = true
 }
 
 local outdoorZones = {
-    [607] = true,
+    [377] = true
 }
 
 -- Shared across ALL zone scripts

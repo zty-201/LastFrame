@@ -21081,13 +21081,13 @@
 			]
 		},
 		"NameComponent": {
-			"name": "Indoor_Detector_01"
+			"name": "SFX_Indoor_Detector_01"
 		},
 		"TransformComponent": {
 			"position": [
-				300.0,
-				180.0,
-				-285.834716796875
+				-214.37100219726563,
+				471.1184387207031,
+				538.2479858398438
 			],
 			"rotation": [
 				0.0,
@@ -21110,9 +21110,9 @@
 			],
 			"enabled": true,
 			"halfExtents": [
-				400.0,
-				200.0,
-				400.0
+				1000.0,
+				500.0,
+				1200.0
 			],
 			"localEulerDeg": [
 				0.0,
@@ -37415,13 +37415,13 @@
 			]
 		},
 		"NameComponent": {
-			"name": "Indoor_Detector_02"
+			"name": "SFX_Outdoor_Detector_01"
 		},
 		"TransformComponent": {
 			"position": [
-				90.0,
-				200.0,
-				300.0
+				300.0,
+				180.0,
+				-1116.904296875
 			],
 			"rotation": [
 				0.0,
@@ -37444,65 +37444,7 @@
 			],
 			"enabled": true,
 			"halfExtents": [
-				600.0,
-				200.0,
-				400.0
-			],
-			"localEulerDeg": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"localPosition": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"radius": 0.5,
-			"type": 0
-		}
-	},
-	"378": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 596331687958085633
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "Indoor_Detector_03"
-		},
-		"TransformComponent": {
-			"position": [
-				30.0,
-				200.0,
-				1100.0
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
-		},
-		"TriggerBoxComponent": {
-			"capHalfHeight": 0.5,
-			"capRadius": 0.5,
-			"debugColor": [
-				0.10000000149011612,
-				0.800000011920929,
-				0.20000000298023224
-			],
-			"enabled": true,
-			"halfExtents": [
-				700.0,
+				400.0,
 				200.0,
 				400.0
 			],
@@ -37525,11 +37467,11 @@
 			"Slots": [
 				{
 					"audio_guid": [
-						12476449099908300803,
+						9017684586087759873,
 						11537445004664754516
 					],
 					"category": 3,
-					"id": "Wind",
+					"id": "Outdoor",
 					"loop": true,
 					"maxDistance": 10.0,
 					"minDistance": 5.0,
@@ -37537,11 +37479,35 @@
 					"playOnStart": true,
 					"spatial": 1,
 					"volume": 1.0
+				},
+				{
+					"audio_guid": [
+						15935213613728841733,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Indoor",
+					"loop": true,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 13767680549791596553
 				}
 			]
 		},
 		"NameComponent": {
-			"name": "Wind_Ambience"
+			"name": "SFX_Ambience_Manager"
 		},
 		"TransformComponent": {
 			"position": [
@@ -37649,64 +37615,6 @@
 				1.0,
 				1.0
 			]
-		}
-	},
-	"380": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 596331687958085633
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "Indoor_Detector_04"
-		},
-		"TransformComponent": {
-			"position": [
-				-700.0,
-				400.0,
-				600.0
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
-		},
-		"TriggerBoxComponent": {
-			"capHalfHeight": 0.5,
-			"capRadius": 0.5,
-			"debugColor": [
-				0.10000000149011612,
-				0.800000011920929,
-				0.20000000298023224
-			],
-			"enabled": true,
-			"halfExtents": [
-				400.0,
-				400.0,
-				300.0
-			],
-			"localEulerDeg": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"localPosition": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"radius": 0.5,
-			"type": 0
 		}
 	},
 	"381": {
@@ -49308,18 +49216,138 @@
 			"Slots": [
 				{
 					"audio_guid": [
-						17135044766221647873,
+						16309874578476007435,
 						11537445004664754516
 					],
 					"category": 0,
-					"id": "Footstep",
-					"loop": true,
+					"id": "Footstep1",
+					"loop": false,
 					"maxDistance": 25.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"volume": 0.20800000429153442
+					"volume": 0.2919999957084656
+				},
+				{
+					"audio_guid": [
+						6185210870235774977,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Footstep2",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 0.3100000023841858
+				},
+				{
+					"audio_guid": [
+						13679200650180280323,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Footstep3",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 0.29899999499320984
+				},
+				{
+					"audio_guid": [
+						8491053879449468933,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Footstep4",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 0.27900001406669617
+				},
+				{
+					"audio_guid": [
+						2149985604111810567,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Footstep5",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 0.28600001335144043
+				},
+				{
+					"audio_guid": [
+						4455828613325504521,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Footstep6",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 0.2879999876022339
+				},
+				{
+					"audio_guid": [
+						10220436136359739403,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Footstep7",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 0.27900001406669617
+				},
+				{
+					"audio_guid": [
+						5608750117932351501,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Footstep8",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 0.26100000739097595
+				},
+				{
+					"audio_guid": [
+						16287532407446159363,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Flashlight",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 0.8769999742507935
 				}
 			]
 		},
