@@ -448,7 +448,6 @@ namespace EngineFramework {
 				throw std::runtime_error((std::string("Unable to load asset of type: ") + resource_type).c_str());
 			}
 		}
-
 	}
 
 
@@ -472,9 +471,8 @@ namespace EngineFramework {
 
 
 		*/
-		LOGD("Loading Texture");
 		//Acceptable files that can be loaded as a texture.
-		std::vector<std::string> texture_extensions{ ".png" };
+		std::vector<std::string> texture_extensions{ ".png", ".dds", ".ktx", ".ktx2" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, texture_extensions);
 
 		/*
