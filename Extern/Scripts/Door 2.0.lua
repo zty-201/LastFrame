@@ -10,7 +10,6 @@ local isOpen = false
 local currentY = 0.0
 local targetY = 0.0
 
--- ✅ NEW: one-time open flag
 local hasOpenedOnce = false
 
 function on_create(Self)
@@ -28,6 +27,10 @@ function on_create(Self)
 
     SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
 
+    -- ✅ NEW: shared state table for icons / other scripts
+    SHARED.DOOR_OPENED_ONCE = SHARED.DOOR_OPENED_ONCE or {}
+    SHARED.DOOR_OPENED_ONCE[EntityID] = false
+
     print(string.format("[Door] Start RotY=%.2f", currentY))
 end
 
@@ -35,16 +38,10 @@ function on_update(Self, dt)
     local tr = Query.GetTransform(EntityID)
     if tr == nil then return end
 
-    ----------------------------------------------------------------
-    -- Consume interaction command (ONE TIME ONLY)
-    ----------------------------------------------------------------
     if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
         local cmdObj = SHARED.DOOR_CMD[EntityID]
-        SHARED.DOOR_CMD[EntityID] = nil   -- consume it
+        SHARED.DOOR_CMD[EntityID] = nil
 
-        -- 🚫 Already opened once → ignore everything forever
-        -- If already opened once:
-        -- allow CLOSE commands (for scripted events), but block toggle/open
         if hasOpenedOnce then
             if cmdObj.cmd == "close" then
                 isOpen = false
@@ -56,26 +53,25 @@ function on_update(Self, dt)
             return
         end
 
-
-        -- Allow only first open / toggle
         if cmdObj.cmd == "open" or cmdObj.cmd == "toggle" then
             isOpen = true
             hasOpenedOnce = true
             targetY = openAngle
+
+            -- ✅ NEW: publish opened-once state
+            SHARED.DOOR_OPENED_ONCE = SHARED.DOOR_OPENED_ONCE or {}
+            SHARED.DOOR_OPENED_ONCE[EntityID] = true
 
             print(string.format(
                 "[Door] OPENED ONCE by=%s -> permanently disabled",
                 tostring(cmdObj.by)
             ))
         else
-            -- close command before opening is ignored
             print("[Door] Ignored cmd before first open:", tostring(cmdObj.cmd))
         end
     end
 
-    ----------------------------------------------------------------
-    -- Rotation logic (UNCHANGED)
-    ----------------------------------------------------------------
+    -- Rotation logic (unchanged)
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1

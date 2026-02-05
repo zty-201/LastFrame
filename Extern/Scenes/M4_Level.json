@@ -292,6 +292,70 @@
 			]
 		}
 	},
+	"1000": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 2825789430918873091
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "MainDoorLeftIconClosed"
+		},
+		"TransformComponent": {
+			"position": [
+				34.94477844238281,
+				132.40484619140625,
+				-680.2339477539063
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1800.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15880757180321595405,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
 	"101": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -37713,9 +37777,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-94.65031433105469,
-				183.1243133544922,
-				-755.91845703125
+				7.652964115142822,
+				185.79998779296875,
+				-794.3157958984375
 			],
 			"rotation": [
 				0.0,
@@ -49275,7 +49339,7 @@
 				0.0
 			],
 			"height": 350.0,
-			"isGrounded": false,
+			"isGrounded": true,
 			"jumpStrength": 10.0,
 			"mass": 70.0,
 			"maxSlopeAngle": 50.0,
@@ -49300,9 +49364,9 @@
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 35.0,
 			"position": [
-				-94.65031433105469,
-				182.32431030273438,
-				-785.41845703125
+				7.652964115142822,
+				184.99998474121094,
+				-823.8157958984375
 			],
 			"quadratic": 0.03200000151991844,
 			"radius": 1000.0,
@@ -49381,9 +49445,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-94.65031433105469,
-				182.32431030273438,
-				-785.91845703125
+				7.652964115142822,
+				184.99998474121094,
+				-824.3157958984375
 			],
 			"rotation": [
 				0.0,
@@ -49391,9 +49455,9 @@
 				0.0
 			],
 			"scale": [
-				1.0,
-				0.9999989867210388,
-				0.9999994039535522
+				0.0,
+				0.0,
+				0.0
 			]
 		}
 	},
@@ -60049,6 +60113,198 @@
 			]
 		}
 	},
+	"607": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6284553944715624449
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "MainDoorLeftIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				25.960954666137695,
+				131.59291076660156,
+				-733.7787475585938
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1800.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				7810306648073666571,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"608": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 2825789430926196741
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "MainRightDoorIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				-24.77281951904297,
+				117.67636108398438,
+				-721.66357421875
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1800.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				7810306648073666571,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"609": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16507575565324599297
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "MainDoorRightLockIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				-25.508697509765625,
+				127.87725067138672,
+				-686.513427734375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1800.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15880757180321595405,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
 	"61": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -60173,6 +60429,262 @@
 				0.9999996423721313,
 				0.9999852776527405
 			]
+		}
+	},
+	"610": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 7860664280792875013
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayroomDoLockIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				80.33246612548828,
+				137.0432586669922,
+				-366.01995849609375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1800.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15880757180321595405,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"611": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 9590046537703145479
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayroomDoUnlockIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				80.33246612548828,
+				137.0432586669922,
+				-366.01995849609375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1800.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				17610139437231865871,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"612": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6146877496887525377
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayroomKeyIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				-416.9317932128906,
+				133.35545349121094,
+				-10.139751434326172
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1780.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15304296428018171923,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"613": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 1535191478468313091
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayroomDiscIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				655.3428955078125,
+				83.59370422363281,
+				-256.51318359375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1781.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15304296428018171923,
+				3711223656383638553
+			],
+			"visible": false
 		}
 	},
 	"62": {
