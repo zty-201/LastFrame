@@ -1,7 +1,8 @@
 ----------------------------------------------------------------
 -- Playroom Key Pickup 2.0.lua  (MODIFIED: Shared-controlled)
 -- + Slam mainhall doors shut
--- + Fade hall lights intensity from 0 -> 500 after pickup
+-- + Immediately hide entity 157
+-- + WAIT 3s, then fade hall lights intensity from 0 -> 500
 ----------------------------------------------------------------
 
 local DEBUG = true
@@ -13,10 +14,14 @@ local ITEM_QTY  = 1
 -- After key pickup, slam these doors shut
 local MAINHALL_DOOR_IDS = { 509, 26 }
 
--- After key pickup, turn on these lights (fade 0 -> 500)
-local HALL_LIGHT_IDS = { 486, 488 }   -- put all your light EntityIDs here
+-- Immediately hide this entity on pickup
+local IMMEDIATE_HIDE_ENTITY_ID = 157
+
+-- Lights to turn on (fade 0 -> 500 after a delay)
+local HALL_LIGHT_IDS = { 486, 488 }
 local LIGHT_TARGET_INTENSITY = 500.0
 local LIGHT_FADE_SECONDS = 1.0
+local LIGHT_DELAY_SECONDS = 3.0
 
 -- If your pickup entity is NOT the same entity this script is on,
 -- set this to that entity id. Otherwise leave as 0 (auto = EntityID).
@@ -25,7 +30,9 @@ local TARGET_ENTITY_ID = 0
 -- Internal
 local pickedUp = false
 
--- Light fade internal
+-- Delay + fade state
+local lightDelayActive = false
+local lightDelayTime = 0.0
 local lightFading = false
 local lightTime = 0.0
 
@@ -42,7 +49,6 @@ local function has_any_lights()
     return false
 end
 
--- Returns true if a command exists for this entity in the shared table
 local function consume_shared_cmd(cmdTable, id)
     if cmdTable == nil then return false end
 
@@ -51,8 +57,6 @@ local function consume_shared_cmd(cmdTable, id)
 
     cmdTable[id] = nil -- consume
 
-    -- accept multiple payload styles:
-    -- true / "toggle" / {cmd="toggle"} / {cmd="pickup"} etc.
     if type(cmd) == "table" then
         local c = cmd.cmd
         return (c == nil) or (c == "toggle") or (c == "pickup") or (c == "take") or (c == "use")
@@ -65,6 +69,7 @@ local function consume_shared_cmd(cmdTable, id)
 end
 
 local function hide_entity(id)
+    if id == nil or id == 0 then return false end
     local tr = Query.GetTransform(id)
     if tr then
         tr:SetScale(0.0, 0.0, 0.0)
@@ -85,9 +90,6 @@ end
 function on_create(Self)
     if DEBUG then
         print("[Key_Shared] on_create EntityID:", EntityID)
-        if not SHARED.Inventory or not SHARED.Inventory.Add then
-            print("[Key_Shared] WARNING: Inventory not ready (SHARED.Inventory.Add missing)")
-        end
     end
 end
 
@@ -95,25 +97,38 @@ function on_update(Self, dt)
     local pickupId = (TARGET_ENTITY_ID ~= 0) and TARGET_ENTITY_ID or EntityID
 
     ----------------------------------------------------------------
-    -- If already picked up, continue light fade
+    -- After pickup: wait, then fade lights
     ----------------------------------------------------------------
     if pickedUp then
+        -- Delay phase
+        if lightDelayActive and has_any_lights() then
+            lightDelayTime = lightDelayTime + dt
+            if lightDelayTime >= LIGHT_DELAY_SECONDS then
+                lightDelayActive = false
+                lightFading = true
+                lightTime = 0.0
+
+                send_light_set_all(0.0, pickupId)
+
+                if DEBUG then
+                    print("[Key_Shared] Light delay finished -> starting fade")
+                end
+            end
+        end
+
+        -- Fade phase
         if lightFading and has_any_lights() then
             lightTime = lightTime + dt
 
-            local t = 1.0
-            if LIGHT_FADE_SECONDS > 0.001 then
-                t = lightTime / LIGHT_FADE_SECONDS
-            end
+            local t = lightTime / math.max(LIGHT_FADE_SECONDS, 0.001)
             if t > 1.0 then t = 1.0 end
 
-            local intensity = LIGHT_TARGET_INTENSITY * t
-            send_light_set_all(intensity, pickupId)
+            send_light_set_all(LIGHT_TARGET_INTENSITY * t, pickupId)
 
             if t >= 1.0 then
                 lightFading = false
                 if DEBUG then
-                    print("[Key_Shared] Light fade complete -> " .. tostring(LIGHT_TARGET_INTENSITY))
+                    print("[Key_Shared] Light fade complete")
                 end
             end
         end
@@ -121,19 +136,15 @@ function on_update(Self, dt)
     end
 
     ----------------------------------------------------------------
-    -- Wait for InteractionBox command (same as before)
+    -- Wait for InteractionBox command
     ----------------------------------------------------------------
-    if SHARED.DOOR_CMD == nil then
-        return
-    end
+    if not SHARED.DOOR_CMD then return end
 
     local triggered = consume_shared_cmd(SHARED.DOOR_CMD, pickupId)
-    if not triggered then
-        return
-    end
+    if not triggered then return end
 
     if DEBUG then
-        print("[Key_Shared] Received shared interact cmd for id=", s(pickupId))
+        print("[Key_Shared] Key picked up")
     end
 
     ----------------------------------------------------------------
@@ -141,53 +152,42 @@ function on_update(Self, dt)
     ----------------------------------------------------------------
     if SHARED.Inventory and SHARED.Inventory.Add then
         SHARED.Inventory.Add(ITEM_ID, ITEM_NAME, ITEM_QTY)
-        if DEBUG then
-            print("[Key_Shared] Added:", ITEM_NAME, "x" .. ITEM_QTY)
-        end
-    else
-        print("[Key_Shared] ERROR: Inventory not available")
-        return
     end
 
     ----------------------------------------------------------------
-    -- 2) Slam the mainhall doors shut
+    -- 2) Immediately hide entity 157
+    ----------------------------------------------------------------
+    local okImmediate = hide_entity(IMMEDIATE_HIDE_ENTITY_ID)
+    if DEBUG then
+        print("[Key_Shared] Immediate hide entity 157 ->", okImmediate)
+    end
+
+    ----------------------------------------------------------------
+    -- 3) Slam the mainhall doors shut
     ----------------------------------------------------------------
     SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
     for _, doorId in ipairs(MAINHALL_DOOR_IDS) do
         if doorId ~= 0 then
             SHARED.DOOR_CMD[doorId] = { cmd = "close", by = pickupId }
-            if DEBUG then
-                print("[Key_Shared] Slam close sent to mainhall door:", doorId)
-            end
         end
     end
 
     ----------------------------------------------------------------
-    -- 3) Start light fade (0 -> 500)
+    -- 4) Start LIGHT DELAY
     ----------------------------------------------------------------
     if has_any_lights() then
-        lightFading = true
+        lightDelayActive = true
+        lightDelayTime = 0.0
+        lightFading = false
         lightTime = 0.0
 
-        -- Force start at 0 immediately
         send_light_set_all(0.0, pickupId)
-
-        if DEBUG then
-            print("[Key_Shared] Light fade started for hall lights")
-        end
-    else
-        if DEBUG then
-            print("[Key_Shared] Light fade skipped (HALL_LIGHT_IDS empty)")
-        end
     end
 
     ----------------------------------------------------------------
-    -- 4) Hide / shrink the key entity
+    -- 5) Hide the key entity itself
     ----------------------------------------------------------------
-    local okHide = hide_entity(pickupId)
-    if DEBUG then
-        print("[Key_Shared] Hide result=", tostring(okHide), " id=", s(pickupId))
-    end
+    hide_entity(pickupId)
 
     pickedUp = true
 end
