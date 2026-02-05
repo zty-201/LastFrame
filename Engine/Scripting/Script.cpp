@@ -45,6 +45,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 //For platform android vs windows
 #include "Platform.h"
 
+#include "UISystem.hpp"
+
 namespace Engine {
 
 #if defined(ENGINE_ENABLE_LUA)
@@ -194,6 +196,31 @@ namespace Engine {
         BindLuaPrintToEngine(s_Lua);
 
         LOGI("[ScriptSystem] Initializing Lua bindings...");
+
+        // ===============================================================
+        // UI bindings (Lua -> UI_System)
+        // ===============================================================
+        s_Lua.set_function("UI_StartPseudoCutscene", []()
+            {
+                // If your UI_System is NOT singleton and is purely static:
+                // EngineFramework::UI_System::StartPseudoCutscene();
+
+                // If UI_System is a singleton:
+                EngineFramework::UI_System::GetInstance().StartPseudoCutscene();
+            });
+
+        s_Lua.set_function("UI_DisplayMenu", [](const std::string& menuName)
+            {
+                // EngineFramework::UI_System::displayMenu(menuName);  // static-style
+                EngineFramework::UI_System::GetInstance().displayMenu(menuName);
+            });
+
+        s_Lua.set_function("UI_CloseAllMenus", []()
+            {
+                // EngineFramework::UI_System::closeAllMenu();
+                EngineFramework::UI_System::GetInstance().closeAllMenu();
+            });
+
 
         // ===============================================================
         // Transform Component bindings

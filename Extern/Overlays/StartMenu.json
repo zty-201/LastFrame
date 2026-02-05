@@ -1,0 +1,179 @@
+{
+	"619": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				10640027270492504069,
+				3711223656383638553
+			],
+			"event_hover": "on_play_hover",
+			"event_trigger": "on_play_pressed",
+			"hover_texture": [
+				3146037490547998721,
+				3711223656383638553
+			],
+			"idle_texture": [
+				0,
+				0
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 17260037342949638145
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				241.1999969482422,
+				311.1499938964844
+			],
+			"position_NDC": [
+				0.0,
+				0.3700000047683716
+			],
+			"size": [
+				120.5999984741211,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"620": {
+		"NameComponent": {
+			"name": "HowToPlayBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				241.1999969482422,
+				247.45001220703125
+			],
+			"position_NDC": [
+				0.0,
+				0.10999999940395355
+			],
+			"size": [
+				120.5999984741211,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"621": {
+		"NameComponent": {
+			"name": "SettingsBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				241.1999969482422,
+				181.3000030517578
+			],
+			"position_NDC": [
+				0.0,
+				-0.1599999964237213
+			],
+			"size": [
+				120.5999984741211,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"622": {
+		"NameComponent": {
+			"name": "QuitBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				241.1999969482422,
+				117.60000610351563
+			],
+			"position_NDC": [
+				0.0,
+				-0.41999998688697815
+			],
+			"size": [
+				120.5999984741211,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}

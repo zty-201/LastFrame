@@ -42,7 +42,7 @@ namespace EngineFramework
 		is_menu_running = false;
 		open_create_menu_popup = false;
 
-		//UI_System::GetInstance().Load_Start_Menu(); //if need uncomment
+		UI_System::GetInstance().Load_Start_Menu(); //if need uncomment
 	}
 
 	MenuManager& MenuManager::GetInstance()

@@ -128,6 +128,14 @@ namespace EngineFramework
 
         void Load_Start_Menu();
 
+        // Cutscene controls
+        void StartPseudoCutscene();
+        void StartCutsceneSequence(const std::vector<std::string>& sceneMenus,
+            float intervalSeconds = 1.5f,
+            bool closeOthersFirst = true);
+        void StopCutsceneSequence(bool closeAll = true);
+        bool IsCutscenePlaying() const;
+
 
     private:
 

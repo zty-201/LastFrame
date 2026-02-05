@@ -84,14 +84,20 @@ local function applyLook()
     if pitch < -pitchLimit then pitch = -pitchLimit end
 
     -- Make player model face where camera is yawing (keep existing pitch/roll)
-    local rx, ry, rz = transform:GetRotation()
+    --local rx, ry, rz = transform:GetRotation()
 
     -- Common convention: yaw around Y axis
     -- If your model faces the wrong direction, add +/-90 or 180 offset.
-    transform:SetRotation(rx, yaw, rz)
+    --transform:SetRotation(rx, yaw, rz)
 
     -- Player position
-    local x, y, z = transform:GetPosition()
+    --local x, y, z = transform:GetPosition()
+
+    if Transform_SetRotation then
+        Transform_SetRotation(EntityID, 0.0, yaw, 0.0)
+    else
+        transform:SetRotation(0.0, yaw, 0.0)
+    end
 
     -- Compute forward vector
     local radYaw   = math.rad(yaw)
@@ -105,6 +111,7 @@ local function applyLook()
     -- -------------------------------
     -- Smoothed camera follow
     -- -------------------------------
+    local x, y, z = transform:GetPosition()
     local smooth = 1.0
 
     local cx, cy, cz = camera:GetPosition()
