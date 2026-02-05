@@ -37713,9 +37713,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-19.985116958618164,
-				170.7831268310547,
-				-848.4735107421875
+				-94.65031433105469,
+				183.1243133544922,
+				-755.91845703125
 			],
 			"rotation": [
 				0.0,
@@ -48725,7 +48725,7 @@
 				0.0
 			],
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 0.0,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -48794,7 +48794,7 @@
 				0.0
 			],
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 0.0,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49291,18 +49291,18 @@
 			],
 			"constant": 1.0,
 			"direction": [
-				0.022338269278407097,
-				-0.002792523242533207,
-				0.999746561050415
+				0.0,
+				0.0,
+				1.0
 			],
 			"innerConeAngle": 15.0,
 			"intensity": 10000.0,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 35.0,
 			"position": [
-				-19.973947525024414,
-				169.98312377929688,
-				-877.9736328125
+				-94.65031433105469,
+				182.32431030273438,
+				-785.41845703125
 			],
 			"quadratic": 0.03200000151991844,
 			"radius": 1000.0,
@@ -49387,7 +49387,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -60047,68 +60047,6 @@
 				1.0,
 				0.9999845623970032
 			]
-		}
-	},
-	"607": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 16305133483762139137
-				},
-				{
-					"Loaded": true,
-					"ScriptGuid": 2199621956400447491
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "HallLighttriggerBox"
-		},
-		"TransformComponent": {
-			"position": [
-				9.11738395690918,
-				118.19569396972656,
-				-548.13037109375
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
-		},
-		"TriggerBoxComponent": {
-			"capHalfHeight": 0.5,
-			"capRadius": 0.5,
-			"debugColor": [
-				0.10000000149011612,
-				0.800000011920929,
-				0.20000000298023224
-			],
-			"enabled": true,
-			"halfExtents": [
-				70.0,
-				100.0,
-				10.0
-			],
-			"localEulerDeg": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"localPosition": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"radius": 0.5,
-			"type": 0
 		}
 	},
 	"61": {
