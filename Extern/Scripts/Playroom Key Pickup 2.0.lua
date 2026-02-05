@@ -29,6 +29,9 @@ local LIGHT_DELAY_SECONDS = 3.0
 -- set this to that entity id. Otherwise leave as 0 (auto = EntityID).
 local TARGET_ENTITY_ID = 0
 
+-- 3D SFX IDs (change these to your actual slot IDs)
+local KEY_PICKUP_SFX_ID = "KeyPickup"
+
 -- Internal
 local pickedUp = false
 
@@ -94,6 +97,14 @@ local function key_in_range(keyId)
     return SHARED
         and SHARED.INTERACT_IN_ZONE
         and SHARED.INTERACT_IN_ZONE[keyId] == true
+end
+
+local function play_3d_sfx_from(entityId, slotId)
+    if type(Audio_PlaySlot) == "function" and entityId ~= nil and slotId ~= nil then
+        Audio_PlaySlot(entityId, slotId)
+        return true
+    end
+    return false
 end
 
 function on_create(Self)
@@ -183,6 +194,7 @@ function on_update(Self, dt)
     -- 2) Immediately hide entity 157
     ----------------------------------------------------------------
     hide_entity(IMMEDIATE_HIDE_ENTITY_ID)
+    play_3d_sfx_from(pickupId, KEY_PICKUP_SFX_ID)
 
     ----------------------------------------------------------------
     -- 3) Slam the mainhall doors shut + show lock icons
