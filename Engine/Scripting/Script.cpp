@@ -507,6 +507,30 @@ namespace Engine {
         audioEnums["Spatial_3D"] = (int)AudioComponent::SpatialMode::ThreeD;
 
         // ===============================================================
+        // Audio bindings (Master volume control)
+        // ===============================================================
+
+        // Expose AudioGroup enum to Lua (optional but nice)
+        {
+            sol::table audioGroup = s_Lua.create_named_table("AudioGroup");
+            audioGroup["Master"] = (int)EngineFramework::AudioGroup::Master;
+            audioGroup["BGM"] = (int)EngineFramework::AudioGroup::BGM;
+            audioGroup["SFX"] = (int)EngineFramework::AudioGroup::SFX;
+            audioGroup["UI"] = (int)EngineFramework::AudioGroup::UI;
+            audioGroup["Ambience"] = (int)EngineFramework::AudioGroup::Ambience;
+        }
+
+        // Master volume setter (recommended for your use case)
+        s_Lua.set_function("Audio_SetMasterVolume",
+            [](float vol)
+            {
+                EngineFramework::AudioSystem::GetInstance().SetMasterVolume(vol);
+            });
+
+        // (Optional) If you want a getter later, you currently don't have one in AudioSystem.
+        // You can store in SHARED in Lua (as we did) without needing a getter.
+
+        // ===============================================================
         // AudioSlot (Lua)
         // ===============================================================
         // A Slot represents ONE sound configuration inside an AudioComponent.
