@@ -11,7 +11,7 @@ local STATE_CP1  = 1
 local SONG_SLOT_ID = "Checkpoint1"
 local SONG_LENGTH_SECONDS = 10.0
 
-local HIDDEN_DOOR_ID = 46
+local HIDDEN_DOOR_ID = 43
 
 function on_create(Self)
     Self.state = STATE_IDLE

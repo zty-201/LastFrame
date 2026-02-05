@@ -1,6 +1,7 @@
 {
 	"MeshComponent": {
-		"meshName": "sponza"
+		"meshName": "sponza",
+		"visibility": true
 	},
 	"SceneRenderPass": null,
 	"TransformComponent": {

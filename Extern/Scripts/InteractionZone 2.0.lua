@@ -1,194 +1,167 @@
--- InteractionBox_FollowPlayer.lua
--- Attach this to the invisible interaction box entity
+-- InteractionBox_InteractableOnly.lua
+-- (Your previous version + minimal additions for icon triggering)
 
--- ========= CONFIG =========
-local PLAYER_ID = 5          -- <-- CHANGE if needed
-local OFFSET_FORWARD = 30    -- distance in front of player
-local OFFSET_Y = 0.8         -- height offset
-local LOG_INTERVAL = 60      -- frames (roughly once per second)
+local PLAYER_ID = 5
+local FORWARD_MODE = "camera"
+local FORWARD_SOURCE_ID = PLAYER_ID
 
--- ========= INTERNAL =========
+local OFFSET_FORWARD = 30.0
+local OFFSET_Y = 0.8
+
+local LOG_EVERY_N_FRAMES = 30
+
+local inside = {}   -- [entityId] = true if inside trigger
 local frame = 0
-local printedFirstUpdate = false
 
--- helper: safe tostring
-local function s(v)
-    if v == nil then return "nil" end
-    return tostring(v)
+-- ✅ NEW: track last frame zone to hide when leaving
+local prev_zone = {} -- [entityId] = true
+
+local function get_player_transform()
+    return Query.GetTransform(PLAYER_ID)
 end
 
--- helper: safe call (won't crash if function doesn't exist)
-local function safe_call(label, fn, ...)
-    if fn == nil then
-        return false, nil
+local function get_forward()
+    if FORWARD_MODE == "camera" then
+        return Query.GetCameraForward(FORWARD_SOURCE_ID)
     end
-    local ok, result = pcall(fn, ...)
-    if not ok then
-        print("[InteractionBox][SAFE_CALL FAIL] " .. label .. " -> " .. s(result))
-        return false, nil
-    end
-    return true, result
+    return 0.0, 0.0, 1.0
 end
 
--- helper: try get entity name if your engine has it
-local function try_get_name(eid)
-    if Query and Query.GetName then
-        local ok, name = safe_call("Query.GetName", Query.GetName, eid)
-        if ok then return name end
+local function is_interactable(id)
+    return SHARED.INTERACTABLE ~= nil and SHARED.INTERACTABLE[id] == true
+end
+
+function GetInteractablesInZone()
+    local list = {}
+    for id, _ in pairs(inside) do
+        if is_interactable(id) then
+            list[#list + 1] = id
+        end
     end
-    return nil
+    table.sort(list, function(a, b) return tonumber(a) < tonumber(b) end)
+    return list
+end
+
+function GetFirstInteractableInZone()
+    local list = GetInteractablesInZone()
+    if #list == 0 then return nil end
+    return list[1]
+end
+
+local function print_interactables(prefix)
+    prefix = prefix or "[InteractionBox]"
+    local list = GetInteractablesInZone()
+    if #list == 0 then
+        print(prefix .. " Interactables: (none)")
+        return
+    end
+
+    local s = ""
+    for i = 1, #list do
+        s = s .. tostring(list[i])
+        if i < #list then s = s .. ", " end
+    end
+    print(prefix .. " Interactables IDs: " .. s)
+end
+
+-- ✅ NEW: icon command bus helper
+local function send_icon_cmd(targetId, cmd)
+    SHARED.ICON_CMD = SHARED.ICON_CMD or {}
+    SHARED.ICON_CMD[targetId] = { cmd = cmd, by = PLAYER_ID }
 end
 
 function on_create(self)
-    print("[InteractionBox] on_create")
-    print("[InteractionBox] EntityID =", EntityID, " PLAYER_ID =", PLAYER_ID)
+    print("[InteractionBox] ready EntityID=" .. tostring(EntityID))
 
-    -- Quick sanity checks (won't crash if missing)
-    if Query == nil then
-        print("[InteractionBox] WARNING: Query is nil (Lua bindings not available?)")
-    else
-        print("[InteractionBox] Query table OK")
-    end
+    SHARED.INTERACTABLE = SHARED.INTERACTABLE or {}
+    SHARED.INTERACT_FN  = SHARED.INTERACT_FN  or {}
 
-    -- If your engine supports printing components, try these safely:
-    if Query then
-        safe_call("Query.GetTransform(EntityID)", Query.GetTransform, EntityID)
-        safe_call("Query.GetTransform(PLAYER_ID)", Query.GetTransform, PLAYER_ID)
-    end
+    SHARED.INTERACT_IN_ZONE = {}
+
+    -- ✅ NEW
+    SHARED.ICON_CMD = SHARED.ICON_CMD or {}
 end
 
 function on_update(self, dt)
-    frame = frame + 1
+    local pT = get_player_transform()
+    if pT == nil or EntityTransform == nil then return end
 
-    -- One-time log to prove on_update is firing + dt looks sane
-    if not printedFirstUpdate then
-        printedFirstUpdate = true
-        print("[InteractionBox] on_update is RUNNING. dt =", s(dt))
-    end
+    local px, py, pz = pT:GetPosition()
+    local fx, fy, fz = get_forward()
 
-    -- Get transforms
-    local playerTr = Query and Query.GetTransform and Query.GetTransform(PLAYER_ID) or nil
-    local boxTr    = Query and Query.GetTransform and Query.GetTransform(EntityID) or nil
+    EntityTransform:SetPosition(
+        px + fx * OFFSET_FORWARD,
+        py + OFFSET_Y,
+        pz + fz * OFFSET_FORWARD
+    )
 
-    if playerTr == nil then
-        if frame % LOG_INTERVAL == 0 then
-            print("[InteractionBox] ERROR: player transform is nil (PLAYER_ID =", PLAYER_ID, ")")
+    -- publish ALL interactables currently in range
+    local zone = {}
+    for id, _ in pairs(inside) do
+        if is_interactable(id) then
+            zone[id] = true
         end
-        return
     end
+    SHARED.INTERACT_IN_ZONE = zone
 
-    if boxTr == nil then
-        if frame % LOG_INTERVAL == 0 then
-            print("[InteractionBox] ERROR: box transform is nil (EntityID =", EntityID, ")")
+    ----------------------------------------------------------------
+    -- ✅ NEW: trigger icon scripts (no key needed)
+    -- Every frame: show for items in range
+    -- When something leaves range: hide
+    ----------------------------------------------------------------
+    for id, _ in pairs(prev_zone) do
+        if zone[id] ~= true then
+            send_icon_cmd(id, "hide")
         end
-        return
     end
 
-    -- Player position
-    local px, py, pz = playerTr:GetPosition()
-
-    -- Forward direction (camera-based)
-    local fx, fy, fz = 0, 0, 1
-    if Query and Query.GetCameraForward then
-        fx, fy, fz = Query.GetCameraForward(PLAYER_ID)
+    for id, _ in pairs(zone) do
+        send_icon_cmd(id, "show")
     end
 
-    -- Compute target position
-    local tx = px + fx * OFFSET_FORWARD
-    local ty = py + OFFSET_Y
-    local tz = pz + fz * OFFSET_FORWARD
+    prev_zone = zone
 
-    -- Move the box
-    boxTr:SetPosition(tx, ty, tz)
+    ----------------------------------------------------------------
+    -- (KEEP) E press → interact (toggle door)
+    ----------------------------------------------------------------
+    if Input.GetKeyDown(GLFW_KEY_E) then
+        local targetId = GetFirstInteractableInZone()
 
-    -- Heartbeat logs (proves script is alive + shows motion)
-    if frame % LOG_INTERVAL == 0 then
-        print(string.format("[InteractionBox] PlayerPos = (%.2f, %.2f, %.2f)", px, py, pz))
-        print(string.format("[InteractionBox] BoxPos    = (%.2f, %.2f, %.2f)", tx, ty, tz))
-        print(string.format("[InteractionBox] Forward   = (%.2f, %.2f, %.2f)", fx, fy, fz))
-    end
-
-    -- ================================
-    -- COLLISION DEBUG (polling fallback)
-    -- ================================
-    -- This tries a few likely engine APIs without crashing.
-    -- If your engine supports NONE of these, you’ll still see SAFE_CALL FAIL logs
-    -- telling you what exists / doesn't.
-
-    if Query then
-        -- 1) Common: Query.GetOverlappingEntities(entityId)
-        if frame % LOG_INTERVAL == 0 and Query.GetOverlappingEntities then
-            local ok, list = safe_call("Query.GetOverlappingEntities", Query.GetOverlappingEntities, EntityID)
-            if ok and list then
-                print("[InteractionBox] Overlaps count =", s(#list))
-                for i = 1, #list do
-                    local eid = list[i]
-                    local nm = try_get_name(eid)
-                    if nm then
-                        print("  -> overlap with", eid, "(" .. nm .. ")")
-                    else
-                        print("  -> overlap with", eid)
-                    end
-                end
-            end
+        if targetId ~= nil then
+            SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
+            SHARED.DOOR_CMD[targetId] = { cmd = "toggle", by = PLAYER_ID }
+            print("[InteractionBox] E -> sent toggle to door " .. tostring(targetId))
+        else
+            print("[InteractionBox] E -> no interactable")
         end
+    end
 
-        -- 2) Common: Query.GetCollidingEntities(entityId)
-        if frame % LOG_INTERVAL == 0 and Query.GetCollidingEntities then
-            local ok, list = safe_call("Query.GetCollidingEntities", Query.GetCollidingEntities, EntityID)
-            if ok and list then
-                print("[InteractionBox] Collisions count =", s(#list))
-                for i = 1, #list do
-                    local eid = list[i]
-                    local nm = try_get_name(eid)
-                    if nm then
-                        print("  -> colliding with", eid, "(" .. nm .. ")")
-                    else
-                        print("  -> colliding with", eid)
-                    end
-                end
-            end
-        end
-
-        -- 3) If your engine exposes PhysicsWorld overlap checks (examples)
-        -- These will just print SAFE_CALL FAIL if they don't exist.
-        if frame % LOG_INTERVAL == 0 then
-            safe_call("Query.OverlapBox (if exists)", Query.OverlapBox, EntityID)
-            safe_call("PhysicsWorld.OverlapBox (if exists)", PhysicsWorld and PhysicsWorld.OverlapBox, EntityID)
+    -- periodic logging
+    if LOG_EVERY_N_FRAMES and LOG_EVERY_N_FRAMES > 0 then
+        frame = frame + 1
+        if (frame % LOG_EVERY_N_FRAMES) == 0 then
+            print_interactables("[InteractionBox][Periodic]")
         end
     end
 end
 
--- ==========================================================
--- COLLISION/TRIGGER CALLBACKS (event-based, best if supported)
--- ==========================================================
--- Your engine might call ONE of these names. We implement many.
--- If any of them fire, you'll know collision events are hooked up.
+function on_trigger_enter(self, otherId)
+    if otherId == nil then return end
 
-local function log_hit(tag, other)
-    local otherId = other
-    -- some engines pass a table {entity=ID} or {id=ID}
-    if type(other) == "table" then
-        otherId = other.entity or other.id or other.EntityID or other[1]
-    end
+    local wasInside = inside[otherId] == true
+    inside[otherId] = true
 
-    local nm = try_get_name(otherId)
-    if nm then
-        print("[InteractionBox][" .. tag .. "] hit with", s(otherId), "(" .. nm .. ")")
-    else
-        print("[InteractionBox][" .. tag .. "] hit with", s(otherId))
+    if (not wasInside) and is_interactable(otherId) then
+        print("[InteractionBox] ENTER interactable -> " .. tostring(otherId))
     end
 end
 
-function on_trigger_enter(self, other)  log_hit("on_trigger_enter", other) end
-function on_trigger_exit(self, other)   log_hit("on_trigger_exit", other) end
-function on_trigger_stay(self, other)   log_hit("on_trigger_stay", other) end
+function on_trigger_exit(self, otherId)
+    if otherId == nil then return end
+    inside[otherId] = nil
+end
 
-function on_collision_enter(self, other) log_hit("on_collision_enter", other) end
-function on_collision_exit(self, other)  log_hit("on_collision_exit", other) end
-function on_collision_stay(self, other)  log_hit("on_collision_stay", other) end
-
--- alternative naming some engines use:
-function on_begin_overlap(self, other)  log_hit("on_begin_overlap", other) end
-function on_end_overlap(self, other)    log_hit("on_end_overlap", other) end
-function on_overlap(self, other)        log_hit("on_overlap", other) end
+function on_trigger_stay(self, otherId)
+    if otherId == nil then return end
+    inside[otherId] = true
+end

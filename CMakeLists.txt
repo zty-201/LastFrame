@@ -123,7 +123,7 @@ message("Building for Android")
   add_library(jnicpp SHARED ${CMAKE_CURRENT_LIST_DIR}/Android/app/src/main/cpp/NativeTemplate.cpp)
   
   #Add precompiled headers to speed up compilation times. 
-  target_precompile_headers(jnicpp PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
+  target_precompile_headers(jnicpp PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
   #Preprocessor Definitions 
   target_compile_definitions(jnicpp PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG> ENGINE_ENABLE_LUA)
 
@@ -141,7 +141,7 @@ endif()
 # Custom target to copy assets
 add_custom_target(copy_assets ALL
 	COMMAND ${CMAKE_COMMAND} -E echo "Cleaning old assets..."
-	COMMAND ${CMAKE_COMMAND} -E remove_directory "${ASSETS_DST}"
+	COMMAND ${CMAKE_COMMAND} -E rm -rf "${ASSETS_DST}"
 	COMMAND ${CMAKE_COMMAND} -E echo "Copying Extern/ to assets..."
 	COMMAND ${CMAKE_COMMAND} -E copy_directory "${EXTERN_SRC}" "${ASSETS_DST}"
 	COMMENT "Copying Extern/ folder to src/main/assets"
@@ -357,19 +357,17 @@ endif()
 #Tester is only used for CI Pipeline to run unit/integration tests before pushing to git remote.
 #As such, it should not be built together with applicationexecutable for typical development unless manually specified.
 #Do not include it when shipping.
+if(WIN32) #Disabled for android, only testing for Android is whether it can build. Open to change if android needs to be tested further.
 enable_testing()
 
 add_executable(tester_executable)
 target_sources(tester_executable PRIVATE ${TESTER_SOURCE} )
 target_include_directories(tester_executable PUBLIC ${ENGINE_APPLICATION_INCLUDE_DIRECTORIES} ${TESTER_INCLUDE_DIRECTORIES})
-if(WIN32)
-	target_link_libraries(tester_executable PRIVATE engine_library GTest::gtest)
-elseif(ANDROID)
-	target_link_libraries(tester_executable PRIVATE jnicpp GTest::gtest)
-endif()
+target_link_libraries(tester_executable PRIVATE engine_library GTest::gtest)
 
 include(GoogleTest)
 gtest_discover_tests(tester_executable CONFIGURATIONS Debug Release)
+endif()
 
 
 #======================================================================

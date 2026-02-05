@@ -589,6 +589,17 @@ void PhysicsWorld::ActivateBody(entt::entity e)
     m_physicsSystem->GetBodyInterfaceNoLock().ActivateBody(it->second);
 }
 
+void PhysicsWorld::SetCharacterRotation(entt::entity entity, const glm::quat& rotation)
+{
+    auto it = m_characters.find(entity);
+    if (it == m_characters.end()) return;
+
+    JPH::CharacterVirtual* character = it->second;
+    JPH::Quat joltRot(rotation.x, rotation.y, rotation.z, rotation.w);
+
+    character->SetRotation(joltRot);
+}
+
 void PhysicsWorld::RemoveBody(entt::entity entity)
 {
     auto it = m_entityToBody.find(entity);

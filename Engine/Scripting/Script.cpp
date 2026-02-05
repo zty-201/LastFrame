@@ -357,6 +357,36 @@ namespace Engine {
             }
             });
 
+        s_Lua.set_function("Transform_GetRotation", [&](uint32_t entityID) -> std::tuple<float, float, float> {
+            entt::entity e = (entt::entity)entityID;
+            if (registry.valid(e) && registry.any_of<TransformComponent>(e))
+            {
+                const auto& transform = registry.get<TransformComponent>(e);
+                return std::make_tuple(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+            }
+            return std::make_tuple(0.f, 0.f, 0.f);
+            });
+
+        s_Lua.set_function("Transform_SetRotation", [&](uint32_t entityID, float x, float y, float z) {
+            entt::entity e = (entt::entity)entityID;
+            if (registry.valid(e) && registry.any_of<TransformComponent>(e))
+            {
+                auto& transform = registry.get<TransformComponent>(e);
+                transform.rotation = glm::vec3(x, y, z);
+                glm::quat q = glm::quat(glm::radians(transform.rotation));
+
+                if (PhysicsWorld::Get().HasBody(e))
+                {
+                    PhysicsWorld::Get().SetRotation(e, q);
+                }
+                
+                if (PhysicsWorld::Get().HasCharacter(e))
+                {
+                    PhysicsWorld::Get().SetCharacterRotation(e, q);
+                }
+            }
+            });
+
         // ===============================================================
         // Light Component bindings
         // ===============================================================

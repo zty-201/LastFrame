@@ -2,11 +2,9 @@
 -- ui_joystick_bg.lua (2D joystick background)
 -- ============================================================
 
-local ANCHOR_X = 0.15
-local ANCHOR_Y = 0.30
+local ANCHOR_X = 0.1
+local ANCHOR_Y = 0.1
 local BG_SIZE  = 350.0
-
-local screenWidth, screenHeight = 2340, 1080
 
 local UI = nil
 
@@ -15,9 +13,17 @@ local function getShared()
 end
 
 local function ensureUIShared()
-    local SH = getShared()
-    SH.UI = SH.UI or {}
-    return SH.UI
+    local Shared = getShared()
+    if not Shared then return nil end
+    Shared.UI = Shared.UI or {}
+    return Shared.UI
+end
+
+
+local function getCanvasSize(ui)
+    local w = (ui and ui.screenW) or (ui and ui.joyScreenWidth) or 2560.0
+    local h = (ui and ui.screenH) or (ui and ui.joyScreenHeight) or 1440.0
+    return w, h
 end
 
 function on_create(self)
@@ -27,23 +33,49 @@ function on_create(self)
         return
     end
 
-    local centerX = ANCHOR_X * screenWidth
-    local centerY = ANCHOR_Y * screenHeight
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
+
+    -- Windows: hide joystick UI
+    if platform == "windows" then
+        UI:SetVisible(false)
+        return
+    end
+
+    -- Android: show + position
+    local uiShared = ensureUIShared()
+    if not uiShared then return end
+
+    local screenW, screenH = getCanvasSize(uiShared)
+
+    local centerX = ANCHOR_X * screenW
+    local centerY = ANCHOR_Y * screenH
 
     UI:SetPosition(centerX - BG_SIZE * 0.5, centerY - BG_SIZE * 0.5)
     UI:SetSize(BG_SIZE, BG_SIZE)
     UI:SetVisible(true)
 
-    local uiShared = ensureUIShared()
-    uiShared.joyCenterX       = centerX
-    uiShared.joyCenterY       = centerY
-    uiShared.joyRadius        = BG_SIZE * 0.5
-    uiShared.joyScreenHeight  = screenHeight   -- <<< NEW: reference UI height
+    uiShared.joyCenterX      = centerX
+    uiShared.joyCenterY      = centerY
+    uiShared.joyRadius       = BG_SIZE * 0.5
+
+    -- Keep these for all scripts that still reference them
+    uiShared.joyScreenWidth  = screenW
+    uiShared.joyScreenHeight = screenH
 end
 
-
 function on_update(self, dt)
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
+
+    -- Windows: do nothing (UI hidden)
+    if platform == "windows" then
+        return
+    end
+
+    if not UI then UI = EntityUI end
     if not UI then return end
+    if not UI:IsVisible() then return end
 
     -- Read current UI position/size (already adjusted by resolution / fullscreen)
     local x, y = UI:GetPosition()
@@ -55,6 +87,8 @@ function on_update(self, dt)
 
     -- Push updated center + radius into SHARED.UI every frame
     local uiShared = ensureUIShared()
+    if not uiShared then return end
+
     uiShared.joyCenterX = centerX
     uiShared.joyCenterY = centerY
     uiShared.joyRadius  = math.min(w, h) * 0.5

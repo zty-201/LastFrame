@@ -423,8 +423,9 @@ namespace EngineFramework
 
 					ImGui::Separator();
 
-					// Reload ALL Lua scripts (safe queued request)
-					if (ImGui::MenuItem("Reload ALL Lua Scripts")) {
+					//Reload ALL Lua scripts (immediate)
+					if (ImGui::MenuItem("Reload ALL Lua Scripts (Re-read from disk)")) {
+						EngineFramework::AssetManagerSystem::GetInstance().ReloadScriptsFromDisk();
 						Engine::ScriptSystem::RequestReloadAll();
 					}
 
@@ -524,7 +525,7 @@ namespace EngineFramework
 		}
 		ImGuiIO& io = ImGui::GetIO();
 		//ImGuiIO& io = ImGui::GetIO();
-		io.FontGlobalScale = 1.0f;   // DEFAULT
+		io.FontGlobalScale = 2.0f;   // DEFAULT
 
 		//DOCKING =================================================		
 		docking();

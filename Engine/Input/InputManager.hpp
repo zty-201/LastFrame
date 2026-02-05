@@ -59,7 +59,7 @@ namespace EngineFramework
         static InputManager& GetInstance() { return *this_class; }
         static inline InputManager* this_class = nullptr;
 
-#if defined(PLATFORM_WINDOWS) //these keys are windows only
+//#if defined(PLATFORM_WINDOWS) //these keys are windows only
         // --- Keyboard API ---
         static bool GetKey(int key);       // true while held
         static bool GetKeyDown(int key);   // true on press
@@ -80,7 +80,7 @@ namespace EngineFramework
 
         static void SetCursorLocked(bool locked);       // hide cursor in-game
         static void SetCursorVisible(bool visible);     // hide cursor in-game 
-#endif
+//#endif
 
         // --- Mouse API ---
         static bool GetMouseButton(int button);

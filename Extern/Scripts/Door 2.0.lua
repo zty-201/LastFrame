@@ -1,17 +1,16 @@
--- Door_InRange_Working.lua
+-- Door_SharedControlled.lua
 -- Attach to Door entity
--- Opens/closes with E when player is in range
+-- Opens ONCE, then permanently ignores all interaction
 
 local closedAngle = 0.0
 local openAngle   = 80.0
 local rotateSpeed = 180.0
-local interactRange = 250.0   -- BIGGER range, as requested
-
-local PLAYER_ID = 5         -- confirmed by you
 
 local isOpen = false
 local currentY = 0.0
 local targetY = 0.0
+
+local hasOpenedOnce = false
 
 function on_create(Self)
     print("[Door] on_create EntityID:", EntityID)
@@ -26,6 +25,12 @@ function on_create(Self)
     currentY = ry
     targetY = ry
 
+    SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
+
+    -- ✅ NEW: shared state table for icons / other scripts
+    SHARED.DOOR_OPENED_ONCE = SHARED.DOOR_OPENED_ONCE or {}
+    SHARED.DOOR_OPENED_ONCE[EntityID] = false
+
     print(string.format("[Door] Start RotY=%.2f", currentY))
 end
 
@@ -33,28 +38,40 @@ function on_update(Self, dt)
     local tr = Query.GetTransform(EntityID)
     if tr == nil then return end
 
-    -- ONLY difference: add in-range gate
-    if Input.GetKeyDown(GLFW_KEY_E) then
-        local inRange = Query.IsEntityInRange(EntityID, PLAYER_ID, interactRange)
+    if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
+        local cmdObj = SHARED.DOOR_CMD[EntityID]
+        SHARED.DOOR_CMD[EntityID] = nil
 
-        print(string.format(
-            "[Door] E pressed. inRange=%s (range=%.1f)",
-            tostring(inRange),
-            interactRange
-        ))
+        if hasOpenedOnce then
+            if cmdObj.cmd == "close" then
+                isOpen = false
+                targetY = closedAngle
+                print("[Door] Scripted CLOSE allowed after one-time open")
+            else
+                print("[Door] Ignored interaction (already opened once)")
+            end
+            return
+        end
 
-        if inRange then
-            isOpen = not isOpen
-            targetY = isOpen and openAngle or closedAngle
+        if cmdObj.cmd == "open" or cmdObj.cmd == "toggle" then
+            isOpen = true
+            hasOpenedOnce = true
+            targetY = openAngle
+
+            -- ✅ NEW: publish opened-once state
+            SHARED.DOOR_OPENED_ONCE = SHARED.DOOR_OPENED_ONCE or {}
+            SHARED.DOOR_OPENED_ONCE[EntityID] = true
+
             print(string.format(
-                "[Door] TOGGLE -> isOpen=%s targetY=%.2f",
-                tostring(isOpen),
-                targetY
+                "[Door] OPENED ONCE by=%s -> permanently disabled",
+                tostring(cmdObj.by)
             ))
+        else
+            print("[Door] Ignored cmd before first open:", tostring(cmdObj.cmd))
         end
     end
 
-    -- Rotation logic UNCHANGED
+    -- Rotation logic (unchanged)
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1
