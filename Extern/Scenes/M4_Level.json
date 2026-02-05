@@ -21050,6 +21050,10 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 13610221679698624513
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
 				}
 			]
 		},
@@ -21139,6 +21143,33 @@
 				1.0,
 				1.0
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				50.0,
+				100.0,
+				10.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				50.0,
+				100.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"260": {
@@ -48539,6 +48570,15 @@
 			"radius": 500.0,
 			"type": 1
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 15458219259379187713
+				}
+			]
+		},
 		"NameComponent": {
 			"name": "Hall_Light_01"
 		}
@@ -48598,6 +48638,15 @@
 			"quadratic": 0.03200000151991844,
 			"radius": 500.0,
 			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 15458219259379187713
+				}
+			]
 		},
 		"NameComponent": {
 			"name": "Hall_Light_02"
@@ -49744,6 +49793,19 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 3204654749004742657
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -49830,6 +49892,33 @@
 				1.0,
 				1.0
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				50.0,
+				100.0,
+				10.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				-50.0,
+				100.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"51": {
@@ -52192,6 +52281,68 @@
 				0.9999998807907104,
 				0.9999997615814209
 			]
+		}
+	},
+	"531": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 2199621956400447491
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "HallLightTriggerBox"
+		},
+		"TransformComponent": {
+			"position": [
+				10.818103790283203,
+				111.11335754394531,
+				-565.9671020507813
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				70.0,
+				100.0,
+				10.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"54": {
