@@ -10800,6 +10800,19 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 929633250878423045
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -10887,6 +10900,33 @@
 				1.0,
 				0.9999992847442627
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				70.0,
+				100.0,
+				20.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				100.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"186": {
@@ -43139,9 +43179,9 @@
 				0.0
 			],
 			"scale": [
-				1.0,
-				0.9999956488609314,
-				0.49999895691871643
+				0.0,
+				0.0,
+				0.0
 			]
 		}
 	},
@@ -48402,6 +48442,19 @@
 		}
 	},
 	"479": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 8423623030858039305
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -48476,7 +48529,7 @@
 		"TransformComponent": {
 			"position": [
 				642.8716430664063,
-				167.3760986328125,
+				68.80591583251953,
 				235.96548461914063
 			],
 			"rotation": [
@@ -48489,6 +48542,33 @@
 				1.0,
 				0.9999998211860657
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				50.0,
+				60.0,
+				50.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"48": {
@@ -48701,9 +48781,9 @@
 				0.0
 			],
 			"scale": [
-				0.9999998211860657,
-				1.0,
-				0.9999998211860657
+				0.0,
+				0.0,
+				0.0
 			]
 		}
 	},
@@ -48741,6 +48821,19 @@
 					],
 					"sphereRadius": 0.5,
 					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 6694240773936136199
 				}
 			]
 		},
@@ -48817,7 +48910,7 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				646.484130859375,
+				1029.5682373046875,
 				69.70638275146484,
 				226.09068298339844
 			],
@@ -48831,6 +48924,33 @@
 				0.9999998211860657,
 				0.9999992847442627
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				30.0,
+				30.0,
+				50.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"482": {
@@ -49749,18 +49869,18 @@
 			],
 			"constant": 1.0,
 			"direction": [
-				0.0,
-				0.0,
-				1.0
+				-0.016751175746321678,
+				0.019546443596482277,
+				0.9996685981750488
 			],
 			"innerConeAngle": 15.0,
 			"intensity": 10000.0,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 35.0,
 			"position": [
-				7.652964115142822,
+				7.644588470458984,
 				184.99998474121094,
-				-823.8157958984375
+				-823.8159790039063
 			],
 			"quadratic": 0.03200000151991844,
 			"radius": 1000.0,
@@ -49845,7 +49965,7 @@
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.9599999785423279,
 				0.0
 			],
 			"scale": [
@@ -61350,6 +61470,198 @@
 			"visible": false
 		}
 	},
+	"617": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 929633250878423041
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "GateLockIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				-324.2513122558594,
+				669.828125,
+				770.0621948242188
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1715.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15304296428018171907,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"618": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 12458848296946892803
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "GateUnlockIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				-324.2513122558594,
+				669.828125,
+				770.0621948242188
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1715.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				8386767400377090053,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"619": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 13997302558790893569
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "StoreroomBoxIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				612.0843505859375,
+				120.65943145751953,
+				232.45205688476563
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1715.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15304296428018171923,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
 	"62": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -61474,6 +61786,70 @@
 				1.0,
 				0.9999996423721313
 			]
+		}
+	},
+	"620": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 15726684815712075779
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "BoltcutterIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				612.0843505859375,
+				120.65943145751953,
+				232.45205688476563
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1715.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				316316868129161217,
+				3711223656383638553
+			],
+			"visible": false
 		}
 	},
 	"63": {
