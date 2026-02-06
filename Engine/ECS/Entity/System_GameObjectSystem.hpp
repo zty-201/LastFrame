@@ -13,6 +13,7 @@
 #include "entt/entity/registry.hpp"
 #include "Archtype.hpp"
 #include "TransformComponent.h"
+#include "Mesh.h"
 namespace EngineFramework
 {
 	class UI_Menu;
@@ -110,7 +111,6 @@ namespace EngineFramework
 			Throws invalid argument if entity is not valid.
 		*/
 		static Archtype CreateArchtypeFromInstance(entt::entity entity, const std::string& model_type);
-
 		static void AssignArchtypeToInstance(entt::entity entity, xresource::instance_guid archtype_guid);
 		
 		//Clears all entities in the scene

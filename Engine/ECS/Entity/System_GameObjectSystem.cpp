@@ -544,6 +544,8 @@ namespace EngineFramework
 					LOGE("[GameObjectSystem] Duplicate component %s already present in Instance, will be ignored", comp_data.type().name());
 				}
 			}
+			// update mesh bounds after deserialization
+			Mesh::MeshData::UpdateMeshBounds(entity_id);
 
 		}
 		//LOGD("Successfully Deserialized %s", json_input.c_str());
@@ -628,7 +630,8 @@ namespace EngineFramework
 					LOGE("[GameObjectSystem] Duplicate component %s already present in Instance, will be ignored", comp_data.type().name());
 				}
 			}
-
+			// update mesh bounds after deserialization
+			Mesh::MeshData::UpdateMeshBounds(entity_id);
 			list.emplace_back(entity_id);
 
 		}
