@@ -80,6 +80,7 @@ uniform float u_RoughnessFactor;
 uniform float u_MetallicFactor;
 
 uniform sampler2DArrayShadow s_CascadeShadowMaps;
+uniform sampler2DArrayShadow s_SpotShadowMaps;
 uniform sampler3D            s_VoxelGrid;
 
 uniform bool u_Tricubic;
@@ -89,6 +90,26 @@ uniform samplerCubeShadow s_PointShadowCubemaps[4];
 
 // ------------------------------------------------------------------
 // FUNCTIONS --------------------------------------------------------
+// ------------------------------------------------------------------
+
+float getSpotLightVisibility(vec3 worldPos, int shadowIndex) {
+    // 1. Get Matrix from UBO
+    mat4 lightMatrix = spot_view_proj[shadowIndex];
+
+    // 2. Project
+    vec4 lightSpacePos = lightMatrix * vec4(worldPos, 1.0);
+    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+    projCoords = projCoords * 0.5 + 0.5; // [-1,1] -> [0,1]
+
+    // 3. Bounds Check
+    if(projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0)
+        return 1.0;
+
+    // 4. Sample
+    float bias = 0.0005; 
+    return texture(s_SpotShadowMaps, vec4(projCoords.xy, float(shadowIndex), projCoords.z - bias));
+}
+
 // ------------------------------------------------------------------
 
 float sample_shadow_map(vec2 coord, float u, float v, float z, int cascade, float inv_shadow_map_size)
@@ -404,8 +425,17 @@ vec3 calculatePointLight(int lightIndex, vec3 worldPos, vec3 N, vec3 Wo, vec3 F0
     // Shadow Logic (Using stored index at .w)
     float shadow = 1.0;
     if (light.direction_shadow.w >= 0.0) {
+
         int idx = int(round(light.direction_shadow.w));
-        shadow = getPointShadow(worldPos, light.position_radius.xyz, light.position_radius.w, idx);
+        
+        if (light.attenuation_type.w > 1.5) { 
+            // IS SPOTLIGHT -> Sample 2D Array
+            shadow = getSpotLightVisibility(worldPos, idx);
+        } 
+        else {
+            // IS POINT LIGHT -> Sample Cubemap
+            shadow = getPointShadow(worldPos, light.position_radius.xyz, light.position_radius.w, idx);
+        }
     }
     
     // Combine everything, including spotIntensity

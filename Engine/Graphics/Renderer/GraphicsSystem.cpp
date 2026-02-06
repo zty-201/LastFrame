@@ -134,6 +134,21 @@ namespace EngineFramework
         FBO tempSpotShadowFBO(FBO::DepthTextureArray, SHADOW_WIDTH, SHADOW_HEIGHT, &m_spotTextureArray, MAX_SHADOW_CASTING_SPOTLIGHTS);
         m_spotShadowFBO = std::move(tempSpotShadowFBO);
 
+        //glBindTexture(GL_TEXTURE_2D_ARRAY, m_spotTextureArray);
+
+        //// 1. Enable Depth Comparison (Required for sampler2DArrayShadow)
+        //glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+        //glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL); // or GL_LESS
+
+        //// 2. Set Border Color to WHITE (Far Depth)
+        //// This ensures that areas *outside* the spotlight cone are treated as "Far Away" (Unshadowed)
+        //glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        //glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        //float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        //glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+        //glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
         // Create the point shadow map framebuffer (we use default and setup manually as we need multiple cube map faces)
         FBO tempPointShadowFBO(FBO::Default, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE);
         m_pointShadowFBO = std::move(tempPointShadowFBO);
@@ -1000,6 +1015,10 @@ namespace EngineFramework
         glActiveTexture(GL_TEXTURE0 + TextureUnits::SHADOW_MAP_UNIT);
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_csmTextureArray);
         shader->setUniform("s_CascadeShadowMaps", TextureUnits::SHADOW_MAP_UNIT);
+
+        glActiveTexture(GL_TEXTURE0 + TextureUnits::SPOT_LIGHT_MAP_UNIT);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, m_spotTextureArray);
+        shader->setUniform("s_SpotShadowMaps", TextureUnits::SPOT_LIGHT_MAP_UNIT);
 
         // Point light cubemaps
         int baseUnit = TextureUnits::POINT_SHADOW_MAP_UNIT;

@@ -40,8 +40,8 @@ namespace EngineFramework
         const int VOLUMETRIC_BLUE_NOISE_UNIT = 6;
         const int VOLUMETRIC_HISTORY_UNIT = 7;
 		const int SHADOW_MAP_UNIT = 8;
-		const int POINT_SHADOW_MAP_UNIT = 9;
-		const int SPOT_LIGHT_MAP_UNIT = 10;
+		const int SPOT_LIGHT_MAP_UNIT = 9;
+		const int POINT_SHADOW_MAP_UNIT = 10;
     }
 
     class GraphicsSystem : public ISystem
