@@ -18642,6 +18642,19 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 12980210322841108481
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -18715,13 +18728,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-451.4081726074219,
+				-451.7706298828125,
 				0.0,
 				897.7496337890625
 			],
 			"rotation": [
-				0.0001042765288730152,
-				-79.99999237060547,
+				0.00010427651432109997,
+				0.0,
 				0.00010427721281303093
 			],
 			"scale": [
@@ -18729,6 +18742,33 @@
 				1.0,
 				0.9999986290931702
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				70.0,
+				100.0,
+				20.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				55.0,
+				100.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"241": {
@@ -20138,6 +20178,25 @@
 		}
 	},
 	"251": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						2876789178491666467,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Laughter",
+					"loop": true,
+					"maxDistance": 100.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				20.74808120727539,
@@ -20171,6 +20230,15 @@
 					],
 					"sphereRadius": 0.5,
 					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16438974836715732999
 				}
 			]
 		},
@@ -49869,18 +49937,18 @@
 			],
 			"constant": 1.0,
 			"direction": [
-				-0.016751175746321678,
-				0.019546443596482277,
-				0.9996685981750488
+				0.0,
+				0.0,
+				1.0
 			],
 			"innerConeAngle": 15.0,
 			"intensity": 10000.0,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 35.0,
 			"position": [
-				7.644588470458984,
+				7.652964115142822,
 				184.99998474121094,
-				-823.8159790039063
+				-823.8157958984375
 			],
 			"quadratic": 0.03200000151991844,
 			"radius": 1000.0,
@@ -49965,7 +50033,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.9599999785423279,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -61284,7 +61352,7 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 8176611146165616643
+					"ScriptGuid": 18325877526990700553
 				}
 			]
 		},
@@ -61348,7 +61416,7 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 5870768136951922689
+					"ScriptGuid": 3337897967101689863
 				}
 			]
 		},
@@ -61392,7 +61460,7 @@
 				0.0
 			],
 			"size": [
-				1781.0,
+				1715.0,
 				1158.0
 			],
 			"size_NDC": [
@@ -62101,6 +62169,132 @@
 				1.0,
 				0.9999998211860657
 			]
+		}
+	},
+	"642": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16438974836661649411
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "BedroomDoorIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				-352.62432861328125,
+				114.07506561279297,
+				877.3536987304688
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1715.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				7810306648073666571,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"643": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 1450995276801277957
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "BedroomCriesTrigger"
+		},
+		"TransformComponent": {
+			"position": [
+				-395.00860595703125,
+				95.59121704101563,
+				963.1289672851563
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				70.0,
+				100.0,
+				63.29999923706055
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"65": {
