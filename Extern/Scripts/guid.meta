@@ -1,5 +1,6 @@
 {
     "Audio_Test": 2474130409138388993,
+    "BoltCutterIcon": 15726684815712075779,
     "BoltCutterPickup": 6694240773936136199,
     "CanteenDoor": 6496363865058656257,
     "CanteenDoorIcon": 5919903112755232771,
@@ -37,6 +38,7 @@
     "PlayroomDoorLockIcon": 7860664280792875013,
     "PlayroomDoorUnlockIcon": 9590046537703145479,
     "PlayroomKeyPickupIcon": 6146877496887525377,
+    "ToolboxOpenIcon": 13997302558790893569,
     "ToolboxOpenMechanic": 8423623030858039305,
     "allen_key": 12380677321083699201,
     "allen_key_interaction": 5234599409030299649,
