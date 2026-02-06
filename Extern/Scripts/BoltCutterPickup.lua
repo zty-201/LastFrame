@@ -21,7 +21,7 @@ local IMMEDIATE_HIDE_ENTITY_ID = 157
 local TARGET_ENTITY_ID = 0
 
 -- 3D SFX IDs (change these to your actual slot IDs)
-local PICKUP_SFX_ID = "KeyPickup"
+local PICKUP_SFX_ID = "ItemPickup"
 
 -- Internal
 local pickedUp = false
