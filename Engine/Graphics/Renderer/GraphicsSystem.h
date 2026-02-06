@@ -1,4 +1,4 @@
-/**
+    /**
  * @file GraphicsSystem.h
  * @brief Declaration of the GraphicsSystem class for managing rendering operations.
  *
@@ -40,7 +40,8 @@ namespace EngineFramework
         const int VOLUMETRIC_BLUE_NOISE_UNIT = 6;
         const int VOLUMETRIC_HISTORY_UNIT = 7;
 		const int SHADOW_MAP_UNIT = 8;
-		const int POINT_SHADOW_MAP_UNIT = 9;
+		const int SPOT_LIGHT_MAP_UNIT = 9;
+		const int POINT_SHADOW_MAP_UNIT = 10;
     }
 
     class GraphicsSystem : public ISystem
@@ -157,7 +158,8 @@ namespace EngineFramework
             glm::mat4 view_proj;
             glm::mat4 prev_view_proj;
             glm::mat4 inv_view_proj;
-            glm::mat4 cascade_view_proj[4];  // Array of cascade matrices
+            glm::mat4 cascade_view_proj[3];  // Array of cascade matrices
+            glm::mat4 spot_view_proj[4];
             glm::vec4 cascade_splits;        // x,y,z,w = split distances
             glm::vec4 cascade_biases;
             glm::vec4 light_direction;
@@ -196,9 +198,14 @@ namespace EngineFramework
         std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCacheWire;
 
 		// Shadow mapping resources
-        static const int CASCADE_COUNT = 4;
+        static const int CASCADE_COUNT = 3;
+        static const int SPOTLIGHT_COUNT = 4;
         GLuint m_csmTextureArray = 0;  // 2D texture array for cascades
+		GLuint m_spotTextureArray = 0; // 2D texture array for spotlights
         std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
+        std::array<glm::mat4, SPOTLIGHT_COUNT> m_spotViewProjMatrices;
+        std::vector<std::pair<int, float>> lightDistances;
+        std::vector<entt::entity> m_lightEntityMap;
         std::array<float, CASCADE_COUNT + 1> m_cascadeSplits;
 		std::array<float, CASCADE_COUNT> m_cascadeBiases;
 
@@ -206,6 +213,7 @@ namespace EngineFramework
         FBO mainFBO;
         FBO m_shadowFBO;
 		FBO m_pointShadowFBO;
+		FBO m_spotShadowFBO;
 
 		// FBO texture attachments
         GLuint sceneTextureID;
@@ -252,7 +260,7 @@ namespace EngineFramework
 
 		// Rendering passes
         void ShadowPass();
-        void MeshPass();
+        void MeshPass(const glm::mat4& viewProj);
         void SkyboxPass();
         void VolumetricLightInjectionPass();
         void VolumetricRayMarchPass();
@@ -267,9 +275,12 @@ namespace EngineFramework
         void LoadBlueNoiseTextures();
 		void RenderDirectionalShadow();
 		void RenderPointLightShadows();
+		void RenderSpotLightShadows();
         void RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius);
         void CalculateCascadeSplits(float nearPlane, float farPlane);
+        std::array<glm::vec4, 6> ExtractFrustumPlanes(const glm::mat4& viewProj);
         bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
+        bool IsBoxInFrustum(const float min[3], const float max[3], const glm::mat4& model, const glm::mat4& viewProj);
         bool WorldToScreen(const glm::vec3& worldPos, glm::vec2& outScreenPos, float& outScale);
         std::vector<glm::vec3> GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ);
 

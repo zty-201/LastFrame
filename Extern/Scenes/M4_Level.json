@@ -38,9 +38,9 @@
 		},
 		"MaterialComponent": {
 			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
+				0.45821326971054077,
+				0.20422832667827606,
+				0.05942247807979584
 			],
 			"albedoMap": [
 				11438888438506422279,
@@ -15756,7 +15756,7 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-195.44676208496094,
+				-191.59976196289063,
 				5.0,
 				-62.09082794189453
 			],
@@ -15767,8 +15767,8 @@
 			],
 			"scale": [
 				1.0,
-				1.0,
-				1.0
+				0.9999991655349731,
+				0.9999991655349731
 			]
 		}
 	},
@@ -18691,6 +18691,19 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 12980210322841108481
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -18770,7 +18783,7 @@
 			],
 			"rotation": [
 				0.0001042765288730152,
-				-79.99999237060547,
+				0.0,
 				0.00010427721281303093
 			],
 			"scale": [
@@ -18778,6 +18791,33 @@
 				1.0,
 				0.9999986290931702
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				70.0,
+				100.0,
+				20.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				55.0,
+				100.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"241": {
@@ -20187,6 +20227,25 @@
 		}
 	},
 	"251": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"audio_guid": [
+						2876789178491666467,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Laughter",
+					"loop": true,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				20.74808120727539,
@@ -20223,6 +20282,10 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -20230,26 +20293,26 @@
 				1.0
 			],
 			"albedoMap": [
-				8811354800417112235,
+				8298322686060036097,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				10540737057327382701,
+				12910008704487424009,
 				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				164443515865759919,
+				12910008704487424005,
 				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				16881805332665041073,
+				9451244190666883075,
 				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				11693658561934229683,
+				18098155475218235399,
 				3711223656383638553
 			],
 			"uvOffset": [
@@ -20262,7 +20325,7 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_monkey",
+			"meshName": "girl",
 			"visibility": true
 		},
 		"NameComponent": {
@@ -20297,12 +20360,12 @@
 		"TransformComponent": {
 			"position": [
 				646.3682861328125,
-				48.55950927734375,
+				49.36000061035156,
 				1190.8017578125
 			],
 			"rotation": [
 				179.99989318847656,
-				-59.99999237060547,
+				93.19999694824219,
 				179.99989318847656
 			],
 			"scale": [
@@ -21443,7 +21506,7 @@
 			],
 			"rotation": [
 				-179.99989318847656,
-				-79.95095825195313,
+				0.0,
 				-179.99989318847656
 			],
 			"scale": [
@@ -31291,7 +31354,7 @@
 			],
 			"rotation": [
 				0.0,
-				90.0,
+				-90.0,
 				-0.6000000238418579
 			],
 			"scale": [
@@ -34028,7 +34091,7 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-400.4551696777344,
+				-397.7330627441406,
 				5.0,
 				-62.09082794189453
 			],
@@ -34039,8 +34102,8 @@
 			],
 			"scale": [
 				1.0,
-				1.0,
-				1.0
+				0.9999983310699463,
+				0.9999983310699463
 			]
 		}
 	},
@@ -50052,7 +50115,7 @@
 				0.984775722026825
 			],
 			"innerConeAngle": 15.0,
-			"intensity": 0.0,
+			"intensity": 10000.0,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 35.0,
 			"position": [
@@ -50137,13 +50200,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				54.12277603149414,
+				137.07379150390625,
 				185.72509765625,
-				-477.8269348144531
+				-873.7933349609375
 			],
 			"rotation": [
 				0.0,
-				-8.880000114440918,
+				-0.0,
 				0.0
 			],
 			"scale": [
@@ -61261,7 +61324,7 @@
 				16044425988305469441,
 				3711223656383638553
 			],
-			"visible": true
+			"visible": false
 		}
 	},
 	"611": {
@@ -62028,6 +62091,25 @@
 				3711223656383638553
 			],
 			"visible": false
+		}
+	},
+	"623": {
+		"TransformComponent": {
+			"position": [
+				-394.63189697265625,
+				166.57717895507813,
+				821.54736328125
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
 		}
 	},
 	"63": {
@@ -68448,6 +68530,129 @@
 				0.999995231628418,
 				3.700005531311035
 			]
+		}
+	},
+	"687": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16438974836661649411
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "BedroomIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				-364.0143737792969,
+				107.37693786621094,
+				882.963134765625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1695.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				7810306648073666571,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"688": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16438974836715732999
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				}
+			]
+		},
+		"TransformComponent": {
+			"position": [
+				983.6026611328125,
+				-180.46914672851563,
+				1619.2896728515625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				1500.0,
+				202.5500030517578,
+				500.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"69": {

@@ -34,6 +34,8 @@
 #include "global.hpp" // For AssetManagerSystem, etc.
 #include "AssimpWrapper.h"
 #include "Animation.hpp"
+#include "MeshComponent.h"
+//#include "AssetManager.hpp"
 
 #ifdef min
 #undef min
@@ -131,6 +133,30 @@ namespace Mesh {
             m_submeshAABBs = { subBox };
 
             createGLBuffers(vertices, indices);
+        }
+
+        static void UpdateMeshBounds(entt::entity entity)
+        {
+            if (!registry.valid(entity) || !registry.all_of<MeshComponent>(entity)) return;
+
+            auto& meshComp = registry.get<MeshComponent>(entity);
+
+            // 1. Get the Resource
+            using AM = EngineFramework::AssetManagerSystem;
+            auto guid = AM::GetFullGuid(AM::MESH_GUID, meshComp.meshName);
+            auto meshData = AM::GetResource<Mesh::MeshData>(guid);
+
+            // 2. Sync Bounds from Resource to Component
+            if (meshData) {
+                const auto& aabb = meshData->GetAABB();
+                meshComp.localMin[0] = aabb.minV.x;
+                meshComp.localMin[1] = aabb.minV.y;
+                meshComp.localMin[2] = aabb.minV.z;
+
+                meshComp.localMax[0] = aabb.maxV.x;
+                meshComp.localMax[1] = aabb.maxV.y;
+                meshComp.localMax[2] = aabb.maxV.z;
+            }
         }
 
     private:

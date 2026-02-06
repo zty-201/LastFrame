@@ -657,6 +657,8 @@ namespace EngineFramework
 			.data<&LightComponent::quadratic>("quadratic")
 			.data<&LightComponent::innerConeAngle>("innerConeAngle")
 			.data<&LightComponent::outerConeAngle>("outerConeAngle")
+			.data<&LightComponent::isStatic>("isStatic")
+			.data<&LightComponent::castShadows>("castShadows")
 			.func<&Emplacer<LightComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<LightComponent>::RemoveComponent>("remove")
 			.func<&Getter<LightComponent>::GetComponent>("get")
