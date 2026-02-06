@@ -6,7 +6,7 @@
 
 local closedAngle = -90.0
 local openAngle   =  10.0
-local rotateSpeed =  120.0  -- faster; tweak if you want
+local rotateSpeed =  50.0  -- faster; tweak if you want
 
 local currentY = 0.0
 local targetY  = 0.0
