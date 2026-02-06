@@ -25,6 +25,8 @@ local MOVE_TO  = { 646.0, 69.7, 226.0 }
 
 local triggeredOnce = false
 
+local BOX_OPEN_SFX_ID = "BoxOpen"
+
 -- ---------------------------------------
 -- Helpers
 -- ---------------------------------------
@@ -133,6 +135,13 @@ function on_update(self, dt)
     local ok = consume_shared_cmd(SHARED.DOOR_CMD, id)
     if not ok then
         return
+    end
+
+    ----------------------------------------------------------------
+    -- ✅ TRIGGERED: play box open SFX FIRST (so it plays at the box position)
+    ----------------------------------------------------------------
+    if type(Audio_PlaySlot) == "function" then
+        Audio_PlaySlot(id, BOX_OPEN_SFX_ID)
     end
 
     ----------------------------------------------------------------
