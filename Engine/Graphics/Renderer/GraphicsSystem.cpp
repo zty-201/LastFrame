@@ -388,8 +388,8 @@ namespace EngineFramework
             float type = m_pointLightData[lightIndex].attenuation_type.w;
 
             // Get the actual component to update its internal state
-            entt::entity e = m_lightEntityMap[lightIndex];
-            auto& lightComp = registry.get<LightComponent>(e);
+            //entt::entity e = m_lightEntityMap[lightIndex];
+            //auto& lightComp = registry.get<LightComponent>(e);
 
             int assignedIndex = -1;
 
