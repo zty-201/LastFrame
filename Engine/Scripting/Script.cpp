@@ -715,6 +715,19 @@ namespace Engine {
             }
         );
 
+        s_Lua.set_function("Script_RequestReloadEntity",
+            [](uint32_t entityId)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                Engine::ScriptSystem::RequestReloadEntity(e);
+            });
+
+        s_Lua.set_function("Script_RequestReloadAll",
+            []()
+            {
+                Engine::ScriptSystem::RequestReloadAll();
+            });
+
         // ===============================================================
         // InputManager bindings
         // ===============================================================
