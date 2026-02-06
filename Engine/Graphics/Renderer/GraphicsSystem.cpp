@@ -336,6 +336,7 @@ namespace EngineFramework
     {
         m_pointLightData.clear();
         lightDistances.clear();
+        m_lightEntityMap.clear();
 
         // Collect point and spot lights
         for (auto [entity, light] : registry.view<LightComponent>().each()) {
@@ -369,7 +370,7 @@ namespace EngineFramework
                 if (isLightInFrustum(light.position, light.radius, viewProj)) {
                     lightDistances.push_back({ static_cast<int>(m_pointLightData.size()), dist });
                 }
-
+                m_lightEntityMap.push_back(entity);
                 m_pointLightData.push_back(data);
             }
         }
@@ -384,28 +385,35 @@ namespace EngineFramework
 
         for (const auto& pair : lightDistances) {
             int lightIndex = pair.first;
-            float type = m_pointLightData[lightIndex].attenuation_type.w; // 1.0 = Point, 2.0 = Spot
+            float type = m_pointLightData[lightIndex].attenuation_type.w;
 
-            if (type == 2.0f) { // Is Spot Light
+            // Get the actual component to update its internal state
+            entt::entity e = m_lightEntityMap[lightIndex];
+            auto& lightComp = registry.get<LightComponent>(e);
+
+            int assignedIndex = -1;
+
+            if (type == 2.0f) { // Spot
                 if (spotShadowCount < MAX_SHADOW_CASTING_LIGHTS) {
-                    // Assign index for the 2D Texture Array (Spot FBO)
-                    m_pointLightData[lightIndex].direction_shadow.w = (float)spotShadowCount;
-                    spotShadowCount++;
-                }
-                else {
-                    m_pointLightData[lightIndex].direction_shadow.w = -1.0f; // No shadow
+                    assignedIndex = spotShadowCount++;
                 }
             }
-            else { // Is Point Light
+            else { // Point
                 if (pointShadowCount < MAX_SHADOW_CASTING_LIGHTS) {
-                    // Assign index for the CubeMap Array (Point FBO)
-                    m_pointLightData[lightIndex].direction_shadow.w = (float)pointShadowCount;
-                    pointShadowCount++;
-                }
-                else {
-                    m_pointLightData[lightIndex].direction_shadow.w = -1.0f; // No shadow
+                    assignedIndex = pointShadowCount++;
                 }
             }
+
+            // Apply Index
+            m_pointLightData[lightIndex].direction_shadow.w = (float)assignedIndex;
+
+            // dirty flag setting removed for now
+            // CRITICAL: If the assigned slot changed (e.g., 0 -> 1), we MUST render 
+            // because Texture 1 contains garbage, even if the light itself didn't move.
+            //if (lightComp._lastShadowIndex != assignedIndex) {
+            //    lightComp._isDirty = true; // Force redraw
+            //    lightComp._lastShadowIndex = assignedIndex;
+            //}
         }
         /*int shadowCount = std::min(MAX_SHADOW_CASTING_LIGHTS, (int)lightDistances.size());
         for (int i = 0; i < shadowCount; i++) {
@@ -688,10 +696,29 @@ namespace EngineFramework
 
     void GraphicsSystem::RenderPointLightShadows()
     {
-        for (const auto& light : m_pointLightData) {
-            if (light.direction_shadow.w >= 0.0f) {
-                int cubemapSlot = int(light.direction_shadow.w);
-                RenderShadowCubemap(cubemapSlot, light.position_radius);
+        for (size_t i = 0; i < m_pointLightData.size(); i++) {
+            const auto& lightData = m_pointLightData[i];
+
+            // 1. Check if it has a shadow index
+            if (lightData.direction_shadow.w < 0.0f) continue;
+
+            // 2. Retrieve the component
+            entt::entity e = m_lightEntityMap[i];
+            auto& lightComp = registry.get<LightComponent>(e);
+
+            // 3. THE OPTIMIZATION
+            // If Static AND Clean, skip all 6 draw calls!
+            if (lightComp.isStatic && !lightComp._isDirty) {
+                continue;
+            }
+
+            // 4. Render
+            int cubemapSlot = int(lightData.direction_shadow.w);
+            RenderShadowCubemap(cubemapSlot, lightData.position_radius);
+
+            // 5. Mark Clean
+            if (lightComp.isStatic) {
+                lightComp._isDirty = false;
             }
         }
     }

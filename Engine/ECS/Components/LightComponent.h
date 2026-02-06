@@ -34,6 +34,16 @@ struct LightComponent
 
 	float innerConeAngle{ 12.5f }; // For spot
 	float outerConeAngle{ 17.5f }; // For spot
+
+    bool isStatic = true;      // Designer sets this
+    bool castShadows = true;
+
+    // Internal flag (not shown in UI)
+    // Initialize to TRUE so it renders at least once on startup
+    bool _isDirty = true;
+
+    // Call this whenever you change position/color/radius in the Editor
+    //void MarkDirty() { _isDirty = true; }
 };
 
 #endif

@@ -1,4 +1,4 @@
-/**
+    /**
  * @file GraphicsSystem.h
  * @brief Declaration of the GraphicsSystem class for managing rendering operations.
  *
@@ -205,6 +205,7 @@ namespace EngineFramework
         std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
         std::array<glm::mat4, SPOTLIGHT_COUNT> m_spotViewProjMatrices;
         std::vector<std::pair<int, float>> lightDistances;
+        std::vector<entt::entity> m_lightEntityMap;
         std::array<float, CASCADE_COUNT + 1> m_cascadeSplits;
 		std::array<float, CASCADE_COUNT> m_cascadeBiases;
 
