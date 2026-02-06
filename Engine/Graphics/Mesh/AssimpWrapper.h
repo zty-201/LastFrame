@@ -3,7 +3,7 @@
 
 #include <assimp/IOStream.hpp>
 #include <assimp/IOSystem.hpp>
-
+#include <mutex>
 // ========================================
 // Custom Assimp IO System for Android
 // ========================================
@@ -71,7 +71,11 @@ public:
             );
 
             // Store it so it stays alive
-            m_fileCache[fullPath] = data;
+            static std::mutex file_cache_mutex;
+            {
+                std::lock_guard<std::mutex> file_cache_lock(file_cache_mutex);
+                m_fileCache[fullPath] = data;
+            }
 
             // Return a stream to it
             return new MemoryIOStream(*data);

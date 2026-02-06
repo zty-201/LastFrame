@@ -557,48 +557,64 @@ namespace EngineFramework {
 		std::vector<std::string> asset_names{};
 		std::vector< std::shared_ptr<Mesh::MeshData>> loaded_resources{};
 
-		std::mutex mesh_mutex;
 		std::vector<std::thread> thread_arr{};
-		std::vector<std::shared_ptr<Mesh::MeshData>> temp_ptr_arr{}; //Keep ptrs to do a final function call after join.
+
+		std::mutex num_pending_mutex;
+		std::atomic<int> num_pending_gpu_load; //Keeps track of how many meshes need to be loaded into gpu mem
+		std::vector<std::shared_ptr<Mesh::MeshData>> pending_gpu_load_arr{}; //Keep ptrs to do a final function call after join.
 
 		// Collect the names and loop through all mesh files
 		for (const std::filesystem::path& path : files) {
 			// Obtain the name of the mesh from the file name (without extension)
 			std::string name = path.stem().string();
-			auto create_append_thread = [path, &mesh_mutex, &temp_ptr_arr, name] {
+			auto create_append_thread = [path, &num_pending_mutex, &pending_gpu_load_arr, &num_pending_gpu_load, name] {
 				// Try catch guard for loading mesh
 				try {
 					LOGI("Loading Mesh: %s", path.string().c_str());
 					std::shared_ptr<Mesh::MeshData> mesh_data{ new Mesh::MeshData(path.string()) };
 					mesh_data->name = name;
 					//Lock-guard to prevent race conditions for multi-threading.
-					std::lock_guard<std::mutex> mesh_lock(mesh_mutex);
-					temp_ptr_arr.emplace_back(mesh_data);
+					std::lock_guard<std::mutex> mesh_lock(num_pending_mutex);
+					pending_gpu_load_arr.emplace_back(mesh_data);
 				}
 				catch (std::exception& e) {
 					LOGE("%s %s %s", "Unable to Load Mesh", name.c_str(), e.what());
+					num_pending_gpu_load--; //Invalid mesh, so no gpu load.
 				}
 
 				};
 
 			thread_arr.emplace_back(create_append_thread);
+			num_pending_gpu_load++; //Each mesh should gpu load after completion.
+		}
 
-		}
-		//Wait for all mesh loaders
-		for (std::thread& thread : thread_arr)
+		//Main thread loads into gpu, side threads create mesh and append to pending_gpu_load_arr
+		while(num_pending_gpu_load > 0)
 		{
-			thread.join();
-		}
-		for (std::shared_ptr<Mesh::MeshData> incomplete_mesh : temp_ptr_arr)
-		{
+			//Check if a thread has finished so the mesh can be pushed to the gpu.
+			if (pending_gpu_load_arr.empty()) continue;
+			std::shared_ptr<Mesh::MeshData> incomplete_mesh;
+			{
+				std::lock_guard<std::mutex> mesh_lock(num_pending_mutex);
+				incomplete_mesh = pending_gpu_load_arr.back();
+				pending_gpu_load_arr.pop_back();
+			}
+			num_pending_gpu_load--; //Eat one.
 			try {
 				incomplete_mesh->LoadWithFilename_AfterThreadJoinCall(); //Can only be done on main thread.
 				loaded_resources.emplace_back(incomplete_mesh);
 				asset_names.emplace_back(incomplete_mesh->name); // Done if resource loading is a success.
 			}
 			catch (std::exception& e) {
-				LOGE("%s %s %s", "Unable to Load Mesh", incomplete_mesh->name.c_str(), e.what());
+				LOGE("%s %s %s", "Unable to load Mesh into GPU mem", incomplete_mesh->name.c_str(), e.what());
 			}
+			LOGI("%s", "Mesh Loaded into GPU Mem");
+		}
+
+		//Wait for all mesh loaders
+		for (std::thread& thread : thread_arr)
+		{
+			thread.join();
 		}
 		// Set Mapping with mesh GUID
 		SetMappings(MESH_GUID, asset_names, loaded_resources, folder_path);
