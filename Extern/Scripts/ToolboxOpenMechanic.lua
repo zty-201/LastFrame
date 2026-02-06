@@ -4,6 +4,9 @@
 -- 1) Move THIS entity to y = -1000
 -- 2) Set entity 480 scale to 1,1,1
 -- 3) Move entity 481 to (646, 69.7, 226)
+--
+-- ✅ Also drives a UI icon via:
+--    SHARED.TRIGGER_ICON_CMD[id] = { cmd = "show"/"hide", by = ... }
 ----------------------------------------------------------------
 
 local DEBUG = true
@@ -79,6 +82,12 @@ local function set_pos(id, x, y, z)
     return false
 end
 
+-- ✅ icon command bus for this trigger
+local function send_trigger_icon_cmd(targetId, cmd)
+    SHARED.TRIGGER_ICON_CMD = SHARED.TRIGGER_ICON_CMD or {}
+    SHARED.TRIGGER_ICON_CMD[targetId] = { cmd = cmd, by = targetId }
+end
+
 -- ---------------------------------------
 -- Lifecycle
 -- ---------------------------------------
@@ -89,36 +98,58 @@ function on_create(self)
 
     SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
     SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
+    SHARED.TRIGGER_ICON_CMD = SHARED.TRIGGER_ICON_CMD or {}
 end
 
 function on_update(self, dt)
-    if triggeredOnce then return end
+    dt = dt or 0.016
 
     local id = (TARGET_ENTITY_ID ~= 0) and TARGET_ENTITY_ID or EntityID
 
+    ----------------------------------------------------------------
+    -- ✅ Drive icon (show only in range; hide forever after trigger)
+    ----------------------------------------------------------------
+    if not triggeredOnce then
+        if in_range(id) then
+            send_trigger_icon_cmd(id, "show")
+        else
+            send_trigger_icon_cmd(id, "hide")
+        end
+    else
+        send_trigger_icon_cmd(id, "hide")
+        return
+    end
+
+    ----------------------------------------------------------------
     -- Must be in interaction range
+    ----------------------------------------------------------------
     if not in_range(id) then
         return
     end
 
+    ----------------------------------------------------------------
     -- Must receive E-press command
+    ----------------------------------------------------------------
     local ok = consume_shared_cmd(SHARED.DOOR_CMD, id)
     if not ok then
         return
     end
 
-    -- 1) Move THIS entity down
+    ----------------------------------------------------------------
+    -- TRIGGERED: perform actions
+    ----------------------------------------------------------------
     move_self_y(id, MOVE_SELF_Y)
 
-    -- 2) Set entity 480 scale to 1,1,1
     if not set_scale(SCALE_ENTITY_ID, SCALE_TO[1], SCALE_TO[2], SCALE_TO[3]) then
         print("[Trigger_MoveDown_And_Activate] WARN: missing Transform on entity " .. tostring(SCALE_ENTITY_ID))
     end
 
-    -- 3) Move entity 481 to target position
     if not set_pos(MOVE_ENTITY_ID, MOVE_TO[1], MOVE_TO[2], MOVE_TO[3]) then
         print("[Trigger_MoveDown_And_Activate] WARN: missing Transform on entity " .. tostring(MOVE_ENTITY_ID))
     end
+
+    -- Force icon hidden forever after trigger
+    send_trigger_icon_cmd(id, "hide")
 
     triggeredOnce = true
 
