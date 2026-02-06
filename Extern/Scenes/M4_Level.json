@@ -127,6 +127,7 @@
 	},
 	"1": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				1.0,
 				0.9200000166893005,
@@ -140,6 +141,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 0.0,
+			"isStatic": true,
 			"linear": 0.0,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49322,6 +49324,7 @@
 	},
 	"483": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				1.0,
 				0.0,
@@ -49335,6 +49338,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49352,6 +49356,7 @@
 	},
 	"484": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				1.0,
 				0.0,
@@ -49365,6 +49370,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49382,6 +49388,7 @@
 	},
 	"485": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				1.0,
 				0.0,
@@ -49395,6 +49402,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49412,6 +49420,7 @@
 	},
 	"486": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49425,6 +49434,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 0.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49451,6 +49461,7 @@
 	},
 	"487": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49464,6 +49475,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49481,6 +49493,7 @@
 	},
 	"488": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49494,6 +49507,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 0.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49520,6 +49534,7 @@
 	},
 	"489": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49533,6 +49548,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49640,6 +49656,7 @@
 	},
 	"490": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49653,6 +49670,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49670,6 +49688,7 @@
 	},
 	"491": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49683,6 +49702,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49700,6 +49720,7 @@
 	},
 	"492": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49713,6 +49734,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49730,6 +49752,7 @@
 	},
 	"493": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49743,6 +49766,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49760,6 +49784,7 @@
 	},
 	"494": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49773,6 +49798,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49790,6 +49816,7 @@
 	},
 	"495": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49803,6 +49830,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49820,6 +49848,7 @@
 	},
 	"496": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49833,6 +49862,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49850,6 +49880,7 @@
 	},
 	"497": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49863,6 +49894,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49880,6 +49912,7 @@
 	},
 	"498": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49893,6 +49926,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -49910,6 +49944,7 @@
 	},
 	"499": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -49923,6 +49958,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -50103,6 +50139,7 @@
 			"stepHeight": 0.30000001192092896
 		},
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				1.0,
 				1.0,
@@ -50116,6 +50153,7 @@
 			],
 			"innerConeAngle": 15.0,
 			"intensity": 10000.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 35.0,
 			"position": [
@@ -50308,6 +50346,7 @@
 	},
 	"500": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				0.9279538989067078,
 				0.28881561756134033,
@@ -50321,6 +50360,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 500.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
@@ -50338,6 +50378,7 @@
 	},
 	"501": {
 		"LightComponent": {
+			"castShadows": true,
 			"color": [
 				1.0,
 				1.0,
@@ -50351,6 +50392,7 @@
 			],
 			"innerConeAngle": 12.5,
 			"intensity": 30000.0,
+			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"position": [
