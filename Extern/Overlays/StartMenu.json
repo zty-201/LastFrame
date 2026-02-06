@@ -1,0 +1,271 @@
+{
+	"636": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "poopoo",
+			"event_trigger": "PlayButton",
+			"hover_texture": [
+				13562766767143288835,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13562766767143288835,
+				3711223656383638553
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 5982082694360776705
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				302.0,
+				311.1499938964844
+			],
+			"position_NDC": [
+				0.0,
+				0.3700000047683716
+			],
+			"size": [
+				151.0,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				13562766767143288835,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"637": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "",
+			"event_trigger": "",
+			"hover_texture": [
+				12986306014839865345,
+				3711223656383638553
+			],
+			"idle_texture": [
+				12986306014839865345,
+				3711223656383638553
+			]
+		},
+		"NameComponent": {
+			"name": "HowToPlayBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				302.0,
+				247.45001220703125
+			],
+			"position_NDC": [
+				0.0,
+				0.10999999940395355
+			],
+			"size": [
+				151.0,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				12986306014839865345,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"638": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "",
+			"event_trigger": "Settings",
+			"hover_texture": [
+				15292149024053559303,
+				3711223656383638553
+			],
+			"idle_texture": [
+				15292149024053559303,
+				3711223656383638553
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 14193534597847351309
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "SettingsBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				302.0,
+				181.3000030517578
+			],
+			"position_NDC": [
+				0.0,
+				-0.1599999964237213
+			],
+			"size": [
+				151.0,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				15292149024053559303,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"639": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "",
+			"event_trigger": "",
+			"hover_texture": [
+				14139227519446712325,
+				3711223656383638553
+			],
+			"idle_texture": [
+				14139227519446712325,
+				3711223656383638553
+			]
+		},
+		"NameComponent": {
+			"name": "QuitBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				302.0,
+				117.60000610351563
+			],
+			"position_NDC": [
+				0.0,
+				-0.41999998688697815
+			],
+			"size": [
+				151.0,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				14139227519446712325,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"640": {
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				755.0,
+				490.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				16486605679922642945,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	}
+}

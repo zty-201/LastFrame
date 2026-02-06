@@ -1,0 +1,170 @@
+{
+	"619": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "",
+			"event_trigger": "play_cutscenes",
+			"hover_texture": [
+				0,
+				0
+			],
+			"idle_texture": [
+				0,
+				0
+			]
+		},
+		"NameComponent": {
+			"name": "PlayBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				302.0,
+				311.1499938964844
+			],
+			"position_NDC": [
+				0.0,
+				0.3700000047683716
+			],
+			"size": [
+				151.0,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"620": {
+		"NameComponent": {
+			"name": "HowToPlayBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				302.0,
+				247.45001220703125
+			],
+			"position_NDC": [
+				0.0,
+				0.10999999940395355
+			],
+			"size": [
+				151.0,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"621": {
+		"NameComponent": {
+			"name": "SettingsBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				302.0,
+				181.3000030517578
+			],
+			"position_NDC": [
+				0.0,
+				-0.1599999964237213
+			],
+			"size": [
+				151.0,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"622": {
+		"NameComponent": {
+			"name": "QuitBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				302.0,
+				117.60000610351563
+			],
+			"position_NDC": [
+				0.0,
+				-0.41999998688697815
+			],
+			"size": [
+				151.0,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"textureid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}

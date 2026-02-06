@@ -6,7 +6,7 @@ local DEBUG = true
 -- ===== ROTATION CONFIG =====
 local closedAngle = 0.0
 local openAngle   = 40.0
-local rotateSpeed = 180.0
+local rotateSpeed = 50.0
 
 local isOpen     = false
 local isUnlocked = false
@@ -15,6 +15,17 @@ local targetY    = 0.0
 
 -- ✅ NEW: once door has opened at least once, icons never show again
 local iconsDisabledForever = false
+
+-- ===== 3D SFX IDs =====
+local SFX_DOOR_LOCKED  = "DoorLocked"
+local SFX_DOOR_UNLOCK  = "DoorUnlock"
+local SFX_DOOR_OPEN    = "DoorOpen"
+
+local function play_3d_sfx(slotId)
+    if type(Audio_PlaySlot) == "function" and type(slotId) == "string" then
+        Audio_PlaySlot(EntityID, slotId) -- plays from the DOOR entity (3D)
+    end
+end
 
 -- ===== KEY CONFIG =====
 local REQUIRED_KEY_ID = "playroom_key"
@@ -183,11 +194,46 @@ function on_update(self, dt)
 
         local cmd = cmdObj.cmd
 
-        if cmd == "toggle" or cmd == "open" then
-            if not can_unlock_and_maybe_consume() then
+        -- ========================================================
+        -- STATE 1/2: LOCKED or UNLOCKABLE -> handle unlock attempt
+        -- ========================================================
+        if (cmd == "toggle" or cmd == "open") and (not isUnlocked) then
+            if not inv_has_key(REQUIRED_KEY_ID) then
+                -- LOCKED
+                play_3d_sfx(SFX_DOOR_LOCKED)
+                if DEBUG then
+                    print("[PlayroomDoor] LOCKED -> DoorLocked SFX")
+                end
+                publish_can_unlock()
                 return
             end
+
+            -- UNLOCKABLE -> unlock now (and optionally consume key), but do NOT open yet
+            if consumeOnFirstUse then
+                local ok = inv_consume_key(REQUIRED_KEY_ID, 1)
+                if not ok then
+                    print("[PlayroomDoor] ERROR: failed to consume key -> " .. tostring(REQUIRED_KEY_ID))
+                    publish_can_unlock()
+                    return
+                end
+            end
+
+            isUnlocked = true
+            play_3d_sfx(SFX_DOOR_UNLOCK)
+
+            if DEBUG then
+                print("[PlayroomDoor] UNLOCKED -> DoorUnlock SFX (door still closed)")
+            end
+
+            publish_can_unlock()
+            update_icons()
+            return
         end
+
+        -- ========================================================
+        -- STATE 3: UNLOCKED -> allow open/toggle
+        -- ========================================================
+        local wasOpen = isOpen
 
         if cmd == "toggle" then
             isOpen = not isOpen
@@ -199,7 +245,15 @@ function on_update(self, dt)
 
         targetY = isOpen and openAngle or closedAngle
 
-        -- ✅ NEW: once opened, disable icons forever immediately
+        -- Play DoorOpen only when transitioning CLOSED -> OPEN
+        if (not wasOpen) and isOpen then
+            play_3d_sfx(SFX_DOOR_OPEN)
+            if DEBUG then
+                print("[PlayroomDoor] OPEN -> DoorOpen SFX")
+            end
+        end
+
+        -- once opened, disable icons forever
         if isOpen and (not iconsDisabledForever) then
             iconsDisabledForever = true
             hide_icons_forever()

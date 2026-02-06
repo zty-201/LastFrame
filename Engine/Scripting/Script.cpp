@@ -45,6 +45,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 //For platform android vs windows
 #include "Platform.h"
 
+#include "UISystem.hpp"
+
 namespace Engine {
 
 #if defined(ENGINE_ENABLE_LUA)
@@ -106,6 +108,47 @@ namespace Engine {
     //    keyActions["OPEN_EDITOR"] = (int)EngineFramework::Key_Actions::OPEN_EDITOR;
 
     //}
+
+    void ScriptSystem::OnButtonEvent(const Button_Event& e) {
+        if (!s_RuntimeRegistry) return;
+
+        //LOGI("[ScriptSystem] Button event received: %s", e.Event_Name.c_str());
+
+        // Dispatch to all entities with Lua scripts
+        auto view = s_RuntimeRegistry->view<LuaScriptComponent>();
+        for (auto [entity, comp] : view.each()) {
+            if (!comp.Enabled) continue;
+
+            for (auto& inst : comp.Scripts) {
+                if (!inst.Loaded) continue;
+
+                if (inst.Env.lua_state() == nullptr) {
+                    continue;
+                }
+
+                // Build handler function name from event_trigger
+                // e.g., if event_trigger = "PlayButton", looks for on_button_PlayButton()
+                std::string handlerName = "on_button_" + e.Event_Name;
+
+                sol::optional<sol::protected_function> funcOption =
+                    inst.Env.get<sol::optional<sol::protected_function>>(handlerName);
+
+                if (funcOption && funcOption.value().valid()) {
+                    auto func = funcOption.value();
+                    try {
+                        auto result = func(inst.Self);
+                        if (!result.valid()) {
+                            sol::error err = result;
+                            LOGE("[ButtonEvent Error] %s: %s", handlerName.c_str(), err.what());
+                        }
+                    }
+                    catch (const sol::error& err) {
+                        LOGE("[ButtonEvent Exception] %s: %s", handlerName.c_str(), err.what());
+                    }
+                }
+            }
+        }
+    }
 
     void DispatchLuaEvent(entt::registry& reg, entt::entity entity, const std::string& funcName, entt::entity param)
     {
@@ -194,6 +237,31 @@ namespace Engine {
         BindLuaPrintToEngine(s_Lua);
 
         LOGI("[ScriptSystem] Initializing Lua bindings...");
+
+        // ===============================================================
+        // UI bindings (Lua -> UI_System)
+        // ===============================================================
+        s_Lua.set_function("UI_StartPseudoCutscene", []()
+            {
+                // If your UI_System is NOT singleton and is purely static:
+                // EngineFramework::UI_System::StartPseudoCutscene();
+
+                // If UI_System is a singleton:
+                EngineFramework::UI_System::GetInstance().StartPseudoCutscene();
+            });
+
+        s_Lua.set_function("UI_DisplayMenu", [](const std::string& menuName)
+            {
+                // EngineFramework::UI_System::displayMenu(menuName);  // static-style
+                EngineFramework::UI_System::GetInstance().displayMenu(menuName);
+            });
+
+        s_Lua.set_function("UI_CloseAllMenus", []()
+            {
+                // EngineFramework::UI_System::closeAllMenu();
+                EngineFramework::UI_System::GetInstance().closeAllMenu();
+            });
+
 
         // ===============================================================
         // Transform Component bindings
@@ -437,6 +505,30 @@ namespace Engine {
 
         audioEnums["Spatial_2D"] = (int)AudioComponent::SpatialMode::TwoD;
         audioEnums["Spatial_3D"] = (int)AudioComponent::SpatialMode::ThreeD;
+
+        // ===============================================================
+        // Audio bindings (Master volume control)
+        // ===============================================================
+
+        // Expose AudioGroup enum to Lua (optional but nice)
+        {
+            sol::table audioGroup = s_Lua.create_named_table("AudioGroup");
+            audioGroup["Master"] = (int)EngineFramework::AudioGroup::Master;
+            audioGroup["BGM"] = (int)EngineFramework::AudioGroup::BGM;
+            audioGroup["SFX"] = (int)EngineFramework::AudioGroup::SFX;
+            audioGroup["UI"] = (int)EngineFramework::AudioGroup::UI;
+            audioGroup["Ambience"] = (int)EngineFramework::AudioGroup::Ambience;
+        }
+
+        // Master volume setter (recommended for your use case)
+        s_Lua.set_function("Audio_SetMasterVolume",
+            [](float vol)
+            {
+                EngineFramework::AudioSystem::GetInstance().SetMasterVolume(vol);
+            });
+
+        // (Optional) If you want a getter later, you currently don't have one in AudioSystem.
+        // You can store in SHARED in Lua (as we did) without needing a getter.
 
         // ===============================================================
         // AudioSlot (Lua)
@@ -1079,6 +1171,9 @@ namespace Engine {
         event_dispatcher.sink<Event_OnTriggerEnter>().connect<&ScriptSystem::OnTriggerEnter>();
         event_dispatcher.sink<Event_OnTriggerExit>().connect<&ScriptSystem::OnTriggerExit>();
         event_dispatcher.sink<Event_OnTriggerStay>().connect<&ScriptSystem::OnTriggerStay>();
+        LOGI("[ScriptSystem] About to subscribe to Button_Event...");
+        event_dispatcher.sink<Button_Event>().connect<&ScriptSystem::OnButtonEvent>();
+        LOGI("[ScriptSystem] Successfully subscribed to Button_Event!");
 
         LOGI("[ScriptSystem] Subscribed to Trigger Events.");
 #endif
@@ -1095,6 +1190,7 @@ namespace Engine {
         event_dispatcher.sink<Event_OnTriggerEnter>().disconnect<&ScriptSystem::OnTriggerEnter>();
         event_dispatcher.sink<Event_OnTriggerExit>().disconnect<&ScriptSystem::OnTriggerExit>();
         event_dispatcher.sink<Event_OnTriggerStay>().disconnect<&ScriptSystem::OnTriggerStay>();
+        event_dispatcher.sink<Button_Event>().disconnect<&ScriptSystem::OnButtonEvent>();
 
         s_RuntimeRegistry = nullptr;
 

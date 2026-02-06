@@ -112,6 +112,8 @@ namespace Engine {
         static void OnTriggerExit(const struct Event_OnTriggerExit& e);
         static void OnTriggerStay(const struct Event_OnTriggerStay& e);
 
+        static void OnButtonEvent(const Button_Event& e);
+
 #if defined(ENGINE_ENABLE_LUA)
         static sol::state& GetLuaState();
 #endif
