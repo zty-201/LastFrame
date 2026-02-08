@@ -1,31 +1,107 @@
-# This is a basic workflow to help you get started with Actions
+name: Build and Test (windows, android)
 
-name: Build and Test (windows)
+#Ensures no duplicate workflow on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
+    paths:
+      - 'Application/**'
+      - 'Engine/**'
+      - 'Tester/**' #Only run if stuff within these folders change.
   pull_request:
     branches: [ "main" ]
-
+    paths:
+      - 'Application/**'
+      - 'Engine/**'
+      - 'Tester/**' #Only run if stuff within these folders change.
+      
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build-test:
+  windows-build-test:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4 #Check out this repo.
+      # Set up java for android gradlew to work.
+      - name: set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: gradle
 
-      - name: Run CI batch script
-        shell: cmd
+      #Save github minutes compared to parallel jobs. Using android x86_64 build because it's faster to build.
+      - name: Parallel Execution of Android Build and Windows Build-Test
+        shell: pwsh
         run: |
-          if exist Tester.bat (
-            call Tester.bat
-          ) else (
-            echo "Tester.bat not found, skipping tests..."
-          )
+          $j1 = Start-ThreadJob {
+            $log = cmd /c Tester.bat 2>&1  # Capture both stdout and stderr
+            return @{ ExitCode = $LASTEXITCODE; Log = $log }
+          }
+
+          $j2 = Start-ThreadJob {
+            Set-Location "./Android"
+            $log = cmd /c gradlew.bat assembleX86_64Release --configure-on-demand 2>&1
+            return @{ ExitCode = $LASTEXITCODE; Log = $log }
+          }
+          
+          Wait-Job $j1, $j2
+          $r1 = Receive-Job $j1
+          $r2 = Receive-Job $j2
+
+          Write-Host "----- Windows Build-Test Log -----"
+          $r1.Log | ForEach-Object { Write-Host $_ }
+
+          Write-Host "----- Android Build Log -----"
+          $r2.Log | ForEach-Object { Write-Host $_ }
+
+
+          if ($r1.ExitCode -ne 0) {
+            Write-Error "Windows build-test failed"
+            exit 1
+          }
+          if ($r2.ExitCode -ne 0) {
+            Write-Error "Android failed to build"
+            exit 1
+          }
+      # - name: Run CI Tester.bat script and Android Build script.
+      #   run: |
+      #     $winJob = Start-Job { ./Tester.bat }
+      #     $androidJob = Start-Job { ./Android/gradlew.bat assembleRelease --parallel --configure-on-demand }
+      #     Wait-Job $winJob, $androidJob
+      #     Receive-Job $winJob
+      #     Receive-Job $androidJob
+      #     if ($winJob.State -ne 'Completed') {
+      #         throw "Windows build-and-test failed!"
+      #     }
+      #     if ($androidJob.State -ne 'Completed') {
+      #         throw "Android build failed!"
+      #     }
+
+      # #Build and Run tests using .bat file.
+      # - name: Run CI batch script
+      #   shell: cmd
+      #   run: |
+      #     if exist Tester.bat (
+      #       call Tester.bat
+      #     ) else (
+      #       echo "Tester.bat not found, skipping tests..."
+      #     )
+      # #Android Build.
+      # - name: set up JDK 11
+      #   uses: actions/setup-java@v3
+      #   with:
+      #     java-version: '11'
+      #     distribution: 'temurin'
+      #     cache: gradle
+      # - name: Configure and Build with Gradle
+      #   run: ./Android/gradlew.bat assembleRelease --parallel --configure-on-demand

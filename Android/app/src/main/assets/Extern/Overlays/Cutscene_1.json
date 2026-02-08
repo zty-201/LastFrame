@@ -1,8 +1,5 @@
 {
-	"623": {
-		"NameComponent": {
-			"name": "Cutscene_1"
-		},
+	"689": {
 		"UIComponent": {
 			"Overlay_name": "Cutscene_1",
 			"color": [
@@ -23,7 +20,7 @@
 				0.0
 			],
 			"size": [
-				780.0,
+				755.0,
 				490.0
 			],
 			"size_NDC": [
