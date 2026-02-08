@@ -1,69 +1,65 @@
 ----------------------------------------------------------------
--- PlayroomToy_IconUI.lua
+-- PlayroomExplosionToy_IconUI.lua
 -- Attach to the ICON UI entity (must have EntityUI)
 --
--- Shows only if:
---   1) SHARED.PLAYROOM_TOY_ICON_SHOW[TOY_ID] == true
---   2) Entity 378 scale is NOT (0,0,0)
+-- Shows icon only if:
+--   - player is in range (InteractionBox): SHARED.INTERACT_IN_ZONE[TOY_ID] == true
+--   - entity 378 scale != (0,0,0)
+-- Optional:
+--   - hide icon while interface is open
 ----------------------------------------------------------------
 
 local DEBUG = false
 
--- Set this to the trigger/toy id (the one InteractionBox ENTER reports)
 local TOY_ID = 378
-
--- Your additional requirement entity
 local SCALE_CHECK_ENTITY_ID = 378
 
-local IN_TABLE = "PLAYROOM_TOY_ICON_SHOW"
+-- If you want icon to disappear while interface is open:
+local HIDE_WHEN_UI_OPEN = true
+local UI_TABLE = "EXPLOSION_TOY_UI_OPEN"
 
--- prevent log spam
-local printedNoUI = false
+local UI = nil
 
-local function set_visible(v)
-    if EntityUI == nil then
-        if not printedNoUI then
-            print("[PlayroomToy_IconUI] ERROR: EntityUI is nil on icon EntityID " .. tostring(EntityID) ..
-                  " (You attached this to a non-UI entity. Attach it to the UI icon entity.)")
-            printedNoUI = true
-        end
-        return
-    end
-    EntityUI:SetVisible(v)
-end
-
-local function toy_should_show()
-    if SHARED == nil then return false end
-    local t = SHARED[IN_TABLE]
-    if t == nil then return false end
-    return t[TOY_ID] == true
-end
-
-local function scale_check_ok()
+local function scale_ok()
     local tr = Query.GetTransform(SCALE_CHECK_ENTITY_ID)
     if tr == nil then return false end
-
     local sx, sy, sz = tr:GetScale()
     return not (sx == 0 and sy == 0 and sz == 0)
 end
 
-function on_create(self)
-    SHARED = SHARED or {}
-    SHARED[IN_TABLE] = SHARED[IN_TABLE] or {}
+local function in_range()
+    return SHARED
+        and SHARED.INTERACT_IN_ZONE
+        and SHARED.INTERACT_IN_ZONE[TOY_ID] == true
+end
 
-    set_visible(false)
+local function ui_open()
+    if not HIDE_WHEN_UI_OPEN then return false end
+    return SHARED and SHARED[UI_TABLE] and SHARED[UI_TABLE][TOY_ID] == true
+end
+
+function on_create(self)
+    UI = EntityUI
+    if not UI then
+        print("[ExplosionToy_IconUI] ERROR: No UIComponent on entity", EntityID,
+              "(attach this script to the UI icon entity, not trigger 378)")
+        return
+    end
+
+    SHARED = SHARED or {}
+    SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
+    SHARED[UI_TABLE] = SHARED[UI_TABLE] or {}
+
+    UI:SetVisible(false)
 
     if DEBUG then
-        print("[PlayroomToy_IconUI] create icon=", EntityID, " toyId=", TOY_ID, " scaleCheck=", SCALE_CHECK_ENTITY_ID)
+        print("[ExplosionToy_IconUI] Initialized. icon=", EntityID, " toyId=", TOY_ID)
     end
 end
 
 function on_update(self, dt)
-    if TOY_ID == 0 then
-        set_visible(false)
-        return
-    end
+    if not UI then return end
 
-    local show = toy_should_show() and scale_check_ok()
-    set_visible(show)
+    local show = in_range() and scale_ok() and (not ui_open())
+    UI:SetVisible(show)
 end

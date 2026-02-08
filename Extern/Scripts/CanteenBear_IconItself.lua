@@ -1,31 +1,34 @@
 ----------------------------------------------------------------
--- CanteenBear_IconUI.lua
+-- CanteenBear_IconItself.lua  (UPDATED)
 -- Attach to the ICON UI entity (must have EntityUI)
 --
--- Shows when:
---   - player is in range of softtoy (SHARED.INTERACT_IN_ZONE[SOFTTOY_ID] == true)
---   - and softtoy is NOT held (optional flag)
---
--- No inventory needed.
--- When you "put it back down", just set HELD=false and icon will appear again if in range.
+-- Icon shows only if:
+--   - in range: SHARED.INTERACT_IN_ZONE[SOFTTOY_ID] == true
+--   - entity 378 scale != (0,0,0)
+--   - (optional) interface not open
 ----------------------------------------------------------------
 
-local DEBUG = true
+print("[CanteenBear_IconItself] ===== SCRIPT FILE LOADED =====")
 
--- IMPORTANT: set this to your softtoy/interactable ID (from logs: 376)
-local SOFTTOY_ID = 376
+local DEBUG = false
 
--- Optional held state:
--- When picked up:  SHARED.SOFTTOY_HELD[SOFTTOY_ID] = true
--- When dropped:   SHARED.SOFTTOY_HELD[SOFTTOY_ID] = false (or nil)
-local HELD_TABLE = "SOFTTOY_HELD"
+-- Set this to the canteen bear interactable id (InteractionBox ENTER/Periodic id)
+local SOFTTOY_ID = 376   -- <-- CHANGE if your canteen bear id isn't 376
 
-local function set_visible(v)
-    if EntityUI == nil then
-        print("[CanteenBear_IconUI] ERROR: EntityUI is nil on icon EntityID " .. tostring(EntityID))
-        return
-    end
-    EntityUI:SetVisible(v)
+-- Extra requirement entity
+local SCALE_CHECK_ENTITY_ID = 376
+
+-- Hide icon while interface open?
+local HIDE_WHEN_UI_OPEN = true
+local UI_TABLE = "CANTEEN_BEAR_UI_OPEN"
+
+local UI = nil
+
+local function scale_ok()
+    local tr = Query.GetTransform(SCALE_CHECK_ENTITY_ID)
+    if tr == nil then return false end
+    local sx, sy, sz = tr:GetScale()
+    return not (sx == 0 and sy == 0 and sz == 0)
 end
 
 local function in_range()
@@ -34,30 +37,32 @@ local function in_range()
         and SHARED.INTERACT_IN_ZONE[SOFTTOY_ID] == true
 end
 
-local function is_held()
-    return SHARED
-        and SHARED[HELD_TABLE]
-        and SHARED[HELD_TABLE][SOFTTOY_ID] == true
+local function ui_open()
+    if not HIDE_WHEN_UI_OPEN then return false end
+    return SHARED and SHARED[UI_TABLE] and SHARED[UI_TABLE][SOFTTOY_ID] == true
 end
 
 function on_create(self)
+    UI = EntityUI
+    if not UI then
+        print("[CanteenBear_IconItself] ERROR: No UIComponent on entity", EntityID,
+              "(attach to the UI icon entity, not the trigger)")
+        return
+    end
+
     SHARED = SHARED or {}
     SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
-    SHARED[HELD_TABLE] = SHARED[HELD_TABLE] or {}
+    SHARED[UI_TABLE] = SHARED[UI_TABLE] or {}
 
-    set_visible(false)
+    UI:SetVisible(false)
 
     if DEBUG then
-        print("[CanteenBear_IconUI] create icon=", EntityID, " softtoy=", SOFTTOY_ID)
+        print("[CanteenBear_IconItself] init icon=", EntityID, " softtoy=", SOFTTOY_ID)
     end
 end
 
 function on_update(self, dt)
-    -- Hide if held; else show only when in range
-    if is_held() then
-        set_visible(false)
-        return
-    end
-
-    set_visible(in_range())
+    if not UI then return end
+    local show = in_range() and scale_ok() and (not ui_open())
+    UI:SetVisible(show)
 end

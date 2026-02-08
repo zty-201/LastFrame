@@ -68945,7 +68945,7 @@
 				1.0
 			],
 			"event_received": "",
-			"is_NDC": false,
+			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -68957,16 +68957,16 @@
 				0.0
 			],
 			"size": [
-				0.0,
-				0.0
+				1719.0,
+				1158.0
 			],
 			"size_NDC": [
-				0.0,
-				0.0
+				1.0,
+				1.0
 			],
 			"textureid": [
-				0,
-				0
+				15304296428018171923,
+				3711223656383638553
 			],
 			"visible": false
 		}
