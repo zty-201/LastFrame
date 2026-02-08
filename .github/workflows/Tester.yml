@@ -41,27 +41,23 @@ jobs:
 
       #Save github minutes compared to parallel jobs. Using android x86_64 build because it's faster to build.
       - name: Parallel Execution of Android Build and Windows Build-Test
-        shell: pwsh
+        shell: cmd
         run: |
-          $winProc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c Tester.bat" -NoNewWindow -PassThru
-          $androidProc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c gradlew.bat assembleX86_64Release --configure-on-demand" -WorkingDirectory "Android" -NoNewWindow -PassThru
+          call ../Tester.bat
+          if errorlevel 1 (
+            echo Windows build-test failed
+            exit /b 1
+          )
 
-          $winProc.WaitForExit()
-          $androidProc.WaitForExit()
+          call ./gradlew.bat assembleX86_64Release --parallel --configure-on-demand
+          if errorlevel 1 (
+            echo Android build failed
+            exit /b 1
+          )
 
-          $winExit = $winProc.ExitCode
-          $androidExit = $androidProc.ExitCode
+          echo Both Windows and Android builds succeeded!
+        working-directory: Android
 
-          if ($winExit -ne 0) {
-              Write-Error "Windows build-test failed with exit code $winExit"
-              exit 1
-          }
-          if ($androidExit -ne 0) {
-              Write-Error "Android build failed with exit code $androidExit"
-              exit 1
-          }
-
-          Write-Host "Both Windows and Android builds succeeded!"
       # - name: Run CI Tester.bat script and Android Build script.
       #   run: |
       #     $winJob = Start-Job { ./Tester.bat }
