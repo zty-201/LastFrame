@@ -360,17 +360,7 @@ void Game_Update()
 		else std::exit(0); // fallback if window isn't accessible
 
 #elif defined(PLATFORM_ANDROID)
-		// Best practice: request Activity finish
-		// If you have access to ANativeActivity*, call finish:
-		if (EngineFramework::GetAndroidActivity() != nullptr)  // <-- your engine should expose this
-		{
-			ANativeActivity_finish(EngineFramework::GetAndroidActivity());
-		}
-		else
-		{
-			// Fallback if you don't have activity pointer
-			std::exit(0);
-		}
+		std::exit(0);
 #endif
 
 		return;
