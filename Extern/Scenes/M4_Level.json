@@ -50400,23 +50400,6 @@
 			"radius": 30.0,
 			"stepHeight": 0.30000001192092896
 		},
-		"LightComponent": {
-			"castShadows": true,
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"constant": 1.0,
-			"innerConeAngle": 15.0,
-			"intensity": 10000.0,
-			"isStatic": false,
-			"linear": 0.09000000357627869,
-			"outerConeAngle": 35.0,
-			"quadratic": 0.03200000151991844,
-			"radius": 1000.0,
-			"type": 2
-		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -50427,10 +50410,6 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 11740093013966520321
-				},
-				{
-					"Loaded": true,
-					"ScriptGuid": 15968805962367582209
 				},
 				{
 					"Loaded": true,
