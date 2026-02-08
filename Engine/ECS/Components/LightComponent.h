@@ -25,8 +25,7 @@ struct LightComponent
 	};
 
     Type type; // false = directional, true = point/spot
-    glm::vec3 position;    // For point/spot
-    glm::vec3 direction;   // For directional/spot
+    //glm::vec3 direction;   // For directional/spot
 	glm::vec3 color{ 1.0f, 1.0f, 1.0f }; // Light color
 	float intensity{ 1.0f }; 	 // Overall intensity multiplier
     float radius{ 1.0f };          // For point/spot
@@ -41,7 +40,7 @@ struct LightComponent
     // Internal flag (not shown in UI)
     // Initialize to TRUE so it renders at least once on startup
     bool _isDirty = true;
-
+    int _lastShadowIndex = 0;
     // Call this whenever you change position/color/radius in the Editor
     //void MarkDirty() { _isDirty = true; }
 };

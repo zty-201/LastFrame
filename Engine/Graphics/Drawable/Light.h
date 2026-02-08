@@ -23,16 +23,16 @@
 namespace Light
 {
 
-    inline void onCursor(LightComponent& light, double xoffset, double yoffset)
+    inline void onCursor(TransformComponent& transform, double xoffset, double yoffset)
     {
         const float PI05 = glm::pi<float>() / 2.0f;
-        const float r = glm::length(light.position); // Calculate radial distance
+        const float r = glm::length(transform.position); // Calculate radial distance
 
         // If radius is zero, we can't calculate angles, so just return.
         if (r < 0.001f) return;
 
-        float alpha = glm::asin(light.position.y / r); // Calculate elevation angle
-        float betta = std::atan2f(light.position.x, light.position.z); // Calculate azimuth angle
+        float alpha = glm::asin(transform.position.y / r); // Calculate elevation angle
+        float betta = std::atan2f(transform.position.x, transform.position.z); // Calculate azimuth angle
 
         // Adjust angles based on cursor offsets
         alpha += yoffset > 0.0 ? -0.05f : 0.05f;
@@ -42,9 +42,9 @@ namespace Light
         alpha = glm::clamp(alpha, -PI05 + 0.01f, PI05 - 0.01f);
 
         // Recalculate position based on new angles
-        light.position.x = r * glm::cos(alpha) * glm::sin(betta);
-        light.position.y = r * glm::sin(alpha);
-        light.position.z = r * glm::cos(alpha) * glm::cos(betta);
+        transform.position.x = r * glm::cos(alpha) * glm::sin(betta);
+        transform.position.y = r * glm::sin(alpha);
+        transform.position.z = r * glm::cos(alpha) * glm::cos(betta);
     }
 
     /**
@@ -52,16 +52,16 @@ namespace Light
      * @param light The LightComponent to modify.
      * @param yoffset The change in the scroll wheel's Y position.
      */
-    inline void onScroll(LightComponent& light, double yoffset)
+    inline void onScroll(TransformComponent& transform, double yoffset)
     {
-        float r = glm::length(light.position);
+        float r = glm::length(transform.position);
 
         // Adjust radial distance based on scroll direction
         r += yoffset > 0.0 ? -1.0f : 1.0f;
         if (r < 1.0f) r = 1.0f; // Clamp minimum radius
 
         // Recalculate position by normalizing the old position and scaling by the new radius
-        light.position = glm::normalize(light.position) * r;
+        transform.position = glm::normalize(transform.position) * r;
     }
 }
 

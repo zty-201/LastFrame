@@ -78,7 +78,6 @@ namespace EngineFramework
     bool Screen::is_simulator_running = false;
     bool Screen::gizmos_IS_hovering = false;
     bool Screen::gizmos_IS_dragged = false;
-    bool Screen::is_adjusting_lights = false;
     bool Screen::is_adjusting_triggerbox = false;
     bool Screen::s_DrawColliders = true;
     bool Screen::s_DrawAllColliders = false;
@@ -889,19 +888,19 @@ namespace EngineFramework
         /*
             for adjusting the lighting 
         */
-        if (is_adjusting_lights) {
+    //    if (is_adjusting_lights) {
 
-            if (io.MouseDown[0]) {
-                auto light_view = registry.view<LightComponent>();
-                auto& light = light_view.get<LightComponent>(light_view.front());
+    //        if (io.MouseDown[0]) {
+    //            auto light_view = registry.view<LightComponent>();
+    //            auto& light = light_view.get<LightComponent>(light_view.front());
+				//auto& transform = registry.get<TransformComponent>(light_view.front());
+    //            if (io.MouseDelta.x > 0.0 || io.MouseDelta.y > 0.0) {
+    //                Light::onCursor(light, io.MouseDelta.x, io.MouseDelta.y);
+    //                //std::cout << "Mouse_delta.x: " << Mouse_delta.x << " | Mouse_delta.y: " << Mouse_delta.y << std::endl;
+    //            }
 
-                if (io.MouseDelta.x > 0.0 || io.MouseDelta.y > 0.0) {
-                    Light::onCursor(light, io.MouseDelta.x, io.MouseDelta.y);
-                    //std::cout << "Mouse_delta.x: " << Mouse_delta.x << " | Mouse_delta.y: " << Mouse_delta.y << std::endl;
-                }
-
-            }
-        }
+    //        }
+    //    }
 
     }
 
@@ -1012,7 +1011,6 @@ namespace EngineFramework
                     object.position = glm::vec3(T[0], T[1], T[2]);
                     object.scale = glm::vec3(S[0], S[1], S[2]);
                     object.rotation = glm::vec3(R[0], R[1], R[2]);
-
                 }
 
 
@@ -1189,36 +1187,29 @@ namespace EngineFramework
                             light.intensity = intensity;
                         }
 
-                        // Controls specific to light type
-                        if (light.type == LightComponent::POINT) { // Point Light
-                            float pos[3] = { light.position.x, light.position.y, light.position.z };
-                            if (ImGui::InputFloat3("Light Position", pos, "%.3f")) {
-                                light.position = glm::vec3(pos[0], pos[1], pos[2]);
-                            }
-                        }
-                        else if (light.type == LightComponent::DIRECTIONAL) { // Directional Light
-                            // Convert direction vector to pitch and yaw for sliders
-                            float pitch = glm::degrees(asinf(-light.direction.y));
-                            float yaw = glm::degrees(atan2f(light.direction.x, light.direction.z));
+                        //if (light.type == LightComponent::DIRECTIONAL) { // Directional Light
+                        //    // Convert direction vector to pitch and yaw for sliders
+                        //    float pitch = glm::degrees(asinf(-light.direction.y));
+                        //    float yaw = glm::degrees(atan2f(light.direction.x, light.direction.z));
 
-                            bool changed = false;
-                            changed |= ImGui::SliderFloat("Pitch", &pitch, -89.9f, 89.9f, "%.1f deg");
-                            changed |= ImGui::SliderFloat("Yaw", &yaw, -180.0f, 180.0f, "%.1f deg");
+                        //    bool changed = false;
+                        //    changed |= ImGui::SliderFloat("Pitch", &pitch, -89.9f, 89.9f, "%.1f deg");
+                        //    changed |= ImGui::SliderFloat("Yaw", &yaw, -180.0f, 180.0f, "%.1f deg");
 
-                            if (changed) {
-                                // Convert degrees back to radians
-                                float pitchRad = glm::radians(pitch);
-                                float yawRad = glm::radians(yaw);
+                        //    if (changed) {
+                        //        // Convert degrees back to radians
+                        //        float pitchRad = glm::radians(pitch);
+                        //        float yawRad = glm::radians(yaw);
 
-                                // Recalculate direction vector
-                                glm::vec3 newDirection;
-                                newDirection.x = cos(pitchRad) * sin(yawRad);
-                                newDirection.y = -sin(pitchRad);
-                                newDirection.z = cos(pitchRad) * cos(yawRad);
+                        //        // Recalculate direction vector
+                        //        glm::vec3 newDirection;
+                        //        newDirection.x = cos(pitchRad) * sin(yawRad);
+                        //        newDirection.y = -sin(pitchRad);
+                        //        newDirection.z = cos(pitchRad) * cos(yawRad);
 
-                                light.direction = glm::normalize(newDirection);
-                            }
-                        }
+                        //        light.direction = glm::normalize(newDirection);
+                        //    }
+                        //}
                     }
                     else {
                         ImGui::TextDisabled("Selected Light entity is invalid or no LightComponent attached.");
@@ -1227,17 +1218,17 @@ namespace EngineFramework
 
                 static std::string button_text = "Adjust Light with Mouse";
 
-                if (is_adjusting_lights) {
-                    button_text = "Stop Adjusting Lights";
-                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.3f, 0.3f, 1.0f)); // red    
-                }else {
-                    button_text = "Adjust Light with Mouse";
-                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.7f, 0.3f, 1.0f)); // green
-                }
+                //if (is_adjusting_lights) {
+                //    button_text = "Stop Adjusting Lights";
+                //    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.3f, 0.3f, 1.0f)); // red    
+                //}else {
+                //    button_text = "Adjust Light with Mouse";
+                //    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.7f, 0.3f, 1.0f)); // green
+                //}
 
-                if (ImGui::Button(button_text.c_str())) {
-                    is_adjusting_lights = !is_adjusting_lights;
-                }
+                //if (ImGui::Button(button_text.c_str())) {
+                //    is_adjusting_lights = !is_adjusting_lights;
+                //}
 
                 ImGui::PopStyleColor();
                 ImGui::EndTabItem();
@@ -1286,7 +1277,6 @@ namespace EngineFramework
     void Screen::gizmos() {
 
         if (is_simulator_running) return;
-        if (is_adjusting_lights) return; //when adjusting lights, gizmos should be disabled
         if (is_adjusting_triggerbox) return;
 
 
@@ -1424,6 +1414,10 @@ namespace EngineFramework
                 object.rotation = new_rotation;
                 object.scale = new_scale;
 
+                if (registry.all_of<LightComponent>(id)) {
+                    registry.get<LightComponent>(id)._isDirty = true;
+                }
+
                 if (has_multi_selection) {
                     for (entt::entity target_id : transform_entities) {
                         if (target_id == id) {
@@ -1449,6 +1443,9 @@ namespace EngineFramework
                                     target_transform.scale[axis] += scale_delta[axis];
                                 }
                             }
+                        }
+                        if (registry.all_of<LightComponent>(id)) {
+                            registry.get<LightComponent>(id)._isDirty = true;
                         }
                     }
                 }
@@ -1542,7 +1539,7 @@ namespace EngineFramework
 
     bool Screen::delete_selected_entity() {
 
-        if (is_simulator_running || is_adjusting_lights) {
+        if (is_simulator_running) {
             return false;
         }
 
@@ -1577,7 +1574,6 @@ namespace EngineFramework
     void Screen::entity_shortcut_menu() {
 
         if (is_simulator_running) return;
-        if (is_adjusting_lights) return;
 
         if (ImGui::BeginPopup("Entity_Shortcut_Menu"))
         {
@@ -1642,7 +1638,6 @@ namespace EngineFramework
             adjusting trigger box using gizmos
         */
         if (is_simulator_running) return;
-        if (is_adjusting_lights) return; //when adjusting lights, gizmos should be disabled
         if (!is_adjusting_triggerbox) return;
 
         if (editor_ptr->selected_objectID == entt::null) {
@@ -1771,7 +1766,6 @@ namespace EngineFramework
     void EngineFramework::Screen::triggerbox()
     {
         if (!s_DrawColliders) return;
-        if (is_adjusting_lights) return;
         if (is_simulator_running) return;
 
         // Use same camera math as gizmos()
@@ -1853,7 +1847,6 @@ namespace EngineFramework
     void EngineFramework::Screen::colliderbox()
     {
         if (!s_DrawColliders) return;
-        if (is_adjusting_lights) return;
         if (is_simulator_running) return;
 
         auto camera_view = registry.view<CameraComponent>();
@@ -1973,7 +1966,6 @@ namespace EngineFramework
     void Screen::drop_target() {
 
         if (is_simulator_running) return;
-        if (is_adjusting_lights) return;
 
         if (ImGui::BeginDragDropTarget())
         {

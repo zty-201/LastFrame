@@ -61,7 +61,7 @@ namespace EngineFramework
 		static bool is_simulator_running;
 		static bool gizmos_IS_hovering;
 		static bool gizmos_IS_dragged;
-		static bool is_adjusting_lights;
+		//static bool is_adjusting_lights;
 		static bool is_adjusting_triggerbox;
 
 		glm::vec3 saved_cam_pos_before_sim{};

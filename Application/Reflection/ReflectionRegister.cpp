@@ -647,8 +647,6 @@ namespace EngineFramework
 		entt::meta_factory<LightComponent>()
 			.type("LightComponent")
 			.data<&LightComponent::type>("type")
-			.data<&LightComponent::position>("position")
-			.data<&LightComponent::direction>("direction")
 			.data<&LightComponent::color>("color")
 			.data<&LightComponent::intensity>("intensity")
 			.data<&LightComponent::radius>("radius")

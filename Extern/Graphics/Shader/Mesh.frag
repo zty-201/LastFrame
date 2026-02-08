@@ -1,10 +1,10 @@
-#version 310 es
+#version 320 es
 precision highp float;
 precision highp int; 
 precision highp sampler2D; 
 precision highp sampler3D;
 precision highp sampler2DArrayShadow;
-precision highp samplerCubeShadow;
+precision highp samplerCubeArrayShadow;
 
 #include <common.glsl>
 
@@ -46,7 +46,6 @@ layout(std140, binding = 0) uniform VolumetricUBO
     mat4  prev_view_proj;
     mat4  inv_view_proj;
     mat4  cascade_view_proj[3];  // Array of cascade matrices
-    mat4  spot_view_proj[4];
     vec4  cascade_splits;
     vec4  cascade_biases;
     vec4  light_direction;
@@ -58,17 +57,18 @@ layout(std140, binding = 0) uniform VolumetricUBO
     ivec4 width_height;
 };
 
-struct PointLightData {
+struct LightSSBO {
     vec4 position_radius;      
     vec4 color_intensity;      
     vec4 attenuation_type;     // .w is TYPE
     vec4 direction_shadow;     // .xyz is Dir, .w is ShadowIndex
     vec4 spot_cutoffs;         // .x=inner, .y=outer
+    mat4 view_proj;
 };
 
-layout(std430, binding = 1) readonly buffer PointLightBuffer {
-    PointLightData lights[];
-} pointLightBuffer;
+layout(std430, binding = 1) readonly buffer LightBuffer {
+    LightSSBO lights[];
+} lightBuffer;
 
 uniform sampler2D s_Albedo;
 uniform sampler2D s_Normal;
@@ -86,15 +86,13 @@ uniform sampler3D            s_VoxelGrid;
 uniform bool u_Tricubic;
 // uniform int u_DebugMode;
 uniform int u_NumPointLights;
-uniform samplerCubeShadow s_PointShadowCubemaps[4]; 
+uniform samplerCubeArrayShadow s_PointShadowArray;
 
 // ------------------------------------------------------------------
 // FUNCTIONS --------------------------------------------------------
 // ------------------------------------------------------------------
 
-float getSpotLightVisibility(vec3 worldPos, int shadowIndex) {
-    // 1. Get Matrix from UBO
-    mat4 lightMatrix = spot_view_proj[shadowIndex];
+float getSpotLightVisibility(vec3 worldPos, mat4 lightMatrix, int shadowIndex) {
 
     // 2. Project
     vec4 lightSpacePos = lightMatrix * vec4(worldPos, 1.0);
@@ -370,24 +368,21 @@ float getPointShadow(vec3 worldPos, vec3 lightPos, float farPlane, int shadowInd
     vec3 lightToFrag = worldPos - lightPos;
     float currentDepth = length(lightToFrag) / farPlane;
     float bias = 0.005;
-    vec4 coords = vec4(lightToFrag, currentDepth - bias);
-
-    // Dynamic indexing of samplers is often forbidden in GLSL.
-    // We use a manual switch.
-    float shadow = 1.0;
-    switch (shadowIndex) {
-        case 0: shadow = texture(s_PointShadowCubemaps[0], coords); break;
-        case 1: shadow = texture(s_PointShadowCubemaps[1], coords); break;
-        case 2: shadow = texture(s_PointShadowCubemaps[2], coords); break;
-        case 3: shadow = texture(s_PointShadowCubemaps[3], coords); break;
-    }
-    return shadow;
+    
+    // Construct the 4D coordinate:
+    // .xyz = Direction vector
+    // .w   = Layer Index (The light index)
+    vec4 coords = vec4(lightToFrag, float(shadowIndex));
+    
+    // Sample with comparison (refZ)
+    // texture(sampler, vec4(dir, layer), refZ)
+    return texture(s_PointShadowArray, coords, currentDepth - bias);
 }
 
 // ------------------------------------------------------------------
 
 vec3 calculatePointLight(int lightIndex, vec3 worldPos, vec3 N, vec3 Wo, vec3 F0, vec3 diffuse_color, float roughness) {
-    PointLightData light = pointLightBuffer.lights[lightIndex];
+    LightSSBO light = lightBuffer.lights[lightIndex];
     
     vec3 lightVec = light.position_radius.xyz - worldPos;
     float dist = length(lightVec);
@@ -430,7 +425,7 @@ vec3 calculatePointLight(int lightIndex, vec3 worldPos, vec3 N, vec3 Wo, vec3 F0
         
         if (light.attenuation_type.w > 1.5) { 
             // IS SPOTLIGHT -> Sample 2D Array
-            shadow = getSpotLightVisibility(worldPos, idx);
+            shadow = getSpotLightVisibility(worldPos, light.view_proj, idx);
         } 
         else {
             // IS POINT LIGHT -> Sample Cubemap

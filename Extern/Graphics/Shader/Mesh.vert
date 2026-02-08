@@ -1,4 +1,4 @@
-#version 310 es
+#version 320 es
 precision highp float;
 // ------------------------------------------------------------------
 // INPUT VARIABLES --------------------------------------------------
@@ -34,7 +34,6 @@ layout(std140, binding = 0) uniform VolumetricUBO
     mat4  prev_view_proj;
     mat4  inv_view_proj;
     mat4  cascade_view_proj[3];  // Array of cascade matrices
-    mat4  spot_view_proj[4];
     vec4  cascade_splits;
     vec4  cascade_biases;
     vec4  light_direction;

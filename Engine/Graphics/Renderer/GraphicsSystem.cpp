@@ -18,10 +18,10 @@
 #define NUM_BLUE_NOISE_TEXTURES 16
 #define SHADOW_WIDTH 4096
 #define SHADOW_HEIGHT 4096
-#define POINT_SHADOW_SIZE 1024
-#define MAX_POINT_LIGHTS 64
-#define MAX_SHADOW_CASTING_LIGHTS 4
-#define MAX_SHADOW_CASTING_SPOTLIGHTS 4
+#define POINT_SHADOW_SIZE 512
+#define MAX_LIGHTS 128
+#define MAX_SHADOW_CASTING_SPOTLIGHTS 32
+#define MAX_SHADOW_CASTING_POINT_LIGHTS 16
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
@@ -134,21 +134,6 @@ namespace EngineFramework
         FBO tempSpotShadowFBO(FBO::DepthTextureArray, SHADOW_WIDTH, SHADOW_HEIGHT, &m_spotTextureArray, MAX_SHADOW_CASTING_SPOTLIGHTS);
         m_spotShadowFBO = std::move(tempSpotShadowFBO);
 
-        //glBindTexture(GL_TEXTURE_2D_ARRAY, m_spotTextureArray);
-
-        //// 1. Enable Depth Comparison (Required for sampler2DArrayShadow)
-        //glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-        //glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL); // or GL_LESS
-
-        //// 2. Set Border Color to WHITE (Far Depth)
-        //// This ensures that areas *outside* the spotlight cone are treated as "Far Away" (Unshadowed)
-        //glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        //glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        //float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        //glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-        //glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-
         // Create the point shadow map framebuffer (we use default and setup manually as we need multiple cube map faces)
         FBO tempPointShadowFBO(FBO::Default, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE);
         m_pointShadowFBO = std::move(tempPointShadowFBO);
@@ -163,24 +148,26 @@ namespace EngineFramework
         glReadBuffer(GL_NONE);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // Create point shadow map cube textures
-        m_pointShadowMapTextures.resize(MAX_SHADOW_CASTING_LIGHTS);
-        glGenTextures(MAX_SHADOW_CASTING_LIGHTS, m_pointShadowMapTextures.data());
+        glGenTextures(1, &m_pointShadowArray); // Add this to header!
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, m_pointShadowArray);
+        // Allocate storage: 6 faces * MAX_LIGHTS
+        // width, height, layers (count * 6)
+        glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 1, GL_DEPTH_COMPONENT24,
+            POINT_SHADOW_SIZE, POINT_SHADOW_SIZE,
+            MAX_SHADOW_CASTING_POINT_LIGHTS * 6);
 
-        for (int i = 0; i < MAX_SHADOW_CASTING_LIGHTS; i++) {
-            glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointShadowMapTextures[i]);
-            for (unsigned int face = 0; face < 6; ++face) {
-                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_DEPTH_COMPONENT24,
-                    POINT_SHADOW_SIZE, POINT_SHADOW_SIZE, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
-            }
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-        }
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        // Hardware PCF Comparison
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, 0);
+
 
         // Get shader GUIDs 
         mesh_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Mesh");
@@ -191,11 +178,11 @@ namespace EngineFramework
         point_shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "PointShadow");
         ui_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "UI");	
         
-        // Create SSBO for point lights
-        glGenBuffers(1, &m_pointLightSSBO);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_pointLightSSBO);
+        // Create SSBO for lights
+        glGenBuffers(1, &m_lightSSBO);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_lightSSBO);
         glBufferData(GL_SHADER_STORAGE_BUFFER,
-            sizeof(PointLightSSBO) * MAX_POINT_LIGHTS,
+            sizeof(LightSSBO) * MAX_LIGHTS,
             nullptr, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
@@ -296,14 +283,14 @@ namespace EngineFramework
 
         // Update all model matrices
         auto transform_view = registry.view<TransformComponent>();
-        for (auto [entity, transform] : transform_view.each()) {
+        for (auto&& [entity, transform] : transform_view.each()) {
             CalculateModelMatrix(transform, transform.modelMatrix);
         }
 
         glm::mat4 viewProj = P * V;
 
         // 1. Update point light SSBO
-        UpdatePointLightSSBO(*active_camera, viewProj);
+        UpdateLightSSBO();
         // 2. Shadow pass (directional + point)
         ShadowPass();
         // 3. Global uniform buffers (camera, light, cascades)
@@ -332,114 +319,127 @@ namespace EngineFramework
         m_frame_idx++;
     }
 
-    void GraphicsSystem::UpdatePointLightSSBO(const CameraComponent& camera, const glm::mat4& viewProj)
+    void GraphicsSystem::UpdateLightSSBO()
     {
-        m_pointLightData.clear();
-        lightDistances.clear();
+        m_LightData.clear();
         m_lightEntityMap.clear();
 
-        // Collect point and spot lights
-        for (auto [entity, light] : registry.view<LightComponent>().each()) {
-            bool isValidType = (light.type == LightComponent::POINT || light.type == LightComponent::SPOT);
+        // 1. COLLECT (Iterate once)
+        // We separate them immediately so we don't need to sort later.
+        std::vector<entt::entity> pointEntities;
+        std::vector<entt::entity> spotEntities;
 
-            if (isValidType && m_pointLightData.size() < MAX_POINT_LIGHTS) {
-                PointLightSSBO data;
-                data.position_radius = glm::vec4(light.position, light.radius);
-                data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f);
+        auto EulerToDirection = [](const glm::vec3& eulerDegrees) {
+            float pitch = glm::radians(eulerDegrees.x);
+            float yaw = glm::radians(eulerDegrees.y);
 
-                // Pack type into .w: 1 = point, 2 = spot
-                float typeVal = (light.type == LightComponent::SPOT) ? 2.0f : 1.0f;
-                data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, typeVal);
+            glm::vec3 dir;
+            dir.x = cos(pitch) * sin(yaw);
+            dir.y = -sin(pitch); // Negative because positive pitch usually looks up
+            dir.z = cos(pitch) * cos(yaw);
+            return glm::normalize(dir);
+            };
 
-                // Direction in .xyz, default shadow index in .w
-                data.direction_shadow = glm::vec4(light.direction, -1.0f);
-
-                // Spot light cutoffs stored in .x and .y, default -1 for point lights
-                float inner = -1.0f;
-                float outer = -1.0f;
-                if (light.type == LightComponent::SPOT) {
-                    inner = glm::cos(glm::radians(light.innerConeAngle));
-                    outer = glm::cos(glm::radians(light.outerConeAngle));
-                }
-                data.spot_cutoffs = glm::vec4(inner, outer, 0.0f, 0.0f);
-
-                // Distance from camera for shadow priority
-                float dist = glm::length(camera.position - light.position);
-
-                // Only consider lights in camera frustum for shadows
-                if (isLightInFrustum(light.position, light.radius, viewProj)) {
-                    lightDistances.push_back({ static_cast<int>(m_pointLightData.size()), dist });
-                }
-                m_lightEntityMap.push_back(entity);
-                m_pointLightData.push_back(data);
-            }
+        auto view = registry.view<LightComponent>();
+        for (auto entity : view) {
+            auto& light = view.get<LightComponent>(entity);
+            if (light.type == LightComponent::POINT) pointEntities.push_back(entity);
+            else if (light.type == LightComponent::SPOT) spotEntities.push_back(entity);
         }
 
-        // Sort visible lights by distance (nearest get shadows)
-        std::sort(lightDistances.begin(), lightDistances.end(),
-            [](const auto& a, const auto& b) { return a.second < b.second; });
-
-        // Assign shadow map indices
+        // 2. PROCESS POINT LIGHTS (Indices 0 to 63)
         int pointShadowCount = 0;
-        int spotShadowCount = 0;
+        for (auto entity : pointEntities) {
+            if (m_LightData.size() >= MAX_LIGHTS) break;
 
-        for (const auto& pair : lightDistances) {
-            int lightIndex = pair.first;
-            float type = m_pointLightData[lightIndex].attenuation_type.w;
+            // Add to list
+            m_lightEntityMap.push_back(entity);
+            auto& light = registry.get<LightComponent>(entity);
+            auto& transform = registry.get<TransformComponent>(entity);
+            glm::vec3 lightDir = EulerToDirection(transform.rotation);
+            // Create Data
+            LightSSBO data;
+            data.position_radius = glm::vec4(transform.position, light.radius);
+            data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f);
+            data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 1.0f); // Type 1.0
+            data.spot_cutoffs = glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f);
 
-            // Get the actual component to update its internal state
-            //entt::entity e = m_lightEntityMap[lightIndex];
-            //auto& lightComp = registry.get<LightComponent>(e);
-
-            int assignedIndex = -1;
-
-            if (type == 2.0f) { // Spot
-                if (spotShadowCount < MAX_SHADOW_CASTING_LIGHTS) {
-                    assignedIndex = spotShadowCount++;
-                }
+            // --- SIMPLE ASSIGNMENT ---
+            // Just take the next slot! No sorting.
+            int shadowIndex = -1;
+            if (pointShadowCount < MAX_SHADOW_CASTING_POINT_LIGHTS) {
+                shadowIndex = pointShadowCount++;
             }
-            else { // Point
-                if (pointShadowCount < MAX_SHADOW_CASTING_LIGHTS) {
-                    assignedIndex = pointShadowCount++;
-                }
+            data.direction_shadow = glm::vec4(lightDir, (float)shadowIndex);
+
+            // DIRTY CHECK
+            if (light._lastShadowIndex != shadowIndex) {
+                light._isDirty = true;
+                light._lastShadowIndex = shadowIndex;
             }
 
-            // Apply Index
-            m_pointLightData[lightIndex].direction_shadow.w = (float)assignedIndex;
-
-            // dirty flag setting removed for now
-            // CRITICAL: If the assigned slot changed (e.g., 0 -> 1), we MUST render 
-            // because Texture 1 contains garbage, even if the light itself didn't move.
-            //if (lightComp._lastShadowIndex != assignedIndex) {
-            //    lightComp._isDirty = true; // Force redraw
-            //    lightComp._lastShadowIndex = assignedIndex;
-            //}
+            m_LightData.push_back(data);
         }
-        /*int shadowCount = std::min(MAX_SHADOW_CASTING_LIGHTS, (int)lightDistances.size());
-        for (int i = 0; i < shadowCount; i++) {
-            int lightIndex = lightDistances[i].first;
-            m_pointLightData[lightIndex].direction_shadow.w = float(i);
-        }*/
 
-        // Upload to SSBO
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_pointLightSSBO);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
-            sizeof(PointLightSSBO) * m_pointLightData.size(),
-            m_pointLightData.data());
+        // 3. PROCESS SPOT LIGHTS (Indices 64 to 127)
+        int spotShadowCount = 0;
+        for (auto entity : spotEntities) {
+            if (m_LightData.size() >= MAX_LIGHTS) break;
+
+            m_lightEntityMap.push_back(entity);
+            auto& light = registry.get<LightComponent>(entity);
+            auto& transform = registry.get<TransformComponent>(entity);
+            glm::vec3 lightDir = EulerToDirection(transform.rotation);
+            LightSSBO data;
+            data.position_radius = glm::vec4(transform.position, light.radius);
+            data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f);
+            data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 2.0f); // Type 2.0
+
+            float inner = glm::cos(glm::radians(light.innerConeAngle));
+            float outer = glm::cos(glm::radians(light.outerConeAngle));
+            data.spot_cutoffs = glm::vec4(inner, outer, 0.0f, 0.0f);
+
+            // --- SIMPLE ASSIGNMENT ---
+            int shadowIndex = -1;
+            if (spotShadowCount < MAX_SHADOW_CASTING_SPOTLIGHTS) {
+                shadowIndex = spotShadowCount++;
+            }
+            data.direction_shadow = glm::vec4(lightDir, (float)shadowIndex);
+
+            // CALCULATE MATRIX (Required for Spots)
+            if (shadowIndex != -1) {
+                float fov = glm::radians(light.outerConeAngle * 2.0f);
+                glm::mat4 P = glm::perspective(fov, 1.0f, 1.0f, light.radius);
+                glm::mat4 V = glm::lookAt(transform.position, transform.position + lightDir, glm::vec3(0, 1, 0));
+                data.view_proj = P * V;
+            }
+
+            // DIRTY CHECK
+            if (light._lastShadowIndex != shadowIndex) {
+                light._isDirty = true;
+                light._lastShadowIndex = shadowIndex;
+            }
+
+            m_LightData.push_back(data);
+        }
+
+        // 4. UPLOAD
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_lightSSBO); // Renamed from m_pointLightSSBO
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(LightSSBO) * m_LightData.size(), m_LightData.data());
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
     void GraphicsSystem::RenderDirectionalShadow()
     {
-        LightComponent* dirLight = nullptr;
+        TransformComponent* dirLightTransform = nullptr;
         for (auto [entity, light] : registry.view<LightComponent>().each()) {
             if (light.type == LightComponent::DIRECTIONAL) {
-                dirLight = &light;
+                dirLightTransform = &registry.get<TransformComponent>(entity);
                 break;
             }
         }
 
-        if (!dirLight) return;
+        if (!dirLightTransform) return;
 
         auto active_camera_entity = GetFirstActiveCamera();
         if (active_camera_entity == entt::null) return;
@@ -492,7 +492,7 @@ namespace EngineFramework
             }
             center /= frustumCorners.size();
 
-            glm::vec3 lightDir = dirLight->direction;
+            glm::vec3 lightDir = dirLightTransform->rotation;
 
             // Stable up vector
             glm::vec3 up = glm::abs(lightDir.y) > 0.999f ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
@@ -655,9 +655,13 @@ namespace EngineFramework
 
         // --- RENDER FACES ---
         for (int face = 0; face < 6; face++) {
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-                m_pointShadowMapTextures[cubemapSlot], 0);
+            // FORMULA: Layer = (LightIndex * 6) + FaceIndex
+            int layer = (cubemapSlot * 6) + face;
+
+            // Attach specific layer of the array to FBO
+            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                m_pointShadowArray, 0, layer);
+
             glClear(GL_DEPTH_BUFFER_BIT);
 
             glm::mat4 lightMatrix = shadowProj * shadowViews[face];
@@ -696,11 +700,12 @@ namespace EngineFramework
 
     void GraphicsSystem::RenderPointLightShadows()
     {
-        for (size_t i = 0; i < m_pointLightData.size(); i++) {
-            const auto& lightData = m_pointLightData[i];
+        for (size_t i = 0; i < m_LightData.size(); i++) {
+            const auto& lightData = m_LightData[i];
 
             // 1. Check if it has a shadow index
             if (lightData.direction_shadow.w < 0.0f) continue;
+			if (lightData.attenuation_type.w >= 1.5f) continue; 
 
             // 2. Retrieve the component
             entt::entity e = m_lightEntityMap[i];
@@ -745,18 +750,26 @@ namespace EngineFramework
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT); // Front-face culling for shadows
 
-        // 4. Reset Matrices
-        // Since we use std::array, we just fill it with identity matrices.
-        m_spotViewProjMatrices.fill(glm::mat4(1.0f));
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.0f, 1.0f);
 
         // 5. Iterate through sorted light data
         // Note: We use the shadow index stored in .w to determine which array slot to use
-        for (size_t i = 0; i < m_pointLightData.size(); i++)
+        for (size_t i = 0; i < m_LightData.size(); i++)
         {
-            const auto& lightData = m_pointLightData[i];
+            const auto& lightData = m_LightData[i];
 
             // Skip if not Spot Light (Type 2.0) or has no shadow index assigned
             if (lightData.attenuation_type.w < 1.5f || lightData.direction_shadow.w < 0.0f) {
+                continue;
+            }
+
+            entt::entity e = m_lightEntityMap[i];
+            auto& lightComp = registry.get<LightComponent>(e);
+
+            // --- FIX 2: The Static Optimization ---
+            // If the light is static and hasn't moved/swapped slots, SKIP IT.
+            if (lightComp.isStatic && !lightComp._isDirty) {
                 continue;
             }
 
@@ -764,45 +777,16 @@ namespace EngineFramework
             int shadowIndex = (int)lightData.direction_shadow.w;
 
             // Safety check to ensure we don't write out of bounds
-            if (shadowIndex >= MAX_SHADOW_CASTING_LIGHTS) continue;
+            if (shadowIndex >= MAX_SHADOW_CASTING_SPOTLIGHTS) continue;
 
-            // --- Calculate Matrix ---
-            glm::vec3 pos = glm::vec3(lightData.position_radius);
-            glm::vec3 dir = glm::vec3(lightData.direction_shadow); // .xyz is direction
-            float range = lightData.position_radius.w;
+            glm::mat4 lightSpaceMatrix = lightData.view_proj;
 
-            // Use a wide FOV (e.g., 90 degrees) to cover the spotlight cone
-            // 1. Get cosine value (e.g., 0.9)
-            float outerCos = lightData.spot_cutoffs.y;
-
-            // 2. Convert to radians (Half Angle) -> acos(0.9) = ~25 degrees
-            float outerAngleRad = std::acos(outerCos);
-
-            // 3. Multiply by 2 for full Field of View -> 50 degrees
-            float fov = outerAngleRad * 2.0f;
-
-            // 4. Safety clamp (prevent crash if acos fails or angle is too wide)
-            fov = glm::clamp(fov, 0.1f, glm::radians(170.0f));
-
-            glm::mat4 proj = glm::perspective(fov, 1.0f, 0.1f, range);
-
-            // Safe Up Vector
-            glm::vec3 up = (std::abs(dir.y) > 0.999f) ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
-
-            glm::mat4 view = glm::lookAt(pos, pos + dir, up);
-            glm::mat4 lightSpaceMatrix = proj * view;
-
-            // Store in our fixed array
-            m_spotViewProjMatrices[shadowIndex] = lightSpaceMatrix;
-
-            // --- Render to Depth Texture Array Layer ---
-            // Access the specific layer (shadowIndex) of the texture array
+            // Bind Layer
             glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                 m_spotTextureArray, 0, shadowIndex);
 
             glClear(GL_DEPTH_BUFFER_BIT);
 
-            // Upload uniform for the vertex shader
             shader->setUniform("u_LightMatrix", lightSpaceMatrix);
 
             // --- Draw Scene ---
@@ -830,9 +814,14 @@ namespace EngineFramework
                         (void*)(sizeof(unsigned int) * subMesh.baseIndex));
                 }
             }
+
+            if (lightComp.isStatic) {
+                lightComp._isDirty = false;
+            }
         }
 
         // 6. Cleanup
+        glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         shader->disuse();
@@ -852,10 +841,12 @@ namespace EngineFramework
         VolumetricUBO* ubo = (VolumetricUBO*)glMapBufferRange(
             GL_UNIFORM_BUFFER, 0, sizeof(VolumetricUBO), GL_MAP_WRITE_BIT);
 
-        LightComponent* dirLight = nullptr;
+        TransformComponent* dirLightTransform = nullptr;
+		LightComponent* dirLight = nullptr;
         for (auto [entity, light] : registry.view<LightComponent>().each()) {
             if (light.type == LightComponent::DIRECTIONAL) {
-                dirLight = &light;
+				dirLight = &light;
+                dirLightTransform = &registry.get<TransformComponent>(entity);
                 break;
             }
         }
@@ -864,8 +855,16 @@ namespace EngineFramework
         glm::vec3 color = glm::vec3(1.0f);
         float intensity = 0.0f;
 
-        if (dirLight) {
-            direction = dirLight->direction;
+        if (dirLightTransform) {
+            // Convert Euler degrees to direction vector
+            float pitch = glm::radians(dirLightTransform->rotation.x);
+            float yaw = glm::radians(dirLightTransform->rotation.y);
+
+            direction.x = cos(pitch) * sin(yaw);
+            direction.y = -sin(pitch);
+            direction.z = cos(pitch) * cos(yaw);
+            direction = glm::normalize(direction);
+
             color = dirLight->color;
             intensity = dirLight->intensity;
         }
@@ -875,10 +874,6 @@ namespace EngineFramework
         ubo->view_proj = P * V;
         ubo->prev_view_proj = m_frame_idx == 0 ? P * V : m_prev_view_projection;
         ubo->inv_view_proj = glm::inverse(ubo->view_proj);
-
-        for (int i = 0; i < MAX_SHADOW_CASTING_LIGHTS; i++) {
-            ubo->spot_view_proj[i] = m_spotViewProjMatrices[i];
-        }
 
         for (int i = 0; i < CASCADE_COUNT; i++) {
             ubo->cascade_view_proj[i] = m_cascadeViewProjMatrices[i];
@@ -936,7 +931,7 @@ namespace EngineFramework
 
         shader->use();
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_pointLightSSBO);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightSSBO);
 
         uint32_t read_idx = static_cast<uint32_t>(m_ping_pong);
         uint32_t write_idx = static_cast<uint32_t>(!m_ping_pong);
@@ -960,16 +955,11 @@ namespace EngineFramework
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_spotTextureArray);
         shader->setUniform("s_SpotShadowMaps", TextureUnits::SPOT_LIGHT_MAP_UNIT);
 
-        int baseUnit = TextureUnits::POINT_SHADOW_MAP_UNIT;
-        for (int i = 0; i < MAX_SHADOW_CASTING_LIGHTS; i++) {
-            glActiveTexture(GL_TEXTURE0 + baseUnit + i);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointShadowMapTextures[i]);
+        glActiveTexture(GL_TEXTURE0 + TextureUnits::POINT_SHADOW_MAP_UNIT);
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, m_pointShadowArray); // Bind the array
+        shader->setUniform("s_PointShadowArray", TextureUnits::POINT_SHADOW_MAP_UNIT);
 
-            std::string uniformName = "s_PointShadowCubemaps[" + std::to_string(i) + "]";
-            shader->setUniform(uniformName.c_str(), baseUnit + i);
-        }
-
-        shader->setUniform("u_NumPointLights", (int)m_pointLightData.size());
+        shader->setUniform("u_NumPointLights", (int)m_LightData.size());
         shader->setUniform("u_Accumulation", m_frame_idx > 0 && m_temporal_accumulation);
 
         glDispatchCompute((VOXEL_GRID_SIZE_X + 7) / 8,
@@ -1036,7 +1026,7 @@ namespace EngineFramework
 
         shader->use();
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_pointLightSSBO);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightSSBO);
 
         // Shadow maps
         glActiveTexture(GL_TEXTURE0 + TextureUnits::SHADOW_MAP_UNIT);
@@ -1048,14 +1038,9 @@ namespace EngineFramework
         shader->setUniform("s_SpotShadowMaps", TextureUnits::SPOT_LIGHT_MAP_UNIT);
 
         // Point light cubemaps
-        int baseUnit = TextureUnits::POINT_SHADOW_MAP_UNIT;
-        for (int i = 0; i < MAX_SHADOW_CASTING_LIGHTS; i++) {
-            glActiveTexture(GL_TEXTURE0 + baseUnit + i);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, m_pointShadowMapTextures[i]);
-
-            std::string uniformName = "s_PointShadowCubemaps[" + std::to_string(i) + "]";
-            shader->setUniform(uniformName.c_str(), baseUnit + i);
-        }
+        glActiveTexture(GL_TEXTURE0 + TextureUnits::POINT_SHADOW_MAP_UNIT);
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, m_pointShadowArray); // Bind the array
+        shader->setUniform("s_PointShadowArray", TextureUnits::POINT_SHADOW_MAP_UNIT);
 
         // Volumetric scattering texture
         glActiveTexture(GL_TEXTURE0 + TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
@@ -1063,7 +1048,7 @@ namespace EngineFramework
         shader->setUniform("s_VoxelGrid", TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
         shader->setUniform("u_Tricubic", m_tricubic_filtering);
 
-        shader->setUniform("u_NumPointLights", (int)m_pointLightData.size());
+        shader->setUniform("u_NumPointLights", (int)m_LightData.size());
 
         // Debug modes via F1-F10
         /*if (SceneManager::GetInstance().is_file_loaded) {

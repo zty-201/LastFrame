@@ -139,7 +139,7 @@ function on_update(self, dt)
         local px, py, pz = transform:GetPosition()
 
         -- Give it a slight offset in front + up (tweak these)
-        local forwardOffset = 0.5
+        local forwardOffset = 2.0
         local upOffset      = 0
 
         local lx = px + dirX * forwardOffset

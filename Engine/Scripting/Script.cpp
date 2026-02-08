@@ -459,18 +459,18 @@ namespace Engine {
         // Light Component bindings
         // ===============================================================
         s_Lua.new_usertype<LightComponent>("LightComponent",
-            "GetPosition", [](LightComponent& light) {
-                return std::make_tuple(light.position.x, light.position.y, light.position.z);
-            },
-            "SetPosition", [](LightComponent& light, float x, float y, float z) {
-                light.position = glm::vec3(x, y, z);
-            },
-            "GetDirection", [](LightComponent& light) {
-                return std::make_tuple(light.direction.x, light.direction.y, light.direction.z);
-            },
-            "SetDirection", [](LightComponent& light, float x, float y, float z) {
-                light.direction = glm::normalize(glm::vec3(x, y, z));
-            },
+            //"GetPosition", [](LightComponent& light) {
+            //    return std::make_tuple(light.position.x, light.position.y, light.position.z);
+            //},
+            //"SetPosition", [](LightComponent& light, float x, float y, float z) {
+            //    light.position = glm::vec3(x, y, z);
+            //},
+            //"GetDirection", [](LightComponent& light) {
+            //    return std::make_tuple(light.direction.x, light.direction.y, light.direction.z);
+            //},
+            //"SetDirection", [](LightComponent& light, float x, float y, float z) {
+            //    light.direction = glm::normalize(glm::vec3(x, y, z));
+            //},
             "GetIntensity", [](LightComponent& light) {
                 return light.intensity;
             },

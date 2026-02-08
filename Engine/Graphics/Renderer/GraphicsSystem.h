@@ -159,7 +159,6 @@ namespace EngineFramework
             glm::mat4 prev_view_proj;
             glm::mat4 inv_view_proj;
             glm::mat4 cascade_view_proj[3];  // Array of cascade matrices
-            glm::mat4 spot_view_proj[4];
             glm::vec4 cascade_splits;        // x,y,z,w = split distances
             glm::vec4 cascade_biases;
             glm::vec4 light_direction;
@@ -171,12 +170,21 @@ namespace EngineFramework
             glm::ivec4 width_height;
         };
 
-        struct PointLightSSBO {
+        struct LightSSBO {
+
+			// point light data layout
             glm::vec4 position_radius;      // .xyz = position, .w = radius
+            
+			// light color and intensity for both point and spot lights
             glm::vec4 color_intensity;      // .xyz = color, .w = intensity
+
+			// attenuation factors and type
             glm::vec4 attenuation_type;     // .x = constant, .y = linear, .z = quadratic, .w = TYPE (1.0=Point, 2.0=Spot)
+
+			// spotlight data layout
             glm::vec4 direction_shadow;     // .xyz = direction, .w = shadow_index
-            glm::vec4 spot_cutoffs;         // .x = cos(inner), .y = cos(outer), .z,w = paddingE
+            glm::vec4 spot_cutoffs;         // .x = cos(inner), .y = cos(outer), .z,w = padding
+            glm::mat4 view_proj;
         };
 
         //std::unique_ptr<InstancingSystem> m_instancingSystem;
@@ -199,12 +207,13 @@ namespace EngineFramework
 
 		// Shadow mapping resources
         static const int CASCADE_COUNT = 3;
-        static const int SPOTLIGHT_COUNT = 4;
+
+        // Texture IDs
         GLuint m_csmTextureArray = 0;  // 2D texture array for cascades
 		GLuint m_spotTextureArray = 0; // 2D texture array for spotlights
+        GLuint m_pointShadowArray = 0;
+
         std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
-        std::array<glm::mat4, SPOTLIGHT_COUNT> m_spotViewProjMatrices;
-        std::vector<std::pair<int, float>> lightDistances;
         std::vector<entt::entity> m_lightEntityMap;
         std::array<float, CASCADE_COUNT + 1> m_cascadeSplits;
 		std::array<float, CASCADE_COUNT> m_cascadeBiases;
@@ -217,11 +226,10 @@ namespace EngineFramework
 
 		// FBO texture attachments
         GLuint sceneTextureID;
-        std::vector<GLuint> m_pointShadowMapTextures;
-
+        
         // SSBOs
-		GLuint m_pointLightSSBO = 0;
-        std::vector<PointLightSSBO> m_pointLightData;
+		GLuint m_lightSSBO = 0;
+        std::vector<LightSSBO> m_LightData;
 
         // 3D textures for volumetric fog passes
         GLuint m_ray_march_voxel_grid = 0;
@@ -268,7 +276,7 @@ namespace EngineFramework
 
 		// Update methods
         void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
-		void UpdatePointLightSSBO(const CameraComponent& camera, const glm::mat4& viewProj);
+		void UpdateLightSSBO();
 
 		// Helper methods
         void PreGeneratePrimitives();
