@@ -50,7 +50,7 @@ jobs:
 
           $j2 = Start-ThreadJob {
             Set-Location "./Android"
-            $log = cmd /c gradlew.bat assembleX86_64Release --configure-on-demand 2>&1
+            #$log = cmd /c gradlew.bat assembleX86_64Release --configure-on-demand 2>&1
             return @{ ExitCode = $LASTEXITCODE; Log = $log }
           }
           
