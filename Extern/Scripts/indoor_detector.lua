@@ -1,14 +1,7 @@
 -- indoor_detector.lua
 print("[IndoorAudio] script file loaded")
 
--- Mark which TriggerBox entity IDs count as indoor
-local indoorZones = {
-    [259] = true
-}
-
-local outdoorZones = {
-    [377] = true
-}
+local PLAYER_ENTITY_ID = 5
 
 -- Shared across ALL zone scripts
 if _G.INDOOR_COUNT == nil then
@@ -27,79 +20,49 @@ function on_create(self)
 end
 
 function on_trigger_enter(self, otherID)
+    print(string.format("[IndoorAudio] Trigger ENTER | Zone=%d | Other=%d", EntityID, otherID))
 
-    print(string.format("[IndoorAudio] Trigger ENTER fired | Zone=%d | Other=%d", EntityID, otherID))
-
-    -- Lazy bind if needed
-    if SHARED.PlayerID == nil then
-        SHARED.PlayerID = otherID
-        print(string.format("[IndoorAudio] PlayerID was nil -> bound PlayerID=%d (lazy bind)", SHARED.PlayerID))
-    end
-
-    -- Ensure it's the player
-    if otherID ~= SHARED.PlayerID then
-        print(string.format("[IndoorAudio] Not player (PlayerID=%d), ignoring.", SHARED.PlayerID))
+    if otherID ~= PLAYER_ENTITY_ID then
+        print(string.format("[IndoorAudio] ENTER ignored: not player (PlayerID=%d).", PLAYER_ENTITY_ID))
         return
     end
 
-    -- OUTDOOR OVERRIDE ZONE (607)
-    if outdoorZones[EntityID] then
-        _G.INDOOR_COUNT = 0
-        print(string.format(">>> PLAYER ENTERED OUTDOOR OVERRIDE ZONE %d | INDOOR_COUNT=%d", EntityID, _G.INDOOR_COUNT))
-        return
-    end
-
-    -- Only indoor zones affect the counter
-    if not indoorZones[EntityID] then
-        print("[IndoorAudio] Zone not registered as indoor. Ignoring.")
-        return
-    end
-
-    -- Debounce
     if playerInsideThisZone then
         print("[IndoorAudio] Already inside this zone. Debounced.")
         return
     end
     playerInsideThisZone = true
 
-    _G.INDOOR_COUNT = _G.INDOOR_COUNT + 1
-
-    print(string.format(
-        ">>> PLAYER ENTERED INDOOR ZONE %d | INDOOR_COUNT=%d",
-        EntityID,
-        _G.INDOOR_COUNT
-    ))
+    _G.INDOOR_COUNT = (_G.INDOOR_COUNT or 0) + 1
+    print(string.format(">>> PLAYER ENTERED INDOOR ZONE %d | INDOOR_COUNT=%d", EntityID, _G.INDOOR_COUNT))
 end
 
 function on_trigger_exit(self, otherID)
+    print(string.format("[IndoorAudio] Trigger EXIT | Zone=%d | Other=%d", EntityID, otherID))
 
-    print(string.format("[IndoorAudio] Trigger EXIT fired | Zone=%d | Other=%d", EntityID, otherID))
-
-    if not indoorZones[EntityID] then
+    if otherID ~= PLAYER_ENTITY_ID then
+        print(string.format("[IndoorAudio] EXIT ignored: not player (PlayerID=%d).", PLAYER_ENTITY_ID))
         return
     end
 
-    if SHARED.PlayerID == nil then
-        print("[IndoorAudio] EXIT ignored: PlayerID still nil.")
-        return
-    end
-
-    if otherID ~= SHARED.PlayerID then
-        return
-    end
-
-    -- Debounce
     if not playerInsideThisZone then
         print("[IndoorAudio] Exit ignored — player wasn't marked inside this zone.")
         return
     end
     playerInsideThisZone = false
 
-    _G.INDOOR_COUNT = math.max(0, _G.INDOOR_COUNT - 1)
+    _G.INDOOR_COUNT = math.max(0, (_G.INDOOR_COUNT or 0) - 1)
+    print(string.format("<<< PLAYER EXITED INDOOR ZONE %d | INDOOR_COUNT=%d", EntityID, _G.INDOOR_COUNT))
+end
 
-    print(string.format(
-        "<<< PLAYER EXITED INDOOR ZONE %d | INDOOR_COUNT=%d",
-        EntityID,
-        _G.INDOOR_COUNT
-    ))
+function on_destroy(self)
+    -- Safety: if zone is destroyed while player is inside, fix global count
+    if playerInsideThisZone then
+        playerInsideThisZone = false
+        _G.INDOOR_COUNT = math.max(0, (_G.INDOOR_COUNT or 0) - 1)
+        print(string.format(
+            "[IndoorAudio] on_destroy: zone removed while inside -> INDOOR_COUNT=%d",
+            _G.INDOOR_COUNT
+        ))
+    end
 end
