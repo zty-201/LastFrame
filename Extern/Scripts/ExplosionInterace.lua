@@ -8,9 +8,10 @@
 -- Also enforces:
 --   entity 378 scale != (0,0,0)
 --
--- IMPORTANT: Captures UI input:
---   when open -> cursor visible + unlocked
+-- Captures UI input ONLY on transitions:
+--   when open  -> cursor visible + unlocked
 --   when closed -> cursor hidden + locked
+-- IMPORTANT: does NOT force cursor state on_create (prevents cursor disappearing at game start)
 ----------------------------------------------------------------
 
 print("[ExplosionToyInterface_Root] ===== SCRIPT FILE LOADED =====")
@@ -21,7 +22,9 @@ local TOY_ID = 378
 local UI_TABLE = "EXPLOSION_TOY_UI_OPEN"
 
 local UI = nil
-local uiWasOpen = false
+
+-- nil = uninitialized (prevents forcing cursor lock at startup)
+local uiWasOpen = nil
 
 local function scale_ok()
     local tr = Query.GetTransform(TOY_ID)
@@ -52,13 +55,16 @@ function on_create(self)
 
     SHARED = SHARED or {}
     SHARED[UI_TABLE] = SHARED[UI_TABLE] or {}
+    if SHARED[UI_TABLE][TOY_ID] == nil then
+        SHARED[UI_TABLE][TOY_ID] = false
+    end
 
+    -- Start hidden, but DO NOT touch cursor/lock here
     UI:SetVisible(false)
-    uiWasOpen = false
-    set_ui_input(false)
 
     if DEBUG then
-        print("[ExplosionToyInterface_Root] Initialized. UI entity=", EntityID, " toyId=", TOY_ID)
+        print("[ExplosionToyInterface_Root] Initialized. UI entity=", EntityID, " toyId=", TOY_ID,
+              "(not forcing cursor/lock on_create)")
     end
 end
 
@@ -68,6 +74,16 @@ function on_update(self, dt)
     local open = want_open() and scale_ok()
     UI:SetVisible(open)
 
+    -- First update: initialize state WITHOUT forcing cursor changes
+    if uiWasOpen == nil then
+        uiWasOpen = open
+        if DEBUG then
+            print("[ExplosionToyInterface_Root] first update, uiWasOpen=", tostring(uiWasOpen))
+        end
+        return
+    end
+
+    -- Only on transitions do we change cursor/lock
     if open ~= uiWasOpen then
         set_ui_input(open)
         uiWasOpen = open
@@ -78,6 +94,6 @@ function on_update(self, dt)
 end
 
 function on_destroy(self)
-    -- Safety: if UI entity is destroyed while open, restore gameplay input
-    set_ui_input(false)
+    -- Do NOT force cursor/lock here either
+    -- (prevents random cursor state changes during menu teardown)
 end

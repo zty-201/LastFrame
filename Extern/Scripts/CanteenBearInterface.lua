@@ -6,13 +6,20 @@ local TOY_ID   = 376
 local UI_TABLE = "CANTEEN_TOY_UI_OPEN"
 
 local UI = nil
-local uiWasOpen = false
+
+-- IMPORTANT:
+-- nil = not initialized yet (prevents forcing cursor lock at game start)
+local uiWasOpen = nil
 
 local function want_open()
     return SHARED and SHARED[UI_TABLE] and SHARED[UI_TABLE][TOY_ID] == true
 end
 
 local function set_ui_input(open)
+    -- When UI opens:
+    --   show cursor + unlock
+    -- When UI closes:
+    --   hide cursor + lock
     if Input and Input.SetCursorVisible then
         Input.SetCursorVisible(open)
     end
@@ -34,12 +41,12 @@ function on_create(self)
         SHARED[UI_TABLE][TOY_ID] = false
     end
 
+    -- Start hidden, but DO NOT touch cursor/lock here
     UI:SetVisible(false)
-    uiWasOpen = false
-    set_ui_input(false)
 
     if DEBUG then
-        print("[CanteenToyInterface_Root] init. TOY_ID=", TOY_ID, "UI_TABLE=", UI_TABLE)
+        print("[CanteenToyInterface_Root] init. TOY_ID=", TOY_ID, "UI_TABLE=", UI_TABLE,
+              " (not forcing cursor/lock on_create)")
     end
 end
 
@@ -49,6 +56,16 @@ function on_update(self, dt)
     local open = want_open()
     UI:SetVisible(open)
 
+    -- First update: initialize state WITHOUT forcing cursor changes.
+    if uiWasOpen == nil then
+        uiWasOpen = open
+        if DEBUG then
+            print("[CanteenToyInterface_Root] first update, uiWasOpen=", tostring(uiWasOpen))
+        end
+        return
+    end
+
+    -- Only on transitions do we change cursor/lock
     if open ~= uiWasOpen then
         set_ui_input(open)
         uiWasOpen = open
@@ -59,5 +76,5 @@ function on_update(self, dt)
 end
 
 function on_destroy(self)
-    set_ui_input(false)
+    -- Do NOT force cursor here either (prevents startup/teardown weirdness)
 end
