@@ -50,7 +50,7 @@ jobs:
           )
 
           cd Android
-          call gradlew.bat assembleX86_64Release --configure-on-demand
+          call gradlew.bat assembleX86_64Release --parallel --configure-on-demand
           if errorlevel 1 (
             echo Android build failed
             exit /b 1
