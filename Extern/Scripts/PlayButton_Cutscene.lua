@@ -155,7 +155,8 @@ function on_button_PlayButton(self)
     print("[PlayButtonController] ===== PLAY BUTTON PRESSED =====")
 
     _G.GAME_STATE = "GAME"
-
+    _G.INDOOR_COUNT = 0
+    
     if self.cutscene_started then
         print("[PlayButtonController] Cutscene already playing, ignoring")
         return

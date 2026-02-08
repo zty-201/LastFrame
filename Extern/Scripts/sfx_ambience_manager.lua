@@ -19,6 +19,15 @@ local current = 0.0          -- current indoor factor [0..1]
 local target  = 0.0          -- target indoor factor [0..1]
 local lastMode = nil
 
+local _dbgT = 0.0
+
+local function ensureGameState()
+    -- If some script reset GAME_STATE, don't let it kill ambience mid-game
+    if _G.GAME_STATE == nil then
+        _G.GAME_STATE = "MENU"
+    end
+end
+
 local function clamp01(x)
     if x < 0.0 then return 0.0 end
     if x > 1.0 then return 1.0 end
@@ -37,10 +46,6 @@ local function isIndoorWanted()
     return (_G.INDOOR_COUNT ~= nil and _G.INDOOR_COUNT > 0)
 end
 
--- IMPORTANT:
--- _G.GAME_STATE should be:
---   "MENU" on main menu
---   "GAME" once Play is pressed / gameplay starts
 local function getMode()
     if _G.GAME_STATE ~= "GAME" then
         return MODE_MENU
@@ -105,6 +110,16 @@ end
 
 function on_update(self, dt)
     if dt == nil then dt = 0.016 end
+
+    _dbgT = _dbgT + dt
+    if _dbgT >= 1.0 then
+        _dbgT = 0.0
+        print(string.format(
+            "[AmbienceManager] GAME_STATE=%s INDOOR_COUNT=%s",
+            tostring(_G.GAME_STATE),
+            tostring(_G.INDOOR_COUNT)
+        ))
+    end
 
     local mode = getMode()
 
