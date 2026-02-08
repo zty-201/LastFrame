@@ -16,7 +16,7 @@ function on_button_ReturnButton(self)
     UI_CloseAllMenus()
 
     -- Display Main Menu
-    UI_DisplayMenu("StartMenu")
+    -- UI_DisplayMenu("StartMenu")
 end
 
 function on_destroy(self)
