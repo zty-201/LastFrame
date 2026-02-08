@@ -43,20 +43,21 @@ jobs:
       - name: Parallel Execution of Android Build and Windows Build-Test
         shell: cmd
         run: |
-          call Tester.bat
+          call ../Tester.bat
           if errorlevel 1 (
             echo Windows build-test failed
             exit /b 1
           )
 
-          cd Android
-          call gradlew.bat assembleX86_64Release --parallel --configure-on-demand
+          call ./gradlew.bat assembleX86_64Release --parallel --configure-on-demand
           if errorlevel 1 (
             echo Android build failed
             exit /b 1
           )
 
           echo Both Windows and Android builds succeeded!
+        working-directory: Android
+
       # - name: Run CI Tester.bat script and Android Build script.
       #   run: |
       #     $winJob = Start-Job { ./Tester.bat }
