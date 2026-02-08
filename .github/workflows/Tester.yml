@@ -43,36 +43,25 @@ jobs:
       - name: Parallel Execution of Android Build and Windows Build-Test
         shell: pwsh
         run: |
-          $j1 = Start-ThreadJob {
-            $log = cmd /c Tester.bat 2>&1  # Capture both stdout and stderr
-            return @{ ExitCode = $LASTEXITCODE; Log = $log }
+          $winProc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c Tester.bat" -NoNewWindow -PassThru
+          $androidProc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c gradlew.bat assembleX86_64Release --configure-on-demand" -WorkingDirectory "Android" -NoNewWindow -PassThru
+
+          $winProc.WaitForExit()
+          $androidProc.WaitForExit()
+
+          $winExit = $winProc.ExitCode
+          $androidExit = $androidProc.ExitCode
+
+          if ($winExit -ne 0) {
+              Write-Error "Windows build-test failed with exit code $winExit"
+              exit 1
+          }
+          if ($androidExit -ne 0) {
+              Write-Error "Android build failed with exit code $androidExit"
+              exit 1
           }
 
-          $j2 = Start-ThreadJob {
-            Set-Location "./Android"
-            #$log = cmd /c gradlew.bat assembleX86_64Release --configure-on-demand 2>&1
-            return @{ ExitCode = $LASTEXITCODE; Log = $log }
-          }
-          
-          Wait-Job $j1, $j2
-          $r1 = Receive-Job $j1
-          $r2 = Receive-Job $j2
-
-          Write-Host "----- Windows Build-Test Log -----"
-          $r1.Log | ForEach-Object { Write-Host $_ }
-
-          Write-Host "----- Android Build Log -----"
-          $r2.Log | ForEach-Object { Write-Host $_ }
-
-
-          if ($r1.ExitCode -ne 0) {
-            Write-Error "Windows build-test failed"
-            exit 1
-          }
-          if ($r2.ExitCode -ne 0) {
-            Write-Error "Android failed to build"
-            exit 1
-          }
+          Write-Host "Both Windows and Android builds succeeded!"
       # - name: Run CI Tester.bat script and Android Build script.
       #   run: |
       #     $winJob = Start-Job { ./Tester.bat }
