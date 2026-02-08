@@ -49,7 +49,8 @@ jobs:
           }
 
           $j2 = Start-ThreadJob {
-            cmd /c .\Android\gradlew.bat assembleX86_64Release --configure-on-demand
+            Set-Location "./Android"
+            cmd /c gradlew.bat assembleX86_64Release --configure-on-demand
             exit $LASTEXITCODE
           }
           
