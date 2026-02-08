@@ -100,12 +100,8 @@ struct Scene
         //Rule of 3, ensure it cannot be copied so texture destructor has no issues with double or permature deletion
         Texture(const Texture& rhs) = delete;
         Texture& operator=(const Texture& rhs) = delete;
-
-#ifdef PLATFORM_WINDOWS
-        //Returns BC3 if true, ETC2 if false.
-        static std::vector<unsigned char> CompressTexture(const char* filename, bool convertBC3 = true);
-#endif
     };
+
 };
 
 #endif

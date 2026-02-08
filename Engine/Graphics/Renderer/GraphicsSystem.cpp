@@ -11,6 +11,7 @@
 #include "SceneManager.hpp"
 
 #include "stb_image.h"
+
 #define VOXEL_GRID_SIZE_X 160
 #define VOXEL_GRID_SIZE_Y 90
 #define VOXEL_GRID_SIZE_Z 128
