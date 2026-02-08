@@ -80,13 +80,26 @@ function Flashlight_Toggle()
 
     if light then
         if isOn then
-            light:SetIntensity(baseIntensity)   -- back to full strength
+            light:SetIntensity(baseIntensity)
         else
-            light:SetIntensity(0.0)            -- completely off
+            light:SetIntensity(0.0)
         end
     end
-end
 
+    -------------------------------------------------
+    -- PLAY FLASHLIGHT TOGGLE SOUND
+    -------------------------------------------------
+    if type(Audio_PlaySlot) == "function" then
+        
+        -- Force retrigger in case player spams toggle
+        Audio_StopSlot(EntityID, "Flashlight")
+        Audio_PlaySlot(EntityID, "Flashlight")
+
+        print("[FLASHLIGHT AUDIO] Played slot 'Flashlight'")
+    else
+        print("[FLASHLIGHT AUDIO ERROR] Audio_PlaySlot missing!")
+    end
+end
 
 function on_update(self, dt)
     if not camera then return end

@@ -767,6 +767,7 @@ void PhysicsWorld::AddForce(entt::entity entity, const glm::vec3& force)
 static inline glm::quat EulerDegToQuat(const glm::vec3& deg) {
     return glm::quat(glm::radians(deg));
 }
+#if defined(PLATFORM_WINDOWS) || defined(DEBUG)
 
 bool PhysicsWorld::RaycastAgainstColliders(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit)
 {
@@ -910,7 +911,7 @@ bool PhysicsWorld::RaycastAgainstColliders(const glm::vec3& origin, const glm::v
 
     return foundHit;
 }
-
+#endif
 bool PhysicsWorld::Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit)
 {
     if (!m_physicsSystem) return false;

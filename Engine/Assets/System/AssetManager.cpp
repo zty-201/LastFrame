@@ -78,7 +78,6 @@ namespace EngineFramework {
 			throw std::invalid_argument("AAssetManager is not initialized in AssetManager");
 		}
 
-		LOGD("Opening Asset: %s", path.c_str());
 		AAsset* asset = AAssetManager_open(android_asset_manager, path.c_str(), AASSET_MODE_BUFFER);
 		if (!asset)
 		{
@@ -136,7 +135,6 @@ namespace EngineFramework {
 			throw std::invalid_argument("AAssetManager is not initialized in AssetManager");
 		}
 
-		LOGD("Opening Asset: %s", path.c_str());
 		AAsset* asset = AAssetManager_open(android_asset_manager, path.c_str(), AASSET_MODE_BUFFER);
 		if (!asset)
 		{
@@ -604,7 +602,6 @@ namespace EngineFramework {
 			num_pending_gpu_load++; //Each mesh should gpu load after completion.
 			thread_arr.emplace_back(create_append_thread);
 		}
-
 		//Main thread loads into gpu, side threads create mesh and append to pending_gpu_load_arr
 		while(num_pending_gpu_load > 0)
 		{
