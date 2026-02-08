@@ -37768,7 +37768,7 @@
 		},
 		"TransformComponent": {
 			"position": [
-				300.0,
+				863.9320068359375,
 				180.0,
 				-1192.671142578125
 			],
@@ -37955,7 +37955,7 @@
 					"maxDistance": 10.0,
 					"minDistance": 5.0,
 					"pitch": 1.0,
-					"playOnStart": true,
+					"playOnStart": false,
 					"spatial": 1,
 					"volume": 1.0
 				},
@@ -37964,13 +37964,28 @@
 						15935213613728841733,
 						11537445004664754516
 					],
-					"category": 0,
+					"category": 3,
 					"id": "Indoor",
 					"loop": true,
 					"maxDistance": 25.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
+					"spatial": 1,
+					"volume": 1.0
+				},
+				{
+					"audio_guid": [
+						12687520148045856771,
+						11537445004664754516
+					],
+					"category": 0,
+					"id": "Menu",
+					"loop": true,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": true,
 					"spatial": 1,
 					"volume": 1.0
 				}
@@ -43568,6 +43583,19 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16102277991515799559
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -43655,6 +43683,33 @@
 				1.0,
 				0.9999881982803345
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				50.0,
+				50.0,
+				50.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				-13.399999618530273,
+				-7.449999809265137
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"432": {
@@ -59550,6 +59605,10 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 6781577181173088257
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 6445003481980993537
 				}
 			]
 		},
@@ -59632,7 +59691,7 @@
 			],
 			"rotation": [
 				0.0,
-				-89.9999771118164,
+				114.78324127197266,
 				0.0
 			],
 			"scale": [
@@ -59676,6 +59735,15 @@
 					],
 					"sphereRadius": 0.5,
 					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6445003481980993537
 				}
 			]
 		},
@@ -59758,7 +59826,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				272.66302490234375,
 				0.0
 			],
 			"scale": [
@@ -59802,6 +59870,15 @@
 					],
 					"sphereRadius": 0.5,
 					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6445003481980993537
 				}
 			]
 		},
@@ -59884,7 +59961,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				218.7709197998047,
 				0.0
 			],
 			"scale": [
@@ -61248,8 +61325,8 @@
 				0.0
 			],
 			"size": [
-				1715.0,
-				1158.0
+				1395.0,
+				833.0
 			],
 			"size_NDC": [
 				1.0,
@@ -61312,8 +61389,8 @@
 				0.0
 			],
 			"size": [
-				1543.0,
-				1024.0
+				1395.0,
+				833.0
 			],
 			"size_NDC": [
 				1.0,
@@ -69152,6 +69229,70 @@
 			],
 			"size": [
 				1729.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15304296428018171923,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"696": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6302445202357600261
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "LobbyBookIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				-838.1239624023438,
+				112.0961685180664,
+				414.13824462890625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1715.0,
 				1158.0
 			],
 			"size_NDC": [

@@ -42,6 +42,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AudioComponent.h"
 #include "Audio.hpp"
 
+// For Game/Scene
+#include "System_GameObjectSystem.hpp"
+#include "SceneManager.hpp"
+
 //For platform android vs windows
 #include "Platform.h"
 
@@ -493,6 +497,23 @@ namespace Engine {
         LOGI("[ScriptSystem] LightComponent bindings complete.");
 
         // ===============================================================
+        // Game / Scene bindings
+        // ===============================================================
+
+        extern void RequestSceneRestart();
+        extern void RequestQuit();
+
+        s_Lua.set_function("Scene_RequestRestart", []()
+            {
+                RequestSceneRestart();
+            });
+
+        s_Lua.set_function("Scene_QuitGame", []()
+            {
+                RequestQuit();
+            });
+
+        // ===============================================================
         // AudioComponent bindings
         // ===============================================================
         // Used by scripts to configure AudioSlot behaviour.
@@ -787,8 +808,8 @@ namespace Engine {
 
         sol::table inputTable = s_Lua.create_named_table("Input");
 
-        
 
+        
         // ===============================================================
         // Query helpers
         // ===============================================================

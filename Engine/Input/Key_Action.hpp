@@ -13,6 +13,7 @@ namespace EngineFramework
 		MOVE_LEFT,
 		MOVE_RIGHT,
 		OPEN_EDITOR,
+		PAUSE,
 	};
 }
 #endif

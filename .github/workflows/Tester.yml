@@ -32,47 +32,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4 #Check out this repo.
       # Set up java for android gradlew to work.
-      - name: set up JDK 11
+      - name: set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
           cache: gradle
 
       #Save github minutes compared to parallel jobs. Using android x86_64 build because it's faster to build.
-      - name: Parallel Execution of Android Build and Windows Build-Test
-        shell: pwsh
+      - name: Windows Build-Test
+        shell: cmd
         run: |
-          $j1 = Start-ThreadJob {
-            $log = cmd /c Tester.bat 2>&1  # Capture both stdout and stderr
-            return @{ ExitCode = $LASTEXITCODE; Log = $log }
-          }
+          call ./Tester.bat
+          if errorlevel 1 (
+            echo Windows build-test failed
+            exit /b 1
+          )
+      - name: Android Build
+        shell: cmd
+        run: |
+          call ./gradlew.bat assembleX86_64Release --parallel --configure-on-demand
+          if errorlevel 1 (
+            echo Android build failed
+            exit /b 1
+          )
 
-          $j2 = Start-ThreadJob {
-            Set-Location "./Android"
-            $log = cmd /c gradlew.bat assembleX86_64Release --configure-on-demand 2>&1
-            return @{ ExitCode = $LASTEXITCODE; Log = $log }
-          }
-          
-          Wait-Job $j1, $j2
-          $r1 = Receive-Job $j1
-          $r2 = Receive-Job $j2
+          echo Both Windows and Android builds succeeded!
+        working-directory: Android
 
-          Write-Host "----- Windows Build-Test Log -----"
-          $r1.Log | ForEach-Object { Write-Host $_ }
-
-          Write-Host "----- Android Build Log -----"
-          $r2.Log | ForEach-Object { Write-Host $_ }
-
-
-          if ($r1.ExitCode -ne 0) {
-            Write-Error "Windows build-test failed"
-            exit 1
-          }
-          if ($r2.ExitCode -ne 0) {
-            Write-Error "Android failed to build"
-            exit 1
-          }
       # - name: Run CI Tester.bat script and Android Build script.
       #   run: |
       #     $winJob = Start-Job { ./Tester.bat }
