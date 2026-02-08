@@ -42,7 +42,7 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 		Compressed Texture (dxt5, etc2) --> gli
 	*/
 	//For compressed texture loading, i believe it support isSRGB and cubemaps.
-	//Code taken from GLI documentation
+	//Code taken from GLI documentation		
 	constexpr std::string compressed_extension[]{ ".DDS", ".dds", ".ktx", ".ktx2" };
 	if (std::find(std::begin(compressed_extension), std::end(compressed_extension), std::filesystem::path(filename).extension().string()) != std::end(compressed_extension))
 	{
@@ -158,20 +158,50 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 		unsigned char* data = stbi_load_from_memory(
 			texture_data.data(),
 			static_cast<int>(texture_data.size()),
-			&width, &height, &bytesPerPix, 4
+			&width, &height, &bytesPerPix, 0
 		);
 
 		if (!data)
 			throw std::runtime_error(std::string("Failed to load texture: ") + filename);
 
+		//Default.
+		GLint internalFormat = GL_RGBA8;
+		GLint format = GL_RGBA;
+		switch (bytesPerPix)
+		{
+		case 1:
+			internalFormat = GL_R8;
+			format = GL_RED;
+			break;
+		case 2:
+			internalFormat = GL_RG8;
+			format = GL_RG;
+			break;
+		case 3:
+			internalFormat = GL_RGB8;
+			format = GL_RGB;
+			if (isSRGB) internalFormat = GL_SRGB8;
+			break;
+		case 4:
+			internalFormat = GL_RGBA8;
+			format = GL_RGBA;
+			if (isSRGB) internalFormat = GL_SRGB8_ALPHA8;
+			break;
+		default:
+			throw std::runtime_error(std::string("Failed to load texture: ") + filename);
+		}
+
 		GLuint texID = 0;
 		glGenTextures(1, &texID);
 		glBindTexture(GL_TEXTURE_2D, texID);
 
-		GLint internalFormat = isSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+		GLint previousAlignment = 0;
+		glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		// Allocates AND uploads Level 0 in one go
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		
 
 		// Automatically generates levels 1...N
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -181,6 +211,7 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+		glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		stbi_image_free(data);
 

@@ -48,47 +48,14 @@ jobs:
             echo Windows build-test failed
             exit /b 1
           )
-      - name: Android Build
-        shell: cmd
-        run: |
-          call ./gradlew.bat assembleX86_64Release --parallel --configure-on-demand
-          if errorlevel 1 (
-            echo Android build failed
-            exit /b 1
-          )
-
-          echo Both Windows and Android builds succeeded!
-        working-directory: Android
-
-      # - name: Run CI Tester.bat script and Android Build script.
-      #   run: |
-      #     $winJob = Start-Job { ./Tester.bat }
-      #     $androidJob = Start-Job { ./Android/gradlew.bat assembleRelease --parallel --configure-on-demand }
-      #     Wait-Job $winJob, $androidJob
-      #     Receive-Job $winJob
-      #     Receive-Job $androidJob
-      #     if ($winJob.State -ne 'Completed') {
-      #         throw "Windows build-and-test failed!"
-      #     }
-      #     if ($androidJob.State -ne 'Completed') {
-      #         throw "Android build failed!"
-      #     }
-
-      # #Build and Run tests using .bat file.
-      # - name: Run CI batch script
+      #Disabled, because android takes 30mins to build... and i have 2k total.
+      # - name: Android Build
       #   shell: cmd
       #   run: |
-      #     if exist Tester.bat (
-      #       call Tester.bat
-      #     ) else (
-      #       echo "Tester.bat not found, skipping tests..."
+      #     call ./gradlew.bat assembleX86_64Release --parallel --configure-on-demand
+      #     if errorlevel 1 (
+      #       echo Android build failed
+      #       exit /b 1
       #     )
-      # #Android Build.
-      # - name: set up JDK 11
-      #   uses: actions/setup-java@v3
-      #   with:
-      #     java-version: '11'
-      #     distribution: 'temurin'
-      #     cache: gradle
-      # - name: Configure and Build with Gradle
-      #   run: ./Android/gradlew.bat assembleRelease --parallel --configure-on-demand
+
+      #   working-directory: Android
