@@ -24,7 +24,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <fstream>
 #include <iostream>
 #include "AssetManager.hpp"
-
+#include "ScriptWrapper.hpp"
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
@@ -135,6 +135,10 @@ namespace EngineFramework
         
         std::string sceneString = AssetManagerSystem::GetStringFromFile("Extern/Overlays/" + filename + ".json");
         GameObjectSystem::GetInstance().DeSerializeAllEntityInstances(sceneString, AllElements_in_this_overlay);
+
+        // [BEN] Testing if buttons work now
+        for (auto e : AllElements_in_this_overlay)
+            Engine::ScriptSystem::RequestReloadEntity(e);
 
 
         //std::cout << "=========================================\n";
