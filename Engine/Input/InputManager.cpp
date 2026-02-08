@@ -170,9 +170,9 @@ namespace EngineFramework
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
             // Editor -- do nothing
 #else
-            auto light_view = registry.view<LightComponent>();
+            /*auto light_view = registry.view<LightComponent>();
             auto& light = light_view.get<LightComponent>(light_view.front());
-            Light::onCursor(light, offset_MouseX, offset_MouseY);
+            Light::onCursor(light, offset_MouseX, offset_MouseY);*/
 #endif
         }
     }
