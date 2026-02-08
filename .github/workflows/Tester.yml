@@ -40,15 +40,17 @@ jobs:
           cache: gradle
 
       #Save github minutes compared to parallel jobs. Using android x86_64 build because it's faster to build.
-      - name: Parallel Execution of Android Build and Windows Build-Test
+      - name: Windows Build-Test
         shell: cmd
         run: |
-          call ../Tester.bat
+          call ./Tester.bat
           if errorlevel 1 (
             echo Windows build-test failed
             exit /b 1
           )
-
+      - name: Android Build
+        shell: cmd
+        run: |
           call ./gradlew.bat assembleX86_64Release --parallel --configure-on-demand
           if errorlevel 1 (
             echo Android build failed

@@ -1,4 +1,3 @@
 /build/
 *.pch
 /.vs/
-/Android/app/src/main/assets/Extern
