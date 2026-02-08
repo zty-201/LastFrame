@@ -10824,9 +10824,9 @@
 		},
 		"ColliderComponent": {
 			"maxBounds": [
-				59.077880859375,
-				241.2906951904297,
-				14.371514320373535
+				125.62799835205078,
+				241.54100036621094,
+				14.472000122070313
 			],
 			"minBounds": [
 				-54.989227294921875,
@@ -10944,19 +10944,19 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-298.5394592285156,
+				-297.4989318847656,
 				540.1688842773438,
-				800.9136352539063
+				739.4270629882813
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-89.9999771118164,
 				0.0
 			],
 			"scale": [
-				0.9999996423721313,
+				0.999999463558197,
 				1.0,
-				0.9999992847442627
+				0.9999991059303284
 			]
 		},
 		"TriggerBoxComponent": {
@@ -10979,7 +10979,7 @@
 				0.0
 			],
 			"localPosition": [
-				0.0,
+				55.0,
 				100.0,
 				0.0
 			],
@@ -20293,7 +20293,12 @@
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
-			"Scripts": []
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16438974836715732999
+				}
+			]
 		},
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -31363,7 +31368,7 @@
 			],
 			"rotation": [
 				0.0,
-				-90.0,
+				90.0,
 				-0.6000000238418579
 			],
 			"scale": [
@@ -37620,8 +37625,17 @@
 			]
 		},
 		"LuaScriptComponent": {
-			"Enabled": false,
-			"Scripts": []
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 15270519434878566401
+				}
+			]
 		},
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -37710,6 +37724,33 @@
 				1.0,
 				1.0000076293945313
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				20.0,
+				50.0,
+				50.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				30.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"377": {
@@ -37771,6 +37812,19 @@
 		}
 	},
 	"378": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 4894225893451137031
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -37855,9 +37909,36 @@
 			],
 			"scale": [
 				0.0,
-				0.0,
+				0.5,
 				0.0
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				50.0,
+				100.0,
+				50.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				50.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"379": {
@@ -38172,9 +38253,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				54.12277603149414,
+				137.07379150390625,
 				186.5251007080078,
-				-447.8269348144531
+				-843.7933349609375
 			],
 			"rotation": [
 				0.0,
@@ -40092,17 +40173,17 @@
 			"position": [
 				-298.5394592285156,
 				540.1688842773438,
-				800.9136352539063
+				806.4412231445313
 			],
 			"rotation": [
 				0.0,
-				89.9999771118164,
+				-89.9999771118164,
 				0.0
 			],
 			"scale": [
-				0.9999996423721313,
+				0.999999463558197,
 				1.0,
-				0.9999992847442627
+				0.9999991059303284
 			]
 		}
 	},
@@ -50359,9 +50440,9 @@
 				-873.7933349609375
 			],
 			"rotation": [
-				-0.15385960042476654,
-				0.08089479058980942,
-				0.984775722026825
+				0.0,
+				0.0,
+				0.0
 			],
 			"scale": [
 				0.0,
@@ -61696,8 +61777,8 @@
 			"Enabled": true,
 			"Scripts": [
 				{
-					"Loaded": false,
-					"ScriptGuid": 8176611146165616643
+					"Loaded": true,
+					"ScriptGuid": 18325877526990700553
 				}
 			]
 		},
@@ -61760,8 +61841,8 @@
 			"Enabled": true,
 			"Scripts": [
 				{
-					"Loaded": false,
-					"ScriptGuid": 5870768136951922689
+					"Loaded": true,
+					"ScriptGuid": 3337897967101689863
 				}
 			]
 		},
@@ -68782,11 +68863,14 @@
 				}
 			]
 		},
+		"NameComponent": {
+			"name": "Bedroom+GirlCrying_TriggerBox"
+		},
 		"TransformComponent": {
 			"position": [
 				983.6026611328125,
-				-180.46914672851563,
-				1619.2896728515625
+				58.20684814453125,
+				1450.6590576171875
 			],
 			"rotation": [
 				0.0,
@@ -68951,6 +69035,134 @@
 				1.0,
 				0.9999998211860657
 			]
+		}
+	},
+	"690": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 10082372664149295107
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "CanteenToy+UI"
+		},
+		"TransformComponent": {
+			"position": [
+				-100.80685424804688,
+				68.748291015625,
+				183.78201293945313
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1719.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15304296428018171923,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"691": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 8929451159575101445
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayroomToyExpolisonIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				523.5675048828125,
+				39.891666412353516,
+				-337.4126892089844
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1729.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15304296428018171923,
+				3711223656383638553
+			],
+			"visible": false
 		}
 	},
 	"7": {

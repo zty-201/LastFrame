@@ -15,6 +15,82 @@ local function try_reload_self(reason)
     return true
 end
 
+local lastSkipState = false
+-- Persist across frames
+local _skipHeldPrev = false
+
+local function is_skip_pressed()
+    local held = false
+
+    -- Spacebar mapped to "JUMP" (this works in your engine)
+    if Input ~= nil and Input.GetAction ~= nil then
+        if Input.GetAction("JUMP") then
+            held = true
+        end
+    end
+
+    -- Mouse click / tap (IF your engine feeds touch as mouse button 0)
+    if Input ~= nil and Input.GetMouseButton ~= nil then
+        if Input.GetMouseButton(0) then
+            held = true
+        end
+    end
+
+    -- edge detect: true only on the first frame it becomes held
+    local pressed = held and (not _skipHeldPrev)
+    _skipHeldPrev = held
+    return pressed
+end
+
+local function try_advance_cutscene_one_step()
+    -- Preferred: advance by ONE scene
+    local advanceFns = {
+        "UI_AdvancePseudoCutscene",
+        "UI_PseudoCutsceneNext",
+        "UI_NextPseudoCutsceneScene",
+        "UI_CutsceneNext",
+    }
+
+    for i = 1, #advanceFns do
+        local name = advanceFns[i]
+        local fn = rawget(_G, name)
+        if type(fn) == "function" then
+            local ok, err = pcall(fn)
+            if ok then
+                print("[PlayButtonController] Advanced cutscene by 1 via " .. name)
+                return true
+            else
+                print("[PlayButtonController] ERROR calling " .. name .. ": " .. tostring(err))
+            end
+        end
+    end
+
+    -- Fallback: end cutscene completely if that's the only API available
+    local skipFns = {
+        "UI_SkipPseudoCutscene",
+        "UI_StopPseudoCutscene",
+        "UI_EndPseudoCutscene",
+        "UI_ClosePseudoCutscene",
+    }
+
+    for i = 1, #skipFns do
+        local name = skipFns[i]
+        local fn = rawget(_G, name)
+        if type(fn) == "function" then
+            local ok, err = pcall(fn)
+            if ok then
+                print("[PlayButtonController] No advance API; skipped entire cutscene via " .. name)
+                return true
+            else
+                print("[PlayButtonController] ERROR calling " .. name .. ": " .. tostring(err))
+            end
+        end
+    end
+
+    print("[PlayButtonController] No cutscene advance/skip binding found. Expose one in C++ (recommended: UI_AdvancePseudoCutscene).")
+    return false
+end
+
 function on_create(self)
     print("[PlayButtonController] ===== on_create CALLED =====")
     print("[PlayButtonController] EntityID=" .. tostring(EntityID))
@@ -50,6 +126,25 @@ function on_update(self, dt)
             if try_reload_self("F5") then
                 self._reload_cooldown = 0.5
             end
+        end
+    end
+
+    -- ------------------------------------------------------------
+    -- CUTSCENE ADVANCE (1 scene per press)
+    -- ------------------------------------------------------------
+    if self.cutscene_started then
+        -- If you added UI_IsCutscenePlaying, you can guard with it:
+        -- if UI_IsCutscenePlaying ~= nil and not UI_IsCutscenePlaying() then return end
+
+        if is_skip_pressed() then
+            if UI_StopPseudoCutscene ~= nil then
+                UI_StopPseudoCutscene()
+            else
+                -- fallback: at least close menus
+                if UI_CloseAllMenus ~= nil then UI_CloseAllMenus() end
+            end
+
+            self.cutscene_started = false
         end
     end
 end

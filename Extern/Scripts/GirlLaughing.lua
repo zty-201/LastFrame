@@ -1,35 +1,43 @@
 ----------------------------------------------------------------
--- CP2_Audio.lua
--- Plays the "Laughter" audio slot (Girl_laugh)
+-- Trigger_Audio_OnRange.lua
+-- Plays audio when player enters InteractionBox range
+-- Stops audio when player leaves range
 ----------------------------------------------------------------
 
 local DEBUG = true
-local SLOT_ID = "Laughter"   -- ✅ MUST match Slot ID in editor exactly
+local AUDIO_SLOT_ID = "Laughter"   -- ← matches your Audio Slot name
+local TARGET_ID = 688              -- interactable entity ID
+
+local wasInRange = false
 
 function on_create(self)
-    SHARED.CP2Audio = SHARED.CP2Audio or {}
-
-    function SHARED.CP2Audio.Play()
-        if type(Audio_PlaySlot) ~= "function" then
-            print("[CP2_Audio] ERROR: Audio_PlaySlot not available")
-            return false
-        end
-
-        Audio_PlaySlot(EntityID, SLOT_ID)
-
-        if DEBUG then
-            print("[CP2_Audio] Play -> slot:", SLOT_ID, "entity:", EntityID)
-        end
-        return true
-    end
+    SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
 
     if DEBUG then
-        print("[CP2_Audio] Ready (slot=" .. SLOT_ID .. ") on EntityID=" .. tostring(EntityID))
+        print("[Trigger_Audio] on_create for entity " .. tostring(EntityID))
     end
 end
 
-function on_destroy(self)
-    if SHARED.CP2Audio then
-        SHARED.CP2Audio = nil
+function on_update(self, dt)
+    local inRange =
+        SHARED.INTERACT_IN_ZONE
+        and SHARED.INTERACT_IN_ZONE[TARGET_ID] == true
+
+    -- ENTER
+    if inRange and not wasInRange then
+        Audio_PlaySlot(EntityID, AUDIO_SLOT_ID)
+        if DEBUG then
+            print("[Trigger_Audio] ENTER -> play", AUDIO_SLOT_ID)
+        end
     end
+
+    -- EXIT
+    if not inRange and wasInRange then
+        Audio_StopSlot(EntityID, AUDIO_SLOT_ID)
+        if DEBUG then
+            print("[Trigger_Audio] EXIT -> stop", AUDIO_SLOT_ID)
+        end
+    end
+
+    wasInRange = inRange
 end

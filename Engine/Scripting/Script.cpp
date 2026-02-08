@@ -250,6 +250,17 @@ namespace Engine {
                 EngineFramework::UI_System::GetInstance().StartPseudoCutscene();
             });
 
+        s_Lua.set_function("UI_StopPseudoCutscene", []()
+            {
+                // stop + close all menus so you instantly leave the cutscene UI
+                EngineFramework::UI_System::GetInstance().StopCutsceneSequence(true);
+            });
+
+        s_Lua.set_function("UI_IsCutscenePlaying", []() -> bool
+            {
+                return EngineFramework::UI_System::GetInstance().IsCutscenePlaying();
+            });
+
         s_Lua.set_function("UI_DisplayMenu", [](const std::string& menuName)
             {
                 // EngineFramework::UI_System::displayMenu(menuName);  // static-style
