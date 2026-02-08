@@ -1,55 +1,63 @@
-----------------------------------------------------------------
--- CanteenBearInterface_Root.lua
--- Attach to UI root entity INSIDE the menu (e.g., CanteenBearInterface)
--- Must have EntityUI
---
--- Visibility driven by:
---   SHARED.CANTEEN_BEAR_UI_OPEN[SOFTTOY_ID] == true
--- AND:
---   entity 378 scale != (0,0,0)
-----------------------------------------------------------------
-
-print("[CanteenBearInterface_Root] ===== SCRIPT FILE LOADED =====")
+print("[CanteenToyInterface_Root] ===== SCRIPT FILE LOADED =====")
 
 local DEBUG = true
 
--- Must match the interactable id you toggle from
-local SOFTTOY_ID = 376  -- <-- CHANGE if needed
-
-local SCALE_CHECK_ENTITY_ID = 376
-local UI_TABLE = "CANTEEN_BEAR_UI_OPEN"
+local TOY_ID   = 376
+local UI_TABLE = "CANTEEN_TOY_UI_OPEN"
 
 local UI = nil
-
-local function scale_ok()
-    local tr = Query.GetTransform(SCALE_CHECK_ENTITY_ID)
-    if tr == nil then return false end
-    local sx, sy, sz = tr:GetScale()
-    return not (sx == 0 and sy == 0 and sz == 0)
-end
+local uiWasOpen = false
 
 local function want_open()
-    return SHARED and SHARED[UI_TABLE] and SHARED[UI_TABLE][SOFTTOY_ID] == true
+    return SHARED and SHARED[UI_TABLE] and SHARED[UI_TABLE][TOY_ID] == true
+end
+
+local function set_ui_input(open)
+    if Input and Input.SetCursorVisible then
+        Input.SetCursorVisible(open)
+    end
+    if Input and Input.SetCursorLocked then
+        Input.SetCursorLocked(not open)
+    end
 end
 
 function on_create(self)
     UI = EntityUI
     if not UI then
-        print("[CanteenBearInterface_Root] ERROR: No UIComponent on entity", EntityID)
+        print("[CanteenToyInterface_Root] ERROR: No EntityUI on", EntityID)
         return
     end
 
     SHARED = SHARED or {}
     SHARED[UI_TABLE] = SHARED[UI_TABLE] or {}
+    if SHARED[UI_TABLE][TOY_ID] == nil then
+        SHARED[UI_TABLE][TOY_ID] = false
+    end
 
     UI:SetVisible(false)
+    uiWasOpen = false
+    set_ui_input(false)
 
     if DEBUG then
-        print("[CanteenBearInterface_Root] Initialized. uiEntity=", EntityID, " softtoy=", SOFTTOY_ID)
+        print("[CanteenToyInterface_Root] init. TOY_ID=", TOY_ID, "UI_TABLE=", UI_TABLE)
     end
 end
 
 function on_update(self, dt)
     if not UI then return end
-    UI:SetVisible(want_open() and scale_ok())
+
+    local open = want_open()
+    UI:SetVisible(open)
+
+    if open ~= uiWasOpen then
+        set_ui_input(open)
+        uiWasOpen = open
+        if DEBUG then
+            print("[CanteenToyInterface_Root] UI open changed ->", tostring(open))
+        end
+    end
+end
+
+function on_destroy(self)
+    set_ui_input(false)
 end

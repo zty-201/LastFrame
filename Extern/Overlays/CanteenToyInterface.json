@@ -6,7 +6,7 @@
 				3711223656383638553
 			],
 			"event_hover": "",
-			"event_trigger": "",
+			"event_trigger": "CloseCanteenToyUI",
 			"hover_texture": [
 				8792970980350722049,
 				3711223656383638553
@@ -22,6 +22,10 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 10522353237313241095
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 10363451816948613125
 				}
 			]
 		},

@@ -1,27 +1,23 @@
 ----------------------------------------------------------------
--- PlayroomExplosionToy_IconUI.lua
--- Attach to the ICON UI entity (must have EntityUI)
+-- ExplosionToy_IconUI.lua
+-- Attach to ICON UI entity (must have EntityUI)
 --
--- Shows icon only if:
---   - player is in range (InteractionBox): SHARED.INTERACT_IN_ZONE[TOY_ID] == true
+-- Shows icon when:
+--   - in range: SHARED.INTERACT_IN_ZONE[378] == true
 --   - entity 378 scale != (0,0,0)
--- Optional:
---   - hide icon while interface is open
+--   - optional: hide icon if interface open
 ----------------------------------------------------------------
 
-local DEBUG = false
+print("[ExplosionToy_IconUI] ===== SCRIPT FILE LOADED =====")
 
 local TOY_ID = 378
-local SCALE_CHECK_ENTITY_ID = 378
-
--- If you want icon to disappear while interface is open:
-local HIDE_WHEN_UI_OPEN = true
 local UI_TABLE = "EXPLOSION_TOY_UI_OPEN"
+local HIDE_WHEN_UI_OPEN = true
 
 local UI = nil
 
 local function scale_ok()
-    local tr = Query.GetTransform(SCALE_CHECK_ENTITY_ID)
+    local tr = Query.GetTransform(TOY_ID)
     if tr == nil then return false end
     local sx, sy, sz = tr:GetScale()
     return not (sx == 0 and sy == 0 and sz == 0)
@@ -41,8 +37,7 @@ end
 function on_create(self)
     UI = EntityUI
     if not UI then
-        print("[ExplosionToy_IconUI] ERROR: No UIComponent on entity", EntityID,
-              "(attach this script to the UI icon entity, not trigger 378)")
+        print("[ExplosionToy_IconUI] ERROR: No UIComponent 'EntityUI' on entity", EntityID)
         return
     end
 
@@ -51,15 +46,9 @@ function on_create(self)
     SHARED[UI_TABLE] = SHARED[UI_TABLE] or {}
 
     UI:SetVisible(false)
-
-    if DEBUG then
-        print("[ExplosionToy_IconUI] Initialized. icon=", EntityID, " toyId=", TOY_ID)
-    end
 end
 
 function on_update(self, dt)
     if not UI then return end
-
-    local show = in_range() and scale_ok() and (not ui_open())
-    UI:SetVisible(show)
+    UI:SetVisible(in_range() and scale_ok() and (not ui_open()))
 end
