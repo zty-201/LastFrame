@@ -1,9 +1,10 @@
 ----------------------------------------------------------------
 -- Test_ConsumeMusicDisc_Shared.lua
--- Uses InteractionBox (shared command table) instead of direct Q key.
--- When InteractionBox targets THIS entity and player presses E:
---   - consume 1 music_disc
---   - trigger StateController CP1
+-- + If player is in range:
+--     - show ICON1 if disc exists in inventory
+--     - else show ICON2
+-- + Hide both when out of range
+-- + ✅ After consuming FIRST disc successfully, hide both icons forever
 ----------------------------------------------------------------
 
 local DEBUG = true
@@ -11,9 +12,17 @@ local DEBUG = true
 local ITEM_ID  = "music_disc"
 local ITEM_QTY = 1
 
--- If InteractionBox targets a DIFFERENT entity (e.g., a trigger),
--- set this to that entity id. Otherwise leave 0 (auto uses EntityID).
 local TARGET_ENTITY_ID = 0
+
+-- Once we consume one disc, never show any icons again
+local iconsDisabledForever = false
+
+-- Disc insert SFX + delayed music trigger
+local DISC_INSERT_SFX_ID = "DiscInsert"
+local DISC_INSERT_DELAY_SECONDS = 0.75  -- make longer/shorter as you like
+
+local pendingTrigger = false
+local pendingTimer = 0.0
 
 local function s(v) return (v == nil) and "nil" or tostring(v) end
 
@@ -21,12 +30,11 @@ local function consume_shared_cmd(cmdTable, id)
     if cmdTable == nil then return nil end
     local cmd = cmdTable[id]
     if cmd == nil then return nil end
-    cmdTable[id] = nil -- consume
+    cmdTable[id] = nil
     return cmd
 end
 
 local function cmd_is_interact(cmd)
-    -- Accept the same payloads your system uses
     if cmd == nil then return false end
     if type(cmd) == "table" then
         local c = cmd.cmd
@@ -37,21 +45,114 @@ local function cmd_is_interact(cmd)
     return true
 end
 
-function on_create(Self)
-    if DEBUG then
-        print("[Test_ConsumeDisc_Shared] on_create EntityID:", EntityID)
-        if not SHARED.Inventory or not SHARED.Inventory.Remove then
-            print("[Test_ConsumeDisc_Shared] WARNING: Inventory.Remove not found")
-        end
+-- ===== ICON BUS HELPERS =====
+local function send_have_icon_cmd(id, cmd)
+    SHARED.DISC_USE_HAVE_ICON_CMD = SHARED.DISC_USE_HAVE_ICON_CMD or {}
+    SHARED.DISC_USE_HAVE_ICON_CMD[id] = { cmd = cmd, by = id }
+end
+
+local function send_nodisc_icon_cmd(id, cmd)
+    SHARED.DISC_USE_NODISC_ICON_CMD = SHARED.DISC_USE_NODISC_ICON_CMD or {}
+    SHARED.DISC_USE_NODISC_ICON_CMD[id] = { cmd = cmd, by = id }
+end
+
+local function in_range(id)
+    return SHARED
+        and SHARED.INTERACT_IN_ZONE
+        and SHARED.INTERACT_IN_ZONE[id] == true
+end
+
+local function disc_count()
+    if not SHARED or not SHARED.Inventory or not SHARED.Inventory.Count then
+        return 0
+    end
+    return SHARED.Inventory.Count(ITEM_ID) or 0
+end
+
+local function hide_icons_forever(targetId)
+    send_have_icon_cmd(targetId, "hide")
+    send_nodisc_icon_cmd(targetId, "hide")
+end
+
+local function update_icons(targetId)
+    -- ✅ NEW: once disabled, always hide
+    if iconsDisabledForever then
+        hide_icons_forever(targetId)
+        return
+    end
+
+    if not in_range(targetId) then
+        hide_icons_forever(targetId)
+        return
+    end
+
+    if disc_count() > 0 then
+        send_have_icon_cmd(targetId, "show")
+        send_nodisc_icon_cmd(targetId, "hide")
+    else
+        send_have_icon_cmd(targetId, "hide")
+        send_nodisc_icon_cmd(targetId, "show")
     end
 end
 
+local function play_3d_sfx_from(entityId, slotId)
+    if type(Audio_PlaySlot) == "function" and entityId ~= nil and slotId ~= nil then
+        Audio_PlaySlot(entityId, slotId)
+        return true
+    end
+    return false
+end
+
+function on_create(Self)
+    if DEBUG then
+        print("[Test_ConsumeDisc_Shared] on_create EntityID:", EntityID)
+    end
+
+    SHARED.DISC_USE_HAVE_ICON_CMD = SHARED.DISC_USE_HAVE_ICON_CMD or {}
+    SHARED.DISC_USE_NODISC_ICON_CMD = SHARED.DISC_USE_NODISC_ICON_CMD or {}
+    SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
+end
+
 function on_update(Self, dt)
+    dt = dt or 0.016
     local targetId = (TARGET_ENTITY_ID ~= 0) and TARGET_ENTITY_ID or EntityID
+
+    -- always drive icons
+    update_icons(targetId)
+
+    -- If we've already consumed once, we might still be waiting to trigger music
+    -- so DO NOT early-return before handling the pending timer.
+    _discPending = _discPending or false
+    _discTimer = _discTimer or 0.0
+    local DISC_TO_MUSIC_DELAY = 0.75
+    local DISC_INSERT_SFX_ID = "DiscInsert"
+
+    -- If we already consumed and are waiting to start music, count down and then trigger
+    if _discPending then
+        _discTimer = _discTimer + dt
+        if _discTimer >= DISC_TO_MUSIC_DELAY then
+            _discPending = false
+            _discTimer = 0.0
+
+            if SHARED.StateController and SHARED.StateController.TriggerCP1 then
+                SHARED.StateController.TriggerCP1()
+                if DEBUG then
+                    print("[Test_ConsumeDisc_Shared] TriggerCP1 fired after DiscInsert delay")
+                end
+            else
+                print("[Test_ConsumeDisc_Shared] WARNING: StateController.TriggerCP1 not found")
+            end
+        end
+        return
+    end
+
+    -- If icons are disabled forever and we're not pending, nothing else to do
+    if iconsDisabledForever then
+        return
+    end
 
     if not SHARED.DOOR_CMD then return end
 
-    -- Triggered only when InteractionBox sends a command to this entity
     local cmd = consume_shared_cmd(SHARED.DOOR_CMD, targetId)
     if not cmd_is_interact(cmd) then
         return
@@ -65,18 +166,12 @@ function on_update(Self, dt)
         ))
     end
 
-    -- Inventory checks
     if not SHARED.Inventory or not SHARED.Inventory.Remove then
         print("[Test_ConsumeDisc_Shared] ERROR: Inventory not available")
         return
     end
 
-    local count = 0
-    if SHARED.Inventory.Count then
-        count = SHARED.Inventory.Count(ITEM_ID) or 0
-    end
-
-    if count <= 0 then
+    if disc_count() <= 0 then
         if DEBUG then
             print("[Test_ConsumeDisc_Shared] No Music Disc to consume")
         end
@@ -91,15 +186,24 @@ function on_update(Self, dt)
 
     if DEBUG then
         print("[Test_ConsumeDisc_Shared] Consumed:", ITEM_ID, "x" .. ITEM_QTY)
-        if SHARED.Inventory.Print then
-            SHARED.Inventory.Print()
+    end
+
+    -- Play DiscInsert FIRST (3D from this entity)
+    if type(Audio_StopSlot) == "function" then
+        Audio_StopSlot(EntityID, DISC_INSERT_SFX_ID) -- ensure retrigger if needed
+    end
+    if type(Audio_PlaySlot) == "function" then
+        Audio_PlaySlot(EntityID, DISC_INSERT_SFX_ID)
+        if DEBUG then
+            print("[Test_ConsumeDisc_Shared] Played DiscInsert, delaying music by 0.75s")
         end
     end
 
-    -- Trigger CP1
-    if SHARED.StateController and SHARED.StateController.TriggerCP1 then
-        SHARED.StateController.TriggerCP1()
-    else
-        print("[Test_ConsumeDisc_Shared] WARNING: StateController.TriggerCP1 not found")
-    end
+    -- Now delay the music start
+    _discPending = true
+    _discTimer = 0.0
+
+    -- after first successful consume, disable icons forever
+    iconsDisabledForever = true
+    hide_icons_forever(targetId)
 end
