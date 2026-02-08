@@ -43561,6 +43561,19 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16102277991515799559
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -43648,6 +43661,33 @@
 				1.0,
 				0.9999881982803345
 			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				50.0,
+				50.0,
+				50.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				-13.399999618530273,
+				-7.449999809265137
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"432": {
@@ -50228,9 +50268,9 @@
 			],
 			"constant": 1.0,
 			"direction": [
-				0.0,
-				0.0,
-				1.0
+				-0.369422048330307,
+				-0.0013962629018351436,
+				0.9292606711387634
 			],
 			"innerConeAngle": 15.0,
 			"intensity": 10000.0,
@@ -50238,9 +50278,9 @@
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 35.0,
 			"position": [
-				137.07379150390625,
+				136.8890838623047,
 				185.72509765625,
-				-873.2933349609375
+				-873.3286743164063
 			],
 			"quadratic": 0.03200000151991844,
 			"radius": 1000.0,
@@ -50325,7 +50365,7 @@
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-21.68000030517578,
 				0.0
 			],
 			"scale": [
@@ -69022,6 +69062,70 @@
 			],
 			"size": [
 				1729.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				15304296428018171923,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"696": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6302445202357600261
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "LobbyBookIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				-838.1239624023438,
+				112.0961685180664,
+				414.13824462890625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1715.0,
 				1158.0
 			],
 			"size_NDC": [
