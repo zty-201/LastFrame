@@ -10,7 +10,7 @@ end
 -- IMPORTANT:
 -- ButtonComponent.event_trigger MUST be "ReturnButton"
 function on_button_ReturnButton(self)
-    print("[ReturnButton] Return button clicked -> opening StartMenu")
+    print("[ReturnButton] Return button clicked -> Resuming Game")
 
     -- Close any currently open menus
     UI_CloseAllMenus()
