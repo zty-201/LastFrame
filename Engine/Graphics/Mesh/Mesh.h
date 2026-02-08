@@ -34,6 +34,7 @@
 #include "global.hpp" // For AssetManagerSystem, etc.
 #include "AssimpWrapper.h"
 #include "Animation.hpp"
+#include <mutex>
 #include "MeshComponent.h"
 //#include "AssetManager.hpp"
 
@@ -103,7 +104,7 @@ namespace Mesh {
         // Default constructor.
         MeshData() = default;
 
-        // Constructor for loading a mesh from a file via Assimp.
+        // Constructor for loading a mesh from a file via Assimp. Call LoadWithFilename_AfterThreadJoinCall() after thread joins.
         explicit MeshData(const std::string& filePath, EngineFramework::Skeleton* skeleton = nullptr) {
             loadWithAssimp(filePath, skeleton);
         }
@@ -159,6 +160,14 @@ namespace Mesh {
             }
         }
 
+        //To be called after MeshData load with filename completes, as it can only be completed on the main thread.
+        void LoadWithFilename_AfterThreadJoinCall()
+        {
+            createGLBuffers(m_temp_vertices, m_temp_indices);
+            m_temp_vertices.clear();
+            m_temp_indices.clear();
+        }
+        std::string name;
     private:
         AABB m_aabb;                     // whole-mesh AABB (object space)
         std::vector<AABB> m_submeshAABBs; // per-submesh AABBs
@@ -179,7 +188,11 @@ namespace Mesh {
 
         // The core Assimp loading function.
         void loadWithAssimp(const std::string& filePath, EngineFramework::Skeleton* skeleton = nullptr) {
-            LOGI("Loading mesh from file: %s", filePath.c_str());
+            static std::mutex text_mutex;
+            {
+                std::lock_guard<std::mutex> text_lock(text_mutex);
+                LOGI("Loading mesh from file: %s", filePath.c_str());
+            }
             Assimp::Importer importer;
 
             // Create custom IO system that can load files from Android assets
@@ -199,21 +212,22 @@ namespace Mesh {
 
             for (unsigned int m = 0; m < scene->mNumMeshes; ++m) {
                 const aiMesh* mesh = scene->mMeshes[m];
-                LOGI("aiMesh[%u]: name='%s', verts=%u, bones=%u",
-                    m,
-                    mesh->mName.C_Str(),
-                    mesh->mNumVertices,
-                    mesh->mNumBones);
+               
+                {
+                    std::lock_guard<std::mutex> text_lock(text_mutex);
+                    LOGI("aiMesh[%u]: name='%s', verts=%u, bones=%u",
+                        m,
+                        mesh->mName.C_Str(),
+                        mesh->mNumVertices,
+                        mesh->mNumBones);
+                }
             }
 
             processMaterials(scene);
             processNode(scene->mRootNode, scene, skeleton);
-            createGLBuffers(m_temp_vertices, m_temp_indices);
-
-
-            m_temp_vertices.clear();
-            m_temp_indices.clear();
         }
+
+
 
         // Extracts materials from the Assimp scene.
         void processMaterials(const aiScene* scene) {
@@ -252,7 +266,9 @@ namespace Mesh {
                 std::string albedoName = tryLoadTexture(aiTextureType_DIFFUSE);
                 if (!albedoName.empty()) {
                     try {
-                        newMat.albedoMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, albedoName);
+                        
+                            newMat.albedoMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, albedoName);
+                        
                         LOGI(" Loaded albedo: %s", albedoName.c_str());
                     }
                     catch (const std::exception& e) {
@@ -279,6 +295,7 @@ namespace Mesh {
                 if (!normalName.empty()) {
                     try {
                         newMat.normalMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, normalName);
+                        
                         LOGI(" Loaded normal: %s", normalName.c_str());
                     }
                     catch (...) {
@@ -290,7 +307,10 @@ namespace Mesh {
                 std::string roughnessName = tryLoadTexture(aiTextureType_DIFFUSE_ROUGHNESS);
                 if (!roughnessName.empty()) {
                     try {
-                        newMat.roughnessMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, roughnessName);
+                        
+                            newMat.roughnessMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, roughnessName);
+                        
+                        
                         LOGI(" Loaded roughness: %s", roughnessName.c_str());
                     }
                     catch (...) {}
@@ -309,7 +329,10 @@ namespace Mesh {
                 }
                 if (!metallicName.empty()) {
                     try {
-                        newMat.metallicMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, metallicName);
+                        
+                            newMat.metallicMap = AssetMgr::GetFullGuid(AssetMgr::TEXTURE_GUID, metallicName);
+                        
+                        
                         LOGI(" Loaded metallic: %s", metallicName.c_str());
                     }
                     catch (...) {}
@@ -391,15 +414,18 @@ namespace Mesh {
 
                     // Start with local index, then try to remap via OFBX skeleton
                     unsigned int boneIndex = b;
-
-                    auto itRemap = EngineFramework::g_OFBXBoneIndexByName.find(bone->mName.C_Str());
-                    if (itRemap != EngineFramework::g_OFBXBoneIndexByName.end()) {
-                        boneIndex = static_cast<unsigned int>(itRemap->second);
+                    {
+                        std::lock_guard<std::mutex> bone_lock{ EngineFramework::g_OFBXBoneIndexByName_mutex };
+                        auto itRemap = EngineFramework::g_OFBXBoneIndexByName.find(bone->mName.C_Str());
+                        if (itRemap != EngineFramework::g_OFBXBoneIndexByName.end()) {
+                            boneIndex = static_cast<unsigned int>(itRemap->second);
+                        }
+                        else {
+                            LOGE("[SKIN] Assimp bone '%s' not found in OFBX skeleton; using local index %u",
+                                bone->mName.C_Str(), boneIndex);
+                        }
                     }
-                    else {
-                        LOGE("[SKIN] Assimp bone '%s' not found in OFBX skeleton; using local index %u",
-                            bone->mName.C_Str(), boneIndex);
-                    }
+                    
 
                     LOGI("[SKIN] Assimp bone %u ('%s') -> OFBX index %u",
                         b, bone->mName.C_Str(), boneIndex);

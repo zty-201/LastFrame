@@ -11,6 +11,7 @@
 #include "Audio.hpp"
 #include "Scripting/ScriptAsset.hpp" //For script asset type registration.
 #include <system_error>
+#include <mutex>
 
 //For guid metadata file reading.
 #ifdef PLATFORM_WINDOWS
@@ -24,6 +25,8 @@
 #include "Audio.hpp"
 #include "SoundAsset.hpp"
 #include "Archtype.hpp"
+
+#include <mutex>
 
 namespace EngineFramework {
 
@@ -207,6 +210,9 @@ namespace EngineFramework {
 		//Iterate through all files in directory until finished.
 		while ((filename = AAssetDir_getNextFileName(assetDir)) != nullptr) {
 			std::filesystem::path file_path = folder_path / filename;
+			std::string ext = file_path.extension().string();
+			//Skip any subdirectories or files with no extensions.
+			if (ext.empty()) continue;
 
 			// Check extensions to see if it matches the accepted extension list.
 			//If no accepted extensions passed, accept all files.
@@ -214,7 +220,6 @@ namespace EngineFramework {
 				file_list.push_back(file_path);
 			}
 			else {
-				std::string ext = file_path.extension().string();
 				if (std::find(accepted_extensions.begin(), accepted_extensions.end(), ext) != accepted_extensions.end()) {
 					file_list.push_back(file_path);
 				}
@@ -446,16 +451,31 @@ namespace EngineFramework {
 				throw std::runtime_error((std::string("Unable to load asset of type: ") + resource_type).c_str());
 			}
 		}
-
 	}
 
 
 	//==Asset Loaders==//
 	bool AssetManagerSystem::LoadTexture(const std::filesystem::path& folder_path)
 	{
-		LOGD("Loading Texture");
+		/*
+			Process:
+			1. Get list of all filepaths in directory
+			2. If file is not precompiled (non-precompiled extension) then compress it to ETC2 and (DXT5 or BC3)
+			- Compiled texture remains in directory.
+			- Original texture moves to sub-directory called "Source"
+			3. Load compiled textures.
+			- ETC2 for android platform
+			- DXT5 for windows
+
+			Compressonator used to load standard image formats and compress to ETC2 / DXT5 or BC3
+			- Mobile supports ETC2
+			- Desktop supports DXT5/BC3. It does not natively support ETC2, meaning there's a performance impact.
+
+
+
+		*/
 		//Acceptable files that can be loaded as a texture.
-		std::vector<std::string> texture_extensions{ ".png" };
+		std::vector<std::string> texture_extensions{ ".png", ".dds", ".ktx", ".ktx2", ".DDS" };
 		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, texture_extensions);
 
 		/*
@@ -537,23 +557,65 @@ namespace EngineFramework {
 		std::vector<std::string> asset_names{};
 		std::vector< std::shared_ptr<Mesh::MeshData>> loaded_resources{};
 
+		std::vector<std::thread> thread_arr{};
+
+		std::mutex num_pending_mutex;
+		std::atomic<int> num_pending_gpu_load; //Keeps track of how many meshes need to be loaded into gpu mem
+		std::vector<std::shared_ptr<Mesh::MeshData>> pending_gpu_load_arr{}; //Keep ptrs to do a final function call after join.
+
 		// Collect the names and loop through all mesh files
 		for (const std::filesystem::path& path : files) {
 			// Obtain the name of the mesh from the file name (without extension)
 			std::string name = path.stem().string();
+			auto create_append_thread = [path, &num_pending_mutex, &pending_gpu_load_arr, &num_pending_gpu_load, name] {
+				// Try catch guard for loading mesh
+				try {
+					LOGI("Loading Mesh: %s", path.string().c_str());
+					std::shared_ptr<Mesh::MeshData> mesh_data{ new Mesh::MeshData(path.string()) };
+					mesh_data->name = name;
+					//Lock-guard to prevent race conditions for multi-threading.
+					std::lock_guard<std::mutex> mesh_lock(num_pending_mutex);
+					pending_gpu_load_arr.emplace_back(mesh_data);
+				}
+				catch (std::exception& e) {
+					LOGE("%s %s %s", "Unable to Load Mesh", name.c_str(), e.what());
+					num_pending_gpu_load--; //Invalid mesh, so no gpu load.
+				}
 
-			// Try catch guard for loading mesh
-			try {
-				LOGI("Loading Mesh: %s", path.string().c_str());
+				};
 
-				loaded_resources.emplace_back(new Mesh::MeshData(path.string()));
-				asset_names.emplace_back(name); // Done if resource loading is a success.
-			}
-			catch (std::exception& e) {
-				LOGE("%s %s %s", "Unable to Load Mesh", name.c_str(), e.what());
-			}
+			thread_arr.emplace_back(create_append_thread);
+			num_pending_gpu_load++; //Each mesh should gpu load after completion.
 		}
 
+		//Main thread loads into gpu, side threads create mesh and append to pending_gpu_load_arr
+		while(num_pending_gpu_load > 0)
+		{
+			//Check if a thread has finished so the mesh can be pushed to the gpu.
+			if (pending_gpu_load_arr.empty()) continue;
+			std::shared_ptr<Mesh::MeshData> incomplete_mesh;
+			{
+				std::lock_guard<std::mutex> mesh_lock(num_pending_mutex);
+				incomplete_mesh = pending_gpu_load_arr.back();
+				pending_gpu_load_arr.pop_back();
+			}
+			num_pending_gpu_load--; //Eat one.
+			try {
+				incomplete_mesh->LoadWithFilename_AfterThreadJoinCall(); //Can only be done on main thread.
+				loaded_resources.emplace_back(incomplete_mesh);
+				asset_names.emplace_back(incomplete_mesh->name); // Done if resource loading is a success.
+			}
+			catch (std::exception& e) {
+				LOGE("%s %s %s", "Unable to load Mesh into GPU mem", incomplete_mesh->name.c_str(), e.what());
+			}
+			LOGI("%s", "Mesh Loaded into GPU Mem");
+		}
+
+		//Wait for all mesh loaders
+		for (std::thread& thread : thread_arr)
+		{
+			thread.join();
+		}
 		// Set Mapping with mesh GUID
 		SetMappings(MESH_GUID, asset_names, loaded_resources, folder_path);
 

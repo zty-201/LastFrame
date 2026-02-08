@@ -206,7 +206,7 @@ endif()
 #---------------------------------------------END JOLT CONFIG----------------------------------------------------------------
 
 # Set variables for cmake to easily use.
-set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp openfbx CACHE INTERNAL "")
+set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp openfbx gli CACHE INTERNAL "")
 
 #Also link important system libraries for opengl drawing
 set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 CACHE INTERNAL "")
@@ -229,6 +229,8 @@ foreach(extern_dependency IN LISTS SHARED_LIBRARIES WINDOWS_SHARED_LIBRARIES WIN
 		$<$<CXX_COMPILER_ID:Clang>:-Wno-analyzer>
 	  )
 	  message("${extern_dependency} analysis off")
+	else()
+	set_source_files_properties(${extern_dependency} PROPERTIES CXX_CLANG_TIDY "" COMPILE_OPTIONS "$<$<CXX_COMPILER_ID:MSVC>:/analyze->")
 	endif()
 
   endif()

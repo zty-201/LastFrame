@@ -12,8 +12,6 @@ macro(import_GTest)
     endif()
 endmacro()
 
-
-
 # Macro to import all dependencies
 macro(importDependencies)
     message("Importing Google Test...")
