@@ -16,5 +16,7 @@ void Game_Update();
 */
 void Game_Destroy();
 
+void RequestSceneRestart();
+void RequestQuit();
 
 #endif
