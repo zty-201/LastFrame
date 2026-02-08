@@ -20,6 +20,8 @@ local moveAreaBottom = screenHeight * 0.5
 local footstepPlaying = false
 local footstepDeadzone = 0.05
 
+local pauseHeldPrev = false
+
 local function getGlobalShared()
     return rawget(_G, "SHARED")
 end
@@ -103,6 +105,32 @@ function on_update(self, dt)
     end
 
     local moveX, moveZ = 0.0, 0.0
+
+    -- ========================================================
+    -- PAUSE INPUT
+    -- ========================================================
+
+    local pauseHeld = false
+
+    if Input and Input.GetAction then
+        pauseHeld = Input.GetAction("PAUSE") == true
+    end
+
+    -- rising edge detection (pressed this frame)
+    local pausePressed = pauseHeld and not pauseHeldPrev
+    pauseHeldPrev = pauseHeld
+
+    if pausePressed then
+        print("[Player] Pause pressed -> opening PauseMenu")
+
+        -- Optional safety check (if bound)
+        if UI_IsCutscenePlaying == nil or not UI_IsCutscenePlaying() then
+            UI_CloseAllMenus()
+            UI_DisplayMenu("PauseMenu")
+        end
+
+        return -- stops movement this frame
+    end
 
     -- ========================================================
     -- INPUT (this is what we'll use for footsteps too)

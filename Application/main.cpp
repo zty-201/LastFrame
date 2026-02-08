@@ -72,6 +72,22 @@ written consent of DigiPen Institute of Technology is prohibited.
 //#endif
 //// End of Jerron's Scripting testing
 
+static bool g_RequestSceneRestart = false;
+static bool g_RequestQuit = false;
+
+// For submission: only 1 scene, hardcode it.
+static const char* g_MainSceneFile = "M4_Level.json";
+
+void RequestSceneRestart()
+{
+	g_RequestSceneRestart = true;
+}
+
+void RequestQuit()
+{
+	g_RequestQuit = true;
+}
+
 //Initialization of game application.
 //android_asset_manager should only be set when building for android.
 void Game_Initialize(void* android_asset_manager)
@@ -328,6 +344,74 @@ void Game_Update()
 
 	//Send all queued events in order.
 	event_dispatcher.update();
+
+	if (g_RequestQuit)
+	{
+		g_RequestQuit = false;
+		LOGI("[App] Quit requested");
+
+		// Stop runtime cleanly (optional but recommended)
+		Engine::ScriptSystem::OnRuntimeStop(registry);
+
+#ifdef PLATFORM_WINDOWS
+		// Prefer using your GraphicsSystem's window getter if you have one
+		GLFWwindow* win = glfwGetCurrentContext();
+		if (win) glfwSetWindowShouldClose(win, GLFW_TRUE);
+		else std::exit(0); // fallback if window isn't accessible
+
+#elif defined(PLATFORM_ANDROID)
+		// Best practice: request Activity finish
+		// If you have access to ANativeActivity*, call finish:
+		if (EngineFramework::GetAndroidActivity() != nullptr)  // <-- your engine should expose this
+		{
+			ANativeActivity_finish(EngineFramework::GetAndroidActivity());
+		}
+		else
+		{
+			// Fallback if you don't have activity pointer
+			std::exit(0);
+		}
+#endif
+
+		return;
+	}
+
+
+	// After systems update/postupdate
+	if (g_RequestSceneRestart)
+	{
+		g_RequestSceneRestart = false;
+
+		LOGI("[App] Restart requested -> reloading %s", g_MainSceneFile);
+
+		// 0) STOP scripting runtime (IMPORTANT)
+		Engine::ScriptSystem::OnRuntimeStop(registry);
+
+		// 1) Close UI first
+		EngineFramework::UI_System::GetInstance().closeAllMenu();
+
+		// 2) Clear gameplay entities
+		EngineFramework::GameObjectSystem::GetInstance().ClearAllInstances();
+
+		// 2.5) CLEAR PHYSICS BODIES (IMPORTANT) - prevents old Jolt bodies snapping player back
+		PhysicsWorld::Get().DestroyAllBodies();
+
+		// 3) Load scene JSON again
+		std::string sceneString =
+			EngineFramework::AssetManagerSystem::GetStringFromFile(
+				std::string("Extern/Scenes/") + g_MainSceneFile
+			);
+
+		EngineFramework::GameObjectSystem::GetInstance().LoadScene(sceneString);
+
+		// 4) START scripting runtime again (IMPORTANT)
+		Engine::ScriptSystem::OnRuntimeStart(registry);
+
+		// 5) Re-init UI and return to StartMenu
+		EngineFramework::UI_System::GetInstance().Initialize();
+		EngineFramework::UI_System::GetInstance().closeAllMenu();
+		EngineFramework::UI_System::GetInstance().displayMenu("StartMenu");
+	}
 
 	time_after_loop = std::chrono::steady_clock::now();
 

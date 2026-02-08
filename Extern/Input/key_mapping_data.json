@@ -35,6 +35,10 @@
         {
             "glfw_key": 57,
             "key_action": "OPEN_EDITOR"
+        },
+        {
+            "glfw_key": 256,
+            "key_action": "PAUSE"
         }
     ]
 }

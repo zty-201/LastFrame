@@ -1,5 +1,5 @@
 {
-	"637": {
+	"639": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16345929764767956995,
@@ -62,7 +62,7 @@
 			"visible": false
 		}
 	},
-	"638": {
+	"640": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				8275479232520028161,
@@ -116,7 +116,7 @@
 			"visible": false
 		}
 	},
-	"639": {
+	"641": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				15193008260161110025,
@@ -173,20 +173,20 @@
 				0.10000000149011612
 			],
 			"textureid": [
-				15193008260161110025,
+				15292149024053559303,
 				3711223656383638553
 			],
 			"visible": false
 		}
 	},
-	"640": {
+	"699": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				11734243746340569093,
 				3711223656383638553
 			],
 			"event_hover": "",
-			"event_trigger": "",
+			"event_trigger": "QuitButton",
 			"hover_texture": [
 				11734243746340569093,
 				3711223656383638553
@@ -194,6 +194,15 @@
 			"idle_texture": [
 				14139227519446712325,
 				3711223656383638553
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 7597924986587840515
+				}
 			]
 		},
 		"NameComponent": {
@@ -233,7 +242,7 @@
 			"visible": false
 		}
 	},
-	"641": {
+	"700": {
 		"NameComponent": {
 			"name": "BG"
 		},
