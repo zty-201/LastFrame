@@ -32,10 +32,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "Audio/Audio.hpp"
 #include "PhysicsRuntimeSystem.hpp"
 #include "AnimationSystem.h"
-#include "Scripting/Script.hpp"   // testing scripting (?)
-#if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
-#include "Scripting/ScriptDebug.hpp" //For testing Lua scripts in DEBUG mode
-#endif
+#include "ScriptWrapper.hpp"
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "System_LevelEditor.hpp"
@@ -134,7 +131,7 @@ void Game_Initialize(void* android_asset_manager)
 			"GraphicsSystem",
 			std::make_unique<EngineFramework::GraphicsSystem>(),
 			1,  // Init Order: First
-			5,  // Update Order: After game logic and editor
+			8,  // Update Order: After game logic and editor
 			8   // Destruct Order: Last
 		);
 
@@ -147,68 +144,77 @@ void Game_Initialize(void* android_asset_manager)
 			6   // Destruct Order: Before Graphics
 		);
 
-		// 5. AudioSystem: Depends on the game state.
+		// 3. AudioSystem: Depends on the game state.
 		core_engine.AddSystem(
 			"AudioSystem",
 			std::make_unique<EngineFramework::AudioSystem>(),
 			3,  // Init Order
-			7,  // Update Order: Last
+			9,  // Update Order: Last
 			5   // Destruct Order: First
 		);
 
-		// 3. AssetManager: Can load assets after graphics and audio systems are up.
+		// 4. AssetManager: Can load assets after graphics and audio systems are up.
 		core_engine.AddSystem(
 			"AssetManager",
 			std::make_unique<EngineFramework::AssetManagerSystem>(),
 			4,  // Init Order
-			2,  // Update Order
+			4,  // Update Order
 			4   // Destruct Order
 		);
 
-		// 4. PhysicsRuntimeSystem: Handles all physics updates and Jolt integration. (Create & Syncing ECS entites with the physics world.)
+		// 5. PhysicsRuntimeSystem: Handles all physics updates and Jolt integration. (Create & Syncing ECS entites with the physics world.)
 		core_engine.AddSystem(
 			"PhysicsRuntimeSystem",
 			std::make_unique<EngineFramework::PhysicsRuntimeSystem>(),
 			5,  // Init Order: after AssetManager, before GameObjectSystem
-			2,  // Update Order: after Input, before GameObjectSystem & Graphics
+			3,  // Update Order: after Input, before GameObjectSystem & Graphics
 			3   // Destruct Order: before GameObjectSystem/Graphics are gone
 		);
 
 		// --- Game Logic and Other Systems ---
 
-		// 5. GameObjectSystem: The main game logic.
+		// 6. GameObjectSystem: The main game logic.
 		core_engine.AddSystem(
 			"GameObjectSystem",
 			std::make_unique<EngineFramework::GameObjectSystem>(),
 			6,  // Init Order
-			3,  // Update Order: After Input and Asset Management
+			6,  // Update Order: After Input and Asset Management
 			2   // Destruct Order
 		);
 
+		// 7. ScriptSystem: Game scripting logic.
+		core_engine.AddSystem(
+			"ScriptWrapper",
+			std::make_unique<EngineFramework::ScriptWrapper>(),
+			7,  // Init Order: after GameObjectSystem
+			2,  // Update Order: after InputManager
+			2   // Destruct Order: before GameObjectSystem is gone
+		);
+
 //#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-		// 6. LevelEditorSystem: Controls rendering when active.
+		// 8. LevelEditorSystem: Controls rendering when active.
 		core_engine.AddSystem(
 			"UI_System",
 			std::make_unique<EngineFramework::UI_System>(),
-			7,  // Init Order: after AssetManager, before GameObjectSystem
-			2,  // Update Order: after Input, before GameObjectSystem & Graphics
+			8,  // Init Order: after AssetManager, before GameObjectSystem
+			5,  // Update Order: after Input, before GameObjectSystem & Graphics
 			3   // Destruct Order: before GameObjectSystem/Graphics are gone
 		);
 //#endif
 
-		// 5. AnimationSystem: For animation to work.
+		// 9. AnimationSystem: For animation to work.
 		core_engine.AddSystem(
 			"AnimationSystem",
 			std::make_unique<EngineFramework::AnimationSystem>(),
-			8,	// Init Order
-			4,	// Update Order
+			9,	// Init Order
+			7,	// Update Order
 			7	// Destruct Order
 		);
 
 		// --- Debug/Editor Systems (Conditional) ---
 
 	#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
-	// 6. LevelEditorSystem: Controls rendering when active.
+	// 10. LevelEditorSystem: Controls rendering when active.
 		core_engine.AddSystem(
 			"LevelEditorSystem",
 			std::make_unique<EngineFramework::LevelEditorSystem>(),
@@ -223,40 +229,6 @@ void Game_Initialize(void* android_asset_manager)
 	{
 		core_engine.InitializeSystems();
 
-		//Jerron's playground
-		// --- Start scripting runtime ---
-		Engine::ScriptSystem::Init();
-
-		// IMPORTANT: use your global/global-accessible registry here.
-		// If you have a global entt::registry named `registry`, use it.
-		// If your GameObjectSystem owns the registry, expose and use it instead.
-		extern entt::registry registry;                 // <-- comment out if not using a global
-		Engine::ScriptSystem::OnRuntimeStart(registry); // start script runtime
-
-		//This section below is only active in DEBUG mode (hopefully)
-#if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
-		Engine::ScriptDebug::Initialize();
-#endif
-
-#if defined(ENGINE_ENABLE_LUA)
-	// Test Lua script loading
-		//{
-		//	auto testEntity = registry.create();
-		//	auto& luaScript = registry.emplace<Engine::LuaScriptComponent>(testEntity);
-
-		//	// Set the path to your test script
-		//	luaScript.ScriptPath = "Extern/Scripts/test.lua";
-		//	luaScript.Enabled = true;
-		//	TestLuaFunctions();
-
-		//	LOGI("Created test entity with Lua script: Scripts/test.lua");
-		//	//LOGI("Watch console for Lua print statements during update loop");
-		//}
-#else
-		LOGI("Lua scripting is disabled - ENGINE_ENABLE_LUA not defined");
-#endif
-
-		//End of Playground (jerron's)
 #ifdef DEBUG
 		// Creates the only instance in the program, and runs all unit tests.
 		UnitTestManager::GetInstance().RunAllTests();
@@ -292,14 +264,6 @@ void Game_Update()
 	prof.BeginFrame(); 
 	{
 		Diagnostics::Scoped s{ "Frame::UpdateAll" };
-
-	// tick scripting by jerron
-	extern entt::registry registry;                       // or EngineFramework::GetRegistry()
-	Engine::ScriptSystem::OnUpdate(registry, delta_time); //Not sure why this isnt running in android?
-
-#if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
-	Engine::ScriptDebug::Update(delta_time);
-#endif
 
 	// --- Jerrons scripting playground ---
 
@@ -375,12 +339,5 @@ void Game_Update()
 
 void Game_Destroy()
 {
-	// stop script runtime and shutdown
-	extern entt::registry registry;                   // or EngineFramework::GetRegistry()
-	Engine::ScriptSystem::OnRuntimeStop(registry);
-	Engine::ScriptSystem::Shutdown();
-
-#if defined(ENGINE_ENABLE_LUA) && defined(DEBUG)
-	Engine::ScriptDebug::Shutdown();
-#endif
+	// ADD ANY DESTROY LOGIC HERE
 }
