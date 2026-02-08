@@ -2,10 +2,10 @@
 #include "pch.hpp"
 #include "Animation.hpp"
 #include "AnimationImporter.hpp"
-
 namespace EngineFramework
 {
 	std::unordered_map<std::string, int> g_OFBXBoneIndexByName;
+	std::mutex g_OFBXBoneIndexByName_mutex;
 
 	// Animation flags
 	ofbx::u64 animFlags =
@@ -358,12 +358,16 @@ namespace EngineFramework
 		}
 
 		// After filling skeleton->bones
-		g_OFBXBoneIndexByName.clear();
-		for (int i = 0; i < (int)boneObjs.size(); ++i)
 		{
-			const char* n = boneObjs[i]->name;
-			g_OFBXBoneIndexByName[std::string(n)] = i;
+			std::lock_guard<std::mutex> bone_mutex(g_OFBXBoneIndexByName_mutex);
+			g_OFBXBoneIndexByName.clear();
+			for (int i = 0; i < (int)boneObjs.size(); ++i)
+			{
+				const char* n = boneObjs[i]->name;
+				g_OFBXBoneIndexByName[std::string(n)] = i;
+			}
 		}
+		
 
 		// 5) return bundle (Animation Package)
 		auto package = std::make_unique<AnimationPackage>();

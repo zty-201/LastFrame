@@ -1,6 +1,7 @@
 #ifndef ANIMATION_COMPONENT_HPP
 #define ANIMATION_COMPONENT_HPP
 #include "ofbx.h"
+#include <mutex>
 
 namespace EngineFramework
 {
@@ -119,6 +120,7 @@ namespace EngineFramework
 	};
 
 	extern std::unordered_map<std::string, int> g_OFBXBoneIndexByName;
+	extern 	std::mutex g_OFBXBoneIndexByName_mutex; //Global mutex for the g_OFBX... map.
 }
 
 #endif
