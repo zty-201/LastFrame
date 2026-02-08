@@ -730,14 +730,14 @@
 			"visible": false
 		}
 	},
-	"696": {
+	"637": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				11734243746340569093,
 				3711223656383638553
 			],
 			"event_hover": "",
-			"event_trigger": "",
+			"event_trigger": "QuitToMenu",
 			"hover_texture": [
 				11734243746340569093,
 				3711223656383638553
@@ -745,6 +745,15 @@
 			"idle_texture": [
 				14139227519446712325,
 				3711223656383638553
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 11503214366706909185
+				}
 			]
 		},
 		"NameComponent": {
@@ -784,7 +793,7 @@
 			"visible": false
 		}
 	},
-	"697": {
+	"638": {
 		"NameComponent": {
 			"name": "BG"
 		},
