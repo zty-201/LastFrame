@@ -72,21 +72,12 @@ written consent of DigiPen Institute of Technology is prohibited.
 //#endif
 //// End of Jerron's Scripting testing
 
-static bool g_RequestSceneRestart = false;
-static bool g_RequestQuit = false;
+
 
 // For submission: only 1 scene, hardcode it.
 static const char* g_MainSceneFile = "M4_Level.json";
 
-void RequestSceneRestart()
-{
-	g_RequestSceneRestart = true;
-}
 
-void RequestQuit()
-{
-	g_RequestQuit = true;
-}
 
 //Initialization of game application.
 //android_asset_manager should only be set when building for android.
@@ -345,9 +336,9 @@ void Game_Update()
 	//Send all queued events in order.
 	event_dispatcher.update();
 
-	if (g_RequestQuit)
+	if (EngineFramework::CoreEngine::g_RequestQuit)
 	{
-		g_RequestQuit = false;
+		EngineFramework::CoreEngine::g_RequestQuit = false;
 		LOGI("[App] Quit requested");
 
 		// Stop runtime cleanly (optional but recommended)
@@ -368,9 +359,9 @@ void Game_Update()
 
 
 	// After systems update/postupdate
-	if (g_RequestSceneRestart)
+	if (EngineFramework::CoreEngine::g_RequestSceneRestart)
 	{
-		g_RequestSceneRestart = false;
+		EngineFramework::CoreEngine::g_RequestSceneRestart = false;
 
 		LOGI("[App] Restart requested -> reloading %s", g_MainSceneFile);
 

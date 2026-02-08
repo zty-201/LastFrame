@@ -87,6 +87,18 @@ namespace EngineFramework
 		CoreEngine(const CoreEngine& rhs) = delete;
 		CoreEngine& operator=(const CoreEngine& rhs) = delete;
 
+		static void RequestSceneRestart()
+		{
+			g_RequestSceneRestart = true;
+		}
+
+		static void RequestQuit()
+		{
+			g_RequestQuit = true;
+		}
+		static inline bool g_RequestSceneRestart = false;
+		static inline bool g_RequestQuit = false;
+
 	private:
 		//Keep it private, as a singleton it should not have multiple instances. Call GetInstance instead.
 		CoreEngine() = default;
@@ -98,6 +110,8 @@ namespace EngineFramework
 		std::vector<CoreSystem> system_arr;
 
 		entt::registry m_registry;
+
+		
 
 		// Helper functions to safely call system methods with try-catch and error logging.
 		void SafeUpdateSystem(CoreSystem& system, float delta_time);

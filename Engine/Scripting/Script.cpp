@@ -19,6 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <glm/geometric.hpp> 
 #include <iostream>
 #include "global.hpp"
+#include "CoreEngine.hpp"
 
 #if defined(ENGINE_ENABLE_LUA)
 #include <mutex>
@@ -499,18 +500,16 @@ namespace Engine {
         // ===============================================================
         // Game / Scene bindings
         // ===============================================================
-
-        extern void RequestSceneRestart();
-        extern void RequestQuit();
+        
 
         s_Lua.set_function("Scene_RequestRestart", []()
             {
-                RequestSceneRestart();
+                EngineFramework::CoreEngine::RequestSceneRestart();
             });
 
         s_Lua.set_function("Scene_QuitGame", []()
             {
-                RequestQuit();
+                EngineFramework::CoreEngine::RequestQuit();
             });
 
         // ===============================================================
@@ -652,7 +651,7 @@ namespace Engine {
         );
 
         // ===============================================================
-        // AudioSystem – Playback helpers (Lua)
+        // AudioSystem ï¿½ Playback helpers (Lua)
         // ===============================================================
         // Recommended way to trigger audio from scripts.
         // Uses entity + slot ID instead of raw sound assets.
@@ -684,7 +683,7 @@ namespace Engine {
             });
 
         // ===============================================================
-        // AudioSystem – Mixer controls (Lua)
+        // AudioSystem ï¿½ Mixer controls (Lua)
         // ===============================================================
         // Used for settings menus (volume sliders).
         // ===============================================================
@@ -696,7 +695,7 @@ namespace Engine {
             });
 
         // ===============================================================
-        // AudioSystem – Environment controls (Lua)
+        // AudioSystem ï¿½ Environment controls (Lua)
         // ===============================================================
         // Controls ambience muffling based on environment.
         //
