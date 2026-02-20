@@ -6,6 +6,7 @@
 #include "PhysicsWorld.hpp"
 #include "PhysicsBuildSystem.hpp"
 #include "PhysicsSyncSystem.hpp"
+#include "TriggerSystem.hpp"
 #include "CoreEngine.hpp"
 #include "Screen.hpp"
 #include "Level_Editor.hpp"
@@ -90,6 +91,9 @@ namespace EngineFramework
 
             // 4) sync physics back to ECS
             m_syncSystem.Update(registry);
+
+            // 5) trigger overlaps (post-physics, authoritative transforms)
+            m_triggerSystem.Update(registry);
         }
 
         void PostUpdate(float) override
@@ -100,5 +104,6 @@ namespace EngineFramework
     private:
         PhysicsBuildSystem m_buildSystem;
         PhysicsSyncSystem  m_syncSystem;
+        TriggerSystem m_triggerSystem;
     };
 }

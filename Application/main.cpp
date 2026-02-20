@@ -32,7 +32,6 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "Audio/Audio.hpp"
 #include "PhysicsRuntimeSystem.hpp"
 #include "AnimationSystem.h"
-#include "TriggerSystem.hpp"
 #include "ScriptWrapper.hpp"
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
@@ -275,7 +274,6 @@ void Game_Update()
 
 		//TODO: Try-Catch handling in Update/PostUpdate.
 		core_engine.UpdateSystems(delta_time);
-		EngineFramework::TriggerSystem::Update(registry); // TO ADD TO SYSTEMS
 
 		core_engine.PostUpdateSystems(delta_time);
 	}
