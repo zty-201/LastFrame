@@ -58,6 +58,7 @@ namespace EngineFramework
 
     GraphicsSystem::~GraphicsSystem()
     {
+        m_instancingSystem.reset();
 #ifdef PLATFORM_WINDOWS
         // Clean up GLFW
         glfwTerminate();
@@ -68,6 +69,10 @@ namespace EngineFramework
     {
         SetupGLFW();
         SetupGraphics();
+
+        // Initialize Instancing System
+        m_instancingSystem = std::make_unique<InstancingSystem>();
+        m_instancingSystem->Initialize(5000);
 
         // Listen for events
         event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&GraphicsSystem::HANDLE_EVENT_LevelEditorToggled>(this);
@@ -170,6 +175,7 @@ namespace EngineFramework
 
         // Get shader GUIDs 
         mesh_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Mesh");
+        mesh_instanced_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "MeshInstanced");
         skybox_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Skybox");
         shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Shadow");
         light_injection_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "LightInjection");
@@ -288,6 +294,9 @@ namespace EngineFramework
 
         glm::mat4 viewProj = P * V;
 
+		// Preprocessing 
+        m_instancingSystem->GatherPass(viewProj);
+
         // 1. Update point light SSBO
         UpdateLightSSBO();
         // 2. Shadow pass (directional + point)
@@ -299,7 +308,7 @@ namespace EngineFramework
         // 5. Volumetric ray march
         VolumetricRayMarchPass();
         // 6. Mesh pass
-        MeshPass(viewProj);
+        MeshPass();
         // 7. Skybox pass
         SkyboxPass();
 		// 8. UI pass
@@ -1000,217 +1009,254 @@ namespace EngineFramework
         shader->disuse();
     }
 
-    void GraphicsSystem::MeshPass(const glm::mat4& viewProj)
+    void GraphicsSystem::MeshPass()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        std::shared_ptr<ShaderProgram> shader{};
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glDepthFunc(GL_LESS);
+
+        std::shared_ptr<ShaderProgram> instanced_shader{};
+        if (mesh_instanced_shader_guid != xresource::full_guid{})
+        {
+            instanced_shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(mesh_instanced_shader_guid);
+        }
+        else
+        {
+            using E_AM = EngineFramework::AssetManagerSystem;
+            mesh_instanced_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "MeshInstanced");
+            instanced_shader = E_AM::GetResource<ShaderProgram>(mesh_instanced_shader_guid);
+        }
+        
+        if (instanced_shader) {
+            instanced_shader->use();
+            glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightSSBO);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_instancingSystem->GetInstanceSSBO());
+            // Shadow maps
+            glActiveTexture(GL_TEXTURE0 + TextureUnits::SHADOW_MAP_UNIT);
+            glBindTexture(GL_TEXTURE_2D_ARRAY, m_csmTextureArray);
+            instanced_shader->setUniform("s_CascadeShadowMaps", TextureUnits::SHADOW_MAP_UNIT);
+
+            glActiveTexture(GL_TEXTURE0 + TextureUnits::SPOT_LIGHT_MAP_UNIT);
+            glBindTexture(GL_TEXTURE_2D_ARRAY, m_spotTextureArray);
+            instanced_shader->setUniform("s_SpotShadowMaps", TextureUnits::SPOT_LIGHT_MAP_UNIT);
+
+            // Point light cubemaps
+            glActiveTexture(GL_TEXTURE0 + TextureUnits::POINT_SHADOW_MAP_UNIT);
+            glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, m_pointShadowArray); // Bind the array
+            instanced_shader->setUniform("s_PointShadowArray", TextureUnits::POINT_SHADOW_MAP_UNIT);
+
+            // Volumetric scattering texture
+            glActiveTexture(GL_TEXTURE0 + TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
+            glBindTexture(GL_TEXTURE_3D, m_ray_march_voxel_grid);
+            instanced_shader->setUniform("s_VoxelGrid", TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
+            instanced_shader->setUniform("u_Tricubic", m_tricubic_filtering);
+
+            instanced_shader->setUniform("u_NumPointLights", (int)m_LightData.size());
+            instanced_shader->setUniform("s_Albedo", TextureUnits::MESH_ALBEDO_UNIT);
+            instanced_shader->setUniform("s_Normal", TextureUnits::MESH_NORMAL_UNIT);
+            instanced_shader->setUniform("s_Roughness", TextureUnits::MESH_ROUGHNESS_UNIT);
+            instanced_shader->setUniform("s_Metallic", TextureUnits::MESH_METALLIC_UNIT);
+
+            for (const auto& batch : m_instancingSystem->GetBatches()) {
+                auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
+                if (!meshData || meshData->vao == 0) meshData = meshCache[batch.key.meshName];
+                if (!meshData || meshData->vao == 0) continue;
+
+                glBindVertexArray(meshData->vao);
+
+                // Set the batch-wide material factors
+                instanced_shader->setUniform("u_AlbedoFactor", batch.material.albedoFactor);
+                instanced_shader->setUniform("u_RoughnessFactor", batch.material.roughnessFactor);
+                instanced_shader->setUniform("u_MetallicFactor", batch.material.metallicFactor);
+                instanced_shader->setUniform("u_UVTransform", glm::vec4(
+                    batch.material.uvTiling.x, batch.material.uvTiling.y,
+                    batch.material.uvOffset.x, batch.material.uvOffset.y
+                ));
+
+                // Set the batch-wide textures
+                auto albedoTex = AssetManagerSystem::GetResource<Scene::Texture>(batch.material.albedoMap);
+                glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_ALBEDO_UNIT);
+                glBindTexture(GL_TEXTURE_2D, (albedoTex && albedoTex->id != 0) ? albedoTex->id : m_defaultWhiteTexture);
+
+                // Normal
+                auto normalTex = AssetManagerSystem::GetResource<Scene::Texture>(batch.material.normalMap);
+                glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_NORMAL_UNIT);
+                glBindTexture(GL_TEXTURE_2D, (normalTex && normalTex->id != 0) ? normalTex->id : m_defaultNormalTexture);
+
+
+                // Roughness
+                auto roughTex = AssetManagerSystem::GetResource<Scene::Texture>(batch.material.roughnessMap);
+                glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_ROUGHNESS_UNIT);
+                glBindTexture(GL_TEXTURE_2D, (roughTex && roughTex->id != 0) ? roughTex->id : m_defaultWhiteTexture);
+
+
+                // Metallic
+                auto metalTex = AssetManagerSystem::GetResource<Scene::Texture>(batch.material.metallicMap);
+                glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_METALLIC_UNIT);
+                glBindTexture(GL_TEXTURE_2D, (metalTex && metalTex->id != 0) ? metalTex->id : m_defaultBlackTexture);
+
+                // Tell the shader where to start reading matrices from the SSBO
+                instanced_shader->setUniform("u_InstanceOffset", (int)batch.instanceOffset);
+
+                // Draw all instances in this batch at once!
+                const auto& subMesh = meshData->subMeshes[batch.key.subMeshIndex];
+                glDrawElementsInstanced(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT,
+                    (void*)(sizeof(unsigned int) * subMesh.baseIndex),
+                    (GLsizei)batch.instanceCount);
+            }
+            instanced_shader->disuse();
+        } else {
+            LOGE("Mesh instanced shader not found!");
+			return;
+        }
+
+        std::shared_ptr<ShaderProgram> standard_shader{};
         if (mesh_shader_guid != xresource::full_guid{})
         {
-            shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(mesh_shader_guid);
+            standard_shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(mesh_shader_guid);
         }
         else
         {
             using E_AM = EngineFramework::AssetManagerSystem;
             mesh_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Mesh");
-            shader = E_AM::GetResource<ShaderProgram>(mesh_shader_guid);
+            standard_shader = E_AM::GetResource<ShaderProgram>(mesh_shader_guid);
         }
 
-        if (!shader) {
-            LOGE("Mesh shader not found!");
-			return;
-        }
+        if (standard_shader) {
+            standard_shader->use();
 
-        shader->use();
-        glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightSSBO);
+            // Reusable identity palette for non-skinned meshes
+            static std::vector<glm::mat4> s_identityPalette;
 
-        // Shadow maps
-        glActiveTexture(GL_TEXTURE0 + TextureUnits::SHADOW_MAP_UNIT);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, m_csmTextureArray);
-        shader->setUniform("s_CascadeShadowMaps", TextureUnits::SHADOW_MAP_UNIT);
+            for (entt::entity entity : m_instancingSystem->GetAnimatedEntities()) {
+                auto& meshComp = registry.get<MeshComponent>(entity);
+                auto& transformComp = registry.get<TransformComponent>(entity);
 
-        glActiveTexture(GL_TEXTURE0 + TextureUnits::SPOT_LIGHT_MAP_UNIT);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, m_spotTextureArray);
-        shader->setUniform("s_SpotShadowMaps", TextureUnits::SPOT_LIGHT_MAP_UNIT);
+                // Upload bone palette  
+                const std::vector<glm::mat4>* paletteToUse = nullptr;
+                bool useSkinning = false;
 
-        // Point light cubemaps
-        glActiveTexture(GL_TEXTURE0 + TextureUnits::POINT_SHADOW_MAP_UNIT);
-        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, m_pointShadowArray); // Bind the array
-        shader->setUniform("s_PointShadowArray", TextureUnits::POINT_SHADOW_MAP_UNIT);
-
-        // Volumetric scattering texture
-        glActiveTexture(GL_TEXTURE0 + TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
-        glBindTexture(GL_TEXTURE_3D, m_ray_march_voxel_grid);
-        shader->setUniform("s_VoxelGrid", TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
-        shader->setUniform("u_Tricubic", m_tricubic_filtering);
-
-        shader->setUniform("u_NumPointLights", (int)m_LightData.size());
-
-        // Debug modes via F1-F10
-        /*if (SceneManager::GetInstance().is_file_loaded) {
-            if (ImGui::IsKeyDown(ImGuiKey_F1)) debugMode = 0;
-            if (ImGui::IsKeyDown(ImGuiKey_F2)) debugMode = 1;
-            if (ImGui::IsKeyDown(ImGuiKey_F3)) debugMode = 2;
-            if (ImGui::IsKeyDown(ImGuiKey_F4)) debugMode = 3;
-            if (ImGui::IsKeyDown(ImGuiKey_F5)) debugMode = 4;
-            if (ImGui::IsKeyDown(ImGuiKey_F6)) debugMode = 5;
-            if (ImGui::IsKeyDown(ImGuiKey_F7)) debugMode = 6;
-            if (ImGui::IsKeyDown(ImGuiKey_F8)) debugMode = 7;
-            if (ImGui::IsKeyDown(ImGuiKey_F9)) debugMode = 8;
-            if (ImGui::IsKeyDown(ImGuiKey_F10)) debugMode = 9;
-        }
-        shader->setUniform("u_DebugMode", debugMode);
-
-        static int lastDebugMode = -1;
-        if (debugMode != lastDebugMode) {
-            const char* modeNames[] = {
-                "Normal", "Cascade Colors", "Shadow UV", "Raw Shadow",
-                "Depth Values", "Cascade Gradients", "Cascade 0 Only",
-                "Light Direction", "Distance", "Cascade 0 Lit/Shadow"
-            };
-            LOGI("Debug Mode: %d - %s", debugMode, modeNames[debugMode]);
-            lastDebugMode = debugMode;
-        }*/
-
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glDepthFunc(GL_LESS);
-
-        auto view = registry.view<MeshComponent, TransformComponent>();
-
-        // Reusable identity palette for non-skinned meshes
-        static std::vector<glm::mat4> s_identityPalette;
-		//int culledMeshes = 0;
-        for (auto [entity, meshComp, transformComp] : view.each())
-        {
-            if (meshComp.meshName == "SkyBox") continue;
-			if (!meshComp.visibility) continue;
-            if (!IsBoxInFrustum(meshComp.localMin, meshComp.localMax, transformComp.modelMatrix, viewProj)) {
-				//culledMeshes++;
-                continue; // Mesh is off-screen!
-
-            }
-            // Upload bone palette  
-            const std::vector<glm::mat4>* paletteToUse = nullptr;
-            bool useSkinning = false;
-
-            if (auto anim = registry.try_get<AnimationComponent>(entity))
-            {
-                if (anim->loaded && !anim->paletteMatrices.empty())
+                if (auto anim = registry.try_get<AnimationComponent>(entity))
                 {
-                    paletteToUse = &anim->paletteMatrices;
-                    useSkinning = true;
+                    if (anim->loaded && !anim->paletteMatrices.empty())
+                    {
+                        paletteToUse = &anim->paletteMatrices;
+                        useSkinning = true;
+                    }
+                }
+
+                if (!paletteToUse)
+                {
+                    // Use identity palette for non-animated meshes or if anim not ready
+                    if (s_identityPalette.empty())
+                        s_identityPalette.assign(maxBones, glm::mat4(1.0f));
+                    paletteToUse = &s_identityPalette;
+                    useSkinning = false;
+                }
+
+                UploadBonePalettes(*paletteToUse);
+
+                xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(
+                    AssetManagerSystem::MESH_GUID, meshComp.meshName);
+
+                auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
+
+                // Fall back to cached mesh if not a resource mesh
+                if (!meshData || meshData->vao == 0) {
+                    meshData = meshCache[meshComp.meshName];
+                }
+
+                if (!meshData || meshData->vao == 0) continue;
+
+                standard_shader->setUniform("u_Model", transformComp.modelMatrix);
+
+                glBindVertexArray(meshData->vao);
+
+                const MaterialComponent* override_material = registry.try_get<MaterialComponent>(entity);
+
+                for (const auto& subMesh : meshData->subMeshes)
+                {
+                    if (subMesh.materialIndex < 0 ||
+                        subMesh.materialIndex >= (int)meshData->materials.size())
+                        continue;
+
+                    const MaterialComponent& material =
+                        override_material ? *override_material : meshData->materials[subMesh.materialIndex];
+
+                    // Factors
+                    standard_shader->setUniform("u_AlbedoFactor", material.albedoFactor);
+                    standard_shader->setUniform("u_RoughnessFactor", material.roughnessFactor);
+                    standard_shader->setUniform("u_MetallicFactor", material.metallicFactor);
+                    standard_shader->setUniform("u_UVTransform", glm::vec4(
+                        material.uvTiling.x,
+                        material.uvTiling.y,
+                        material.uvOffset.x,
+                        material.uvOffset.y
+                    ));
+
+                    // Albedo
+                    auto albedoTex = AssetManagerSystem::GetResource<Scene::Texture>(material.albedoMap);
+                    glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_ALBEDO_UNIT);
+                    glBindTexture(GL_TEXTURE_2D, (albedoTex && albedoTex->id != 0) ? albedoTex->id : m_defaultWhiteTexture);
+
+
+                    // Normal
+                    auto normalTex = AssetManagerSystem::GetResource<Scene::Texture>(material.normalMap);
+                    glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_NORMAL_UNIT);
+                    glBindTexture(GL_TEXTURE_2D, (normalTex && normalTex->id != 0) ? normalTex->id : m_defaultNormalTexture);
+
+
+                    // Roughness
+                    auto roughTex = AssetManagerSystem::GetResource<Scene::Texture>(material.roughnessMap);
+                    glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_ROUGHNESS_UNIT);
+                    glBindTexture(GL_TEXTURE_2D, (roughTex && roughTex->id != 0) ? roughTex->id : m_defaultWhiteTexture);
+
+
+                    // Metallic
+                    auto metalTex = AssetManagerSystem::GetResource<Scene::Texture>(material.metallicMap);
+                    glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_METALLIC_UNIT);
+                    glBindTexture(GL_TEXTURE_2D, (metalTex && metalTex->id != 0) ? metalTex->id : m_defaultBlackTexture);
+
+
+                    static bool logged_first = false;
+                    if (!logged_first) {
+                        LOGI("=== First Submesh Render Debug ===");
+                        LOGI("Submesh: %s", subMesh.name.c_str());
+                        LOGI("Material: %s", material.name.c_str());
+                        LOGI("  - Albedo: ptr=%p, id=%u, using_fallback=%d",
+                            (void*)albedoTex.get(),
+                            albedoTex ? albedoTex->id : 0,
+                            !(albedoTex && albedoTex->id != 0));
+                        LOGI("  - Normal: ptr=%p, id=%u, using_fallback=%d",
+                            (void*)normalTex.get(),
+                            normalTex ? normalTex->id : 0,
+                            !(normalTex && normalTex->id != 0));
+                        LOGI("  - Roughness: ptr=%p, id=%u, factor=%.2f",
+                            (void*)roughTex.get(),
+                            roughTex ? roughTex->id : 0,
+                            material.roughnessFactor);
+                        LOGI("  - Metallic: ptr=%p, id=%u, factor=%.2f",
+                            (void*)metalTex.get(),
+                            metalTex ? metalTex->id : 0,
+                            material.metallicFactor);
+                        LOGI("Default textures: white=%u, normal=%u", m_defaultWhiteTexture, m_defaultNormalTexture);
+                        logged_first = true;
+                    }
+
+                    glDrawElements(GL_TRIANGLES, subMesh.indexCount,
+                        GL_UNSIGNED_INT,
+                        (void*)(sizeof(unsigned int) * subMesh.baseIndex));
                 }
             }
 
-            if (!paletteToUse)
-            {
-                // Use identity palette for non-animated meshes or if anim not ready
-                if (s_identityPalette.empty())
-                    s_identityPalette.assign(maxBones, glm::mat4(1.0f));
-                paletteToUse = &s_identityPalette;
-                useSkinning = false;
-            }
-
-            UploadBonePalettes(*paletteToUse);
-
-            xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(
-                AssetManagerSystem::MESH_GUID, meshComp.meshName);
-
-            auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-
-            // Fall back to cached mesh if not a resource mesh
-            if (!meshData || meshData->vao == 0) {
-                meshData = meshCache[meshComp.meshName];
-            }
-
-            if (!meshData || meshData->vao == 0) continue;
-
-            shader->setUniform("u_Model", transformComp.modelMatrix);
-
-            glBindVertexArray(meshData->vao);
-
-            const MaterialComponent* override_material = registry.try_get<MaterialComponent>(entity);
-
-            for (const auto& subMesh : meshData->subMeshes)
-            {
-                if (subMesh.materialIndex < 0 ||
-                    subMesh.materialIndex >= (int)meshData->materials.size())
-                    continue;
-
-                const MaterialComponent& material =
-                    override_material ? *override_material : meshData->materials[subMesh.materialIndex];
-
-                // Factors
-                shader->setUniform("u_AlbedoFactor", material.albedoFactor);
-                shader->setUniform("u_RoughnessFactor", material.roughnessFactor);
-                shader->setUniform("u_MetallicFactor", material.metallicFactor);
-                shader->setUniform("u_UVTransform", glm::vec4(
-                    material.uvTiling.x,
-                    material.uvTiling.y,
-                    material.uvOffset.x,
-                    material.uvOffset.y
-                ));
-
-                // Albedo
-                auto albedoTex = AssetManagerSystem::GetResource<Scene::Texture>(material.albedoMap);
-                glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_ALBEDO_UNIT);
-                glBindTexture(GL_TEXTURE_2D, (albedoTex && albedoTex->id != 0) ? albedoTex->id : m_defaultWhiteTexture);
-                shader->setUniform("s_Albedo", TextureUnits::MESH_ALBEDO_UNIT);
-
-                // Normal
-                auto normalTex = AssetManagerSystem::GetResource<Scene::Texture>(material.normalMap);
-                glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_NORMAL_UNIT);
-                glBindTexture(GL_TEXTURE_2D, (normalTex && normalTex->id != 0) ? normalTex->id : m_defaultNormalTexture);
-                shader->setUniform("s_Normal", TextureUnits::MESH_NORMAL_UNIT);
-
-                // Roughness
-                auto roughTex = AssetManagerSystem::GetResource<Scene::Texture>(material.roughnessMap);
-                glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_ROUGHNESS_UNIT);
-                glBindTexture(GL_TEXTURE_2D, (roughTex && roughTex->id != 0) ? roughTex->id : m_defaultWhiteTexture);
-                shader->setUniform("s_Roughness", TextureUnits::MESH_ROUGHNESS_UNIT);
-
-                // Metallic
-                auto metalTex = AssetManagerSystem::GetResource<Scene::Texture>(material.metallicMap);
-                glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_METALLIC_UNIT);
-                glBindTexture(GL_TEXTURE_2D, (metalTex && metalTex->id != 0) ? metalTex->id : m_defaultBlackTexture);
-                shader->setUniform("s_Metallic", TextureUnits::MESH_METALLIC_UNIT);
-
-                static bool logged_first = false;
-                if (!logged_first) {
-                    LOGI("=== First Submesh Render Debug ===");
-                    LOGI("Submesh: %s", subMesh.name.c_str());
-                    LOGI("Material: %s", material.name.c_str());
-                    LOGI("  - Albedo: ptr=%p, id=%u, using_fallback=%d",
-                        (void*)albedoTex.get(),
-                        albedoTex ? albedoTex->id : 0,
-                        !(albedoTex && albedoTex->id != 0));
-                    LOGI("  - Normal: ptr=%p, id=%u, using_fallback=%d",
-                        (void*)normalTex.get(),
-                        normalTex ? normalTex->id : 0,
-                        !(normalTex && normalTex->id != 0));
-                    LOGI("  - Roughness: ptr=%p, id=%u, factor=%.2f",
-                        (void*)roughTex.get(),
-                        roughTex ? roughTex->id : 0,
-                        material.roughnessFactor);
-                    LOGI("  - Metallic: ptr=%p, id=%u, factor=%.2f",
-                        (void*)metalTex.get(),
-                        metalTex ? metalTex->id : 0,
-                        material.metallicFactor);
-                    LOGI("Default textures: white=%u, normal=%u", m_defaultWhiteTexture, m_defaultNormalTexture);
-                    logged_first = true;
-                }
-
-                glDrawElements(GL_TRIANGLES, subMesh.indexCount,
-                               GL_UNSIGNED_INT,
-                               (void*)(sizeof(unsigned int) * subMesh.baseIndex));
-            }
+            standard_shader->disuse();
         }
-		//LOGI("Culled meshes this frame: %d", culledMeshes);
-        shader->disuse();
+        
     }
 
     void GraphicsSystem::SkyboxPass()

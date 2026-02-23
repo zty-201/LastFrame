@@ -24,5 +24,9 @@
   "UI" : {
     "vertex":   "Extern/Graphics/Shader/UI.vert",
     "fragment": "Extern/Graphics/Shader/UI.frag"
+  },
+  "MeshInstanced" : {
+    "vertex":   "Extern/Graphics/Shader/MeshInstanced.vert",
+    "fragment": "Extern/Graphics/Shader/Mesh.frag"
   }
 }

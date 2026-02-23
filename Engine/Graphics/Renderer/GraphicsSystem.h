@@ -25,7 +25,6 @@
 #include "InstancingSystem.h"
 
 
-
 namespace EngineFramework
 {
     namespace TextureUnits
@@ -141,6 +140,12 @@ namespace EngineFramework
         bool GetTricubicFiltering() const { return m_tricubic_filtering; }
         void SetTricubicFiltering(bool value) { m_tricubic_filtering = value; }
 
+		// Frustum Culling Functions
+        bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
+        bool IsBoxInFrustum(const float min[3], const float max[3], const glm::mat4& model, const glm::mat4& viewProj);
+        bool WorldToScreen(const glm::vec3& worldPos, glm::vec2& outScreenPos, float& outScale);
+        std::vector<glm::vec3> GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ);
+
     private:
 
         // Debug Mode
@@ -187,10 +192,12 @@ namespace EngineFramework
             glm::mat4 view_proj;
         };
 
-        //std::unique_ptr<InstancingSystem> m_instancingSystem;
+		// Instancing system for batching and culling
+        std::unique_ptr<InstancingSystem> m_instancingSystem;
         
 		// Shader GUIDs
         xresource::full_guid mesh_shader_guid;
+        xresource::full_guid mesh_instanced_shader_guid;
         xresource::full_guid skybox_shader_guid;
         xresource::full_guid shadow_shader_guid;
 		xresource::full_guid point_shadow_shader_guid;
@@ -268,7 +275,7 @@ namespace EngineFramework
 
 		// Rendering passes
         void ShadowPass();
-        void MeshPass(const glm::mat4& viewProj);
+        void MeshPass();
         void SkyboxPass();
         void VolumetricLightInjectionPass();
         void VolumetricRayMarchPass();
@@ -287,10 +294,6 @@ namespace EngineFramework
         void RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius);
         void CalculateCascadeSplits(float nearPlane, float farPlane);
         std::array<glm::vec4, 6> ExtractFrustumPlanes(const glm::mat4& viewProj);
-        bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
-        bool IsBoxInFrustum(const float min[3], const float max[3], const glm::mat4& model, const glm::mat4& viewProj);
-        bool WorldToScreen(const glm::vec3& worldPos, glm::vec2& outScreenPos, float& outScale);
-        std::vector<glm::vec3> GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ);
 
         //==Event Handlers, one for each type of event.
         void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
