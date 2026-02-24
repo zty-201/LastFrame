@@ -1139,84 +1139,84 @@ namespace EngineFramework
                 ImGui::Separator();
 
                 // Start Light settings
-                ImGui::SeparatorText("Lights");
-                ImGui::Spacing();
+                //ImGui::SeparatorText("Lights");
+                //ImGui::Spacing();
 
                 // Gather lights from registry
-                std::vector<std::string> lightNames;
-                std::vector<entt::entity> lightEntities;
-                for (auto entity : registry.view<LightComponent>()) {
-                    std::stringstream ss;
-                    ss << "Light " << lightNames.size() << " (ent " << static_cast<uint32_t>(entity) << ")";
-                    lightNames.push_back(ss.str());
-                    lightEntities.push_back(entity);
-                }
+                //std::vector<std::string> lightNames;
+                //std::vector<entt::entity> lightEntities;
+                //for (auto entity : registry.view<LightComponent>()) {
+                //    std::stringstream ss;
+                //    ss << "Light " << lightNames.size() << " (ent " << static_cast<uint32_t>(entity) << ")";
+                //    lightNames.push_back(ss.str());
+                //    lightEntities.push_back(entity);
+                //}
 
-                static int selected_light_idx = 0;
+                //static int selected_light_idx = 0;
 
-                // Check for lights and adjust the lights if needed
-                if (!lightNames.empty()) {
-                    // Create a drop down to select the specific light
-                    // First create a char* array for ImGui to read the names
-                    std::vector<const char*> lightNamePtrs;
-                    lightNamePtrs.reserve(lightNames.size());
+                //// Check for lights and adjust the lights if needed
+                //if (!lightNames.empty()) {
+                //    // Create a drop down to select the specific light
+                //    // First create a char* array for ImGui to read the names
+                //    std::vector<const char*> lightNamePtrs;
+                //    lightNamePtrs.reserve(lightNames.size());
 
-                    // Loop through to get the char* pointers
-                    for (const auto& name : lightNames) {
-                        lightNamePtrs.push_back(name.c_str());
-                    }
+                //    // Loop through to get the char* pointers
+                //    for (const auto& name : lightNames) {
+                //        lightNamePtrs.push_back(name.c_str());
+                //    }
 
-                    // Check if an overflow (in index) occurs
-                    if (selected_light_idx >= static_cast<int>(lightNames.size())) {
-                        selected_light_idx = 0;
-                    }
+                //    // Check if an overflow (in index) occurs
+                //    if (selected_light_idx >= static_cast<int>(lightNames.size())) {
+                //        selected_light_idx = 0;
+                //    }
 
-                    ImGui::Combo("Select Light", &selected_light_idx,
-                        lightNamePtrs.data(), static_cast<int>(lightNamePtrs.size()));
+                //    ImGui::Combo("Select Light", &selected_light_idx,
+                //        lightNamePtrs.data(), static_cast<int>(lightNamePtrs.size()));
 
-                    // Obtain the selected light entity to adjust values
-                    entt::entity selected_light_entity = lightEntities[selected_light_idx];
+                //    // Obtain the selected light entity to adjust values
+                //    entt::entity selected_light_entity = lightEntities[selected_light_idx];
 
-                    // Check if the entity is valid and has LightComponent
-                    if (registry.valid(selected_light_entity) && registry.all_of<LightComponent>(selected_light_entity)) {
-                        auto& light = registry.get<LightComponent>(selected_light_entity);
+                //    // Check if the entity is valid and has LightComponent
+                //    if (registry.valid(selected_light_entity) && registry.all_of<LightComponent>(selected_light_entity)) {
+                //        auto& light = registry.get<LightComponent>(selected_light_entity);
 
-                        // Intensity
-                        float intensity = light.intensity;
-                        if (ImGui::InputFloat("Light Intensity", &intensity)) {
-                            light.intensity = intensity;
-                        }
+                //        // Intensity
+                //        float intensity = light.intensity;
+                //        if (ImGui::InputFloat("Light Intensity", &intensity)) {
+                //            light.intensity = intensity;
+                //        }
 
-                        //if (light.type == LightComponent::DIRECTIONAL) { // Directional Light
-                        //    // Convert direction vector to pitch and yaw for sliders
-                        //    float pitch = glm::degrees(asinf(-light.direction.y));
-                        //    float yaw = glm::degrees(atan2f(light.direction.x, light.direction.z));
+                //        //if (light.type == LightComponent::DIRECTIONAL) { // Directional Light
+                //        //    // Convert direction vector to pitch and yaw for sliders
+                //        //    float pitch = glm::degrees(asinf(-light.direction.y));
+                //        //    float yaw = glm::degrees(atan2f(light.direction.x, light.direction.z));
 
-                        //    bool changed = false;
-                        //    changed |= ImGui::SliderFloat("Pitch", &pitch, -89.9f, 89.9f, "%.1f deg");
-                        //    changed |= ImGui::SliderFloat("Yaw", &yaw, -180.0f, 180.0f, "%.1f deg");
+                //        //    bool changed = false;
+                //        //    changed |= ImGui::SliderFloat("Pitch", &pitch, -89.9f, 89.9f, "%.1f deg");
+                //        //    changed |= ImGui::SliderFloat("Yaw", &yaw, -180.0f, 180.0f, "%.1f deg");
 
-                        //    if (changed) {
-                        //        // Convert degrees back to radians
-                        //        float pitchRad = glm::radians(pitch);
-                        //        float yawRad = glm::radians(yaw);
+                //        //    if (changed) {
+                //        //        // Convert degrees back to radians
+                //        //        float pitchRad = glm::radians(pitch);
+                //        //        float yawRad = glm::radians(yaw);
 
-                        //        // Recalculate direction vector
-                        //        glm::vec3 newDirection;
-                        //        newDirection.x = cos(pitchRad) * sin(yawRad);
-                        //        newDirection.y = -sin(pitchRad);
-                        //        newDirection.z = cos(pitchRad) * cos(yawRad);
+                //        //        // Recalculate direction vector
+                //        //        glm::vec3 newDirection;
+                //        //        newDirection.x = cos(pitchRad) * sin(yawRad);
+                //        //        newDirection.y = -sin(pitchRad);
+                //        //        newDirection.z = cos(pitchRad) * cos(yawRad);
 
-                        //        light.direction = glm::normalize(newDirection);
-                        //    }
-                        //}
-                    }
-                    else {
-                        ImGui::TextDisabled("Selected Light entity is invalid or no LightComponent attached.");
-                    }
-                }
+                //        //        light.direction = glm::normalize(newDirection);
+                //        //    }
+                //        //}
+                //    }
+                //    else {
+                //        ImGui::TextDisabled("Selected Light entity is invalid or no LightComponent attached.");
+                //    }
+                //}
 
-                static std::string button_text = "Adjust Light with Mouse";
+                //static std::string button_text = "Adjust Light with Mouse";
 
                 //if (is_adjusting_lights) {
                 //    button_text = "Stop Adjusting Lights";
@@ -1230,7 +1230,7 @@ namespace EngineFramework
                 //    is_adjusting_lights = !is_adjusting_lights;
                 //}
 
-                ImGui::PopStyleColor();
+                //ImGui::PopStyleColor();
                 ImGui::EndTabItem();
                 // If you want to add new lights
     //            if(ImGui::Button("Add New Light")) {

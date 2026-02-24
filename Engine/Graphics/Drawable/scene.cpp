@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  * @file scene.cpp
  * @brief Implementation of texture loading and management for 3D scenes.
  *
@@ -371,7 +371,7 @@ std::vector<unsigned char> Scene::Texture::CompressTexture(const char* filename,
 	////ETC2 Cli --> CompressonatorCLI.exe -fd ETC2 -UseGPUDecompress  input.png output.ktx
 	////BC3 Cli --> CompressonatorCLI.exe -fd BC3 -quality 1.0 -threads 8 -refine 1 -srgba input.png output.dds
 	////BC3 Cli --> CompressonatorCLI.exe -fd BC3 -quality 1.0 -threads 8 -refine 1 -srgba "C:\input_folder\*.png" "C:\output_folder"
-	////BC3 or ETC2_RGBA  -ff <ext>,…,<ext> for png,jpg etc. -fx <ext> for dds,ktx etc. 
+	////BC3 or ETC2_RGBA  -ff <ext>,?<ext> for png,jpg etc. -fx <ext> for dds,ktx etc. 
 	///*
 	//	-UseSRGBFrames -EncodeWith GPU   //Only if srgb
 	//	-fd ETC2_RGBA or BC3

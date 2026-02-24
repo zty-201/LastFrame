@@ -651,7 +651,7 @@ namespace Engine {
         );
 
         // ===============================================================
-        // AudioSystem � Playback helpers (Lua)
+        // AudioSystem  Playback helpers (Lua)
         // ===============================================================
         // Recommended way to trigger audio from scripts.
         // Uses entity + slot ID instead of raw sound assets.
@@ -683,7 +683,7 @@ namespace Engine {
             });
 
         // ===============================================================
-        // AudioSystem � Mixer controls (Lua)
+        // AudioSystem  Mixer controls (Lua)
         // ===============================================================
         // Used for settings menus (volume sliders).
         // ===============================================================
@@ -695,7 +695,7 @@ namespace Engine {
             });
 
         // ===============================================================
-        // AudioSystem � Environment controls (Lua)
+        // AudioSystem  Environment controls (Lua)
         // ===============================================================
         // Controls ambience muffling based on environment.
         //

@@ -1456,7 +1456,6 @@ namespace EngineFramework
 
     void GraphicsSystem::CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix)
     {
-
         // Translation
         glm::mat4 T = glm::translate(glm::mat4(1.0f), transform.position);
 
@@ -1469,7 +1468,8 @@ namespace EngineFramework
         glm::mat4 S = glm::scale(glm::mat4(1.0f), transform.scale);
 
         // Combine: TRS
-        modelMatrix = T * R * S;
+		glm::mat4 model = T * R * S;
+        modelMatrix = model;
     }
 
     void GraphicsSystem::LoadBlueNoiseTextures()
