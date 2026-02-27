@@ -1,0 +1,148 @@
+#version 320 es
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+// ------------------------------------------------------------------
+// DATA STRUCTURES
+// ------------------------------------------------------------------
+
+struct InstanceData {
+    uint batchID;
+    uint padding[3];
+    mat4 modelMatrix;
+    vec4 boundingSphere; // xyz = local center, w = local radius
+};
+
+struct DrawCommand {
+    uint count;
+    uint instanceCount; // We will atomicAdd to this
+    uint firstIndex;
+    uint baseVertex;
+    uint baseInstance;
+};
+
+// ------------------------------------------------------------------
+// BUFFERS
+// ------------------------------------------------------------------
+
+// 1. Input: All instances in the scene
+layout(std430, binding = 0) readonly buffer InstanceBuffer {
+    InstanceData instances[];
+};
+
+// 2. In/Out: The Indirect Draw Commands
+layout(std430, binding = 1) buffer CommandBuffer {
+    DrawCommand commands[];
+};
+
+// 3. Output: The Translation Table (Which instances are visible per pass)
+layout(std430, binding = 2) writeonly buffer VisibleIndicesBuffer {
+    uint visibleIndices[];
+};
+
+// ------------------------------------------------------------------
+// UNIFORMS
+// ------------------------------------------------------------------
+
+uniform mat4 u_MainViewProj;
+uniform mat4 u_CascadeViewProj[3];
+uniform uint u_TotalInstances;
+
+// Hardcoded based on C++ constants (MAX_BATCHES and MAX_INSTANCES)
+const uint MAX_BATCHES = 1000u;
+const uint MAX_INSTANCES = 50000u;
+
+// ------------------------------------------------------------------
+// HELPER FUNCTIONS
+// ------------------------------------------------------------------
+
+// Frustum extraction logic
+void ExtractPlanes(mat4 vp, out vec4 planes[6]) {
+    planes[0] = vp[3] + vp[0]; // Left
+    planes[1] = vp[3] - vp[0]; // Right
+    planes[2] = vp[3] + vp[1]; // Bottom
+    planes[3] = vp[3] - vp[1]; // Top
+    planes[4] = vp[3] + vp[2]; // Near
+    planes[5] = vp[3] - vp[2]; // Far
+
+    for(int i = 0; i < 6; i++) {
+        planes[i] = planes[i] / length(planes[i].xyz);
+    }
+}
+
+// Check if a sphere is inside the frustum planes
+bool IsSphereInFrustum(vec3 center, float radius, vec4 planes[6]) {
+    for(int i = 0; i < 6; i++) {
+        if(dot(planes[i].xyz, center) + planes[i].w < -radius) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// ------------------------------------------------------------------
+// MAIN LOGIC
+// ------------------------------------------------------------------
+
+void main() {
+    uint idx = gl_GlobalInvocationID.x;
+    if (idx >= u_TotalInstances) return;
+
+    InstanceData inst = instances[idx];
+    
+    // 1. Transform Local Bounding Sphere to World Space
+    vec3 worldCenter = vec3(inst.modelMatrix * vec4(inst.boundingSphere.xyz, 1.0));
+    
+    // Quick approximation for world radius (assumes uniform scaling for the sphere)
+    vec3 scale = vec3(length(inst.modelMatrix[0].xyz), 
+                      length(inst.modelMatrix[1].xyz), 
+                      length(inst.modelMatrix[2].xyz));
+    float maxScale = max(scale.x, max(scale.y, scale.z));
+    float worldRadius = inst.boundingSphere.w * maxScale;
+
+    // 2. Extract Frustum Planes
+    vec4 mainPlanes[6];
+    vec4 c0Planes[6];
+    vec4 c1Planes[6];
+    vec4 c2Planes[6];
+    
+    ExtractPlanes(u_MainViewProj, mainPlanes);
+    ExtractPlanes(u_CascadeViewProj[0], c0Planes);
+    ExtractPlanes(u_CascadeViewProj[1], c1Planes);
+    ExtractPlanes(u_CascadeViewProj[2], c2Planes);
+
+    uint batchID = inst.batchID;
+
+    // --- PASS 0: MAIN CAMERA ---
+    if (IsSphereInFrustum(worldCenter, worldRadius, mainPlanes)) {
+        uint cmdIndex = (0u * MAX_BATCHES) + batchID;
+        uint slotIdx = atomicAdd(commands[cmdIndex].instanceCount, 1u);
+        
+        // (PassIndex * MAX_INSTANCES) + BatchOffset + SlotIndex
+        uint writeIdx = (0u * MAX_INSTANCES) + inst.instanceOffset + slotIdx;
+        visibleIndices[writeIdx] = idx; 
+    }
+
+    // --- PASS 1: CASCADE 0 ---
+    if (IsSphereInFrustum(worldCenter, worldRadius, c0Planes)) {
+        uint cmdIndex = (1u * MAX_BATCHES) + batchID;
+        uint slotIdx = atomicAdd(commands[cmdIndex].instanceCount, 1u);
+        uint writeIdx = (1u * MAX_INSTANCES) + inst.instanceOffset + slotIdx;
+        visibleIndices[writeIdx] = idx;
+    }
+
+    // --- PASS 2: CASCADE 1 ---
+    if (IsSphereInFrustum(worldCenter, worldRadius, c1Planes)) {
+        uint cmdIndex = (2u * MAX_BATCHES) + batchID;
+        uint slotIdx = atomicAdd(commands[cmdIndex].instanceCount, 1u);
+        uint writeIdx = (2u * MAX_INSTANCES) + inst.instanceOffset + slotIdx;
+        visibleIndices[writeIdx] = idx;
+    }
+
+    // --- PASS 3: CASCADE 2 ---
+    if (IsSphereInFrustum(worldCenter, worldRadius, c2Planes)) {
+        uint cmdIndex = (3u * MAX_BATCHES) + batchID;
+        uint slotIdx = atomicAdd(commands[cmdIndex].instanceCount, 1u);
+        uint writeIdx = (3u * MAX_INSTANCES) + inst.instanceOffset + slotIdx;
+        visibleIndices[writeIdx] = idx;
+    }
+}

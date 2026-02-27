@@ -295,7 +295,7 @@ namespace EngineFramework
         void RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius);
         void CalculateCascadeSplits(float nearPlane, float farPlane);
         std::array<glm::vec4, 6> ExtractFrustumPlanes(const glm::mat4& viewProj);
-
+        void UpdateCascadeMatrices(const CameraComponent& camera, const glm::mat4& camView);
         //==Event Handlers, one for each type of event.
         void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);

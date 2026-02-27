@@ -299,8 +299,9 @@ namespace EngineFramework
 
         glm::mat4 viewProj = P * V;
 
+        UpdateCascadeMatrices(*active_camera, V);
 		// Preprocessing 
-        m_instancingSystem->GatherPass(viewProj);
+        m_instancingSystem->GatherPass(viewProj, m_cascadeViewProjMatrices);
 
         // 1. Update point light SSBO
         UpdateLightSSBO();
@@ -481,112 +482,44 @@ namespace EngineFramework
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
 
-        // One pass per cascade
+        // Bind our Indirect Commands buffer globally for this pass
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
+        size_t numBatches = m_instancingSystem->GetActiveBatchCount();
+
         for (int cascade = 0; cascade < CASCADE_COUNT; cascade++) {
             glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
-            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                m_csmTextureArray, 0, cascade);
+            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_csmTextureArray, 0, cascade);
             glClear(GL_DEPTH_BUFFER_BIT);
-
-            float cascadeBias = m_shadow_bias * (1.0f + float(cascade) * 0.5f);
-            m_cascadeBiases[cascade] = cascadeBias;
-
-            float nearSplit = m_cascadeSplits[cascade];
-            float farSplit = m_cascadeSplits[cascade + 1];
-
-            // Frustum slice corners
-            std::vector<glm::vec3> frustumCorners = GetFrustumCornersWorldSpace(
-                camera, camView, nearSplit, farSplit);
-
-            // Average center of corners
-            glm::vec3 center(0.0f);
-            for (const auto& corner : frustumCorners) {
-                center += corner;
-            }
-            center /= frustumCorners.size();
-
-            glm::vec3 lightDir = dirLightTransform->rotation;
-
-            // Stable up vector
-            glm::vec3 up = glm::abs(lightDir.y) > 0.999f ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
-
-            // Light view, anchored at origin for stability
-            glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f), lightDir, up);
-
-            // Bounding sphere of frustum slice
-            glm::vec3 frustumCenter(0.0f);
-            for (const auto& corner : frustumCorners) {
-                frustumCenter += corner;
-            }
-            frustumCenter /= frustumCorners.size();
-
-            float radius = 0.0f;
-            for (const auto& corner : frustumCorners) {
-                float dist = glm::length(corner - frustumCenter);
-                radius = glm::max(radius, dist);
-            }
-
-            glm::vec3 lightSpaceCenter = glm::vec3(lightView * glm::vec4(frustumCenter, 1.0f));
-
-            float diameter = radius * 2.0f;
-            float texelSize = diameter / SHADOW_WIDTH;
-
-            // Snap center to texel grid to reduce shimmering
-            lightSpaceCenter.x = floor(lightSpaceCenter.x / texelSize) * texelSize;
-            lightSpaceCenter.y = floor(lightSpaceCenter.y / texelSize) * texelSize;
-
-            float minX = lightSpaceCenter.x - radius;
-            float maxX = lightSpaceCenter.x + radius;
-            float minY = lightSpaceCenter.y - radius;
-            float maxY = lightSpaceCenter.y + radius;
-
-            float zMult = 10.0f;
-            float minZ = lightSpaceCenter.z - radius * zMult;
-            float maxZ = lightSpaceCenter.z + radius * zMult;
-
-            // Ortho projection in light space
-            glm::mat4 lightProj = glm::ortho(minX, maxX, minY, maxY, -maxZ, -minZ);
-
-            m_cascadeViewProjMatrices[cascade] = lightProj * lightView;
 
             shader->setUniform("u_LightMatrix", m_cascadeViewProjMatrices[cascade]);
 
-            /*float minSize = 0.0f;
-            if (cascade == 1) minSize = 2.0f;
-            if (cascade == 2) minSize = 5.0f;
-            if (cascade == 3) minSize = 10.0f;*/
+            int passOffset = cascade + 1; // Pass 1, 2, or 3
+            int batchIndex = 0;
 
-            auto view = registry.view<MeshComponent, TransformComponent>();
-            for (auto [entity, meshComp, transformComp] : view.each()) {
-                if (meshComp.meshName == "SkyBox") continue;
-                if (!meshComp.visibility) continue; // Basic check
-
-                //float maxScale = std::max(transformComp.scale.x, std::max(transformComp.scale.y, transformComp.scale.z));
-                // Assuming average mesh size is ~1 unit. If you have tiny meshes scaled up, this works fine.
-                //if (maxScale < minSize) continue;
-
-                // --- THE FIX: Cull against the Shadow Cascade Matrix ---
-                if (!IsBoxInFrustum(meshComp.localMin, meshComp.localMax, transformComp.modelMatrix, m_cascadeViewProjMatrices[cascade])) {
-                    continue;
-                }
-                xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(
-                    AssetManagerSystem::MESH_GUID, meshComp.meshName);
-                auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-
-                if (!meshData || meshData->vao == 0) continue;
-
-                shader->setUniform("u_Model", transformComp.modelMatrix);
+            for (const auto& batch : m_instancingSystem->GetBatches()) {
+                auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(
+                    AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
+                if (!meshData || meshData->vao == 0) meshData = meshCache[batch.key.meshName];
+                if (!meshData || meshData->vao == 0) { batchIndex++; continue; }
 
                 glBindVertexArray(meshData->vao);
-                for (const auto& subMesh : meshData->subMeshes) {
-                    glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT,
-                        (void*)(sizeof(unsigned int) * subMesh.baseIndex));
-                }
+
+                // Tell Vertex Shader where to read this batch's visible IDs
+                int visibleIndexOffset = (passOffset * MAX_INSTANCES) + batch.instanceOffset;
+                shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
+
+                // Calculate the memory jump for the indirect command
+                void* indirectCmdAddress = (void*)(((passOffset * numBatches) + batchIndex) * sizeof(DrawElementsIndirectCommand));
+
+                // The single draw call!
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
+
+                batchIndex++;
             }
         }
 
         glCullFace(GL_BACK);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // Unbind
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
     }
@@ -1035,7 +968,8 @@ namespace EngineFramework
             mesh_instanced_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "MeshInstanced");
             instanced_shader = E_AM::GetResource<ShaderProgram>(mesh_instanced_shader_guid);
         }
-        
+       
+
         if (instanced_shader) {
             instanced_shader->use();
             glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
@@ -1066,6 +1000,10 @@ namespace EngineFramework
             instanced_shader->setUniform("s_Normal", TextureUnits::MESH_NORMAL_UNIT);
             instanced_shader->setUniform("s_Roughness", TextureUnits::MESH_ROUGHNESS_UNIT);
             instanced_shader->setUniform("s_Metallic", TextureUnits::MESH_METALLIC_UNIT);
+
+            glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
+            size_t numBatches = m_instancingSystem->GetActiveBatchCount();
+            int batchIndex = 0;
 
             for (const auto& batch : m_instancingSystem->GetBatches()) {
                 auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
@@ -1108,12 +1046,19 @@ namespace EngineFramework
                 // Tell the shader where to start reading matrices from the SSBO
                 instanced_shader->setUniform("u_InstanceOffset", (int)batch.instanceOffset);
 
-                // Draw all instances in this batch at once!
-                const auto& subMesh = meshData->subMeshes[batch.key.subMeshIndex];
-                glDrawElementsInstanced(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT,
-                    (void*)(sizeof(unsigned int) * subMesh.baseIndex),
-                    (GLsizei)batch.instanceCount);
+                // Tell Vertex Shader where to read this batch's visible IDs (Pass 0)
+                int visibleIndexOffset = (0 * MAX_INSTANCES) + batch.instanceOffset;
+                instanced_shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
+
+                // Calculate memory jump
+                void* indirectCmdAddress = (void*)(((0 * numBatches) + batchIndex) * sizeof(DrawElementsIndirectCommand));
+
+                // The single draw call!
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
+
+                batchIndex++;
             }
+            glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
             instanced_shader->disuse();
         } else {
             LOGE("Mesh instanced shader not found!");
@@ -1546,6 +1491,85 @@ namespace EngineFramework
             float uniformSplit = nearPlane + (farPlane - nearPlane) * p;
 
             m_cascadeSplits[i] = lambda * logSplit + (1.0f - lambda) * uniformSplit;
+        }
+    }
+
+    void GraphicsSystem::UpdateCascadeMatrices(const CameraComponent& camera, const glm::mat4& camView) {
+        TransformComponent* dirLightTransform = nullptr;
+        for (auto [entity, light] : registry.view<LightComponent>().each()) {
+            if (light.type == LightComponent::DIRECTIONAL) {
+                dirLightTransform = &registry.get<TransformComponent>(entity);
+                break;
+            }
+        }
+        if (!dirLightTransform) return;
+
+        CalculateCascadeSplits(camera.nearPlane, camera.farPlane);
+        glm::vec3 lightDir = dirLightTransform->rotation;
+        glm::vec3 up = glm::abs(lightDir.y) > 0.999f ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
+        glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f), lightDir, up);
+
+        for (int cascade = 0; cascade < CASCADE_COUNT; cascade++) {
+            float cascadeBias = m_shadow_bias * (1.0f + float(cascade) * 0.5f);
+            m_cascadeBiases[cascade] = cascadeBias;
+
+            float nearSplit = m_cascadeSplits[cascade];
+            float farSplit = m_cascadeSplits[cascade + 1];
+
+            // Frustum slice corners
+            std::vector<glm::vec3> frustumCorners = GetFrustumCornersWorldSpace(
+                camera, camView, nearSplit, farSplit);
+
+            // Average center of corners
+            glm::vec3 center(0.0f);
+            for (const auto& corner : frustumCorners) {
+                center += corner;
+            }
+            center /= frustumCorners.size();
+
+            glm::vec3 lightDir = dirLightTransform->rotation;
+
+            // Stable up vector
+            glm::vec3 up = glm::abs(lightDir.y) > 0.999f ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
+
+            // Light view, anchored at origin for stability
+            glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f), lightDir, up);
+
+            // Bounding sphere of frustum slice
+            glm::vec3 frustumCenter(0.0f);
+            for (const auto& corner : frustumCorners) {
+                frustumCenter += corner;
+            }
+            frustumCenter /= frustumCorners.size();
+
+            float radius = 0.0f;
+            for (const auto& corner : frustumCorners) {
+                float dist = glm::length(corner - frustumCenter);
+                radius = glm::max(radius, dist);
+            }
+
+            glm::vec3 lightSpaceCenter = glm::vec3(lightView * glm::vec4(frustumCenter, 1.0f));
+
+            float diameter = radius * 2.0f;
+            float texelSize = diameter / SHADOW_WIDTH;
+
+            // Snap center to texel grid to reduce shimmering
+            lightSpaceCenter.x = floor(lightSpaceCenter.x / texelSize) * texelSize;
+            lightSpaceCenter.y = floor(lightSpaceCenter.y / texelSize) * texelSize;
+
+            float minX = lightSpaceCenter.x - radius;
+            float maxX = lightSpaceCenter.x + radius;
+            float minY = lightSpaceCenter.y - radius;
+            float maxY = lightSpaceCenter.y + radius;
+
+            float zMult = 10.0f;
+            float minZ = lightSpaceCenter.z - radius * zMult;
+            float maxZ = lightSpaceCenter.z + radius * zMult;
+
+            // Ortho projection in light space
+            glm::mat4 lightProj = glm::ortho(minX, maxX, minY, maxY, -maxZ, -minZ);
+
+            m_cascadeViewProjMatrices[cascade] = lightProj * lightView;
         }
     }
 
