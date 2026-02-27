@@ -53,6 +53,11 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "UIComponent.h"
 namespace EngineFramework
 {
+	namespace
+	{
+		constexpr const char* kEntityPayloadType = "OBJECT_MANAGER_ENTITY_PAYLOAD";
+	}
+
 	ObjectManager::ObjectManager() {
 		LOGI("Lfeature: ObjectManager CREATED");
 	}
@@ -61,6 +66,204 @@ namespace EngineFramework
 	}
 	void ObjectManager::Initialize() {
 
+	}
+
+	std::string ObjectManager::TrimString(const std::string& value)
+	{
+		auto first = std::find_if_not(value.begin(), value.end(), [](unsigned char ch) { return std::isspace(ch); });
+		auto last = std::find_if_not(value.rbegin(), value.rend(), [](unsigned char ch) { return std::isspace(ch); }).base();
+		if (first >= last)
+		{
+			return {};
+		}
+		return std::string(first, last);
+	}
+
+	bool ObjectManager::AddEntityToFilter(CustomFilter& filter, entt::entity entity)
+	{
+		if (entity == entt::null || !registry.valid(entity))
+		{
+			return false;
+		}
+		if (std::find(filter.members.begin(), filter.members.end(), entity) != filter.members.end())
+		{
+			return false;
+		}
+		filter.members.push_back(entity);
+		return true;
+	}
+
+	void ObjectManager::RemoveEntityFromFilter(CustomFilter& filter, entt::entity entity)
+	{
+		filter.members.erase(std::remove(filter.members.begin(), filter.members.end(), entity), filter.members.end());
+	}
+
+	bool ObjectManager::IsEntityInFilters(entt::entity entity) const
+	{
+		if (entity == entt::null)
+		{
+			return false;
+		}
+		for (const auto& filter : m_CustomFilters)
+		{
+			if (std::find(filter.members.begin(), filter.members.end(), entity) != filter.members.end())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void ObjectManager::RemoveEntityFromAllFilters(entt::entity entity)
+	{
+		for (auto& filter : m_CustomFilters)
+		{
+			RemoveEntityFromFilter(filter, entity);
+		}
+	}
+
+	void ObjectManager::CleanupFilters()
+	{
+		for (auto& filter : m_CustomFilters)
+		{
+			filter.members.erase(
+				std::remove_if(filter.members.begin(), filter.members.end(),
+					[](entt::entity entity)
+					{
+						return entity == entt::null || !registry.valid(entity);
+					}),
+				filter.members.end());
+		}
+	}
+
+	void ObjectManager::DrawCustomFilters(iEditorView& selection_state)
+	{
+		ImGui::Separator();
+		ImGui::Text("Custom Filters");
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.6f);
+		ImGui::InputTextWithHint("##CustomFilterName", "New filter name", m_NewFilterNameBuffer.data(), m_NewFilterNameBuffer.size());
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Create Filter"))
+		{
+			std::string name = TrimString(m_NewFilterNameBuffer.data());
+			if (!name.empty())
+			{
+				CustomFilter new_filter{};
+				new_filter.name = std::move(name);
+				m_CustomFilters.emplace_back(std::move(new_filter));
+				m_NewFilterNameBuffer.fill(0);
+			}
+		}
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Clear Filters"))
+		{
+			m_CustomFilters.clear();
+		}
+
+		ImGui::Selectable("Drop here to keep entity unfiltered", false, ImGuiSelectableFlags_Disabled);
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(kEntityPayloadType))
+			{
+				entt::entity dropped = *static_cast<const entt::entity*>(payload->Data);
+				RemoveEntityFromAllFilters(dropped);
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+		if (m_CustomFilters.empty())
+		{
+			ImGui::TextDisabled("No filters created yet.");
+			return;
+		}
+
+		for (size_t i = 0; i < m_CustomFilters.size();)
+		{
+			auto& filter = m_CustomFilters[i];
+			ImGui::PushID(static_cast<int>(i));
+			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
+			if (filter.expanded)
+			{
+				flags |= ImGuiTreeNodeFlags_DefaultOpen;
+			}
+
+			bool open = ImGui::TreeNodeEx(filter.name.c_str(), flags);
+			bool remove_filter = false;
+
+			if (ImGui::BeginPopupContextItem("FilterContextMenu"))
+			{
+				if (ImGui::MenuItem("Delete Filter"))
+				{
+					remove_filter = true;
+				}
+				ImGui::EndPopup();
+			}
+
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(kEntityPayloadType))
+				{
+					entt::entity dropped = *static_cast<const entt::entity*>(payload->Data);
+					RemoveEntityFromAllFilters(dropped);
+					AddEntityToFilter(filter, dropped);
+				}
+				ImGui::EndDragDropTarget();
+			}
+
+			if (remove_filter)
+			{
+				if (open)
+				{
+					ImGui::TreePop();
+				}
+				ImGui::PopID();
+				m_CustomFilters.erase(m_CustomFilters.begin() + static_cast<std::ptrdiff_t>(i));
+				continue;
+			}
+
+			filter.expanded = open;
+			if (open)
+			{
+				if (filter.members.empty())
+				{
+					ImGui::TextDisabled("Drag entities here to populate this filter.");
+				}
+
+				for (size_t member_index = 0; member_index < filter.members.size();)
+				{
+					entt::entity member = filter.members[member_index];
+					if (member == entt::null || !registry.valid(member))
+					{
+						filter.members.erase(filter.members.begin() + static_cast<std::ptrdiff_t>(member_index));
+						continue;
+					}
+
+					ImGui::PushID(static_cast<int>(member_index));
+					std::string label = GameObjectSystem::GetEntityName(member);
+					bool is_selected = selection_state.IsEntitySelected(member);
+					if (ImGui::Selectable(label.c_str(), is_selected))
+					{
+						selection_state.SetEntitySelection(member);
+						selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+					}
+
+					if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+					{
+						entt::entity payload = member;
+						ImGui::SetDragDropPayload(kEntityPayloadType, &payload, sizeof(payload));
+						ImGui::TextUnformatted(label.c_str());
+						ImGui::EndDragDropSource();
+					}
+					ImGui::PopID();
+					++member_index;
+				}
+
+				ImGui::TreePop();
+			}
+
+			ImGui::PopID();
+			++i;
+		}
 	}
 
 	static inline Mesh::AABB TransformAABB(const Mesh::AABB& box, const glm::mat4& M) {
@@ -138,7 +341,9 @@ namespace EngineFramework
 			static char rename_buffer[128]{};
 
 			iEditorView& selection_state = LevelEditor::GetInstance().variables;
-
+			CleanupFilters();
+			DrawCustomFilters(selection_state);
+			ImGui::Separator();
 
 			auto duplicate_and_select = [&](entt::entity source_entity) -> entt::entity {
 				if (source_entity == entt::null || !registry.valid(source_entity)) {
@@ -221,6 +426,11 @@ namespace EngineFramework
 			// Iterate through here to allow the search of object name
 			int incrementing_imgui_id{};
 			for (auto entity : entities) {
+
+				if (IsEntityInFilters(entity))
+				{
+					continue;
+				}
 
 				/*
 					DISPLAYING OF MENU ENTITIES ONLY WHEN MENU IS OPENED
@@ -325,6 +535,14 @@ namespace EngineFramework
 					}
 				}
 
+				if (registry.valid(entity) && ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+				{
+					entt::entity payload = entity;
+					ImGui::SetDragDropPayload(kEntityPayloadType, &payload, sizeof(payload));
+					ImGui::TextUnformatted(label.c_str());
+					ImGui::EndDragDropSource();
+				}
+
 				// Check for right-click while the item is hovered/active
 				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
 					// Open the popup menu attached to this item
@@ -360,6 +578,7 @@ namespace EngineFramework
 
 						// 1. Destroy the entity
 						registry.destroy(entity);
+						RemoveEntityFromAllFilters(entity);
 
 						if (MenuManager::GetInstance().is_menu_running)
 						{

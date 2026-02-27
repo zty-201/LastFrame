@@ -18,6 +18,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <unordered_map>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <array>
 #include "ISystem.hpp"
 #include "entt/entity/registry.hpp"
 #include "System_LevelEditor.hpp"
@@ -43,14 +45,30 @@ namespace EngineFramework
 
         static bool feature_enabled;
     private:
+        struct CustomFilter
+        {
+            std::string name;
+            std::vector<entt::entity> members;
+            bool expanded = true;
+        };
+
         //Set when user wants to create an archtype from instance, which will open up a popup menu to input additional information.
         //Setting entity data in the tuple will trigger create archtype from instance event.
         entt::entity instance_to_create_archtype = entt::null;
+        std::vector<CustomFilter> m_CustomFilters;
+        std::array<char, 64> m_NewFilterNameBuffer{};
 
         /*
             Creates an archtype file + asset, reloads archtype assets, then assigns the archtype to the entity.
         */
         void CreateArchtypeFromInstance(entt::entity entity, const std::string& name, const std::string& model_type);
+        void DrawCustomFilters(iEditorView& selection_state);
+        void CleanupFilters();
+        void RemoveEntityFromAllFilters(entt::entity entity);
+        static bool AddEntityToFilter(CustomFilter& filter, entt::entity entity);
+        static void RemoveEntityFromFilter(CustomFilter& filter, entt::entity entity);
+        static std::string TrimString(const std::string& value);
+        bool IsEntityInFilters(entt::entity entity) const;
     };
 }
 
