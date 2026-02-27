@@ -87,7 +87,8 @@ namespace EngineFramework
 
 		//Quick Call function to load scene and destroy current scene.
 		void LoadScene(const std::string& json_input);
-		
+		//Deferred Scene Loading for Scripts
+		void QueueLoadScene(const std::string& json_input);
 		/*
 			Creates a single entity with the same component data (copied) from archtype
 		*/
@@ -161,6 +162,9 @@ namespace EngineFramework
 
 		//Keeps track of the one and only instance of this system, created by core engine.
 		static inline GameObjectSystem* this_system{};
+
+		bool m_pendingSceneLoad = false;
+		std::string m_pendingSceneData = "";
 
 		friend UI_Menu;
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
