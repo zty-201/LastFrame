@@ -38,6 +38,7 @@
 //For printing instance/type_guids in error messages
 #include <inttypes.h>
 #include "UIComponent.h"
+#include "UISystem.hpp"
 
 namespace EngineFramework
 {
@@ -94,6 +95,12 @@ namespace EngineFramework
 		DeSerializeAllEntityInstances(json_input);
 	}
 
+	void GameObjectSystem::QueueLoadScene(const std::string& json_input)
+	{
+		m_pendingSceneLoad = true;
+		m_pendingSceneData = json_input;
+	}
+
 	void GameObjectSystem::ClearAllInstances()
 	{
 		registry.clear();
@@ -109,6 +116,18 @@ namespace EngineFramework
 	void GameObjectSystem::Update(float delta_time)
 	{
 		UNREFERENCED_PARAMETER(delta_time);
+		if (m_pendingSceneLoad)
+		{
+			LOGI("[GameObjectSystem] Executing Deferred Scene Load...");
+
+			ClearAllInstances();
+			DeSerializeAllEntityInstances(m_pendingSceneData);
+
+			UI_System::GetInstance().Initialize();
+
+			m_pendingSceneLoad = false;
+			m_pendingSceneData.clear();
+		}
 	}
 
 	/*
