@@ -131,6 +131,14 @@ namespace EngineFramework
 #ifndef DISABLE_FMOD
             FMOD::Channel* channel = nullptr;
 #endif
+            // Fade feature
+            bool useFade = false;
+            float fadeDuration = 1.0f;
+            float currentFadeVolume = 0.0f;
+            float targetVolume = 1.0f;
+            bool isFadingOut = false;
+
+            // 3D feature
             bool is3D = false;
             bool looping = false;
             float minDistance = 1.0f;
@@ -152,7 +160,7 @@ namespace EngineFramework
         void ProcessStopSlot(const AudioCommand& command);
         void ProcessStopAllForEntity(const AudioCommand& command);
 
-        void UpdateActiveInstances(entt::registry& ecsRegistry);
+        void UpdateActiveInstances(entt::registry& ecsRegistry, float dt);
         void HandlePlayOnStart(entt::registry& ecsRegistry);
 
     private:

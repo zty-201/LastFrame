@@ -268,7 +268,7 @@ namespace EngineFramework
 		ProcessCommands(ecs);
 
 		// 4) Update looping 3D instances to follow entity transforms
-		UpdateActiveInstances(ecs);
+		UpdateActiveInstances(ecs, dt);
 
 #ifndef DISABLE_FMOD
 		// 5) FMOD internal update
@@ -365,7 +365,19 @@ namespace EngineFramework
 		if (FMOD::ChannelGroup* grp = pickGroup(group))
 			channel->setChannelGroup(grp);
 
-		channel->setVolume(std::clamp(slot->volume, 0.0f, 1.0f));
+		// Fade
+		float finalTargetVolume = std::clamp(slot->volume, 0.0f, 1.0f);
+
+		if (slot->useFade)
+		{
+			channel->setVolume(0.0f);	// Start at 0.0 so it will ramp up
+		}
+		else
+		{
+			channel->setVolume(finalTargetVolume);	// If no fade, set to desired volume
+		}
+
+		//channel->setVolume(std::clamp(slot->volume, 0.0f, 1.0f));
 		channel->setPitch(slot->pitch);
 
 		const bool is3D = (slot->spatial == AudioComponent::SpatialMode::ThreeD);
@@ -390,8 +402,20 @@ namespace EngineFramework
 			{
 				if (inst.entity == cmd.entity && inst.slotId == cmd.slotId)
 				{
-					if (inst.channel) inst.channel->stop();
-					inst = {}; // clear
+					if (inst.isFadingOut) continue;
+
+					if (inst.useFade && inst.fadeDuration > 0.0f)
+					{
+						inst.isFadingOut = true;
+					}
+					else
+					{
+						if (inst.channel) inst.channel->stop();
+						inst.channel = nullptr;
+					}
+
+					//if (inst.channel) inst.channel->stop();
+					//inst = {}; // clear
 				}
 			}
 
@@ -399,6 +423,11 @@ namespace EngineFramework
 				cmd.entity,
 				cmd.slotId,
 				channel,
+				slot->useFade,			// Designer's choice to fade or not
+				slot->fadeDuration,
+				0.0f,					// Current fade volume (start at 0)
+				finalTargetVolume,		// Ramp up to this volume
+				false,					// isFadingOut
 				is3D,
 				slot->loop,
 				slot->minDistance,
@@ -417,8 +446,18 @@ namespace EngineFramework
 		{
 			if (inst.entity == cmd.entity && inst.slotId == cmd.slotId)
 			{
-				if (inst.channel) inst.channel->stop();
-				inst.channel = nullptr;
+
+				if (inst.isFadingOut) continue;	// Let it fade
+
+				if (inst.useFade && inst.fadeDuration > 0.0f)
+				{
+					inst.isFadingOut = true;
+				}
+				else
+				{
+					if (inst.channel) inst.channel->stop();
+					inst.channel = nullptr;
+				}
 			}
 		}
 #endif
@@ -438,13 +477,40 @@ namespace EngineFramework
 #endif
 	}
 
-	void AudioSystem::UpdateActiveInstances(entt::registry& ecs)
+	void AudioSystem::UpdateActiveInstances(entt::registry& ecs, float dt)
 	{
 #ifndef DISABLE_FMOD
 		// Remove dead/stopped channels and update 3D positions
 		for (auto& instance : m_active)
 		{
 			if (!instance.channel) continue;
+
+			// Calculate how much to change the fade
+			float fadeStep = dt / instance.fadeDuration;
+
+			if (instance.isFadingOut)
+			{
+				// Ramp down
+				instance.currentFadeVolume -= fadeStep;
+				if (instance.currentFadeVolume <= 0.0f)
+				{
+					instance.currentFadeVolume = 0.0f;
+					instance.channel->stop();
+					instance.channel = nullptr;
+					continue;
+				}
+			}
+			else
+			{
+				// Ramp up
+				if (instance.currentFadeVolume < 1.0f)
+				{
+					instance.currentFadeVolume = std::min(1.0f, instance.currentFadeVolume + fadeStep);
+				}
+			}
+
+			float finalVolume = instance.targetVolume * instance.currentFadeVolume;
+			instance.channel->setVolume(finalVolume);
 
 			// If entity is gone, stop sound
 			if (!ecs.valid(instance.entity) || !ecs.all_of<TransformComponent>(instance.entity))

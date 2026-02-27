@@ -120,6 +120,8 @@ struct adl_serializer<AudioComponent::Slot> {
 		j["volume"] = s.volume;
 		j["pitch"] = s.pitch;
 		j["loop"] = s.loop;
+		j["useFade"] = s.useFade;
+		j["fadeDuration"] = s.fadeDuration;
 		j["playOnStart"] = s.playOnStart;
 		j["minDistance"] = s.minDistance;
 		j["maxDistance"] = s.maxDistance;
@@ -138,6 +140,8 @@ struct adl_serializer<AudioComponent::Slot> {
 		s.volume = j.value("volume", 1.0f);
 		s.pitch = j.value("pitch", 1.0f);
 		s.loop = j.value("loop", false);
+		s.useFade = j.value("useFade", false);
+		s.fadeDuration = j.value("fadeDuration", 1.0f);
 		s.playOnStart = j.value("playOnStart", false);
 		s.minDistance = j.value("minDistance", 1.0f);
 		s.maxDistance = j.value("maxDistance", 25.0f);
@@ -700,10 +704,12 @@ namespace EngineFramework
 			.data<&AudioComponent::Slot::volume>("volume")
 			.data<&AudioComponent::Slot::pitch>("pitch")
 			.data<&AudioComponent::Slot::loop>("loop")
+			.data<&AudioComponent::Slot::useFade>("useFade")
+			.data<&AudioComponent::Slot::fadeDuration>("fadeDuration")
 			.data<&AudioComponent::Slot::playOnStart>("playOnStart")
 			.data<&AudioComponent::Slot::category>("category")
 			.data<&AudioComponent::Slot::spatial>("spatial")
-			.data<&AudioComponent::Slot::maxDistance>("maxDistance")
+			.data<&AudioComponent::Slot::minDistance>("minDistance")
 			.data<&AudioComponent::Slot::maxDistance>("maxDistance");
 
 		entt::meta_factory<AudioComponent>()
