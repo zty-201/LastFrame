@@ -262,8 +262,9 @@ namespace EngineFramework
 		// Previous frame matrices for temporal reprojection
         glm::mat4 m_prev_view_projection;
         
-		// Screen dimensions
+	// Screen dimensions
         glm::vec2 screen = { WIDTH,HEIGHT };
+		bool m_windowMinimized = false;
         
 		// Other flags
         bool show_debugDraw = false;

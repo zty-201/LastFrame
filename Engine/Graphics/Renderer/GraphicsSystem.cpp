@@ -273,6 +273,11 @@ namespace EngineFramework
 
     void GraphicsSystem::RenderScene()
     {
+        if (m_windowMinimized)
+        {
+            return;
+        }
+
         glEnable(GL_DEPTH_TEST);
 
         auto active_camera_entity = GetFirstActiveCamera();
@@ -1705,6 +1710,14 @@ namespace EngineFramework
 
     void GraphicsSystem::HANDLE_EVENT_WindowResized(Event_Window_Resized& window_resize)
     {
+        if (window_resize.width <= 0 || window_resize.height <= 0)
+        {
+            m_windowMinimized = true;
+            return;
+        }
+
+        m_windowMinimized = false;
+
         // Save current texture binding
         GLint prevTexture;
         glGetIntegerv(GL_TEXTURE_BINDING_2D, &prevTexture);
