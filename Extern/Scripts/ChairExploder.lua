@@ -1,5 +1,5 @@
 ----------------------------------------------------------------
--- ChairScatter_CP1.lua (FINAL FINAL)
+-- ChairScatter_CP1.lua (EXPLOSION VERSION)
 ----------------------------------------------------------------
 local DEBUG = true
 
@@ -10,19 +10,18 @@ local CHAIR_PART_IDS = {
 }
 
 -- Special entities
-local DROP_ENTITY_ID   = 522   -- send to y = -1000
-local HIDE_ENTITY_ID   = 209   -- scale to 0,0,0
-local SCALE_378_ID     = 378   -- scale to 0.6
-local SCALE_380_ID     = 380   -- scale to 1.0
+local DROP_ENTITY_ID = 522
+local HIDE_ENTITY_ID = 209
+local SCALE_378_ID   = 378
+local SCALE_380_ID   = 380
 
--- Scatter ranges
-local SCATTER_RANGE_XZ = 300.0
-local SCATTER_RANGE_Y  = 10.0
+-- Explosion force ranges
+local BURST_XZ   = 400.0   -- horizontal kick
+local BURST_Y    = 350.0   -- upward kick
+local GRAVITY    = 280.0   -- pull down per second squared
 
--- Optional Y clamp
-local CLAMP_Y = true
-local Y_MIN =  50.0
-local Y_MAX =  150.0
+-- Y floor: pieces stop here
+local Y_FLOOR    = 40.0
 
 local function log(...)
     if DEBUG then print("[ChairScatter]", ...) end
@@ -32,14 +31,12 @@ local function rand_range(r)
     return (math.random() * 2.0 - 1.0) * r
 end
 
-local function clamp(v, lo, hi)
-    if v < lo then return lo end
-    if v > hi then return hi end
-    return v
-end
-
 function on_create(Self)
-    Self.done = false
+    Self.done       = false
+    Self.simulating = false
+
+    -- Will hold per-piece state: { id, vx, vy, vz, stopped }
+    Self.pieces = {}
 
     SHARED.ChairScatter = SHARED.ChairScatter or {}
     SHARED.ChairScatter._self = Self
@@ -49,32 +46,32 @@ function on_create(Self)
         if not s or s.done then return end
         s.done = true
 
-        log("Triggering CP1 scatter effects")
+        log("Explosion triggered!")
 
         ----------------------------------------------------------------
-        -- 1️⃣ Scatter chair parts
+        -- 1. Assign random burst velocities to each chair piece
         ----------------------------------------------------------------
+        s.pieces = {}
         for _, id in ipairs(CHAIR_PART_IDS) do
             local tr = Query.GetTransform(id)
             if tr then
-                local x, y, z = tr:GetPosition()
-
-                local nx = x + rand_range(SCATTER_RANGE_XZ)
-                local ny = y + rand_range(SCATTER_RANGE_Y)
-                local nz = z + rand_range(SCATTER_RANGE_XZ)
-
-                if CLAMP_Y then
-                    ny = clamp(ny, Y_MIN, Y_MAX)
-                end
-
-                tr:SetPosition(nx, ny, nz)
+                table.insert(s.pieces, {
+                    id      = id,
+                    vx      = rand_range(BURST_XZ),
+                    vy      = math.random() * BURST_Y + 100.0,  -- always pops upward
+                    vz      = rand_range(BURST_XZ),
+                    stopped = false
+                })
             else
                 log("WARN: no Transform for chair part:", id)
             end
         end
 
+        -- Start simulating in on_update
+        s.simulating = true
+
         ----------------------------------------------------------------
-        -- 2️⃣ Drop entity 522
+        -- 2. Drop entity 522
         ----------------------------------------------------------------
         local trDrop = Query.GetTransform(DROP_ENTITY_ID)
         if trDrop then
@@ -84,7 +81,7 @@ function on_create(Self)
         end
 
         ----------------------------------------------------------------
-        -- 3️⃣ Hide entity 209
+        -- 3. Hide entity 209
         ----------------------------------------------------------------
         local trHide = Query.GetTransform(HIDE_ENTITY_ID)
         if trHide then
@@ -93,7 +90,7 @@ function on_create(Self)
         end
 
         ----------------------------------------------------------------
-        -- 4️⃣ Scale entity 378 to 0.6
+        -- 4. Scale entity 378 to 0.6
         ----------------------------------------------------------------
         local tr378 = Query.GetTransform(SCALE_378_ID)
         if tr378 then
@@ -102,7 +99,7 @@ function on_create(Self)
         end
 
         ----------------------------------------------------------------
-        -- 5️⃣ Scale entity 380 to 1.0
+        -- 5. Scale entity 380 to 1.0
         ----------------------------------------------------------------
         local tr380 = Query.GetTransform(SCALE_380_ID)
         if tr380 then
@@ -114,7 +111,50 @@ function on_create(Self)
     log("Ready. EntityID:", EntityID)
 end
 
-function on_update(Self, dt) end
+function on_update(Self, dt)
+    if not Self.simulating then return end
+
+    dt = dt or 0.016
+
+    local allStopped = true
+
+    for _, p in ipairs(Self.pieces) do
+        if not p.stopped then
+            allStopped = false
+
+            -- Apply gravity to vertical velocity
+            p.vy = p.vy - GRAVITY * dt
+
+            -- Get current position
+            local tr = Query.GetTransform(p.id)
+            if tr then
+                local x, y, z = tr:GetPosition()
+
+                local nx = x + p.vx * dt
+                local ny = y + p.vy * dt
+                local nz = z + p.vz * dt
+
+                -- Hit the floor?
+                if ny <= Y_FLOOR then
+                    ny = Y_FLOOR
+                    p.vy = 0.0
+                    p.vx = 0.0
+                    p.vz = 0.0
+                    p.stopped = true
+                    log("Piece", p.id, "hit floor")
+                end
+
+                tr:SetPosition(nx, ny, nz)
+            end
+        end
+    end
+
+    -- All pieces landed, stop simulating
+    if allStopped then
+        Self.simulating = false
+        log("All pieces settled, simulation done")
+    end
+end
 
 function on_destroy(Self)
     if SHARED.ChairScatter and SHARED.ChairScatter._self == Self then
