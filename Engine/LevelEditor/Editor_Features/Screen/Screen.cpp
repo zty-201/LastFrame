@@ -67,6 +67,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "SceneManager.hpp"
 #include "PhysicsWorld.hpp"
 #include "MenuManager.hpp"
+#include "Editor_Features/ObjectManager/ObjectManager.hpp"
 //Audio
 #include "Audio.hpp"
 #include "UISystem.hpp"
@@ -704,20 +705,28 @@ namespace EngineFramework
             first_init = false;
         }
 
-        //only do this when needed.
-        if (available_size.x != available_size_old.x || available_size.y != available_size_old.y)
-        {
-            //resize when the screen size changes		
-            //std::cout << "x: " << available_size.x << "y: " << available_size.y << std::endl;
-            Event_Window_Resized window_resize;
-            window_resize.width = static_cast<int>(available_size.x);
-            window_resize.height = static_cast<int>(available_size.y);
-            event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
-        }
+        
 
+        //if (available_size.x != available_size_old.x || available_size.y != available_size_old.y)
+        //{
+        //    //resize when the screen size changes		
+        //    std::cout << "x: " << available_size.x << "y: " << available_size.y << std::endl;
+        //    /*ImGui::Image((void*)(intptr_t)GraphicsSystem::GetInstance().GetSceneTextureID(),
+        //        available_size,
+        //        ImVec2(0, 1), ImVec2(1, 0));
+
+        //    Event_Window_Resized window_resize;
+        //    window_resize.width = static_cast<int>(available_size.x);
+        //    window_resize.height = static_cast<int>(available_size.y);
+        //    event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));*/
+        //}
+        
         ImGui::Image((void*)(intptr_t)GraphicsSystem::GetInstance().GetSceneTextureID(),
             available_size,
             ImVec2(0, 1), ImVec2(1, 0));
+        
+
+        
 
         available_size_old = available_size;
     }
@@ -1558,6 +1567,7 @@ namespace EngineFramework
             entity_history = history_system->start_track(selected, Record_Type::ENTITY_REMOVED);
         }
 
+        ObjectManager::RemoveEntityFromFilters(selected);
         registry.destroy(selected);
 
         if (history_system && entity_history) {

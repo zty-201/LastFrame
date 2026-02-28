@@ -512,6 +512,28 @@ namespace Engine {
                 EngineFramework::CoreEngine::RequestQuit();
             });
 
+        s_Lua.set_function("LoadScene", [&](const std::string& sceneName) {
+            std::string fileName = sceneName;
+            if (fileName.find(".json") == std::string::npos)
+            {
+                fileName += ".json";
+            }
+
+            std::string path = "Extern/Scenes/" + fileName;
+
+            std::string sceneString = EngineFramework::AssetManagerSystem::GetStringFromFile(path);
+
+            if (!sceneString.empty())
+            {
+                LOGI("[Lua] Queueing scene load: %s", fileName.c_str());
+                EngineFramework::GameObjectSystem::GetInstance().QueueLoadScene(sceneString);
+            }
+            else
+            {
+                LOGE("[Lua ERROR] LoadScene failed: Could not find or read %s", path.c_str());
+            }
+            });
+
         // ===============================================================
         // AudioComponent bindings
         // ===============================================================
