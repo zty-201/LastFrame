@@ -59,13 +59,25 @@ namespace EngineFramework
 	}
 
 	ObjectManager::ObjectManager() {
+		s_Instance = this;
 		LOGI("Lfeature: ObjectManager CREATED");
 	}
 	ObjectManager::~ObjectManager() {
-
+		if (s_Instance == this)
+		{
+			s_Instance = nullptr;
+		}
 	}
 	void ObjectManager::Initialize() {
 
+	}
+
+	void ObjectManager::RemoveEntityFromFilters(entt::entity entity)
+	{
+		if (s_Instance)
+		{
+			s_Instance->RemoveEntityFromAllFilters(entity);
+		}
 	}
 
 	std::string ObjectManager::TrimString(const std::string& value)
@@ -372,6 +384,37 @@ namespace EngineFramework
 				return duplicated_entity;
 			};
 
+			auto delete_entity = [&](entt::entity target_entity) -> bool {
+				if (target_entity == entt::null || !registry.valid(target_entity)) {
+					return false;
+				}
+
+				std::unique_ptr<Record> entity_history{};
+				HistorySystem* history_system = HistorySystem::this_class ? &HistorySystem::GetInstance() : nullptr;
+				if (history_system) {
+					entity_history = history_system->start_track(target_entity, Record_Type::ENTITY_REMOVED);
+				}
+
+				registry.destroy(target_entity);
+				RemoveEntityFromAllFilters(target_entity);
+
+				if (MenuManager::GetInstance().is_menu_running)
+				{
+					MenuManager::GetInstance().remove_element(target_entity);
+				}
+
+				if (history_system) {
+					history_system->end_track(entity_history);
+				}
+
+				selection_state.RemoveEntitySelection(target_entity);
+				if (!selection_state.HasEntitySelection()) {
+					selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
+				}
+
+				return true;
+			};
+
 			const bool window_focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 			const bool window_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
 
@@ -419,6 +462,13 @@ namespace EngineFramework
 					}
 					else {
 						LOGW("[ObjectManager] No valid entity selected to rename");
+					}
+				}
+
+				if (ImGui::Shortcut(ImGuiKey_Delete, copy_paste_flags)) {
+					entt::entity active_entity = selection_state.selected_objectID;
+					if (!delete_entity(active_entity)) {
+						LOGW("[ObjectManager] No valid entity selected to delete");
 					}
 				}
 			}
@@ -570,31 +620,7 @@ namespace EngineFramework
 
 					if (ImGui::MenuItem(deleteLabel.c_str())) {
 
-						std::unique_ptr<EngineFramework::Record> entity_history{};
-						HistorySystem* history_system = HistorySystem::this_class ? &HistorySystem::GetInstance() : nullptr;
-						if (history_system) {
-							entity_history = history_system->start_track(entity, Record_Type::ENTITY_REMOVED);
-						}
-
-						// 1. Destroy the entity
-						registry.destroy(entity);
-						RemoveEntityFromAllFilters(entity);
-
-						if (MenuManager::GetInstance().is_menu_running)
-						{
-							MenuManager::GetInstance().remove_element(entity);
-						}
-
-						if (history_system) {
-							history_system->end_track(entity_history);
-						}
-
-						// 2. Clear selection
-						selection_state.RemoveEntitySelection(entity);
-						if (!selection_state.HasEntitySelection()) {
-							selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
-						}
-
+						delete_entity(entity);
 						ImGui::EndPopup();
 						break; // Exit the loop safely
 					}

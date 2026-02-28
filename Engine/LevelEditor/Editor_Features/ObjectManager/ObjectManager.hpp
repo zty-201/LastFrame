@@ -43,6 +43,7 @@ namespace EngineFramework
         //Handles buttons at the top
         void top_buttons();
 
+        static void RemoveEntityFromFilters(entt::entity entity);
         static bool feature_enabled;
     private:
         struct CustomFilter
@@ -69,6 +70,8 @@ namespace EngineFramework
         static void RemoveEntityFromFilter(CustomFilter& filter, entt::entity entity);
         static std::string TrimString(const std::string& value);
         bool IsEntityInFilters(entt::entity entity) const;
+
+        static inline ObjectManager* s_Instance{};
     };
 }
 

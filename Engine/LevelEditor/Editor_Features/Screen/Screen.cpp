@@ -67,6 +67,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "SceneManager.hpp"
 #include "PhysicsWorld.hpp"
 #include "MenuManager.hpp"
+#include "Editor_Features/ObjectManager/ObjectManager.hpp"
 //Audio
 #include "Audio.hpp"
 #include "UISystem.hpp"
@@ -1558,6 +1559,7 @@ namespace EngineFramework
             entity_history = history_system->start_track(selected, Record_Type::ENTITY_REMOVED);
         }
 
+        ObjectManager::RemoveEntityFromFilters(selected);
         registry.destroy(selected);
 
         if (history_system && entity_history) {
