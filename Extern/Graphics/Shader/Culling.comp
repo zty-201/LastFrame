@@ -7,7 +7,8 @@ layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
 struct InstanceData {
     uint batchID;
-    uint padding[3];
+    uint instanceOffset; 
+    uint padding[2];
     mat4 modelMatrix;
     vec4 boundingSphere; // xyz = local center, w = local radius
 };
@@ -57,13 +58,20 @@ const uint MAX_INSTANCES = 50000u;
 
 // Frustum extraction logic
 void ExtractPlanes(mat4 vp, out vec4 planes[6]) {
-    planes[0] = vp[3] + vp[0]; // Left
-    planes[1] = vp[3] - vp[0]; // Right
-    planes[2] = vp[3] + vp[1]; // Bottom
-    planes[3] = vp[3] - vp[1]; // Top
-    planes[4] = vp[3] + vp[2]; // Near
-    planes[5] = vp[3] - vp[2]; // Far
+    // Transpose the matrix so array indexing accesses the ROWS, not columns
+    mat4 tvp = transpose(vp);
 
+    planes[0] = tvp[3] + tvp[0]; // Left
+    planes[1] = tvp[3] - tvp[0]; // Right
+    planes[2] = tvp[3] + tvp[1]; // Bottom
+    planes[3] = tvp[3] - tvp[1]; // Top
+    
+    // Note: Assuming standard OpenGL [-1, 1] Z clip space. 
+    // If you ever switch to [0, 1] Vulkan/D3D style, Near would just be tvp[2]
+    planes[4] = tvp[3] + tvp[2]; // Near
+    planes[5] = tvp[3] - tvp[2]; // Far
+
+    // Normalize the planes
     for(int i = 0; i < 6; i++) {
         planes[i] = planes[i] / length(planes[i].xyz);
     }

@@ -179,6 +179,7 @@ namespace EngineFramework
         skybox_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Skybox");
         shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Shadow");
         light_injection_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "LightInjection");
+        
         ray_march_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "RayMarch");
         point_shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "PointShadow");
         ui_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "UI");	
@@ -484,8 +485,8 @@ namespace EngineFramework
 
         // Bind our Indirect Commands buffer globally for this pass
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
-        size_t numBatches = m_instancingSystem->GetActiveBatchCount();
-
+        //size_t numBatches = m_instancingSystem->GetActiveBatchCount();
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_instancingSystem->GetVisibleIndicesBuffer());
         for (int cascade = 0; cascade < CASCADE_COUNT; cascade++) {
             glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
             glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_csmTextureArray, 0, cascade);
@@ -505,11 +506,11 @@ namespace EngineFramework
                 glBindVertexArray(meshData->vao);
 
                 // Tell Vertex Shader where to read this batch's visible IDs
-                int visibleIndexOffset = (passOffset * MAX_INSTANCES) + batch.instanceOffset;
+                int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
                 shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
 
                 // Calculate the memory jump for the indirect command
-                void* indirectCmdAddress = (void*)(((passOffset * numBatches) + batchIndex) * sizeof(DrawElementsIndirectCommand));
+                void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
 
                 // The single draw call!
                 glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
@@ -778,7 +779,7 @@ namespace EngineFramework
     {
         RenderDirectionalShadow();
         RenderPointLightShadows();
-		RenderSpotLightShadows();
+		//RenderSpotLightShadows();
     }
 
     void GraphicsSystem::UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P)
@@ -975,6 +976,7 @@ namespace EngineFramework
             glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightSSBO);
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_instancingSystem->GetInstanceSSBO());
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_instancingSystem->GetVisibleIndicesBuffer());
             // Shadow maps
             glActiveTexture(GL_TEXTURE0 + TextureUnits::SHADOW_MAP_UNIT);
             glBindTexture(GL_TEXTURE_2D_ARRAY, m_csmTextureArray);
@@ -1002,7 +1004,6 @@ namespace EngineFramework
             instanced_shader->setUniform("s_Metallic", TextureUnits::MESH_METALLIC_UNIT);
 
             glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
-            size_t numBatches = m_instancingSystem->GetActiveBatchCount();
             int batchIndex = 0;
 
             for (const auto& batch : m_instancingSystem->GetBatches()) {
@@ -1043,15 +1044,12 @@ namespace EngineFramework
                 glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_METALLIC_UNIT);
                 glBindTexture(GL_TEXTURE_2D, (metalTex && metalTex->id != 0) ? metalTex->id : m_defaultBlackTexture);
 
-                // Tell the shader where to start reading matrices from the SSBO
-                instanced_shader->setUniform("u_InstanceOffset", (int)batch.instanceOffset);
-
                 // Tell Vertex Shader where to read this batch's visible IDs (Pass 0)
-                int visibleIndexOffset = (0 * MAX_INSTANCES) + batch.instanceOffset;
+                int visibleIndexOffset = static_cast<int>((0 * MAX_INSTANCES) + batch.instanceOffset);
                 instanced_shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
 
                 // Calculate memory jump
-                void* indirectCmdAddress = (void*)(((0 * numBatches) + batchIndex) * sizeof(DrawElementsIndirectCommand));
+                void* indirectCmdAddress = (void*)(((0 * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
 
                 // The single draw call!
                 glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
@@ -1526,14 +1524,6 @@ namespace EngineFramework
                 center += corner;
             }
             center /= frustumCorners.size();
-
-            glm::vec3 lightDir = dirLightTransform->rotation;
-
-            // Stable up vector
-            glm::vec3 up = glm::abs(lightDir.y) > 0.999f ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
-
-            // Light view, anchored at origin for stability
-            glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f), lightDir, up);
 
             // Bounding sphere of frustum slice
             glm::vec3 frustumCenter(0.0f);

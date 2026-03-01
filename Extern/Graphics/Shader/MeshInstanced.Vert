@@ -42,22 +42,35 @@ layout(std140, binding = 0) uniform VolumetricUBO {
 };
 
 // SSBO containing our instance matrices
-layout(std430, binding = 2) readonly buffer InstanceBuffer {
-    mat4 instance_models[];
+
+struct InstanceData {
+    uint batchID;
+    uint instanceOffset;
+    uint padding[2];
+    mat4 modelMatrix;
+    vec4 boundingSphere;
 };
 
-uniform int u_InstanceOffset; // Tells us where this batch starts in the SSBO
+layout(std430, binding = 2) readonly buffer InstanceBuffer {
+    InstanceData instances[];
+};
+
+layout(std430, binding = 3) readonly buffer VisibleIndicesBuffer {
+    uint visibleIndices[];
+};
+
+uniform int u_VisibleIndexOffset; 
 uniform vec4 u_UVTransform;
 
 // ------------------------------------------------------------------
 // MAIN -------------------------------------------------------------
 // ------------------------------------------------------------------
 void main() {   
-    // Calculate the actual index in the massive SSBO
-    int index = gl_InstanceID + u_InstanceOffset;
-    
-    // Fetch the specific model matrix for this instance
-    mat4 model = instance_models[index];
+    // 1. Fetch the real instance ID from the Compute Shader's translation table
+    uint actualInstanceID = visibleIndices[u_VisibleIndexOffset + gl_InstanceID];
+
+    // 2. Fetch the specific model matrix using the real ID
+    mat4 model = instances[actualInstanceID].modelMatrix;
 
     vec4 world_pos = model * vec4(VS_IN_Position, 1.0f);
     FS_IN_WorldPos = world_pos.xyz;

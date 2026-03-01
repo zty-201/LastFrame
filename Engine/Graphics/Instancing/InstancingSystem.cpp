@@ -15,7 +15,7 @@ namespace EngineFramework
 
     void InstancingSystem::Initialize(size_t maxTotalInstances) {
         m_maxTotalInstances = maxTotalInstances;
-
+		culling_shader_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::SHADER_GUID, "Culling");
         // Pre-allocate the massive SSBO once
         glGenBuffers(1, &m_instanceSSBO);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
@@ -111,10 +111,10 @@ namespace EngineFramework
         // --- FLATTEN DATA AND BUILD COMMANDS ---
         size_t currentOffset = 0;
         int batchIndex = 0;
-        size_t numBatches = batchSortingMap.size();
+        //size_t numBatches = batchSortingMap.size();
 
         // Allocate exact space for 4 passes (Main + 3 Cascades)
-        m_indirectCommands.assign(numBatches * 4, DrawElementsIndirectCommand{ 0, 0, 0, 0, 0 });
+        m_indirectCommands.assign(MAX_BATCHES * NUM_PASSES, DrawElementsIndirectCommand{ 0, 0, 0, 0, 0 });
 
         for (auto& [key, instances] : batchSortingMap) {
             if (instances.empty()) continue;
@@ -136,7 +136,7 @@ namespace EngineFramework
 
                 // Base Instance is always 0 because the Compute Shader handles indexing now
                 for (int pass = 0; pass < 4; pass++) {
-                    int cmdIndex = (pass * numBatches) + batchIndex;
+                    int cmdIndex = (pass * MAX_BATCHES) + batchIndex;
                     m_indirectCommands[cmdIndex].count = indexCount;
                     m_indirectCommands[cmdIndex].instanceCount = 0; // GPU WILL FILL THIS!
                     m_indirectCommands[cmdIndex].firstIndex = firstIndex;
@@ -159,11 +159,15 @@ namespace EngineFramework
 
         // --- UPLOAD DATA TO GPU ---
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
-        //glBufferData(GL_SHADER_STORAGE_BUFFER, m_maxTotalInstances * sizeof(InstanceData), nullptr, GL_DYNAMIC_DRAW);
+        // Orphan the old buffer
+        glBufferData(GL_SHADER_STORAGE_BUFFER, m_maxTotalInstances * sizeof(InstanceData), nullptr, GL_DYNAMIC_DRAW);
+        // Upload to the new buffer
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, m_globalInstanceData.size() * sizeof(InstanceData), m_globalInstanceData.data());
 
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
-        //glBufferData(GL_DRAW_INDIRECT_BUFFER, m_indirectCommands.capacity() * sizeof(DrawElementsIndirectCommand), nullptr, GL_DYNAMIC_DRAW);
+        // Orphan the old buffer
+        glBufferData(GL_DRAW_INDIRECT_BUFFER, MAX_BATCHES* NUM_PASSES * sizeof(DrawElementsIndirectCommand), nullptr, GL_DYNAMIC_DRAW);
+        // Upload to the new buffer
         glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0, m_indirectCommands.size() * sizeof(DrawElementsIndirectCommand), m_indirectCommands.data());
 
         // --- DISPATCH COMPUTE SHADER ---
