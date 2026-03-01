@@ -1342,12 +1342,31 @@ namespace EngineFramework
         // We sort them by 'layer' so background panels draw before text/icons
         auto view = registry.view<UIComponent>();
 
-        
+        struct UIRenderItem
+        {
+            int layer;
+            entt::entity entity;
+        };
 
+        std::vector<UIRenderItem> drawList;
 
         for (auto [entity, ui] : view.each())
         {
             if (!ui.visible) continue;
+            drawList.push_back({ ui.layer, entity });
+        }
+
+
+        std::stable_sort(drawList.begin(), drawList.end(), [](const UIRenderItem& a, const UIRenderItem& b) {
+            return a.layer < b.layer;
+        });
+
+
+        
+        for (const auto& item : drawList)
+        {
+            if (!registry.valid(item.entity) || !registry.all_of<UIComponent>(item.entity)) continue;
+            auto& ui = registry.get<UIComponent>(item.entity);
 
             if (ui.is_NDC) {
 
@@ -1363,15 +1382,15 @@ namespace EngineFramework
                 // (because scale starts from bottom left up so like we need to shift down)
                 ui.position.x -= ui.size.x * 0.5f;
                 ui.position.y -= ui.size.y * 0.5f;
-                
+
 
             }
 
             glm::vec2 finalPos = ui.position;
             glm::vec2 finalSize = ui.size;
 
-            if (registry.all_of<TransformComponent>(entity)) {
-                auto& transform = registry.get<TransformComponent>(entity);
+            if (registry.all_of<TransformComponent>(item.entity)) {
+                auto& transform = registry.get<TransformComponent>(item.entity);
 
                 glm::vec2 screenPos;
                 float scaleFactor = 1.0f;
@@ -1389,7 +1408,7 @@ namespace EngineFramework
                 }
             }
 
-            
+
 
 
             // --- CALCULATE MODEL MATRIX ---
@@ -1420,7 +1439,11 @@ namespace EngineFramework
 
             // --- DRAW ---
             glDrawElements(GL_TRIANGLES, meshData->subMeshes[0].indexCount, GL_UNSIGNED_INT, 0);
+                
         }
+
+            
+        
 
         shader->disuse();
 
