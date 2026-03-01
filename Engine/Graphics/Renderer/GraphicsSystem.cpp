@@ -353,9 +353,16 @@ namespace EngineFramework
             return glm::normalize(dir);
             };
 
-        auto view = registry.view<LightComponent>();
+        /*auto view = registry.view<LightComponent>();
         for (auto entity : view) {
             auto& light = view.get<LightComponent>(entity);
+            if (light.type == LightComponent::POINT) pointEntities.push_back(entity);
+            else if (light.type == LightComponent::SPOT) spotEntities.push_back(entity);
+        }*/
+
+        auto view = registry.view<LightComponent, TransformComponent>();
+        for (auto [entity, light, transform] : view.each())
+        {
             if (light.type == LightComponent::POINT) pointEntities.push_back(entity);
             else if (light.type == LightComponent::SPOT) spotEntities.push_back(entity);
         }
@@ -445,9 +452,9 @@ namespace EngineFramework
     void GraphicsSystem::RenderDirectionalShadow()
     {
         TransformComponent* dirLightTransform = nullptr;
-        for (auto [entity, light] : registry.view<LightComponent>().each()) {
+        for (auto [entity, light, transform] : registry.view<LightComponent, TransformComponent>().each()) {
             if (light.type == LightComponent::DIRECTIONAL) {
-                dirLightTransform = &registry.get<TransformComponent>(entity);
+                dirLightTransform = &transform;
                 break;
             }
         }
@@ -856,10 +863,10 @@ namespace EngineFramework
 
         TransformComponent* dirLightTransform = nullptr;
 		LightComponent* dirLight = nullptr;
-        for (auto [entity, light] : registry.view<LightComponent>().each()) {
+        for (auto [entity, light, transform] : registry.view<LightComponent, TransformComponent>().each()) {
             if (light.type == LightComponent::DIRECTIONAL) {
 				dirLight = &light;
-                dirLightTransform = &registry.get<TransformComponent>(entity);
+                dirLightTransform = &transform;
                 break;
             }
         }
