@@ -84,7 +84,7 @@ namespace EngineFramework
 
     const size_t MAX_BATCHES = 1000;
     const size_t MAX_INSTANCES = 50000;
-    const size_t NUM_PASSES = 4;
+    const size_t NUM_PASSES = 36;
 
     // ============================================================================
     // 4. INSTANCING SYSTEM

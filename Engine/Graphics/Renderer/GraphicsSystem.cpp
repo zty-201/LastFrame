@@ -298,19 +298,18 @@ namespace EngineFramework
         // 1. Update point light SSBO
         UpdateLightSSBO();
 
-		// Preprocessing 
+		// Preprocessing (around 5ms)
         m_instancingSystem->UpdateAndDispatchCompute(viewProj, m_cascadeViewProjMatrices, m_spotLightViewProjMatrices);
 
-        
-        // 2. Shadow pass (directional + point)
+        // 2. Shadow pass (directional + point) (around 1 to 2ms)
         ShadowPass();
-        // 3. Global uniform buffers (camera, light, cascades)
+        // 3. Global uniform buffers (camera, light, cascades) (around 7ms)
         UpdateUBOs(*active_camera, V, P);
         // 4. Volumetric light injection
         VolumetricLightInjectionPass();
         // 5. Volumetric ray march
         VolumetricRayMarchPass();
-        // 6. Mesh pass
+        // 6. Mesh pass (2-3ms)
         MeshPass();
         // 7. Skybox pass
         SkyboxPass();
@@ -484,8 +483,9 @@ namespace EngineFramework
 
         // Bind our Indirect Commands buffer globally for this pass
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
-        //size_t numBatches = m_instancingSystem->GetActiveBatchCount();
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_instancingSystem->GetInstanceSSBO()); // Required for ShadowMap.vert instances[]
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_instancingSystem->GetVisibleIndicesBuffer());
+
         for (int cascade = 0; cascade < CASCADE_COUNT; cascade++) {
             glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
             glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_csmTextureArray, 0, cascade);
