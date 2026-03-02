@@ -100,8 +100,6 @@ namespace EngineFramework
             return view.front();
         }
 
-        void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
-
         // Simple get and set functions for Fog Control Parameters
         // Anisotrophy
         void SetAnisotrophy(float value) { m_anisotropy = value; }
@@ -224,6 +222,7 @@ namespace EngineFramework
         GLuint m_pointShadowArray = 0;
 
         std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
+        std::vector<glm::mat4> m_spotLightViewProjMatrices;
         std::vector<entt::entity> m_lightEntityMap;
         std::array<float, CASCADE_COUNT + 1> m_cascadeSplits;
 		std::array<float, CASCADE_COUNT> m_cascadeBiases;

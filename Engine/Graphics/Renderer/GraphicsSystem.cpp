@@ -72,7 +72,7 @@ namespace EngineFramework
 
         // Initialize Instancing System
         m_instancingSystem = std::make_unique<InstancingSystem>();
-        m_instancingSystem->Initialize(5000);
+        m_instancingSystem->Initialize(MAX_INSTANCES);
 
         // Listen for events
         event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&GraphicsSystem::HANDLE_EVENT_LevelEditorToggled>(this);
@@ -291,20 +291,17 @@ namespace EngineFramework
         float aspect = (screen.y > 0) ? (float)screen.x / screen.y : 1.0f;
         glm::mat4 P = Camera::getPerspective(*active_camera, aspect);
 
-        // Update all model matrices
-        /*auto transform_view = registry.view<TransformComponent>();
-        for (auto&& [entity, transform] : transform_view.each()) {
-            CalculateModelMatrix(transform, transform.modelMatrix);
-        }*/
-
         glm::mat4 viewProj = P * V;
 
         UpdateCascadeMatrices(*active_camera, V);
-		// Preprocessing 
-        m_instancingSystem->UpdateAndDispatchCompute(viewProj, m_cascadeViewProjMatrices);
 
         // 1. Update point light SSBO
         UpdateLightSSBO();
+
+		// Preprocessing 
+        m_instancingSystem->UpdateAndDispatchCompute(viewProj, m_cascadeViewProjMatrices, m_spotLightViewProjMatrices);
+
+        
         // 2. Shadow pass (directional + point)
         ShadowPass();
         // 3. Global uniform buffers (camera, light, cascades)
@@ -397,6 +394,7 @@ namespace EngineFramework
 
         // 3. PROCESS SPOT LIGHTS (Indices 64 to 127)
         int spotShadowCount = 0;
+        m_spotLightViewProjMatrices.resize(MAX_SHADOW_CASTING_SPOTLIGHTS, glm::mat4(1.0f));
         for (auto entity : spotEntities) {
             if (m_LightData.size() >= MAX_LIGHTS) break;
 
@@ -426,6 +424,8 @@ namespace EngineFramework
                 glm::mat4 P = glm::perspective(fov, 1.0f, 1.0f, light.radius);
                 glm::mat4 V = glm::lookAt(transform.position, transform.position + lightDir, glm::vec3(0, 1, 0));
                 data.view_proj = P * V;
+				// Store for later use in shadow pass
+				m_spotLightViewProjMatrices[shadowIndex] = data.view_proj;
             }
 
             // DIRTY CHECK
@@ -436,7 +436,7 @@ namespace EngineFramework
 
             m_LightData.push_back(data);
         }
-
+		m_spotLightViewProjMatrices.resize(spotShadowCount); // Shrink to actual count
         // 4. UPLOAD
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_lightSSBO); // Renamed from m_pointLightSSBO
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(LightSSBO) * m_LightData.size(), m_LightData.data());
@@ -675,110 +675,87 @@ namespace EngineFramework
     }
 
     void GraphicsSystem::RenderSpotLightShadows() {
-        // 1. Get and Use Shader
         std::shared_ptr<ShaderProgram> shader{};
         if (shadow_shader_guid != xresource::full_guid{}) {
             shader = AssetManagerSystem::GetResource<ShaderProgram>(shadow_shader_guid);
-        }
-        else {
+        } else {
             using E_AM = AssetManagerSystem;
-            shader = E_AM::GetResource<ShaderProgram>(E_AM::GetFullGuid(E_AM::SHADER_GUID, "Shadow"));
+            shadow_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Shadow");
+            shader = E_AM::GetResource<ShaderProgram>(shadow_shader_guid);
         }
-
         if (!shader) return;
         shader->use();
 
-        // 2. Setup Framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_spotShadowFBO.handle);
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-
-        // 3. Setup Render State
         glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT); // Front-face culling for shadows
-
+        glCullFace(GL_FRONT); 
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0f, 1.0f);
 
-        // 5. Iterate through sorted light data
-        // Note: We use the shadow index stored in .w to determine which array slot to use
-        for (size_t i = 0; i < m_LightData.size(); i++)
-        {
+        // Bind Buffers globally for this pass
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_instancingSystem->GetInstanceSSBO()); // Required for ShadowMap.vert instances[]
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_instancingSystem->GetVisibleIndicesBuffer());
+
+        for (size_t i = 0; i < m_LightData.size(); i++) {
             const auto& lightData = m_LightData[i];
 
-            // Skip if not Spot Light (Type 2.0) or has no shadow index assigned
-            if (lightData.attenuation_type.w < 1.5f || lightData.direction_shadow.w < 0.0f) {
-                continue;
-            }
+            if (lightData.attenuation_type.w < 1.5f || lightData.direction_shadow.w < 0.0f) continue;
 
             entt::entity e = m_lightEntityMap[i];
             auto& lightComp = registry.get<LightComponent>(e);
 
-            // --- FIX 2: The Static Optimization ---
-            // If the light is static and hasn't moved/swapped slots, SKIP IT.
-            if (lightComp.isStatic && !lightComp._isDirty) {
-                continue;
-            }
+            if (lightComp.isStatic && !lightComp._isDirty) continue;
 
-            // The shadow index (0 to 3) we assigned in UpdatePointLightSSBO
             int shadowIndex = (int)lightData.direction_shadow.w;
-
-            // Safety check to ensure we don't write out of bounds
             if (shadowIndex >= MAX_SHADOW_CASTING_SPOTLIGHTS) continue;
 
-            glm::mat4 lightSpaceMatrix = lightData.view_proj;
-
-            // Bind Layer
-            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                m_spotTextureArray, 0, shadowIndex);
-
+            // Bind appropriate texture layer
+            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_spotTextureArray, 0, shadowIndex);
             glClear(GL_DEPTH_BUFFER_BIT);
 
-            shader->setUniform("u_LightMatrix", lightSpaceMatrix);
+            shader->setUniform("u_LightMatrix", lightData.view_proj);
 
-            // --- Draw Scene ---
-            auto meshView = registry.view<MeshComponent, TransformComponent>();
-            for (auto [entity, meshComp, transformComp] : meshView.each())
-            {
-                if (meshComp.meshName == "SkyBox" || !meshComp.visibility) continue;
+            // --- Execute Indirect Batch Draw ---
+            int passOffset = 4 + shadowIndex; // Passes 4+ belong to Spotlights
+            int batchIndex = 0;
 
-                // --- THE FIX: Cull against the Shadow Cascade Matrix ---
-                if (!IsBoxInFrustum(meshComp.localMin, meshComp.localMax, transformComp.modelMatrix, lightSpaceMatrix)) {
-                    continue;
-                }
-                xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(
-                    AssetManagerSystem::MESH_GUID, meshComp.meshName);
-                auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-
-                if (!meshData || meshData->vao == 0) meshData = meshCache[meshComp.meshName];
-                if (!meshData || meshData->vao == 0) continue;
-
-                shader->setUniform("u_Model", transformComp.modelMatrix);
+            for (const auto& batch : m_instancingSystem->GetBatches()) {
+                auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(
+                    AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
+                if (!meshData || meshData->vao == 0) meshData = meshCache[batch.key.meshName];
+                if (!meshData || meshData->vao == 0) { batchIndex++; continue; }
 
                 glBindVertexArray(meshData->vao);
-                for (const auto& subMesh : meshData->subMeshes) {
-                    glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT,
-                        (void*)(sizeof(unsigned int) * subMesh.baseIndex));
-                }
+
+                // Shift offset to the correct pass window
+                int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
+                shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
+
+                void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
+
+                batchIndex++;
             }
 
-            if (lightComp.isStatic) {
-                lightComp._isDirty = false;
-            }
+            if (lightComp.isStatic) lightComp._isDirty = false;
         }
 
-        // 6. Cleanup
         glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
+
     }
 
     void GraphicsSystem::ShadowPass()
     {
         RenderDirectionalShadow();
         RenderPointLightShadows();
-		//RenderSpotLightShadows();
+		RenderSpotLightShadows();
     }
 
     void GraphicsSystem::UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P)
@@ -1399,24 +1376,6 @@ namespace EngineFramework
             LOGE("Failed to load mesh: %s. Error: %s", meshName.c_str(), e.what());
             meshCache[meshName] = nullptr;
         }
-    }
-
-    void GraphicsSystem::CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix)
-    {
-        // Translation
-        glm::mat4 T = glm::translate(glm::mat4(1.0f), transform.position);
-
-        // Rotation (Euler - Quaternion - Matrix)
-        glm::vec3 rotationRadians = glm::radians(transform.rotation);
-        glm::quat Q = glm::quat(rotationRadians);
-        glm::mat4 R = glm::mat4_cast(Q);
-
-        // Scale
-        glm::mat4 S = glm::scale(glm::mat4(1.0f), transform.scale);
-
-        // Combine: TRS
-		glm::mat4 model = T * R * S;
-        modelMatrix = model;
     }
 
     void GraphicsSystem::LoadBlueNoiseTextures()

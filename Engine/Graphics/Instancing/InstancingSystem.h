@@ -98,7 +98,7 @@ namespace EngineFramework
 
         // Gathers all entities, culls them, and builds the batches/SSBO data
         void BuildSceneBatches();
-        void UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj);
+        void UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj, const std::vector<glm::mat4>& spotProj);
 
         // Getters for the GraphicsSystem to use during rendering
         const std::vector<RenderBatch>& GetBatches() const { return m_activeBatches; }

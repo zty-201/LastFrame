@@ -174,7 +174,7 @@ namespace EngineFramework
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
-    void InstancingSystem::UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj) {
+    void InstancingSystem::UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj, const std::vector<glm::mat4>& spotProj) {
         if (m_globalInstanceData.empty()) return;
 
         // --- 1. PROCESS ONLY DIRTY ENTITIES ---
@@ -237,10 +237,18 @@ namespace EngineFramework
 
         cullingShader->use();
 
+        // For directional light cascade culling
         cullingShader->setUniform("u_MainViewProj", mainViewProj);
         for (int i = 0; i < 3; i++) {
             cullingShader->setUniform("u_CascadeViewProj[" + std::to_string(i) + "]", cascadeProj[i]);
         }
+
+		// For spotlight culling
+        cullingShader->setUniform("u_NumSpotLights", (int)spotProj.size());
+        for (size_t i = 0; i < spotProj.size(); ++i) {
+            cullingShader->setUniform("u_SpotLightViewProj[" + std::to_string(i) + "]", spotProj[i]);
+        }
+
         cullingShader->setUniform("u_TotalInstances", (uint32_t)m_globalInstanceData.size());
 
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_instanceSSBO);
@@ -258,10 +266,10 @@ namespace EngineFramework
 
     void InstancingSystem::CalculateModelMatrix(TransformComponent& transform, glm::mat4& modelMatrix)
     {
-		// Store previous frame's transform data 
-		transform.prevPosition = transform.position;
-		transform.prevRotation = transform.rotation;
-		transform.prevScale = transform.scale;
+        // Store previous frame's transform data 
+        transform.prevPosition = transform.position;
+        transform.prevRotation = transform.rotation;
+        transform.prevScale = transform.scale;
 
         // Translation
         glm::mat4 T = glm::translate(glm::mat4(1.0f), transform.position);
@@ -277,6 +285,6 @@ namespace EngineFramework
         // Combine: TRS
         glm::mat4 model = T * R * S;
         modelMatrix = model;
-		//transform.prevModelMatrix = modelMatrix; // Store the initial model matrix as the previous one
+        //transform.prevModelMatrix = modelMatrix; // Store the initial model matrix as the previous one
     }
 }

@@ -46,7 +46,9 @@ layout(std430, binding = 2) writeonly buffer VisibleIndicesBuffer {
 
 uniform mat4 u_MainViewProj;
 uniform mat4 u_CascadeViewProj[3];
+uniform mat4 u_SpotLightViewProj[32];
 uniform uint u_TotalInstances;
+uniform int u_NumSpotLights;
 
 // Hardcoded based on C++ constants (MAX_BATCHES and MAX_INSTANCES)
 const uint MAX_BATCHES = 1000u;
@@ -152,5 +154,20 @@ void main() {
         uint slotIdx = atomicAdd(commands[cmdIndex].instanceCount, 1u);
         uint writeIdx = (3u * MAX_INSTANCES) + inst.instanceOffset + slotIdx;
         visibleIndices[writeIdx] = idx;
+    }
+
+    // --- PASS 4+: SPOT LIGHTS ---
+    for (int i = 0; i < u_NumSpotLights; i++) {
+        vec4 spotPlanes[6];
+        ExtractPlanes(u_SpotLightViewProj[i], spotPlanes);
+        
+        if (IsSphereInFrustum(worldCenter, worldRadius, spotPlanes)) {
+            uint passIdx = 4u + uint(i);
+            uint cmdIndex = (passIdx * MAX_BATCHES) + batchID;
+            uint slotIdx = atomicAdd(commands[cmdIndex].instanceCount, 1u);
+            
+            uint writeIdx = (passIdx * MAX_INSTANCES) + inst.instanceOffset + slotIdx;
+            visibleIndices[writeIdx] = idx;
+        }
     }
 }
