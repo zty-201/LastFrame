@@ -100,8 +100,6 @@ namespace EngineFramework
             return view.front();
         }
 
-        void CalculateModelMatrix(const TransformComponent& transform, glm::mat4& modelMatrix);
-
         // Simple get and set functions for Fog Control Parameters
         // Anisotrophy
         void SetAnisotrophy(float value) { m_anisotropy = value; }
@@ -139,6 +137,9 @@ namespace EngineFramework
 		// Tricubic Filtering
         bool GetTricubicFiltering() const { return m_tricubic_filtering; }
         void SetTricubicFiltering(bool value) { m_tricubic_filtering = value; }
+
+		// Getter for instancing system
+		std::unique_ptr<InstancingSystem>& GetInstancingSystem() { return m_instancingSystem; }
 
 		// Frustum Culling Functions
         bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
@@ -221,6 +222,7 @@ namespace EngineFramework
         GLuint m_pointShadowArray = 0;
 
         std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
+        std::vector<glm::mat4> m_spotLightViewProjMatrices;
         std::vector<entt::entity> m_lightEntityMap;
         std::array<float, CASCADE_COUNT + 1> m_cascadeSplits;
 		std::array<float, CASCADE_COUNT> m_cascadeBiases;
@@ -295,7 +297,7 @@ namespace EngineFramework
         void RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius);
         void CalculateCascadeSplits(float nearPlane, float farPlane);
         std::array<glm::vec4, 6> ExtractFrustumPlanes(const glm::mat4& viewProj);
-
+        void UpdateCascadeMatrices(const CameraComponent& camera, const glm::mat4& camView);
         //==Event Handlers, one for each type of event.
         void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);

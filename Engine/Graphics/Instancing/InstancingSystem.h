@@ -51,12 +51,25 @@ namespace EngineFramework
         }
     };
 
+
+    struct DrawElementsIndirectCommand {
+        GLuint count;         // Number of indices in the submesh
+        GLuint instanceCount; // How many instances to draw (Compute shader will overwrite this later)
+        GLuint firstIndex;    // Offset in the index buffer
+        GLuint baseVertex;    // Offset in the vertex buffer (usually 0)
+        GLuint baseInstance;  // Offset in the SSBO (replaces u_InstanceOffset)
+    };
+
     // ============================================================================
     // 2. ULTRA-LEAN INSTANCE DATA
     // ============================================================================
     struct InstanceData {
+        uint32_t batchID;
+        uint32_t instanceOffset; // NEW: Replaces first padding
+        uint32_t padding[2];
         glm::mat4 modelMatrix;
-        // 64 bytes total. Perfectly aligned for std430.
+        glm::vec4 boundingSphere; // x,y,z = local center, w = local radius
+        // Total size: 80 bytes (perfectly aligned for std430)
     };
 
     // ============================================================================
@@ -69,6 +82,10 @@ namespace EngineFramework
         size_t instanceCount;       // How many instances to draw
     };
 
+    const size_t MAX_BATCHES = 1000;
+    const size_t MAX_INSTANCES = 50000;
+    const size_t NUM_PASSES = 36;
+
     // ============================================================================
     // 4. INSTANCING SYSTEM
     // ============================================================================
@@ -80,21 +97,32 @@ namespace EngineFramework
         void Initialize(size_t maxTotalInstances = 50000);
 
         // Gathers all entities, culls them, and builds the batches/SSBO data
-        void GatherPass(const glm::mat4& viewProj);
+        void BuildSceneBatches();
+        void UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj, const std::vector<glm::mat4>& spotProj);
 
         // Getters for the GraphicsSystem to use during rendering
         const std::vector<RenderBatch>& GetBatches() const { return m_activeBatches; }
         const std::vector<entt::entity>& GetAnimatedEntities() const { return m_animatedEntities; }
         GLuint GetInstanceSSBO() const { return m_instanceSSBO; }
-
+        GLuint GetIndirectBuffer() const { return m_indirectBuffer; }
+        GLuint GetVisibleIndicesBuffer() const { return m_visibleIndicesBuffer; }
+        size_t GetActiveBatchCount() const { return m_activeBatches.size(); }
     private:
         GLuint m_instanceSSBO = 0;
+        GLuint m_indirectBuffer = 0;
         size_t m_maxTotalInstances = 0;
+        GLuint m_visibleIndicesBuffer = 0;
 
+        xresource::full_guid culling_shader_guid;
+        
         // Frame-by-frame data
         std::vector<InstanceData> m_globalInstanceData;
         std::vector<RenderBatch> m_activeBatches;
+        std::vector<DrawElementsIndirectCommand> m_indirectCommands;
         std::vector<entt::entity> m_animatedEntities;
+
+		// Helper functions
+        void CalculateModelMatrix(TransformComponent& transform, glm::mat4& modelMatrix);
     };
 }
 #endif // INSTANCINGSYSTEM_H

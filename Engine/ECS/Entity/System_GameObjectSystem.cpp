@@ -40,6 +40,9 @@
 #include "UIComponent.h"
 #include "UISystem.hpp"
 
+// Graphics system
+#include "GraphicsSystem.h"
+
 namespace EngineFramework
 {
 
@@ -93,6 +96,7 @@ namespace EngineFramework
 	{
 		ClearAllInstances();
 		DeSerializeAllEntityInstances(json_input);
+		GraphicsSystem::GetInstance().GetInstancingSystem()->BuildSceneBatches();
 	}
 
 	void GameObjectSystem::QueueLoadScene(const std::string& json_input)

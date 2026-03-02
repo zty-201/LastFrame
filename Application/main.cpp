@@ -226,7 +226,7 @@ void Game_Initialize(void* android_asset_manager)
 			"LevelEditorSystem",
 			std::make_unique<EngineFramework::LevelEditorSystem>(),
 			100,  // Init Order: After all other game systems
-			7,  // Update Order: After game logic and main graphics update
+			10,  // Update Order: After game logic and main graphics update
 			1   // Destruct Order: With other game systems
 		);
 	#endif
