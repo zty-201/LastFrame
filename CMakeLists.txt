@@ -17,6 +17,9 @@ cmake_minimum_required(VERSION 3.20)
 #Use filters to separate folders.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project("LastFrame" VERSION 1.0 LANGUAGES C CXX)
+if(WIN32)
+  set(CMAKE_VS_USE_POWERSHELL 0)
+endif()
 
 # -------------------------------------------------------------------------------------
 # Global compile setting: align all Debug iterator levels with Jolt (Release-like)
