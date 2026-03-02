@@ -37,4 +37,8 @@ struct MeshComponent {
 	bool visibility = true;
 };
 
+struct InstanceMetadata {
+    std::vector<uint32_t> ssboIndices; // Map to GPU memory slots
+};
+
 #endif

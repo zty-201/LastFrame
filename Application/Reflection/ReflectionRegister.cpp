@@ -834,6 +834,14 @@ namespace EngineFramework
 			.func<&GetRef<SkyboxRenderPass>>("get_ref")
 			.custom<RequiresSerializedHistoryTag>(RequiresSerializedHistoryTag{});
 
+		entt::meta_factory<SkyboxRenderPass>()
+			.type("SkyboxRenderPass")
+			.func<&Emplacer<SkyboxRenderPass>::EmplaceComponent>("emplace")
+			.func<&Remover<SkyboxRenderPass>::RemoveComponent>("remove")
+			.func<&Getter<SkyboxRenderPass>::GetComponent>("get")
+			.func<&GetRef<SkyboxRenderPass>>("get_ref")
+			.custom<RequiresSerializedHistoryTag>(RequiresSerializedHistoryTag{});
+
 		entt::meta_factory<TriggerBoxComponent>()
 			.type("TriggerBoxComponent")
 			.data<&TriggerBoxComponent::enabled>("enabled")

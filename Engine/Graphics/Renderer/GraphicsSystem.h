@@ -140,6 +140,9 @@ namespace EngineFramework
         bool GetTricubicFiltering() const { return m_tricubic_filtering; }
         void SetTricubicFiltering(bool value) { m_tricubic_filtering = value; }
 
+		// Getter for instancing system
+		std::unique_ptr<InstancingSystem>& GetInstancingSystem() { return m_instancingSystem; }
+
 		// Frustum Culling Functions
         bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
         bool IsBoxInFrustum(const float min[3], const float max[3], const glm::mat4& model, const glm::mat4& viewProj);

@@ -39,6 +39,9 @@
 #include <inttypes.h>
 #include "UIComponent.h"
 
+// Graphics system
+#include "GraphicsSystem.h"
+
 namespace EngineFramework
 {
 
@@ -92,6 +95,7 @@ namespace EngineFramework
 	{
 		ClearAllInstances();
 		DeSerializeAllEntityInstances(json_input);
+		GraphicsSystem::GetInstance().GetInstancingSystem()->BuildSceneBatches();
 	}
 
 	void GameObjectSystem::ClearAllInstances()

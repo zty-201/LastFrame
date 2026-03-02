@@ -13,9 +13,11 @@ namespace EngineFramework
         }
     }
 
-    void InstancingSystem::Initialize(size_t maxTotalInstances) {
+    void InstancingSystem::Initialize(size_t maxTotalInstances) {\
+
         m_maxTotalInstances = maxTotalInstances;
 		culling_shader_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::SHADER_GUID, "Culling");
+
         // Pre-allocate the massive SSBO once
         glGenBuffers(1, &m_instanceSSBO);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
@@ -39,22 +41,34 @@ namespace EngineFramework
         LOGI("InstancingSystem initialized with capacity for %zu instances.", m_maxTotalInstances);
     }
 
-    void InstancingSystem::GatherPass(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj)
+    void InstancingSystem::BuildSceneBatches()
     {
         m_globalInstanceData.clear();
         m_activeBatches.clear();
         m_animatedEntities.clear();
-        m_indirectCommands.clear(); // Ensure this is a std::vector<DrawElementsIndirectCommand>
+        registry.clear<InstanceMetadata>();
 
-        std::map<BatchKey, std::vector<InstanceData>> batchSortingMap;
+        // Pre-allocate indirect commands with zeros
+        m_indirectCommands.assign(MAX_BATCHES * NUM_PASSES, DrawElementsIndirectCommand{ 0, 0, 0, 0, 0 });
+
+        // Temporary struct to pair the entity with its data during sorting
+        struct SubmeshInstance {
+            entt::entity entity;
+            InstanceData data;
+        };
+
+        std::map<BatchKey, std::vector<SubmeshInstance>> batchSortingMap;
         std::map<BatchKey, MaterialComponent> batchMaterials;
+
+        auto transform_view = registry.view<TransformComponent>();
+        for (auto&& [entity, transform] : transform_view.each()) {
+            CalculateModelMatrix(transform, transform.modelMatrix);
+        }
 
         auto view = registry.view<MeshComponent, TransformComponent>();
 
         for (auto [entity, meshComp, transformComp] : view.each()) {
             if (meshComp.meshName == "SkyBox" || !meshComp.visibility) continue;
-
-            // NOTICE: CPU Frustum culling is completely removed here!
 
             // Separate Animated Entities
             if (registry.any_of<AnimationComponent>(entity)) {
@@ -93,32 +107,27 @@ namespace EngineFramework
                     batchMaterials[key] = mat;
                 }
 
-                // --- CALCULATE BOUNDING SPHERE ---
+                // Local bounding sphere (The compute shader converts this to world space!)
                 glm::vec3 localMin = glm::vec3(meshComp.localMin[0], meshComp.localMin[1], meshComp.localMin[2]);
                 glm::vec3 localMax = glm::vec3(meshComp.localMax[0], meshComp.localMax[1], meshComp.localMax[2]);
                 glm::vec3 localCenter = (localMin + localMax) * 0.5f;
                 float localRadius = glm::length(localMax - localMin) * 0.5f;
 
                 InstanceData data;
-                data.batchID = 0;
+                data.batchID = 0; // Filled below
                 data.modelMatrix = transformComp.modelMatrix;
                 data.boundingSphere = glm::vec4(localCenter, localRadius);
 
-                batchSortingMap[key].push_back(data);
+                batchSortingMap[key].push_back({ entity, data });
             }
         }
 
         // --- FLATTEN DATA AND BUILD COMMANDS ---
         size_t currentOffset = 0;
         int batchIndex = 0;
-        //size_t numBatches = batchSortingMap.size();
-
-        // Allocate exact space for 4 passes (Main + 3 Cascades)
-        m_indirectCommands.assign(MAX_BATCHES * NUM_PASSES, DrawElementsIndirectCommand{ 0, 0, 0, 0, 0 });
 
         for (auto& [key, instances] : batchSortingMap) {
             if (instances.empty()) continue;
-            if (currentOffset + instances.size() > m_maxTotalInstances) break;
 
             RenderBatch batch;
             batch.key = key;
@@ -130,48 +139,90 @@ namespace EngineFramework
             auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(
                 AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, key.meshName));
 
-            if (meshData && key.subMeshIndex < meshData->subMeshes.size()) {
-                GLuint indexCount = meshData->subMeshes[key.subMeshIndex].indexCount;
-                GLuint firstIndex = meshData->subMeshes[key.subMeshIndex].baseIndex;
+            GLuint indexCount = meshData->subMeshes[key.subMeshIndex].indexCount;
+            GLuint firstIndex = meshData->subMeshes[key.subMeshIndex].baseIndex;
 
-                // Base Instance is always 0 because the Compute Shader handles indexing now
-                for (int pass = 0; pass < 4; pass++) {
-                    int cmdIndex = (pass * MAX_BATCHES) + batchIndex;
-                    m_indirectCommands[cmdIndex].count = indexCount;
-                    m_indirectCommands[cmdIndex].instanceCount = 0; // GPU WILL FILL THIS!
-                    m_indirectCommands[cmdIndex].firstIndex = firstIndex;
-                    m_indirectCommands[cmdIndex].baseVertex = 0;
-                    m_indirectCommands[cmdIndex].baseInstance = 0;
-                }
+            // Setup base Indirect Commands
+            for (int pass = 0; pass < NUM_PASSES; pass++) {
+                int cmdIndex = (pass * MAX_BATCHES) + batchIndex;
+                m_indirectCommands[cmdIndex].count = indexCount;
+                m_indirectCommands[cmdIndex].instanceCount = 0;
+                m_indirectCommands[cmdIndex].firstIndex = firstIndex;
+                m_indirectCommands[cmdIndex].baseVertex = 0;
+                m_indirectCommands[cmdIndex].baseInstance = 0;
             }
+            size_t batchBaseOffset = currentOffset;
+            for (auto& inst : instances) {
+                inst.data.batchID = batchIndex;
+                inst.data.instanceOffset = static_cast<uint32_t>(batchBaseOffset);
 
-            for (auto& instance : instances) {
-                instance.batchID = batchIndex;
-                instance.instanceOffset = static_cast<uint32_t>(currentOffset);
+                m_globalInstanceData.push_back(inst.data);
+
+                // Assign the GPU memory slot back to the ECS Entity
+                auto& meta = registry.get_or_emplace<InstanceMetadata>(inst.entity);
+                meta.ssboIndices.push_back(static_cast<uint32_t>(currentOffset));
+
+                currentOffset++;
             }
-
-            m_globalInstanceData.insert(m_globalInstanceData.end(), instances.begin(), instances.end());
-            currentOffset += instances.size();
             batchIndex++;
         }
 
+        // --- INITIAL UPLOAD ---
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, m_maxTotalInstances * sizeof(InstanceData), nullptr, GL_DYNAMIC_DRAW);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, m_globalInstanceData.size() * sizeof(InstanceData), m_globalInstanceData.data());
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    }
+
+    void InstancingSystem::UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj) {
         if (m_globalInstanceData.empty()) return;
 
-        // --- UPLOAD DATA TO GPU ---
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
-        // Orphan the old buffer
-        glBufferData(GL_SHADER_STORAGE_BUFFER, m_maxTotalInstances * sizeof(InstanceData), nullptr, GL_DYNAMIC_DRAW);
-        // Upload to the new buffer
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, m_globalInstanceData.size() * sizeof(InstanceData), m_globalInstanceData.data());
+        // --- 1. PROCESS ONLY DIRTY ENTITIES ---
 
+        auto instanced_view = registry.view<TransformComponent, InstanceMetadata>();
+        bool buffer_bound = false; // Track if we need to bind the buffer
+
+        for (auto [entity, transform, meta] : instanced_view.each()) {
+
+            // Fast comparison of 9 floats
+            if (transform.position != transform.prevPosition ||
+                transform.rotation != transform.prevRotation ||
+                transform.scale != transform.prevScale) {
+
+                // 2. DO THE HEAVY MATH ONLY WHEN NEEDED
+                CalculateModelMatrix(transform, transform.modelMatrix);
+
+				//LOGI("Entity %zu marked dirty. Updating GPU instance data.", static_cast<size_t>(entity));
+
+                if (!buffer_bound) {
+                    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
+                    buffer_bound = true;
+                }
+                for (uint32_t idx : meta.ssboIndices) {
+                    // 1. Update the CPU-side cache
+                    m_globalInstanceData[idx].modelMatrix = transform.modelMatrix;
+
+                    // 2. Upload ONLY this specific struct to the GPU
+                    // Offset = index * size of one struct
+                    // Size = size of one struct
+                    glBufferSubData(GL_SHADER_STORAGE_BUFFER,
+                        idx * sizeof(InstanceData),
+                        sizeof(InstanceData),
+                        &m_globalInstanceData[idx]);
+                }
+            }
+        }
+        if (buffer_bound) {
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+        }
+
+        // --- 3. RESET INDIRECT COMMANDS (Instance Counts -> 0) ---
+        // The GPU overwrites these counts every frame, so we must reset them using our pristine CPU copy
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
-        // Orphan the old buffer
-        glBufferData(GL_DRAW_INDIRECT_BUFFER, MAX_BATCHES* NUM_PASSES * sizeof(DrawElementsIndirectCommand), nullptr, GL_DYNAMIC_DRAW);
-        // Upload to the new buffer
+        glBufferData(GL_DRAW_INDIRECT_BUFFER, MAX_BATCHES * NUM_PASSES * sizeof(DrawElementsIndirectCommand), nullptr, GL_DYNAMIC_DRAW);
         glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0, m_indirectCommands.size() * sizeof(DrawElementsIndirectCommand), m_indirectCommands.data());
 
-        // --- DISPATCH COMPUTE SHADER ---
-        // Make sure you load your Culling Compute Shader in GraphicsSystem::SetupGraphics
+        // --- 4. DISPATCH COMPUTE SHADER ---
         std::shared_ptr<ShaderProgram> cullingShader{};
         if (culling_shader_guid != xresource::full_guid{})
         {
@@ -183,6 +234,7 @@ namespace EngineFramework
             culling_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Culling");
             cullingShader = E_AM::GetResource<ShaderProgram>(culling_shader_guid);
         }
+
         cullingShader->use();
 
         cullingShader->setUniform("u_MainViewProj", mainViewProj);
@@ -190,21 +242,41 @@ namespace EngineFramework
             cullingShader->setUniform("u_CascadeViewProj[" + std::to_string(i) + "]", cascadeProj[i]);
         }
         cullingShader->setUniform("u_TotalInstances", (uint32_t)m_globalInstanceData.size());
-        //cullingShader->setUniform("u_TotalBatches", (uint32_t)numBatches);
 
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_instanceSSBO);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_indirectBuffer);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_visibleIndicesBuffer);
 
-        // 1 thread per instance
         GLuint numGroups = (GLuint)(m_globalInstanceData.size() + 63) / 64;
         glDispatchCompute(numGroups, 1, 1);
-
-        // Block CPU until compute is done writing
         glMemoryBarrier(GL_COMMAND_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
 
         cullingShader->disuse();
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    }
+
+    void InstancingSystem::CalculateModelMatrix(TransformComponent& transform, glm::mat4& modelMatrix)
+    {
+		// Store previous frame's transform data 
+		transform.prevPosition = transform.position;
+		transform.prevRotation = transform.rotation;
+		transform.prevScale = transform.scale;
+
+        // Translation
+        glm::mat4 T = glm::translate(glm::mat4(1.0f), transform.position);
+
+        // Rotation (Euler - Quaternion - Matrix)
+        glm::vec3 rotationRadians = glm::radians(transform.rotation);
+        glm::quat Q = glm::quat(rotationRadians);
+        glm::mat4 R = glm::mat4_cast(Q);
+
+        // Scale
+        glm::mat4 S = glm::scale(glm::mat4(1.0f), transform.scale);
+
+        // Combine: TRS
+        glm::mat4 model = T * R * S;
+        modelMatrix = model;
+		//transform.prevModelMatrix = modelMatrix; // Store the initial model matrix as the previous one
     }
 }

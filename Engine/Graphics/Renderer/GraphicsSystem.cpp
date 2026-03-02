@@ -179,7 +179,6 @@ namespace EngineFramework
         skybox_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Skybox");
         shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Shadow");
         light_injection_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "LightInjection");
-        
         ray_march_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "RayMarch");
         point_shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "PointShadow");
         ui_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "UI");	
@@ -293,16 +292,16 @@ namespace EngineFramework
         glm::mat4 P = Camera::getPerspective(*active_camera, aspect);
 
         // Update all model matrices
-        auto transform_view = registry.view<TransformComponent>();
+        /*auto transform_view = registry.view<TransformComponent>();
         for (auto&& [entity, transform] : transform_view.each()) {
             CalculateModelMatrix(transform, transform.modelMatrix);
-        }
+        }*/
 
         glm::mat4 viewProj = P * V;
 
         UpdateCascadeMatrices(*active_camera, V);
 		// Preprocessing 
-        m_instancingSystem->GatherPass(viewProj, m_cascadeViewProjMatrices);
+        m_instancingSystem->UpdateAndDispatchCompute(viewProj, m_cascadeViewProjMatrices);
 
         // 1. Update point light SSBO
         UpdateLightSSBO();

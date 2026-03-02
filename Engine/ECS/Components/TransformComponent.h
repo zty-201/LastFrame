@@ -27,8 +27,11 @@ struct TransformComponent {
     glm::vec3 rotation = { 0.0f, 0.0f, 0.0f }; // Euler angles
     glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
-	glm::vec3 prevScale = { 1.0f, 1.0f, 1.0f };
 
+    // Previous frame's transform data
+    glm::vec3 prevPosition = position;
+	glm::vec3 prevRotation = rotation;
+	glm::vec3 prevScale = { 1.0f, 1.0f, 1.0f };
     glm::mat4 prevModelMatrix = glm::mat4(1.0f);
 };
 
@@ -38,4 +41,5 @@ struct SceneRenderPass {};
 
 // Tag to mark an entity as being part of the skybox rendering pass
 struct SkyboxRenderPass {};
+
 #endif

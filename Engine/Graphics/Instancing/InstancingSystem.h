@@ -97,7 +97,8 @@ namespace EngineFramework
         void Initialize(size_t maxTotalInstances = 50000);
 
         // Gathers all entities, culls them, and builds the batches/SSBO data
-        void GatherPass(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj);
+        void BuildSceneBatches();
+        void UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj);
 
         // Getters for the GraphicsSystem to use during rendering
         const std::vector<RenderBatch>& GetBatches() const { return m_activeBatches; }
@@ -113,12 +114,15 @@ namespace EngineFramework
         GLuint m_visibleIndicesBuffer = 0;
 
         xresource::full_guid culling_shader_guid;
-
+        
         // Frame-by-frame data
         std::vector<InstanceData> m_globalInstanceData;
         std::vector<RenderBatch> m_activeBatches;
         std::vector<DrawElementsIndirectCommand> m_indirectCommands;
         std::vector<entt::entity> m_animatedEntities;
+
+		// Helper functions
+        void CalculateModelMatrix(TransformComponent& transform, glm::mat4& modelMatrix);
     };
 }
 #endif // INSTANCINGSYSTEM_H
