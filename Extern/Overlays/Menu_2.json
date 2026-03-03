@@ -1,5 +1,5 @@
 {
-	"681": {
+	"630": {
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
 			"color": [
@@ -34,7 +34,7 @@
 			"visible": false
 		}
 	},
-	"682": {
+	"631": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				1122364430668251137,

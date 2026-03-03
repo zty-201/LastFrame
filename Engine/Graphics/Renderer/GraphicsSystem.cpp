@@ -305,7 +305,7 @@ namespace EngineFramework
 
         // 2. Shadow pass (directional + point) (around 1 to 2ms)
         ShadowPass();
-        // 3. Global uniform buffers (camera, light, cascades) (around 7ms)
+        // 3. Global uniform buffers (camera, light, cascades) 
         UpdateUBOs(*active_camera, V, P);
         // 4. Volumetric light injection
         VolumetricLightInjectionPass();
@@ -762,9 +762,11 @@ namespace EngineFramework
 
     void GraphicsSystem::UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P)
     {
-        glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBO);
-        VolumetricUBO* ubo = (VolumetricUBO*)glMapBufferRange(
-            GL_UNIFORM_BUFFER, 0, sizeof(VolumetricUBO), GL_MAP_WRITE_BIT);
+        VolumetricUBO uboData;
+
+        
+        /*VolumetricUBO* ubo = (VolumetricUBO*)glMapBufferRange(
+            GL_UNIFORM_BUFFER, 0, sizeof(VolumetricUBO), GL_MAP_WRITE_BIT);*/
 
         TransformComponent* dirLightTransform = nullptr;
 		LightComponent* dirLight = nullptr;
@@ -794,49 +796,51 @@ namespace EngineFramework
             intensity = dirLight->intensity;
         }
 
-        ubo->view = V;
-        ubo->projection = P;
-        ubo->view_proj = P * V;
-        ubo->prev_view_proj = m_frame_idx == 0 ? P * V : m_prev_view_projection;
-        ubo->inv_view_proj = glm::inverse(ubo->view_proj);
+        uboData.view = V;
+        uboData.projection = P;
+        uboData.view_proj = P * V;
+        uboData.prev_view_proj = m_frame_idx == 0 ? P * V : m_prev_view_projection;
+        uboData.inv_view_proj = glm::inverse(uboData.view_proj);
 
         for (int i = 0; i < CASCADE_COUNT; i++) {
-            ubo->cascade_view_proj[i] = m_cascadeViewProjMatrices[i];
+            uboData.cascade_view_proj[i] = m_cascadeViewProjMatrices[i];
         }
 
-        ubo->cascade_splits = glm::vec4(
+        uboData.cascade_splits = glm::vec4(
             m_cascadeSplits[1],
             m_cascadeSplits[2],
             m_cascadeSplits[3],
             0.0f
         );
 
-        ubo->cascade_biases = glm::vec4(
+        uboData.cascade_biases = glm::vec4(
             m_cascadeBiases[0],
             m_cascadeBiases[1],
             m_cascadeBiases[2],
             m_cascadeBiases[3]
         );
 
-        ubo->light_direction = glm::vec4(direction, 0.0f);
-        ubo->light_color = glm::vec4(color * intensity, m_ambient_light_intensity);
-        ubo->camera_position = glm::vec4(camera.position, 1.0f);
-        ubo->bias_near_far_pow = glm::vec4(
+        uboData.light_direction = glm::vec4(direction, 0.0f);
+        uboData.light_color = glm::vec4(color * intensity, m_ambient_light_intensity);
+        uboData.camera_position = glm::vec4(camera.position, 1.0f);
+        uboData.bias_near_far_pow = glm::vec4(
             m_shadow_bias,
             camera.nearPlane,
             camera.farPlane,
             m_depth_power
         );
-        ubo->aniso_density_scattering_absorption = glm::vec4(
+        uboData.aniso_density_scattering_absorption = glm::vec4(
             m_anisotropy,
             m_density,
             m_scattering,
             m_absorption
         );
-        ubo->time = glm::vec4(static_cast<float>(get_native_time()), 0, 0, 0);
-        ubo->width_height = glm::ivec4((int)screen.x, (int)screen.y, 0, 0);
+        uboData.time = glm::vec4(static_cast<float>(get_native_time()), 0, 0, 0);
+        uboData.width_height = glm::ivec4((int)screen.x, (int)screen.y, 0, 0);
 
-        glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+        glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBO);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(VolumetricUBO), &uboData);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
