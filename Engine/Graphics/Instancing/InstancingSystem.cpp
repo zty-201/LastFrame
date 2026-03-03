@@ -13,7 +13,7 @@ namespace EngineFramework
         }
     }
 
-    void InstancingSystem::Initialize(size_t maxTotalInstances) {\
+    void InstancingSystem::Initialize(size_t maxTotalInstances) {
 
         m_maxTotalInstances = maxTotalInstances;
 		culling_shader_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::SHADER_GUID, "Culling");
@@ -182,16 +182,16 @@ namespace EngineFramework
         for (auto&& [entity, transform] : transform_view.each()) {
             CalculateModelMatrix(transform, transform.modelMatrix);
         }*/
-        auto instanced_view = registry.view<TransformComponent>();
+        auto transform_view = registry.view<TransformComponent>();
         bool buffer_bound = false; // Track if we need to bind the buffer
 
-        for (auto&& [entity, transform] : instanced_view.each()) {
+        for (auto&& [entity, transform] : transform_view.each()) {
 
             // Fast comparison of 9 floats
             if (transform.position != transform.prevPosition ||
                 transform.rotation != transform.prevRotation ||
                 transform.scale != transform.prevScale) {
-
+                LOGI("Entity %zu has changed transform.", static_cast<size_t>(entity));
                 // 2. DO THE HEAVY MATH ONLY WHEN NEEDED
                 CalculateModelMatrix(transform, transform.modelMatrix);
 
