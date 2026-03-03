@@ -151,7 +151,7 @@ namespace EngineFramework
 
         // Debug Mode
         int debugMode = 0;
-        //bool test = false;
+
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* pWindow = nullptr;
 #endif
