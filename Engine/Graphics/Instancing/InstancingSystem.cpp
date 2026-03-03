@@ -178,11 +178,14 @@ namespace EngineFramework
         if (m_globalInstanceData.empty()) return;
 
         // --- 1. PROCESS ONLY DIRTY ENTITIES ---
-
-        auto instanced_view = registry.view<TransformComponent, InstanceMetadata>();
+        /*auto transform_view = registry.view<TransformComponent>();
+        for (auto&& [entity, transform] : transform_view.each()) {
+            CalculateModelMatrix(transform, transform.modelMatrix);
+        }*/
+        auto instanced_view = registry.view<TransformComponent>();
         bool buffer_bound = false; // Track if we need to bind the buffer
 
-        for (auto [entity, transform, meta] : instanced_view.each()) {
+        for (auto&& [entity, transform] : instanced_view.each()) {
 
             // Fast comparison of 9 floats
             if (transform.position != transform.prevPosition ||
@@ -193,12 +196,18 @@ namespace EngineFramework
                 CalculateModelMatrix(transform, transform.modelMatrix);
 
 				//LOGI("Entity %zu marked dirty. Updating GPU instance data.", static_cast<size_t>(entity));
+                auto* meta = registry.try_get<InstanceMetadata>(entity);
+
+                if (!meta) {
+                    LOGW("Entity %zu has no InstanceMetadata! Skipping GPU update.", static_cast<size_t>(entity));
+                    continue;
+                }
 
                 if (!buffer_bound) {
                     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
                     buffer_bound = true;
                 }
-                for (uint32_t idx : meta.ssboIndices) {
+                for (uint32_t idx : meta->ssboIndices) {
                     // 1. Update the CPU-side cache
                     m_globalInstanceData[idx].modelMatrix = transform.modelMatrix;
 
@@ -210,6 +219,7 @@ namespace EngineFramework
                         sizeof(InstanceData),
                         &m_globalInstanceData[idx]);
                 }
+                
             }
         }
         if (buffer_bound) {

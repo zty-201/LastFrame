@@ -1,5 +1,5 @@
 {
-	"697": {
+	"667": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				7063588723440451587,
@@ -66,7 +66,7 @@
 			"visible": false
 		}
 	},
-	"698": {
+	"668": {
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [

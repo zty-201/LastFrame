@@ -293,6 +293,8 @@ namespace EngineFramework
 
         glm::mat4 viewProj = P * V;
 
+        
+
         UpdateCascadeMatrices(*active_camera, V);
 
         // 1. Update point light SSBO
