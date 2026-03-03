@@ -191,7 +191,7 @@ namespace EngineFramework
             if (transform.position != transform.prevPosition ||
                 transform.rotation != transform.prevRotation ||
                 transform.scale != transform.prevScale) {
-                LOGI("Entity %zu has changed transform.", static_cast<size_t>(entity));
+                //LOGI("Entity %zu has changed transform.", static_cast<size_t>(entity));
                 // 2. DO THE HEAVY MATH ONLY WHEN NEEDED
                 CalculateModelMatrix(transform, transform.modelMatrix);
 
@@ -199,7 +199,7 @@ namespace EngineFramework
                 auto* meta = registry.try_get<InstanceMetadata>(entity);
 
                 if (!meta) {
-                    LOGW("Entity %zu has no InstanceMetadata! Skipping GPU update.", static_cast<size_t>(entity));
+                    //LOGW("Entity %zu has no InstanceMetadata! Skipping GPU update.", static_cast<size_t>(entity));
                     continue;
                 }
 
