@@ -448,9 +448,20 @@ namespace EngineFramework
     {
         TransformComponent* dirLightTransform = nullptr;
         for (auto [entity, light] : registry.view<LightComponent>().each()) {
+
             if (light.type == LightComponent::DIRECTIONAL) {
-                dirLightTransform = &registry.get<TransformComponent>(entity);
+
+                if (auto* transform = registry.try_get<TransformComponent>(entity)) {
+                    dirLightTransform = transform;                    
+                }
+                /*else {
+                    std::cout << "Directional light missing TransformComponent!\n";
+                }*/
+
                 break;
+
+                /*dirLightTransform = &registry.get<TransformComponent>(entity);
+                break;*/
             }
         }
 
@@ -770,9 +781,21 @@ namespace EngineFramework
 		LightComponent* dirLight = nullptr;
         for (auto [entity, light] : registry.view<LightComponent>().each()) {
             if (light.type == LightComponent::DIRECTIONAL) {
-				dirLight = &light;
-                dirLightTransform = &registry.get<TransformComponent>(entity);
+
+                dirLight = &light;
+
+                if (auto* transform = registry.try_get<TransformComponent>(entity)) {
+                    dirLightTransform = transform;
+                }
+                /*else {
+                    std::cout << "Directional light missing TransformComponent!\n";
+                }*/
+
                 break;
+
+				/*dirLight = &light;
+                dirLightTransform = &registry.get<TransformComponent>(entity);
+                break;*/
             }
         }
 
@@ -1479,8 +1502,21 @@ namespace EngineFramework
         TransformComponent* dirLightTransform = nullptr;
         for (auto [entity, light] : registry.view<LightComponent>().each()) {
             if (light.type == LightComponent::DIRECTIONAL) {
-                dirLightTransform = &registry.get<TransformComponent>(entity);
+
+                if (auto* transform = registry.try_get<TransformComponent>(entity)) {
+                    dirLightTransform = transform;
+                    //std::cout << "hellow lol\n";
+                }
+                /*else {
+                    std::cout << "Directional light missing TransformComponent!\n";
+                }*/
+
                 break;
+
+
+                /*dirLightTransform = &registry.get<TransformComponent>(entity);
+                std::cout << "hellow lol\n";
+                break;*/
             }
         }
         if (!dirLightTransform) return;
