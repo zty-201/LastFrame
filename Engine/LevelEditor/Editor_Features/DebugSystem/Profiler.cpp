@@ -116,7 +116,25 @@ namespace EngineFramework {
         //std::vector<std::pair<std::string, Diagnostics::Section>> rows(P.Sections().begin(), P.Sections().end());
         //std::sort(rows.begin(), rows.end(), [](auto& a, auto& b) {return a.second.ms > b.second.ms; });
 
-        const auto& secs = P.Sections();
+		auto secs = P.Sections(); // copy so we can inject editor-only timings
+		const auto& level_editor_profile = LevelEditorSystem::GetProfilingData();
+
+        auto integrate_editor_sample = [&](const char* label, const LevelEditorSystem::ProfilerSectionSample& sample) {
+            if (!sample.valid) {
+                return;
+            }
+            if (secs.find(label) != secs.end()) {
+                return;
+            }
+
+            Diagnostics::Section synthetic;
+            synthetic.ms = sample.ms;
+            synthetic.calls = sample.calls;
+            secs.emplace(label, synthetic);
+        };
+
+		integrate_editor_sample("Sys::LevelEditorSystem::Update", level_editor_profile.update);
+
         // Make sure every visible label has a deterministic position
         for (const auto& kv : secs) {
             EnsureLabelInOrder(kv.first);
@@ -258,86 +276,6 @@ namespace EngineFramework {
 
             ImGui::TextDisabled("calls %d, %.*f ms/call  (%.1f%% of Frame)", sec.calls, MS_PRECISION, (sec.calls ? smoothed / sec.calls : 0.0), pctFrame);
             ImGui::Separator();
-        }
-
-        ImGui::SeparatorText("Level Editor");
-        const auto& level_editor_profile = EngineFramework::LevelEditorSystem::GetProfilingData();
-        auto show_level_editor_row = [&](const char* pretty_name, std::initializer_list<const char*> section_names,
-            const EngineFramework::LevelEditorSystem::ProfilerSectionSample* fallback_sample) -> const Diagnostics::Section* {
-            const Diagnostics::Section* section_ptr = nullptr;
-            const char* used_label = nullptr;
-            for (const char* section_name : section_names) {
-                auto sec_it = secs.find(section_name);
-                if (sec_it != secs.end()) {
-                    section_ptr = &sec_it->second;
-                    used_label = section_name;
-                    break;
-                }
-            }
-
-            if (!section_ptr) {
-                if (!fallback_sample || !fallback_sample->valid) {
-                    ImGui::TextDisabled("%s: no samples this frame", pretty_name);
-                    return nullptr;
-                }
-
-                const double per_call = fallback_sample->calls ? fallback_sample->ms / fallback_sample->calls : 0.0;
-                const double pct_update = s_ema_updateAll > 0.0 ? (fallback_sample->ms / s_ema_updateAll) * 100.0 : 0.0;
-                const double pct_frame = s_ema_frame_ms > 0.0 ? (fallback_sample->ms / s_ema_frame_ms) * 100.0 : 0.0;
-
-                float frac = (float)(fallback_sample->ms / std::max(0.001, s_ema_updateAll));
-                if (frac > 1.f) frac = 1.f;
-                char label[256];
-                snprintf(label, sizeof(label), "%s  %d%%  %.*f ms", pretty_name, (int)pct_update, MS_PRECISION, fallback_sample->ms);
-                ImGui::ProgressBar(frac, ImVec2(-1, 0), label);
-                ImGui::TextDisabled("calls %d, %.*f ms/call  (%.1f%% of Frame)", fallback_sample->calls, MS_PRECISION, per_call, pct_frame);
-                return nullptr;
-            }
-
-            const auto& sec = *section_ptr;
-            double smoothed = sec.ms;
-            const double per_call = sec.calls ? smoothed / sec.calls : 0.0;
-            const double pct_update = s_ema_updateAll > 0.0 ? (smoothed / s_ema_updateAll) * 100.0 : 0.0;
-            const double pct_frame = s_ema_frame_ms > 0.0 ? (smoothed / s_ema_frame_ms) * 100.0 : 0.0;
-
-            float frac = (float)(smoothed / std::max(0.001, s_ema_updateAll));
-            if (frac > 1.f) frac = 1.f;
-
-            char label[256];
-            snprintf(label, sizeof(label), "%s  %d%%  %.*f ms", pretty_name, (int)pct_update, MS_PRECISION, smoothed);
-            ImGui::ProgressBar(frac, ImVec2(-1, 0), label);
-
-            ImGui::TextDisabled("calls %d, %.*f ms/call  (%.1f%% of Frame)", sec.calls, MS_PRECISION, per_call, pct_frame);
-            return section_ptr;
-        };
-
-        const Diagnostics::Section* editor_update_sec =
-            show_level_editor_row("Sys::LevelEditorSystem::Update",
-                { "Sys::LevelEditorSystem::Update", "LevelEditorSystem::Update" },
-                level_editor_profile.update.valid ? &level_editor_profile.update : nullptr);
-
-        const Diagnostics::Section* editor_run_sec =
-            show_level_editor_row("LevelEditor::Run", { "LevelEditor::Run" },
-                level_editor_profile.run.valid ? &level_editor_profile.run : nullptr);
-
-        // If globals didn't capture the editor sections, inject fallback into the ordering/hist cache so they show in All sections list
-        auto inject_fallback_section = [&](const char* label, const EngineFramework::LevelEditorSystem::ProfilerSectionSample& sample) {
-            if (!sample.valid) return;
-            auto it = s_index.find(label);
-            if (it == s_index.end()) {
-                s_order.push_back(label);
-                s_index[label] = (int)s_order.size() - 1;
-            }
-            section_hist[label].max = frame_hist.max;
-            section_hist[label].push((float)((sample.ms / std::max(0.001, s_ema_updateAll)) * 100.0));
-            s_ema_ms[label] = sample.ms;
-        };
-
-        if (!editor_update_sec && level_editor_profile.update.valid) {
-            inject_fallback_section("Sys::LevelEditorSystem::Update", level_editor_profile.update);
-        }
-        if (!editor_run_sec && level_editor_profile.run.valid) {
-            inject_fallback_section("LevelEditor::Run", level_editor_profile.run);
         }
 
         // Full table

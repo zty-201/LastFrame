@@ -55,7 +55,6 @@ namespace EngineFramework
 
 		struct ProfilingData {
 			ProfilerSectionSample update;
-			ProfilerSectionSample run;
 		};
 
 		static const ProfilingData& GetProfilingData();

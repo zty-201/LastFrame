@@ -93,8 +93,6 @@ namespace EngineFramework
 		auto& profiling = g_level_editor_profiling;
 		profiling.update.valid = false;
 		profiling.update.calls = 0;
-		profiling.run.valid = false;
-		profiling.run.calls = 0;
 		ScopedSectionTimer update_timer{ profiling.update, true };
 		UNREFERENCED_PARAMETER(delta_time);
 
@@ -141,8 +139,7 @@ namespace EngineFramework
 				else if (application->Get_Editor_State()) {
 					//std::cout << "Imgui running\n";
 					//open is a 1 time thing, it shouldnt be called everyframe
-					//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed			
-					ScopedSectionTimer run_timer{ profiling.run, true };
+					//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed		
 					application->Run();
 
 				}
