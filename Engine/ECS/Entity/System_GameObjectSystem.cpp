@@ -510,8 +510,7 @@ namespace EngineFramework
 			/*
 			  1. Instantiate from archtype, or from scratch otherwise.
 			*/
-			//entt::entity entity_id = registry.create(entt::entity(std::stoul(key)));
-			entt::entity entity_id = registry.create();
+			entt::entity entity_id = registry.create(entt::entity(std::stoul(key)));
 			if (entity_json.contains("archtype"))
 			{
 				xresource::instance_guid archtype_guid{ entity_json["archtype"].get<uint64_t>() };
@@ -541,13 +540,6 @@ namespace EngineFramework
 
 				//Creation of component.
 				entt::meta_type comp_type = entt::resolve(GetID(comp_name));
-
-				if (!comp_type)
-				{
-					LOGE("[GameObjectSystem] Unrecognized component in JSON: %s. Skipping this component.", comp_name.c_str());
-					continue;
-				}
-
 				entt::meta_any comp_data = comp_type.construct();
 
 				//Iterate over component data members and set values. If empty it does nothing.
@@ -565,9 +557,7 @@ namespace EngineFramework
 				auto func = comp_data.type().func("emplace"_hs);
 				if (!func)
 				{
-					//throw std::runtime_error((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp_data.type().name()).c_str());
-					LOGE("[GameObjectSystem] Emplace function not registered for component: %s. Skipping.", comp_name.c_str());
-					continue;
+					throw std::runtime_error((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp_data.type().name()).c_str());
 				}
 				entt::meta_any success = func.invoke({}, entity_id, static_cast<const void*>(&comp_data));
 				//Duplicate component already present inside.
@@ -578,10 +568,7 @@ namespace EngineFramework
 				}
 			}
 			// update mesh bounds after deserialization
-			if (registry.all_of<MeshComponent>(entity_id))
-			{
-				Mesh::MeshData::UpdateMeshBounds(entity_id);
-			}
+			Mesh::MeshData::UpdateMeshBounds(entity_id);
 
 		}
 		//LOGD("Successfully Deserialized %s", json_input.c_str());
@@ -609,8 +596,7 @@ namespace EngineFramework
 			/*
 				1. Instantiate from archtype, or from scratch otherwise.
 			*/
-			//entt::entity entity_id = registry.create(entt::entity(std::stoul(key)));
-			entt::entity entity_id = registry.create();
+			entt::entity entity_id = registry.create(entt::entity(std::stoul(key)));
 			if (entity_json.contains("archtype"))
 			{
 				xresource::instance_guid archtype_guid{ entity_json["archtype"].get<uint64_t>() };
@@ -640,13 +626,6 @@ namespace EngineFramework
 
 				//Creation of component.
 				entt::meta_type comp_type = entt::resolve(GetID(comp_name));
-
-				if (!comp_type)
-				{
-					LOGE("[GameObjectSystem] Unrecognized component in JSON: %s. Skipping this component.", comp_name.c_str());
-					continue;
-				}
-
 				entt::meta_any comp_data = comp_type.construct();
 
 				//Iterate over component data members and set values. If empty it does nothing.
@@ -664,9 +643,7 @@ namespace EngineFramework
 				auto func = comp_data.type().func("emplace"_hs);
 				if (!func)
 				{
-					//throw std::runtime_error((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp_data.type().name()).c_str());
-					LOGE("[GameObjectSystem] Emplace function not registered for component: %s. Skipping.", comp_name.c_str());
-					continue;
+					throw std::runtime_error((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp_data.type().name()).c_str());
 				}
 				entt::meta_any success = func.invoke({}, entity_id, static_cast<const void*>(&comp_data));
 				//Duplicate component already present inside.
@@ -677,10 +654,7 @@ namespace EngineFramework
 				}
 			}
 			// update mesh bounds after deserialization
-			if (registry.all_of<MeshComponent>(entity_id))
-			{
-				Mesh::MeshData::UpdateMeshBounds(entity_id);
-			}
+			Mesh::MeshData::UpdateMeshBounds(entity_id);
 			list.emplace_back(entity_id);
 
 		}
@@ -714,9 +688,7 @@ namespace EngineFramework
 			auto func = comp.type().func("emplace"_hs);
 			if (!func)
 			{
-				//throw std::runtime_error((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp.type().name()).c_str());
-				LOGE("[GameObjectSystem] Emplace function not registered for this component. Skipping");
-				continue;
+				throw std::runtime_error((std::string("[GameObjectSystem] Emplace function not registered for this component: ") + comp.type().name()).c_str());
 			}
 			entt::meta_any success = func.invoke({}, entity, static_cast<const void*>(&comp));
 			//Duplicate component already present inside.

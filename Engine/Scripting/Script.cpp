@@ -1136,18 +1136,16 @@ namespace Engine {
         // NOTE: these still reference `registry` as in your original code.
         // Ideally swap to `reg` (passed in) later.
         s_Lua.set_function("GetMainCamera", []() -> CameraComponent* {
-            if (!s_RuntimeRegistry) return nullptr;
-            auto view = s_RuntimeRegistry->view<CameraComponent>();
+            auto view = registry.view<CameraComponent>();
             if (!view.empty()) {
-                return &s_RuntimeRegistry->get<CameraComponent>(view.front());
+                return &view.get<CameraComponent>(view.front());
             }
             return nullptr;
             });
 
         s_Lua.set_function("GetEntityTransform", [](entt::entity e) -> TransformComponent* {
-            if (!s_RuntimeRegistry || !s_RuntimeRegistry->valid(e)) return nullptr;
-            if (s_RuntimeRegistry->all_of<TransformComponent>(e)) {
-                return &s_RuntimeRegistry->get<TransformComponent>(e);
+            if (registry.all_of<TransformComponent>(e)) {
+                return &registry.get<TransformComponent>(e);
             }
             return nullptr;
             });
@@ -1431,22 +1429,22 @@ namespace Engine {
 
             // NOTE: these still use `registry` like your original code.
             LightComponent* entityLight = nullptr;
-            if (reg.all_of<LightComponent>(e)) {
+            if (registry.all_of<LightComponent>(e)) {
                 entityLight = &registry.get<LightComponent>(e);
             }
 
             UIComponent* entityUI = nullptr;
-            if (reg.all_of<UIComponent>(e)) {
+            if (registry.all_of<UIComponent>(e)) {
                 entityUI = &registry.get<UIComponent>(e);
             }
 
             PhysicsComponent* entityPhysics = nullptr;
-            if (reg.all_of<PhysicsComponent>(e)) {
+            if (registry.all_of<PhysicsComponent>(e)) {
                 entityPhysics = &registry.get<PhysicsComponent>(e);
             }
 
             AudioComponent* entityAudio = nullptr;
-            if (reg.all_of<AudioComponent>(e)) {
+            if (registry.all_of<AudioComponent>(e)) {
                 entityAudio = &registry.get<AudioComponent>(e);
             }
 

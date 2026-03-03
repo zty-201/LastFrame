@@ -30,9 +30,6 @@
 //Physics
 //#include <Jolt/Jolt.h>
 
-//#if defined(_MSC_VER)
-//	#define ENTT_ASSERT(condition, msg) do { if (!(condition)) __debugbreak(); } while(false)
-//#endif
 
 //ECS and reflection and event system
 #include "entt/entity/registry.hpp"
