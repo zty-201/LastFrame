@@ -178,12 +178,10 @@ namespace EngineFramework
         if (m_globalInstanceData.empty()) return;
 
         // --- 1. PROCESS ONLY DIRTY ENTITIES ---
-        /*auto transform_view = registry.view<TransformComponent>();
-        for (auto&& [entity, transform] : transform_view.each()) {
-            CalculateModelMatrix(transform, transform.modelMatrix);
-        }*/
         auto transform_view = registry.view<TransformComponent>();
-        bool buffer_bound = false; // Track if we need to bind the buffer
+        uint32_t minDirtyIndex = std::numeric_limits<uint32_t>::max();
+        uint32_t maxDirtyIndex = 0;
+        bool hasDirtyInstances = false;
 
         for (auto&& [entity, transform] : transform_view.each()) {
 
@@ -191,38 +189,42 @@ namespace EngineFramework
             if (transform.position != transform.prevPosition ||
                 transform.rotation != transform.prevRotation ||
                 transform.scale != transform.prevScale) {
-                //LOGI("Entity %zu has changed transform.", static_cast<size_t>(entity));
-                // 2. DO THE HEAVY MATH ONLY WHEN NEEDED
+				// Calculate model matrix only when dirty
                 CalculateModelMatrix(transform, transform.modelMatrix);
 
-				//LOGI("Entity %zu marked dirty. Updating GPU instance data.", static_cast<size_t>(entity));
                 auto* meta = registry.try_get<InstanceMetadata>(entity);
 
-                if (!meta) {
-                    //LOGW("Entity %zu has no InstanceMetadata! Skipping GPU update.", static_cast<size_t>(entity));
-                    continue;
-                }
-
-                if (!buffer_bound) {
-                    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
-                    buffer_bound = true;
-                }
+                if (!meta) continue;
+                
                 for (uint32_t idx : meta->ssboIndices) {
                     // 1. Update the CPU-side cache
                     m_globalInstanceData[idx].modelMatrix = transform.modelMatrix;
 
-                    // 2. Upload ONLY this specific struct to the GPU
-                    // Offset = index * size of one struct
-                    // Size = size of one struct
-                    glBufferSubData(GL_SHADER_STORAGE_BUFFER,
-                        idx * sizeof(InstanceData),
-                        sizeof(InstanceData),
-                        &m_globalInstanceData[idx]);
+                    // 2. Expand our memory "bounding box"
+                    minDirtyIndex = std::min(minDirtyIndex, idx);
+                    maxDirtyIndex = std::max(maxDirtyIndex, idx);
+                    hasDirtyInstances = true;
                 }
-                
             }
         }
-        if (buffer_bound) {
+
+        // --- 2. SINGLE BATCHED UPLOAD ---
+        if (hasDirtyInstances) {
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
+
+            // Calculate the contiguous chunk size and starting offset
+            uint32_t updateCount = (maxDirtyIndex - minDirtyIndex) + 1;
+            GLintptr offset = minDirtyIndex * sizeof(InstanceData);
+            GLsizeiptr size = updateCount * sizeof(InstanceData);
+
+            // Upload the specific slice of the vector
+            glBufferSubData(
+                GL_SHADER_STORAGE_BUFFER,
+                offset,
+                size,
+                &m_globalInstanceData[minDirtyIndex]
+            );
+
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         }
 

@@ -293,8 +293,6 @@ namespace EngineFramework
 
         glm::mat4 viewProj = P * V;
 
-        
-
         UpdateCascadeMatrices(*active_camera, V);
 
         // 1. Update point light SSBO
@@ -775,29 +773,15 @@ namespace EngineFramework
     {
         VolumetricUBO uboData;
 
-        
-        /*VolumetricUBO* ubo = (VolumetricUBO*)glMapBufferRange(
-            GL_UNIFORM_BUFFER, 0, sizeof(VolumetricUBO), GL_MAP_WRITE_BIT);*/
-
         TransformComponent* dirLightTransform = nullptr;
 		LightComponent* dirLight = nullptr;
         for (auto [entity, light] : registry.view<LightComponent>().each()) {
             if (light.type == LightComponent::DIRECTIONAL) {
-
                 dirLight = &light;
-
                 if (auto* transform = registry.try_get<TransformComponent>(entity)) {
                     dirLightTransform = transform;
                 }
-                /*else {
-                    std::cout << "Directional light missing TransformComponent!\n";
-                }*/
-
                 break;
-
-				/*dirLight = &light;
-                dirLightTransform = &registry.get<TransformComponent>(entity);
-                break;*/
             }
         }
 
