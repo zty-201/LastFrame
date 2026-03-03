@@ -486,6 +486,11 @@ namespace EngineFramework
 				if (instance.isFadingOut)
 				{
 					instance.currentFadeVolume -= fadeStep;
+
+					// Print during fade-out
+					LOGI("[Audio] Fading OUT | Slot: %s | Multiplier: %.2f",
+						instance.slotId.c_str(), instance.currentFadeVolume);
+
 					if (instance.currentFadeVolume <= 0.0f)
 					{
 						instance.currentFadeVolume = 0.0f;
@@ -497,6 +502,10 @@ namespace EngineFramework
 				else if (instance.currentFadeVolume < 1.0f)
 				{
 					instance.currentFadeVolume = std::min(1.0f, instance.currentFadeVolume + fadeStep);
+
+					// Print during fade-in
+					LOGI("[Audio] Fading IN | Slot: %s | Multiplier: %.2f",
+						instance.slotId.c_str(), instance.currentFadeVolume);
 				}
 			}
 			else
@@ -509,12 +518,12 @@ namespace EngineFramework
 			float finalVolume = instance.targetVolume * instance.currentFadeVolume;
 			instance.channel->setVolume(finalVolume);
 
-			// DEBUG PRINT: Only prints for active channels
-			LOGI("[Audio Debug] Slot: %-10s | Final Vol: %.2f | Fade Multiplier: %.2f | Mode: %s",
-				instance.slotId.c_str(),
-				finalVolume,
-				instance.currentFadeVolume,
-				instance.useFade ? "FADE_ON" : "FADE_OFF");
+			//// DEBUG PRINT: Only prints for active channels
+			//LOGI("[Audio Debug] Slot: %-10s | Final Vol: %.2f | Fade Multiplier: %.2f | Mode: %s",
+			//	instance.slotId.c_str(),
+			//	finalVolume,
+			//	instance.currentFadeVolume,
+			//	instance.useFade ? "FADE_ON" : "FADE_OFF");
 
 			// 4. Existing Entity & 3D Validation
 			if (!ecs.valid(instance.entity) || !ecs.all_of<TransformComponent>(instance.entity))
