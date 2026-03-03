@@ -18,6 +18,9 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <vector>
 #include <iostream>
 #include <iomanip>
+#if defined(_DEBUG) && defined(PLATFORM_WINDOWS)
+#include <crtdbg.h>
+#endif
 
 #include "main.hpp"
 #include "GraphicsSystem.h" // Include GraphicsSystem header
@@ -96,7 +99,7 @@ void Game_Initialize(void* android_asset_manager)
 		*/
 		// Enable run-time memory check for debug builds.
 		//Disable /fsanitize=address temporarily to use, remember to enable afterwards
-#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+#if defined(_DEBUG) && defined(PLATFORM_WINDOWS)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 	//_CrtSetBreakAlloc(11183);
@@ -220,13 +223,13 @@ void Game_Initialize(void* android_asset_manager)
 
 		// --- Debug/Editor Systems (Conditional) ---
 
-	#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+	#if defined(_DEBUG) && defined(PLATFORM_WINDOWS)
 	// 10. LevelEditorSystem: Controls rendering when active.
 		core_engine.AddSystem(
 			"LevelEditorSystem",
 			std::make_unique<EngineFramework::LevelEditorSystem>(),
 			100,  // Init Order: After all other game systems
-			7,  // Update Order: After game logic and main graphics update
+			10,  // Update Order: After game logic and main graphics update
 			1   // Destruct Order: With other game systems
 		);
 	#endif

@@ -28,6 +28,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 //Entt ECS system
 #include <entt/entity/registry.hpp>
 #include "System_LevelEditor.hpp"
+#include <chrono>
 
 //Casting meta data to type.
 #include "ReflectionRegister.hpp"
@@ -36,8 +37,37 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetManager.hpp"
 namespace EngineFramework
 {
+	namespace {
+		using Clock = std::chrono::high_resolution_clock;
+
+		struct ScopedSectionTimer {
+			LevelEditorSystem::ProfilerSectionSample& section;
+			Clock::time_point start;
+			ScopedSectionTimer(LevelEditorSystem::ProfilerSectionSample& target, bool count_call)
+				: section(target), start(Clock::now())
+			{
+				section.valid = true;
+				if (count_call) {
+					section.calls = 1;
+				}
+			}
+
+			~ScopedSectionTimer()
+			{
+				section.ms = std::chrono::duration<double, std::milli>(Clock::now() - start).count();
+			}
+		};
+
+		LevelEditorSystem::ProfilingData g_level_editor_profiling{};
+	}
+
 	bool LevelEditorSystem::Get_Enable() {
 		return LevelEditor::Get_Editor_State();
+	}
+
+	const LevelEditorSystem::ProfilingData& LevelEditorSystem::GetProfilingData()
+	{
+		return g_level_editor_profiling;
 	}
 
 	LevelEditorSystem::LevelEditorSystem()
@@ -60,6 +90,12 @@ namespace EngineFramework
 	}
 	void LevelEditorSystem::Update(float delta_time)
 	{
+		auto& profiling = g_level_editor_profiling;
+		profiling.update.valid = false;
+		profiling.update.calls = 0;
+		profiling.run.valid = false;
+		profiling.run.calls = 0;
+		ScopedSectionTimer update_timer{ profiling.update, true };
 		UNREFERENCED_PARAMETER(delta_time);
 
 		if (!application)return;
@@ -102,17 +138,17 @@ namespace EngineFramework
 				editor_resize.height = InputManager::GetInstance().GetWindowSize().second;
 				event_dispatcher.trigger<Event_Window_Resized>(std::move(editor_resize));
 			}
-			else if (application->Get_Editor_State()) {
-				//std::cout << "Imgui running\n";
-				//open is a 1 time thing, it shouldnt be called everyframe
-				//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed			
-				application->Run();
+				else if (application->Get_Editor_State()) {
+					//std::cout << "Imgui running\n";
+					//open is a 1 time thing, it shouldnt be called everyframe
+					//see if there are things extra things to init in imgui, thats 1 time when running, else open can be removed			
+					ScopedSectionTimer run_timer{ profiling.run, true };
+					application->Run();
 
-			}
+				}
 		}
 
 	}
 
 }
 #endif
-
