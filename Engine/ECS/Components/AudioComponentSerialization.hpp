@@ -26,6 +26,8 @@ inline void NormalizeAudioComponentJson(nlohmann::json& componentJson)
                 slotJson["audio_guid"] = clipJson["audio_guid"];
 
             // Defaults (match your new component defaults)
+            slotJson["useFade"] = clipJson.value("useFade", false);
+            slotJson["fadeDuration"] = clipJson.value("fadeDuration", 1.0f);
             slotJson["volume"] = clipJson.value("volume", 1.0f);
             slotJson["pitch"] = clipJson.value("pitch", 1.0f);
             slotJson["loop"] = clipJson.value("loop", false);

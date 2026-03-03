@@ -36,9 +36,11 @@ struct AudioComponent
 		xresource::full_guid audio_guid{};
 
 		// Basic playback controls
-		float volume	= 1.0f;
-		float pitch		= 1.0f;
-		bool loop		= false;
+		float volume		= 1.0f;
+		float pitch			= 1.0f;
+		bool loop			= false;
+		bool useFade		= false;
+		float fadeDuration	= 1.0f;
 
 		AudioCategory category = AudioCategory::SFX;
 

@@ -1003,6 +1003,15 @@ namespace EditorFeatures {
 				ImGui::SameLine();
 				ImGui::Checkbox("Play On Start", &slot.playOnStart);
 
+				// ----- FADE -----
+				ImGui::Checkbox("Use Fade", &slot.useFade);
+				if (slot.useFade)
+				{
+					ImGui::SameLine();
+					ImGui::SetNextItemWidth(100.0f);
+					ImGui::DragFloat("Fade Duration (s)", &slot.fadeDuration, 0.1f, 0.0f, 10.0f, "%.2fs");
+				}
+				
 				// ----- VOLUME -----
 				if (slot.volume < 0.0f) slot.volume = 0.0f;
 				ImGui::SliderFloat("Volume", &slot.volume, 0.0f, 1.0f);
