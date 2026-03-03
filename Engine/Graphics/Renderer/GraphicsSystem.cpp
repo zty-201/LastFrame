@@ -293,6 +293,10 @@ namespace EngineFramework
 
         glm::mat4 viewProj = P * V;
 
+        /*if (!test) {
+            m_instancingSystem->BuildSceneBatches();
+			test = true;
+        }*/
         
 
         UpdateCascadeMatrices(*active_camera, V);
