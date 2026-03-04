@@ -21,9 +21,257 @@
 #include "scene.h"
 #include "AssetManager.hpp"
 
-// For loading textures
+ // For loading textures
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
+//For compressing textures
+#include "compressonator.h"
+
+namespace
+{
+#ifdef PLATFORM_WINDOWS
+	enum class TextureType
+	{
+		BC_X, //For Windows
+		ETC2 //For Android.
+	};
+
+	//RAII data containing compressed texture data.
+	class CompressedTextureData
+	{
+	public:
+		CompressedTextureData() = default;
+		//For errors.
+		CompressedTextureData(const std::string& error_str) noexcept
+			: CompressedTextureData()
+		{
+			this->error_str = error_str;
+		}
+
+		CompressedTextureData(
+			uint32_t                    width,
+			uint32_t                    height,
+			uint32_t                    mip_levels,
+			CMP_FORMAT                  format,
+			bool                        is_srgb,
+			short                       channels,
+			std::vector<std::byte>      data,
+			std::optional<std::string>  error_str = std::nullopt
+		) noexcept
+			: width(width),
+			height(height),
+			mip_levels(mip_levels),
+			format(format),
+			is_srgb(is_srgb),
+			channels(channels),
+			data(std::move(data)),
+			error_str(std::move(error_str))
+		{
+		}
+
+		bool isValid() const noexcept { return !data.empty() && width > 0 && height > 0 && !error_str; }
+
+
+	public:
+		// Texture data
+		uint32_t    width = 0;
+		uint32_t    height = 0;
+		uint32_t    mip_levels = 1;
+		CMP_FORMAT  format = CMP_FORMAT_Unknown;
+		bool        is_srgb = false;
+		short       channels = 0;
+		std::vector<std::byte> data;
+		std::optional<std::string> error_str;
+	};
+
+	//RAII data containing uncompressed texture data loaded by stbi.
+	class UnCompressedTextureData
+	{
+	public:
+		UnCompressedTextureData() = default;
+		UnCompressedTextureData(unsigned char* data, uint32_t width, uint32_t height, uint32_t channels, bool is_srgb)
+			: width{ width }, height{ height }, channels{ channels }, is_srgb{ is_srgb } {
+			if (width > 0 && height > 0 && channels > 0)
+			{
+				this->data = std::vector<std::byte>(data, data + width * height * channels);
+			}
+		}
+
+		bool isValid() const { return (width > 0 && height > 0 && channels > 0 && !data.empty()); }
+	public:
+		//RAII texture data. 
+		std::vector<std::byte> data;
+		uint32_t    width = 0;
+		uint32_t    height = 0;
+		uint32_t	channels = 0;
+		bool is_srgb = false;
+	};
+
+	/*
+		Returns compressed data of the texture filepath passed in.
+		UnCompressedTextureData -> The loaded texture data. It should be flipped vertically.
+		TextureType -> What type to compress texture to.
+	*/
+	CompressedTextureData CompressTexture(const UnCompressedTextureData& uncompressed_texture, TextureType compression_type)
+	{
+		if (!uncompressed_texture.isValid())
+		{
+			return CompressedTextureData("Invalid Texture Passed In");
+		}
+
+		/*
+			Compression:
+			- There are two types of compression, one for BCx (Windows) and one for ETC2 (Android).
+			Among those, there are different formats for channels 1-4.
+
+			is_srgb is defined as the color space and has the same uncompressed/compressed format as non-srgb.
+			Thus, compress srgb the same way, as long as the gpu knows it's srgb when uploaded.
+		*/
+
+		/*
+			Assign input and output formats.
+		*/
+		//==Input is assumed to always be 1 unsigned byte per channel (no floating pt).
+		CMP_FORMAT input_format{};
+		switch (uncompressed_texture.channels)
+		{
+		case 1:
+			input_format = CMP_FORMAT_R_8;
+			break;
+		case 2:
+			input_format = CMP_FORMAT_RG_8;
+			break;
+		case 3:
+			input_format = CMP_FORMAT_RGB_888;
+			break;
+		case 4:
+			input_format = CMP_FORMAT_RGBA_8888;
+			break;
+		}
+
+		CMP_FORMAT output_format{};
+		if (compression_type == TextureType::BC_X)
+		{
+			switch (uncompressed_texture.channels)
+			{
+			case 1:
+				output_format = CMP_FORMAT_BC4;
+				break;
+			case 2:
+				output_format = CMP_FORMAT_BC5;
+				break;
+			case 3:
+				output_format = CMP_FORMAT_BC1;
+				break;
+			case 4:
+				output_format = CMP_FORMAT_BC3;
+				break;
+			}
+		}
+		else if (compression_type == TextureType::ETC2)
+		{
+			switch (uncompressed_texture.channels)
+			{
+			case 1:
+				return CompressedTextureData("1 Channel ETC2 unsupported");
+				break;
+			case 2:
+				return CompressedTextureData("2 Channel ETC2 unsupported");
+				break;
+			case 3:
+				output_format = CMP_FORMAT_ETC2_RGB;
+				break;
+			case 4:
+				output_format = CMP_FORMAT_ETC2_RGBA;
+				break;
+			}
+		}
+
+		/*
+			Setup source texture (input).
+		*/
+		CMP_Texture src_texture{};
+		src_texture.dwSize = sizeof(CMP_Texture);
+		src_texture.dwWidth = uncompressed_texture.width;
+		src_texture.dwHeight = uncompressed_texture.height;
+		src_texture.dwPitch = uncompressed_texture.width * uncompressed_texture.channels; // bytes per row
+		src_texture.format = input_format;
+		src_texture.dwDataSize = static_cast<CMP_DWORD>(uncompressed_texture.data.size());
+		src_texture.pData = reinterpret_cast<CMP_BYTE*>(const_cast<std::byte*>(uncompressed_texture.data.data()));
+
+		/*
+			Setup destination texture (output).
+		*/
+		CMP_Texture dst_texture{};
+		dst_texture.dwSize = sizeof(CMP_Texture);
+		dst_texture.dwWidth = uncompressed_texture.width;
+		dst_texture.dwHeight = uncompressed_texture.height;
+		dst_texture.dwPitch = 0; // let CMP calculate
+		dst_texture.format = output_format;
+		dst_texture.dwDataSize = CMP_CalculateBufferSize(&dst_texture);
+		dst_texture.pData = reinterpret_cast<CMP_BYTE*>(malloc(dst_texture.dwDataSize));
+
+		if (!dst_texture.pData)
+		{
+			return CompressedTextureData("Failed to allocate destination buffer");
+		}
+
+		/*
+			Set compression options.
+		*/
+		CMP_CompressOptions options{};
+		options.dwSize = sizeof(CMP_CompressOptions);
+		options.fquality = 0.88f;   // quality: 0.0 (fastest) – 1.0 (best)
+		options.dwnumThreads = 0;       // 0 = use all available hardware threads
+
+		/*
+			Compress.
+		*/
+		CMP_ERROR cmp_error = CMP_ConvertTexture(&src_texture, &dst_texture, &options, nullptr /*no progress callback*/);
+
+		if (cmp_error != CMP_OK)
+		{
+			free(dst_texture.pData);
+			return CompressedTextureData(std::string("CMP_ConvertTexture failed, error code: ") + std::to_string(static_cast<int>(cmp_error)));
+		}
+
+		/*
+			Move compressed bytes into the result object and free the CMP buffer.
+		*/
+		std::vector<std::byte> compressed_bytes(
+			reinterpret_cast<std::byte*>(dst_texture.pData),
+			reinterpret_cast<std::byte*>(dst_texture.pData) + dst_texture.dwDataSize);
+
+		free(dst_texture.pData);
+
+		return CompressedTextureData(
+			uncompressed_texture.width, uncompressed_texture.height, 
+			0, //Temporary.
+			output_format, 
+			uncompressed_texture.is_srgb, 
+			uncompressed_texture.channels, 
+			std::move(compressed_bytes)
+		);
+	}
+#endif
+}
+
+#ifdef PLATFORM_WINDOWS
+
+std::optional<std::string> Scene::CompressAndWriteTexture(const std::filesystem::path& src_path, bool compress_BCx, bool compress_ETC2)
+{
+	/*
+		Compress into BC and ETC2 before writing both files to same directory as src (with different extensions).
+		Do checks for srgb ("Albedo")
+	*/
+
+	//== Call stbi_load after GetDataFromFile, with flip_vertically toggled on.
+
+	//== Call CompressTexture for each non-empty suffix, and write to folder.
+}
+#endif
+
 
 //
 	// This function utilizes the stb_image or gli library for loading image files and OpenGL 
@@ -34,9 +282,16 @@
 	//          later to refer to the texture in rendering operations.
 	// const char* filename: This parameter takes a string representing the file path 
 	//          of the image from which the texture is to be loaded.
-	//
+	// isSRGB: States if the texture is an srgb texture, which requires a different compression and loading process.
 GLuint setupTexture(const char* filename, bool isSRGB = true)
 {
+
+	/*
+		Note: If BCx is supported on android, then load that (as ETC2 doesn't have 1 or 2 channel compression and has to resort to uncompressed for those).
+		When loading, load BC first (Windows, Android if possible), then ETC2 (Android if extension not supported), then uncompressed (png, jpg).
+		When loading uncompressed check if texture is already loaded (via other methods like BC or ETC2)
+	*/
+
 	/*
 		Standard Image Formats (png, jpg) --> stbi
 		Compressed Texture (dxt5, etc2) --> gli
@@ -48,7 +303,7 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 	{
 		std::vector<unsigned char> buffer = EngineFramework::AssetManagerSystem::GetDataFromFile(filename);
 		gli::texture Texture = gli::load((const char*)buffer.data(), buffer.size()); //Self-Managed via RAII
-		if(Texture.empty()) throw std::runtime_error(std::string("Failed to load texture: ") + filename);
+		if (Texture.empty()) throw std::runtime_error(std::string("Failed to load texture: ") + filename);
 
 		//There's no need to flip texture, since it should already flipped during compression process.
 
@@ -148,9 +403,12 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 				}
 		return TextureName;
 	}
-	//For Standard image loading
+	//For Standard image loading + Compression
 	else
 	{
+
+#ifdef PLATFORM_ANDROID
+
 		int width, height, bytesPerPix;
 		stbi_set_flip_vertically_on_load(true);
 
@@ -164,9 +422,12 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 		if (!data)
 			throw std::runtime_error(std::string("Failed to load texture: ") + filename);
 
+		//Unable to (and should not) compress images in android. Just load as normal uncompressed texture, should this texture be uncompressed.
 		//Default.
 		GLint internalFormat = GL_RGBA8;
 		GLint format = GL_RGBA;
+
+		//Textures can have 1-4 channels, so switch formats to match that.
 		switch (bytesPerPix)
 		{
 		case 1:
@@ -195,19 +456,24 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 		glGenTextures(1, &texID);
 		glBindTexture(GL_TEXTURE_2D, texID);
 
+		//Save previous setting so it can be loaded back afterwards.
 		GLint previousAlignment = 0;
 		glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
+		//Tightly packed texture, no padding.
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		// Allocates AND uploads Level 0 in one go
 		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		
+
 
 		// Automatically generates levels 1...N
 		glGenerateMipmap(GL_TEXTURE_2D);
-
+		//When texture is mapped to a larger surface than its size.
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		//When texture is mapped to a smaller surface than its size, mipmap is used. Trilinear filtering.
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+		//Set texture to repeat vertically/horizontally if out-of-bounds.
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
@@ -215,6 +481,12 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 		glBindTexture(GL_TEXTURE_2D, 0);
 		stbi_image_free(data);
 
+		return texID;
+
+#elif defined(PLATFORM_WINDOWS)
+
+		//TODO: Compress texture.
+#endif
 		return texID;
 	}
 }
@@ -232,7 +504,7 @@ GLuint setupHdrCubeMap(const std::array<std::string, 6>& filenames)
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
 
 	// Iterate through the provided file names
-	for (GLuint i = 0; i<6; i++)
+	for (GLuint i = 0; i < 6; i++)
 	{
 		GLint w, h; // Variables to store the width and height of the texture
 
@@ -274,7 +546,7 @@ GLuint setupHdrCubeMap(const std::array<std::string, 6>& filenames)
 Scene::Texture::Texture(const std::string& file, GLuint channel)
 	: id{ 0 }, channel{ channel }, target{ 0 }
 {
-	if (file.find("Albedo") != std::string::npos){
+	if (file.find("Albedo") != std::string::npos) {
 		id = setupTexture(file.c_str(), true);
 	}
 	else {
@@ -292,116 +564,3 @@ Scene::Texture::Texture(const std::array<std::string, 6>& filenames, GLuint chan
 	id = setupHdrCubeMap(filenames);
 	target = GL_TEXTURE_CUBE_MAP;
 }
-
-#ifdef PLATFORM_WINDOWS
-
-std::vector<unsigned char> Scene::Texture::CompressTexture(const char* filename, bool convertBC3)
-{
-	UNREFERENCED_PARAMETER(filename);
-	UNREFERENCED_PARAMETER(convertBC3);
-	//int width, height, bytesPerPix;
-	//stbi_set_flip_vertically_on_load(true);
-
-	////Load raw data
-	//std::vector<unsigned char> texture_data = EngineFramework::AssetManagerSystem::GetDataFromFile(std::filesystem::path(filename));
-	//unsigned char* data = stbi_load_from_memory(
-	//	texture_data.data(),
-	//	static_cast<int>(texture_data.size()),
-	//	&width, &height, &bytesPerPix, 4
-	//);
-
-	//if (!data) return {}; //Return empty to show unable to compress, since unable to load.
-
-	////Handle SRGB correctly, and set the correct formats.
-	//bool isSRGB = false;
-	//if (std::string_view(filename).find("Albedo") != std::string::npos) isSRGB = true;
-	//CMP_FORMAT input_format = CMP_FORMAT_RGBA_8888; //Both normal and srgb have 4 channels of 8 bits each.
-	//CMP_FORMAT output_format{};
-	//if (convertBC3)
-	//{
-	//	output_format = CMP_FORMAT_BC3;
-	//}
-	//else if (isSRGB)
-	//{
-	//	output_format = CMP_FORMAT_ETC2_SRGBA;
-	//}
-	//else output_format = CMP_FORMAT_ETC2_RGBA;
-
-	////==========================
-	//// Load Source Texture
-	////==========================
-	//CMP_Texture srcTexture{};
-	//srcTexture.dwSize = sizeof(srcTexture);
-	//srcTexture.dwWidth = width;
-	//srcTexture.dwHeight = height;
-	//srcTexture.dwPitch = width*4; //Probably the size of a row in bytes.
-	//srcTexture.format = input_format; //Both normal and srgb have 4 channels of 8 bits each.
-	//srcTexture.dwDataSize = width*height*4; //Size of each pixel is 4 * 8 bits = 4 bytes. Size of entire grid = w * h * 4
-	//srcTexture.pData = data;
-
-	////===================================
-	//// Initialize Compressed Destination
-	////===================================
-	//CMP_Texture destTexture{};
-	//destTexture.dwSize = sizeof(destTexture);
-	//destTexture.dwWidth = srcTexture.dwWidth;
-	//destTexture.dwHeight = srcTexture.dwHeight;
-	//destTexture.format = output_format;
-	//destTexture.dwDataSize = CMP_CalculateBufferSize(&destTexture);
-	//destTexture.pData = (CMP_BYTE*)malloc(destTexture.dwDataSize);
-
-	////==========================
-	//// Set Compression Options
-	////==========================
-	//CMP_CompressOptions options = { 0 };
-	//options.dwSize = sizeof(options);
-	//options.dwnumThreads = 8;
-	//options.bUseCGCompress = true;
-	////Max quality, lower speed.
-	//options.fquality = 1.0f;
-	//// Recommended for BC3 quality
-	//options.bUseRefinementSteps = true;
-	//options.nRefinementSteps = 1;
-
-	////Compression type
-	//options.useSRGBFrames = isSRGB;  // Ensures gamma-correct processing
-	//options.SourceFormat = input_format;
-	//options.DestFormat = output_format;
-
-	////ETC2 Cli --> CompressonatorCLI.exe -fd ETC2 -UseGPUDecompress  input.png output.ktx
-	////BC3 Cli --> CompressonatorCLI.exe -fd BC3 -quality 1.0 -threads 8 -refine 1 -srgba input.png output.dds
-	////BC3 Cli --> CompressonatorCLI.exe -fd BC3 -quality 1.0 -threads 8 -refine 1 -srgba "C:\input_folder\*.png" "C:\output_folder"
-	////BC3 or ETC2_RGBA  -ff <ext>,?<ext> for png,jpg etc. -fx <ext> for dds,ktx etc. 
-	///*
-	//	-UseSRGBFrames -EncodeWith GPU   //Only if srgb
-	//	-fd ETC2_RGBA or BC3
-	//	-RefineSteps 2 -CompressionSpeed 0
-	//	-ff png,jpg
-	//	CompressonatorCLI.exe -fd ETC2_RGBA -EncodeWith GPU -ff png,jpg -UseSRGBFrames -RefineSteps 2 -CompressionSpeed 0 "../" "../"
-	//*/
-
-	////Leave out -srgba if not srgba.
-
-	//
-	////==========================
-	//// Compress Texture
-	////==========================
-	//CMP_ERROR   cmp_status;
-	//cmp_status = CMP_ConvertTexture(&srcTexture, &destTexture, &options, NULL);
-	//if (cmp_status != CMP_OK)
-	//{
-	//	free(srcTexture.pData);
-	//	free(destTexture.pData);
-	//	return {};
-	//}
-
-	////==========================
-	//// Save Compressed Testure
-	////==========================
-	//
-
-	//stbi_image_free(srcTexture.pData);
-	//free(destTexture.pData);
-	return {}; //Temporary.
-}
-#endif

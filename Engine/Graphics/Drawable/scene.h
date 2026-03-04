@@ -17,7 +17,8 @@
  */
 #ifndef SCENE_H
 #define SCENE_H
-
+#include <filesystem>
+#include <optional>
 #include "ShaderProgram.h"
 #include "CameraComponent.h"
 #include "LightComponent.h"
@@ -101,11 +102,20 @@ struct Scene
         Texture(const Texture& rhs) = delete;
         Texture& operator=(const Texture& rhs) = delete;
 
-#ifdef PLATFORM_WINDOWS
-        //Returns BC3 if true, ETC2 if false.
-        static std::vector<unsigned char> CompressTexture(const char* filename, bool convertBC3 = true);
-#endif
+
     };
+#ifdef PLATFORM_WINDOWS
+    /*
+        Takes the texture file and compresses it, before writing back as file with an added suffix into the same directory.
+        \param src_path The original uncompressed texture file
+        \param bc_suffix and etc2_suffix 
+        The suffix to apply onto the compressed texture file for that texture type.
+        Keep empty if that texture type shouldn't be written.
+        Must have at least one non-empty suffix.
+        \return Returns an error string if unsuccessful.
+    */
+    static [[nodiscard]] std::optional<std::string> CompressAndWriteTexture(const std::filesystem::path& src_path, bool compress_BCx, bool compress_ETC2);
+#endif
 };
 
 #endif
