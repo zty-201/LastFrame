@@ -293,6 +293,7 @@ namespace
 
 std::optional<std::string> Scene::CompressAndWriteTexture(const std::filesystem::path& src_path, bool compress_BCx, bool compress_ETC2)
 {
+	//TODO: CompressAndWriteTexture for storing texture as compressed texture files with different extensions.
 	UNREFERENCED_PARAMETER(src_path);
 	UNREFERENCED_PARAMETER(compress_BCx);
 	UNREFERENCED_PARAMETER(compress_ETC2);
@@ -326,6 +327,8 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 		Note: If BCx is supported on android, then load that (as ETC2 doesn't have 1 or 2 channel compression and has to resort to uncompressed for those).
 		When loading, load BC first (Windows, Android if possible), then ETC2 (Android if extension not supported), then uncompressed (png, jpg).
 		When loading uncompressed check if texture is already loaded (via other methods like BC or ETC2)
+
+		For SRGB, use the respective opengl srgb formats. Format the compressed texture was stored in stays the same, Format to upload is different.
 	*/
 
 	/*
@@ -442,7 +445,7 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 	//For Standard image loading + Compression
 	else
 	{
-
+		//TODO: Android -> Load as normal image, unable to compress. Windows -> CompressAndWrite (but for testing just compress and upload to gpu instead of uploading uncompressed).
 //#ifdef PLATFORM_ANDROID
 		int width, height, bytesPerPix;
 		stbi_set_flip_vertically_on_load(true);
