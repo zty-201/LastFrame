@@ -15,4 +15,5 @@ Key_Actions = {
 	MOVE_RIGHT = 7,
 	OPEN_EDITOR = 8,
 	PAUSE = 9,
+	SPRINT = 10,
 }

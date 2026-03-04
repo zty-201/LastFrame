@@ -39,6 +39,10 @@
         {
             "glfw_key": 256,
             "key_action": "PAUSE"
+        },
+        {
+            "glfw_key": 340,
+            "key_action": "SPRINT"
         }
     ]
 }
