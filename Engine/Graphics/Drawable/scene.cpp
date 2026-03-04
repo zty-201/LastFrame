@@ -16,6 +16,7 @@
  * @date Sept, 2025
  */
 #include "pch.hpp"
+#include <utility>
 #include "gli/gli.hpp"
 
 #include "scene.h"
@@ -31,7 +32,7 @@
 namespace
 {
 #ifdef PLATFORM_WINDOWS
-	enum class TextureType
+	enum class CompressionTextureType
 	{
 		BC_X, //For Windows
 		ETC2 //For Android.
@@ -50,8 +51,7 @@ namespace
 		}
 
 		CompressedTextureData(
-			uint32_t                    width,
-			uint32_t                    height,
+			std::vector<std::pair<uint32_t, uint32_t>> mipmaps_width_height,
 			uint32_t                    mip_levels,
 			CMP_FORMAT                  format,
 			bool                        is_srgb,
@@ -59,8 +59,8 @@ namespace
 			std::vector<std::byte>      data,
 			std::optional<std::string>  error_str = std::nullopt
 		) noexcept
-			: width(width),
-			height(height),
+			: 
+			mipmaps_width_height(std::move(mipmaps_width_height)),
 			mip_levels(mip_levels),
 			format(format),
 			is_srgb(is_srgb),
@@ -70,13 +70,12 @@ namespace
 		{
 		}
 
-		bool isValid() const noexcept { return !data.empty() && width > 0 && height > 0 && !error_str; }
+		bool isValid() const noexcept { return !data.empty() && mipmaps_width_height.size() > 0 && mip_levels > 0 && channels > 0 && format != CMP_FORMAT_Unknown && !error_str; }
 
 
 	public:
 		// Texture data
-		uint32_t    width = 0;
-		uint32_t    height = 0;
+		std::vector<std::pair<uint32_t, uint32_t>> mipmaps_width_height; //Width and Height of each mipmap.
 		uint32_t    mip_levels = 1;
 		CMP_FORMAT  format = CMP_FORMAT_Unknown;
 		bool        is_srgb = false;
@@ -94,7 +93,7 @@ namespace
 			: width{ width }, height{ height }, channels{ channels }, is_srgb{ is_srgb } {
 			if (width > 0 && height > 0 && channels > 0)
 			{
-				this->data = std::vector<std::byte>(data, data + width * height * channels);
+				this->data = std::vector<std::byte>(reinterpret_cast<std::byte*>(data), reinterpret_cast<std::byte*>(data) + width * height * channels);
 			}
 		}
 
@@ -113,7 +112,7 @@ namespace
 		UnCompressedTextureData -> The loaded texture data. It should be flipped vertically.
 		TextureType -> What type to compress texture to.
 	*/
-	CompressedTextureData CompressTexture(const UnCompressedTextureData& uncompressed_texture, TextureType compression_type)
+	CompressedTextureData CompressTexture(const UnCompressedTextureData& uncompressed_texture, CompressionTextureType compression_type)
 	{
 		if (!uncompressed_texture.isValid())
 		{
@@ -121,6 +120,7 @@ namespace
 		}
 
 		/*
+			Assign input and output formats.
 			Compression:
 			- There are two types of compression, one for BCx (Windows) and one for ETC2 (Android).
 			Among those, there are different formats for channels 1-4.
@@ -129,11 +129,8 @@ namespace
 			Thus, compress srgb the same way, as long as the gpu knows it's srgb when uploaded.
 		*/
 
-		/*
-			Assign input and output formats.
-		*/
-		//==Input is assumed to always be 1 unsigned byte per channel (no floating pt).
-		CMP_FORMAT input_format{};
+		//==Input is assumed to always be 8bits per channel (no floating pt).
+		CMP_FORMAT input_format = CMP_FORMAT_Unknown;
 		switch (uncompressed_texture.channels)
 		{
 		case 1:
@@ -150,8 +147,8 @@ namespace
 			break;
 		}
 
-		CMP_FORMAT output_format{};
-		if (compression_type == TextureType::BC_X)
+		CMP_FORMAT output_format = CMP_FORMAT_Unknown;
+		if (compression_type == CompressionTextureType::BC_X)
 		{
 			switch (uncompressed_texture.channels)
 			{
@@ -169,7 +166,7 @@ namespace
 				break;
 			}
 		}
-		else if (compression_type == TextureType::ETC2)
+		else if (compression_type == CompressionTextureType::ETC2)
 		{
 			switch (uncompressed_texture.channels)
 			{
@@ -187,35 +184,40 @@ namespace
 				break;
 			}
 		}
-
-		/*
-			Setup source texture (input).
-		*/
-		CMP_Texture src_texture{};
-		src_texture.dwSize = sizeof(CMP_Texture);
-		src_texture.dwWidth = uncompressed_texture.width;
-		src_texture.dwHeight = uncompressed_texture.height;
-		src_texture.dwPitch = uncompressed_texture.width * uncompressed_texture.channels; // bytes per row
-		src_texture.format = input_format;
-		src_texture.dwDataSize = static_cast<CMP_DWORD>(uncompressed_texture.data.size());
-		src_texture.pData = reinterpret_cast<CMP_BYTE*>(const_cast<std::byte*>(uncompressed_texture.data.data()));
-
-		/*
-			Setup destination texture (output).
-		*/
-		CMP_Texture dst_texture{};
-		dst_texture.dwSize = sizeof(CMP_Texture);
-		dst_texture.dwWidth = uncompressed_texture.width;
-		dst_texture.dwHeight = uncompressed_texture.height;
-		dst_texture.dwPitch = 0; // let CMP calculate
-		dst_texture.format = output_format;
-		dst_texture.dwDataSize = CMP_CalculateBufferSize(&dst_texture);
-		dst_texture.pData = reinterpret_cast<CMP_BYTE*>(malloc(dst_texture.dwDataSize));
-
-		if (!dst_texture.pData)
+		if (input_format == CMP_FORMAT_Unknown || output_format == CMP_FORMAT_Unknown)
 		{
-			return CompressedTextureData("Failed to allocate destination buffer");
+			return CompressedTextureData("Wrong compression type or Invalid number of channels");
 		}
+		/*
+			Instead of compressing a single texture, convert the texture into a mipmap chain and compress each mipmap separately.
+			This increases quality of mipmap (instead of generating mipmaps from lossy compressed data).
+		*/
+
+		// --- Build a CMP_MipSet from the uncompressed data ---
+		CMP_MipSet mip_set{};
+		
+		if (CMP_CreateMipSet(&mip_set,
+			uncompressed_texture.width,
+			uncompressed_texture.height,
+			1,              // depth (1 for 2D)
+			CF_8bit,        // 8 bits per channel
+			TT_2D) != CMP_OK)
+		{
+			return CompressedTextureData("Failed to create MipMap Set");
+		}
+		mip_set.m_format = input_format;
+		// Copy the base level pixel data into the MipSet
+		CMP_MipLevel* base_level = nullptr;
+		CMP_GetMipLevel(&base_level, &mip_set, 0, 0);
+		if (!base_level) return CompressedTextureData("Failed to create MipMap Set");
+		std::memcpy(base_level->m_pbData,
+			uncompressed_texture.data.data(),
+			uncompressed_texture.data.size());
+
+		// --- Generate full mip chain ---
+		CMP_GenerateMIPLevels(&mip_set, 0); // 0 = generate all levels down to 1x1
+
+		const uint32_t mip_levels = mip_set.m_nMipLevels;
 
 		/*
 			Set compression options.
@@ -225,33 +227,63 @@ namespace
 		options.fquality = 0.88f;   // quality: 0.0 (fastest) – 1.0 (best)
 		options.dwnumThreads = 0;       // 0 = use all available hardware threads
 
-		/*
-			Compress.
-		*/
-		CMP_ERROR cmp_error = CMP_ConvertTexture(&src_texture, &dst_texture, &options, nullptr /*no progress callback*/);
-
-		if (cmp_error != CMP_OK)
+		// --- Compress all mipmaps individually and concatenate into a single array ---//
+		std::vector<std::byte> all_compressed_data;
+		std::vector<std::pair<uint32_t, uint32_t>> mipmaps_width_height{}; //Keep track of each mipmaps dimensions.
+		for (uint32_t mip = 0; mip < mip_levels; ++mip)
 		{
-			free(dst_texture.pData);
-			return CompressedTextureData(std::string("CMP_ConvertTexture failed, error code: ") + std::to_string(static_cast<int>(cmp_error)));
+			//Get mipmap data and dimensions for that level.
+			CMP_MipLevel* mip_level = nullptr;
+			CMP_GetMipLevel(&mip_level, &mip_set, mip, 0);
+			if (!mip_level) return CompressedTextureData("Failed to create MipMap Set");
+			mipmaps_width_height.push_back(std::pair<uint32_t, uint32_t>(mip_level->m_nWidth, mip_level->m_nHeight));
+
+
+			// Pass mipmap data in as src, get compressed mipmap out as dst.
+			CMP_Texture src_texture{};
+			src_texture.dwSize = sizeof(CMP_Texture);
+			src_texture.dwWidth = mip_level->m_nWidth;
+			src_texture.dwHeight = mip_level->m_nHeight;
+			src_texture.dwPitch = mip_level->m_nWidth * uncompressed_texture.channels; //Size of row.
+			src_texture.format = input_format;
+			src_texture.dwDataSize = mip_level->m_dwLinearSize;
+			src_texture.pData = mip_level->m_pbData;
+
+			CMP_Texture dst_texture{};
+			dst_texture.dwSize = sizeof(CMP_Texture);
+			//Follow src dimensions
+			dst_texture.dwWidth = mip_level->m_nWidth;
+			dst_texture.dwHeight = mip_level->m_nHeight;
+			//Let compressonator set the pitch.
+			dst_texture.format = output_format;
+			dst_texture.dwDataSize = CMP_CalculateBufferSize(&dst_texture);
+			std::vector<std::byte> dst_data( dst_texture.dwDataSize ); //RAII free of dst.
+			dst_texture.pData = reinterpret_cast<CMP_BYTE*>(dst_data.data());
+
+
+			//Error checking
+			CMP_ERROR cmp_err = CMP_ConvertTexture(&src_texture, &dst_texture, &options, nullptr);
+			if (cmp_err != CMP_OK)
+			{
+				CMP_FreeMipSet(&mip_set);
+				return CompressedTextureData("CMP_ConvertTexture failed at mip level "
+					+ std::to_string(mip) + " (error " + std::to_string(cmp_err) + ")");
+			}
+
+			//Add compressed mipmap to the data array.
+			all_compressed_data.insert(all_compressed_data.end(),
+				dst_data.begin(), dst_data.end());
 		}
 
-		/*
-			Move compressed bytes into the result object and free the CMP buffer.
-		*/
-		std::vector<std::byte> compressed_bytes(
-			reinterpret_cast<std::byte*>(dst_texture.pData),
-			reinterpret_cast<std::byte*>(dst_texture.pData) + dst_texture.dwDataSize);
-
-		free(dst_texture.pData);
+		CMP_FreeMipSet(&mip_set);
 
 		return CompressedTextureData(
-			uncompressed_texture.width, uncompressed_texture.height, 
-			0, //Temporary.
-			output_format, 
-			uncompressed_texture.is_srgb, 
-			uncompressed_texture.channels, 
-			std::move(compressed_bytes)
+			std::move(mipmaps_width_height),
+			mip_levels,
+			output_format,
+			uncompressed_texture.is_srgb,
+			static_cast<short>(uncompressed_texture.channels),
+			std::move(all_compressed_data)
 		);
 	}
 #endif
@@ -261,6 +293,10 @@ namespace
 
 std::optional<std::string> Scene::CompressAndWriteTexture(const std::filesystem::path& src_path, bool compress_BCx, bool compress_ETC2)
 {
+	UNREFERENCED_PARAMETER(src_path);
+	UNREFERENCED_PARAMETER(compress_BCx);
+	UNREFERENCED_PARAMETER(compress_ETC2);
+	return std::optional<std::string>();
 	/*
 		Compress into BC and ETC2 before writing both files to same directory as src (with different extensions).
 		Do checks for srgb ("Albedo")
@@ -407,8 +443,7 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 	else
 	{
 
-#ifdef PLATFORM_ANDROID
-
+//#ifdef PLATFORM_ANDROID
 		int width, height, bytesPerPix;
 		stbi_set_flip_vertically_on_load(true);
 
@@ -483,11 +518,10 @@ GLuint setupTexture(const char* filename, bool isSRGB = true)
 
 		return texID;
 
-#elif defined(PLATFORM_WINDOWS)
+//#elif defined(PLATFORM_WINDOWS)
 
 		//TODO: Compress texture.
-#endif
-		return texID;
+//#endif
 	}
 }
 
