@@ -226,6 +226,19 @@ namespace EngineFramework
             );
 
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+            //glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
+
+            //// This single line does both:
+            //// 1. Abandons the old memory (bypassing the GPU stall)
+            //// 2. Uploads the entire CPU vector into the new memory block
+            //glBufferData(
+            //    GL_SHADER_STORAGE_BUFFER,
+            //    m_globalInstanceData.size() * sizeof(InstanceData),
+            //    m_globalInstanceData.data(),
+            //    GL_DYNAMIC_DRAW
+            //);
+
+            //glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         }
 
         // --- 3. RESET INDIRECT COMMANDS (Instance Counts -> 0) ---

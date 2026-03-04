@@ -298,7 +298,7 @@ namespace EngineFramework
         // 1. Update point light SSBO
         UpdateLightSSBO();
 
-		// Preprocessing (around 5ms)
+		// Preprocessing (around 0.8ms) to implement ring buffers to reduce stalls + fix instance count buffer orphaning
         m_instancingSystem->UpdateAndDispatchCompute(viewProj, m_cascadeViewProjMatrices, m_spotLightViewProjMatrices);
 
         // 2. Shadow pass (directional + point) (around 1 to 2ms)
@@ -336,9 +336,10 @@ namespace EngineFramework
 
         // 1. COLLECT (Iterate once)
         // We separate them immediately so we don't need to sort later.
-        std::vector<entt::entity> pointEntities;
-        std::vector<entt::entity> spotEntities;
-
+		static std::vector<entt::entity> pointEntities; // prevent reallocation every frame
+        static std::vector<entt::entity> spotEntities;
+		pointEntities.clear();
+		spotEntities.clear();
         auto EulerToDirection = [](const glm::vec3& eulerDegrees) {
             float pitch = glm::radians(eulerDegrees.x);
             float yaw = glm::radians(eulerDegrees.y);
@@ -531,6 +532,9 @@ namespace EngineFramework
 
         glCullFace(GL_BACK);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // Unbind
+        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind framebuffer
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
     }
@@ -755,8 +759,10 @@ namespace EngineFramework
 
         glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // unbind indirect buffer
+        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind framebuffer
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
 
