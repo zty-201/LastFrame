@@ -18,7 +18,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "Profiler.hpp"
 #include "Diagnostics/ProfilerEngine.hpp" // Engine side profiler
+#include "System_LevelEditor.hpp"
 #include <algorithm>
+#include <initializer_list>
 #include <imgui.h>
 
 // Generic getter for ImGui::PlotLines using any []-indexable container
@@ -114,7 +116,25 @@ namespace EngineFramework {
         //std::vector<std::pair<std::string, Diagnostics::Section>> rows(P.Sections().begin(), P.Sections().end());
         //std::sort(rows.begin(), rows.end(), [](auto& a, auto& b) {return a.second.ms > b.second.ms; });
 
-        const auto& secs = P.Sections();
+		auto secs = P.Sections(); // copy so we can inject editor-only timings
+		const auto& level_editor_profile = LevelEditorSystem::GetProfilingData();
+
+        auto integrate_editor_sample = [&](const char* label, const LevelEditorSystem::ProfilerSectionSample& sample) {
+            if (!sample.valid) {
+                return;
+            }
+            if (secs.find(label) != secs.end()) {
+                return;
+            }
+
+            Diagnostics::Section synthetic;
+            synthetic.ms = sample.ms;
+            synthetic.calls = sample.calls;
+            secs.emplace(label, synthetic);
+        };
+
+		integrate_editor_sample("Sys::LevelEditorSystem::Update", level_editor_profile.update);
+
         // Make sure every visible label has a deterministic position
         for (const auto& kv : secs) {
             EnsureLabelInOrder(kv.first);
@@ -302,5 +322,3 @@ namespace EngineFramework {
     }
 } // namespace EngineFramework
 #endif
-
-

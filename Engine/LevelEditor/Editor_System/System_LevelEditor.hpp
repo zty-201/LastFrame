@@ -46,6 +46,18 @@ namespace EngineFramework
 	public:
 
 		static bool Get_Enable();
+		
+		struct ProfilerSectionSample {
+			double ms = 0.0;
+			int calls = 0;
+			bool valid = false;
+		};
+
+		struct ProfilingData {
+			ProfilerSectionSample update;
+		};
+
+		static const ProfilingData& GetProfilingData();
 
 	};
 
