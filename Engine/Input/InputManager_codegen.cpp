@@ -12,5 +12,6 @@ namespace EngineFramework
 		key_mapping[Key_Actions::MOVE_RIGHT] = 68;
 		key_mapping[Key_Actions::OPEN_EDITOR] = 57;
 		key_mapping[Key_Actions::PAUSE] = 256;
+		key_mapping[Key_Actions::SPRINT] = 340;
 	}
 }

@@ -3,6 +3,7 @@
 -- ============================================================
 
 local moveSpeed = 100.0
+local sprintMultiplier = 1.5
 local jumpForce = 8.0
 local deadZone = 0.1
 
@@ -152,6 +153,17 @@ function on_update(self, dt)
     local len = math.sqrt(moveX * moveX + moveZ * moveZ)
 
     -- ========================================================
+    -- SPRINT (held) - mapped in editor as action "SPRINT"
+    -- ========================================================
+    local sprintHeld = false
+    if Input and Input.GetAction then
+        sprintHeld = Input.GetAction("SPRINT") == true
+    end
+
+    local isSprinting = sprintHeld and (len > deadZone)
+    local speedMul = isSprinting and sprintMultiplier or 1.0
+
+    -- ========================================================
     -- MOVEMENT
     -- ========================================================
     if len > deadZone then
@@ -170,7 +182,7 @@ function on_update(self, dt)
         local finalZ = (rightZ * moveX) + (forwardZ * moveZ)
 
         if type(Character_SetVelocity) == "function" then
-            Character_SetVelocity(EntityID, finalX * moveSpeed, 0, finalZ * moveSpeed)
+            Character_SetVelocity(EntityID, finalX * moveSpeed * speedMul, 0, finalZ * moveSpeed * speedMul)
         end
     else
         if type(Character_SetVelocity) == "function" then
@@ -223,6 +235,10 @@ function on_update(self, dt)
     if t < 0.0 then t = 0.0 end
 
     local interval = footstepIntervalMax + (footstepIntervalMin - footstepIntervalMax) * t
+
+    -- Sprinting => quicker footsteps
+    interval = interval / speedMul
+    if interval < 0.15 then interval = 0.15 end
 
     footstepTimer = (footstepTimer or 0.0) + dt
     if footstepTimer >= interval then
