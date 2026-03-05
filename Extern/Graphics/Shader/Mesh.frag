@@ -222,32 +222,30 @@ float visibility(vec3 p)
     vec4 view_pos = view * vec4(p, 1.0);
     float depth = abs(view_pos.z);
     
-    // Select cascade
-    int cascade = 3;
+    // Select cascade. Default to 2 (the last valid cascade) instead of 3.
+    int cascade = 2; 
     if (depth < cascade_splits.x) cascade = 0;
     else if (depth < cascade_splits.y) cascade = 1;
-    else if (depth < cascade_splits.z) cascade = 2;
     
     // Sample primary cascade
     float shadow = visibility_cascade(p, cascade);
-    
-    // Blend cascades
+
+    // Blend cascades (only blend if we aren't on the last cascade)
     float blend = getCascadeBlend(depth, cascade);
-    if (blend > 0.0 && cascade < 3) {
+    if (blend > 0.0 && cascade < 2) { 
         float shadow2 = visibility_cascade(p, cascade + 1);
         shadow = mix(shadow, shadow2, blend);
     }
 
-    // Fade out shadows at the max shadow distance
-    float maxShadowDist = cascade_splits.w;
+    // Fix: Use .z as the max distance, because C++ passed 0.0 to .w
+    float maxShadowDist = cascade_splits.z; 
     float fadeStart = maxShadowDist * 0.9;
-    float distBlend = smoothstep(maxShadowDist, fadeStart, depth); // 1.0 close, 0.0 at max dist
     
-    // If beyond max distance, return 0.0 (fully dark) to match out-of-bounds logic,
-    // or we can clamp it to the last known shadow value.
-    // Standard approach: Fade to 0.0 (dark) implies no shadow caster logic known.
-
-    return mix(0.0, shadow, distBlend);
+    // Fix: smoothstep requires edge0 < edge1
+    float fade = smoothstep(fadeStart, maxShadowDist, depth);
+    
+    // Fix: Fade to 1.0 (fully lit) in the distance, not 0.0 (dark)
+    return mix(shadow, 1.0, fade); 
 }
 
 // ------------------------------------------------------------------

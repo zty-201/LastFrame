@@ -765,6 +765,7 @@ namespace EngineFramework
 			AssignArchtypeToInstance(duplicated_entity, archtype_entry->second);
 		}
 
+		GraphicsSystem::GetInstance().GetInstancingSystem()->BuildSceneBatches();
 		return duplicated_entity;
 	}
 

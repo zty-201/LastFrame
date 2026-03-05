@@ -655,7 +655,8 @@ namespace EngineFramework
 
         shader->disuse();
         glCullFace(GL_BACK);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
     }
 
@@ -1516,7 +1517,14 @@ namespace EngineFramework
         if (!dirLightTransform) return;
 
         CalculateCascadeSplits(camera.nearPlane, camera.farPlane);
-        glm::vec3 lightDir = dirLightTransform->rotation;
+        float pitch = glm::radians(dirLightTransform->rotation.x);
+        float yaw = glm::radians(dirLightTransform->rotation.y);
+
+        glm::vec3 lightDir;
+        lightDir.x = cos(pitch) * sin(yaw);
+        lightDir.y = -sin(pitch);
+        lightDir.z = cos(pitch) * cos(yaw);
+        lightDir = glm::normalize(lightDir);
         glm::vec3 up = glm::abs(lightDir.y) > 0.999f ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
         glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f), lightDir, up);
 
