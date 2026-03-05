@@ -381,6 +381,9 @@ namespace EngineFramework
 
 				selection_state.SetEntitySelection(duplicated_entity);
 				selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+
+				GraphicsSystem::GetInstance().GetInstancingSystem()->BuildSceneBatches();
+
 				return duplicated_entity;
 			};
 
@@ -412,6 +415,7 @@ namespace EngineFramework
 					selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
 				}
 
+				GraphicsSystem::GetInstance().GetInstancingSystem()->BuildSceneBatches();
 				return true;
 			};
 

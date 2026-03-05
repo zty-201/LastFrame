@@ -114,8 +114,10 @@ float sample_shadow_map(vec2 coord, float u, float v, float z, int cascade, floa
 {
     vec2 uv = coord + vec2(u, v) * inv_shadow_map_size;
     
-    // Scale bias per cascade
-    float bias = bias_near_far_pow.x * (1.0 + float(cascade) * 0.5);
+    // Decrease the bias for larger cascades because their Z-range is massive.
+    // Using powers of 2 (1.0, 2.0, 4.0) roughly matches frustum volume growth.
+    float cascade_scale = pow(2.0, float(cascade)); 
+    float bias = bias_near_far_pow.x / cascade_scale;
     
     return texture(s_CascadeShadowMaps, vec4(uv, float(cascade), z - bias));
 }

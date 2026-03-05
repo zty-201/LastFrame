@@ -493,6 +493,9 @@ namespace EngineFramework
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
 
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.0f, 1.0f); // Hardware slope-scaled depth bias
+
         // Bind our Indirect Commands buffer globally for this pass
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_instancingSystem->GetInstanceSSBO()); // Required for ShadowMap.vert instances[]
@@ -530,6 +533,7 @@ namespace EngineFramework
             }
         }
 
+        glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // Unbind
         const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
