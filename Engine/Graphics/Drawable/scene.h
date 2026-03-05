@@ -60,8 +60,8 @@
 #define DISABLE     false
 
 // Functions for loading textures
-GLuint setupTexture(const char* filename);
-GLuint setupHdrCubeMap(const std::array<std::string, 6>&);
+[[nodiscard]] GLuint setupTexture(const char* filename, bool isSRGB = true);
+[[nodiscard]] GLuint setupHdrCubeMap(const std::array<std::string, 6>&);
 
 //
 // The main Scene class encapsulates rendering passes, objects, textures, and cameras
@@ -106,12 +106,12 @@ struct Scene
     };
 #ifdef PLATFORM_WINDOWS
     /*
-        Takes the texture file and compresses it, before writing back as file with an added suffix into the same directory.
+        Takes the texture file and compresses it, before writing back as file(s) with appropriate extension into the same directory.
+        Does not modify original file.
         \param src_path The original uncompressed texture file
-        \param bc_suffix and etc2_suffix 
-        The suffix to apply onto the compressed texture file for that texture type.
-        Keep empty if that texture type shouldn't be written.
-        Must have at least one non-empty suffix.
+        \param compress_X
+        Whether compressed file of type X should be generated and written.
+        At least one should be true.
         \return Returns an error string if unsuccessful.
     */
     static [[nodiscard]] std::optional<std::string> CompressAndWriteTexture(const std::filesystem::path& src_path, bool compress_BCx, bool compress_ETC2);

@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
 
 // Setup GLSurfaceView
             glSurfaceView = binding.glSurfaceView;
+            //Note: <uses feature> in manifest does not guarantee 3.2 support for sideloaded apk like emulators.
             glSurfaceView.setEGLContextClientVersion(3); // OpenGL ES 3.X, uses highest version.
             glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
             glSurfaceView.setRenderer(this);

@@ -22,6 +22,9 @@
 #define MAX_SHADOW_CASTING_SPOTLIGHTS 32
 #define MAX_SHADOW_CASTING_POINT_LIGHTS 16
 
+#ifdef PLATFORM_WINDOWS
+#include "compressonator.h"
+#endif
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
 class LevelEditor; // forward declaration
@@ -77,6 +80,10 @@ namespace EngineFramework
         // Listen for events
         event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&GraphicsSystem::HANDLE_EVENT_LevelEditorToggled>(this);
         event_dispatcher.sink<Event_Window_Resized>().connect<&GraphicsSystem::HANDLE_EVENT_WindowResized>(this);
+
+#ifdef PLATFORM_WINDOWS
+        CMP_InitFramework(); //Initialize compressonator framework.
+#endif
     }
 
     void GraphicsSystem::SetupGLFW()
