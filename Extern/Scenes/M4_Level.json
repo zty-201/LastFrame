@@ -85255,6 +85255,54 @@
 			]
 		}
 	},
+	"818": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"constant": 1.0,
+			"innerConeAngle": 15.0,
+			"intensity": 0.0,
+			"isStatic": false,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"quadratic": 0.03200000151991844,
+			"radius": 500.0,
+			"type": 2
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 15968805962367582209
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayerFlashlight"
+		},
+		"TransformComponent": {
+			"position": [
+				-461.9490051269531,
+				316.9678649902344,
+				-505.62554931640625
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
 	"82": {
 		"ColliderComponent": {
 			"maxBounds": [

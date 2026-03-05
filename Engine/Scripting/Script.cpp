@@ -475,18 +475,6 @@ namespace Engine {
         // Light Component bindings
         // ===============================================================
         s_Lua.new_usertype<LightComponent>("LightComponent",
-            //"GetPosition", [](LightComponent& light) {
-            //    return std::make_tuple(light.position.x, light.position.y, light.position.z);
-            //},
-            //"SetPosition", [](LightComponent& light, float x, float y, float z) {
-            //    light.position = glm::vec3(x, y, z);
-            //},
-            //"GetDirection", [](LightComponent& light) {
-            //    return std::make_tuple(light.direction.x, light.direction.y, light.direction.z);
-            //},
-            //"SetDirection", [](LightComponent& light, float x, float y, float z) {
-            //    light.direction = glm::normalize(glm::vec3(x, y, z));
-            //},
             "GetIntensity", [](LightComponent& light) {
                 return light.intensity;
             },
@@ -947,6 +935,17 @@ namespace Engine {
                 return &s_RuntimeRegistry->get<AudioComponent>(e);
             });
 
+        queryTable.set_function("GetLight", [](uint32_t entityId) -> LightComponent* {
+            if (!s_RuntimeRegistry) return nullptr;
+
+            entt::entity e = static_cast<entt::entity>(entityId);
+            if (!s_RuntimeRegistry->valid(e)) return nullptr;
+
+            if (!s_RuntimeRegistry->all_of<LightComponent>(e)) return nullptr;
+
+            return &s_RuntimeRegistry->get<LightComponent>(e);
+            });
+
 
         // Audio Bindings
         sol::table audioTable = s_Lua.create_named_table("Audio");
@@ -1141,6 +1140,26 @@ namespace Engine {
                 return &view.get<CameraComponent>(view.front());
             }
             return nullptr;
+            });
+
+        s_Lua.set_function("GetPlayerFlashlightID", []() -> sol::optional<uint32_t> {
+            auto view = registry.view<Engine::LuaScriptComponent, LightComponent>();
+
+            for (auto [e, lsc, light] : view.each()) {
+                for (auto& inst : lsc.Scripts) {
+                    if (inst.ScriptGuid.m_Value == 0) continue;
+
+                    auto full_guid = xresource::full_guid(
+                        inst.ScriptGuid,
+                        EngineFramework::AssetManagerSystem::SCRIPT_GUID
+                    );
+
+                    if (EngineFramework::AssetManagerSystem::GetName(full_guid) == "flashlight_controller") {
+                        return static_cast<uint32_t>(e); // Return the raw Entity ID!
+                    }
+                }
+            }
+            return sol::nullopt; // Returns 'nil' in Lua
             });
 
         s_Lua.set_function("GetEntityTransform", [](entt::entity e) -> TransformComponent* {

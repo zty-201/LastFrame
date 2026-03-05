@@ -8,108 +8,62 @@
 -- Attach this to the same entity as player_pov_camera.
 -- ============================================================
 
+-- ============================================================
+-- flashlight_controller.lua
+-- Attach this directly to your separate Flashlight Entity!
+-- ============================================================
+
 local camera = nil
-local range   = 8.0
-local fovDeg  = 40.0
-local isOn    = false
-local transform = nil
-local light     = nil
+local isOn = false
 local baseIntensity = 10000.0
 
--- Remember previous F state so we can detect a press
-local prevFDown = false
-
+-- Helper to safely get the SHARED table (used to grab player Yaw/Pitch)
 local function getGlobalShared()
     return rawget(_G, "SHARED")
 end
 
-local function ensureSharedFlashlight()
-    local SHARED = getGlobalShared()
-    if not SHARED then return nil end
-    SHARED.FLASHLIGHT = SHARED.FLASHLIGHT or {}
-    return SHARED.FLASHLIGHT
-end
-
 function on_create(self)
     camera = GetMainCamera()
-    transform = EntityTransform
-    light     = EntityLight
 
-    print("[flashlight_controller] on_create, transform=", transform, " light=", light)
-
-    if not camera then
-        print("[flashlight_controller] ERROR: no camera")
-        return
-    end
-
-    local FL = ensureSharedFlashlight()
-    if FL then
-        FL.isOn       = isOn
-        FL.range      = range
-        FL.cosHalfFov = math.cos(math.rad(fovDeg * 0.5))
-        FL.posX, FL.posY, FL.posZ = camera:GetPosition()
-        FL.fx, FL.fy, FL.fz       = 0.0, 0.0, 1.0
-    end
-
-    -- sync Lua state with actual light state
-    if light then
-        -- remember whatever you set in the inspector as the "ON" value
-        if light.GetIntensity then
-            local current = light:GetIntensity()
-            if current and current > 0.0 then
-                baseIntensity = current
-            end
+    if EntityLight then
+        -- Store the intensity you set in the editor Inspector
+        local current = EntityLight:GetIntensity()
+        if current > 0.0 then
+            baseIntensity = current
         end
 
-        -- start flashlight OFF
-        light:SetIntensity(10000.0)
-        isOn = true
-        if FL then FL.isOn = true end
+        -- Start the flashlight OFF
+        EntityLight:SetIntensity(0.0)
+        isOn = false
     end
 end
 
--- This is what we’ll call from C++ / UI
 function Flashlight_Toggle()
-    local FL = ensureSharedFlashlight()
-    if not FL then return end
-
     isOn = not isOn
-    FL.isOn = isOn
 
-    print("[flashlight_controller] Toggled flashlight, isOn=", isOn)
-
-    if light then
+    -- Toggle the Light Component
+    if EntityLight then
         if isOn then
-            light:SetIntensity(baseIntensity)
+            EntityLight:SetIntensity(baseIntensity)
         else
-            light:SetIntensity(0.0)
+            EntityLight:SetIntensity(0.0)
         end
     end
 
-    -------------------------------------------------
-    -- PLAY FLASHLIGHT TOGGLE SOUND
-    -------------------------------------------------
+    -- Play the toggle sound using the new Audio API
     if type(Audio_PlaySlot) == "function" then
-        
-        -- Force retrigger in case player spams toggle
         Audio_StopSlot(EntityID, "Flashlight")
         Audio_PlaySlot(EntityID, "Flashlight")
-
-        print("[FLASHLIGHT AUDIO] Played slot 'Flashlight'")
-    else
-        print("[FLASHLIGHT AUDIO ERROR] Audio_PlaySlot missing!")
     end
 end
 
 function on_update(self, dt)
-    if not camera then return end
-    local FL = ensureSharedFlashlight()
-    if not FL then return end
+    if not camera or not EntityTransform then return end
 
+    -- 1. Get Base Camera Position
     local cx, cy, cz = camera:GetPosition()
-    FL.posX, FL.posY, FL.posZ = cx, cy, cz
 
-    -- Read yaw/pitch from your POV script if you store them there
+    -- 2. Grab Yaw & Pitch from your Player POV script
     local SHARED = getGlobalShared()
     local yaw, pitch = 0.0, 0.0
     if SHARED and SHARED.POV then
@@ -117,68 +71,40 @@ function on_update(self, dt)
         pitch = SHARED.POV.pitch or 0.0
     end
 
+    -- 3. Set Rotation (Match the player's looking angle)
+    EntityTransform:SetRotation(-pitch, yaw, 0.0)
+
+    -- 4. Calculate Forward & Right vectors for offset
     local radYaw   = math.rad(yaw)
     local radPitch = math.rad(pitch)
     local cosPitch = math.cos(radPitch)
 
-    -- Camera forward vector
     local fx = cosPitch * math.sin(radYaw)
-    local fy = math.sin(radPitch)
+    local fy = -math.sin(radPitch) 
     local fz = cosPitch * math.cos(radYaw)
 
-    -- Use the SAME forward for flashlight
-    local dirX = fx
-    local dirY = fy
-    local dirZ = fz
+    local rx = math.cos(radYaw)
+    local rz = -math.sin(radYaw)
 
-    -- Store this as the cone's forward vector too (icons will use this)
-    FL.fx, FL.fy, FL.fz = dirX, dirY, dirZ
+    -- 5. Apply Realistic Positional Offsets
+    local forwardOffset = 50.0   -- 0.5 units in front of the camera
+    local rightOffset   = 5.0   -- 0.3 units to the right (held in right hand)
+    local upOffset      = -0.2  -- Slightly below eye-level
 
-    if transform and light then
-        -- 1) move light to player
-        local px, py, pz = transform:GetPosition()
+    local lx = cx + (fx * forwardOffset) + (rx * rightOffset)
+    local ly = cy + (fy * forwardOffset) + upOffset
+    local lz = cz + (fz * forwardOffset) + (rz * rightOffset)
 
-        -- Give it a slight offset in front + up (tweak these)
-        local forwardOffset = 2.0
-        local upOffset      = 0
+    EntityTransform:SetPosition(lx, ly, lz)
 
-        local lx = px + dirX * forwardOffset
-        local ly = py + upOffset
-        local lz = pz + dirZ * forwardOffset
-
-        light:SetPosition(lx, ly, lz)
-
-        -- 2) aim the light forward into the world
-        light:SetDirection(dirX, dirY, dirZ)
+    -- 6. Keyboard Toggle (Press F to toggle)
+    if PLATFORM == "windows" and Input.GetKeyDown(GLFW_KEY_F) then
+        Flashlight_Toggle()
     end
-
-    -- =========================================
-    -- Keyboard toggle + AUDIO PLAY
-    -- =========================================
-    if PLATFORM == "windows" then
-        if Input.GetKeyDown(GLFW_KEY_Q) then
-            print("[FLASH] Q pressed")
-
-            -- 1) toggle flashlight
-            Flashlight_Toggle()
-
-            -- 2) play audio ONCE (NO LOOP)
-            if EntityAudio then
-                EntityAudio:SetLoop(false)
-                EntityAudio:RequestPlay()
-                print("[FLASH] Played toggle sound")
-            else
-                print("[FLASH] NO AUDIO COMPONENT FOUND!")
-            end
-        end
-    end
-
-
-    -- =========================================
-    -- UI toggle request (from ui_flashlight.lua)
-    -- =========================================
-    if FL.requestToggle then
-        FL.requestToggle = false
+    
+    -- 7. UI Toggle hook
+    if SHARED and SHARED.FLASHLIGHT and SHARED.FLASHLIGHT.requestToggle then
+        SHARED.FLASHLIGHT.requestToggle = false
         Flashlight_Toggle()
     end
 end
