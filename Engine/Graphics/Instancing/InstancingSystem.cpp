@@ -38,6 +38,7 @@ namespace EngineFramework
         // Reserve memory to prevent CPU reallocations during gathering
         m_globalInstanceData.reserve(m_maxTotalInstances);
         m_indirectCommands.reserve(1000);
+
         LOGI("InstancingSystem initialized with capacity for %zu instances.", m_maxTotalInstances);
     }
 
@@ -175,6 +176,22 @@ namespace EngineFramework
     }
 
     void InstancingSystem::UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj, const std::vector<glm::mat4>& spotProj) {
+
+        // --- 1. HANDLE DIRTY BATCHES (From Level Editor UI) ---
+        if (m_needsBatchRebuild) {
+            BuildSceneBatches();
+            m_needsBatchRebuild = false;
+            m_pendingCreations.clear(); // Building batches catches everything, clear the queue!
+        }
+
+        // --- 2. HANDLE DEFERRED CREATIONS (From Duplicate/Spawn) ---
+        if (!m_pendingCreations.empty()) {
+            for (entt::entity newEntity : m_pendingCreations) {
+                ProcessNewInstance(newEntity);
+            }
+            m_pendingCreations.clear();
+        }
+
         if (m_globalInstanceData.empty()) return;
 
         // --- 1. PROCESS ONLY DIRTY ENTITIES ---
@@ -311,5 +328,164 @@ namespace EngineFramework
         glm::mat4 model = T * R * S;
         modelMatrix = model;
         //transform.prevModelMatrix = modelMatrix; // Store the initial model matrix as the previous one
+    }
+
+    void InstancingSystem::SetDynamicUpdatesEnabled(bool enabled)
+    {
+        if (enabled == m_isListening) return;
+
+        if (enabled) {
+            // All reactions changed to bathc breaking change for now, implement optimization later
+            // 1. Listen for Creations / Deletions
+            registry.on_construct<MeshComponent>().connect<&InstancingSystem::OnBatchBreakingChange>(this);
+            registry.on_destroy<MeshComponent>().connect<&InstancingSystem::OnBatchBreakingChange>(this);
+
+            // 2. Listen for Batch-Breaking Modifications (The fix for your UI editor bug)
+            registry.on_update<MaterialComponent>().connect<&InstancingSystem::OnBatchBreakingChange>(this);
+            registry.on_update<MeshComponent>().connect<&InstancingSystem::OnBatchBreakingChange>(this);
+            registry.on_update<AnimationComponent>().connect<&InstancingSystem::OnBatchBreakingChange>(this);
+
+            m_isListening = true;
+        }
+        else {
+            // Disconnect everything
+            registry.on_construct<MeshComponent>().disconnect<&InstancingSystem::OnBatchBreakingChange>(this);
+            registry.on_destroy<MeshComponent>().disconnect<&InstancingSystem::OnBatchBreakingChange>(this);
+
+            registry.on_update<MaterialComponent>().disconnect<&InstancingSystem::OnBatchBreakingChange>(this);
+            registry.on_update<MeshComponent>().disconnect<&InstancingSystem::OnBatchBreakingChange>(this);
+            registry.on_update<AnimationComponent>().disconnect<&InstancingSystem::OnBatchBreakingChange>(this);
+
+            // Clear pending states
+            m_pendingCreations.clear();
+            m_needsBatchRebuild = false;
+            m_isListening = false;
+        }
+    }
+
+    void InstancingSystem::OnBatchBreakingChange(entt::registry& reg, entt::entity entity)
+    {
+        UNREFERENCED_PARAMETER(reg);
+        UNREFERENCED_PARAMETER(entity);
+        m_needsBatchRebuild = true;
+    }
+
+    void InstancingSystem::OnMeshAdded(entt::registry& reg, entt::entity entity)
+    {
+        UNREFERENCED_PARAMETER(reg);
+        // Defer the processing to avoid the ECS initialization crash!
+        m_pendingCreations.push_back(entity);
+		LOGI("MeshComponent added to Entity %u, deferring batch processing.", static_cast<uint32_t>(entity));
+    }
+
+    void InstancingSystem::OnMeshRemoved(entt::registry& reg, entt::entity entity)
+    {
+        auto* meta = reg.try_get<InstanceMetadata>(entity);
+        if (!meta) return;
+
+        for (uint32_t idx : meta->ssboIndices) {
+            // 1. Mark as Tombstone so the Compute Shader skips it
+            m_globalInstanceData[idx].batchID = INVALID_BATCH;
+
+            // 2. Add to free list for future use
+            m_freeSSBOIndices.push_back(idx);
+
+            // 3. Upload the tombstone to the GPU immediately (Just 80 bytes!)
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
+            glBufferSubData(GL_SHADER_STORAGE_BUFFER, idx * sizeof(InstanceData), sizeof(InstanceData), &m_globalInstanceData[idx]);
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+        }
+		LOGI("MeshComponent removed from Entity %u, marked %zu instances for deletion.", static_cast<uint32_t>(entity), meta->ssboIndices.size());
+    }
+
+    void InstancingSystem::ProcessNewInstance(entt::entity entity)
+    {
+        auto* meshComp = registry.try_get<MeshComponent>(entity);
+        auto* transformComp = registry.try_get<TransformComponent>(entity);
+
+        if (!meshComp || !transformComp || meshComp->meshName == "SkyBox" || !meshComp->visibility) return;
+
+        // We don't batch animated entities in the SSBO the same way
+        if (registry.any_of<AnimationComponent>(entity)) {
+            m_animatedEntities.push_back(entity);
+            return;
+        }
+
+        xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp->meshName);
+        auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
+        if (!meshData || meshData->vao == 0) return;
+
+        const MaterialComponent* overrideMat = registry.try_get<MaterialComponent>(entity);
+        auto& meta = registry.get_or_emplace<InstanceMetadata>(entity);
+
+        for (size_t i = 0; i < meshData->subMeshes.size(); i++) {
+            const auto& subMesh = meshData->subMeshes[i];
+            if (subMesh.materialIndex < 0 || subMesh.materialIndex >= meshData->materials.size()) continue;
+
+            const MaterialComponent& mat = overrideMat ? *overrideMat : meshData->materials[subMesh.materialIndex];
+
+            // 1. Construct the Fingerprint
+            BatchKey key;
+            key.meshName = meshComp->meshName;
+            key.subMeshIndex = static_cast<int>(i);
+            key.albedoMap = mat.albedoMap;
+            key.normalMap = mat.normalMap;
+            key.roughnessMap = mat.roughnessMap;
+            key.metallicMap = mat.metallicMap;
+            key.albedoFactor = mat.albedoFactor;
+            key.roughnessFactor = mat.roughnessFactor;
+            key.metallicFactor = mat.metallicFactor;
+            key.uvTiling = mat.uvTiling;
+            key.uvOffset = mat.uvOffset;
+
+            // 2. Find the existing batch
+            int targetBatchID = -1;
+            uint32_t targetInstanceOffset = 0;
+            for (size_t b = 0; b < m_activeBatches.size(); b++) {
+                if (!(m_activeBatches[b].key < key) && !(key < m_activeBatches[b].key)) { // Key equality check
+                    targetBatchID = static_cast<int>(b);
+                    targetInstanceOffset = static_cast<uint32_t>(m_activeBatches[b].instanceOffset);
+                    m_activeBatches[b].instanceCount++; // Increment CPU count
+                    break;
+                }
+            }
+
+            // 3. Fallback: If this is a brand new mesh/material combo never seen before
+            if (targetBatchID == -1) {
+                BuildSceneBatches();
+                return; // BuildSceneBatches handles everything, so we can just exit.
+            }
+
+            // 4. Create the new Data
+            glm::vec3 localMin = glm::vec3(meshComp->localMin[0], meshComp->localMin[1], meshComp->localMin[2]);
+            glm::vec3 localMax = glm::vec3(meshComp->localMax[0], meshComp->localMax[1], meshComp->localMax[2]);
+            glm::vec3 localCenter = (localMin + localMax) * 0.5f;
+            float localRadius = glm::length(localMax - localMin) * 0.5f;
+
+            InstanceData data;
+            data.batchID = targetBatchID;
+            data.instanceOffset = targetInstanceOffset;
+            CalculateModelMatrix(*transformComp, data.modelMatrix);
+            data.boundingSphere = glm::vec4(localCenter, localRadius);
+
+            // 5. Find a memory slot (Free List or Append)
+            uint32_t targetIdx = 0;
+            if (!m_freeSSBOIndices.empty()) {
+                targetIdx = m_freeSSBOIndices.back();
+                m_freeSSBOIndices.pop_back();
+                m_globalInstanceData[targetIdx] = data;
+            }
+            else {
+                targetIdx = static_cast<uint32_t>(m_globalInstanceData.size());
+                m_globalInstanceData.push_back(data);
+            }
+
+            meta.ssboIndices.push_back(targetIdx);
+
+            // 6. Upload ONLY the new data to the GPU (80 bytes!)
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
+            glBufferSubData(GL_SHADER_STORAGE_BUFFER, targetIdx * sizeof(InstanceData), sizeof(InstanceData), &m_globalInstanceData[targetIdx]);
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+        }
     }
 }

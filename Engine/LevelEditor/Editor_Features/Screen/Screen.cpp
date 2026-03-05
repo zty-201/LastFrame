@@ -160,7 +160,11 @@ namespace EngineFramework
             }
 
             std::unique_ptr<Record> record = history_system ? history_system->start_track(entity, "MaterialComponent", "albedoMap") : nullptr;
-            registry.get<MaterialComponent>(entity).albedoMap = texture_guid;
+
+            registry.patch<MaterialComponent>(entity, [&](auto& mat) {
+                mat.albedoMap = texture_guid;
+                });
+
             if (history_system) {
                 history_system->end_track(record, entt::meta_any{ texture_guid });
             }
