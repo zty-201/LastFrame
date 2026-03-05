@@ -129,13 +129,13 @@
 		"LightComponent": {
 			"castShadows": true,
 			"color": [
-				1.0,
-				0.9200000166893005,
-				0.8500000238418579
+				0.5490196347236633,
+				0.0784313753247261,
+				0.03921568766236305
 			],
 			"constant": 0.0,
 			"innerConeAngle": 12.5,
-			"intensity": 0.0,
+			"intensity": 15.0,
 			"isStatic": true,
 			"linear": 0.0,
 			"outerConeAngle": 17.5,
@@ -153,9 +153,9 @@
 				50.0
 			],
 			"rotation": [
-				0.0560000017285347,
-				-0.8809999823570251,
-				-0.10000000149011612
+				180.0,
+				85.0,
+				0.0
 			],
 			"scale": [
 				0.0,
@@ -3766,6 +3766,7 @@
 						0
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Slot1",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -3773,6 +3774,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -10781,6 +10783,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "DoorLocked",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -10788,6 +10791,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -10796,6 +10800,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "DoorUnlock",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -10803,6 +10808,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -10811,6 +10817,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "DoorOpen",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -10818,6 +10825,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -15390,6 +15398,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "KeyPickup",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -15397,6 +15406,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -16167,6 +16177,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Checkpoint1",
 					"loop": false,
 					"maxDistance": 100.0,
@@ -16174,6 +16185,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -16182,6 +16194,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "DiscInsert",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -16189,6 +16202,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -20244,6 +20258,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Laughter",
 					"loop": true,
 					"maxDistance": 25.0,
@@ -20251,6 +20266,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -21337,6 +21353,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "OpenDoor",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -21344,6 +21361,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -21352,6 +21370,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "OpenMaindoor",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -21359,6 +21378,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -21367,6 +21387,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "CloseMaindoor",
 					"loop": false,
 					"maxDistance": 300.0,
@@ -21374,6 +21395,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -21382,6 +21404,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "GirlGiggle",
 					"loop": false,
 					"maxDistance": 300.0,
@@ -21389,6 +21412,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -31199,6 +31223,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "DoorLocked",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -31206,6 +31231,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -31214,6 +31240,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "DoorUnlock",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -31221,6 +31248,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -31229,6 +31257,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "DoorOpen",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -31236,6 +31265,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -37950,6 +37980,7 @@
 						11537445004664754516
 					],
 					"category": 3,
+					"fadeDuration": 1.0,
 					"id": "Outdoor",
 					"loop": true,
 					"maxDistance": 10.0,
@@ -37957,6 +37988,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -37965,6 +37997,7 @@
 						11537445004664754516
 					],
 					"category": 3,
+					"fadeDuration": 1.0,
 					"id": "Indoor",
 					"loop": true,
 					"maxDistance": 25.0,
@@ -37972,6 +38005,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -37980,6 +38014,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Menu",
 					"loop": true,
 					"maxDistance": 25.0,
@@ -37987,6 +38022,7 @@
 					"pitch": 1.0,
 					"playOnStart": true,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -39900,6 +39936,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "OpenDoor",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -39907,6 +39944,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -48726,6 +48764,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "BoxOpen",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -48733,6 +48772,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -49163,6 +49203,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "ItemPickup",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -49170,6 +49211,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -50245,6 +50287,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Footstep1",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -50252,6 +50295,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 0.1080000028014183
 				},
 				{
@@ -50260,6 +50304,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Footstep2",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -50267,6 +50312,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 0.11400000005960464
 				},
 				{
@@ -50275,6 +50321,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Footstep3",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -50282,6 +50329,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 0.10599999874830246
 				},
 				{
@@ -50290,6 +50338,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Footstep4",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -50297,6 +50346,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 0.10599999874830246
 				},
 				{
@@ -50305,6 +50355,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Footstep5",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -50312,6 +50363,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 0.1080000028014183
 				},
 				{
@@ -50320,6 +50372,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Footstep6",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -50327,6 +50380,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 0.09399999678134918
 				},
 				{
@@ -50335,6 +50389,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Footstep7",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -50342,6 +50397,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 0.1080000028014183
 				},
 				{
@@ -50350,6 +50406,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Footstep8",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -50357,6 +50414,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 0.1120000034570694
 				},
 				{
@@ -50365,6 +50423,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "Flashlight",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -50372,6 +50431,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 0.24500000476837158
 				}
 			]
@@ -50948,6 +51008,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "DiscPickup",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -50955,6 +51016,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
@@ -51097,6 +51159,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "OpenDoor",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -51104,6 +51167,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -51112,6 +51176,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "OpenMaindoor",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -51119,6 +51184,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				},
 				{
@@ -51127,6 +51193,7 @@
 						11537445004664754516
 					],
 					"category": 0,
+					"fadeDuration": 1.0,
 					"id": "CloseMaindoor",
 					"loop": false,
 					"maxDistance": 300.0,
@@ -51134,6 +51201,7 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
+					"useFade": false,
 					"volume": 1.0
 				}
 			]
