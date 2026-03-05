@@ -50674,45 +50674,6 @@
 			]
 		}
 	},
-	"501": {
-		"LightComponent": {
-			"castShadows": true,
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"constant": 4.699999809265137,
-			"innerConeAngle": 12.5,
-			"intensity": 30000.0,
-			"isStatic": true,
-			"linear": 0.09000000357627869,
-			"outerConeAngle": 17.5,
-			"quadratic": 0.03200000151991844,
-			"radius": 10000.0,
-			"type": 2
-		},
-		"NameComponent": {
-			"name": "SF_Spotlight_01"
-		},
-		"TransformComponent": {
-			"position": [
-				36.11851501464844,
-				737.31298828125,
-				816.75341796875
-			],
-			"rotation": [
-				171.6662139892578,
-				88.16996765136719,
-				-10.84220027923584
-			],
-			"scale": [
-				0.9999858736991882,
-				1.000016450881958,
-				0.9999990463256836
-			]
-		}
-	},
 	"502": {
 		"ButtonComponent": {
 			"clicked_texture": [
