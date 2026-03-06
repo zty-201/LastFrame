@@ -58,6 +58,36 @@ namespace EngineFramework
 	namespace
 	{
 		constexpr const char* kEntityPayloadType = "OBJECT_MANAGER_ENTITY_PAYLOAD";
+
+		bool EntityMatchesSearch(entt::entity entity,
+			bool has_search_query,
+			const std::string& search_query_lower,
+			bool numeric_search,
+			uint32_t search_id)
+		{
+			if (!has_search_query)
+			{
+				return true;
+			}
+
+			if (entity == entt::null || !registry.valid(entity))
+			{
+				return false;
+			}
+
+			if (numeric_search && static_cast<uint32_t>(entt::to_entity(entity)) == search_id)
+			{
+				return true;
+			}
+
+			std::string label = GameObjectSystem::GetEntityName(entity);
+			std::string label_lower = label;
+			std::transform(label_lower.begin(), label_lower.end(), label_lower.begin(), [](unsigned char c)
+				{
+					return static_cast<char>(std::tolower(c));
+				});
+			return label_lower.find(search_query_lower) != std::string::npos;
+		}
 	}
 
 	ObjectManager::ObjectManager() {
@@ -332,7 +362,11 @@ namespace EngineFramework
 		}
 	}
 
-	void ObjectManager::DrawCustomFilters(iEditorView& selection_state)
+	void ObjectManager::DrawCustomFilters(iEditorView& selection_state,
+		bool has_search_query,
+		const std::string& search_query_lower,
+		bool numeric_search,
+		uint32_t search_id)
 	{
 		ImGui::Separator();
 		ImGui::Text("Custom Filters");
@@ -376,6 +410,21 @@ namespace EngineFramework
 		for (size_t i = 0; i < m_CustomFilters.size();)
 		{
 			auto& filter = m_CustomFilters[i];
+			if (has_search_query)
+			{
+				const bool filter_matches_search = std::any_of(filter.members.begin(), filter.members.end(),
+					[&](entt::entity member)
+					{
+						return EntityMatchesSearch(member, has_search_query, search_query_lower, numeric_search, search_id);
+					});
+
+				if (!filter_matches_search)
+				{
+					++i;
+					continue;
+				}
+			}
+
 			ImGui::PushID(static_cast<int>(i));
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
 			if (filter.expanded)
@@ -431,6 +480,13 @@ namespace EngineFramework
 					if (member == entt::null || !registry.valid(member))
 					{
 						filter.members.erase(filter.members.begin() + static_cast<std::ptrdiff_t>(member_index));
+						continue;
+					}
+
+					const bool member_matches_search = EntityMatchesSearch(member, has_search_query, search_query_lower, numeric_search, search_id);
+					if (has_search_query && !member_matches_search)
+					{
+						++member_index;
 						continue;
 					}
 
@@ -536,9 +592,9 @@ namespace EngineFramework
 			static entt::entity rename_target = entt::null;
 			static char rename_buffer[128]{};
 
-			iEditorView& selection_state = LevelEditor::GetInstance().variables;
-			CleanupFilters();
-			DrawCustomFilters(selection_state);
+		iEditorView& selection_state = LevelEditor::GetInstance().variables;
+		CleanupFilters();
+		DrawCustomFilters(selection_state, has_search_query, search_query_lower, numeric_search, search_id);
 			ImGui::Separator();
 
 			auto duplicate_and_select = [&](entt::entity source_entity) -> entt::entity {

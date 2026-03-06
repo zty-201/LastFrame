@@ -67,7 +67,11 @@ namespace EngineFramework
             Creates an archtype file + asset, reloads archtype assets, then assigns the archtype to the entity.
         */
         void CreateArchtypeFromInstance(entt::entity entity, const std::string& name, const std::string& model_type);
-        void DrawCustomFilters(iEditorView& selection_state);
+        void DrawCustomFilters(iEditorView& selection_state,
+            bool has_search_query,
+            const std::string& search_query_lower,
+            bool numeric_search,
+            uint32_t search_id);
 
         // Filters related stuff
         void CleanupFilters();
