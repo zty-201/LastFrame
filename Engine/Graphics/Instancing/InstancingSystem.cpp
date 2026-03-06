@@ -183,10 +183,17 @@ namespace EngineFramework
         if (m_needsBatchRebuild) {
             BuildSceneBatches();
             m_needsBatchRebuild = false;
-            m_pendingCreations.clear(); // Building batches catches everything, clear the queue!
+            m_pendingCreations.clear(); // Building batches catches everything, clear the queue
         }
 
-        // --- 2. HANDLE DEFERRED CREATIONS (From Duplicate/Spawn) ---
+        // --- 2. HANDLE DEFERRED CREATIONS (From Duplicate/Spawn) --- 
+		// not in use currently as it requires a major refactor of how each systems
+        // uses the transform and mesh component. 
+        // Issue 1: when objects are destructed, we need to log the destruction of 
+        // MeshInstance first as the destruction order arent guaranteed. 
+        // There isnt frequent creation/destruction, 
+        // but this is the solution for UI editor bug and future dynamic scenes
+
         if (!m_pendingCreations.empty()) {
             for (entt::entity newEntity : m_pendingCreations) {
                 ProcessNewInstance(newEntity);
@@ -196,6 +203,13 @@ namespace EngineFramework
 
         if (m_globalInstanceData.empty()) return;
 
+		// --- 3. UPDATE INSTANCE DATA & INDIRECT COMMANDS ---
+		// triple buffering logic: we have 3 buffers for the instance data, 
+        // indirect commands, and visible indices. Each frame, we write to 
+        // the next buffer in a circular manner, ensuring the GPU is done 
+        // with that buffer before we write to it again. 
+        // This allows us to avoid stalls and ensures smooth rendering 
+        // even when the CPU updates every frame.
         m_currentFrame++;
         int ringIdx = m_currentFrame % FRAMES_IN_FLIGHT;
 
@@ -217,7 +231,7 @@ namespace EngineFramework
             }
         }
 
-        // 3. ZERO-STALL UPLOAD 
+        // UPLOAD 
         // We upload the ENTIRE vector. The GPU is guaranteed to be done with this specific buffer.
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBOs[ringIdx]);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, m_globalInstanceData.size() * sizeof(InstanceData), m_globalInstanceData.data());

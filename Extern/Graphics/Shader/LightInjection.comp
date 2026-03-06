@@ -265,7 +265,22 @@ void main()
                 // Fetch history sample
                 vec4 history = textureLod(s_History, history_uv, 0.0f);
 
-                color_and_density = mix(history, color_and_density, 0.05f);
+                // --- HISTORY REJECTION ---
+                // 1. Calculate the luminance (brightness) of both samples
+                // The vec3(0.2126, 0.7152, 0.0722) represents the human eye's sensitivity to RGB
+                float current_lum = dot(color_and_density.rgb, vec3(0.2126, 0.7152, 0.0722));
+                float history_lum = dot(history.rgb, vec3(0.2126, 0.7152, 0.0722));
+                
+                // 2. How much did the light change in this specific voxel?
+                float lum_diff = abs(current_lum - history_lum);
+                
+                // 3. Create a dynamic blend factor. 
+                // Base is 0.05 (for static areas). If lum_diff is large, push towards 1.0 (trust new frame).
+                // The '5.0f' is a sensitivity multiplier. Tweak this if the trail is still too long!
+                float dynamic_blend = clamp(0.05f + (lum_diff * 5.0f), 0.05f, 1.0f);
+
+                // 4. Mix using the dynamic blend instead of the hardcoded 0.05f
+                color_and_density = mix(history, color_and_density, dynamic_blend);
             }
         }
 
