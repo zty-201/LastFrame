@@ -21,6 +21,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetManager.hpp"
 #include "Screen.hpp"
 #include "UISystem.hpp"
+#include "ObjectManager.hpp"
 
 namespace EngineFramework
 {
@@ -46,6 +47,7 @@ namespace EngineFramework
 		UI_System::GetInstance().closeAllMenu();
 
 		currentScene = defaultScene;
+		ObjectManager::LoadFiltersForScene(currentScene);
 		Screen::GetInstance().is_enabled = true;
 		is_file_loaded = true;
 	}
@@ -99,6 +101,7 @@ namespace EngineFramework
 					currentScene = scene;
 					UI_System::GetInstance().Initialize();
 					Screen::GetInstance().is_enabled = true;
+					ObjectManager::LoadFiltersForScene(currentScene);
 					is_file_loaded = true;
 				}
 			}

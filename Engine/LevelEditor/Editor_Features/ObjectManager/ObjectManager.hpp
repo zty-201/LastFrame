@@ -20,6 +20,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <sstream>
 #include <vector>
 #include <array>
+#include <filesystem>
 #include "ISystem.hpp"
 #include "entt/entity/registry.hpp"
 #include "System_LevelEditor.hpp"
@@ -43,7 +44,10 @@ namespace EngineFramework
         //Handles buttons at the top
         void top_buttons();
 
+        // Filters related helper functions
         static void RemoveEntityFromFilters(entt::entity entity);
+        static void SaveFiltersForScene(const std::string& scene_filename);
+        static void LoadFiltersForScene(const std::string& scene_filename);
         static bool feature_enabled;
     private:
         struct CustomFilter
@@ -63,9 +67,18 @@ namespace EngineFramework
             Creates an archtype file + asset, reloads archtype assets, then assigns the archtype to the entity.
         */
         void CreateArchtypeFromInstance(entt::entity entity, const std::string& name, const std::string& model_type);
-        void DrawCustomFilters(iEditorView& selection_state);
+        void DrawCustomFilters(iEditorView& selection_state,
+            bool has_search_query,
+            const std::string& search_query_lower,
+            bool numeric_search,
+            uint32_t search_id);
+
+        // Filters related stuff
         void CleanupFilters();
         void RemoveEntityFromAllFilters(entt::entity entity);
+        std::string SerializeFiltersToJson() const;
+        void DeserializeFiltersFromJson(const std::string& json_text);
+        static std::filesystem::path GetFilterSavePath(const std::string& scene_filename);
         static bool AddEntityToFilter(CustomFilter& filter, entt::entity entity);
         static void RemoveEntityFromFilter(CustomFilter& filter, entt::entity entity);
         static std::string TrimString(const std::string& value);
