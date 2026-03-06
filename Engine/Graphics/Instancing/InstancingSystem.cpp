@@ -8,8 +8,10 @@ namespace EngineFramework
     InstancingSystem::InstancingSystem() {}
 
     InstancingSystem::~InstancingSystem() {
-        if (m_instanceSSBO != 0) {
-            glDeleteBuffers(1, &m_instanceSSBO);
+        if (m_instanceSSBOs[0] != 0) {
+            glDeleteBuffers(FRAMES_IN_FLIGHT, m_instanceSSBOs);
+            glDeleteBuffers(FRAMES_IN_FLIGHT, m_indirectBuffers);
+            glDeleteBuffers(FRAMES_IN_FLIGHT, m_visibleIndicesBuffers);
         }
     }
 
@@ -18,22 +20,27 @@ namespace EngineFramework
         m_maxTotalInstances = maxTotalInstances;
 		culling_shader_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::SHADER_GUID, "Culling");
 
-        // Pre-allocate the massive SSBO once
-        glGenBuffers(1, &m_instanceSSBO);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, m_maxTotalInstances * sizeof(InstanceData), nullptr, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+        // Generate buffers
+        glGenBuffers(FRAMES_IN_FLIGHT, m_instanceSSBOs);
+        glGenBuffers(FRAMES_IN_FLIGHT, m_indirectBuffers);
+        glGenBuffers(FRAMES_IN_FLIGHT, m_visibleIndicesBuffers);
 
-        // Allocate Indirect Command Buffer (MAX_BATCHES * 4 passes)
-        glGenBuffers(1, &m_indirectBuffer);
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
-        glBufferData(GL_DRAW_INDIRECT_BUFFER, MAX_BATCHES * NUM_PASSES * sizeof(DrawElementsIndirectCommand), nullptr, GL_DYNAMIC_DRAW);
+        // Pre-allocate memory for all frames in flight
+        for (int i = 0; i < FRAMES_IN_FLIGHT; ++i) {
+            // Instance Data
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBOs[i]);
+            glBufferData(GL_SHADER_STORAGE_BUFFER, m_maxTotalInstances * sizeof(InstanceData), nullptr, GL_DYNAMIC_DRAW);
 
-        // Allocate Visible Indices Buffer (MAX_INSTANCES * 4 passes)
-        glGenBuffers(1, &m_visibleIndicesBuffer);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_visibleIndicesBuffer);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, MAX_INSTANCES * NUM_PASSES * sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
+            // Indirect Commands
+            glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffers[i]);
+            glBufferData(GL_DRAW_INDIRECT_BUFFER, MAX_BATCHES * NUM_PASSES * sizeof(DrawElementsIndirectCommand), nullptr, GL_DYNAMIC_DRAW);
+
+            // Visible Indices
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_visibleIndicesBuffers[i]);
+            glBufferData(GL_SHADER_STORAGE_BUFFER, MAX_INSTANCES * NUM_PASSES * sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
+        }
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
         // Reserve memory to prevent CPU reallocations during gathering
         m_globalInstanceData.reserve(m_maxTotalInstances);
@@ -168,11 +175,6 @@ namespace EngineFramework
             batchIndex++;
         }
 
-        // --- INITIAL UPLOAD ---
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, m_maxTotalInstances * sizeof(InstanceData), nullptr, GL_DYNAMIC_DRAW);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, m_globalInstanceData.size() * sizeof(InstanceData), m_globalInstanceData.data());
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
     void InstancingSystem::UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj, const std::vector<glm::mat4>& spotProj) {
@@ -194,75 +196,35 @@ namespace EngineFramework
 
         if (m_globalInstanceData.empty()) return;
 
-        // --- 1. PROCESS ONLY DIRTY ENTITIES ---
+        m_currentFrame++;
+        int ringIdx = m_currentFrame % FRAMES_IN_FLIGHT;
+
+        // 2. Update CPU cache (EnTT Loop)
         auto transform_view = registry.view<TransformComponent>();
-        uint32_t minDirtyIndex = std::numeric_limits<uint32_t>::max();
-        uint32_t maxDirtyIndex = 0;
-        bool hasDirtyInstances = false;
-
         for (auto&& [entity, transform] : transform_view.each()) {
-
-            // Fast comparison of 9 floats
             if (transform.position != transform.prevPosition ||
                 transform.rotation != transform.prevRotation ||
                 transform.scale != transform.prevScale) {
-				// Calculate model matrix only when dirty
+
                 CalculateModelMatrix(transform, transform.modelMatrix);
 
                 auto* meta = registry.try_get<InstanceMetadata>(entity);
-
                 if (!meta) continue;
-                
-                for (uint32_t idx : meta->ssboIndices) {
-                    // 1. Update the CPU-side cache
-                    m_globalInstanceData[idx].modelMatrix = transform.modelMatrix;
 
-                    // 2. Expand our memory "bounding box"
-                    minDirtyIndex = std::min(minDirtyIndex, idx);
-                    maxDirtyIndex = std::max(maxDirtyIndex, idx);
-                    hasDirtyInstances = true;
+                for (uint32_t idx : meta->ssboIndices) {
+                    m_globalInstanceData[idx].modelMatrix = transform.modelMatrix;
                 }
             }
         }
 
-        // --- 2. SINGLE BATCHED UPLOAD ---
-        if (hasDirtyInstances) {
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
+        // 3. ZERO-STALL UPLOAD 
+        // We upload the ENTIRE vector. The GPU is guaranteed to be done with this specific buffer.
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBOs[ringIdx]);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, m_globalInstanceData.size() * sizeof(InstanceData), m_globalInstanceData.data());
 
-            // Calculate the contiguous chunk size and starting offset
-            uint32_t updateCount = (maxDirtyIndex - minDirtyIndex) + 1;
-            GLintptr offset = minDirtyIndex * sizeof(InstanceData);
-            GLsizeiptr size = updateCount * sizeof(InstanceData);
-
-            // Upload the specific slice of the vector
-            glBufferSubData(
-                GL_SHADER_STORAGE_BUFFER,
-                offset,
-                size,
-                &m_globalInstanceData[minDirtyIndex]
-            );
-
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-            //glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
-
-            //// This single line does both:
-            //// 1. Abandons the old memory (bypassing the GPU stall)
-            //// 2. Uploads the entire CPU vector into the new memory block
-            //glBufferData(
-            //    GL_SHADER_STORAGE_BUFFER,
-            //    m_globalInstanceData.size() * sizeof(InstanceData),
-            //    m_globalInstanceData.data(),
-            //    GL_DYNAMIC_DRAW
-            //);
-
-            //glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-        }
-
-        // --- 3. RESET INDIRECT COMMANDS (Instance Counts -> 0) ---
-        // The GPU overwrites these counts every frame, so we must reset them using our pristine CPU copy
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
-        glBufferData(GL_DRAW_INDIRECT_BUFFER, MAX_BATCHES * NUM_PASSES * sizeof(DrawElementsIndirectCommand), nullptr, GL_DYNAMIC_DRAW);
-        glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0, m_indirectCommands.size() * sizeof(DrawElementsIndirectCommand), m_indirectCommands.data());
+        // Upload pristine indirect commands
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffers[ringIdx]);
+        glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0, m_indirectCommands.size() * sizeof(DrawElementsIndirectCommand), m_indirectCommands.data());;
 
         // --- 4. DISPATCH COMPUTE SHADER ---
         std::shared_ptr<ShaderProgram> cullingShader{};
@@ -293,9 +255,9 @@ namespace EngineFramework
 
         cullingShader->setUniform("u_TotalInstances", (uint32_t)m_globalInstanceData.size());
 
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_instanceSSBO);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_indirectBuffer);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_visibleIndicesBuffer);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_instanceSSBOs[ringIdx]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_indirectBuffers[ringIdx]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_visibleIndicesBuffers[ringIdx]);
 
         GLuint numGroups = (GLuint)(m_globalInstanceData.size() + 63) / 64;
         glDispatchCompute(numGroups, 1, 1);
@@ -390,10 +352,6 @@ namespace EngineFramework
             // 2. Add to free list for future use
             m_freeSSBOIndices.push_back(idx);
 
-            // 3. Upload the tombstone to the GPU immediately (Just 80 bytes!)
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
-            glBufferSubData(GL_SHADER_STORAGE_BUFFER, idx * sizeof(InstanceData), sizeof(InstanceData), &m_globalInstanceData[idx]);
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         }
 		LOGI("MeshComponent removed from Entity %u, marked %zu instances for deletion.", static_cast<uint32_t>(entity), meta->ssboIndices.size());
     }
@@ -482,10 +440,6 @@ namespace EngineFramework
 
             meta.ssboIndices.push_back(targetIdx);
 
-            // 6. Upload ONLY the new data to the GPU (80 bytes!)
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBO);
-            glBufferSubData(GL_SHADER_STORAGE_BUFFER, targetIdx * sizeof(InstanceData), sizeof(InstanceData), &m_globalInstanceData[targetIdx]);
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         }
     }
 }

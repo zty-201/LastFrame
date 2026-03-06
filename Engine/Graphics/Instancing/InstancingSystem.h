@@ -105,17 +105,22 @@ namespace EngineFramework
         // Getters for the GraphicsSystem to use during rendering
         const std::vector<RenderBatch>& GetBatches() const { return m_activeBatches; }
         const std::vector<entt::entity>& GetAnimatedEntities() const { return m_animatedEntities; }
-        GLuint GetInstanceSSBO() const { return m_instanceSSBO; }
-        GLuint GetIndirectBuffer() const { return m_indirectBuffer; }
-        GLuint GetVisibleIndicesBuffer() const { return m_visibleIndicesBuffer; }
+        GLuint GetInstanceSSBO() const { return m_instanceSSBOs[m_currentFrame % FRAMES_IN_FLIGHT]; }
+        GLuint GetIndirectBuffer() const { return m_indirectBuffers[m_currentFrame % FRAMES_IN_FLIGHT]; }
+        GLuint GetVisibleIndicesBuffer() const { return m_visibleIndicesBuffers[m_currentFrame % FRAMES_IN_FLIGHT]; }
         size_t GetActiveBatchCount() const { return m_activeBatches.size(); }
 
         static constexpr uint32_t INVALID_BATCH = 0xFFFFFFFF;
 
     private:
-        GLuint m_instanceSSBO = 0;
-        GLuint m_indirectBuffer = 0;
-        GLuint m_visibleIndicesBuffer = 0;
+        static const int FRAMES_IN_FLIGHT = 3;
+        uint32_t m_currentFrame = 0;
+
+        // Replace single GLuints with arrays
+        GLuint m_instanceSSBOs[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        GLuint m_indirectBuffers[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        GLuint m_visibleIndicesBuffers[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+
         size_t m_maxTotalInstances = 0;
 
         xresource::full_guid culling_shader_guid;
