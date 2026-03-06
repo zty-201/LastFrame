@@ -153,8 +153,8 @@
 				50.0
 			],
 			"rotation": [
-				180.0,
-				85.0,
+				165.0,
+				90.0,
 				0.0
 			],
 			"scale": [
@@ -12885,53 +12885,53 @@
 			]
 		}
 	},
-	"501": {
-		"MaterialComponent": {
-			"albedoFactor": [
+	"2": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
-			"albedoMap": [
-				8652294881921892357,
-				4431689612682600001
+			"constant": 1.0,
+			"innerConeAngle": 15.0,
+			"intensity": 0.0,
+			"isStatic": false,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"quadratic": 0.03200000151991844,
+			"radius": 2500.0,
+			"type": 2
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 15968805962367582209
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayerFlashlight"
+		},
+		"TransformComponent": {
+			"position": [
+				-461.9490051269531,
+				316.9678649902344,
+				-505.62554931640625
 			],
-			"ambientOcclusionMap": [
-				0,
-				0
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				0,
-				0
-			],
-			"name": "Skybox",
-			"normalMap": [
-				0,
-				0
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
-			],
-			"uvOffset": [
+			"rotation": [
+				0.0,
 				0.0,
 				0.0
 			],
-			"uvTiling": [
+			"scale": [
+				1.0,
 				1.0,
 				1.0
 			]
-		},
-		"MeshComponent": {
-			"meshName": "SkyBox",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Skybox"
-		},
-		"SkyboxRenderPass": null
+		}
 	},
 	"20": {
 		"MaterialComponent": {
@@ -50674,6 +50674,54 @@
 			]
 		}
 	},
+	"501": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				8652294881921892357,
+				4431689612682600001
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Skybox",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "SkyBox",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Skybox"
+		},
+		"SkyboxRenderPass": null
+	},
 	"502": {
 		"ButtonComponent": {
 			"clicked_texture": [
@@ -85213,93 +85261,6 @@
 				4.9999823570251465,
 				5.000038146972656,
 				1.0000098943710327
-			]
-		}
-	},
-	"817": {
-		"LightComponent": {
-			"castShadows": true,
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"constant": 4.699999809265137,
-			"innerConeAngle": 10.020000457763672,
-			"intensity": 10000.0,
-			"isStatic": true,
-			"linear": 0.09000000357627869,
-			"outerConeAngle": 14.670000076293945,
-			"quadratic": 0.03200000151991844,
-			"radius": 1200.0,
-			"type": 2
-		},
-		"NameComponent": {
-			"name": "Bedroom_Spotlight_01"
-		},
-		"TransformComponent": {
-			"position": [
-				919.94580078125,
-				320.0033264160156,
-				1197.143798828125
-			],
-			"rotation": [
-				147.1999969482422,
-				86.73025512695313,
-				175.75534057617188
-			],
-			"scale": [
-				0.9999359250068665,
-				0.9999890327453613,
-				0.9999791979789734
-			]
-		}
-	},
-	"2": {
-		"LightComponent": {
-			"castShadows": true,
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"constant": 1.0,
-			"innerConeAngle": 15.0,
-			"intensity": 0.0,
-			"isStatic": false,
-			"linear": 0.09000000357627869,
-			"outerConeAngle": 35.0,
-			"quadratic": 0.03200000151991844,
-			"radius": 2500.0,
-			"type": 2
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 15968805962367582209
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "PlayerFlashlight"
-		},
-		"TransformComponent": {
-			"position": [
-				-461.9490051269531,
-				316.9678649902344,
-				-505.62554931640625
-			],
-			"rotation": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
 			]
 		}
 	},
