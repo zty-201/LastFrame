@@ -52,7 +52,6 @@ namespace EngineFramework
 
 	AssetWindow::~AssetWindow()
 	{
-        
 	}
 
 	void AssetWindow::Initialize()
@@ -472,20 +471,21 @@ namespace EngineFramework
         if (ec) {
             return 0;
         }
-
+        // we just access it from the entt meta no need to store in local cache as 
+		// lookup time is around same and we need to ensure the data is always up to date,
+        // otherwise we need to monitor file change and update the local cache accordingly which is more complex
         const std::string key = path.stem().string();
         using E_AM = EngineFramework::AssetManagerSystem;
         xresource::full_guid texture_guid = E_AM::GetFullGuid(E_AM::TEXTURE_GUID, key);
         auto textureId = E_AM::GetResource<Scene::Texture>(texture_guid);
         if (textureId) {
-            //LOGI("[AssetWindow] Found existing texture resource for %s with key %s", path.string().c_str(), key.c_str());
+            GLuint texId = textureId->id;
+            return texId;
         }
-        else {
-            //LOGW("[AssetWindow] No existing texture resource found for %s with key %s", path.string().c_str(), key.c_str());
-            return 0;
-		}
-        return textureId->id;
+
+        return 0;
     }
+
 
     /*
     * return false if the component's variable does not exists in the component mapping

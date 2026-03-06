@@ -79,6 +79,7 @@ namespace EngineFramework
 		// If the cache entry is valid, it will return the stored GL texture id, otherwise it deletes the old GL texture, remove entry and calls for LoadThumbnail to rebuild a new one
 		// Then store the new entry back in to the cache before returning the texture id
 		unsigned int GetThumbnailTexture(const std::filesystem::path& path);
+
 		
 	};
 }
