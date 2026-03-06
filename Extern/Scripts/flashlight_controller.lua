@@ -87,9 +87,9 @@ function on_update(self, dt)
     local rz = -math.sin(radYaw)
 
     -- 5. Apply Realistic Positional Offsets
-    local forwardOffset = 50.0   -- 0.5 units in front of the camera
-    local rightOffset   = 5.0   -- 0.3 units to the right (held in right hand)
-    local upOffset      = -0.2  -- Slightly below eye-level
+    local forwardOffset = 15.0   -- 0.5 units in front of the camera
+    local rightOffset   = 0.0   -- 0.3 units to the right (held in right hand)
+    local upOffset      = 0.0  -- Slightly below eye-level
 
     local lx = cx + (fx * forwardOffset) + (rx * rightOffset)
     local ly = cy + (fy * forwardOffset) + upOffset

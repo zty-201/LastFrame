@@ -12885,7 +12885,7 @@
 			]
 		}
 	},
-	"2": {
+	"501": {
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -72955,7 +72955,7 @@
 			],
 			"rotation": [
 				0.0,
-				90.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -85255,7 +85255,7 @@
 			]
 		}
 	},
-	"818": {
+	"2": {
 		"LightComponent": {
 			"castShadows": true,
 			"color": [
@@ -85270,7 +85270,7 @@
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 35.0,
 			"quadratic": 0.03200000151991844,
-			"radius": 500.0,
+			"radius": 2500.0,
 			"type": 2
 		},
 		"LuaScriptComponent": {
