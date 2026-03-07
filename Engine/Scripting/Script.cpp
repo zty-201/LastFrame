@@ -271,6 +271,14 @@ namespace Engine {
                 // EngineFramework::UI_System::displayMenu(menuName);  // static-style
                 EngineFramework::UI_System::GetInstance().displayMenu(menuName);
             });
+        s_Lua.set_function("UI_CloseMenu", [](const std::string& menuName)
+            {
+                EngineFramework::UI_System::GetInstance().closeMenu(menuName);
+            });
+        s_Lua.set_function("UI_IsMenuActive", [](const std::string& menuName) -> bool
+            {
+                return EngineFramework::UI_System::GetInstance().IsMenuActive(menuName);
+            });
 
         s_Lua.set_function("UI_CloseAllMenus", []()
             {
