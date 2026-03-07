@@ -1,4 +1,13 @@
+----------------------------------------------------------------
+-- LittleGirl_RunAcrossHallway.lua
+-- Attach to the little girl running at hallway
+--
+-- Unhides girl(running) when:
+--  - Disc placed in music box, music halfway
+----------------------------------------------------------------
 local DEBUG = true
+
+local RUN_AUDIO_SLOT = "Running"
 
 local runActive = false
 local runTimer = 0.0
@@ -57,6 +66,12 @@ function on_update(self, dt)
         currentX, currentY, currentZ = tr:GetPosition()
         show_girl()
 
+        -- Play running sound
+        if type(Audio_PlaySlot) == "function" then
+            Audio_StopSlot(EntityID, RUN_AUDIO_SLOT)
+            Audio_PlaySlot(EntityID, RUN_AUDIO_SLOT)
+        end
+
         if DEBUG then
             print("[LittleGirl] Run started")
         end
@@ -83,6 +98,12 @@ function on_update(self, dt)
 
     if runTimer >= runDuration then
         runActive = false
+
+        -- Stop running sound
+        if type(Audio_StopSlot) == "function" then
+            Audio_StopSlot(EntityID, RUN_AUDIO_SLOT)
+        end
+
         hide_girl()
 
         if DEBUG then
