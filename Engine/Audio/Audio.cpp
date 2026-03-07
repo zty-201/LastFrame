@@ -82,12 +82,14 @@ namespace EngineFramework
 	AudioSystem::~AudioSystem()
 	{
 #ifndef DISABLE_FMOD
-		if (m_ambienceLowpass) { m_ambienceLowpass->release(); m_ambienceLowpass = nullptr; }
-		if (m_groupAmbience) { m_groupAmbience->release(); m_groupAmbience = nullptr; }
-		if (m_groupUI) { m_groupUI->release();       m_groupUI = nullptr; }
-		if (m_groupBGM) { m_groupBGM->release();    m_groupBGM = nullptr; }
-		if (m_groupSFX) { m_groupSFX->release();      m_groupSFX = nullptr; }
-		if (m_groupMaster) { m_groupMaster->release();   m_groupMaster = nullptr; }
+		if (m_ambienceLowpass)		{ m_ambienceLowpass->release();			m_ambienceLowpass = nullptr; }
+		if (m_groupAmbienceOutdoor) { m_groupAmbienceOutdoor->release();	m_groupAmbienceOutdoor = nullptr; }
+		if (m_groupAmbienceIndoor)	{ m_groupAmbienceIndoor->release();		m_groupAmbienceIndoor = nullptr; }
+		if (m_groupAmbience)		{ m_groupAmbience->release();			m_groupAmbience = nullptr; }
+		if (m_groupUI)				{ m_groupUI->release();					m_groupUI = nullptr; }
+		if (m_groupBGM)				{ m_groupBGM->release();				m_groupBGM = nullptr; }
+		if (m_groupSFX)				{ m_groupSFX->release();				m_groupSFX = nullptr; }
+		if (m_groupMaster)			{ m_groupMaster->release();				m_groupMaster = nullptr; }
 
 		if (m_system)
 		{
@@ -117,12 +119,15 @@ namespace EngineFramework
 		logFmodError(r, "System::set3DSettings");
 		if (r != FMOD_OK) return;
 
-		// Create groups
+		// Create channel groups
 		r = m_system->createChannelGroup("Master", &m_groupMaster);     logFmodError(r, "createChannelGroup(Master)");     if (r != FMOD_OK) return;
 		r = m_system->createChannelGroup("Music", &m_groupBGM);       logFmodError(r, "createChannelGroup(Music)");      if (r != FMOD_OK) return;
 		r = m_system->createChannelGroup("SFX", &m_groupSFX);           logFmodError(r, "createChannelGroup(SFX)");        if (r != FMOD_OK) return;
 		r = m_system->createChannelGroup("UI", &m_groupUI);             logFmodError(r, "createChannelGroup(UI)");         if (r != FMOD_OK) return;
 		r = m_system->createChannelGroup("Ambience", &m_groupAmbience); logFmodError(r, "createChannelGroup(Ambience)");   if (r != FMOD_OK) return;
+
+		r = m_system->createChannelGroup("AmbienceOutdoor", &m_groupAmbienceOutdoor); logFmodError(r, "createChannelGroup(AmbienceOutdoor)");   if (r != FMOD_OK) return;
+		r = m_system->createChannelGroup("AmbienceIndoor", &m_groupAmbienceIndoor); logFmodError(r, "createChannelGroup(AmbienceIndoor)");   if (r != FMOD_OK) return;
 
 		// Attach to master
 		if (m_groupMaster)
@@ -146,6 +151,17 @@ namespace EngineFramework
 			{
 				FMOD_RESULT rr = m_groupMaster->addGroup(m_groupAmbience);
 				logFmodError(rr, "Master->addGroup(Ambience)");
+
+				if (m_groupAmbienceOutdoor)
+				{
+					rr = m_groupAmbience->addGroup(m_groupAmbienceOutdoor);
+					logFmodError(rr, "Ambience->addGroup(AmbienceOutdoor)");
+				}
+				if (m_groupAmbienceIndoor)
+				{
+					rr = m_groupAmbience->addGroup(m_groupAmbienceIndoor);
+					logFmodError(rr, "Ambience->addGroup(AmbienceIndoor)");
+				}
 			}
 		}
 
@@ -155,16 +171,18 @@ namespace EngineFramework
 		if (m_groupSFX)      m_groupSFX->setVolume(1.0f);
 		if (m_groupUI)       m_groupUI->setVolume(1.0f);
 		if (m_groupAmbience) m_groupAmbience->setVolume(1.0f);
+		if (m_groupAmbienceOutdoor) m_groupAmbienceOutdoor->setVolume(1.0f);
+		if (m_groupAmbienceIndoor) m_groupAmbienceIndoor->setVolume(1.0f);
 
 		// Ambience muffling DSP (lowpass), controlled by SetIndoorFactor()
-		if (m_system && m_groupAmbience)
+		if (m_system && m_groupAmbienceOutdoor)
 		{
 			FMOD_RESULT r2 = m_system->createDSPByType(FMOD_DSP_TYPE_LOWPASS, &m_ambienceLowpass);
 			logFmodError(r2, "createDSPByType(LOWPASS)");
 
 			if (r2 == FMOD_OK && m_ambienceLowpass)
 			{
-				r2 = m_groupAmbience->addDSP(0, m_ambienceLowpass);
+				r2 = m_groupAmbienceOutdoor->addDSP(0, m_ambienceLowpass);
 				logFmodError(r2, "Ambience addDSP(LOWPASS)");
 
 				// Start outdoors: no muffling
@@ -359,8 +377,21 @@ namespace EngineFramework
 
 		// Route to category bus
 		AudioGroup group = MapCategoryToGroup(slot->category);
-		if (FMOD::ChannelGroup* grp = pickGroup(group))
-			channel->setChannelGroup(grp);
+		if (group == AudioGroup::Ambience)
+		{
+			switch (slot->ambienceType)
+			{
+				case AudioComponent::AmbienceType::Outdoor:
+					if (m_groupAmbienceOutdoor) channel->setChannelGroup(m_groupAmbienceOutdoor);
+					break;
+				case AudioComponent::AmbienceType::Indoor:
+					if (m_groupAmbienceIndoor) channel->setChannelGroup(m_groupAmbienceIndoor);
+					break;
+				default:
+					if (m_groupAmbience) channel->setChannelGroup(m_groupAmbience);
+					break;
+			}
+		}
 
 		// Fade
 		float finalTargetVolume = std::clamp(slot->volume, 0.0f, 5.0f);
@@ -403,6 +434,8 @@ namespace EngineFramework
 
 					if (inst.useFade && inst.fadeDuration > 0.0f)
 					{
+						LOGI("[Audio] Marking isFadingOut=true | Slot: %s | Triggered by PlaySlot command for: %s",
+							inst.slotId.c_str(), cmd.slotId.c_str());
 						inst.isFadingOut = true;
 					}
 					else
@@ -439,6 +472,7 @@ namespace EngineFramework
 	void AudioSystem::ProcessStopSlot(const AudioCommand& cmd)
 	{
 #ifndef DISABLE_FMOD
+		LOGI("[Audio] ProcessStopSlot called | Slot: %s", cmd.slotId.c_str());
 		for (auto& inst : m_active)
 		{
 			if (inst.entity == cmd.entity && inst.slotId == cmd.slotId)
@@ -448,6 +482,8 @@ namespace EngineFramework
 
 				if (inst.useFade && inst.fadeDuration > 0.0f)
 				{
+					LOGI("[Audio] Marking isFadingOut=true | Slot: %s | Triggered by StopSlot",
+						inst.slotId.c_str());
 					inst.isFadingOut = true;
 				}
 				else
@@ -519,8 +555,12 @@ namespace EngineFramework
 			}
 
 			// 3. Apply volume
-			float finalVolume = instance.targetVolume * instance.currentFadeVolume;
-			instance.channel->setVolume(finalVolume);
+			if (instance.isFadingOut || instance.currentFadeVolume < 1.0f)
+			{
+				float equalPowerMultiplier = std::sin(instance.currentFadeVolume * (3.14159265f * 0.5f));
+				float finalVolume = instance.targetVolume * equalPowerMultiplier;
+				instance.channel->setVolume(finalVolume);
+			}
 
 			//// DEBUG PRINT: Only prints for active channels
 			//LOGI("[Audio Debug] Slot: %-10s | Final Vol: %.2f | Fade Multiplier: %.2f | Mode: %s",
@@ -583,11 +623,23 @@ namespace EngineFramework
 				continue;
 			}*/
 
-			bool playing = false;
+			/*bool playing = false;
 			if (instance.channel->isPlaying(&playing) != FMOD_OK || !playing)
 			{
 				instance.channel = nullptr;
 				continue;
+			}*/
+
+			// 5. Remove if FMOD stopped it naturally (non-looping sounds that finished)
+			// BUT: do not remove looping channels - they should play forever until explicitly stopped
+			if (!instance.looping)
+			{
+				bool playing = false;
+				if (instance.channel->isPlaying(&playing) != FMOD_OK || !playing)
+				{
+					instance.channel = nullptr;
+					continue;
+				}
 			}
 
 			if (instance.is3D)
@@ -784,13 +836,24 @@ namespace EngineFramework
 
 		// 0.0 outdoor = clear, 1.0 indoor = muffled
 		const float cutoffOutdoor = 20000.0f;
-		const float cutoffIndoor = 1200.0f;
-
+		const float cutoffIndoor = 2500.0f;
 		const float cutoff = cutoffOutdoor + (cutoffIndoor - cutoffOutdoor) * m_indoorFactor;
 
 		m_ambienceLowpass->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoff);
 		m_ambienceLowpass->setBypass(m_indoorFactor < 0.01f);
+
+		const float minOutdoorVolume = 0.5f;
+		const float outdoorVol = 1.0f - (m_indoorFactor * (1.0f - minOutdoorVolume));
+
+		if (m_groupAmbienceOutdoor) m_groupAmbienceOutdoor->setVolume(outdoorVol);
+
+		// DEBUG
+		float confirmedVol = -1.0f;
+		if (m_groupAmbienceOutdoor) m_groupAmbienceOutdoor->getVolume(&confirmedVol);
+		LOGI("[Audio] SetIndoorFactor=%.2f | OutdoorGroupVol set =%.2f | confirmed=%.2f", m_indoorFactor, outdoorVol, confirmedVol);
 #endif
 	}
+
+
 
 } // namespace EngineFramework
