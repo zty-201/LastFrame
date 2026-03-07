@@ -72,6 +72,9 @@ namespace EngineFramework
             const std::string& search_query_lower,
             bool numeric_search,
             uint32_t search_id);
+        entt::entity DuplicateAndSelect(entt::entity source_entity, iEditorView& selection_state);
+        bool DeleteEntity(entt::entity target_entity, iEditorView& selection_state);
+        void BeginRename(entt::entity entity);
 
         // Filters related stuff
         void CleanupFilters();
@@ -85,6 +88,10 @@ namespace EngineFramework
         bool IsEntityInFilters(entt::entity entity) const;
 
         static inline ObjectManager* s_Instance{};
+        bool m_OpenArchtypePopupOnce = false;
+        bool m_OpenRenamePopup = false;
+        entt::entity m_RenameTarget = entt::null;
+        std::array<char, 128> m_RenameBuffer{};
     };
 }
 
