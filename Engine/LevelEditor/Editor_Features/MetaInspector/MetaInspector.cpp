@@ -1014,7 +1014,7 @@ namespace EditorFeatures {
 				
 				// ----- VOLUME -----
 				if (slot.volume < 0.0f) slot.volume = 0.0f;
-				ImGui::SliderFloat("Volume", &slot.volume, 0.0f, 1.0f);
+				ImGui::SliderFloat("Volume", &slot.volume, 0.0f, 5.0f);
 
 				// ----- SPATIAL -----
 				draw_spatial_combo("Spatial", slot.spatial);

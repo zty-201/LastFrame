@@ -20,10 +20,18 @@ local MAINHALL_DOOR_IDS = { 509, 26 }
 local IMMEDIATE_HIDE_ENTITY_ID = 157
 
 -- Lights to turn on (fade 0 -> 500 after a delay)
-local HALL_LIGHT_IDS = { 486, 488 }
+-- Ordered cascade (FIRST → LAST)
+local HALL_LIGHT_CASCADE = { 488, 486 }
+local LIGHT_CASCADE_DELAY = 0.5
+
+local cascadeIndex = 1
+local cascadeTimer = 0.0
+local cascadeActive = false
+local lightFadeStates = {}
+
 local LIGHT_TARGET_INTENSITY = 500.0
-local LIGHT_FADE_SECONDS = 1.0
-local LIGHT_DELAY_SECONDS = 3.0
+local LIGHT_FADE_SECONDS = 0.7
+local LIGHT_DELAY_SECONDS = 2.0
 
 -- If your pickup entity is NOT the same entity this script is on,
 -- set this to that entity id. Otherwise leave as 0 (auto = EntityID).
@@ -42,8 +50,8 @@ local lightFading = false
 local lightTime = 0.0
 
 local function has_any_lights()
-    if HALL_LIGHT_IDS == nil then return false end
-    for _, lid in ipairs(HALL_LIGHT_IDS) do
+    if HALL_LIGHT_CASCADE == nil then return false end
+    for _, lid in ipairs(HALL_LIGHT_CASCADE) do
         if lid ~= 0 then return true end
     end
     return false
@@ -80,7 +88,7 @@ end
 
 local function send_light_set_all(value, byId)
     SHARED.LIGHT_CMD = SHARED.LIGHT_CMD or {}
-    for _, lid in ipairs(HALL_LIGHT_IDS) do
+    for _, lid in ipairs(HALL_LIGHT_CASCADE) do
         if lid ~= 0 then
             SHARED.LIGHT_CMD[lid] = { cmd = "set", by = byId, value = value }
         end
@@ -135,38 +143,71 @@ function on_update(Self, dt)
     end
 
     ----------------------------------------------------------------
-    -- After pickup: wait, then fade lights
+    -- After pickup: wait, then cascade lights
     ----------------------------------------------------------------
     if pickedUp then
-        if lightDelayActive and has_any_lights() then
+
+        if lightDelayActive then
             lightDelayTime = lightDelayTime + dt
             if lightDelayTime >= LIGHT_DELAY_SECONDS then
                 lightDelayActive = false
-                lightFading = true
-                lightTime = 0.0
 
-                send_light_set_all(0.0, pickupId)
+                cascadeActive = true
+                cascadeIndex = 1
+                cascadeTimer = LIGHT_CASCADE_DELAY
 
                 if DEBUG then
-                    print("[Key_Shared] Light delay finished -> starting fade")
+                    print("[Key_Shared] Light delay finished -> starting cascade")
                 end
             end
         end
 
-        if lightFading and has_any_lights() then
-            lightTime = lightTime + dt
-            local t = lightTime / math.max(LIGHT_FADE_SECONDS, 0.001)
-            if t > 1.0 then t = 1.0 end
+        if cascadeActive then
+            cascadeTimer = cascadeTimer + dt
 
-            send_light_set_all(LIGHT_TARGET_INTENSITY * t, pickupId)
+            if cascadeTimer >= LIGHT_CASCADE_DELAY then
+                cascadeTimer = 0.0
 
-            if t >= 1.0 then
-                lightFading = false
-                if DEBUG then
-                    print("[Key_Shared] Light fade complete")
+                local lid = HALL_LIGHT_CASCADE[cascadeIndex]
+
+                if lid ~= nil then
+                    lightFadeStates[lid] =
+                    {
+                        t = 0.0,
+                        start = 0.0,
+                        target = LIGHT_TARGET_INTENSITY
+                    }
+
+                    cascadeIndex = cascadeIndex + 1
+                else
+                    cascadeActive = false
+                    if DEBUG then
+                        print("[Key_Shared] Light cascade complete")
+                    end
                 end
             end
         end
+
+        for lid, state in pairs(lightFadeStates) do
+            state.t = state.t + dt
+            local progress = state.t / LIGHT_FADE_SECONDS
+            if progress > 1.0 then progress = 1.0 end
+
+            local value = state.start + (state.target - state.start) * progress
+
+            SHARED.LIGHT_CMD = SHARED.LIGHT_CMD or {}
+            SHARED.LIGHT_CMD[lid] =
+            {
+                cmd = "set",
+                by = pickupId,
+                value = value
+            }
+
+            if progress >= 1.0 then
+                lightFadeStates[lid] = nil
+            end
+        end
+
         return
     end
 

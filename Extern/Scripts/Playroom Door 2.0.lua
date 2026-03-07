@@ -5,7 +5,7 @@ local DEBUG = true
 
 -- ===== ROTATION CONFIG =====
 local closedAngle = 0.0
-local openAngle   = 40.0
+local openAngle   = -240.0
 local rotateSpeed = 50.0
 
 local isOpen     = false

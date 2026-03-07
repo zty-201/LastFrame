@@ -113,6 +113,10 @@ namespace EngineFramework
 		logFmodError(r, "System::init");
 		if (r != FMOD_OK) return;
 
+		r = m_system->set3DSettings(1.0f, 1.0f, 0.35f);
+		logFmodError(r, "System::set3DSettings");
+		if (r != FMOD_OK) return;
+
 		// Create groups
 		r = m_system->createChannelGroup("Master", &m_groupMaster);     logFmodError(r, "createChannelGroup(Master)");     if (r != FMOD_OK) return;
 		r = m_system->createChannelGroup("Music", &m_groupBGM);       logFmodError(r, "createChannelGroup(Music)");      if (r != FMOD_OK) return;
@@ -359,7 +363,7 @@ namespace EngineFramework
 			channel->setChannelGroup(grp);
 
 		// Fade
-		float finalTargetVolume = std::clamp(slot->volume, 0.0f, 1.0f);
+		float finalTargetVolume = std::clamp(slot->volume, 0.0f, 5.0f);
 
 		if (slot->useFade)
 		{
@@ -658,7 +662,7 @@ namespace EngineFramework
 		if (r != FMOD_OK || !channel) return false;
 
 		if (auto* grp = pickGroup(group)) channel->setChannelGroup(grp);
-		channel->setVolume(std::clamp(volume, 0.0f, 1.0f));
+		channel->setVolume(std::clamp(volume, 0.0f, 5.0f));
 		channel->setPaused(paused ? true : false);
 		if (!paused) channel->setPaused(false);
 		return true;
@@ -691,7 +695,7 @@ namespace EngineFramework
 		if (r != FMOD_OK || !channel) return false;
 
 		if (auto* grp = pickGroup(group)) channel->setChannelGroup(grp);
-		channel->setVolume(std::clamp(volume, 0.0f, 1.0f));
+		channel->setVolume(std::clamp(volume, 0.0f, 5.0f));
 		channel->setMode((loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF) | (is3D ? FMOD_3D : FMOD_2D));
 
 		if (is3D)
@@ -729,7 +733,7 @@ namespace EngineFramework
 	void AudioSystem::SetMasterVolume(float volume)
 	{
 		if (!m_initialized) return;
-		volume = std::clamp(volume, 0.0f, 1.0f);
+		volume = std::clamp(volume, 0.0f, 5.0f);
 #ifndef DISABLE_FMOD
 		if (m_groupMaster) m_groupMaster->setVolume(volume);
 #endif
@@ -738,7 +742,7 @@ namespace EngineFramework
 	void AudioSystem::SetGroupVolume(AudioGroup group, float volume)
 	{
 		if (!m_initialized) return;
-		volume = std::clamp(volume, 0.0f, 1.0f);
+		volume = std::clamp(volume, 0.0f, 5.0f);
 #ifndef DISABLE_FMOD
 		if (auto* grp = pickGroup(group)) grp->setVolume(volume);
 #endif
