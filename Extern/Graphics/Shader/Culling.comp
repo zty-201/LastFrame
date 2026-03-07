@@ -98,7 +98,9 @@ void main() {
     if (idx >= u_TotalInstances) return;
 
     InstanceData inst = instances[idx];
-    
+
+    if (inst.batchID == 0xFFFFFFFFu) return;
+
     // 1. Transform Local Bounding Sphere to World Space
     vec3 worldCenter = vec3(inst.modelMatrix * vec4(inst.boundingSphere.xyz, 1.0));
     

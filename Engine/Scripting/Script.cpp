@@ -246,6 +246,15 @@ namespace Engine {
         // ===============================================================
         // UI bindings (Lua -> UI_System)
         // ===============================================================
+
+        s_Lua.set_function("GetEntityName",
+            [](uint32_t entityId) -> std::string
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                return EngineFramework::GameObjectSystem::GetInstance().GetEntityName(e);
+            });
+
+
         s_Lua.set_function("UI_StartPseudoCutscene", []()
             {
                 // If your UI_System is NOT singleton and is purely static:
@@ -475,18 +484,6 @@ namespace Engine {
         // Light Component bindings
         // ===============================================================
         s_Lua.new_usertype<LightComponent>("LightComponent",
-            //"GetPosition", [](LightComponent& light) {
-            //    return std::make_tuple(light.position.x, light.position.y, light.position.z);
-            //},
-            //"SetPosition", [](LightComponent& light, float x, float y, float z) {
-            //    light.position = glm::vec3(x, y, z);
-            //},
-            //"GetDirection", [](LightComponent& light) {
-            //    return std::make_tuple(light.direction.x, light.direction.y, light.direction.z);
-            //},
-            //"SetDirection", [](LightComponent& light, float x, float y, float z) {
-            //    light.direction = glm::normalize(glm::vec3(x, y, z));
-            //},
             "GetIntensity", [](LightComponent& light) {
                 return light.intensity;
             },
@@ -765,7 +762,23 @@ namespace Engine {
             },
             "SetLayer", [](UIComponent& ui, int layer) {
                 ui.layer = layer;
+            },
+            "GetPosition_NDC", [](UIComponent& ui) {
+                return std::make_tuple(ui.position_NDC.x, ui.position_NDC.y);
+            },
+            "SetPosition_NDC", [](UIComponent& ui, float x, float y) {
+                ui.position_NDC = glm::vec2(x, y);
+            },
+            "is_NDC", [](UIComponent& ui, bool v) {
+                ui.is_NDC = v;
+            },
+            "GetSize_NDC", [](UIComponent& ui) {
+                return std::make_tuple(ui.size_NDC.x, ui.size_NDC.y);
+            },
+            "SetSize_NDC", [](UIComponent& ui, float x, float y) {
+                ui.size_NDC = glm::vec2(x, y);
             }
+            
         );
 
         s_Lua.set_function("Script_RequestReloadEntity",
@@ -945,6 +958,17 @@ namespace Engine {
                 if (!s_RuntimeRegistry->all_of<AudioComponent>(e)) return nullptr;
 
                 return &s_RuntimeRegistry->get<AudioComponent>(e);
+            });
+
+        queryTable.set_function("GetLight", [](uint32_t entityId) -> LightComponent* {
+            if (!s_RuntimeRegistry) return nullptr;
+
+            entt::entity e = static_cast<entt::entity>(entityId);
+            if (!s_RuntimeRegistry->valid(e)) return nullptr;
+
+            if (!s_RuntimeRegistry->all_of<LightComponent>(e)) return nullptr;
+
+            return &s_RuntimeRegistry->get<LightComponent>(e);
             });
 
 
@@ -1141,6 +1165,26 @@ namespace Engine {
                 return &view.get<CameraComponent>(view.front());
             }
             return nullptr;
+            });
+
+        s_Lua.set_function("GetPlayerFlashlightID", []() -> sol::optional<uint32_t> {
+            auto view = registry.view<Engine::LuaScriptComponent, LightComponent>();
+
+            for (auto [e, lsc, light] : view.each()) {
+                for (auto& inst : lsc.Scripts) {
+                    if (inst.ScriptGuid.m_Value == 0) continue;
+
+                    auto full_guid = xresource::full_guid(
+                        inst.ScriptGuid,
+                        EngineFramework::AssetManagerSystem::SCRIPT_GUID
+                    );
+
+                    if (EngineFramework::AssetManagerSystem::GetName(full_guid) == "flashlight_controller") {
+                        return static_cast<uint32_t>(e); // Return the raw Entity ID!
+                    }
+                }
+            }
+            return sol::nullopt; // Returns 'nil' in Lua
             });
 
         s_Lua.set_function("GetEntityTransform", [](entt::entity e) -> TransformComponent* {

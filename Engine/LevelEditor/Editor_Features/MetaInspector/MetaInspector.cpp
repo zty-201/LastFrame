@@ -1323,6 +1323,7 @@ namespace EditorFeatures {
 				if (edited) {
 					v = { values[0], values[1] };
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 			else if (field.type() == entt::resolve<glm::vec3>()) {
@@ -1371,6 +1372,7 @@ namespace EditorFeatures {
 					draw_vec4_drag(label.c_str(), v);
 					update_field_history(entity, component_name, data, obj);
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 
@@ -1381,6 +1383,7 @@ namespace EditorFeatures {
 						if (!descriptor.sources.empty() && draw_asset_guid_picker(label.c_str(), guid, tag->kind, descriptor.none_label, descriptor.sources, descriptor.formatter)) {
 							commit_instant_history(entity, component_name, data, obj, [&]() {
 								data.set(obj, guid);
+								any_change = true;
 							});
 						}
 					}
@@ -1494,6 +1497,22 @@ namespace EditorFeatures {
 
 			ImGui::PopID();
 		}
+
+		// --- ADD THIS BLOCK HERE ---
+		if (any_change) {
+			// Trigger EnTT on_update signals so the InstancingSystem knows to rebuild batches
+			if (mt == entt::resolve<MaterialComponent>()) {
+				registry.patch<MaterialComponent>(entity);
+			}
+			else if (mt == entt::resolve<MeshComponent>()) {
+				registry.patch<MeshComponent>(entity);
+			}
+			else if (mt == entt::resolve<AnimationComponent>()) {
+				registry.patch<AnimationComponent>(entity);
+			}
+		}
+		// ---------------------------
+
 		return any_change;
 	}
 }

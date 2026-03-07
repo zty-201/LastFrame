@@ -108,7 +108,7 @@ namespace EngineFramework
         }
 
 
-        if (action == GLFW_PRESS && key == GLFW_KEY_U) {
+        /*if (action == GLFW_PRESS && key == GLFW_KEY_U) {
 
             UI_System::GetInstance().displayMenu("Menu_1");
 
@@ -123,7 +123,7 @@ namespace EngineFramework
         }
         else if (action == GLFW_PRESS && key == GLFW_KEY_L) {
             UI_System::GetInstance().closeAllMenu();
-        }
+        }*/
     }
 
     void InputManager::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)

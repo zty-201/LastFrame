@@ -94,9 +94,15 @@ namespace EngineFramework
 
 	void GameObjectSystem::LoadScene(const std::string& json_input)
 	{
+		// Disable dynamic updates to prevent batch rebuilding until all entities are loaded, otherwise we will have a performance spike after every entity load.
+		GraphicsSystem::GetInstance().GetInstancingSystem()->SetDynamicUpdatesEnabled(false);
+
 		ClearAllInstances();
 		DeSerializeAllEntityInstances(json_input);
+
+		// After loading all entities, build the batches for rendering. This is more efficient than building batches after every entity load.
 		GraphicsSystem::GetInstance().GetInstancingSystem()->BuildSceneBatches();
+		GraphicsSystem::GetInstance().GetInstancingSystem()->SetDynamicUpdatesEnabled(true);
 	}
 
 	void GameObjectSystem::QueueLoadScene(const std::string& json_input)
@@ -124,10 +130,18 @@ namespace EngineFramework
 		{
 			LOGI("[GameObjectSystem] Executing Deferred Scene Load...");
 
+			GraphicsSystem::GetInstance().GetInstancingSystem()->SetDynamicUpdatesEnabled(false);
+
 			ClearAllInstances();
 			DeSerializeAllEntityInstances(m_pendingSceneData);
-
 			UI_System::GetInstance().Initialize();
+
+			// 2. Bulk upload the new scene
+			GraphicsSystem::GetInstance().GetInstancingSystem()->BuildSceneBatches();
+
+			// 3. WAKE the engine back up
+			GraphicsSystem::GetInstance().GetInstancingSystem()->SetDynamicUpdatesEnabled(true);
+			
 
 			m_pendingSceneLoad = false;
 			m_pendingSceneData.clear();
