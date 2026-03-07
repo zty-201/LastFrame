@@ -111,6 +111,7 @@ function on_create(Self)
     SHARED.DISC_USE_HAVE_ICON_CMD = SHARED.DISC_USE_HAVE_ICON_CMD or {}
     SHARED.DISC_USE_NODISC_ICON_CMD = SHARED.DISC_USE_NODISC_ICON_CMD or {}
     SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
+    SHARED.MUSICBOX_DISC_PLACED = false
 end
 
 function on_update(Self, dt)
@@ -183,6 +184,8 @@ function on_update(Self, dt)
         print("[Test_ConsumeDisc_Shared] ERROR: Remove failed")
         return
     end
+
+    SHARED.MUSICBOX_DISC_PLACED = true
 
     if DEBUG then
         print("[Test_ConsumeDisc_Shared] Consumed:", ITEM_ID, "x" .. ITEM_QTY)
