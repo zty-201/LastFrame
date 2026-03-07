@@ -407,7 +407,7 @@ namespace EngineFramework
     void UI_System::Load_Start_Menu()
     {
         displayMenu("StartMenu");
-        displayMenu("AndroidInputOverlay"); //remember to set if end flags for android build.
+        //displayMenu("AndroidInputOverlay"); //remember to set if end flags for android build.
     }
 
     void UI_System::displayMenu(std::string menuname)

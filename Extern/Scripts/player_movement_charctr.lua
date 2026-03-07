@@ -111,13 +111,14 @@ function on_update(self, dt)
         end
     end
 
-    2. Read from Keyboard (Windows) - only if joystick isn't dominating
+    --2. Read from Keyboard (Windows) - only if joystick isn't dominating
     if PLATFORM == "windows" then
         if Input.GetAction("MOVE_FORWARD") then moveZ = moveZ + 1 end
         if Input.GetAction("MOVE_BACK")    then moveZ = moveZ - 1 end
         if Input.GetAction("MOVE_LEFT")    then moveX = moveX + 1 end
         if Input.GetAction("MOVE_RIGHT")   then moveX = moveX - 1 end
     end
+
     UI_DisplayMenu("AndroidInputOverlay")
     local len = math.sqrt(moveX * moveX + moveZ * moveZ)
 
