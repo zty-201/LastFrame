@@ -135,7 +135,7 @@ namespace EngineFramework
 
         current_menu = ""; // none, i havent set default yet
 
-        Load_Start_Menu();
+        //Load_Start_Menu();
     }
 
     void UI_System::Clean_All()

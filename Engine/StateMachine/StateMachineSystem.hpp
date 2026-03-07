@@ -5,7 +5,7 @@
 
 namespace EngineFramework
 {
-    class StateMachineSystem final : public ISystem
+    class StateMachineSystem : public ISystem
     {
     public:
         StateMachineSystem() = default;
@@ -17,12 +17,12 @@ namespace EngineFramework
     private:
         void Initialize() override;
         void Update(float dt) override;
-        void PostUpdate(float dt) override
-        {
-            UNREFERENCED_PARAMETER(dt);
-        }
+        //void PostUpdate(float dt) override {}
 
     private:
         Engine::StateMachine m_stateMachine;
+
+        // Add this line
+        bool m_started = false;
     };
 }

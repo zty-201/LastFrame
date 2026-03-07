@@ -19,5 +19,5 @@ public:
 private:
     std::string m_name = "Splash";
     float m_timer = 0.0f;
-    float m_duration = 3.0f;
+    float m_duration = 2.5f;
 };
