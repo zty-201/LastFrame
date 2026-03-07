@@ -35,6 +35,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "UIComponent.h"
 #include "Input/InputManager.hpp"
 #include "NameComponent.h"
+#include "Script.hpp"
 
 namespace EngineFramework
 {
@@ -269,6 +270,10 @@ namespace EngineFramework
                     joystick.outputX = currentOffset.x / joystick.maxRadius;
                     joystick.outputY = currentOffset.y / joystick.maxRadius;
                 }
+
+                auto& lua = Engine::ScriptSystem::GetLuaState();
+                lua["SHARED"]["UI"]["joystickX"] = joystick.outputX;
+                lua["SHARED"]["UI"]["joystickY"] = joystick.outputY;
             }
             else
             {
@@ -278,6 +283,9 @@ namespace EngineFramework
                     joystick.isBeingDragged = false;
                     joystick.outputX = joystick.outputY = 0.f;
                 }
+                auto& lua = Engine::ScriptSystem::GetLuaState();
+                lua["SHARED"]["UI"]["joystickX"] = 0.0f;
+                lua["SHARED"]["UI"]["joystickY"] = 0.0f;
             }
 
             if (registry.valid(joystick.knobEntity) && registry.all_of<UIComponent>(joystick.knobEntity))
