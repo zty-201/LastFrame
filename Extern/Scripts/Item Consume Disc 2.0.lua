@@ -24,6 +24,18 @@ local DISC_INSERT_DELAY_SECONDS = 0.75  -- make longer/shorter as you like
 local pendingTrigger = false
 local pendingTimer = 0.0
 
+------------------------------------------------
+-- TTLS sequence states
+------------------------------------------------
+local SEQ_IDLE      = 0
+local SEQ_START     = 1
+local SEQ_PAUSE     = 2
+local SEQ_EXPLODE   = 3
+local SEQ_END       = 4
+
+local sequenceState = SEQ_IDLE
+local sequenceTimer = 0.0
+
 local function s(v) return (v == nil) and "nil" or tostring(v) end
 
 local function consume_shared_cmd(cmdTable, id)

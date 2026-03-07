@@ -16165,12 +16165,12 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						15134610902839312391,
+						15689459791576875013,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"id": "Checkpoint1",
+					"id": "TTLS_Start",
 					"loop": false,
 					"maxDistance": 100.0,
 					"minDistance": 1.0,
@@ -16178,7 +16178,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 2.0320000648498535
 				},
 				{
 					"ambienceType": 0,
@@ -16189,6 +16189,24 @@
 					"category": 0,
 					"fadeDuration": 1.0,
 					"id": "DiscInsert",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 2.0209999084472656
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						13960077534666604547,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "TTLS_End",
 					"loop": false,
 					"maxDistance": 25.0,
 					"minDistance": 1.0,
@@ -49711,7 +49729,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 451.4753112792969,
+			"intensity": 471.5586242675781,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -49829,7 +49847,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 372.7079772949219,
+			"intensity": 342.3106994628906,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -49967,7 +49985,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 418.3017272949219,
+			"intensity": 388.55462646484375,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50015,7 +50033,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 362.009521484375,
+			"intensity": 349.0611877441406,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50063,7 +50081,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 515.5597534179688,
+			"intensity": 502.9374694824219,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50111,7 +50129,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 518.9268798828125,
+			"intensity": 463.4005126953125,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -53172,6 +53190,28 @@
 		}
 	},
 	"522": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						17864768738380677141,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "ChairExplode",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 2.0320000648498535
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				21.22170639038086,
@@ -53205,6 +53245,15 @@
 					],
 					"sphereRadius": 0.5,
 					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6781577181173088257
 				}
 			]
 		},
@@ -53251,7 +53300,7 @@
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Playroom_KidChair_05"
+			"name": "Playroom_KidChair_05 (Source)"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -59760,10 +59809,6 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 6781577181173088257
-				},
-				{
-					"Loaded": true,
 					"ScriptGuid": 6445003481980993537
 				}
 			]
@@ -59847,7 +59892,7 @@
 			],
 			"rotation": [
 				0.0,
-				40.00716018676758,
+				44.152198791503906,
 				0.0
 			],
 			"scale": [
@@ -59982,7 +60027,7 @@
 			],
 			"rotation": [
 				0.0,
-				40.00716018676758,
+				44.152198791503906,
 				0.0
 			],
 			"scale": [
@@ -60117,7 +60162,7 @@
 			],
 			"rotation": [
 				0.0,
-				40.00716018676758,
+				44.152198791503906,
 				0.0
 			],
 			"scale": [
@@ -85861,6 +85906,236 @@
 				0.0,
 				0.0
 			]
+		}
+	},
+	"821": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6302445202357600261
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayroomNotesIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				491.65423583984375,
+				112.0962905883789,
+				-577.5888061523438
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1320.0,
+				833.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				14098791784313045011,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
+	"822": {
+		"ColliderComponent": {
+			"maxBounds": [
+				5.042779922485352,
+				0.5131120085716248,
+				4.305193901062012
+			],
+			"minBounds": [
+				-4.389447212219238,
+				0.03763800859451294,
+				-4.48587703704834
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						4.716113567352295,
+						0.2377369999885559,
+						4.395535469055176
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.32666635513305664,
+						0.27537500858306885,
+						-0.09034156799316406
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16102277991515799559
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				16480914648126767115,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				7257542611271991309,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				17633836152733614095,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				11292767877395955729,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				2645856592844603411,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "notes",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Playroom_Notes"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				488.04217529296875,
+				103.88298034667969,
+				-572.6637573242188
+			],
+			"rotation": [
+				-179.99989318847656,
+				70.40000915527344,
+				-179.99989318847656
+			],
+			"scale": [
+				2.0,
+				2.0,
+				2.0
+			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				10.0,
+				10.0,
+				10.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				3.049999952316284,
+				0.20000000298023224
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"83": {
