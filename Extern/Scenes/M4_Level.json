@@ -12885,53 +12885,53 @@
 			]
 		}
 	},
-	"501": {
-		"MaterialComponent": {
-			"albedoFactor": [
+	"2": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
-			"albedoMap": [
-				8652294881921892357,
-				4431689612682600001
+			"constant": 1.0,
+			"innerConeAngle": 15.0,
+			"intensity": 0.0,
+			"isStatic": false,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"quadratic": 0.03200000151991844,
+			"radius": 2500.0,
+			"type": 2
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 15968805962367582209
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayerFlashlight"
+		},
+		"TransformComponent": {
+			"position": [
+				-461.9490051269531,
+				316.9678649902344,
+				-505.62554931640625
 			],
-			"ambientOcclusionMap": [
-				0,
-				0
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				0,
-				0
-			],
-			"name": "Skybox",
-			"normalMap": [
-				0,
-				0
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
-			],
-			"uvOffset": [
+			"rotation": [
+				0.0,
 				0.0,
 				0.0
 			],
-			"uvTiling": [
+			"scale": [
+				1.0,
 				1.0,
 				1.0
 			]
-		},
-		"MeshComponent": {
-			"meshName": "SkyBox",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Skybox"
-		},
-		"SkyboxRenderPass": null
+		}
 	},
 	"20": {
 		"MaterialComponent": {
@@ -50674,6 +50674,54 @@
 			]
 		}
 	},
+	"501": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				8652294881921892357,
+				4431689612682600001
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Skybox",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "SkyBox",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Skybox"
+		},
+		"SkyboxRenderPass": null
+	},
 	"502": {
 		"ButtonComponent": {
 			"clicked_texture": [
@@ -85255,52 +85303,80 @@
 			]
 		}
 	},
-	"2": {
-		"LightComponent": {
-			"castShadows": true,
+	"818": {
+		"NameComponent": {
+			"name": "Joystick BG"
+		},
+		"UIComponent": {
+			"Overlay_name": "Android Input Menu",
 			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
-			"constant": 1.0,
-			"innerConeAngle": 15.0,
-			"intensity": 0.0,
-			"isStatic": false,
-			"linear": 0.09000000357627869,
-			"outerConeAngle": 35.0,
-			"quadratic": 0.03200000151991844,
-			"radius": 2500.0,
-			"type": 2
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 15968805962367582209
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "PlayerFlashlight"
-		},
-		"TransformComponent": {
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
 			"position": [
-				-461.9490051269531,
-				316.9678649902344,
-				-505.62554931640625
+				64.97498321533203,
+				35.247501373291016
 			],
-			"rotation": [
-				0.0,
-				0.0,
-				0.0
+			"position_NDC": [
+				-0.7850000262260437,
+				-0.6850000023841858
 			],
-			"scale": [
+			"size": [
+				113.0,
+				122.5999984741211
+			],
+			"size_NDC": [
+				0.10000000149011612,
+				0.20000000298023224
+			],
+			"textureid": [
+				13373202070917185537,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"819": {
+		"NameComponent": {
+			"name": "Joystick"
+		},
+		"UIComponent": {
+			"Overlay_name": "Android Input Menu",
+			"color": [
 				1.0,
 				1.0,
 				1.0
-			]
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				64.97498321533203,
+				35.247501373291016
+			],
+			"position_NDC": [
+				-0.7850000262260437,
+				-0.6850000023841858
+			],
+			"size": [
+				113.0,
+				122.5999984741211
+			],
+			"size_NDC": [
+				0.10000000149011612,
+				0.20000000298023224
+			],
+			"textureid": [
+				3601763066940784643,
+				3711223656383638553
+			],
+			"visible": false
 		}
 	},
 	"82": {

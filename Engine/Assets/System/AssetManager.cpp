@@ -443,11 +443,13 @@ namespace EngineFramework {
 				throw std::runtime_error((std::string("No Function Loader for resource type: ") + resource_type +
 					". Ensure it is spelt correctly, and asset loader has been added to asset_loader_map.").c_str());
 			}
+			//LOGI("[Asset Trace] ---> Starting Loader: %s", resource_type.c_str());
 			//Call the asset loader for that respective asset type, and pass in the folderpath.
 			if (!asset_loader_map[resource_type](folder_path))
 			{
 				throw std::runtime_error((std::string("Unable to load asset of type: ") + resource_type).c_str());
 			}
+			//LOGI("[Asset Trace] <--- Finished Loader: %s", resource_type.c_str());
 		}
 	}
 
