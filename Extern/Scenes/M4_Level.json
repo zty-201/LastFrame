@@ -3761,6 +3761,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						0,
 						0
@@ -10742,6 +10743,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						1147406921581395983,
 						11537445004664754516
@@ -10759,6 +10761,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						8064935949222477843,
 						11537445004664754516
@@ -10776,6 +10779,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						11523700463043018775,
 						11537445004664754516
@@ -12850,6 +12854,28 @@
 		}
 	},
 	"2": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16287532407446159363,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Flashlight",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 0.5249999761581421
+				}
+			]
+		},
 		"LightComponent": {
 			"castShadows": true,
 			"color": [
@@ -12881,9 +12907,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-29.950607299804688,
+				203.2270050048828,
 				190.6817626953125,
-				-73.64641571044922
+				-386.6596984863281
 			],
 			"rotation": [
 				-0.0,
@@ -15357,6 +15383,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						13829543472256712737,
 						11537445004664754516
@@ -16136,6 +16163,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						15134610902839312391,
 						11537445004664754516
@@ -16153,6 +16181,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						16135386481470406667,
 						11537445004664754516
@@ -20217,6 +20246,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						2876789178491666467,
 						11537445004664754516
@@ -21312,6 +21342,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						17288307986077253649,
 						11537445004664754516
@@ -21329,6 +21360,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						11523700463043018791,
 						11537445004664754516
@@ -21346,6 +21378,7 @@
 					"volume": 1.003000020980835
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						6912014444615630885,
 						11537445004664754516
@@ -21363,6 +21396,7 @@
 					"volume": 5.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						0,
 						0
@@ -31182,6 +31216,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						1147406921581395983,
 						11537445004664754516
@@ -31199,6 +31234,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						8064935949222477843,
 						11537445004664754516
@@ -31216,6 +31252,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						17288307986077253649,
 						11537445004664754516
@@ -31357,7 +31394,7 @@
 		"TransformComponent": {
 			"position": [
 				98.26484680175781,
-				0.0,
+				295.782958984375,
 				-459.3639831542969
 			],
 			"rotation": [
@@ -31367,8 +31404,8 @@
 			],
 			"scale": [
 				0.999999463558197,
-				0.9999979138374329,
-				0.9999974370002747
+				0.9999953508377075,
+				0.9999948740005493
 			]
 		},
 		"TriggerBoxComponent": {
@@ -37939,12 +37976,13 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 1,
 					"audio_guid": [
 						9017684586087759873,
 						11537445004664754516
 					],
 					"category": 3,
-					"fadeDuration": 1.0,
+					"fadeDuration": 3.0,
 					"id": "Outdoor",
 					"loop": true,
 					"maxDistance": 10.0,
@@ -37952,16 +37990,17 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"useFade": false,
+					"useFade": true,
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 2,
 					"audio_guid": [
 						15935213613728841733,
 						11537445004664754516
 					],
 					"category": 3,
-					"fadeDuration": 1.0,
+					"fadeDuration": 3.0,
 					"id": "Indoor",
 					"loop": true,
 					"maxDistance": 25.0,
@@ -37969,25 +38008,26 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"useFade": false,
+					"useFade": true,
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						12687520148045856771,
 						11537445004664754516
 					],
-					"category": 0,
+					"category": 1,
 					"fadeDuration": 1.0,
 					"id": "Menu",
-					"loop": true,
+					"loop": false,
 					"maxDistance": 25.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
-					"playOnStart": true,
+					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 0.34200000762939453
 				}
 			]
 		},
@@ -38268,9 +38308,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-29.950607299804688,
+				203.2270050048828,
 				191.4817657470703,
-				-58.64641571044922
+				-371.6596984863281
 			],
 			"rotation": [
 				0.0,
@@ -39895,6 +39935,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						17288307986077253649,
 						11537445004664754516
@@ -48723,6 +48764,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						8064935949222477869,
 						11537445004664754516
@@ -49162,6 +49204,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						3453249930795089951,
 						11537445004664754516
@@ -49592,6 +49635,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						8124441560211767297,
 						11537445004664754516
@@ -49667,32 +49711,41 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 451.4753112792969,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"quadratic": 0.03200000151991844,
-			"radius": 600.0,
+			"radius": 1200.0,
 			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6930785349034000389
+				}
+			]
 		},
 		"NameComponent": {
 			"name": "Playroom_Light_01"
 		},
 		"TransformComponent": {
 			"position": [
-				558.9500122070313,
-				168.60000610351563,
-				-568.6500244140625
+				568.0775756835938,
+				150.3831787109375,
+				-578.5573120117188
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
@@ -49700,6 +49753,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						8124441560211767297,
 						11537445004664754516
@@ -49775,13 +49829,22 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 372.7079772949219,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"quadratic": 0.03200000151991844,
-			"radius": 600.0,
+			"radius": 1200.0,
 			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6930785349034000389
+				}
+			]
 		},
 		"NameComponent": {
 			"name": "Canteen_Light_01"
@@ -49904,13 +49967,22 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 418.3017272949219,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"quadratic": 0.03200000151991844,
-			"radius": 600.0,
+			"radius": 1200.0,
 			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6930785349034000389
+				}
+			]
 		},
 		"NameComponent": {
 			"name": "Canteen_Light_02"
@@ -49943,13 +50015,22 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 362.009521484375,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"quadratic": 0.03200000151991844,
-			"radius": 600.0,
+			"radius": 1200.0,
 			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6930785349034000389
+				}
+			]
 		},
 		"NameComponent": {
 			"name": "Canteen_Light_03"
@@ -49982,13 +50063,22 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 515.5597534179688,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"quadratic": 0.03200000151991844,
-			"radius": 600.0,
+			"radius": 1200.0,
 			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6930785349034000389
+				}
+			]
 		},
 		"NameComponent": {
 			"name": "Canteen_Light_04"
@@ -50021,13 +50111,22 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 518.9268798828125,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
 			"quadratic": 0.03200000151991844,
-			"radius": 600.0,
+			"radius": 1200.0,
 			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6930785349034000389
+				}
+			]
 		},
 		"NameComponent": {
 			"name": "Canteen_Light_05"
@@ -50288,6 +50387,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						16309874578476007435,
 						11537445004664754516
@@ -50305,6 +50405,7 @@
 					"volume": 0.1080000028014183
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						6185210870235774977,
 						11537445004664754516
@@ -50322,6 +50423,7 @@
 					"volume": 0.11400000005960464
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						13679200650180280323,
 						11537445004664754516
@@ -50339,6 +50441,7 @@
 					"volume": 0.10599999874830246
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						8491053879449468933,
 						11537445004664754516
@@ -50356,6 +50459,7 @@
 					"volume": 0.10599999874830246
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						2149985604111810567,
 						11537445004664754516
@@ -50373,6 +50477,7 @@
 					"volume": 0.1080000028014183
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						4455828613325504521,
 						11537445004664754516
@@ -50390,6 +50495,7 @@
 					"volume": 0.09399999678134918
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						10220436136359739403,
 						11537445004664754516
@@ -50407,6 +50513,7 @@
 					"volume": 0.1080000028014183
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						5608750117932351501,
 						11537445004664754516
@@ -50422,23 +50529,6 @@
 					"spatial": 1,
 					"useFade": false,
 					"volume": 0.1120000034570694
-				},
-				{
-					"audio_guid": [
-						16287532407446159363,
-						11537445004664754516
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"id": "Flashlight",
-					"loop": false,
-					"maxDistance": 25.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"useFade": false,
-					"volume": 0.24500000476837158
 				}
 			]
 		},
@@ -50535,13 +50625,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-29.950607299804688,
+				203.2270050048828,
 				190.6817626953125,
-				-888.10888671875
+				-401.6596984863281
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -51018,6 +51108,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						16135386481470406669,
 						11537445004664754516
@@ -51092,7 +51183,7 @@
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Playroom_SoftToy_Disc"
+			"name": "Playroom_Disc (SoftToy)"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -51169,6 +51260,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						17288307986077253649,
 						11537445004664754516
@@ -51186,6 +51278,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						11523700463043018775,
 						11537445004664754516
@@ -51203,6 +51296,7 @@
 					"volume": 5.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						6912014444615630885,
 						11537445004664754516
@@ -59753,7 +59847,7 @@
 			],
 			"rotation": [
 				0.0,
-				91.1533203125,
+				40.00716018676758,
 				0.0
 			],
 			"scale": [
@@ -59888,7 +59982,7 @@
 			],
 			"rotation": [
 				0.0,
-				91.1533203125,
+				40.00716018676758,
 				0.0
 			],
 			"scale": [
@@ -60023,7 +60117,7 @@
 			],
 			"rotation": [
 				0.0,
-				91.1533203125,
+				40.00716018676758,
 				0.0
 			],
 			"scale": [
@@ -61670,9 +61764,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				80.33246612548828,
-				137.0432586669922,
-				-366.01995849609375
+				91.92605590820313,
+				108.5403823852539,
+				-354.498779296875
 			],
 			"rotation": [
 				0.0,
@@ -61680,9 +61774,9 @@
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		},
 		"UIComponent": {
@@ -61705,8 +61799,8 @@
 				0.0
 			],
 			"size": [
-				755.0,
-				490.0
+				1102.0,
+				833.0
 			],
 			"size_NDC": [
 				1.0,
@@ -61734,9 +61828,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				80.33246612548828,
-				137.0432586669922,
-				-366.01995849609375
+				91.9260025024414,
+				108.54000091552734,
+				-354.4989929199219
 			],
 			"rotation": [
 				0.0,
@@ -61769,8 +61863,8 @@
 				0.0
 			],
 			"size": [
-				1800.0,
-				1158.0
+				1102.0,
+				833.0
 			],
 			"size_NDC": [
 				1.0,
@@ -61862,9 +61956,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				655.3428955078125,
-				83.59370422363281,
-				-256.51318359375
+				657.026611328125,
+				76.2557601928711,
+				-259.27069091796875
 			],
 			"rotation": [
 				0.0,
@@ -61897,8 +61991,8 @@
 				0.0
 			],
 			"size": [
-				1781.0,
-				1158.0
+				1320.0,
+				833.0
 			],
 			"size_NDC": [
 				1.0,
@@ -61926,9 +62020,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				581.6229858398438,
-				146.1432342529297,
-				-528.1101684570313
+				583.4970092773438,
+				131.6501922607422,
+				-532.8197631835938
 			],
 			"rotation": [
 				0.0,
@@ -61961,8 +62055,8 @@
 				0.0
 			],
 			"size": [
-				1781.0,
-				1158.0
+				1320.0,
+				833.0
 			],
 			"size_NDC": [
 				1.0,
@@ -61990,9 +62084,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				581.6229858398438,
-				146.1432342529297,
-				-528.1101684570313
+				583.4970092773438,
+				131.64999389648438,
+				-532.8200073242188
 			],
 			"rotation": [
 				0.0,
@@ -62025,8 +62119,8 @@
 				0.0
 			],
 			"size": [
-				1781.0,
-				1158.0
+				1320.0,
+				833.0
 			],
 			"size_NDC": [
 				1.0,
@@ -69416,8 +69510,8 @@
 				0.0
 			],
 			"size": [
-				1729.0,
-				1158.0
+				1320.0,
+				833.0
 			],
 			"size_NDC": [
 				1.0,
@@ -85359,6 +85453,169 @@
 			]
 		}
 	},
+	"818": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6930785348991287297
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayroomDoorHandleIcon"
+		},
+		"TransformComponent": {
+			"position": [
+				88.64759826660156,
+				120.09732818603516,
+				-366.01995849609375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1102.0,
+				833.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				7810306648073666571,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"819": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 10389549862831964163
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				8406558607316762655,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				3218411836585951265,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				3218411836585951267,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				18206391396474961957,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				7830097855013339175,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "CD",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Playroom_Disc (MusicBox)"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				582.3497924804688,
+				125.41146850585938,
+				-530.5180053710938
+			],
+			"rotation": [
+				0.0,
+				115.38575744628906,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
 	"82": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -85482,6 +85739,127 @@
 				0.20000000298023224,
 				1.0,
 				0.9999998211860657
+			]
+		}
+	},
+	"820": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						2876789178491666467,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Running",
+					"loop": true,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 9813089110592405511
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				8298322686060036097,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				12910008704487424009,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				12910008704487424005,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				9451244190666883075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				18098155475218235399,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "little_girl",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Hall_Girl"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				26.635326385498047,
+				9.417980194091797,
+				-523.1233520507813
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
 			]
 		}
 	},

@@ -50,7 +50,7 @@ local function start_flicker()
     flickerDuration = random_range(0.02, 0.08)
 
     -- flame-like brightness variation
-    flickerIntensity = defaultIntensity * random_range(0.7, 1.05)
+    flickerIntensity = defaultIntensity * random_range(0.3, 1.05)
 end
 
 function on_create(self)
