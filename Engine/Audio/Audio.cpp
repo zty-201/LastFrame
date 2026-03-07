@@ -430,6 +430,8 @@ namespace EngineFramework
 
 					if (inst.useFade && inst.fadeDuration > 0.0f)
 					{
+						LOGI("[Audio] Marking isFadingOut=true | Slot: %s | Triggered by PlaySlot command for: %s",
+							inst.slotId.c_str(), cmd.slotId.c_str());
 						inst.isFadingOut = true;
 					}
 					else
@@ -466,6 +468,7 @@ namespace EngineFramework
 	void AudioSystem::ProcessStopSlot(const AudioCommand& cmd)
 	{
 #ifndef DISABLE_FMOD
+		LOGI("[Audio] ProcessStopSlot called | Slot: %s", cmd.slotId.c_str());
 		for (auto& inst : m_active)
 		{
 			if (inst.entity == cmd.entity && inst.slotId == cmd.slotId)
@@ -475,6 +478,8 @@ namespace EngineFramework
 
 				if (inst.useFade && inst.fadeDuration > 0.0f)
 				{
+					LOGI("[Audio] Marking isFadingOut=true | Slot: %s | Triggered by StopSlot",
+						inst.slotId.c_str());
 					inst.isFadingOut = true;
 				}
 				else
@@ -546,9 +551,12 @@ namespace EngineFramework
 			}
 
 			// 3. Apply volume
-			float equalPowerMultiplier = std::sin(instance.currentFadeVolume * (3.14159265f * 0.5f));
-			float finalVolume = instance.targetVolume * equalPowerMultiplier;
-			instance.channel->setVolume(finalVolume);
+			if (instance.isFadingOut || instance.currentFadeVolume < 1.0f)
+			{
+				float equalPowerMultiplier = std::sin(instance.currentFadeVolume * (3.14159265f * 0.5f));
+				float finalVolume = instance.targetVolume * equalPowerMultiplier;
+				instance.channel->setVolume(finalVolume);
+			}
 
 			//// DEBUG PRINT: Only prints for active channels
 			//LOGI("[Audio Debug] Slot: %-10s | Final Vol: %.2f | Fade Multiplier: %.2f | Mode: %s",
@@ -611,11 +619,23 @@ namespace EngineFramework
 				continue;
 			}*/
 
-			bool playing = false;
+			/*bool playing = false;
 			if (instance.channel->isPlaying(&playing) != FMOD_OK || !playing)
 			{
 				instance.channel = nullptr;
 				continue;
+			}*/
+
+			// 5. Remove if FMOD stopped it naturally (non-looping sounds that finished)
+			// BUT: do not remove looping channels - they should play forever until explicitly stopped
+			if (!instance.looping)
+			{
+				bool playing = false;
+				if (instance.channel->isPlaying(&playing) != FMOD_OK || !playing)
+				{
+					instance.channel = nullptr;
+					continue;
+				}
 			}
 
 			if (instance.is3D)
@@ -812,18 +832,21 @@ namespace EngineFramework
 
 		// 0.0 outdoor = clear, 1.0 indoor = muffled
 		const float cutoffOutdoor = 20000.0f;
-		const float cutoffIndoor = 800.0f;
+		const float cutoffIndoor = 2500.0f;
 		const float cutoff = cutoffOutdoor + (cutoffIndoor - cutoffOutdoor) * m_indoorFactor;
 
 		m_ambienceLowpass->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoff);
 		m_ambienceLowpass->setBypass(m_indoorFactor < 0.01f);
 
-		const float PI_OVER_2 = 3.14159265f * 0.5f;
-		const float outdoorVol = std::cos(m_indoorFactor * PI_OVER_2);	// 1.0 -> 0.0
-		const float indoorVol = std::sin(m_indoorFactor * PI_OVER_2);	// 0.0 -> 1.0
+		const float minOutdoorVolume = 0.5f;
+		const float outdoorVol = 1.0f - (m_indoorFactor * (1.0f - minOutdoorVolume));
 
 		if (m_groupAmbienceOutdoor) m_groupAmbienceOutdoor->setVolume(outdoorVol);
-		if (m_groupAmbienceIndoor) m_groupAmbienceIndoor->setVolume(indoorVol);
+
+		// DEBUG
+		float confirmedVol = -1.0f;
+		if (m_groupAmbienceOutdoor) m_groupAmbienceOutdoor->getVolume(&confirmedVol);
+		LOGI("[Audio] SetIndoorFactor=%.2f | OutdoorGroupVol set =%.2f | confirmed=%.2f", m_indoorFactor, outdoorVol, confirmedVol);
 #endif
 	}
 

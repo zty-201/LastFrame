@@ -3761,6 +3761,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						0,
 						0
@@ -10778,6 +10779,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						1147406921581395983,
 						11537445004664754516
@@ -10795,6 +10797,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						8064935949222477843,
 						11537445004664754516
@@ -10812,6 +10815,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						11523700463043018775,
 						11537445004664754516
@@ -15393,6 +15397,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						13829543472256712737,
 						11537445004664754516
@@ -16172,6 +16177,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						15134610902839312391,
 						11537445004664754516
@@ -16189,6 +16195,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						16135386481470406667,
 						11537445004664754516
@@ -20253,6 +20260,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						2876789178491666467,
 						11537445004664754516
@@ -21348,6 +21356,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						17288307986077253649,
 						11537445004664754516
@@ -21365,6 +21374,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						11523700463043018791,
 						11537445004664754516
@@ -21382,6 +21392,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						6912014444615630885,
 						11537445004664754516
@@ -21399,6 +21410,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						4544308512936820739,
 						11537445004664754516
@@ -31218,6 +31230,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						1147406921581395983,
 						11537445004664754516
@@ -31235,6 +31248,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						8064935949222477843,
 						11537445004664754516
@@ -31252,6 +31266,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						17288307986077253649,
 						11537445004664754516
@@ -37975,12 +37990,13 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 1,
 					"audio_guid": [
 						9017684586087759873,
 						11537445004664754516
 					],
 					"category": 3,
-					"fadeDuration": 1.0,
+					"fadeDuration": 3.0,
 					"id": "Outdoor",
 					"loop": true,
 					"maxDistance": 10.0,
@@ -37988,16 +38004,17 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"useFade": false,
+					"useFade": true,
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 2,
 					"audio_guid": [
 						15935213613728841733,
 						11537445004664754516
 					],
 					"category": 3,
-					"fadeDuration": 1.0,
+					"fadeDuration": 3.0,
 					"id": "Indoor",
 					"loop": true,
 					"maxDistance": 25.0,
@@ -38005,15 +38022,16 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"useFade": false,
+					"useFade": true,
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						12687520148045856771,
 						11537445004664754516
 					],
-					"category": 0,
+					"category": 1,
 					"fadeDuration": 1.0,
 					"id": "Menu",
 					"loop": true,
@@ -38021,9 +38039,9 @@
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": true,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 0.5
 				}
 			]
 		},
@@ -39931,6 +39949,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						17288307986077253649,
 						11537445004664754516
@@ -48759,6 +48778,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						8064935949222477869,
 						11537445004664754516
@@ -49198,6 +49218,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						3453249930795089951,
 						11537445004664754516
@@ -50282,6 +50303,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						16309874578476007435,
 						11537445004664754516
@@ -50299,6 +50321,7 @@
 					"volume": 0.1080000028014183
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						6185210870235774977,
 						11537445004664754516
@@ -50316,6 +50339,7 @@
 					"volume": 0.11400000005960464
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						13679200650180280323,
 						11537445004664754516
@@ -50333,6 +50357,7 @@
 					"volume": 0.10599999874830246
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						8491053879449468933,
 						11537445004664754516
@@ -50350,6 +50375,7 @@
 					"volume": 0.10599999874830246
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						2149985604111810567,
 						11537445004664754516
@@ -50367,6 +50393,7 @@
 					"volume": 0.1080000028014183
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						4455828613325504521,
 						11537445004664754516
@@ -50384,6 +50411,7 @@
 					"volume": 0.09399999678134918
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						10220436136359739403,
 						11537445004664754516
@@ -50401,6 +50429,7 @@
 					"volume": 0.1080000028014183
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						5608750117932351501,
 						11537445004664754516
@@ -50418,6 +50447,7 @@
 					"volume": 0.1120000034570694
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						16287532407446159363,
 						11537445004664754516
@@ -50529,9 +50559,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-385.66522216796875,
-				190.6817626953125,
-				705.2505493164063
+				25.645912170410156,
+				190.68186950683594,
+				-906.0086669921875
 			],
 			"rotation": [
 				0.0,
@@ -50539,9 +50569,9 @@
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
@@ -51012,6 +51042,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						16135386481470406669,
 						11537445004664754516
@@ -51163,6 +51194,7 @@
 		"AudioComponent": {
 			"Slots": [
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						17288307986077253649,
 						11537445004664754516
@@ -51180,6 +51212,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						11523700463043018775,
 						11537445004664754516
@@ -51197,6 +51230,7 @@
 					"volume": 1.0
 				},
 				{
+					"ambienceType": 0,
 					"audio_guid": [
 						6912014444615630885,
 						11537445004664754516
