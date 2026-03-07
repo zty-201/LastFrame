@@ -50529,6 +50529,24 @@
 					"spatial": 1,
 					"useFade": false,
 					"volume": 0.1120000034570694
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16287532407446159363,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Flashlight",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 0.24500000476837158
 				}
 			]
 		},

@@ -280,10 +280,14 @@ namespace EngineFramework
 			HandlePlayOnStart(ecs);
 
 		// 3) Process queued play/stop commands
-		ProcessCommands(ecs);
+		if (m_inSimulation)
+			ProcessCommands(ecs);
+		else
+			m_commands.clear();
 
 		// 4) Update looping 3D instances to follow entity transforms
-		UpdateActiveInstances(ecs, dt);
+		if(m_inSimulation)
+			UpdateActiveInstances(ecs, dt);
 
 #ifndef DISABLE_FMOD
 		// 5) FMOD internal update
@@ -770,6 +774,19 @@ namespace EngineFramework
 	{
 		if (!m_initialized) return;
 #ifndef DISABLE_FMOD
+
+		// Stop all tracked active instances explicitly
+		for (auto& inst : m_active)
+		{
+			if (inst.channel)
+			{
+				inst.channel->stop();
+				inst.channel = nullptr;
+			}
+		}
+
+		m_active.clear();
+
 		if (m_groupMaster) m_groupMaster->stop();
 #endif
 	}
