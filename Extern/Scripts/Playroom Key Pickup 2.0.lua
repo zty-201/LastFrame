@@ -118,6 +118,7 @@ function on_create(Self)
 end
 
 function on_update(Self, dt)
+
     local pickupId = (TARGET_ENTITY_ID ~= 0) and TARGET_ENTITY_ID or EntityID
 
     ----------------------------------------------------------------

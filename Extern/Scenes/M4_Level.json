@@ -50529,9 +50529,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-385.66522216796875,
-				190.6817626953125,
-				705.2505493164063
+				2.431133270263672,
+				188.37701416015625,
+				-606.1233520507813
 			],
 			"rotation": [
 				0.0,
@@ -50539,9 +50539,9 @@
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
@@ -85264,6 +85264,144 @@
 			]
 		}
 	},
+	"817": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 13883938552243666945
+				}
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 1,
+			"luminance": 1.0,
+			"position": [
+				221.10003662109375,
+				58.74999237060547
+			],
+			"position_NDC": [
+				0.0,
+				-0.800000011920929
+			],
+			"size": [
+				1031.7999267578125,
+				117.5
+			],
+			"size_NDC": [
+				0.699999988079071,
+				0.10000000149011612
+			],
+			"textureid": [
+				1838384050924011527,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"818": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 625341249264926723
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "playroom_key"
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				663.2999877929688,
+				528.75
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				147.40000915527344,
+				117.5
+			],
+			"size_NDC": [
+				0.11999999731779099,
+				0.07999999821186066
+			],
+			"textureid": [
+				9908834583171940357,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"819": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 625341249264926723
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "boltcutter"
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				442.20001220703125,
+				70.49999237060547
+			],
+			"position_NDC": [
+				-0.2800000011920929,
+				-0.800000011920929
+			],
+			"size": [
+				176.87998962402344,
+				94.0
+			],
+			"size_NDC": [
+				0.11999999731779099,
+				0.07999999821186066
+			],
+			"textureid": [
+				17979285115419869185,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
 	"82": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -85388,6 +85526,53 @@
 				1.0,
 				0.9999998211860657
 			]
+		}
+	},
+	"820": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 625341249264926723
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "music_disc"
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				663.52001953125,
+				540.5
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				180.95999145507813,
+				94.0
+			],
+			"size_NDC": [
+				0.11999999731779099,
+				0.07999999821186066
+			],
+			"textureid": [
+				5873609317047975939,
+				3711223656383638553
+			],
+			"visible": false
 		}
 	},
 	"83": {
