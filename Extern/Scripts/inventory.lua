@@ -1,10 +1,15 @@
 ----------------------------------------------------------------
--- Inventory Script
--- Exposes SHARED.Inventory API for other scripts (including UI)
--- Supports item icons via UIComponent texture binding
+-- Inventory Script (Stable, Clean, Diagnostic Version)
 ----------------------------------------------------------------
 
-local function AddItem(Self, itemId, itemName, amount, textureName)
+local DEBUG_UPDATE = true
+
+----------------------------------------------------------------
+-- Inventory Script
+----------------------------------------------------------------
+
+-- local helpers (avoid global collisions)
+local function AddItem(Self, itemId, itemName, amount)
     amount = amount or 1
     local inv = Self.inventory.items
 
@@ -12,11 +17,7 @@ local function AddItem(Self, itemId, itemName, amount, textureName)
         inv[itemId].qty = inv[itemId].qty + amount
         print("[Inventory] Added:", itemName, "x"..amount)
     else
-        inv[itemId] = {
-            name        = itemName,
-            qty         = amount,
-            textureName = textureName or "", -- asset name e.g. "icon_sword"
-        }
+        inv[itemId] = { name = itemName, qty = amount }
         print("[Inventory] Added new:", itemName, "x"..amount)
     end
 end
@@ -50,7 +51,7 @@ end
 local function PrintInventory(Self)
     print("====== INVENTORY ======")
     for id, data in pairs(Self.inventory.items) do
-        print("ID:", id, "| Name:", data.name, "| Qty:", data.qty, "| Texture:", data.textureName or "(none)")
+        print("ID:", id, "| Name:", data.name, "| Qty:", data.qty)
     end
 end
 
@@ -65,13 +66,10 @@ function on_create(Self)
     SHARED.Inventory = SHARED.Inventory or {}
     SHARED.Inventory._self = Self
 
-    -- Add(itemId, itemName, amount, textureName)
-    -- textureName: the asset name registered in AssetManager e.g. "icon_sword"
-    -- The UI reads this and calls EntityUI:SetTexture(textureName) on the slot entity
-    function SHARED.Inventory.Add(itemId, itemName, amount, textureName)
+    function SHARED.Inventory.Add(itemId, itemName, amount)
         local s = SHARED.Inventory._self
         if not s then return end
-        AddItem(s, itemId, itemName, amount, textureName)
+        AddItem(s, itemId, itemName, amount)
     end
 
     function SHARED.Inventory.Remove(itemId, amount)
@@ -92,9 +90,7 @@ function on_create(Self)
         PrintInventory(s)
     end
 
-    -- GetItems(): returns the raw items table.
-    -- Each entry: { name, qty, textureName }
-    -- textureName is the asset name string the UI passes to EntityUI:SetTexture()
+    -- optional: UI can read items
     function SHARED.Inventory.GetItems()
         local s = SHARED.Inventory._self
         return (s and s.inventory and s.inventory.items) or {}
@@ -114,6 +110,7 @@ end
 function on_destroy(Self)
     print("[Inventory] on_destroy() for entity:", EntityID)
 
+    -- optional safety: clear shared owner if this entity was the owner
     if SHARED.Inventory and SHARED.Inventory._self == Self then
         SHARED.Inventory._self = nil
     end

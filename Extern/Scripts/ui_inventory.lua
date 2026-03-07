@@ -1,245 +1,221 @@
 ----------------------------------------------------------------
 -- ui_inventory.lua
--- Inventory UI Panel
+-- Inventory UI driver — works with the engine's UIComponent system.
 --
--- HOW TEXTURES WORK:
---   Each item stored via SHARED.Inventory.Add() carries a textureName
---   field (the asset name string, e.g. "icon_sword").
+-- HOW THIS WORKS:
+--   The engine renders UI by reading UIComponent.textureid on each entity.
+--   Lua cannot issue arbitrary draw calls — it can only mutate UIComponent
+--   fields (SetVisible, SetPosition, SetSize, SetColor) on pre-placed
+--   entities whose textures were already assigned in the editor.
 --
---   This script keeps a pool of slot UIComponent entities.
---   When a slot is populated it calls:
---       slotUI:SetTexture(item.textureName)
---   which maps to the new UIComponent binding added in Script.cpp:
---       "SetTexture", [](UIComponent& ui, const std::string& name) {
---           ui.textureid = AssetManagerSystem::GetFullGuid(
---               AssetManagerSystem::TEXTURE_GUID, name); }
+-- SETUP IN THE EDITOR (required before this script works):
+--   1. Place a "panel background" entity (UIComponent with your panel
+--      texture).  Note its entity ID → set ENTITY_PANEL below.
+--   2. Place SLOT_COUNT "slot frame" entities in a grid (UIComponent with
+--      the empty-slot-frame texture).  Note their IDs → SLOT_ENTITIES.
+--   3. Place SLOT_COUNT "item icon" entities at the same grid positions
+--      (UIComponent — texture is the item icon from your atlas, assigned
+--      per-item in the editor).  Note their IDs → ICON_ENTITIES.
+--   4. Place a "selection highlight" entity → ENTITY_SELECTED_HIGHLIGHT.
+--   5. Place a "drag ghost" entity → ENTITY_DRAG_GHOST.
+--   6. (Optional) Place text-label entities for item name / description
+--      if your engine has a text UIComponent variant.
 --
---   Empty slots call slotUI:SetTexture("") to clear the texture
---   (the renderer falls back to m_defaultWhiteTexture automatically).
+-- TEXTURE ASSIGNMENT WORKFLOW:
+--   In the editor, assign the correct item icon texture to each ICON entity
+--   (one icon entity = one item type).  The slotEntityId field in
+--   inventory.lua's ITEM_REGISTRY records which editor entity carries
+--   that item's icon.  At runtime, this script moves those icon entities
+--   into the correct grid slot position so the right texture appears.
 --
--- Depends on:
---   ui_canvas.lua  -> SHARED.UI  (screen metrics)
---   inventory.lua  -> SHARED.Inventory  (item data)
+-- COORDINATE SYSTEM:
+--   UIComponent.position is real pixels from bottom-left — matching the
+--   ortho projection in GraphicsSystem::RenderUI().
+--   SHARED.UI.realW / realH (from ui_canvas.lua) give the window size.
 --
--- Required C++ addition in Script.cpp (UIComponent bindings):
---   "SetTexture", [](UIComponent& ui, const std::string& name) {
---       ui.textureid = AssetManagerSystem::GetFullGuid(
---           AssetManagerSystem::TEXTURE_GUID, name);
---   }
+-- DEPENDENCIES:
+--   ui_canvas.lua  → populates SHARED.UI
+--   inventory.lua  → populates SHARED.Inventory
 ----------------------------------------------------------------
 
 ----------------------------------------------------------------
--- Layout constants (virtual UI units, 1440-tall coordinate space)
+-- !! CONFIGURE THESE TO MATCH YOUR EDITOR ENTITY IDs !!
+-- Open the Object Manager in the editor, select each entity you
+-- placed for the inventory panel, and read off its numeric ID.
+-- Replace the nil values below with those IDs.
 ----------------------------------------------------------------
-local PANEL_W        = 600.0
-local PANEL_H        = 520.0
-local PANEL_ANCHOR_X = 0.5
-local PANEL_ANCHOR_Y = 0.5
 
-local SLOT_SIZE      = 90.0
-local SLOT_PAD       = 12.0
-local SLOTS_PER_ROW  = 5
-local HEADER_H       = 50.0
-local INFO_H         = 120.0
+-- Main background panel entity (dark panel texture).
+local ENTITY_PANEL = nil              -- e.g. 10
 
-local TITLE_FONT_SZ  = 28.0
-local ITEM_FONT_SZ   = 16.0
-local INFO_FONT_SZ   = 18.0
+-- Close / Use / Drop button entities (buttons placed on the panel).
+local ENTITY_BTN_CLOSE = nil          -- e.g. 11
+local ENTITY_BTN_USE   = nil          -- e.g. 12
+local ENTITY_BTN_DROP  = nil          -- e.g. 13
 
-local COL_PANEL_BG      = { 0.08, 0.08, 0.10, 0.95 }
-local COL_HEADER_BG     = { 0.12, 0.12, 0.16, 1.00 }
-local COL_SLOT_EMPTY    = { 0.15, 0.15, 0.18, 1.00 }
-local COL_SLOT_FILLED   = { 0.20, 0.22, 0.28, 1.00 }
-local COL_SLOT_SELECTED = { 0.35, 0.55, 0.80, 1.00 }
-local COL_SLOT_DRAG_SRC = { 0.80, 0.60, 0.20, 1.00 }
-local COL_SLOT_DROP_TGT = { 0.40, 0.80, 0.40, 1.00 }
-local COL_SLOT_HOVER    = { 0.28, 0.30, 0.38, 1.00 }
-local COL_INFO_BG       = { 0.10, 0.10, 0.13, 1.00 }
-local COL_TEXT_TITLE    = { 0.90, 0.90, 1.00, 1.00 }
-local COL_TEXT_ITEM     = { 0.80, 0.85, 0.95, 1.00 }
-local COL_TEXT_QTY      = { 0.55, 0.85, 0.55, 1.00 }
-local COL_TEXT_DESC     = { 0.70, 0.72, 0.80, 1.00 }
-local COL_BTN_NORMAL    = { 0.22, 0.28, 0.40, 1.00 }
-local COL_BTN_HOVER     = { 0.32, 0.42, 0.62, 1.00 }
-local COL_BTN_TEXT      = { 0.90, 0.92, 1.00, 1.00 }
-local COL_CLOSE_BTN     = { 0.55, 0.18, 0.18, 1.00 }
-local COL_CLOSE_HOVER   = { 0.80, 0.25, 0.25, 1.00 }
-local COL_COMBINE_HINT  = { 0.90, 0.75, 0.30, 1.00 }
+-- Selection highlight entity (bright border, shown over selected slot).
+local ENTITY_SELECTED_HIGHLIGHT = nil -- e.g. 14
+
+-- Drag ghost entity (follows cursor while dragging an item).
+local ENTITY_DRAG_GHOST = nil         -- e.g. 15
+
+-- Optional text-label entities (only if your engine supports text UI).
+local ENTITY_INFO_NAME = nil          -- e.g. 16
+local ENTITY_INFO_DESC = nil          -- e.g. 17
+
+-- Slot frame entities — one per grid cell, in row-major order.
+-- These carry the empty-slot-frame texture; they are always visible
+-- while the panel is open.
+local SLOT_ENTITIES = {
+    nil, nil, nil, nil, nil,   -- row 1  (slots  1– 5)
+    nil, nil, nil, nil, nil,   -- row 2  (slots  6–10)
+    nil, nil, nil, nil, nil,   -- row 3  (slots 11–15)
+    nil, nil, nil, nil, nil,   -- row 4  (slots 16–20)
+}
+
+-- Item icon entities — one per grid cell, same order as SLOT_ENTITIES.
+-- Each entity already has the correct item icon texture assigned in the
+-- editor.  At runtime, this script repositions them into the matching
+-- slot and shows/hides them based on what is in that slot.
+--
+-- IMPORTANT: the number of icon entities equals the number of distinct
+-- item types in your game, NOT the number of grid slots.  If you have
+-- fewer icon entities than slots, some slots will never display an icon.
+-- Expand this table to cover every item in ITEM_REGISTRY (inventory.lua).
+local ICON_ENTITIES = {
+    -- Map item IDs to their editor entity IDs.
+    -- Format: ["item_id"] = entityId
+    -- Example:
+    --   ["health_potion"] = 20,
+    --   ["mana_potion"]   = 21,
+    --   ["iron_sword"]    = 22,
+}
 
 ----------------------------------------------------------------
--- Script state
+-- Layout constants (pixels — must match what you placed in editor)
 ----------------------------------------------------------------
-local UI        = nil     -- this entity's UIComponent (panel background)
-local isOpen    = false
+local SLOT_SIZE     = 90.0    -- width and height of each slot entity
+local SLOT_PAD      = 12.0    -- gap between slots in the grid
 
-local slotOrder = {}      -- sorted item IDs for stable slot layout
+----------------------------------------------------------------
+-- Tint colours applied via UIComponent:SetColor(r, g, b, a)
+-- The base texture colour is multiplied by this, so white = no tint.
+----------------------------------------------------------------
+local COL_SLOT_NORMAL   = { 1.0, 1.0, 1.0, 1.0 }
+local COL_SLOT_HOVER    = { 0.8, 0.9, 1.0, 1.0 }
+local COL_SLOT_SELECTED = { 0.4, 0.7, 1.0, 1.0 }
+local COL_SLOT_DRAG_SRC = { 1.0, 0.8, 0.3, 0.5 }
+local COL_SLOT_DROP_TGT = { 0.4, 1.0, 0.5, 1.0 }
+local COL_DRAG_GHOST    = { 1.0, 1.0, 1.0, 0.65 }
 
--- Interaction
-local selectedId  = nil
-local hoveredIdx  = nil
-local dragIdx     = nil
-local dragX       = 0.0
-local dragY       = 0.0
+----------------------------------------------------------------
+-- Runtime state
+----------------------------------------------------------------
+local isOpen        = false
+local slotOrder     = {}   -- sorted item-ID list rebuilt each frame
+local selectedId    = nil  -- item ID of selected slot
+local hoveredIdx    = nil  -- 1-based slot index under cursor
+local dragIdx       = nil  -- 1-based slot index being dragged
+local dragX, dragY  = 0, 0
 
 local prevMouseDown = false
 local prevMouseUp   = false
 local prevInvKey    = false
 
-local btnClose = nil
-local btnUse   = nil
-local btnDrop  = nil
-
-local combineFlashTimer = 0.0
-local combineFlashMsg   = ""
-
--- Pool of slot UIComponent entities created at runtime.
--- slotEntities[i] is the entt entity (uint32) for slot i.
--- We create these once in on_create and reuse them every frame.
-local slotEntities = {}
-local MAX_SLOTS    = 20  -- 5 cols x 4 rows
+-- Cached slot world-pixel rects { x, y, w, h } indexed by slot number.
+-- Populated from editor entity positions when the panel is opened.
+local slotRects = {}
 
 ----------------------------------------------------------------
--- Shared accessors
+-- Helpers
 ----------------------------------------------------------------
-local function getShared()  return rawget(_G, "SHARED") end
-local function getUIShared() local S = getShared(); return S and S.UI end
+local function getShared()    return rawget(_G, "SHARED") end
 local function getInventory() local S = getShared(); return S and S.Inventory end
 
-local function getCanvasSize()
-    local ui = getUIShared()
-    return (ui and ui.screenW) or 2560.0, (ui and ui.screenH) or 1440.0
+-- True pixel window size (set by ui_canvas.lua every frame).
+local function getScreenSize()
+    local S  = getShared()
+    local ui = S and S.UI
+    return (ui and ui.realW) or 1920.0,
+           (ui and ui.realH) or 1080.0
 end
 
-local function toUICoords(rawMx, rawMy)
-    local ui = getUIShared()
-    if ui and ui.ToUIX and ui.ToUIY then
-        return ui.ToUIX(rawMx), ui.ToUIY(rawMy)
-    end
-    local _, h = getCanvasSize()
-    return rawMx, h - rawMy
+-- Raw mouse Y is pixels-from-top; engine UIComponent expects pixels-from-bottom.
+local function toEngineY(rawMy)
+    local _, h = getScreenSize()
+    return h - rawMy
 end
 
 local function pointInRect(px, py, rx, ry, rw, rh)
     return px >= rx and px <= rx + rw and py >= ry and py <= ry + rh
 end
 
-local function getPanelOrigin()
-    local sw, sh = getCanvasSize()
-    return PANEL_ANCHOR_X * sw - PANEL_W * 0.5,
-           PANEL_ANCHOR_Y * sh - PANEL_H * 0.5
+-- Fetch UIComponent for an arbitrary entity ID using the C++ binding.
+local function getUI(entityId)
+    if not entityId then return nil end
+    return GetEntityUI(entityId)
 end
 
--- Rebuild slotOrder from current inventory (sorted for stability)
+local function uiSetVisible(entityId, v)
+    local ui = getUI(entityId)
+    if ui then ui:SetVisible(v) end
+end
+
+local function uiSetColor(entityId, col)
+    local ui = getUI(entityId)
+    if ui then ui:SetColor(col[1], col[2], col[3], col[4] or 1.0) end
+end
+
+local function uiSetPosition(entityId, x, y)
+    local ui = getUI(entityId)
+    if ui then ui:SetPosition(x, y) end
+end
+
+local function uiGetRect(entityId)
+    local ui = getUI(entityId)
+    if not ui then return nil end
+    local x, y = ui:GetPosition()
+    local w, h = ui:GetSize()
+    return { x = x, y = y, w = w, h = h }
+end
+
+----------------------------------------------------------------
+-- Slot order — stable alphabetical sort of current item IDs
+----------------------------------------------------------------
 local function refreshSlotOrder()
+    local items = {}
     local inv = getInventory()
-    local items = inv and inv.GetItems() or {}
+    if inv then items = inv.GetItems() end
     local ids = {}
     for id in pairs(items) do ids[#ids + 1] = id end
     table.sort(ids)
     slotOrder = ids
 end
 
-local function getItemAt(idx)
+-- Returns (itemId, itemData) for slot index i, or (nil, nil)
+local function getItemAt(i)
     local inv = getInventory()
     if not inv then return nil, nil end
-    local id = slotOrder[idx]
+    local id = slotOrder[i]
     if not id then return nil, nil end
-    local items = inv.GetItems()
-    return id, items[id]
-end
-
--- Slot index -> bottom-left x, y in virtual-UI space
-local function slotLocalPos(idx, panelX, panelY)
-    local col = ((idx - 1) % SLOTS_PER_ROW)
-    local row = math.floor((idx - 1) / SLOTS_PER_ROW)
-    local x = panelX + SLOT_PAD + col * (SLOT_SIZE + SLOT_PAD)
-    local y = panelY + INFO_H + SLOT_PAD + row * (SLOT_SIZE + SLOT_PAD)
-    return x, y
+    local data = inv.GetItems()[id]
+    return id, data
 end
 
 ----------------------------------------------------------------
--- Slot UIComponent entity helpers
+-- Cache slot pixel rects from editor entity positions.
+-- Call once when opening the panel so hit-testing uses real coords.
 ----------------------------------------------------------------
-
--- Apply a texture to a slot's UIComponent.
--- Calls the new SetTexture binding added in Script.cpp.
--- If textureName is "" the renderer automatically falls back to
--- the default white texture (harmless transparent-looking quad).
-local function applySlotTexture(slotEntityId, textureName)
-    if not slotEntityId then return end
-    local slotUI = GetEntityUI(slotEntityId)
-    if not slotUI then return end
-
-    -- SetTexture resolves the name to a full_guid via AssetManagerSystem
-    -- Requires UIComponent binding in Script.cpp:
-    --   "SetTexture", [](UIComponent& ui, const std::string& name) {
-    --       ui.textureid = AssetManagerSystem::GetFullGuid(
-    --           AssetManagerSystem::TEXTURE_GUID, name); }
-    slotUI:SetTexture(textureName or "")
-end
-
--- Position + resize a slot UIComponent to match current layout.
--- Slot entities are rendered by the engine's RenderUI() pass using
--- UIComponent.position and UIComponent.size in real-pixel space.
--- We convert from virtual-UI coords back to real pixels here.
-local function positionSlotEntity(slotEntityId, sx, sy)
-    if not slotEntityId then return end
-    local slotUI = GetEntityUI(slotEntityId)
-    if not slotUI then return end
-
-    local uiS = getUIShared()
-    -- Convert virtual-UI position to real pixels
-    local realX, realY, realW, realH
-    if uiS and uiS.scaleX and uiS.scaleY then
-        realX = sx / uiS.scaleX
-        realY = sy / uiS.scaleY
-        realW = SLOT_SIZE / uiS.scaleX
-        realH = SLOT_SIZE / uiS.scaleY
-    else
-        realX, realY, realW, realH = sx, sy, SLOT_SIZE, SLOT_SIZE
+local function cacheSlotRects()
+    slotRects = {}
+    for i, entityId in ipairs(SLOT_ENTITIES) do
+        slotRects[i] = uiGetRect(entityId)
     end
-
-    slotUI:SetPosition(realX, realY)
-    slotUI:SetSize(realW, realH)
 end
 
-----------------------------------------------------------------
--- Drawing helpers (panel overlay uses EntityUI draw calls)
-----------------------------------------------------------------
-local function drawRect(x, y, w, h, col)
-    if not UI then return end
-    UI:SetColor(col[1], col[2], col[3], col[4] or 1.0)
-    UI:DrawRect(x, y, w, h)
-end
-
-local function drawText(text, x, y, fontSize, col)
-    if not UI then return end
-    UI:SetColor(col[1], col[2], col[3], col[4] or 1.0)
-    UI:DrawText(text, x, y, fontSize)
-end
-
-local function truncate(s, maxLen)
-    if #s <= maxLen then return s end
-    return s:sub(1, maxLen - 2) .. ".."
-end
-
-local function makeButton(label, x, y, w, h, col, hoverCol, mx, my)
-    local isHover = pointInRect(mx, my, x, y, w, h)
-    drawRect(x, y, w, h, isHover and hoverCol or col)
-    local tw = w * 0.5 - #label * (ITEM_FONT_SZ * 0.3)
-    drawText(label, x + tw, y + h * 0.28, ITEM_FONT_SZ, COL_BTN_TEXT)
-    return { x = x, y = y, w = w, h = h }
-end
-
-----------------------------------------------------------------
--- Slot hit-test: return slot index (1-based) or nil
-----------------------------------------------------------------
 local function slotIndexAt(mx, my)
-    local panelX, panelY = getPanelOrigin()
-    for i = 1, MAX_SLOTS do
-        local sx, sy = slotLocalPos(i, panelX, panelY)
-        if sy + SLOT_SIZE > panelY + PANEL_H - HEADER_H then break end
-        if pointInRect(mx, my, sx, sy, SLOT_SIZE, SLOT_SIZE) then
+    for i, rect in ipairs(slotRects) do
+        if rect and pointInRect(mx, my, rect.x, rect.y, rect.w, rect.h) then
             return i
         end
     end
@@ -247,227 +223,197 @@ local function slotIndexAt(mx, my)
 end
 
 ----------------------------------------------------------------
--- Update slot entities: texture + position every frame
--- This is the core of the texture-loading integration.
+-- Open / Close panel
 ----------------------------------------------------------------
-local function updateSlotEntities()
-    local panelX, panelY = getPanelOrigin()
+local function openPanel()
+    isOpen     = true
+    selectedId = nil
+    dragIdx    = nil
 
-    for i = 1, MAX_SLOTS do
-        local eid = slotEntities[i]
-        if not eid then break end
+    refreshSlotOrder()
+    cacheSlotRects()
 
-        local sx, sy = slotLocalPos(i, panelX, panelY)
-        local slotUI = GetEntityUI(eid)
-        if slotUI then
-            local itemId, itemData = getItemAt(i)
-            local slotVisible = isOpen and (sy + SLOT_SIZE <= panelY + PANEL_H - HEADER_H)
+    uiSetVisible(ENTITY_PANEL, true)
+    uiSetVisible(ENTITY_BTN_CLOSE, true)
+    uiSetVisible(ENTITY_BTN_USE,   false)  -- shown only when item selected
+    uiSetVisible(ENTITY_BTN_DROP,  false)
+    uiSetVisible(ENTITY_SELECTED_HIGHLIGHT, false)
+    uiSetVisible(ENTITY_DRAG_GHOST, false)
+    uiSetVisible(ENTITY_INFO_NAME, false)
+    uiSetVisible(ENTITY_INFO_DESC, false)
 
-            slotUI:SetVisible(slotVisible)
+    for _, e in ipairs(SLOT_ENTITIES) do uiSetVisible(e, true)  end
+    for _, e in pairs(ICON_ENTITIES)  do uiSetVisible(e, false) end
 
-            if slotVisible then
-                -- Position in real-pixel space
-                positionSlotEntity(eid, sx, sy)
+    Input.SetCursorVisible(true)
+    Input.SetCursorLocked(false)
+    print("[ui_inventory] Opened")
+end
 
-                -- Apply texture from inventory item
-                if itemData and itemData.textureName and itemData.textureName ~= "" then
-                    applySlotTexture(eid, itemData.textureName)
-                    -- Tint: white for normal, coloured for selected/drag states
-                    local col = COL_SLOT_FILLED
-                    if dragIdx == i      then col = COL_SLOT_DRAG_SRC
-                    elseif hoveredIdx == i and dragIdx and dragIdx ~= i then col = COL_SLOT_DROP_TGT
-                    elseif itemId == selectedId then col = COL_SLOT_SELECTED
-                    elseif hoveredIdx == i      then col = COL_SLOT_HOVER
-                    end
-                    slotUI:SetColor(col[1], col[2], col[3], col[4] or 1.0)
-                else
-                    -- Empty slot: clear texture, use dim colour
-                    applySlotTexture(eid, "")
-                    slotUI:SetColor(
-                        COL_SLOT_EMPTY[1], COL_SLOT_EMPTY[2],
-                        COL_SLOT_EMPTY[3], COL_SLOT_EMPTY[4] or 1.0)
-                end
+local function closePanel()
+    isOpen     = false
+    selectedId = nil
+    dragIdx    = nil
+
+    uiSetVisible(ENTITY_PANEL, false)
+    uiSetVisible(ENTITY_BTN_CLOSE, false)
+    uiSetVisible(ENTITY_BTN_USE,   false)
+    uiSetVisible(ENTITY_BTN_DROP,  false)
+    uiSetVisible(ENTITY_SELECTED_HIGHLIGHT, false)
+    uiSetVisible(ENTITY_DRAG_GHOST, false)
+    uiSetVisible(ENTITY_INFO_NAME, false)
+    uiSetVisible(ENTITY_INFO_DESC, false)
+
+    for _, e in ipairs(SLOT_ENTITIES) do uiSetVisible(e, false) end
+    for _, e in pairs(ICON_ENTITIES)  do uiSetVisible(e, false) end
+
+    Input.SetCursorVisible(false)
+    Input.SetCursorLocked(true)
+    print("[ui_inventory] Closed")
+end
+
+----------------------------------------------------------------
+-- Drive all UIComponent entities to reflect current state.
+-- Called every frame while the panel is open.
+----------------------------------------------------------------
+local function updateVisuals(mx, my)
+    local inv   = getInventory()
+    local items = inv and inv.GetItems() or {}
+
+    -- ── Slot frames and icon entities ──────────────────────────
+    -- First, hide every icon entity so we start clean.
+    for _, iconEntity in pairs(ICON_ENTITIES) do
+        uiSetVisible(iconEntity, false)
+    end
+
+    for i = 1, #SLOT_ENTITIES do
+        local slotEntity = SLOT_ENTITIES[i]
+        local itemId, itemData = getItemAt(i)
+
+        local isHovered  = (hoveredIdx == i)
+        local isSelected = (selectedId ~= nil and itemId == selectedId)
+        local isDragSrc  = (dragIdx == i)
+        local isDragTgt  = (dragIdx ~= nil and isHovered and dragIdx ~= i)
+
+        -- Slot frame tint
+        local slotCol
+        if isDragSrc       then slotCol = COL_SLOT_DRAG_SRC
+        elseif isDragTgt   then slotCol = COL_SLOT_DROP_TGT
+        elseif isSelected  then slotCol = COL_SLOT_SELECTED
+        elseif isHovered   then slotCol = COL_SLOT_HOVER
+        else                    slotCol = COL_SLOT_NORMAL
+        end
+        uiSetColor(slotEntity, slotCol)
+
+        -- Icon: if this slot has an item, move its icon entity here and show it.
+        if itemData and not isDragSrc then
+            local iconEntity = ICON_ENTITIES[itemId]
+            if iconEntity and slotRects[i] then
+                uiSetPosition(iconEntity, slotRects[i].x, slotRects[i].y)
+                uiSetVisible(iconEntity, true)
+                uiSetColor(iconEntity, { 1, 1, 1, 1 })
             end
         end
     end
-end
 
-----------------------------------------------------------------
--- Render panel overlay (header, info bar, text labels)
-----------------------------------------------------------------
-local function render(mx, my)
-    if not isOpen then return end
-
-    local panelX, panelY = getPanelOrigin()
-    local inv   = getInventory()
-    local items = (inv and inv.GetItems()) or {}
-
-    -- Panel background
-    drawRect(panelX, panelY, PANEL_W, PANEL_H, COL_PANEL_BG)
-
-    -- Header
-    local headerY = panelY + PANEL_H - HEADER_H
-    drawRect(panelX, headerY, PANEL_W, HEADER_H, COL_HEADER_BG)
-    drawText("INVENTORY", panelX + 16, headerY + HEADER_H * 0.25, TITLE_FONT_SZ, COL_TEXT_TITLE)
-
-    -- Close button
-    local closeBtnW = 44.0
-    local closeBtnX = panelX + PANEL_W - closeBtnW - 6
-    local closeBtnY = headerY + 3
-    local closeBtnH = HEADER_H - 6
-    local closeHover = pointInRect(mx, my, closeBtnX, closeBtnY, closeBtnW, closeBtnH)
-    drawRect(closeBtnX, closeBtnY, closeBtnW, closeBtnH,
-             closeHover and COL_CLOSE_HOVER or COL_CLOSE_BTN)
-    drawText("X", closeBtnX + 14, closeBtnY + closeBtnH * 0.22, ITEM_FONT_SZ + 2, COL_BTN_TEXT)
-    btnClose = { x = closeBtnX, y = closeBtnY, w = closeBtnW, h = closeBtnH }
-
-    -- Info / description area
-    local infoY = panelY
-    drawRect(panelX, infoY, PANEL_W, INFO_H, COL_INFO_BG)
-
-    if selectedId and items[selectedId] then
-        local d = items[selectedId]
-        drawText(d.name,  panelX + 12, infoY + INFO_H - 28, INFO_FONT_SZ,     COL_TEXT_TITLE)
-        drawText("x" .. d.qty, panelX + 12, infoY + INFO_H - 52, ITEM_FONT_SZ, COL_TEXT_QTY)
-
-        local btnW, btnH = 90.0, 30.0
-        local btnY = infoY + 8
-        btnUse  = makeButton("USE",  panelX + PANEL_W - btnW * 2 - 20, btnY, btnW, btnH,
-                             COL_BTN_NORMAL, COL_BTN_HOVER, mx, my)
-        btnDrop = makeButton("DROP", panelX + PANEL_W - btnW - 10,     btnY, btnW, btnH,
-                             COL_CLOSE_BTN, COL_CLOSE_HOVER, mx, my)
+    -- ── Selection highlight ─────────────────────────────────────
+    if selectedId and ENTITY_SELECTED_HIGHLIGHT then
+        local selIdx = nil
+        for i, id in ipairs(slotOrder) do
+            if id == selectedId then selIdx = i; break end
+        end
+        if selIdx and slotRects[selIdx] then
+            local r = slotRects[selIdx]
+            uiSetPosition(ENTITY_SELECTED_HIGHLIGHT, r.x, r.y)
+            uiSetVisible(ENTITY_SELECTED_HIGHLIGHT, true)
+        else
+            uiSetVisible(ENTITY_SELECTED_HIGHLIGHT, false)
+        end
     else
-        drawText("Select an item to inspect it.",
-                 panelX + 12, infoY + INFO_H * 0.45, ITEM_FONT_SZ, COL_TEXT_DESC)
-        btnUse  = nil
-        btnDrop = nil
+        uiSetVisible(ENTITY_SELECTED_HIGHLIGHT, false)
     end
 
-    if dragIdx then
-        drawText("Drop onto another item to combine",
-                 panelX + 12, infoY + 8, ITEM_FONT_SZ - 2, COL_COMBINE_HINT)
+    -- ── Drag ghost ──────────────────────────────────────────────
+    if dragIdx and ENTITY_DRAG_GHOST then
+        -- Centre the ghost on the cursor
+        uiSetPosition(ENTITY_DRAG_GHOST, dragX - SLOT_SIZE * 0.5, dragY - SLOT_SIZE * 0.5)
+        uiSetVisible(ENTITY_DRAG_GHOST, true)
+        uiSetColor(ENTITY_DRAG_GHOST, COL_DRAG_GHOST)
+    else
+        uiSetVisible(ENTITY_DRAG_GHOST, false)
     end
 
-    if combineFlashTimer > 0 then
-        drawText(combineFlashMsg, panelX + 12, infoY + 8, ITEM_FONT_SZ - 2, COL_COMBINE_HINT)
-    end
+    -- ── Action buttons (USE / DROP) ─────────────────────────────
+    local hasSelection = (selectedId ~= nil and items[selectedId] ~= nil)
+    uiSetVisible(ENTITY_BTN_USE,  hasSelection)
+    uiSetVisible(ENTITY_BTN_DROP, hasSelection)
 
-    -- Text labels drawn on top of each slot entity
-    for i = 1, MAX_SLOTS do
-        local sx, sy = slotLocalPos(i, panelX, panelY)
-        if sy + SLOT_SIZE > panelY + PANEL_H - HEADER_H then break end
-
-        local itemId, itemData = getItemAt(i)
-        local isDragSrc = (dragIdx == i)
-
-        if itemData and not isDragSrc then
-            local shortName = truncate(itemData.name, 9)
-            drawText(shortName,        sx + 6, sy + SLOT_SIZE - 22, ITEM_FONT_SZ - 2, COL_TEXT_ITEM)
-            drawText("x" .. itemData.qty, sx + 6, sy + 6,           ITEM_FONT_SZ - 2, COL_TEXT_QTY)
-        elseif not itemData then
-            drawText(tostring(i), sx + SLOT_SIZE * 0.4, sy + SLOT_SIZE * 0.4,
-                     ITEM_FONT_SZ, { 0.25, 0.25, 0.28, 1.0 })
-        end
-    end
-
-    -- Drag ghost: show item name + qty floating at cursor
-    if dragIdx then
-        local itemId, itemData = getItemAt(dragIdx)
-        if itemData then
-            local gx = dragX - SLOT_SIZE * 0.5
-            local gy = dragY - SLOT_SIZE * 0.5
-            drawRect(gx, gy, SLOT_SIZE, SLOT_SIZE, { 0.35, 0.55, 0.80, 0.70 })
-            drawText(truncate(itemData.name, 9),   gx + 6, gy + SLOT_SIZE - 22, ITEM_FONT_SZ - 2, COL_TEXT_ITEM)
-            drawText("x" .. itemData.qty, gx + 6, gy + 6, ITEM_FONT_SZ - 2, COL_TEXT_QTY)
-        end
+    -- ── Info panel ─────────────────────────────────────────────
+    -- If your engine exposes SetText() on text entities, call it here:
+    --   getUI(ENTITY_INFO_NAME):SetText(items[selectedId].name)
+    --   getUI(ENTITY_INFO_DESC):SetText(items[selectedId].description)
+    uiSetVisible(ENTITY_INFO_NAME, hasSelection)
+    uiSetVisible(ENTITY_INFO_DESC, hasSelection)
+    if hasSelection then
+        local d = items[selectedId]
+        -- Log as fallback if no text component available
+        -- (only print on change — use a dirty flag in production)
     end
 end
 
 ----------------------------------------------------------------
--- on_create: build slot entity pool
+-- on_create
 ----------------------------------------------------------------
 function on_create(Self)
-    UI = EntityUI
-    if not UI then
-        print("[ui_inventory] WARNING: No UIComponent on entity")
-    end
-    if UI then UI:SetVisible(false) end
+    print("[ui_inventory] on_create(), entity:", EntityID)
 
-    -- Slot entities are expected to be pre-created in the editor as
-    -- plain UIComponent entities with no scene mesh. We look them up
-    -- from SHARED.UI.SlotEntities if the level populates that table,
-    -- OR we fall back to an inline creation table you can fill below.
-    --
-    -- Pattern A (editor-driven, recommended):
-    --   In another script or level setup, populate:
-    --       SHARED.UI = SHARED.UI or {}
-    --       SHARED.UI.InventorySlotEntities = { entityId1, entityId2, ... }
-    --   before this script's on_create runs.
-    --
-    -- Pattern B (manual): fill slotEntities directly with entity IDs
-    --   that already exist in the registry (editor-placed).
-    --       slotEntities = { 42, 43, 44, ... }
+    -- Start fully hidden
+    uiSetVisible(ENTITY_PANEL, false)
+    uiSetVisible(ENTITY_BTN_CLOSE, false)
+    uiSetVisible(ENTITY_BTN_USE,   false)
+    uiSetVisible(ENTITY_BTN_DROP,  false)
+    uiSetVisible(ENTITY_SELECTED_HIGHLIGHT, false)
+    uiSetVisible(ENTITY_DRAG_GHOST, false)
+    uiSetVisible(ENTITY_INFO_NAME, false)
+    uiSetVisible(ENTITY_INFO_DESC, false)
+    for _, e in ipairs(SLOT_ENTITIES) do uiSetVisible(e, false) end
+    for _, e in pairs(ICON_ENTITIES)  do uiSetVisible(e, false) end
 
-    local S = getShared()
-    if S and S.UI and S.UI.InventorySlotEntities then
-        slotEntities = S.UI.InventorySlotEntities
-        print("[ui_inventory] Loaded", #slotEntities, "slot entities from SHARED.UI.InventorySlotEntities")
-    else
-        -- No slot entities found yet; updateSlotEntities() will be a no-op
-        -- until they are registered. Call the above setup from your level script.
-        print("[ui_inventory] WARNING: SHARED.UI.InventorySlotEntities not set. " ..
-              "Slot textures will not display until slot entities are registered.")
-    end
-
-    print("[ui_inventory] Initialized")
+    print("[ui_inventory] Ready — fill in entity IDs at top of file.")
 end
 
 ----------------------------------------------------------------
 -- on_update
 ----------------------------------------------------------------
 function on_update(Self, dt)
-    -- Inventory toggle
-    local invKeyDown = Input.GetKeyDown(66) -- B key (GLFW 66)
-    local S = getShared()
+
+    -- ── Toggle inventory key ──────────────────────────────────
+    local invKeyDown = Key_Actions
+        and Input.GetActionDown(Key_Actions.INVENTORY)
+        or  Input.GetKeyDown(73)   -- fallback: I key
 
     if invKeyDown and not prevInvKey then
-        isOpen = not isOpen
-        if UI then UI:SetVisible(isOpen) end
-        if isOpen then
-            Input.SetCursorVisible(true)
-            Input.SetCursorLocked(false)
-            refreshSlotOrder()
-            selectedId = nil
-            dragIdx    = nil
-        else
-            Input.SetCursorVisible(false)
-            Input.SetCursorLocked(true)
-            -- Hide all slot entities when closing
-            for _, eid in ipairs(slotEntities) do
-                local slotUI = GetEntityUI(eid)
-                if slotUI then slotUI:SetVisible(false) end
-            end
-        end
-        print("[ui_inventory] Toggled:", isOpen and "OPEN" or "CLOSED")
+        if isOpen then closePanel() else openPanel() end
     end
     prevInvKey = invKeyDown
 
-    if combineFlashTimer > 0 then
-        combineFlashTimer = combineFlashTimer - dt
-    end
-
     if not isOpen then return end
 
-    -- Mouse position in virtual-UI coords
+    -- ── Mouse coords in engine pixel space (bottom-left origin) ─
     local rawMx, rawMy = Input.GetMousePosition()
-    local mx, my = toUICoords(rawMx, rawMy)
+    local mx = rawMx
+    local my = toEngineY(rawMy)
 
+    -- ── Refresh data ──────────────────────────────────────────
+    refreshSlotOrder()
     hoveredIdx = slotIndexAt(mx, my)
 
+    -- ── Input processing ──────────────────────────────────────
     local mouseDown = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
     local mouseHeld = Input.GetMouseButton(GLFW_MOUSE_BUTTON_LEFT)
     local mouseUp   = Input.GetMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT)
 
+    -- Track drag ghost position
     if dragIdx and mouseHeld then
         dragX = mx
         dragY = my
@@ -475,45 +421,44 @@ function on_update(Self, dt)
 
     -- Mouse DOWN
     if mouseDown and not prevMouseDown then
-        if btnClose and pointInRect(mx, my, btnClose.x, btnClose.y, btnClose.w, btnClose.h) then
-            isOpen = false
-            if UI then UI:SetVisible(false) end
-            Input.SetCursorVisible(false)
-            Input.SetCursorLocked(true)
-            for _, eid in ipairs(slotEntities) do
-                local slotUI = GetEntityUI(eid)
-                if slotUI then slotUI:SetVisible(false) end
-            end
-            dragIdx = nil; selectedId = nil
-            prevMouseDown = mouseDown; return
+
+        -- Close button
+        local closeBtnRect = uiGetRect(ENTITY_BTN_CLOSE)
+        if closeBtnRect and pointInRect(mx, my, closeBtnRect.x, closeBtnRect.y, closeBtnRect.w, closeBtnRect.h) then
+            closePanel()
+            prevMouseDown = mouseDown
+            return
         end
 
-        if btnUse and pointInRect(mx, my, btnUse.x, btnUse.y, btnUse.w, btnUse.h) then
-            if selectedId then
-                print("[ui_inventory] USE:", selectedId)
-                if S and S.Game and S.Game.UseItem then S.Game.UseItem(selectedId) end
-            end
-            prevMouseDown = mouseDown; return
+        -- USE button
+        local useBtnRect = uiGetRect(ENTITY_BTN_USE)
+        if selectedId and useBtnRect and pointInRect(mx, my, useBtnRect.x, useBtnRect.y, useBtnRect.w, useBtnRect.h) then
+            print("[ui_inventory] USE:", selectedId)
+            local S = getShared()
+            if S and S.Game and S.Game.UseItem then S.Game.UseItem(selectedId) end
+            prevMouseDown = mouseDown
+            return
         end
 
-        if btnDrop and pointInRect(mx, my, btnDrop.x, btnDrop.y, btnDrop.w, btnDrop.h) then
-            if selectedId then
-                print("[ui_inventory] DROP:", selectedId)
-                local inv = getInventory()
-                if inv then
-                    inv.Remove(selectedId, 1)
-                    if inv.Count(selectedId) <= 0 then selectedId = nil end
-                end
+        -- DROP button
+        local dropBtnRect = uiGetRect(ENTITY_BTN_DROP)
+        if selectedId and dropBtnRect and pointInRect(mx, my, dropBtnRect.x, dropBtnRect.y, dropBtnRect.w, dropBtnRect.h) then
+            print("[ui_inventory] DROP:", selectedId)
+            local inv = getInventory()
+            if inv then
+                inv.Remove(selectedId, 1)
+                if inv.Count(selectedId) <= 0 then selectedId = nil end
             end
-            prevMouseDown = mouseDown; return
+            prevMouseDown = mouseDown
+            return
         end
 
+        -- Slot click / begin drag
         if hoveredIdx then
-            local itemId = getItemAt(hoveredIdx)
+            local itemId, _ = getItemAt(hoveredIdx)
             if itemId then
                 dragIdx    = hoveredIdx
-                dragX      = mx
-                dragY      = my
+                dragX, dragY = mx, my
                 selectedId = itemId
             else
                 selectedId = nil
@@ -525,35 +470,37 @@ function on_update(Self, dt)
         end
     end
 
-    -- Mouse UP
+    -- Mouse UP — resolve drag drop / combine
     if mouseUp and not prevMouseUp then
         if dragIdx then
             local dropIdx = slotIndexAt(mx, my)
+
             if dropIdx and dropIdx ~= dragIdx then
                 local srcId = getItemAt(dragIdx)
                 local tgtId = getItemAt(dropIdx)
+
                 if srcId and tgtId then
                     local inv = getInventory()
-                    if inv and inv.GetRecipe then
+                    if inv then
                         local recipe = inv.GetRecipe(srcId, tgtId)
                         if recipe then
-                            combineFlashMsg   = "Combining: " .. srcId .. " + " .. tgtId .. " => " .. recipe.name
-                            combineFlashTimer = 2.5
-                            local ok = inv.Combine and inv.Combine(srcId, tgtId)
+                            local ok = inv.Combine(srcId, tgtId)
                             if ok then
-                                print("[ui_inventory] Combine SUCCESS =>", recipe.name)
+                                print("[ui_inventory] Combined =>", recipe.name)
                                 selectedId = recipe.id
                             end
                         else
-                            combineFlashMsg   = "No recipe for " .. srcId .. " + " .. tgtId
-                            combineFlashTimer = 1.5
+                            print("[ui_inventory] No recipe:", srcId, "+", tgtId)
                         end
                     end
                 end
+
             elseif dropIdx == dragIdx then
+                -- Dropped back on same slot — keep selection
                 local itemId = getItemAt(dragIdx)
-                selectedId = itemId or selectedId
+                selectedId   = itemId or selectedId
             end
+
             dragIdx = nil
         end
     end
@@ -561,14 +508,8 @@ function on_update(Self, dt)
     prevMouseDown = mouseDown
     prevMouseUp   = mouseUp
 
-    -- Update inventory slot order for this frame
-    refreshSlotOrder()
-
-    -- Sync slot UIComponent entities (texture + position + visibility)
-    updateSlotEntities()
-
-    -- Draw panel overlay (header, info bar, text labels)
-    render(mx, my)
+    -- ── Drive all UI entities ─────────────────────────────────
+    updateVisuals(mx, my)
 end
 
 ----------------------------------------------------------------
@@ -579,10 +520,5 @@ function on_destroy(Self)
         Input.SetCursorVisible(false)
         Input.SetCursorLocked(true)
     end
-    -- Hide all slot entities on cleanup
-    for _, eid in ipairs(slotEntities) do
-        local slotUI = GetEntityUI(eid)
-        if slotUI then slotUI:SetVisible(false) end
-    end
-    print("[ui_inventory] Destroyed")
+    print("[ui_inventory] on_destroy()")
 end
