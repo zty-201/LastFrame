@@ -391,7 +391,10 @@ namespace
 	}
 
 	/*
-		Returns compressed data of the texture filepath passed in.
+		Returns compressed data of the texture data passed in.
+		\param texture_data
+		The texture data, ensure data is tightly packed with the correct number of channels.
+		While it is taken in as non-const reference, it will not be changed.
 		\param is_srgb
 		Whether texture file data is in srgb/gamma colorspace.
 		\param TextureType
@@ -399,39 +402,20 @@ namespace
 		\param quality
 		From 0 to 1.0. Much higher performance hit at higher levels.
 	*/
-	CompressedTextureData CompressTexture(const std::filesystem::path& file_path, bool is_srgb, CompressionTextureType compression_type, float quality)
+	CompressedTextureData CompressTexture(UnCompressedTextureData& texture_data, CompressionTextureType compression_type, float quality)
 	{
 		//TODO: Look into supporting 1-2 channel compression on mobile using ASTC compression or ETC2 RGB, and see if it's beneficial.
 		//TODO: Look into compressing to .basis file, then transcoding during runtime to GPU supported texture (more compatibility, no need to worry about astc).
 		if (quality < 0 || quality > 1.0) return CompressedTextureData("Invalid Compression Quality passed in, must be in range [0, 1]");
-
+		if (!texture_data.isValid()) return CompressedTextureData("Invalid texture data passed in for compression");
 		/*
 			Process
-			1. Load texture
-			2. Get important parameters
-			3. Compress texture
-			5. Write data to CompressedTextureData and free textures used.
+			1. Get important parameters
+			2. Compress texture
+			3. Write data to CompressedTextureData and free textures used.
 		*/
-
-
-		//== Load data from file.
-		int width{}, height{}, channels{};
-		stbi_set_flip_vertically_on_load(true);
-		std::vector<unsigned char> file_data = EngineFramework::AssetManagerSystem::GetDataFromFile(file_path);
-		if (file_data.empty())
-			return CompressedTextureData(std::string("Failed to read texture file: ") + file_path.string());
-
-		//RAII management of stbi data.
-		auto stbi_data_free = [](unsigned char* data) {
-			if (data) stbi_image_free(data);
-			};
-		std::unique_ptr<unsigned char, decltype(stbi_data_free)> stbi_data{
-			stbi_load_from_memory(
-			file_data.data(),
-			static_cast<int>(file_data.size()),
-			&width, &height, &channels, 0), stbi_data_free };
-		if (!stbi_data)
-			return CompressedTextureData("Unable to process texture data");
+		int width = texture_data.width, height = texture_data.height, channels = texture_data.channels;
+		bool is_srgb = texture_data.is_srgb;
 
 		//==Get input and output formats.
 
@@ -466,7 +450,7 @@ namespace
 		src_texture.format = input_format;
 		src_texture.dwWidth = width;
 		src_texture.dwHeight = height;
-		src_texture.pData = static_cast<CMP_BYTE*>(stbi_data.get());
+		src_texture.pData = reinterpret_cast<CMP_BYTE*>(texture_data.data.data());
 		src_texture.dwDataSize = width * height * channels;
 
 		CMP_Texture dst_texture{};
@@ -815,31 +799,114 @@ namespace
 
 #ifdef PLATFORM_WINDOWS
 
-[[nodiscard]] std::optional<std::string> Scene::CompressAndWriteTexture(const std::filesystem::path& src_path, bool compress_BCx, bool compress_ETC2)
+[[nodiscard]] std::optional<std::string> Scene::CompressAndWriteTexture(const std::filesystem::path& file_path, const std::filesystem::path& folder_BCx, const std::filesystem::path& folder_ETC2)
 {
-	if (!(compress_BCx || compress_ETC2))
+	if (folder_BCx.empty() && folder_ETC2.empty())
 	{
 		return "At least one compression type should be selected.";
 	}
-			
 
-		//Mimic loading of BCx precompressed texture. For now it just uses runtime-compression instead.
-	//CompressedTextureData compressed_texture(std::move(CompressTexture(file_path, is_srgb, CompressionTextureType::BC_X, 0.88f)));
-	//TODO: CompressAndWriteTexture for storing texture as compressed texture files with different extensions.
-	UNREFERENCED_PARAMETER(src_path);
-	UNREFERENCED_PARAMETER(compress_BCx);
-	UNREFERENCED_PARAMETER(compress_ETC2);
+
+	//==Load texture data into a usable format for CompressTexture.
+	stbi_set_flip_vertically_on_load(true);
+	std::vector<unsigned char> file_data = EngineFramework::AssetManagerSystem::GetDataFromFile(file_path);
+	if (file_data.empty())
+		return std::string("Failed to read texture file: ") + file_path.string();
+
+	//RAII management of stbi data.
+	auto stbi_data_free = [](unsigned char* data) {
+		if (data) stbi_image_free(data);
+		};
+	int width{}, height{}, channels{};
+	std::shared_ptr<unsigned char> stbi_data{
+		stbi_load_from_memory(
+		file_data.data(),
+		static_cast<int>(file_data.size()),
+		&width, &height, &channels, 0), stbi_data_free };
+	if (!stbi_data)
+		return "Unable to process texture data" + file_path.string();
+
+	bool is_srgb = (file_path.string().find("Albedo") != std::string::npos);
+
+	//Copy to usable format
+	UnCompressedTextureData uncompressed_texture(stbi_data, width, height, channels, is_srgb);
+
+	//Logically this should not ever happen, otherwise it could be due to pre-checks failing to validate data correctly.
+	if (!uncompressed_texture.isValid()) return "Unknown error in CompressAndWriteTexture";
+
 	/*
-		Compress into BC and ETC2 before writing both files to same directory as src (with different extensions).
-		Do checks for srgb ("Albedo")
+	*	Compresses texture data, then writes to appropriate file.
+		\param out_dir
+		The directory to store in
+		\param file_name
+		The stemmed file name, i.e. without folder prefix or extension postfix.
+		\return
+		Nothing on success, error string otherwise.
 	*/
+	auto CompressAndWriteTextureDir = [&uncompressed_texture](const std::filesystem::path& out_dir, const std::string& file_name, CompressionTextureType compression_type, float quality) -> std::optional<std::string> {
+			/*
+				 Custom extensions used for each compression type.
+				 This denotes that the texture is compressed as X type, but stored in a custom file that does not follow BCx or ETC2 standard headers.
+			*/
+			std::string extension{};
+			switch (compression_type)
+			{
+			case CompressionTextureType::BC_X:
+				extension = ".compiled_bc";
+				break;
+			case CompressionTextureType::ETC2:
+				extension = ".compiled_etc2";
+				break;
+			default:
+				return "Invalid Compression Type";
+			}
 
-	//== Call stbi_load after GetDataFromFile, with flip_vertically toggled on.
+			//==Compress texture
+			CompressedTextureData compressed_texture(std::move(CompressTexture(uncompressed_texture, compression_type, quality)));
+			if (!compressed_texture.isValid())
+				return compressed_texture.error_str;
 
-	//== Call CompressTexture for each non-empty suffix, and write to folder.
+			//==Write to file in designated folder with the custom extension and same file name.
+			auto err_code = compressed_texture.WriteDataToFile(out_dir / (file_name + extension) );
 
-	//== TODO: Define class methods for CompressedTextureData to read/write from file (using GetDataFromFile?) ? Or use typical dds/ktx file types.
+			if (err_code.has_value()) return err_code;
 
+			return {};
+		};
+
+	/*
+		Compress data to respective types.
+		Write results to respective folders with the appropriate extensions and the same file name.
+	*/
+	std::string file_name = file_path.stem().string(); //Just get the file name by itself.
+	float quality = 0.88f; //0 to 1, where 1 is the highest quality with the longest compression time. Processing time may scale exponentially?
+	std::string full_err_code{}; //Accumulate errors, don't return immediately on error but let the other compression type also run.
+	if (!folder_BCx.empty())
+	{
+		//Check if folderpath is invalid, and tell the user instead of silently failing. 
+		if (!std::filesystem::exists(folder_BCx) || !std::filesystem::is_directory(folder_BCx))
+		{
+			full_err_code += "Invalid directory passed for CompressAndWrite: " + folder_BCx.string() + " BCx not compressed.";
+		}
+		else
+		{
+			auto err_code = CompressAndWriteTextureDir(folder_BCx, file_name, CompressionTextureType::BC_X, quality);
+			if (err_code) full_err_code += err_code.value();
+		}
+	}
+	if (!folder_ETC2.empty())
+	{
+		if (!std::filesystem::exists(folder_ETC2) || !std::filesystem::is_directory(folder_ETC2))
+		{
+			full_err_code += "Invalid directory passed for CompressAndWrite: " + folder_ETC2.string() + " ETC2 not compressed.";
+		}
+		else
+		{
+			auto err_code = CompressAndWriteTextureDir(folder_ETC2, file_name, CompressionTextureType::ETC2, quality);
+			if (err_code) full_err_code += err_code.value();
+		}
+	}
+	if (!full_err_code.empty()) return full_err_code; //Error
 	return {}; //No Error.
 }
 #endif

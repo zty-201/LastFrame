@@ -106,15 +106,17 @@ struct Scene
     };
 #ifdef PLATFORM_WINDOWS
     /*
-        Takes the texture file and compresses it, before writing back as file(s) with appropriate extension into the same directory.
+        Takes the texture file and compresses it, before writing back as file(s) with appropriate extension and the same file name into the respective directories provided.
         Does not modify original file.
-        \param src_path The original uncompressed texture file
-        \param compress_X
-        Whether compressed file of type X should be generated and written.
-        At least one should be true.
+        \param src_path 
+        - The original uncompressed texture file
+        \param folder_BCx, folder_ETC2  
+        - folder_path to folders for compressed BCx and ETC2 files respectively.
+        Leave blank if that type should not be generated.
+        At least one must not be blank, otherwise none will be generated and an error will be returned.
         \return Returns an error string if unsuccessful.
     */
-    static [[nodiscard]] std::optional<std::string> CompressAndWriteTexture(const std::filesystem::path& src_path, bool compress_BCx, bool compress_ETC2);
+    [[nodiscard]] std::optional<std::string> CompressAndWriteTexture(const std::filesystem::path& src_path, const std::filesystem::path& folder_BCx = {}, const std::filesystem::path& folder_ETC2 = {});
 #endif
 };
 
