@@ -86,9 +86,11 @@ function on_update(self, dt)
 
     local tr = Query.GetTransform(EntityID)
     if tr then
-        currentY = currentY + ROTATE_SPEED * dt
-        local rx, _, rz = tr:GetRotation()
-        tr:SetRotation(rx, currentY, rz)
+        if SHARED and SHARED.MUSICBOX_DISC_SPIN == true then
+            local rx, ry, rz = tr:GetRotation()
+            ry = ry + 220.0 * dt
+            tr:SetRotation(rx, ry, rz)
+        end
     end
 
     -- Trigger little girl once at 10 seconds

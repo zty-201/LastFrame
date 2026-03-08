@@ -25,6 +25,7 @@
 #include "MetaInspector.hpp"
 #include "NameComponent.h"
 #include "ButtonComponent.hpp"
+#include "JoystickComponent.h"
 
 
 /*
@@ -892,6 +893,19 @@ namespace EngineFramework
 			.func<&Getter<NameComponent>::GetComponent>("get")
 			.func<&GetRef<NameComponent>>("get_ref");
 
+		// Register joystick component
+		entt::meta_factory<JoystickComponent>()
+			.type("JoystickComponent")
+			.data<&JoystickComponent::maxRadius>("maxRadius")
+			.data<&JoystickComponent::baseCenter>("baseCenter")
+			.data<&JoystickComponent::isBeingDragged>("isBeingDragged")
+			.data<&JoystickComponent::outputX>("outputX")
+			.data<&JoystickComponent::outputY>("outputY")
+			.data<&JoystickComponent::knobTargetName>("knobTargetName")
+			.func<&Emplacer<JoystickComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<JoystickComponent>::RemoveComponent>("remove")
+			.func<&Getter<JoystickComponent>::GetComponent>("get")
+			.func<&GetRef<JoystickComponent>>("get_ref");
 	}
 
 	//Helper function to cast json to the correct data type, and set comp_data.

@@ -22,6 +22,19 @@ local MENU_NAME = "ExplosionToyInterface"
 local DOOR_CMD_TABLE = "DOOR_CMD"
 local UI_TABLE       = "EXPLOSION_TOY_UI_OPEN"
 
+local SOFT_TOY_PICKUP_SFX_ID    = "SoftToyPickup"
+local SOFT_TOY_DISCOVERY_SFX_ID = "Discovery"
+
+local hasPlayedDiscovery = false
+
+local function play_3d_sfx(slotId)
+    if type(Audio_PlaySlot) == "function" and slotId ~= nil then
+        Audio_PlaySlot(EntityID, slotId)
+        return true
+    end
+    return false
+end
+
 local function scale_ok()
     local tr = Query.GetTransform(TOY_ID)
     if tr == nil then return false end
@@ -43,6 +56,8 @@ function on_create(self)
     SHARED[DOOR_CMD_TABLE] = SHARED[DOOR_CMD_TABLE] or {}
     SHARED[UI_TABLE] = SHARED[UI_TABLE] or {}
     SHARED[UI_TABLE][TOY_ID] = false
+
+    hasPlayedDiscovery = false
 
     if DEBUG then
         print("[ExplosionToy_TriggerBox] created. TOY_ID=", TOY_ID, " MENU=", MENU_NAME)
@@ -73,7 +88,22 @@ function on_update(self, dt)
     end
 
     -- Toggle open flag
-    SHARED[UI_TABLE][TOY_ID] = not (SHARED[UI_TABLE][TOY_ID] == true)
+    local wasOpen = (SHARED[UI_TABLE][TOY_ID] == true)
+    local isNowOpen = not wasOpen
+    SHARED[UI_TABLE][TOY_ID] = isNowOpen
+
+    if isNowOpen then
+        play_3d_sfx(SOFT_TOY_PICKUP_SFX_ID)
+
+        if not hasPlayedDiscovery then
+            play_3d_sfx(SOFT_TOY_DISCOVERY_SFX_ID)
+            hasPlayedDiscovery = true
+        end
+
+        if DEBUG then
+            print("[ExplosionToy_TriggerBox] Toy picked up")
+        end
+    end
 
     if DEBUG then
         print("[ExplosionToy_TriggerBox] UI open =", tostring(SHARED[UI_TABLE][TOY_ID]))
