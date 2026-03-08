@@ -12767,9 +12767,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				507.82257080078125,
+				-81.41554260253906,
 				190.6817626953125,
-				-368.4610290527344
+				309.34393310546875
 			],
 			"rotation": [
 				-0.0,
@@ -38279,9 +38279,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				507.82257080078125,
+				-81.41554260253906,
 				191.4817657470703,
-				-353.4610290527344
+				324.34393310546875
 			],
 			"rotation": [
 				0.0,
@@ -49718,7 +49718,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 263.8885803222656,
+			"intensity": 95.10829162597656,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -49876,7 +49876,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 363.03240966796875,
+			"intensity": 140.9484405517578,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50058,7 +50058,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 166.79725646972656,
+			"intensity": 39.45546340942383,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50150,7 +50150,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 222.1418914794922,
+			"intensity": 92.15428924560547,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50242,7 +50242,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 220.81687927246094,
+			"intensity": 54.51904296875,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50334,7 +50334,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 319.9499206542969,
+			"intensity": 125.8345947265625,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50870,13 +50870,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				35.23372268676758,
+				-81.41554260253906,
 				190.6817626953125,
 				-820.5714111328125
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -59822,7 +59822,7 @@
 			],
 			"rotation": [
 				0.0,
-				31.933799743652344,
+				44.0737190246582,
 				0.0
 			],
 			"scale": [
@@ -59957,7 +59957,7 @@
 			],
 			"rotation": [
 				0.0,
-				31.933799743652344,
+				44.0737190246582,
 				0.0
 			],
 			"scale": [
@@ -62023,7 +62023,7 @@
 				0.0
 			],
 			"size": [
-				1195.0,
+				1568.0,
 				1071.0
 			],
 			"size_NDC": [
@@ -85994,7 +85994,12 @@
 	"824": {
 		"LuaScriptComponent": {
 			"Enabled": true,
-			"Scripts": []
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6609824712134443009
+				}
+			]
 		},
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -86039,7 +86044,7 @@
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Lobby_Girl"
+			"name": "Lobby_Girl_01"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -86069,19 +86074,469 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-726.5771484375,
-				62.441551208496094,
-				676.5433349609375
+				-472.6348571777344,
+				10.962358474731445,
+				508.82452392578125
 			],
 			"rotation": [
-				-0.00010427086090203375,
-				126.5999984741211,
-				-0.00010427325469208881
+				179.99989318847656,
+				61.75,
+				179.99989318847656
 			],
 			"scale": [
-				0.9999873638153076,
+				0.9999874234199524,
 				1.0,
-				0.9999873638153076
+				0.9999874234199524
+			]
+		}
+	},
+	"825": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				1990257341920198839,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				15248854644898939065,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				4872561103437316283,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				1413796589616775357,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				13519472387988668607,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_inside_outside",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Outer_Wall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				739.2413940429688,
+				0.0,
+				-538.8895263671875
+			],
+			"rotation": [
+				0.0,
+				-89.99994659423828,
+				0.0
+			],
+			"scale": [
+				1.0,
+				2.0,
+				0.9999996423721313
+			]
+		}
+	},
+	"826": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				1990257341920198839,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				15248854644898939065,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				4872561103437316283,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				1413796589616775357,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				13519472387988668607,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_inside_outside",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Outer_Wall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				739.2413940429688,
+				0.0,
+				-203.52212524414063
+			],
+			"rotation": [
+				0.0,
+				-89.99994659423828,
+				0.0
+			],
+			"scale": [
+				0.9999996423721313,
+				2.0,
+				0.9999996423721313
+			]
+		}
+	},
+	"827": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				1990257341920198839,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				15248854644898939065,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				4872561103437316283,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				1413796589616775357,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				13519472387988668607,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_inside_outside",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Outer_Wall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				739.2413940429688,
+				0.0,
+				125.69835662841797
+			],
+			"rotation": [
+				0.0,
+				-89.99994659423828,
+				0.0
+			],
+			"scale": [
+				0.9999996423721313,
+				2.0,
+				0.9999996423721313
+			]
+		}
+	},
+	"828": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				1990257341920198839,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				15248854644898939065,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				4872561103437316283,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				1413796589616775357,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				13519472387988668607,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_inside_outside",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Outer_Wall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				739.2413940429688,
+				0.0,
+				456.32855224609375
+			],
+			"rotation": [
+				0.0,
+				-89.99994659423828,
+				0.0
+			],
+			"scale": [
+				0.9999996423721313,
+				2.0,
+				0.9999996423721313
+			]
+		}
+	},
+	"829": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				1990257341920198839,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				15248854644898939065,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				4872561103437316283,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				1413796589616775357,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				13519472387988668607,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_inside_outside",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Outer_Wall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				739.2413940429688,
+				0.0,
+				790.3284912109375
+			],
+			"rotation": [
+				0.0,
+				-89.99994659423828,
+				0.0
+			],
+			"scale": [
+				0.9999996423721313,
+				2.0,
+				0.9999996423721313
 			]
 		}
 	},
@@ -86443,6 +86898,571 @@
 				0.9999996423721313,
 				1.0,
 				0.9999996423721313
+			]
+		}
+	},
+	"830": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				1990257341920198839,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				15248854644898939065,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				4872561103437316283,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				1413796589616775357,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				13519472387988668607,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_inside_outside",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Outer_Wall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				739.2413940429688,
+				0.0,
+				954.1722412109375
+			],
+			"rotation": [
+				0.0,
+				-89.99994659423828,
+				0.0
+			],
+			"scale": [
+				0.9999996423721313,
+				2.0,
+				0.9999996423721313
+			]
+		}
+	},
+	"831": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				1990257341920198839,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				15248854644898939065,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				4872561103437316283,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				1413796589616775357,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				13519472387988668607,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_inside_outside",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Outer_Wall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				739.2413940429688,
+				0.0,
+				1408.5159912109375
+			],
+			"rotation": [
+				0.0,
+				-89.99994659423828,
+				0.0
+			],
+			"scale": [
+				0.9999996423721313,
+				2.0,
+				0.9999996423721313
+			]
+		}
+	},
+	"832": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				1990257341920198839,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				15248854644898939065,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				4872561103437316283,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				1413796589616775357,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				13519472387988668607,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_inside_outside",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Outer_Wall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				739.2413940429688,
+				240.63970947265625,
+				1203.554443359375
+			],
+			"rotation": [
+				0.0,
+				-89.99994659423828,
+				0.0
+			],
+			"scale": [
+				0.9999996423721313,
+				1.0,
+				0.9999996423721313
+			]
+		}
+	},
+	"833": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				1990257341920198839,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				15248854644898939065,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				4872561103437316283,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				1413796589616775357,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				13519472387988668607,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_inside_outside",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Outer_Wall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				739.2413940429688,
+				-245.73098754882813,
+				1203.554443359375
+			],
+			"rotation": [
+				0.0,
+				-89.99994659423828,
+				0.0
+			],
+			"scale": [
+				0.9999996423721313,
+				1.0,
+				0.9999996423721313
+			]
+		}
+	},
+	"834": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						9758562131409846275,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Thunder",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 2.4769999980926514
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						13629370604515147787,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "ScareSound",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 0.2150000035762787
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						1085543999116279813,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "GirlLaughing",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16409657501337534471
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				8298322686060036097,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				12910008704487424009,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				12910008704487424005,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				9451244190666883075,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				18098155475218235399,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "little_girl",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "SF_Girl_01 (Scare)"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-426.0724792480469,
+				542.8167724609375,
+				739.0574340820313
+			],
+			"rotation": [
+				-107.54998016357422,
+				-0.0,
+				-179.99989318847656
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
+	"835": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				1.0,
+				0.9985881447792053,
+				0.9711815714836121
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 50000.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 31.309999465942383,
+			"quadratic": 0.03200000151991844,
+			"radius": 20000.0,
+			"type": 2
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 10645049978284752899
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "SF_Light_Lightning"
+		},
+		"TransformComponent": {
+			"position": [
+				-29.26523208618164,
+				695.029052734375,
+				825.4061279296875
+			],
+			"rotation": [
+				-184.4499969482422,
+				85.04996490478516,
+				-179.99989318847656
+			],
+			"scale": [
+				0.0010000001639127731,
+				0.0009999999310821295,
+				0.0010000001639127731
 			]
 		}
 	},

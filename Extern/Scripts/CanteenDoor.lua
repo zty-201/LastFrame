@@ -6,10 +6,11 @@
 -- 3. When triggered, door CLOSES by rotating 90 degrees
 -- 4. Door becomes LOCKED after closing
 -- 5. After player unlocks and opens it once, it can no longer be closed by interaction
+-- 6. Opening the door after unlock activates the upstairs ghost girl scare
 
 local closeOffset = -90.0
-local openSpeed  = 60.0      -- slow open speed
-local closeSpeed = 200.0     -- fast slam shut speed
+local openSpeed  = 60.0
+local closeSpeed = 200.0
 
 local openY = 0.0
 local closedY = 0.0
@@ -33,6 +34,11 @@ local function play_3d_sfx(slotId)
     return false
 end
 
+local function activate_sf_girl()
+    SHARED.SF_GIRL_ACTIVE = true
+    print("[CanteenDoor] Activated SF_GIRL_ACTIVE")
+end
+
 function on_create(self)
     local tr = Query.GetTransform(EntityID)
     if tr == nil then
@@ -43,6 +49,7 @@ function on_create(self)
     SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
     SHARED.CANTEEN_DOOR_LOCKED = SHARED.CANTEEN_DOOR_LOCKED or {}
     SHARED.CANTEEN_DOOR_OPEN = SHARED.CANTEEN_DOOR_OPEN or {}
+    SHARED.SF_GIRL_ACTIVE = SHARED.SF_GIRL_ACTIVE or false
 
     local rx, ry, rz = tr:GetRotation()
 
@@ -59,6 +66,7 @@ function on_create(self)
 
     SHARED.CANTEEN_DOOR_LOCKED[EntityID] = false
     SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
+    SHARED.SF_GIRL_ACTIVE = false
 
     tr:SetRotation(rx, currentY, rz)
 
@@ -102,6 +110,7 @@ function on_update(self, dt)
                     hasBeenOpenedByPlayer = true
                     SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
 
+                    activate_sf_girl()
                     play_3d_sfx(DOOR_OPEN_SFX_ID)
 
                     print(string.format("[CanteenDoor] TOGGLE -> OPEN by=%s", tostring(cmdObj.by)))
@@ -118,6 +127,7 @@ function on_update(self, dt)
                 hasBeenOpenedByPlayer = true
                 SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
 
+                activate_sf_girl()
                 play_3d_sfx(DOOR_OPEN_SFX_ID)
 
                 print(string.format("[CanteenDoor] OPEN command received by=%s", tostring(cmdObj.by)))

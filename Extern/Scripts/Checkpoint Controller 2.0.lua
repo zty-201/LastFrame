@@ -22,7 +22,7 @@ local CP1_LENGTH_SECONDS = 10.0
 -- =========================
 -- CP2 CONFIG
 -- =========================
-local CP2_DELAY_SECONDS = 2.0
+local CP2_DELAY_SECONDS = 1.5
 local HIDDEN_DOOR_ID = 43
 
 -- =========================
