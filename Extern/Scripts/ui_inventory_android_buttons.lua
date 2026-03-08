@@ -1,13 +1,10 @@
-
 -- UI_Inventory_Android_Buttons.lua
--- Inventory manager / panel controller
 
 local DEBUG = true
 
-
 local function debug_print(...)
     if DEBUG then
-        print("[UI_Inventory]", ...)
+        print("[UI_Inventory_ANDROID]", ...)
     end
 end
 
@@ -20,87 +17,86 @@ local function set_visible(v)
 end
 
 local function get_item_id()
-    local name = GetEntityName(EntityID)
-    --print("===============================================My entity name is: ", name)
     return GetEntityName(EntityID)
 end
 
 local function ensure_tables()
     SHARED.UI_INVENTORY_ANDROID = SHARED.UI_INVENTORY_ANDROID or {}
+
     if SHARED.UI_INVENTORY_ANDROID_STATE == nil then
         SHARED.UI_INVENTORY_ANDROID_STATE = false
     end
 end
 
-local function reset_tables()
-    SHARED.UI_INVENTORY_ANDROID = SHARED.UI_INVENTORY_ANDROID or {}
-    SHARED.UI_INVENTORY_ANDROID_STATE = false
-    
+------------------------------------------------
+-- Button events
+------------------------------------------------
+
+function on_button_OpenInventory(self)
+    ensure_tables()
+    SHARED.UI_INVENTORY_ANDROID_STATE = true
+    debug_print("Android inventory OPEN")
 end
 
---run when triggered by an button event. 
-function on_button_OpenInventory(self)       
-    SHARED.UI_INVENTORY_ANDROID_STATE = true;
+function on_button_CloseInventory(self)
+    ensure_tables()
+    SHARED.UI_INVENTORY_ANDROID_STATE = false
+    debug_print("Android inventory CLOSE")
 end
+
+------------------------------------------------
+-- Initialization
+------------------------------------------------
 
 function on_create(self)
-
-    reset_tables()
     ensure_tables()
-    ------------------------------------------------
-    -- Toggle Function for android
-    ------------------------------------------------
-    function SHARED.UI_INVENTORY_ANDROID.is_toggle_android()
-        ensure_tables()
-        local temp = SHARED.UI_INVENTORY_ANDROID_STATE
-        SHARED.UI_INVENTORY_ANDROID_STATE = false
-        return temp
-    end
-
-    
-
-    ------------------------------------------------
-    -- Pre Settings
-    ------------------------------------------------
-
-    local entity_name = get_item_id()  
-    if entity_name == "android_inventory_close_state" then      
-        set_visible(true)         
-    end
-
-    if entity_name == "android_inventory_open_state" then      
-        set_visible(false)         
-    end
-
-    debug_print("Initialized: Android inventory buttons, on_create")
+    debug_print("Android inventory buttons initialized")
 end
+
+------------------------------------------------
+-- Update visibility
+------------------------------------------------
 
 function on_update(self, dt)
 
+    if _G.GAME_STATE ~= "GAME" then
+        return
+    end
+
+    --update itself is the menu is active, else return
+    if not UI_is_MenuOpen("Android_Inventory_Buttons") then
+        return
+    end
+    
     ensure_tables()
 
     local entity_name = get_item_id()
 
-    --meaning the state is opened ah
-    if entity_name == "android_inventory_open_state" then
-        if SHARED.UI_INVENTORY_OPEN then
+    if SHARED.UI_INVENTORY_ANDROID_STATE then
+        --debug_print("android_inventory_open_state")
+    else
+        --debug_print("android_inventory_close_state")
+    end
+
+    if entity_name == "android_inventory_open_state" then   
+        if SHARED.UI_INVENTORY_ANDROID_STATE then
             set_visible(true)
         else
             set_visible(false)
-        end      
-    end
+        end
+        
+    elseif entity_name == "android_inventory_close_state" then
 
-    if entity_name == "android_inventory_close_state" then
-        if not SHARED.UI_INVENTORY_OPEN then
-            set_visible(true)
-        else
+        if SHARED.UI_INVENTORY_ANDROID_STATE then
             set_visible(false)
-        end      
+            debug_print("android_inventory_close_state")
+        else
+            set_visible(true)
+        end
     end
 
-    
 end
 
-function on_destroy(self) 
-    debug_print("Inventory tables cleared")
+function on_destroy(self)
+    debug_print("Android inventory button destroyed")
 end

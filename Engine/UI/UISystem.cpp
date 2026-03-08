@@ -300,7 +300,7 @@ namespace EngineFramework
 
     void UI_System::displayMenu(std::string menuname)
     {
-        std::cout << "[UI_System] displayMenu('" << menuname << "')\n";
+        //std::cout << "[UI_System] displayMenu('" << menuname << "')\n";
 
         auto it = Menu_Mapping.find(menuname);
 
@@ -314,6 +314,23 @@ namespace EngineFramework
         }
     }
 
+    void UI_System::displayMenu_InvisibleLayer(std::string menuname)
+    {
+        //std::cout << "[UI_System] displayMenu('" << menuname << "')\n";
+
+        auto it = Menu_Mapping.find(menuname);
+
+        if (it != Menu_Mapping.end() && it->second.first)
+        {
+            std::cout << "[UI_System] displayMenu invisible success: " << menuname << "\n";
+
+            it->second.first->draw_elements(false);
+            current_menu = menuname;
+            it->second.second = true;
+        }
+    }
+
+    
     void UI_System::closeMenu(std::string menuname)
     {
         auto it = Menu_Mapping.find(menuname);
@@ -324,6 +341,18 @@ namespace EngineFramework
             current_menu = "";
             it->second.second = false;
         }
+    }
+
+    bool UI_System::is_MenuOpen(std::string menuname){
+
+        auto it = Menu_Mapping.find(menuname);
+
+        if (it != Menu_Mapping.end() && it->second.first)
+        {
+            return it->second.second;
+        }
+
+        return false;
     }
 
     void UI_System::closeMenu()
@@ -350,6 +379,8 @@ namespace EngineFramework
         }
 
         current_menu.clear();
+
+        std::cout << "=========================== CLOSEEEEE ALLLLLL MENU () ======================================\n";
     }
 
     // -------------------------------------------------------------------------
@@ -366,7 +397,9 @@ namespace EngineFramework
         gCutscene.Stop();
         if (closeAll)
         {
+            
             closeAllMenu();
+            displayMenu_InvisibleLayer("Android_Inventory_Buttons");           
         }
     }
 
@@ -400,11 +433,11 @@ namespace EngineFramework
                 // OR trigger scene load / gameplay start etc.
                 // For now: return to StartMenu
                 closeAllMenu();
-                //displayMenu("StartMenu");
+                displayMenu("Android_Inventory_Buttons");
             }
         );
 
-        displayMenu("Android_Inventory_Buttons");
+        
     }
 
     void UI_System::StartPseudoCutscene()

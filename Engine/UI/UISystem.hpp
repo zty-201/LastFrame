@@ -112,8 +112,12 @@ namespace EngineFramework
         bool DeserializeOverlay(std::string);
 
         void displayMenu(std::string menu);
+        void displayMenu_InvisibleLayer(std::string menu);
+        bool is_MenuOpen(std::string menu);
         void closeMenu(); //this is current menu
+
         void closeMenu(std::string menu);
+        
         void closeAllMenu();
         std::vector<entt::entity> getMenu_Entities(std::string menu);
         std::unordered_set<entt::entity> getAllMenu_Entities();

@@ -207,33 +207,52 @@ function on_create(self)
 end
 
 function on_update(self, dt)
+
+    --UI_DisplayMenu("Android_Inventory_Buttons")
     ensure_tables()
 
-    local pressed = false;
-    if PLATFORM == "android" then
-        --pressed = SHARED.UI_INVENTORY_ANDROID.is_toggle_android()
-    else
-        pressed = SHARED.UI_INVENTORY_ANDROID.is_toggle_android()
-        --pressed = is_toggle_pressed()
-    end
+    
 
+    -- Android state control
+    if SHARED.UI_INVENTORY_ANDROID_STATE ~= nil then
+        if SHARED.UI_INVENTORY_ANDROID_STATE ~= inventoryOpen then
+            inventoryOpen = SHARED.UI_INVENTORY_ANDROID_STATE
+            SHARED.UI_INVENTORY_OPEN = inventoryOpen
 
+            set_visible(inventoryOpen)
 
-    if pressed and not prevTogglePressed then
-        inventoryOpen = not inventoryOpen
-        SHARED.UI_INVENTORY_OPEN = inventoryOpen
+            if inventoryOpen then
+                SHARED.UI_INVENTORY.RecalculatePositions()
+                debug_print("Inventory opened")
+            else
+                debug_print("Inventory closed")
+            end
 
-        set_visible(inventoryOpen)
-
-        if inventoryOpen then
-            SHARED.UI_INVENTORY.RecalculatePositions()
-            debug_print("Inventory opened")
-        else
-            debug_print("Inventory closed")
+            if SHARED.UI_INVENTORY_ANDROID_STATE then
+                debug_print("android_inventory_open_state")
+            else
+                debug_print("android_inventory_close_state")
+            end
         end
     end
 
-    prevTogglePressed = pressed
+    -- PC control
+    
+    --local pressed = is_toggle_pressed()
+    -- if pressed and not prevTogglePressed then
+    --     inventoryOpen = not inventoryOpen
+    --     SHARED.UI_INVENTORY_OPEN = inventoryOpen
+    --     set_visible(inventoryOpen)
+    --     if inventoryOpen then
+    --         SHARED.UI_INVENTORY.RecalculatePositions()
+    --         debug_print("Inventory opened")
+            
+    --     else
+    --         debug_print("Inventory closed")
+    --     end
+    -- end
+
+    -- prevTogglePressed = pressed
 end
 
 function on_destroy(self)
