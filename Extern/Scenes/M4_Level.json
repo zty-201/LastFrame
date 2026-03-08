@@ -21242,8 +21242,8 @@
 					"fadeDuration": 1.0,
 					"id": "OpenDoor",
 					"loop": false,
-					"maxDistance": 25.0,
-					"minDistance": 1.0,
+					"maxDistance": 500.0,
+					"minDistance": 300.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
@@ -37956,8 +37956,8 @@
 					"fadeDuration": 3.0,
 					"id": "Outdoor",
 					"loop": true,
-					"maxDistance": 10.0,
-					"minDistance": 5.0,
+					"maxDistance": 50000.0,
+					"minDistance": 10000.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
@@ -37974,8 +37974,8 @@
 					"fadeDuration": 3.0,
 					"id": "Indoor",
 					"loop": true,
-					"maxDistance": 25.0,
-					"minDistance": 1.0,
+					"maxDistance": 50000.0,
+					"minDistance": 10000.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
@@ -37991,12 +37991,12 @@
 					"category": 1,
 					"fadeDuration": 1.0,
 					"id": "Menu",
-					"loop": false,
+					"loop": true,
 					"maxDistance": 25.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": false,
 					"volume": 0.34200000762939453
 				}
@@ -50872,7 +50872,7 @@
 			"position": [
 				35.23372268676758,
 				190.6817626953125,
-				-827.5075073242188
+				-820.5714111328125
 			],
 			"rotation": [
 				0.0,

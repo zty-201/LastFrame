@@ -24,6 +24,10 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include <algorithm>
 #include <iostream>
 
+#if defined(_DEBUG) && defined(PLATFORM_WINDOWS)
+#include "System_LevelEditor.hpp"
+#endif
+
 //#ifdef PLATFORM_ANDROID
 //#include <android/asset_manager.h>
 //#include <android/asset_manager_jni.h>
@@ -196,10 +200,8 @@ namespace EngineFramework
 		m_initialized = true;
 		LOGI("%s", "[AudioSystem] Initialization Successful!");
 
-#if !defined(_DEBUG) || !defined(PLATFORM_WINDOWS)
-		// If in release mode - considered simulation is active
 		m_inSimulation = true;
-#endif
+
 	}
 
 	void AudioSystem::SetPathResolver(std::function<std::string(const std::string&)> resolver)
@@ -281,18 +283,20 @@ namespace EngineFramework
 #endif
 
 		// 2) playOnStart slots
-		if(m_inSimulation)
+#if defined(_DEBUG) && defined(PLATFORM_WINDOWS)
+		if (!LevelEditorSystem::Get_Enable() && m_inSimulation)
 			HandlePlayOnStart(ecs);
+#else
+		if (m_inSimulation)
+			HandlePlayOnStart(ecs);
+#endif
 
 		// 3) Process queued play/stop commands
-		if (m_inSimulation)
-			ProcessCommands(ecs);
-		else
-			m_commands.clear();
+		ProcessCommands(ecs);
 
 		// 4) Update looping 3D instances to follow entity transforms
-		if(m_inSimulation)
-			UpdateActiveInstances(ecs, dt);
+		//if(m_inSimulation)
+		UpdateActiveInstances(ecs, dt);
 
 #ifndef DISABLE_FMOD
 		// 5) FMOD internal update
@@ -328,8 +332,7 @@ namespace EngineFramework
 		auto view = ecs.view<AudioComponent>();
 		view.each([&](entt::entity e, AudioComponent& comp)
 			{
-				//LOGI("[Audio] Found AudioComponent on entity %u, Slots=%zu",
-				//	(uint32_t)e, comp.Slots.size());
+				//LOGI("[Audio] Found AudioComponent on entity %u, Slots=%zu", (uint32_t)e, comp.Slots.size());
 
 				if (m_playOnStartDone[e]) return;
 
@@ -337,8 +340,7 @@ namespace EngineFramework
 				{
 					if (slot.playOnStart && !slot.id.empty())
 					{
-						LOGI("[Audio] Queuing playOnStart slot '%s' for entity %u",
-							slot.id.c_str(), (uint32_t)e);
+						//LOGI("[Audio] Queuing playOnStart slot '%s' for entity %u", slot.id.c_str(), (uint32_t)e);
 
 						PlayEntitySlot(e, slot.id);
 					}
@@ -418,7 +420,9 @@ namespace EngineFramework
 		channel->setPitch(slot->pitch);
 
 		const bool is3D = (slot->spatial == AudioComponent::SpatialMode::ThreeD);
-		channel->setMode((slot->loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF) | (is3D ? FMOD_3D : FMOD_2D));
+		FMOD_MODE channelMode = (slot->loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+		channelMode |= is3D ? (FMOD_3D | FMOD_3D_LINEARROLLOFF) : FMOD_2D;
+		channel->setMode(channelMode);
 
 		if (is3D)
 		{
@@ -432,8 +436,8 @@ namespace EngineFramework
 		channel->setPaused(false);
 
 		// Track only if looping or if you want follow-up control by slot
-		if (slot->loop || is3D)
-		{
+		//if (slot->loop || is3D)
+		//{
 			// If an instance with same entity+slot exists, stop it and replace (optional policy)
 			for (auto& inst : m_active)
 			{
@@ -443,8 +447,7 @@ namespace EngineFramework
 
 					if (inst.useFade && inst.fadeDuration > 0.0f)
 					{
-						LOGI("[Audio] Marking isFadingOut=true | Slot: %s | Triggered by PlaySlot command for: %s",
-							inst.slotId.c_str(), cmd.slotId.c_str());
+						//LOGI("[Audio] Marking isFadingOut=true | Slot: %s | Triggered by PlaySlot command for: %s", inst.slotId.c_str(), cmd.slotId.c_str());
 						inst.isFadingOut = true;
 					}
 					else
@@ -472,7 +475,7 @@ namespace EngineFramework
 				slot->minDistance,
 				slot->maxDistance
 				});
-		}
+		//}
 #else
 		(void)tf; (void)slot;
 #endif
@@ -481,7 +484,7 @@ namespace EngineFramework
 	void AudioSystem::ProcessStopSlot(const AudioCommand& cmd)
 	{
 #ifndef DISABLE_FMOD
-		LOGI("[Audio] ProcessStopSlot called | Slot: %s", cmd.slotId.c_str());
+		//LOGI("[Audio] ProcessStopSlot called | Slot: %s", cmd.slotId.c_str());
 		for (auto& inst : m_active)
 		{
 			if (inst.entity == cmd.entity && inst.slotId == cmd.slotId)
@@ -491,8 +494,7 @@ namespace EngineFramework
 
 				if (inst.useFade && inst.fadeDuration > 0.0f)
 				{
-					LOGI("[Audio] Marking isFadingOut=true | Slot: %s | Triggered by StopSlot",
-						inst.slotId.c_str());
+					//LOGI("[Audio] Marking isFadingOut=true | Slot: %s | Triggered by StopSlot", inst.slotId.c_str());
 					inst.isFadingOut = true;
 				}
 				else
@@ -537,8 +539,7 @@ namespace EngineFramework
 					instance.currentFadeVolume -= fadeStep;
 
 					// Print during fade-out
-					LOGI("[Audio] Fading OUT | Slot: %s | Multiplier: %.2f",
-						instance.slotId.c_str(), instance.currentFadeVolume);
+					//LOGI("[Audio] Fading OUT | Slot: %s | Multiplier: %.2f", instance.slotId.c_str(), instance.currentFadeVolume);
 
 					if (instance.currentFadeVolume <= 0.0f)
 					{
@@ -553,8 +554,7 @@ namespace EngineFramework
 					instance.currentFadeVolume = std::min(1.0f, instance.currentFadeVolume + fadeStep);
 
 					// Print during fade-in
-					LOGI("[Audio] Fading IN | Slot: %s | Multiplier: %.2f",
-						instance.slotId.c_str(), instance.currentFadeVolume);
+					//LOGI("[Audio] Fading IN | Slot: %s | Multiplier: %.2f", instance.slotId.c_str(), instance.currentFadeVolume);
 				}
 			}
 			else
@@ -571,13 +571,6 @@ namespace EngineFramework
 				instance.channel->setVolume(finalVolume);
 			}
 
-			//// DEBUG PRINT: Only prints for active channels
-			//LOGI("[Audio Debug] Slot: %-10s | Final Vol: %.2f | Fade Multiplier: %.2f | Mode: %s",
-			//	instance.slotId.c_str(),
-			//	finalVolume,
-			//	instance.currentFadeVolume,
-			//	instance.useFade ? "FADE_ON" : "FADE_OFF");
-
 			// 4. Existing Entity & 3D Validation
 			if (!ecs.valid(instance.entity) || !ecs.all_of<TransformComponent>(instance.entity))
 			{
@@ -585,59 +578,6 @@ namespace EngineFramework
 				instance.channel = nullptr;
 				continue;
 			}
-
-			//// Calculate how much to change the fade
-			//float fadeStep = dt / instance.fadeDuration;
-
-			//if (instance.isFadingOut)
-			//{
-			//	// Ramp down
-			//	instance.currentFadeVolume -= fadeStep;
-			//	if (instance.currentFadeVolume <= 0.0f)
-			//	{
-			//		instance.currentFadeVolume = 0.0f;
-			//		instance.channel->stop();
-			//		instance.channel = nullptr;
-			//		continue;
-			//	}
-			//}
-			//else
-			//{
-			//	// Ramp up
-			//	if (instance.currentFadeVolume < 1.0f)
-			//	{
-			//		instance.currentFadeVolume = std::min(1.0f, instance.currentFadeVolume + fadeStep);
-			//	}
-			//}
-
-			//// PRINT CHECK
-			//// We only print if the fade is actually in progress (not 0 or 1) 
-			//// or you can remove the 'if' to see constant volume levels.
-			//if (instance.currentFadeVolume > 0.0f && instance.currentFadeVolume < 1.0f) {
-			//	LOGI("[Audio Debug] Slot: %s | Fade Percent: %.2f | Target: %.2f | Result: %.2f",
-			//		instance.slotId.c_str(),
-			//		instance.currentFadeVolume,
-			//		instance.targetVolume,
-			//		instance.targetVolume * instance.currentFadeVolume);
-			//}
-
-			//float finalVolume = instance.targetVolume * instance.currentFadeVolume;
-			//instance.channel->setVolume(finalVolume);
-
-			// If entity is gone, stop sound
-			/*if (!ecs.valid(instance.entity) || !ecs.all_of<TransformComponent>(instance.entity))
-			{
-				instance.channel->stop();
-				instance.channel = nullptr;
-				continue;
-			}*/
-
-			/*bool playing = false;
-			if (instance.channel->isPlaying(&playing) != FMOD_OK || !playing)
-			{
-				instance.channel = nullptr;
-				continue;
-			}*/
 
 			// 5. Remove if FMOD stopped it naturally (non-looping sounds that finished)
 			// BUT: do not remove looping channels - they should play forever until explicitly stopped
@@ -681,7 +621,7 @@ namespace EngineFramework
 
 #ifndef DISABLE_FMOD
 		FMOD::Sound* snd = nullptr;
-		FMOD_MODE mode = modeFor(loop, false, AudioRolloff::Linear);
+		FMOD_MODE mode = modeFor(loop, true, AudioRolloff::Linear);
 
 #ifdef PLATFORM_ANDROID
 		std::vector<unsigned char> file_data = AssetManagerSystem::GetDataFromFile(resolved);
@@ -829,6 +769,8 @@ namespace EngineFramework
 
 	void AudioSystem::SetSimulationMode(bool enabled)
 	{
+		//LOGI("[Audio] SetSimulationMode called | enabled=%d | m_inSimulation=%d", enabled, m_inSimulation);
+		
 		if (m_inSimulation == enabled)
 			return;
 
@@ -841,11 +783,42 @@ namespace EngineFramework
 		}
 		else
 		{
-			// Leaving simulator: stop anything that is playing from the simulator
-			StopAll();
+			//LOGI("[Audio] Stopping simulation | active instances: %zu", m_active.size());
+
+			// Stop all tracked channels explicitly
+			for (auto& inst : m_active)
+			{
+				if (inst.channel)
+				{
+					//LOGI("[Audio] Stopping channel | Slot: %s", inst.slotId.c_str());
+					inst.channel->stop();
+					inst.channel = nullptr;
+				}
+			}
 			m_active.clear();
 			m_commands.clear();
 			m_playOnStartDone.clear();
+
+#ifndef DISABLE_FMOD
+			// Stop at group level as catch-all for any untracked channels
+			if (m_groupAmbienceOutdoor) m_groupAmbienceOutdoor->stop();
+			if (m_groupAmbienceIndoor)  m_groupAmbienceIndoor->stop();
+			if (m_groupAmbience)        m_groupAmbience->stop();
+			if (m_groupBGM)             m_groupBGM->stop();
+			if (m_groupSFX)             m_groupSFX->stop();
+			if (m_groupUI)              m_groupUI->stop();
+			if (m_groupMaster)          m_groupMaster->stop();
+
+			// Reset ambience state for clean re-entry
+			if (m_groupAmbienceOutdoor) m_groupAmbienceOutdoor->setVolume(1.0f);
+			if (m_groupAmbienceIndoor)  m_groupAmbienceIndoor->setVolume(0.0f);
+			if (m_ambienceLowpass)
+			{
+				m_ambienceLowpass->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, 20000.0f);
+				m_ambienceLowpass->setBypass(true);
+			}
+			m_indoorFactor = 0.0f;
+#endif
 		}
 	}
 
@@ -872,7 +845,7 @@ namespace EngineFramework
 		// DEBUG
 		float confirmedVol = -1.0f;
 		if (m_groupAmbienceOutdoor) m_groupAmbienceOutdoor->getVolume(&confirmedVol);
-		LOGI("[Audio] SetIndoorFactor=%.2f | OutdoorGroupVol set =%.2f | confirmed=%.2f", m_indoorFactor, outdoorVol, confirmedVol);
+		//LOGI("[Audio] SetIndoorFactor=%.2f | OutdoorGroupVol set =%.2f | confirmed=%.2f", m_indoorFactor, outdoorVol, confirmedVol);
 #endif
 	}
 
