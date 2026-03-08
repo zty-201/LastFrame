@@ -41,7 +41,6 @@ end
 --run when triggered by an button event. 
 function on_button_OpenInventory(self)       
     SHARED.UI_INVENTORY_ANDROID_STATE = true;
-    debug_print(" ================================== on_button_OpenInventory")
 end
 
 function on_create(self)
