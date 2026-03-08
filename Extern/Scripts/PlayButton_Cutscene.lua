@@ -166,6 +166,7 @@ function on_button_PlayButton(self)
 
     local ok, err = pcall(function()
         UI_StartPseudoCutscene()
+        --UI_DisplayMenu("Android_Inventory_Buttons")
     end)
 
     if ok then

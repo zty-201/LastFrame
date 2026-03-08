@@ -403,6 +403,8 @@ namespace EngineFramework
                 //displayMenu("StartMenu");
             }
         );
+
+        displayMenu("Android_Inventory_Buttons");
     }
 
     void UI_System::StartPseudoCutscene()

@@ -14,6 +14,7 @@ function on_button_ReturnButton(self)
 
     -- Close any currently open menus
     UI_CloseAllMenus()
+    UI_DisplayMenu("Android_Inventory_Buttons")
 
     -- Display Main Menu
     -- UI_DisplayMenu("StartMenu")
