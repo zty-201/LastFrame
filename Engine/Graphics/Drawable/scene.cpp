@@ -13,10 +13,10 @@
  * - Configuring texture parameters and mipmaps.
  *
  *  Compatibility Notes:
-    Glad.h has been generated for opengl es 3.2 for android and windows platform.
+	Glad.h has been generated for opengl es 3.2 for android and windows platform.
 
-    Android: ETC2 texture guaranteed, ASTC probably available on most modern phones.
-    Desktop: ETC2 texture may be available but emulated to uncompressed. Use BCx texture (added via extensions) instead.
+	Android: ETC2 texture guaranteed, ASTC probably available on most modern phones.
+	Desktop: ETC2 texture may be available but emulated to uncompressed. Use BCx texture (added via extensions) instead.
 
  * @author Zhang TongYan
  * @date Sept, 2025
@@ -47,7 +47,7 @@ namespace
 		ETC2, //For Android.
 		UNKNOWN
 	};
-	
+
 	//RAII data containing compressed texture data.
 	class CompressedTextureData
 	{
@@ -130,13 +130,42 @@ namespace
 #ifdef PLATFORM_WINDOWS //Only for windows, where it actively compresses textures and uses Compressonator defines.
 
 	/*
+		Sets the CMP_FORMAT value of the uncompressed_format variable, based on number of channels.
+		Assumes 8 bits per channel.
+		\param [out] uncompressed_format
+		The original format of the data before compression
+		\return
+		Error string.
+	*/
+	[[nodiscard]] std::optional<std::string> GetCMPUncompressedFormat(int num_channels, CMP_FORMAT& uncompressed_format)
+	{
+		switch (num_channels)
+		{
+		case 1:
+			uncompressed_format = CMP_FORMAT_R_8;
+			break;
+		case 2:
+			uncompressed_format = CMP_FORMAT_RG_8;
+			break;
+		case 3:
+			uncompressed_format = CMP_FORMAT_RGB_888;
+			break;
+		case 4:
+			uncompressed_format = CMP_FORMAT_RGBA_8888;
+			break;
+		default: return "Invalid number of channels";
+		}
+		return {};
+	}
+
+	/*
 		Sets the values of the compressed_format variables passed in, based on the current format and compression type chosen.
 		Bits per channel assumed to be a fixed 8 bits.
 
 		\param uncompressed_format
 		The format the texture is currently in.
 		\param compression_type
-		The compression type to compress to	
+		The compression type to compress to
 		\param [out] compressed_format
 		The format to compress to
 		\param [out] num_channels
@@ -145,7 +174,7 @@ namespace
 
 		Returns an error string if unable to set a format.
 	*/
-	[[nodiscard]] std::optional<std::string> GetTextureCompressionFormat(const CMP_FORMAT& uncompressed_format, CompressionTextureType compression_type, CMP_FORMAT& compressed_format, int &num_channels)
+	[[nodiscard]] std::optional<std::string> GetTextureCompressionFormat(const CMP_FORMAT& uncompressed_format, CompressionTextureType compression_type, CMP_FORMAT& compressed_format, int& num_channels)
 	{
 		//Bits per channel assumed to be a fixed 8 bits.
 		switch (uncompressed_format)
@@ -265,7 +294,7 @@ namespace
 	void flipTextureVertical(CMP_MipSet& mipset) {
 		UNREFERENCED_PARAMETER(mipset);
 		//use dwLinearSize / dwHeight for row size for each mipmap level separately.
-		
+
 	}
 
 	/*
@@ -276,143 +305,123 @@ namespace
 		What type to compress texture to.
 		\param quality
 		From 0 to 1.0. Much higher performance hit at higher levels.
-		\param max_mipmap_level
-		Maximum mipmap levels that can be generated from the image. 
-		This is the requested level, however less levels may be generated if it is not possible.
 	*/
-	CompressedTextureData CompressTexture(const std::filesystem::path& file_path, bool is_srgb, CompressionTextureType compression_type, float quality, unsigned int max_mipmap_level = 100)
+	CompressedTextureData CompressTexture(const std::filesystem::path& file_path, bool is_srgb, CompressionTextureType compression_type, float quality)
 	{
 		//TODO: Look into supporting 1-2 channel compression on mobile using ASTC compression or ETC2 RGB, and see if it's beneficial.
 		//TODO: Look into compressing to .basis file, then transcoding during runtime to GPU supported texture (more compatibility, no need to worry about astc).
 		if (quality < 0 || quality > 1.0) return CompressedTextureData("Invalid Compression Quality passed in, must be in range [0, 1]");
+
 		/*
 			Process
-			1. Load texture into mipmap set
-			2. Get important parameters like compression format, num channels
-			3. Generate mipmap chain if not present.
-			4. Compress mipmap
-			5. Write mipmap to CompressedTextureData and free mipmaps used.
+			1. Load texture
+			2. Get important parameters
+			3. Compress texture
+			5. Write data to CompressedTextureData and free textures used.
 		*/
-		//== Load texture data into mipmap set.
-		CMP_MipSet mipset_in;
-		memset(&mipset_in, 0, sizeof(CMP_MipSet));
-		auto cmp_status = CMP_LoadTexture(file_path.string().c_str(), &mipset_in);
-		if (cmp_status != CMP_OK) {
-			return CompressedTextureData("Unable to load texture file");
-		}
 
-		/*
-			TODO:
-			1. Try to manually load into mipset instead of using CMP_LoadTexture which defaults to always load as RGBA
-			- Run once and record all the settings set by LoadTexture.
-			2. If so, then setting stbi_image_load_vertically(true) will remove the need to manually flip image.
-		*/
-		flipTextureVertical(mipset_in); //Vertically flip all levels before generating mipmap chain.
 
-		
-		//==Generate mipmap chain if not present.
-		if (mipset_in.m_nMipLevels <= 1)
+		//== Load data from file.
+		int width{}, height{}, channels{};
+		stbi_set_flip_vertically_on_load(true);
+		std::vector<unsigned char> file_data = EngineFramework::AssetManagerSystem::GetDataFromFile(file_path);
+		if (file_data.empty())
+			return CompressedTextureData(std::string("Failed to read texture file: ") + file_path.string());
+
+		//RAII management of stbi data.
+		auto stbi_data_free = [](unsigned char* data) {
+			if (data) stbi_image_free(data);
+			};
+		std::unique_ptr<unsigned char, decltype(stbi_data_free)> stbi_data{
+			stbi_load_from_memory(
+			file_data.data(),
+			static_cast<int>(file_data.size()),
+			&width, &height, &channels, 0), stbi_data_free };
+		if (!stbi_data)
+			return CompressedTextureData("Unable to process texture data");
+
+		//==Get input and output formats.
+
+		//Get texture format as CMP_FORMAT
+		CMP_FORMAT input_format{};
+		auto err_code = GetCMPUncompressedFormat(channels, input_format);
+		if (err_code.has_value())
 		{
-			/*
-			*	Calculates the minimum size of the lowest-level mipmap after generation.
-			*	If requested level is too high, then an adjusted size will be returned.
-			*/
-			CMP_INT nMinSize = CMP_CalcMinMipSize(mipset_in.m_nHeight, mipset_in.m_nWidth, (CMP_INT) max_mipmap_level);
-
-			//Generate levels.
-			CMP_GenerateMIPLevels(&mipset_in, nMinSize);
+			return CompressedTextureData("Invalid number of channels passed in, logic error?");
 		}
 
-
-		/*
-			Get important parameters.
-			Note: srgb and non-srgb is treated the same way, as the format is the same (only the color space is different) and thus they can be compressed
-			the same way (so long as gpu knows it's srgb when uploading).
-		*/
-
-		//==Input is assumed to always be 8bits per channel (no floating pt).
 		CMP_FORMAT output_format{};
 		int num_channels{};
-		auto err_code = GetTextureCompressionFormat(mipset_in.m_format, compression_type, output_format, num_channels);
+		err_code = GetTextureCompressionFormat(input_format, compression_type, output_format, num_channels);
 		if (err_code.has_value())
 		{
-			CMP_FreeMipSet(&mipset_in);
 			return CompressedTextureData(err_code.value());
 		}
-		/*
-			Compress mipmap.
-		*/
 
-		//== Set Options
-		KernelOptions kernel_options;
-		memset(&kernel_options, 0, sizeof(KernelOptions));
-		kernel_options.format = output_format;   // Set the format to process
-		kernel_options.fquality = quality;     // Set the quality of the result
-		kernel_options.threads = 0;            // Auto setting
-		if(is_srgb) kernel_options.useSRGBFrames = true;
+		//compressed output_format, but as an opengl enum.
+		GLenum compressed_type;
+		err_code = GetGLTextureFormat(output_format, is_srgb, compressed_type);
+		if (err_code.has_value())
+		{
+			return CompressedTextureData(err_code.value());
+		}
 
-		// Mipmap set buffer for compressed texture
-		CMP_MipSet mipset_out;
-		memset(&mipset_out, 0, sizeof(CMP_MipSet));
+		//== Set input and output variables.
+		CMP_Texture src_texture{};
+		src_texture.dwSize = sizeof(src_texture);
+		src_texture.dwPitch = width * channels; //size of row. assuming tightly packed data.
+		src_texture.format = input_format;
+		src_texture.dwWidth = width;
+		src_texture.dwHeight = height;
+		src_texture.pData = static_cast<CMP_BYTE*>(stbi_data.get());
+		src_texture.dwDataSize = width * height * channels;
 
-		//===============================================
-		// Compress the texture using Compressonator Lib
-		//===============================================
-		cmp_status = CMP_ProcessTexture(&mipset_in, &mipset_out, kernel_options, nullptr);
+		CMP_Texture dst_texture{};
+		dst_texture.dwSize = sizeof(dst_texture);
+		dst_texture.dwWidth = width;
+		dst_texture.dwHeight = height;
+		dst_texture.dwPitch = 0;
+		dst_texture.format = output_format;
+		dst_texture.dwDataSize = CMP_CalculateBufferSize(&dst_texture);
+		std::vector<std::byte> output_data(dst_texture.dwDataSize);
+		dst_texture.pData = reinterpret_cast<CMP_BYTE*>(output_data.data());
+
+
+		//== Compression
+		CMP_CompressOptions options = { 0 };
+		options.dwSize = sizeof(options);
+		options.fquality = quality;
+		options.dwnumThreads = 0; //Let it select.
+		options.bDXT1UseAlpha = false; //Only RGB is converted to DXT1 for our case, so disable this because there's no alpha.
+		options.bUseRefinementSteps = true;
+		options.DestFormat = output_format;
+		options.SourceFormat = input_format;
+		//TODO: See if this is needed.
+		//if(is_srgb) options.useSRGBFrames = true;
+		//options.bUseCGCompress = true;
+		
+
+		CMP_ERROR cmp_status = CMP_ConvertTexture(&src_texture, &dst_texture, &options, nullptr);
 		if (cmp_status != CMP_OK)
 		{
-			CMP_FreeMipSet(&mipset_in);
-			return CompressedTextureData("Error when compressing texture: " + std::to_string(cmp_status));
+			return CompressedTextureData("Failed to compress texture");
 		}
 
-		/*
-			Copy over to result.
-		*/
-		// --- Concatenate all data into a single array, keep track of important info.
-		std::vector<std::byte> all_compressed_data;
-		std::vector<uint32_t> compressed_data_size{}; //Each mipmap data size after compression.
-		std::vector<std::pair<uint32_t, uint32_t>> mipmaps_width_height{}; //Keep track of each mipmaps dimensions.
-		int num_mipmaps = mipset_out.m_nMipLevels;
-		for (CMP_INT mip = 0; mip < num_mipmaps; mip += 1)
-		{
-			//Get mipmap data and dimensions for that level.
-			CMP_MipLevel* mip_level = nullptr;
-			CMP_GetMipLevel(&mip_level, &mipset_out, mip, 0);
-			if (!mip_level)
-			{
-				CMP_FreeMipSet(&mipset_in);
-				CMP_FreeMipSet(&mipset_out);
-				return CompressedTextureData("Failed to create MipMap Set");
-			}
-			//Set important information for each mip level individually.
-			mipmaps_width_height.push_back(std::pair<uint32_t, uint32_t>(mip_level->m_nWidth, mip_level->m_nHeight));
-			all_compressed_data.insert(all_compressed_data.end(),
-				reinterpret_cast<std::byte*>(mip_level->m_pbData), reinterpret_cast<std::byte*>(mip_level->m_pbData) + mip_level->m_dwLinearSize);
-			compressed_data_size.push_back(static_cast<uint32_t>(mip_level->m_dwLinearSize));
-		}
-
-		CMP_FreeMipSet(&mipset_in);
-		CMP_FreeMipSet(&mipset_out);
-
-
-		//Compressed format opengl equivalent.
-		GLenum opengl_compressed_format;
-		err_code = GetGLTextureFormat(output_format, is_srgb, opengl_compressed_format);
-		if (err_code.has_value())
-		{
-			//Something went wrong, return val from GetTextureCompressionFormat doesn't match with GetGLTextureFormat
-			return CompressedTextureData(err_code.value());
-		}
-
+		// Copy to result.
+		// Note that these variables indicate a potential for future mipmap compression to be added.
+		// As it is just 1 texture, just set level to 1.
+		std::vector<std::pair<uint32_t, uint32_t>> mipmap_width_height{ {width, height} };
+		std::vector<uint32_t> compressed_data_size{ static_cast<uint32_t>(output_data.size()) };
 		return CompressedTextureData(
-			std::move(mipmaps_width_height),
+			std::move(mipmap_width_height),
 			std::move(compressed_data_size),
-			num_mipmaps,
-			opengl_compressed_format,
+			1,
+			compressed_type,
 			is_srgb,
-			num_channels,
-			std::move(all_compressed_data)
+			channels,
+			std::move(output_data)
 		);
+
 	}
 #endif	
 
@@ -432,7 +441,7 @@ namespace
 		//For now, just load as is without run-time compression. 
 		//TODO: Look into runtime-compression for these uncompressed files using generic compression_format and gl_teximage2d. May be too poor quality however.
 		loaded_texture = 0;
-		
+
 		//== Load data from file.
 		int width, height, bytesPerPix;
 		stbi_set_flip_vertically_on_load(true);
@@ -447,14 +456,14 @@ namespace
 
 		//RAII dtor for raw stbi data
 		auto free_stbi_data = [](unsigned char* stbi_data)
-		{
-			if (stbi_data) stbi_image_free(stbi_data);
-		};
+			{
+				if (stbi_data) stbi_image_free(stbi_data);
+			};
 		std::shared_ptr<unsigned char> stbi_data(stbi_data_DONOTUSE, free_stbi_data);
 
 		if (!stbi_data)
 			return std::string("Failed to load texture: ") + file_path.string();
-		
+
 
 		//TODO: delete runtime-compress code, just use normal code (since no need to compress at runtime). This is just to test if compressor is working.
 #ifdef PLATFORM_WINDOWS
@@ -518,7 +527,7 @@ namespace
 		}
 		//Upload compressed texture.
 		else
-		{			
+		{
 			//==Upload to GPU with various params.
 			GLuint texID = 0;
 			glGenTextures(1, &texID);
@@ -529,11 +538,18 @@ namespace
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			//When texture is mapped to a smaller surface than its size, mipmap is used. Trilinear filtering.
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, compressed_texture.mip_levels-1);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, compressed_texture.mip_levels - 1);
 
 			//Set texture to repeat vertically/horizontally if out-of-bounds.
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+			//Texture swizzling R and B to account for flipped texture during compression.
+			if (compressed_texture.channels > 2)
+			{
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+			}
 
 			//Save previous setting so it can be loaded back afterwards.
 			GLint previousAlignment = 0;
@@ -547,16 +563,16 @@ namespace
 
 				Use glCompressedTexImage2D (takes in pre-compressed data) instead of glTexImage2D (which only takes in uncompressed)
 			*/
-			
+
 			{
 				//Updated for each mipmap loaded, to point to the next mipmap.
-				int compressed_data_offset = 0; 
+				int compressed_data_offset = 0;
 				for (uint32_t mip = 0; mip < compressed_texture.mip_levels; ++mip)
 				{
 					const uint32_t mip_width = compressed_texture.mipmaps_width_height[mip].first;
 					const uint32_t mip_height = compressed_texture.mipmaps_width_height[mip].second;
 					const uint32_t mip_data_size = compressed_texture.compressed_data_size[mip];
-					
+
 					glCompressedTexImage2D(
 						GL_TEXTURE_2D,
 						static_cast<GLint>(mip),  // Mipmap level
@@ -624,7 +640,7 @@ namespace
 
 		// Automatically generates levels 1...N
 		glGenerateMipmap(GL_TEXTURE_2D);
-		
+
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -633,7 +649,7 @@ namespace
 		//Check for error when uploading.
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
-			if(texID) glDeleteTextures(1, &texID);
+			if (texID) glDeleteTextures(1, &texID);
 			return std::string("Error when uploading texture: ERR_CODE ") + std::to_string(err);
 		}
 
@@ -801,7 +817,7 @@ namespace
 		\return
 		Nothing on success, Error string otherwise.
 	*/
-	[[nodiscard]] std::optional<std::string> GetGLTextureFormat(GLenum& current_format, GLint &internal_format, int channels, bool is_srgb)
+	[[nodiscard]] std::optional<std::string> GetGLTextureFormat(GLenum& current_format, GLint& internal_format, int channels, bool is_srgb)
 	{
 		//Textures can have 1-4 channels, so switch formats to match that.
 		//SRGB only applies to 3-4 channel (rgb is needed for gamma color space), ignore if 1-2.
@@ -822,7 +838,7 @@ namespace
 			break;
 		case 4:
 			current_format = GL_RGBA;
-			if (is_srgb) internal_format = GL_SRGB8_ALPHA8; 
+			if (is_srgb) internal_format = GL_SRGB8_ALPHA8;
 			else internal_format = GL_RGBA8;
 			break;
 		default:
@@ -869,10 +885,10 @@ namespace
 					SRGB / RGB is used instead of the + 1 bit Alpha version of DXT1.
 					Both formats are the same size, but since original data was in RGB format it'll always be opaque.
 				*/
-				current_format = (is_srgb)? GL_COMPRESSED_SRGB_S3TC_DXT1_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+				current_format = (is_srgb) ? GL_COMPRESSED_SRGB_S3TC_DXT1_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
 				break;
 			case 4:
-				current_format = (is_srgb)? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT : GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+				current_format = (is_srgb) ? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT : GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 				break;
 			}
 #else
@@ -884,10 +900,10 @@ namespace
 			switch (channels)
 			{
 			case 3:
-				current_format = (is_srgb)? GL_COMPRESSED_SRGB8_ETC2 : GL_COMPRESSED_RGB8_ETC2;
+				current_format = (is_srgb) ? GL_COMPRESSED_SRGB8_ETC2 : GL_COMPRESSED_RGB8_ETC2;
 				break;
 			case 4:
-				current_format = (is_srgb)? GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC : GL_COMPRESSED_RGBA8_ETC2_EAC;
+				current_format = (is_srgb) ? GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC : GL_COMPRESSED_RGBA8_ETC2_EAC;
 				break;
 			default:
 				return "Current Compression Algorithm does not support 1-2 channel ETC2 compression. Update GetGLTextureFormat if it does.";
