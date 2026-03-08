@@ -22,11 +22,13 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
+#endif
+
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
-
-#endif
+#include <algorithm>
+#include <cctype>
 
 #include "AssetManager.hpp"
 
@@ -38,6 +40,55 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #define ACTION_CANCEL       3
 #define ACTION_POINTER_DOWN 5
 #define ACTION_POINTER_UP   6
+
+namespace
+{
+    using EngineFramework::Key_Actions;
+
+    std::string ToUpperCopy(std::string value)
+    {
+        std::transform(value.begin(), value.end(), value.begin(),
+            [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+        return value;
+    }
+
+    bool ParseKeyAction(const std::string& name, Key_Actions& out)
+    {
+        const std::string normalized = ToUpperCopy(name);
+
+        if (normalized == "FLASHLIGHT") { out = Key_Actions::FLASHLIGHT; return true; }
+        if (normalized == "INTERACT") { out = Key_Actions::INTERACT; return true; }
+        if (normalized == "INVENTORY") { out = Key_Actions::INVENTORY; return true; }
+        if (normalized == "JUMP") { out = Key_Actions::JUMP; return true; }
+        if (normalized == "MOVE_BACK") { out = Key_Actions::MOVE_BACK; return true; }
+        if (normalized == "MOVE_FORWARD") { out = Key_Actions::MOVE_FORWARD; return true; }
+        if (normalized == "MOVE_LEFT") { out = Key_Actions::MOVE_LEFT; return true; }
+        if (normalized == "MOVE_RIGHT") { out = Key_Actions::MOVE_RIGHT; return true; }
+        if (normalized == "OPEN_EDITOR") { out = Key_Actions::OPEN_EDITOR; return true; }
+        if (normalized == "PAUSE") { out = Key_Actions::PAUSE; return true; }
+        if (normalized == "SPRINT") { out = Key_Actions::SPRINT; return true; }
+        return false;
+    }
+
+    std::string KeyActionName(Key_Actions action)
+    {
+        switch (action)
+        {
+        case Key_Actions::FLASHLIGHT: return "FLASHLIGHT";
+        case Key_Actions::INTERACT: return "INTERACT";
+        case Key_Actions::INVENTORY: return "INVENTORY";
+        case Key_Actions::JUMP: return "JUMP";
+        case Key_Actions::MOVE_BACK: return "MOVE_BACK";
+        case Key_Actions::MOVE_FORWARD: return "MOVE_FORWARD";
+        case Key_Actions::MOVE_LEFT: return "MOVE_LEFT";
+        case Key_Actions::MOVE_RIGHT: return "MOVE_RIGHT";
+        case Key_Actions::OPEN_EDITOR: return "OPEN_EDITOR";
+        case Key_Actions::PAUSE: return "PAUSE";
+        case Key_Actions::SPRINT: return "SPRINT";
+        default: return {};
+        }
+    }
+}
 
 namespace EngineFramework
 {
@@ -545,11 +596,23 @@ namespace EngineFramework
         event_dispatcher.sink<Event_Level_Editor_Simulation>().connect<&InputManager::HANDLE_EVENT_LevelEditor_Simulation>(this);
         event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&InputManager::HANDLE_EVENT_LevelEditorToggled>(this);
 #endif
-#if defined(PLATFORM_WINDOWS)  
+
         initialise_keymapping();
-        codegen_deseralise();
-        seralise();
-#endif        
+        bool loadedFromJson = LoadKeyMappingFromJson();
+
+#if defined(DEBUG) && defined(PLATFORM_WINDOWS)
+        if (!loadedFromJson)
+        {
+            codegen_deseralise();
+            seralise();
+            loadedFromJson = !key_mapping_data.empty();
+        }
+#endif
+
+        if (!loadedFromJson)
+        {
+            PopulateDefaultKeyMappingData();
+        }
     }
 
     void InputManager::Update(float deltaTime)
@@ -818,7 +881,7 @@ namespace EngineFramework
 
 #endif
 
-    void InputManager::seralise() {
+void InputManager::seralise() {
         //STORE DATA FROM KEY_MAPPING_DATA TO JSON FILE
         //logging purpose, does not key data
         nlohmann::json data; // root JSON object
@@ -847,6 +910,67 @@ namespace EngineFramework
         file << data.dump(4);
         file.close();
 
+    }
+
+    bool InputManager::LoadKeyMappingFromJson()
+    {
+        std::string path = AssetManagerSystem::GetAssetFolderPrefix().string() + "Extern/Input/key_mapping_data.json";
+        std::ifstream file(path);
+        if (!file.is_open())
+        {
+            LOGW("[InputManager] Unable to open key mapping file: %s", path.c_str());
+            return false;
+        }
+
+        nlohmann::json data;
+        try
+        {
+            file >> data;
+        }
+        catch (const std::exception& e)
+        {
+            LOGE("[InputManager] Failed to parse %s: %s", path.c_str(), e.what());
+            return false;
+        }
+
+        if (!data.contains("gameplay_keys") || !data["gameplay_keys"].is_array())
+        {
+            LOGE("[InputManager] Invalid key_mapping_data.json: missing gameplay_keys array");
+            return false;
+        }
+
+        key_mapping_data.clear();
+
+        for (const auto& entry : data["gameplay_keys"])
+        {
+            if (!entry.contains("key_action") || !entry.contains("glfw_key"))
+                continue;
+
+            std::string actionName = entry["key_action"].get<std::string>();
+            int keyCode = entry["glfw_key"].get<int>();
+            key_mapping_data[actionName] = keyCode;
+
+            Key_Actions actionEnum;
+            if (ParseKeyAction(actionName, actionEnum))
+            {
+                key_mapping[actionEnum] = keyCode;
+            }
+        }
+
+        return !key_mapping_data.empty();
+    }
+
+    void InputManager::PopulateDefaultKeyMappingData()
+    {
+        key_mapping_data.clear();
+        for (const auto& [action, key] : key_mapping)
+        {
+            std::string name = KeyActionName(action);
+            if (!name.empty())
+            {
+                key_mapping_data[name] = key;
+            }
+        }
     }
 
     void InputManager::codegen_deseralise() {
@@ -972,7 +1096,16 @@ namespace EngineFramework
                         {
                             std::string number_str = content.substr(equal_pos + 1, end_pos - equal_pos - 1);
                             if (!number_str.empty())
-                                key_mapping_data[tag] = std::stoi(number_str);
+                            {
+                                int keyValue = std::stoi(number_str);
+                                key_mapping_data[tag] = keyValue;
+
+                                Key_Actions actionEnum;
+                                if (ParseKeyAction(tag, actionEnum))
+                                {
+                                    key_mapping[actionEnum] = keyValue;
+                                }
+                            }
                         }
                     }
                 }
