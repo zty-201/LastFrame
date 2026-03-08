@@ -96,7 +96,7 @@ function on_update(self, dt)
     _dbgPrintTimer = (_dbgPrintTimer or 0.0) + dt
     if _dbgPrintTimer >= 1.0 then
         _dbgPrintTimer = _dbgPrintTimer - 1.0
-        print(string.format("[player_movement_charctr] on_update heartbeat | dt=%.3f", dt))
+        -- print(string.format("[player_movement_charctr] on_update heartbeat | dt=%.3f", dt))
     end
 
     local SHARED = getGlobalShared()

@@ -145,7 +145,7 @@ function on_update(self, dt)
     if _dbgT >= 1.0 then
         _dbgT = 0.0
         print(string.format(
-            "[AmbienceManager] GAME_STATE=%s INDOOR_COUNT=%s",
+            -- "[AmbienceManager] GAME_STATE=%s INDOOR_COUNT=%s",
             tostring(_G.GAME_STATE),
             tostring(_G.INDOOR_COUNT)
         ))
