@@ -18,6 +18,7 @@ local MODE_INDOOR  = 2
 local current = 0.0          -- current indoor factor [0..1]
 local target  = 0.0          -- target indoor factor [0..1]
 local lastMode = nil
+local indoorPlaying = false
 
 local _dbgT = 0.0
 
@@ -50,7 +51,9 @@ local function getMode()
     if _G.GAME_STATE ~= "GAME" then
         return MODE_MENU
     end
-    return isIndoorWanted() and MODE_INDOOR or MODE_OUTDOOR
+
+    return MODE_OUTDOOR
+    -- return isIndoorWanted() and MODE_INDOOR or MODE_OUTDOOR
 end
 
 local function applyMode(mode)
@@ -64,25 +67,45 @@ local function applyMode(mode)
         Audio_PlaySlot(EntityID, SLOT_MENU)
         Audio_StopSlot(EntityID, SLOT_OUTDOOR)
         Audio_StopSlot(EntityID, SLOT_INDOOR)
+
+        indoorPlaying = false
         return
     end
 
     -- GAME MODE (Outdoor / Indoor crossfade)
     Audio_StopSlot(EntityID, SLOT_MENU)
 
+    -- Apply Occlusion
     Audio_SetIndoorFactor(current)
 
-    if target >= 0.5 then
-        Audio_PlaySlot(EntityID, SLOT_INDOOR)
-        if current >= (1.0 - STOP_EPS) then
-            Audio_StopSlot(EntityID, SLOT_OUTDOOR)
-        end
-    else
+    -- Outdoor always plays during gameplay, never stop
+    if not indoorPlaying and target == 0.0 then
         Audio_PlaySlot(EntityID, SLOT_OUTDOOR)
-        if current <= STOP_EPS then
-            Audio_StopSlot(EntityID, SLOT_INDOOR)
-        end
     end
+
+    -- Start indoor when transitioning into indoor
+    if target == 1.0 and not indoorPlaying then
+        Audio_PlaySlot(EntityID, SLOT_INDOOR)
+        indoorPlaying = true
+    end
+
+    -- Stop indoor only once fully back outside
+    if current <= STOP_EPS and indoorPlaying then
+        Audio_StopSlot(EntityID, SLOT_INDOOR)
+        indoorPlaying = false
+    end
+
+    -- if target >= 0.5 then
+    --     Audio_PlaySlot(EntityID, SLOT_INDOOR)
+    --     if current >= (1.0 - STOP_EPS) then
+    --         Audio_StopSlot(EntityID, SLOT_OUTDOOR)
+    --     end
+    -- else
+    --     Audio_PlaySlot(EntityID, SLOT_OUTDOOR)
+    --     if current <= STOP_EPS then
+    --         Audio_StopSlot(EntityID, SLOT_INDOOR)
+    --     end
+    -- end
 end
 
 function on_create(self)
@@ -104,7 +127,14 @@ function on_create(self)
     else
         target  = isIndoorWanted() and 1.0 or 0.0
         current = target
-        applyMode(mode)
+
+        Audio_PlaySlot(EntityID, SLOT_OUTDOOR)
+        if isIndoorWanted() then
+            Audio_PlaySlot(EntityID, SLOT_INDOOR)
+            indoorPlaying = true
+        end
+        Audio_SetIndoorFactor(current)
+        -- applyMode(mode)
     end
 end
 

@@ -978,6 +978,34 @@ namespace EditorFeatures {
 				// ----- CATEGORY -----
 				draw_category_combo("Category", slot.category);
 
+				// ----- AMBIENCE SUB-TYPE -----
+				if (slot.category == AudioComponent::AudioCategory::Ambience)
+				{
+					const char* ambiencePreview = "General";
+					switch (slot.ambienceType)
+					{
+						case AudioComponent::AmbienceType::Outdoor: ambiencePreview = "Outdoor";
+							break;
+						case AudioComponent::AmbienceType::Indoor:	ambiencePreview = "Indoor";
+							break;
+						default: break;
+					}
+
+					if (ImGui::BeginCombo("Ambience Type", ambiencePreview))
+					{
+						auto pick = [&](AudioComponent::AmbienceType v, const char* name)
+						{
+							bool selected = (slot.ambienceType == v);
+							if (ImGui::Selectable(name, selected)) slot.ambienceType = v;
+							if (selected) ImGui::SetItemDefaultFocus();
+						};
+						pick(AudioComponent::AmbienceType::General, "General");
+						pick(AudioComponent::AmbienceType::Outdoor, "Outdoor");
+						pick(AudioComponent::AmbienceType::Indoor, "Indoor");
+						ImGui::EndCombo();
+					}
+				}
+
 				// ----- ASSET PICKER -----
 				if (has_sources)
 				{
@@ -1014,7 +1042,7 @@ namespace EditorFeatures {
 				
 				// ----- VOLUME -----
 				if (slot.volume < 0.0f) slot.volume = 0.0f;
-				ImGui::SliderFloat("Volume", &slot.volume, 0.0f, 1.0f);
+				ImGui::SliderFloat("Volume", &slot.volume, 0.0f, 5.0f);
 
 				// ----- SPATIAL -----
 				draw_spatial_combo("Spatial", slot.spatial);

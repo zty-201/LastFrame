@@ -121,6 +121,7 @@ namespace EngineFramework
         std::unordered_set<entt::entity> getAllMenu_Entities();
 
         void update_Joysticks();
+        bool IsMenuActive(const std::string& menu) const;
         
 #ifdef PLATFORM_WINDOWS  //Not used on android.
         std::unordered_set<entt::entity> Seralise_AllMenus();
@@ -151,4 +152,3 @@ namespace EngineFramework
 
 }
 #endif
-

@@ -32,6 +32,7 @@ inline void NormalizeAudioComponentJson(nlohmann::json& componentJson)
             slotJson["pitch"] = clipJson.value("pitch", 1.0f);
             slotJson["loop"] = clipJson.value("loop", false);
             slotJson["playOnStart"] = clipJson.value("playOnStart", false);
+            slotJson["ambienceType"] = clipJson.value("ambienceType", static_cast<int>(AudioComponent::AmbienceType::General));
 
             // Spatial: legacy used is3D bool
             // New format stores spatial enum as int (0=TwoD, 1=ThreeD) in our recommended serializer.

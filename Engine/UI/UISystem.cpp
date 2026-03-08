@@ -464,6 +464,14 @@ namespace EngineFramework
         current_menu.clear();
     }
 
+    bool UI_System::IsMenuActive(const std::string& menuname) const
+    {
+        auto it = Menu_Mapping.find(menuname);
+        if (it == Menu_Mapping.end() || !it->second.first)
+            return false;
+        return it->second.second;
+    }
+
     // -------------------------------------------------------------------------
     // NEW: Cutscene API (call this from your Play button)
     // -------------------------------------------------------------------------

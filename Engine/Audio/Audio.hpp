@@ -174,6 +174,8 @@ namespace EngineFramework
         FMOD::ChannelGroup* m_groupSFX = nullptr;
         FMOD::ChannelGroup* m_groupUI = nullptr;
         FMOD::ChannelGroup* m_groupAmbience = nullptr;
+        FMOD::ChannelGroup* m_groupAmbienceOutdoor = nullptr;
+        FMOD::ChannelGroup* m_groupAmbienceIndoor = nullptr;
 
         FMOD::DSP* m_ambienceLowpass = nullptr;
 #else
@@ -183,6 +185,8 @@ namespace EngineFramework
         void* m_groupSFX = nullptr;
         void* m_groupUI = nullptr;
         void* m_groupAmbience = nullptr;
+        void* m_groupAmbienceOutdoor = nullptr;
+        void* m_groupAmbienceIndoor = nullptr;
         void* m_ambienceLowpass = nullptr;
 #endif
 
