@@ -209,7 +209,15 @@ end
 function on_update(self, dt)
     ensure_tables()
 
-    local pressed = is_toggle_pressed()
+    local pressed = false;
+    if PLATFORM == "android" then
+        --pressed = SHARED.UI_INVENTORY_ANDROID.is_toggle_android()
+    else
+        pressed = SHARED.UI_INVENTORY_ANDROID.is_toggle_android()
+        --pressed = is_toggle_pressed()
+    end
+
+
 
     if pressed and not prevTogglePressed then
         inventoryOpen = not inventoryOpen
