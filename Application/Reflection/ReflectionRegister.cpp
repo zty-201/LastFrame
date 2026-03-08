@@ -584,6 +584,7 @@ namespace EngineFramework
 			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&ButtonComponent::event_hover>("event_hover")
 			.data<&ButtonComponent::event_trigger>("event_trigger")
+			.data<&ButtonComponent::stay_clicked>("stay_clicked")
 			.func<&Emplacer<ButtonComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<ButtonComponent>::RemoveComponent>("remove")
 			.func<&Getter<ButtonComponent>::GetComponent>("get")

@@ -12885,53 +12885,53 @@
 			]
 		}
 	},
-	"501": {
-		"MaterialComponent": {
-			"albedoFactor": [
+	"2": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
 				1.0,
 				1.0,
 				1.0
 			],
-			"albedoMap": [
-				8652294881921892357,
-				4431689612682600001
+			"constant": 1.0,
+			"innerConeAngle": 15.0,
+			"intensity": 0.0,
+			"isStatic": false,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 35.0,
+			"quadratic": 0.03200000151991844,
+			"radius": 2500.0,
+			"type": 2
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 15968805962367582209
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "PlayerFlashlight"
+		},
+		"TransformComponent": {
+			"position": [
+				-385.66522216796875,
+				184.99998474121094,
+				720.2505493164063
 			],
-			"ambientOcclusionMap": [
-				0,
-				0
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				0,
-				0
-			],
-			"name": "Skybox",
-			"normalMap": [
-				0,
-				0
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
-			],
-			"uvOffset": [
+			"rotation": [
+				-0.0,
 				0.0,
 				0.0
 			],
-			"uvTiling": [
+			"scale": [
+				1.0,
 				1.0,
 				1.0
 			]
-		},
-		"MeshComponent": {
-			"meshName": "SkyBox",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Skybox"
-		},
-		"SkyboxRenderPass": null
+		}
 	},
 	"20": {
 		"MaterialComponent": {
@@ -38304,9 +38304,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				137.07379150390625,
-				186.5251007080078,
-				-843.7933349609375
+				-385.66522216796875,
+				185.79998779296875,
+				735.2505493164063
 			],
 			"rotation": [
 				0.0,
@@ -38335,7 +38335,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -38427,7 +38428,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -38481,7 +38483,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -38570,7 +38573,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
@@ -38621,7 +38625,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -38839,7 +38844,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -38893,7 +38899,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -38982,7 +38989,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
@@ -40255,7 +40263,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -40347,7 +40356,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -40401,7 +40411,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -40490,7 +40501,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
@@ -43765,7 +43777,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -43857,7 +43870,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -43911,7 +43925,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -44000,7 +44015,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
@@ -48823,6 +48839,10 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 8423623030858039305
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 13049831441568595969
 				}
 			]
 		},
@@ -50448,8 +50468,8 @@
 			"gravityFactor": 25.0,
 			"groundNormal": [
 				0.0,
-				0.9999926686286926,
-				0.003839715151116252
+				1.0,
+				0.0
 			],
 			"height": 350.0,
 			"isGrounded": true,
@@ -50530,12 +50550,12 @@
 		"TransformComponent": {
 			"position": [
 				-385.66522216796875,
-				190.6817626953125,
+				184.99998474121094,
 				705.2505493164063
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -50674,6 +50694,54 @@
 			]
 		}
 	},
+	"501": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				8652294881921892357,
+				4431689612682600001
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Skybox",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "SkyBox",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Skybox"
+		},
+		"SkyboxRenderPass": null
+	},
 	"502": {
 		"ButtonComponent": {
 			"clicked_texture": [
@@ -50689,7 +50757,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -50781,7 +50850,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -50835,7 +50905,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -50924,7 +50995,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
@@ -53164,7 +53236,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -53256,7 +53329,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -53310,7 +53384,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -53399,7 +53474,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
@@ -59699,7 +59775,7 @@
 			],
 			"rotation": [
 				0.0,
-				114.78324127197266,
+				55.64508056640625,
 				0.0
 			],
 			"scale": [
@@ -59834,7 +59910,7 @@
 			],
 			"rotation": [
 				0.0,
-				272.66302490234375,
+				55.64508056640625,
 				0.0
 			],
 			"scale": [
@@ -59969,7 +60045,7 @@
 			],
 			"rotation": [
 				0.0,
-				218.7709197998047,
+				55.64508056640625,
 				0.0
 			],
 			"scale": [
@@ -62227,7 +62303,7 @@
 				0.0
 			],
 			"size": [
-				1715.0,
+				1572.0,
 				1158.0
 			],
 			"size_NDC": [
@@ -85252,54 +85328,6 @@
 				0.9999359250068665,
 				0.9999890327453613,
 				0.9999791979789734
-			]
-		}
-	},
-	"2": {
-		"LightComponent": {
-			"castShadows": true,
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"constant": 1.0,
-			"innerConeAngle": 15.0,
-			"intensity": 0.0,
-			"isStatic": false,
-			"linear": 0.09000000357627869,
-			"outerConeAngle": 35.0,
-			"quadratic": 0.03200000151991844,
-			"radius": 2500.0,
-			"type": 2
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 15968805962367582209
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "PlayerFlashlight"
-		},
-		"TransformComponent": {
-			"position": [
-				-461.9490051269531,
-				316.9678649902344,
-				-505.62554931640625
-			],
-			"rotation": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
 			]
 		}
 	},

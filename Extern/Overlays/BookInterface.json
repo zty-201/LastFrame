@@ -14,7 +14,8 @@
 			"idle_texture": [
 				8792970980350722049,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,

@@ -753,6 +753,12 @@ namespace Engine {
             },
             "SetLayer", [](UIComponent& ui, int layer) {
                 ui.layer = layer;
+            },
+            "GetSizeNDC", [](UIComponent& ui) {
+                return std::make_tuple(ui.size_NDC.x, ui.size_NDC.y);
+            },
+            "SetSizeNDC", [](UIComponent& ui, float w, float h) {
+                ui.size_NDC = glm::vec2(w, h);
             }
         );
 

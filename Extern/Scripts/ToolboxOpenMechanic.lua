@@ -1,11 +1,10 @@
 ----------------------------------------------------------------
--- Trigger_MoveDown_And_Activate.lua
+-- ToolboxOpenMechanic.lua
 -- When in InteractionBox range and E is pressed:
--- 1) Move THIS entity to y = -1000
--- 2) Set entity 480 scale to 1,1,1
--- 3) Move entity 481 to (646, 69.7, 226)
+--   - If LockScreen is closed -> open it
+--   - If LockScreen is open   -> close it
 --
--- ✅ Also drives a UI icon via:
+-- Drives a UI icon via:
 --    SHARED.TRIGGER_ICON_CMD[id] = { cmd = "show"/"hide", by = ... }
 ----------------------------------------------------------------
 
@@ -15,17 +14,11 @@ local DEBUG = true
 -- set this. Otherwise leave 0 (uses EntityID).
 local TARGET_ENTITY_ID = 0
 
-local SCALE_ENTITY_ID = 480
-local MOVE_ENTITY_ID  = 481
-
-local MOVE_SELF_Y = -1000.0
-
-local SCALE_TO = { 1.0, 1.0, 1.0 }
-local MOVE_TO  = { 646.0, 69.7, 226.0 }
-
-local triggeredOnce = false
-
+local MENU_NAME       = "LockScreen"
+local UI_TABLE        = "LOCKSCREEN_OPEN"
 local BOX_OPEN_SFX_ID = "BoxOpen"
+
+local isOpen = false
 
 -- ---------------------------------------
 -- Helpers
@@ -58,33 +51,6 @@ local function in_range(id)
         and SHARED.INTERACT_IN_ZONE[id] == true
 end
 
-local function move_self_y(id, newY)
-    local tr = Query.GetTransform(id)
-    if not tr then return false end
-    local x, _, z = tr:GetPosition()
-    tr:SetPosition(x, newY, z)
-    return true
-end
-
-local function set_scale(id, sx, sy, sz)
-    local tr = Query.GetTransform(id)
-    if tr then
-        tr:SetScale(sx, sy, sz)
-        return true
-    end
-    return false
-end
-
-local function set_pos(id, x, y, z)
-    local tr = Query.GetTransform(id)
-    if tr then
-        tr:SetPosition(x, y, z)
-        return true
-    end
-    return false
-end
-
--- ✅ icon command bus for this trigger
 local function send_trigger_icon_cmd(targetId, cmd)
     SHARED.TRIGGER_ICON_CMD = SHARED.TRIGGER_ICON_CMD or {}
     SHARED.TRIGGER_ICON_CMD[targetId] = { cmd = cmd, by = targetId }
@@ -95,12 +61,14 @@ end
 -- ---------------------------------------
 function on_create(self)
     if DEBUG then
-        print("[Trigger_MoveDown_And_Activate] on_create EntityID=" .. tostring(EntityID))
+        print("[ToolboxOpenMechanic] on_create EntityID=" .. tostring(EntityID))
     end
 
-    SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
+    SHARED.DOOR_CMD         = SHARED.DOOR_CMD         or {}
     SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
     SHARED.TRIGGER_ICON_CMD = SHARED.TRIGGER_ICON_CMD or {}
+    SHARED[UI_TABLE]        = false
+    SHARED.LOCK_DISABLED    = false
 end
 
 function on_update(self, dt)
@@ -108,64 +76,60 @@ function on_update(self, dt)
 
     local id = (TARGET_ENTITY_ID ~= 0) and TARGET_ENTITY_ID or EntityID
 
+    -- Sync isOpen from SHARED in case it was closed externally (e.g. LockManager)
+    if SHARED and SHARED[UI_TABLE] == false and isOpen then
+        isOpen = false
+        if DEBUG then print("[ToolboxOpenMechanic] isOpen synced to false from SHARED") end
+    end
+
     ----------------------------------------------------------------
-    -- ✅ Drive icon (show only in range; hide forever after trigger)
+    -- Drive icon (hidden while LockScreen is open, else show in range)
     ----------------------------------------------------------------
-    if not triggeredOnce then
-        if in_range(id) then
-            send_trigger_icon_cmd(id, "show")
-        else
-            send_trigger_icon_cmd(id, "hide")
-        end
-    else
+    if isOpen or not in_range(id) then
         send_trigger_icon_cmd(id, "hide")
-        return
+    else
+        send_trigger_icon_cmd(id, "show")
     end
 
     ----------------------------------------------------------------
     -- Must be in interaction range
     ----------------------------------------------------------------
-    if not in_range(id) then
-        return
-    end
+    if not in_range(id) then return end
 
     ----------------------------------------------------------------
     -- Must receive E-press command
     ----------------------------------------------------------------
-    local ok = consume_shared_cmd(SHARED.DOOR_CMD, id)
-    if not ok then
-        return
-    end
+    if not consume_shared_cmd(SHARED.DOOR_CMD, id) then return end
 
     ----------------------------------------------------------------
-    -- ✅ TRIGGERED: play box open SFX FIRST (so it plays at the box position)
+    -- Toggle LockScreen open/close
     ----------------------------------------------------------------
-    if type(Audio_PlaySlot) == "function" then
-        Audio_PlaySlot(id, BOX_OPEN_SFX_ID)
-    end
+    if not isOpen then
+        -- Opening
+        if SHARED.LOCK_DISABLED then return end
+        if type(Audio_PlaySlot) == "function" then
+            Audio_PlaySlot(id, BOX_OPEN_SFX_ID)
+        end
 
-    ----------------------------------------------------------------
-    -- TRIGGERED: perform actions
-    ----------------------------------------------------------------
-    move_self_y(id, MOVE_SELF_Y)
+        if UI_DisplayMenu ~= nil then
+            UI_DisplayMenu(MENU_NAME)
+        else
+            print("[ToolboxOpenMechanic] ERROR: UI_DisplayMenu binding missing")
+        end
 
-    if not set_scale(SCALE_ENTITY_ID, SCALE_TO[1], SCALE_TO[2], SCALE_TO[3]) then
-        print("[Trigger_MoveDown_And_Activate] WARN: missing Transform on entity " .. tostring(SCALE_ENTITY_ID))
-    end
+        SHARED[UI_TABLE] = true
+        isOpen = true
 
-    if not set_pos(MOVE_ENTITY_ID, MOVE_TO[1], MOVE_TO[2], MOVE_TO[3]) then
-        print("[Trigger_MoveDown_And_Activate] WARN: missing Transform on entity " .. tostring(MOVE_ENTITY_ID))
-    end
+        if DEBUG then print("[ToolboxOpenMechanic] Opened: " .. MENU_NAME) end
+    else
+        -- Closing
+        if UI_CloseAllMenus ~= nil then
+            UI_CloseAllMenus()
+        end
 
-    -- Force icon hidden forever after trigger
-    send_trigger_icon_cmd(id, "hide")
+        SHARED[UI_TABLE] = false
+        isOpen = false
 
-    triggeredOnce = true
-
-    if DEBUG then
-        print("[Trigger_MoveDown_And_Activate] TRIGGERED -> moved self to y="
-            .. tostring(MOVE_SELF_Y)
-            .. ", scaled " .. tostring(SCALE_ENTITY_ID)
-            .. ", moved " .. tostring(MOVE_ENTITY_ID))
+        if DEBUG then print("[ToolboxOpenMechanic] Closed: " .. MENU_NAME) end
     end
 end

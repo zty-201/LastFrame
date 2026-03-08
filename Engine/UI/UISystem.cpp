@@ -308,6 +308,7 @@ namespace EngineFramework
         {
             std::cout << "[UI_System] displayMenu success: " << menuname << "\n";
 
+            it->second.first->Initialize(); // Reset button states before showing
             it->second.first->draw_elements();
             current_menu = menuname;
             it->second.second = true;
