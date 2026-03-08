@@ -82,8 +82,24 @@ namespace
 		{
 		}
 
-		bool isValid() const noexcept { return !error_str && !data.empty() && mipmaps_width_height.size() > 0 && mip_levels > 0 && channels > 0 && compressed_type != 0; }
-
+		bool isValid() const noexcept { 
+			return !error_str && !data.empty() && mipmaps_width_height.size() > 0 && mip_levels == mipmaps_width_height.size() && compressed_data_size.size() == mip_levels && channels > 0 && compressed_type != 0;
+		}
+#ifdef PLATFORM_WINDOWS  //Only write compressed files in windows, for android just read data.
+		/*
+			Writes the fully initialized class to the filepath specified.
+			Ensure parent folder is valid.
+			\return
+			Nothing if successful, error string on error.
+		*/
+		[[nodiscard]] std::optional<std::string> WriteDataToFile(const std::filesystem::path& file_path) const;
+#endif
+		/*
+			Reads and initializes itself from a compressed file.
+			\return
+			Nothing if successful, error string on error.
+		*/
+		[[nodiscard]] std::optional<std::string> ReadDataFromFile(const std::filesystem::path& file_path);
 
 	public:
 		// Texture data
@@ -120,6 +136,69 @@ namespace
 		bool is_srgb = false;
 	};
 
+
+
+
+	//======================================================================
+	[[nodiscard]] std::optional<std::string> CompressedTextureData::WriteDataToFile(const std::filesystem::path& file_path) const
+	{
+		if (!isValid())
+			return "Cannot write invalid data, this object is not correctly initialized yet";
+		std::ofstream file(file_path, std::ios::binary);
+		if (!file.is_open())
+			return "Failed to open file for writing: " + file_path.string();
+
+		//Simple non-ptr data.
+		file.write(reinterpret_cast<const char*>(&mip_levels), sizeof(mip_levels));
+		file.write(reinterpret_cast<const char*>(&compressed_type), sizeof(compressed_type));
+		file.write(reinterpret_cast<const char*>(&is_srgb), sizeof(is_srgb));
+		file.write(reinterpret_cast<const char*>(&channels), sizeof(channels));
+
+		// Write vectors. mip_levels is guaranteed to be the size of these 2 vectors, as isValid() checks for that.
+		file.write(reinterpret_cast<const char*>(mipmaps_width_height.data()), mip_levels * sizeof(std::pair<uint32_t, uint32_t>));
+		file.write(reinterpret_cast<const char*>(compressed_data_size.data()), mip_levels * sizeof(uint32_t));
+
+		// Write data
+		uint64_t data_size = static_cast<uint64_t>(data.size());
+		file.write(reinterpret_cast<const char*>(&data_size), sizeof(data_size));
+		file.write(reinterpret_cast<const char*>(data.data()), data_size); //1 byte per element.
+
+		if (!file.good())
+			return "Error occurred while writing to file: " + file_path.string();
+
+		return {};
+	}
+	[[nodiscard]] std::optional<std::string> CompressedTextureData::ReadDataFromFile(const std::filesystem::path& file_path)
+	{
+		std::ifstream file(file_path, std::ios::binary);
+		if (!file.is_open())
+			return "Failed to open file for reading: " + file_path.string();
+
+		// Simple non-ptr data.
+		file.read(reinterpret_cast<char*>(&mip_levels), sizeof(mip_levels));
+		file.read(reinterpret_cast<char*>(&compressed_type), sizeof(compressed_type));
+		file.read(reinterpret_cast<char*>(&is_srgb), sizeof(is_srgb));
+		file.read(reinterpret_cast<char*>(&channels), sizeof(channels));
+
+		// Read vectors, now that mip_levels is known.
+		mipmaps_width_height.resize(mip_levels);
+		compressed_data_size.resize(mip_levels);
+		file.read(reinterpret_cast<char*>(mipmaps_width_height.data()), mip_levels * sizeof(std::pair<uint32_t, uint32_t>));
+		file.read(reinterpret_cast<char*>(compressed_data_size.data()), mip_levels * sizeof(uint32_t));
+
+		// Read data
+		uint64_t data_size = 0;
+		file.read(reinterpret_cast<char*>(&data_size), sizeof(data_size));
+		data.resize(data_size);
+		file.read(reinterpret_cast<char*>(data.data()), data_size);
+
+		if (!file.good())
+			return "Error occurred while reading from file: " + file_path.string();
+		if (!isValid())
+			return "Invalid data read from file: " + file_path.string();
+
+		return {};
+	}
 }
 
 //Helper Functions
