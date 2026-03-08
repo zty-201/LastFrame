@@ -195,6 +195,11 @@ namespace EngineFramework
 
 		m_initialized = true;
 		LOGI("%s", "[AudioSystem] Initialization Successful!");
+
+#if !defined(_DEBUG) || !defined(PLATFORM_WINDOWS)
+		// If in release mode - considered simulation is active
+		m_inSimulation = true;
+#endif
 	}
 
 	void AudioSystem::SetPathResolver(std::function<std::string(const std::string&)> resolver)
