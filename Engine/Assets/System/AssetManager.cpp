@@ -456,22 +456,24 @@ namespace EngineFramework {
 	bool AssetManagerSystem::LoadTexture(const std::filesystem::path& folder_path)
 	{
 		/*
+		* Note: Only one of each name is to be loaded, even if there are multiple extensions.
+		
 			Process:
-			1. Get list of all filepaths in directory
-			2. If file is not precompiled (non-precompiled extension) then compress it to ETC2 and (DXT5 or BC3)
-			- Compiled texture remains in directory.
-			- Original texture moves to sub-directory called "Source"
-			3. Load compiled textures.
+			1a. Get list of all filepaths in compressed files directory (for the respective platform) and original directory. Store as dictionary and list separately.
+			1b. Get list of all file names in do_not_compress.meta, store as dictionary.
+			2. If file is not in compressed files directory dictionary AND it is not in the do_not_compress.meta file dictionary, then compress and store.
+			2b. If compression failed, then add filename to do_not_compress.meta.
+			3. Load compiled textures from respective compressed directory based on platform.
 			- ETC2 for android platform
-			- DXT5 for windows
-
-			Compressonator used to load standard image formats and compress to ETC2 / DXT5 or BC3
-			- Mobile supports ETC2
-			- Desktop supports DXT5/BC3. It does not natively support ETC2, meaning there's a performance impact.
-
-
-
+			- BCx for windows
+			- Add name to array if successfully loaded.
+			4. For each texture in original directory, load as uncompressed file IF AssetManagerSystem does not have it already loaded.
+			- This also acts as a failsafe in case compressed files failed to load for some reason.
+			- Add name to array if loaded.
+			5. Because SetGUIDMappings relies on a name array and not filepath array, no need to worry about guid mapping.
+			Just ensure only one of each name is in the array.
 		*/
+
 		LOGI("Loading Textures...");
 		//Acceptable files that can be loaded as a texture.
 		std::vector<std::string> texture_extensions{ ".png", ".dds", ".ktx", ".ktx2", ".DDS" };

@@ -568,10 +568,6 @@ namespace
 		glGenTextures(1, &texID);
 		if (texID == 0) return "Unable to allocate texture in gpu mem";
 		glBindTexture(GL_TEXTURE_2D, texID);
-		OnScopeExit delete_texture(
-			[&texID]() {
-				if (texID != 0) glDeleteTextures(1, &texID);
-			});
 
 		//When texture is mapped to a larger surface than its size.
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -600,6 +596,7 @@ namespace
 		//Check for error when uploading.
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
+			if (texID) glDeleteTextures(1, &texID);
 			return std::string("Error when uploading texture: ERR_CODE ") + std::to_string(err);
 		}
 
@@ -633,10 +630,6 @@ namespace
 		glGenTextures(1, &texID);
 		if (texID == 0) return "Unable to allocate texture in gpu mem";
 		glBindTexture(GL_TEXTURE_2D, texID);
-		OnScopeExit delete_texture(
-			[&texID]() {
-				if (texID != 0) glDeleteTextures(1, &texID);
-			});
 
 		//When texture is mapped to a larger surface than its size.
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -697,6 +690,7 @@ namespace
 		//Check for error when uploading.
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
+			if(texID) glDeleteTextures(1, &texID);
 			return std::string("Error when uploading texture: ERR_CODE ") + std::to_string(err);
 		}
 
@@ -899,18 +893,17 @@ Scene::Texture::Texture(const std::array<std::string, 6>& filenames, GLuint chan
 	/*
 		There are two types of image loading:
 		- Uncompressed: png, jpg, jpeg
-		- Compressed: ".DDS", ".dds", ".ktx", ".ktx2"
+		- Compressed: ".compiled_etc2", ".compiled_bc"
 
 		Use extensions to determine what type the image is.
 	*/
 	constexpr std::array<const char*, 3> uncompressed_extensions{ ".png", ".jpg", ".jpeg" };
-	constexpr std::array<const char*, 4> compressed_extensions{ ".DDS", ".dds", ".ktx", ".ktx2" };
+	constexpr std::array<const char*, 4> compressed_extensions{ ".compiled_etc2", ".compiled_bc" };
 	static auto isExtensionValid = []<std::size_t N>(const std::array<const char*, N>&extension_arr, const std::string & extension)
 		-> bool
 	{
 		return (std::find(std::begin(extension_arr), std::end(extension_arr), extension) != std::end(extension_arr));
 	};
-
 	std::string extension = std::filesystem::path(filename).extension().string();
 
 	GLuint loaded_texture = 0;
@@ -923,13 +916,15 @@ Scene::Texture::Texture(const std::array<std::string, 6>& filenames, GLuint chan
 	//For Compressed Image loading
 	else if (isExtensionValid(compressed_extensions, extension))
 	{
-		error_code = LoadCompressedTexture(loaded_texture, filename, is_srgb);
+		error_code = LoadCompressedTexture(loaded_texture, filename);
 	}
 	//Invalid file type
 	else
 	{
 		error_code = "Unsupported Texture File Extension";
 	}
+
+
 	if (error_code)
 	{
 		LOGE("Unable to Load Texture: %s, Error: %s", filename, error_code.value().c_str());
