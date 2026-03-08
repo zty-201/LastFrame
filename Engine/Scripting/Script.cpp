@@ -225,6 +225,7 @@ namespace Engine {
         // Create SHARED table for cross-script communication
         // ===============================================================
         s_Lua["SHARED"] = s_Lua.create_table();
+        s_Lua["SHARED"]["UI"] = s_Lua.create_table();
         LOGI("[ScriptSystem] Created SHARED table for cross-script communication");
 
         // ===============================================================
@@ -246,6 +247,15 @@ namespace Engine {
         // ===============================================================
         // UI bindings (Lua -> UI_System)
         // ===============================================================
+
+        s_Lua.set_function("GetEntityName",
+            [](uint32_t entityId) -> std::string
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                return EngineFramework::GameObjectSystem::GetInstance().GetEntityName(e);
+            });
+
+
         s_Lua.set_function("UI_StartPseudoCutscene", []()
             {
                 // If your UI_System is NOT singleton and is purely static:
@@ -270,6 +280,14 @@ namespace Engine {
             {
                 // EngineFramework::UI_System::displayMenu(menuName);  // static-style
                 EngineFramework::UI_System::GetInstance().displayMenu(menuName);
+            });
+        s_Lua.set_function("UI_CloseMenu", [](const std::string& menuName)
+            {
+                EngineFramework::UI_System::GetInstance().closeMenu(menuName);
+            });
+        s_Lua.set_function("UI_IsMenuActive", [](const std::string& menuName) -> bool
+            {
+                return EngineFramework::UI_System::GetInstance().IsMenuActive(menuName);
             });
 
         s_Lua.set_function("UI_CloseAllMenus", []()
@@ -753,7 +771,23 @@ namespace Engine {
             },
             "SetLayer", [](UIComponent& ui, int layer) {
                 ui.layer = layer;
+            },
+            "GetPosition_NDC", [](UIComponent& ui) {
+                return std::make_tuple(ui.position_NDC.x, ui.position_NDC.y);
+            },
+            "SetPosition_NDC", [](UIComponent& ui, float x, float y) {
+                ui.position_NDC = glm::vec2(x, y);
+            },
+            "is_NDC", [](UIComponent& ui, bool v) {
+                ui.is_NDC = v;
+            },
+            "GetSize_NDC", [](UIComponent& ui) {
+                return std::make_tuple(ui.size_NDC.x, ui.size_NDC.y);
+            },
+            "SetSize_NDC", [](UIComponent& ui, float x, float y) {
+                ui.size_NDC = glm::vec2(x, y);
             }
+            
         );
 
         s_Lua.set_function("Script_RequestReloadEntity",

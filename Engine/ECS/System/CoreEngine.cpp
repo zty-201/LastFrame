@@ -45,7 +45,9 @@ namespace EngineFramework
 
 		for (CoreSystem& system : system_arr)
 		{
+			//LOGI("[Core Trace] ---> Starting: %s", system.name.c_str());
 			system.system->Initialize();
+			//LOGI("[Core Trace] <--- Finished: %s", system.name.c_str());
 		}
 
 		//Sort from smallest to largest, so that the first system to be updated is at the front of the array.
