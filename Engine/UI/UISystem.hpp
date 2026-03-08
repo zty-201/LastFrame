@@ -22,6 +22,8 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <glm/glm.hpp>
 #include "ISystem.hpp"
 #include "ButtonComponent.hpp"
+#include "JoystickComponent.h"
+#include "InputManager.hpp"
 
 #ifdef PLATFORM_WINDOWS
 #include "GLFW/glfw3.h"
@@ -117,6 +119,8 @@ namespace EngineFramework
         void closeAllMenu();
         std::vector<entt::entity> getMenu_Entities(std::string menu);
         std::unordered_set<entt::entity> getAllMenu_Entities();
+
+        void update_Joysticks();
         bool IsMenuActive(const std::string& menu) const;
         
 #ifdef PLATFORM_WINDOWS  //Not used on android.

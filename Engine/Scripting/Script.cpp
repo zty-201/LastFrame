@@ -225,6 +225,7 @@ namespace Engine {
         // Create SHARED table for cross-script communication
         // ===============================================================
         s_Lua["SHARED"] = s_Lua.create_table();
+        s_Lua["SHARED"]["UI"] = s_Lua.create_table();
         LOGI("[ScriptSystem] Created SHARED table for cross-script communication");
 
         // ===============================================================

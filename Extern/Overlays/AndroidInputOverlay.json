@@ -1,0 +1,89 @@
+{
+	"820": {
+		"JoystickComponent": {
+			"baseCenter": [
+				350.4000244140625,
+				885.4674682617188
+			],
+			"isBeingDragged": false,
+			"knobTargetName": "js",
+			"maxRadius": 100.0,
+			"outputX": 0.0,
+			"outputY": 0.0
+		},
+		"NameComponent": {
+			"name": "jsBG"
+		},
+		"UIComponent": {
+			"Overlay_name": "AndroidInputOverlay",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				120.39999389648438,
+				4.124992370605469
+			],
+			"position_NDC": [
+				-0.6850000023841858,
+				-0.7850000262260437
+			],
+			"size": [
+				112.0,
+				110.0
+			],
+			"size_NDC": [
+				0.10000000149011612,
+				0.20000000298023224
+			],
+			"textureid": [
+				13373202070917185537,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"821": {
+		"NameComponent": {
+			"name": "js"
+		},
+		"UIComponent": {
+			"Overlay_name": "AndroidInputOverlay",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 3,
+			"luminance": 1.0,
+			"position": [
+				120.39999389648438,
+				4.125007629394531
+			],
+			"position_NDC": [
+				-0.6850000023841858,
+				-0.7849999666213989
+			],
+			"size": [
+				112.0,
+				110.0
+			],
+			"size_NDC": [
+				0.10000000149011612,
+				0.20000000298023224
+			],
+			"textureid": [
+				3601763066940784643,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	}
+}

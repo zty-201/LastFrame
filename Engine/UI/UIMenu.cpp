@@ -114,12 +114,12 @@ namespace EngineFramework
         //std::cout << "=========================================\n";
 
     }
+
     void UI_Menu::Update() {
 
         update_Buttons();
-
-
     }
+
     void UI_Menu::Clean() {
         AllElements_in_this_overlay.clear();
     }
@@ -285,6 +285,7 @@ namespace EngineFramework
         }
 
     }
+
     void UI_Menu::update_Button_State(ButtonComponent& button, entt::entity e) {
 
         button.is_hover = false;

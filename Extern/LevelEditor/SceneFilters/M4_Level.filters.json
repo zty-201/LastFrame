@@ -934,6 +934,17 @@
 				694
 			],
 			"name": "UI"
+		},
+		{
+			"expanded": true,
+			"members": [
+				825,
+				826,
+				827,
+				828,
+				829
+			],
+			"name": "ui_inventory"
 		}
 	]
 }

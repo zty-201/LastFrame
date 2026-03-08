@@ -12755,6 +12755,10 @@
 				{
 					"Loaded": true,
 					"ScriptGuid": 15968805962367582209
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 15075290188979453953
 				}
 			]
 		},
@@ -86534,6 +86538,241 @@
 				2.0,
 				0.9999996423721313
 			]
+		}
+	},
+	"825": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 625341249264926723
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "music_disc"
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				520.2000122070313,
+				528.75
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				115.5999984741211,
+				117.5
+			],
+			"size_NDC": [
+				0.11999999731779099,
+				0.07999999821186066
+			],
+			"textureid": [
+				4351542134253125641,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"826": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 625341249264926723
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "playroom_key"
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				520.2000122070313,
+				528.75
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				115.5999984741211,
+				117.5
+			],
+			"size_NDC": [
+				0.11999999731779099,
+				0.07999999821186066
+			],
+			"textureid": [
+				9908834583171940357,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"827": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 625341249264926723
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "boltcutter"
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				0.0,
+				0.0
+			],
+			"size_NDC": [
+				0.11999999731779099,
+				0.07999999821186066
+			],
+			"textureid": [
+				17979285115419869185,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"828": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 625341249264926723
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "flashlight_inventory"
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				520.2000122070313,
+				528.75
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				115.5999984741211,
+				117.5
+			],
+			"size_NDC": [
+				0.11999999731779099,
+				0.07999999821186066
+			],
+			"textureid": [
+				5873609317047975939,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"829": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 13883938552243666945
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "inventory_ui_icon"
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 1,
+			"luminance": 1.0,
+			"position": [
+				173.39999389648438,
+				58.74999237060547
+			],
+			"position_NDC": [
+				0.0,
+				-0.800000011920929
+			],
+			"size": [
+				809.2000122070313,
+				117.5
+			],
+			"size_NDC": [
+				0.699999988079071,
+				0.10000000149011612
+			],
+			"textureid": [
+				1838384050924011527,
+				3711223656383638553
+			],
+			"visible": false
 		}
 	},
 	"83": {
