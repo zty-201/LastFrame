@@ -506,7 +506,58 @@ namespace EngineFramework
 						ImGui::TextUnformatted(label.c_str());
 						ImGui::EndDragDropSource();
 					}
+					bool break_member_loop = false;
+					std::string popup_id = "FilterEntityContextMenu##" + std::to_string((uint32_t)member);
+					if (ImGui::BeginPopupContextItem(popup_id.c_str()))
+					{
+						selection_state.SetEntitySelection(member);
+						selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+
+						std::string duplicate_label = "Duplicate Entity##Filter" + std::to_string((uint32_t)member);
+						if (ImGui::MenuItem(duplicate_label.c_str()))
+						{
+							DuplicateAndSelect(member, selection_state);
+							break_member_loop = true;
+						}
+
+						std::string delete_label = "Delete Entity##Filter" + std::to_string((uint32_t)member);
+						if (!break_member_loop && ImGui::MenuItem(delete_label.c_str()))
+						{
+							DeleteEntity(member, selection_state);
+							break_member_loop = true;
+						}
+
+						if (!break_member_loop && !MenuManager::GetInstance().is_menu_running)
+						{
+							std::string archtype_label = "Create Archtype From Entity##Filter" + std::to_string((uint32_t)member);
+							if (ImGui::MenuItem(archtype_label.c_str()))
+							{
+								instance_to_create_archtype = member;
+								m_OpenArchtypePopupOnce = true;
+								break_member_loop = true;
+							}
+						}
+
+						std::string rename_label = "Rename##Filter" + std::to_string((uint32_t)member);
+						if (!break_member_loop && ImGui::MenuItem(rename_label.c_str()))
+						{
+							BeginRename(member);
+							break_member_loop = true;
+						}
+
+						ImGui::EndPopup();
+					}
+
+					if (ImGui::IsItemHovered())
+					{
+						ImGui::SetTooltip("Entity ID: %u", (uint32_t)member);
+					}
+
 					ImGui::PopID();
+					if (break_member_loop)
+					{
+						break;
+					}
 					++member_index;
 				}
 
@@ -516,6 +567,88 @@ namespace EngineFramework
 			ImGui::PopID();
 			++i;
 		}
+	}
+
+	entt::entity ObjectManager::DuplicateAndSelect(entt::entity source_entity, iEditorView& selection_state)
+	{
+		if (source_entity == entt::null || !registry.valid(source_entity))
+		{
+			LOGW("[ObjectManager] Cannot duplicate invalid entity");
+			return entt::null;
+		}
+
+		entt::entity duplicated_entity = GameObjectSystem::GetInstance().DuplicateInstance(source_entity);
+		if (duplicated_entity == entt::null)
+		{
+			return entt::null;
+		}
+
+		if (HistorySystem::this_class)
+		{
+			HistorySystem& history_system = HistorySystem::GetInstance();
+			auto record = history_system.start_track(duplicated_entity, Record_Type::ENTITY_ADDED);
+			history_system.end_track(record);
+		}
+
+		if (MenuManager::GetInstance().is_menu_running)
+		{
+			MenuManager::GetInstance().add_element(duplicated_entity);
+		}
+
+		selection_state.SetEntitySelection(duplicated_entity);
+		selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
+
+		return duplicated_entity;
+	}
+
+	bool ObjectManager::DeleteEntity(entt::entity target_entity, iEditorView& selection_state)
+	{
+		if (target_entity == entt::null || !registry.valid(target_entity))
+		{
+			return false;
+		}
+
+		std::unique_ptr<Record> entity_history{};
+		HistorySystem* history_system = HistorySystem::this_class ? &HistorySystem::GetInstance() : nullptr;
+		if (history_system)
+		{
+			entity_history = history_system->start_track(target_entity, Record_Type::ENTITY_REMOVED);
+		}
+
+		registry.destroy(target_entity);
+		RemoveEntityFromAllFilters(target_entity);
+
+		if (MenuManager::GetInstance().is_menu_running)
+		{
+			MenuManager::GetInstance().remove_element(target_entity);
+		}
+
+		if (history_system)
+		{
+			history_system->end_track(entity_history);
+		}
+
+		selection_state.RemoveEntitySelection(target_entity);
+		if (!selection_state.HasEntitySelection())
+		{
+			selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
+		}
+
+		return true;
+	}
+
+	void ObjectManager::BeginRename(entt::entity entity)
+	{
+		if (entity == entt::null || !registry.valid(entity))
+		{
+			return;
+		}
+
+		m_RenameTarget = entity;
+		std::string current_name = GameObjectSystem::GetEntityName(entity);
+		std::snprintf(m_RenameBuffer.data(), m_RenameBuffer.size(), "%s", current_name.c_str());
+		m_RenameBuffer[m_RenameBuffer.size() - 1] = '\0';
+		m_OpenRenamePopup = true;
 	}
 
 	static inline Mesh::AABB TransformAABB(const Mesh::AABB& box, const glm::mat4& M) {
@@ -584,80 +717,12 @@ namespace EngineFramework
 			if (numeric_search) {
 				search_id = static_cast<uint32_t>(std::strtoul(search_query_raw.c_str(), nullptr, 10));
 			}
-			static bool open_popup_once{};
 			static entt::entity copied_entity = entt::null;
-
-			// For renaming purposes
-			static bool open_rename_popup{};
-			static entt::entity rename_target = entt::null;
-			static char rename_buffer[128]{};
 
 		iEditorView& selection_state = LevelEditor::GetInstance().variables;
 		CleanupFilters();
 		DrawCustomFilters(selection_state, has_search_query, search_query_lower, numeric_search, search_id);
 			ImGui::Separator();
-
-			auto duplicate_and_select = [&](entt::entity source_entity) -> entt::entity {
-				if (source_entity == entt::null || !registry.valid(source_entity)) {
-					LOGW("[ObjectManager] Cannot duplicate invalid entity");
-					return entt::null;
-				}
-
-				entt::entity duplicated_entity = GameObjectSystem::GetInstance().DuplicateInstance(source_entity);
-				if (duplicated_entity == entt::null) {
-					return entt::null;
-				}
-
-				if (HistorySystem::this_class) {
-					HistorySystem& history_system = HistorySystem::GetInstance();
-					auto record = history_system.start_track(duplicated_entity, Record_Type::ENTITY_ADDED);
-					history_system.end_track(record);
-				}
-
-				if (MenuManager::GetInstance().is_menu_running)
-				{					
-					MenuManager::GetInstance().add_element(duplicated_entity);
-				}
-
-				selection_state.SetEntitySelection(duplicated_entity);
-				selection_state.latest_selected = iEditorView::Latest_Selected::INSTANCE_SELECTED;
-
-				//GraphicsSystem::GetInstance().GetInstancingSystem()->BuildSceneBatches();
-
-				return duplicated_entity;
-			};
-
-			auto delete_entity = [&](entt::entity target_entity) -> bool {
-				if (target_entity == entt::null || !registry.valid(target_entity)) {
-					return false;
-				}
-
-				std::unique_ptr<Record> entity_history{};
-				HistorySystem* history_system = HistorySystem::this_class ? &HistorySystem::GetInstance() : nullptr;
-				if (history_system) {
-					entity_history = history_system->start_track(target_entity, Record_Type::ENTITY_REMOVED);
-				}
-
-				registry.destroy(target_entity);
-				RemoveEntityFromAllFilters(target_entity);
-
-				if (MenuManager::GetInstance().is_menu_running)
-				{
-					MenuManager::GetInstance().remove_element(target_entity);
-				}
-
-				if (history_system) {
-					history_system->end_track(entity_history);
-				}
-
-				selection_state.RemoveEntitySelection(target_entity);
-				if (!selection_state.HasEntitySelection()) {
-					selection_state.latest_selected = iEditorView::Latest_Selected::NONE;
-				}
-
-				//GraphicsSystem::GetInstance().GetInstancingSystem()->BuildSceneBatches();
-				return true;
-			};
 
 			const bool window_focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 			const bool window_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
@@ -679,7 +744,7 @@ namespace EngineFramework
 					}
 				}
 
-				// Ctrl + V reuses duplicate_and_select function to get the copied entity and paste the instance which is also tracked by history/selection
+				// Ctrl + V reuses DuplicateAndSelect to get the copied entity and paste the instance which is also tracked by history/selection
 				// Hnece duplicated instances can be redo/undo etc
 				if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_V, copy_paste_flags)) {
 					if (copied_entity == entt::null) {
@@ -690,7 +755,7 @@ namespace EngineFramework
 						copied_entity = entt::null;
 					}
 					else {
-						duplicate_and_select(copied_entity);
+						DuplicateAndSelect(copied_entity, selection_state);
 					}
 				}
 
@@ -698,11 +763,7 @@ namespace EngineFramework
 				if (ImGui::Shortcut(ImGuiKey_F2, copy_paste_flags)) {
 					entt::entity active_entity = selection_state.selected_objectID;
 					if (active_entity != entt::null && registry.valid(active_entity)) {
-						rename_target = active_entity;
-						std::string current_name = GameObjectSystem::GetEntityName(active_entity);
-						std::snprintf(rename_buffer, sizeof(rename_buffer), "%s", current_name.c_str());
-						rename_buffer[sizeof(rename_buffer) - 1] = '\0';
-						open_rename_popup = true;
+						BeginRename(active_entity);
 					}
 					else {
 						LOGW("[ObjectManager] No valid entity selected to rename");
@@ -711,7 +772,7 @@ namespace EngineFramework
 
 				if (ImGui::Shortcut(ImGuiKey_Delete, copy_paste_flags)) {
 					entt::entity active_entity = selection_state.selected_objectID;
-					if (!delete_entity(active_entity)) {
+					if (!DeleteEntity(active_entity, selection_state)) {
 						LOGW("[ObjectManager] No valid entity selected to delete");
 					}
 				}
@@ -855,7 +916,7 @@ namespace EngineFramework
 					// Add the actions to be tracked by history system to ensure the redo/undo works for duplicating and delete etc
 					std::string duplicateLabel = "Duplicate Entity##" + std::to_string((uint32_t)entity);
 					if (ImGui::MenuItem(duplicateLabel.c_str())) {
-						duplicate_and_select(entity);
+						DuplicateAndSelect(entity, selection_state);
 						ImGui::EndPopup();
 						break;
 					}
@@ -864,7 +925,7 @@ namespace EngineFramework
 
 					if (ImGui::MenuItem(deleteLabel.c_str())) {
 
-						delete_entity(entity);
+						DeleteEntity(entity, selection_state);
 						ImGui::EndPopup();
 						break; // Exit the loop safely
 					}
@@ -876,7 +937,7 @@ namespace EngineFramework
 						if (ImGui::MenuItem(instance_archtype_label.c_str())) {
 
 							instance_to_create_archtype = entity;
-							open_popup_once = true;
+							m_OpenArchtypePopupOnce = true;
 							ImGui::EndPopup();
 							break;
 						}
@@ -887,11 +948,7 @@ namespace EngineFramework
 					// Will open a modal popup for user to edit the name
 					std::string rename_label = "Rename##" + std::to_string((uint32_t)entity);
 					if (ImGui::MenuItem(rename_label.c_str())) {
-						rename_target = entity;
-						std::string current_name = GameObjectSystem::GetEntityName(entity);
-						std::snprintf(rename_buffer, sizeof(rename_buffer), "%s", current_name.c_str());
-						rename_buffer[sizeof(rename_buffer) - 1] = '\0';
-						open_rename_popup = true;
+						BeginRename(entity);
 						ImGui::EndPopup();
 						break;
 					}
@@ -906,10 +963,10 @@ namespace EngineFramework
 
 			}
 
-			if (rename_target != entt::null && open_rename_popup)
+			if (m_RenameTarget != entt::null && m_OpenRenamePopup)
 			{
 				ImGui::OpenPopup("Rename Entity");
-				open_rename_popup = false;
+				m_OpenRenamePopup = false;
 			}
 
 			// In the modal popup, user can edit the name
@@ -921,31 +978,31 @@ namespace EngineFramework
 				CALL_AT_END(imgui_endrename, ImGui::EndPopup(););
 				auto reset_rename_state = [&]()
 				{
-					rename_target = entt::null;
-					rename_buffer[0] = '\0';
+					m_RenameTarget = entt::null;
+					m_RenameBuffer[0] = '\0';
 				};
 
-				if (rename_target == entt::null || !registry.valid(rename_target))
+				if (m_RenameTarget == entt::null || !registry.valid(m_RenameTarget))
 				{
 					reset_rename_state();
 					ImGui::CloseCurrentPopup();
 				}
 				else
 				{
-					ImGui::InputText("Name", rename_buffer, sizeof(rename_buffer));
+					ImGui::InputText("Name", m_RenameBuffer.data(), m_RenameBuffer.size());
 
 					auto finalize_rename = [&](const char* new_name)
 					{
 						HistorySystem* history_system = HistorySystem::this_class ? &HistorySystem::GetInstance() : nullptr;
-						bool has_component = registry.all_of<NameComponent>(rename_target);
+						bool has_component = registry.all_of<NameComponent>(m_RenameTarget);
 						const std::string desired_name = new_name ? std::string(new_name) : std::string{};
 
 						if (desired_name.empty())
 						{
 							if (has_component)
 							{
-								std::unique_ptr<Record> record = history_system ? history_system->start_track(rename_target, "NameComponent", Record_Type::COMP_REMOVED) : nullptr;
-								registry.remove<NameComponent>(rename_target);
+								std::unique_ptr<Record> record = history_system ? history_system->start_track(m_RenameTarget, "NameComponent", Record_Type::COMP_REMOVED) : nullptr;
+								registry.remove<NameComponent>(m_RenameTarget);
 								if (history_system)
 								{
 									history_system->end_track(record);
@@ -956,8 +1013,8 @@ namespace EngineFramework
 
 						if (has_component)
 						{
-							std::unique_ptr<Record> record = history_system ? history_system->start_track(rename_target, "NameComponent", "name") : nullptr;
-							registry.get<NameComponent>(rename_target).name = desired_name;
+							std::unique_ptr<Record> record = history_system ? history_system->start_track(m_RenameTarget, "NameComponent", "name") : nullptr;
+							registry.get<NameComponent>(m_RenameTarget).name = desired_name;
 							if (history_system)
 							{
 								history_system->end_track(record, entt::meta_any{ desired_name });
@@ -965,10 +1022,10 @@ namespace EngineFramework
 						}
 						else
 						{
-							registry.emplace<NameComponent>(rename_target, NameComponent{ desired_name });
+							registry.emplace<NameComponent>(m_RenameTarget, NameComponent{ desired_name });
 							if (history_system)
 							{
-								std::unique_ptr<Record> record = history_system->start_track(rename_target, "NameComponent", Record_Type::COMP_ADDED);
+								std::unique_ptr<Record> record = history_system->start_track(m_RenameTarget, "NameComponent", Record_Type::COMP_ADDED);
 								history_system->end_track(record);
 							}
 						}
@@ -976,7 +1033,7 @@ namespace EngineFramework
 
 					if (ImGui::Button("Confirm"))
 					{
-						finalize_rename(rename_buffer);
+						finalize_rename(m_RenameBuffer.data());
 						reset_rename_state();
 						ImGui::CloseCurrentPopup();
 					}
@@ -989,10 +1046,10 @@ namespace EngineFramework
 				}
 			}
 
-			if (instance_to_create_archtype != entt::null && open_popup_once)
+			if (instance_to_create_archtype != entt::null && m_OpenArchtypePopupOnce)
 			{
 				ImGui::OpenPopup("Create Archtype From Instance");
-				open_popup_once = false;
+				m_OpenArchtypePopupOnce = false;
 			}
 			
 			//Create archtype from instance, and assign archtype to that instance.

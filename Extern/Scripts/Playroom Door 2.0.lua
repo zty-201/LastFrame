@@ -5,7 +5,7 @@ local DEBUG = true
 
 -- ===== ROTATION CONFIG =====
 local closedAngle = 0.0
-local openAngle   = 40.0
+local openAngle   = -240.0
 local rotateSpeed = 50.0
 
 local isOpen     = false
@@ -74,20 +74,25 @@ local function send_unlock_cmd(cmd)
     SHARED.UNLOCK_ICON_CMD[INTERACTABLE_ID] = { cmd = cmd, by = EntityID }
 end
 
+local function send_handle_cmd(cmd)
+    SHARED.HANDLE_ICON_CMD = SHARED.HANDLE_ICON_CMD or {}
+    SHARED.HANDLE_ICON_CMD[INTERACTABLE_ID] = { cmd = cmd, by = EntityID }
+end
+
 local function in_range()
     return SHARED
         and SHARED.INTERACT_IN_ZONE
         and SHARED.INTERACT_IN_ZONE[INTERACTABLE_ID] == true
 end
 
--- ✅ NEW: force-hide both icons and keep them hidden
+-- Force-hide both icons and keep them hidden
 local function hide_icons_forever()
     send_lock_cmd("hide")
     send_unlock_cmd("hide")
+    send_handle_cmd("hide")
 end
 
 local function update_icons()
-    -- ✅ if door has ever opened, icons are permanently disabled
     if iconsDisabledForever then
         hide_icons_forever()
         return
@@ -96,17 +101,25 @@ local function update_icons()
     if not in_range() then
         send_lock_cmd("hide")
         send_unlock_cmd("hide")
+        send_handle_cmd("hide")
         return
     end
 
-    local canUnlock = (isUnlocked == true) or inv_has_key(REQUIRED_KEY_ID)
+    if isUnlocked then
+        send_lock_cmd("hide")
+        send_unlock_cmd("hide")
+        send_handle_cmd("show")
+        return
+    end
 
-    if canUnlock then
+    if inv_has_key(REQUIRED_KEY_ID) then
         send_lock_cmd("hide")
         send_unlock_cmd("show")
+        send_handle_cmd("hide")
     else
         send_lock_cmd("show")
         send_unlock_cmd("hide")
+        send_handle_cmd("hide")
     end
 end
 
@@ -166,6 +179,7 @@ function on_create(self)
     SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
     SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
     SHARED.PLAYROOM_CAN_UNLOCK = SHARED.PLAYROOM_CAN_UNLOCK or {}
+    SHARED.HANDLE_ICON_CMD = SHARED.HANDLE_ICON_CMD or {}
     SHARED.LOCK_ICON_CMD = SHARED.LOCK_ICON_CMD or {}
     SHARED.UNLOCK_ICON_CMD = SHARED.UNLOCK_ICON_CMD or {}
 

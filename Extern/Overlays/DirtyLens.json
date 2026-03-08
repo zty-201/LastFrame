@@ -1,0 +1,40 @@
+{
+	"900000": {
+		"NameComponent": {
+			"name": "LensTint"
+		},
+		"UIComponent": {
+			"Overlay_name": "DirtyLens",
+			"color": [
+				0.6499999761581421,
+				0.550000011920929,
+				0.44999998807907104
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 100,
+			"luminance": 0.3499999940395355,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				0.0,
+				0.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				16190863482069467137,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	}
+}

@@ -4,7 +4,11 @@
 --     - show ICON1 if disc exists in inventory
 --     - else show ICON2
 -- + Hide both when out of range
--- + ✅ After consuming FIRST disc successfully, hide both icons forever
+-- + After consuming FIRST disc successfully, hide both icons forever
+-- + Play DiscInsert immediately
+-- + Delay disc visual placement
+-- + Delay music trigger
+-- + Delay disc spinning separately
 ----------------------------------------------------------------
 
 local DEBUG = true
@@ -17,14 +21,27 @@ local TARGET_ENTITY_ID = 0
 -- Once we consume one disc, never show any icons again
 local iconsDisabledForever = false
 
--- Disc insert SFX + delayed music trigger
+-- Audio / timing
 local DISC_INSERT_SFX_ID = "DiscInsert"
-local DISC_INSERT_DELAY_SECONDS = 0.75  -- make longer/shorter as you like
+local DISC_INSERT_DELAY_SECONDS = 1.0
 
+-- Disc visual timing
+local DISC_VISUAL_DELAY = 0.5
+local discVisualPending = false
+local discVisualTimer = 0.0
+
+-- Disc spin timing
+local DISC_SPIN_DELAY = 1.7
+local discSpinPending = false
+local discSpinTimer = 0.0
+
+-- Music trigger timing
 local pendingTrigger = false
 local pendingTimer = 0.0
 
-local function s(v) return (v == nil) and "nil" or tostring(v) end
+local function s(v)
+    return (v == nil) and "nil" or tostring(v)
+end
 
 local function consume_shared_cmd(cmdTable, id)
     if cmdTable == nil then return nil end
@@ -75,7 +92,6 @@ local function hide_icons_forever(targetId)
 end
 
 local function update_icons(targetId)
-    -- ✅ NEW: once disabled, always hide
     if iconsDisabledForever then
         hide_icons_forever(targetId)
         return
@@ -95,14 +111,6 @@ local function update_icons(targetId)
     end
 end
 
-local function play_3d_sfx_from(entityId, slotId)
-    if type(Audio_PlaySlot) == "function" and entityId ~= nil and slotId ~= nil then
-        Audio_PlaySlot(entityId, slotId)
-        return true
-    end
-    return false
-end
-
 function on_create(Self)
     if DEBUG then
         print("[Test_ConsumeDisc_Shared] on_create EntityID:", EntityID)
@@ -111,28 +119,72 @@ function on_create(Self)
     SHARED.DISC_USE_HAVE_ICON_CMD = SHARED.DISC_USE_HAVE_ICON_CMD or {}
     SHARED.DISC_USE_NODISC_ICON_CMD = SHARED.DISC_USE_NODISC_ICON_CMD or {}
     SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
+
+    SHARED.MUSICBOX_DISC_PLACED = false
+    SHARED.MUSICBOX_DISC_SPIN = false
+
+    discVisualPending = false
+    discVisualTimer = 0.0
+
+    discSpinPending = false
+    discSpinTimer = 0.0
+
+    pendingTrigger = false
+    pendingTimer = 0.0
 end
 
 function on_update(Self, dt)
     dt = dt or 0.016
     local targetId = (TARGET_ENTITY_ID ~= 0) and TARGET_ENTITY_ID or EntityID
 
-    -- always drive icons
+    -- Always drive icons
     update_icons(targetId)
 
-    -- If we've already consumed once, we might still be waiting to trigger music
-    -- so DO NOT early-return before handling the pending timer.
-    _discPending = _discPending or false
-    _discTimer = _discTimer or 0.0
-    local DISC_TO_MUSIC_DELAY = 0.75
-    local DISC_INSERT_SFX_ID = "DiscInsert"
+    ------------------------------------------------
+    -- Disc visual delay
+    ------------------------------------------------
+    if discVisualPending then
+        discVisualTimer = discVisualTimer + dt
 
-    -- If we already consumed and are waiting to start music, count down and then trigger
-    if _discPending then
-        _discTimer = _discTimer + dt
-        if _discTimer >= DISC_TO_MUSIC_DELAY then
-            _discPending = false
-            _discTimer = 0.0
+        if discVisualTimer >= DISC_VISUAL_DELAY then
+            discVisualPending = false
+            discVisualTimer = 0.0
+
+            SHARED.MUSICBOX_DISC_PLACED = true
+
+            if DEBUG then
+                print("[Test_ConsumeDisc_Shared] Disc visual placed after delay")
+            end
+        end
+    end
+
+    ------------------------------------------------
+    -- Disc spin delay
+    ------------------------------------------------
+    if discSpinPending then
+        discSpinTimer = discSpinTimer + dt
+
+        if discSpinTimer >= DISC_SPIN_DELAY then
+            discSpinPending = false
+            discSpinTimer = 0.0
+
+            SHARED.MUSICBOX_DISC_SPIN = true
+
+            if DEBUG then
+                print("[Test_ConsumeDisc_Shared] Disc spin enabled")
+            end
+        end
+    end
+
+    ------------------------------------------------
+    -- Delayed music trigger
+    ------------------------------------------------
+    if pendingTrigger then
+        pendingTimer = pendingTimer + dt
+
+        if pendingTimer >= DISC_INSERT_DELAY_SECONDS then
+            pendingTrigger = false
+            pendingTimer = 0.0
 
             if SHARED.StateController and SHARED.StateController.TriggerCP1 then
                 SHARED.StateController.TriggerCP1()
@@ -146,7 +198,6 @@ function on_update(Self, dt)
         return
     end
 
-    -- If icons are disabled forever and we're not pending, nothing else to do
     if iconsDisabledForever then
         return
     end
@@ -188,22 +239,27 @@ function on_update(Self, dt)
         print("[Test_ConsumeDisc_Shared] Consumed:", ITEM_ID, "x" .. ITEM_QTY)
     end
 
-    -- Play DiscInsert FIRST (3D from this entity)
-    if type(Audio_StopSlot) == "function" then
-        Audio_StopSlot(EntityID, DISC_INSERT_SFX_ID) -- ensure retrigger if needed
-    end
+    -- Play DiscInsert immediately
     if type(Audio_PlaySlot) == "function" then
         Audio_PlaySlot(EntityID, DISC_INSERT_SFX_ID)
         if DEBUG then
-            print("[Test_ConsumeDisc_Shared] Played DiscInsert, delaying music by 0.75s")
+            print("[Test_ConsumeDisc_Shared] Played DiscInsert")
         end
     end
 
-    -- Now delay the music start
-    _discPending = true
-    _discTimer = 0.0
+    -- Start delayed disc visual placement
+    discVisualPending = true
+    discVisualTimer = 0.0
 
-    -- after first successful consume, disable icons forever
+    -- Start delayed disc spinning
+    discSpinPending = true
+    discSpinTimer = 0.0
+
+    -- Start delayed music trigger
+    pendingTrigger = true
+    pendingTimer = 0.0
+
+    -- After first successful consume, disable icons forever
     iconsDisabledForever = true
     hide_icons_forever(targetId)
 end

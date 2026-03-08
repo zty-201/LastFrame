@@ -117,6 +117,7 @@ namespace EngineFramework
         void closeAllMenu();
         std::vector<entt::entity> getMenu_Entities(std::string menu);
         std::unordered_set<entt::entity> getAllMenu_Entities();
+        bool IsMenuActive(const std::string& menu) const;
         
 #ifdef PLATFORM_WINDOWS  //Not used on android.
         std::unordered_set<entt::entity> Seralise_AllMenus();
@@ -147,4 +148,3 @@ namespace EngineFramework
 
 }
 #endif
-
