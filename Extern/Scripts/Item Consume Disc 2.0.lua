@@ -26,7 +26,7 @@ local DISC_INSERT_SFX_ID = "DiscInsert"
 local DISC_INSERT_DELAY_SECONDS = 1.0
 
 -- Disc visual timing
-local DISC_VISUAL_DELAY = 0.5
+local DISC_VISUAL_DELAY = 0.4
 local discVisualPending = false
 local discVisualTimer = 0.0
 

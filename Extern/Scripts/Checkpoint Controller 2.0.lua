@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
 -- StateController_CP1_CP2.lua
--- CP1: TTLS_Start
+-- CP1: TTLS_Start + Tension
 -- CP2: Chair explode
 -- CP3: TTLS_End
 ----------------------------------------------------------------
@@ -16,6 +16,7 @@ local STATE_CP3  = 3
 -- CP1 CONFIG
 -- =========================
 local CP1_SLOT_ID = "TTLS_Start"
+local CP1_TENSION_SLOT_ID = "Tension"
 local CP1_LENGTH_SECONDS = 10.0
 
 -- =========================
@@ -33,6 +34,14 @@ local CP3_LENGTH_SECONDS = 23.0
 local function play_slot_from(entityId, slotId)
     if type(Audio_PlaySlot) == "function" and entityId ~= nil and slotId ~= nil then
         Audio_PlaySlot(entityId, slotId)
+        return true
+    end
+    return false
+end
+
+local function stop_slot_from(entityId, slotId)
+    if type(Audio_StopSlot) == "function" and entityId ~= nil and slotId ~= nil then
+        Audio_StopSlot(entityId, slotId)
         return true
     end
     return false
@@ -84,6 +93,9 @@ function on_create(Self)
         local s = SHARED.StateController._self
         if not s then return end
 
+        -- stop tension right before silence / CP2 pause
+        stop_slot_from(EntityID, CP1_TENSION_SLOT_ID)
+
         s.state = STATE_CP2
         s.timer = 0.0
 
@@ -113,7 +125,7 @@ function on_create(Self)
 end
 
 -- =========================
--- CP1 = TTLS_Start
+-- CP1 = TTLS_Start + Tension
 -- =========================
 local function Checkpoint1(Self, dt)
     if not Self.cp1Started then
@@ -121,10 +133,11 @@ local function Checkpoint1(Self, dt)
         Self.timer = 0.0
 
         if DEBUG then
-            print("[StateController] CP1: playing slot:", CP1_SLOT_ID)
+            print("[StateController] CP1: playing slots:", CP1_SLOT_ID, "and", CP1_TENSION_SLOT_ID)
         end
 
         play_slot_from(EntityID, CP1_SLOT_ID)
+        play_slot_from(EntityID, CP1_TENSION_SLOT_ID)
     end
 
     Self.timer = Self.timer + dt
@@ -232,6 +245,8 @@ function on_update(Self, dt)
 end
 
 function on_destroy(Self)
+    stop_slot_from(EntityID, CP1_TENSION_SLOT_ID)
+
     if SHARED.StateController and SHARED.StateController._self == Self then
         SHARED.StateController._self = nil
     end

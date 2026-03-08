@@ -12,7 +12,7 @@ local RUN_AUDIO_SLOT = "Running"
 local runActive = false
 local runTimer = 0.0
 local runDuration = 2.5
-local runSpeed = 320.0
+local runSpeed = 360.0
 
 local currentX = 0.0
 local currentY = 0.0

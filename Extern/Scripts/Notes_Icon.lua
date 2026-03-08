@@ -9,7 +9,7 @@
 
 print("[PlayroomNotes_IconUI] ===== SCRIPT FILE LOADED =====")
 
-local NOTES_ID  = 432                 -- <<<<<< must match trigger script
+local NOTES_ID  = 822                 -- <<<<<< must match trigger script
 local UI_TABLE  = "PLAYROOM_NOTES_UI_OPEN"
 local HIDE_WHEN_UI_OPEN = true
 
