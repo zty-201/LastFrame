@@ -170,32 +170,46 @@ namespace
 	}
 	[[nodiscard]] std::optional<std::string> CompressedTextureData::ReadDataFromFile(const std::filesystem::path& file_path)
 	{
-		std::ifstream file(file_path, std::ios::binary);
-		if (!file.is_open())
-			return "Failed to open file for reading: " + file_path.string();
+		std::vector<unsigned char> file_data;
+		try
+		{
+			file_data = std::move(EngineFramework::AssetManagerSystem::GetDataFromFile(file_path));
+		}
+		catch (...)
+		{
+			return "Unable to read file: " + file_path.string();
+		}
+
+		size_t offset = 0;
+		const auto read = [&](void* dst, size_t size)
+		{
+			std::memcpy(dst, file_data.data() + offset, size);
+			offset += size;
+		};
 
 		// Simple non-ptr data.
-		file.read(reinterpret_cast<char*>(&mip_levels), sizeof(mip_levels));
-		file.read(reinterpret_cast<char*>(&compressed_type), sizeof(compressed_type));
-		file.read(reinterpret_cast<char*>(&is_srgb), sizeof(is_srgb));
-		file.read(reinterpret_cast<char*>(&channels), sizeof(channels));
+		read(&mip_levels, sizeof(mip_levels));
+		read(&compressed_type, sizeof(compressed_type));
+		read(&is_srgb, sizeof(is_srgb));
+		read(&channels, sizeof(channels));
 
 		// Read vectors, now that mip_levels is known.
 		mipmaps_width_height.resize(mip_levels);
 		compressed_data_size.resize(mip_levels);
-		file.read(reinterpret_cast<char*>(mipmaps_width_height.data()), mip_levels * sizeof(std::pair<uint32_t, uint32_t>));
-		file.read(reinterpret_cast<char*>(compressed_data_size.data()), mip_levels * sizeof(uint32_t));
+		read(mipmaps_width_height.data(), mip_levels * sizeof(std::pair<uint32_t, uint32_t>));
+		read(compressed_data_size.data(), mip_levels * sizeof(uint32_t));
 
 		// Read data
 		uint64_t data_size = 0;
-		file.read(reinterpret_cast<char*>(&data_size), sizeof(data_size));
+		read(&data_size, sizeof(data_size));
 		data.resize(data_size);
-		file.read(reinterpret_cast<char*>(data.data()), data_size);
+		read(data.data(), data_size);
 
-		if (!file.good())
-			return "Error occurred while reading from file: " + file_path.string();
+		if (offset > file_data.size())
+			return "Unexpected end of data while reading from file: " + file_path.string();
 		if (!isValid())
 			return "Invalid data read from file: " + file_path.string();
+
 
 		return {};
 	}
@@ -524,164 +538,23 @@ namespace
 		//== Load data from file.
 		int width, height, bytesPerPix;
 		stbi_set_flip_vertically_on_load(true);
-		std::vector<unsigned char> texture_data = EngineFramework::AssetManagerSystem::GetDataFromFile(file_path);
-		if (texture_data.empty())
+		std::vector<unsigned char> file_data = EngineFramework::AssetManagerSystem::GetDataFromFile(file_path);
+		if (file_data.empty())
 			return std::string("Failed to read texture file: ") + file_path.string();
-		unsigned char* stbi_data_DONOTUSE = stbi_load_from_memory(
-			texture_data.data(),
-			static_cast<int>(texture_data.size()),
-			&width, &height, &bytesPerPix, 0
-		);
 
-		//RAII dtor for raw stbi data
-		auto free_stbi_data = [](unsigned char* stbi_data)
-			{
-				if (stbi_data) stbi_image_free(stbi_data);
+		//RAII management of stbi data.
+		auto stbi_data_free = [](unsigned char* data) {
+			if (data) stbi_image_free(data);
 			};
-		std::shared_ptr<unsigned char> stbi_data(stbi_data_DONOTUSE, free_stbi_data);
-
+		std::unique_ptr<unsigned char, decltype(stbi_data_free)> stbi_data{
+			stbi_load_from_memory(
+			file_data.data(),
+			static_cast<int>(file_data.size()),
+			&width, &height, &bytesPerPix, 0), stbi_data_free };
 		if (!stbi_data)
-			return std::string("Failed to load texture: ") + file_path.string();
+			return std::string("Unable to process texture data: ") + file_path.string();
+	
 
-
-		//TODO: delete runtime-compress code, just use normal code (since no need to compress at runtime). This is just to test if compressor is working.
-#ifdef PLATFORM_WINDOWS
-#define RUNTIME_COMPRESSION_TEST
-#endif
-#ifdef RUNTIME_COMPRESSION_TEST
-		//Mimic loading of BCx precompressed texture. For now it just uses runtime-compression instead.
-		CompressedTextureData compressed_texture(std::move(CompressTexture(file_path, is_srgb, CompressionTextureType::BC_X, 0.88f)));
-
-		//Compressed texture is invalid, fallback to uncompressed.
-		if (!compressed_texture.isValid())
-		{
-			LOGD("Unable to compress, using uncompressed: %s", file_path.string().c_str());
-			//internal_format -> what format to upload as.  current_format -> what format the texture data is prior to upload.
-			GLenum current_format = GL_RGBA;
-			GLint internal_format = GL_RGBA8;
-			std::optional<std::string> error_code = GetGLTextureFormat(current_format, internal_format, bytesPerPix, is_srgb);
-			if (error_code)
-			{
-				return error_code;
-			}
-			//==Upload to GPU with various params.
-			GLuint texID = 0;
-			glGenTextures(1, &texID);
-			if (texID == 0) return "Unable to allocate texture in gpu mem";
-			glBindTexture(GL_TEXTURE_2D, texID);
-
-			//When texture is mapped to a larger surface than its size.
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			//When texture is mapped to a smaller surface than its size, mipmap is used. Trilinear filtering.
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-			//Set texture to repeat vertically/horizontally if out-of-bounds.
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-			//Save previous setting so it can be loaded back afterwards.
-			GLint previousAlignment = 0;
-			glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
-			//Tightly packed texture, no padding.
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-			// Allocates AND uploads Level 0 in one go
-			glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, current_format, GL_UNSIGNED_BYTE, stbi_data.get());
-
-			// Automatically generates levels 1...N
-			glGenerateMipmap(GL_TEXTURE_2D);
-
-			glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
-			glBindTexture(GL_TEXTURE_2D, 0);
-
-			//Check for error when uploading.
-			GLenum err = glGetError();
-			if (err != GL_NO_ERROR) {
-				if (texID) glDeleteTextures(1, &texID);
-				return std::string("Error when uploading texture: ERR_CODE ") + std::to_string(err);
-			}
-
-			loaded_texture = texID;
-			return {}; //No Error.
-		}
-		//Upload compressed texture.
-		else
-		{
-			//==Upload to GPU with various params.
-			GLuint texID = 0;
-			glGenTextures(1, &texID);
-			if (texID == 0) return "Unable to allocate texture in gpu mem";
-			glBindTexture(GL_TEXTURE_2D, texID);
-
-			//When texture is mapped to a larger surface than its size.
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			//When texture is mapped to a smaller surface than its size, mipmap is used. Trilinear filtering.
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, compressed_texture.mip_levels - 1);
-
-			//Set texture to repeat vertically/horizontally if out-of-bounds.
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-			//Texture swizzling R and B to account for flipped texture during compression.
-			if (compressed_texture.channels > 2)
-			{
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
-			}
-
-			//Save previous setting so it can be loaded back afterwards.
-			GLint previousAlignment = 0;
-			glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
-			//Tightly packed texture, no padding.
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-			/*
-				Compressed texture is actually a chain of individually compressed mipmaps.
-				Thus, load each mipmap one-by-one.
-
-				Use glCompressedTexImage2D (takes in pre-compressed data) instead of glTexImage2D (which only takes in uncompressed)
-			*/
-
-			{
-				//Updated for each mipmap loaded, to point to the next mipmap.
-				int compressed_data_offset = 0;
-				for (uint32_t mip = 0; mip < compressed_texture.mip_levels; ++mip)
-				{
-					const uint32_t mip_width = compressed_texture.mipmaps_width_height[mip].first;
-					const uint32_t mip_height = compressed_texture.mipmaps_width_height[mip].second;
-					const uint32_t mip_data_size = compressed_texture.compressed_data_size[mip];
-
-					glCompressedTexImage2D(
-						GL_TEXTURE_2D,
-						static_cast<GLint>(mip),  // Mipmap level
-						compressed_texture.compressed_type,           // Internal compressed format (e.g. GL_COMPRESSED_RGBA_S3TC_DXT5_EXT)
-						static_cast<GLsizei>(mip_width),
-						static_cast<GLsizei>(mip_height),
-						0,                        // Border, must be 0
-						static_cast<GLsizei>(mip_data_size),
-						static_cast<const void*>(&compressed_texture.data[compressed_data_offset])
-					);
-					//Move offset to next mipmap.
-					compressed_data_offset += mip_data_size;
-				}
-			}
-
-			glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
-			glBindTexture(GL_TEXTURE_2D, 0);
-
-			//Check for error when uploading.
-			GLenum err = glGetError();
-			if (err != GL_NO_ERROR) {
-				if (texID) glDeleteTextures(1, &texID);
-				return std::string("Error when uploading texture: ERR_CODE ") + std::to_string(err);
-			}
-
-			loaded_texture = texID;
-			return {}; //No Error.
-		}
-#endif
-#ifndef RUNTIME_COMPRESSION_TEST
 		//internal_format -> what format to upload as.  current_format -> what format the texture data is prior to upload.
 		GLenum current_format = GL_RGBA;
 		GLint internal_format = GL_RGBA8;
@@ -693,11 +566,12 @@ namespace
 		//==Upload to GPU with various params.
 		GLuint texID = 0;
 		glGenTextures(1, &texID);
-		if (texID == 0)
-		{
-			return "Unable to allocate texture in gpu mem";
-		}
+		if (texID == 0) return "Unable to allocate texture in gpu mem";
 		glBindTexture(GL_TEXTURE_2D, texID);
+		OnScopeExit delete_texture(
+			[&texID]() {
+				if (texID != 0) glDeleteTextures(1, &texID);
+			});
 
 		//When texture is mapped to a larger surface than its size.
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -715,26 +589,22 @@ namespace
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		// Allocates AND uploads Level 0 in one go
-		glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, current_format, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, current_format, GL_UNSIGNED_BYTE, stbi_data.get());
 
 		// Automatically generates levels 1...N
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-
 		glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
 		glBindTexture(GL_TEXTURE_2D, 0);
-
 
 		//Check for error when uploading.
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
-			if (texID) glDeleteTextures(1, &texID);
 			return std::string("Error when uploading texture: ERR_CODE ") + std::to_string(err);
 		}
 
 		loaded_texture = texID;
 		return {}; //No Error.
-#endif
 	}
 
 	/*
@@ -745,139 +615,93 @@ namespace
 		ID of the created texture is written here
 		\param file_path
 		File path of the texture
-		\param is_srgb
-		Whether texture is in srgb color space, typically used for Albedo textures.
 	*/
-	[[nodiscard]] std::optional<std::string> LoadCompressedTexture(GLuint& loaded_texture, const std::filesystem::path& file_path, bool is_srgb)
+	[[nodiscard]] std::optional<std::string> LoadCompressedTexture(GLuint& loaded_texture, const std::filesystem::path& file_path)
 	{
 		loaded_texture = 0;
-		UNREFERENCED_PARAMETER(file_path);
-		UNREFERENCED_PARAMETER(is_srgb);
-		return {};
+
+		//== Load compressed data from file
+		CompressedTextureData compressed_texture{};
+		auto err_code = compressed_texture.ReadDataFromFile(file_path);
+		if (err_code.has_value())
+		{
+			return err_code;
+		}
+
+		//==Upload to GPU with various params.
+		GLuint texID = 0;
+		glGenTextures(1, &texID);
+		if (texID == 0) return "Unable to allocate texture in gpu mem";
+		glBindTexture(GL_TEXTURE_2D, texID);
+		OnScopeExit delete_texture(
+			[&texID]() {
+				if (texID != 0) glDeleteTextures(1, &texID);
+			});
+
+		//When texture is mapped to a larger surface than its size.
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		//When texture is mapped to a smaller surface than its size, mipmap is used. Trilinear filtering.
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, compressed_texture.mip_levels - 1); //Ensure gpu only uses what was uploaded.
+
+		//Set texture to repeat vertically/horizontally if out-of-bounds.
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		//Texture swizzling R and B to account for flipped texture during compression for RGB and RGBA.
+		if (compressed_texture.channels >= 3)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+		}
+
+		//Save previous setting so it can be loaded back afterwards.
+		GLint previousAlignment = 0;
+		glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
+		//Tightly packed texture, no padding.
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		/*
-			NOTE: GL_COMPRESSEDTEXIMAGE2D should be used when uploading pre-compressed data, as specifying compressed_format in gl_teximage2d ends up doing runtime-compression that is poor quality.
+			Compressed texture is actually a chain of individually compressed mipmaps.
+			Thus, load each mipmap one-by-one.
+
+			Use glCompressedTexImage2D (takes in pre-compressed data) instead of glTexImage2D (which only takes in uncompressed)
 		*/
+		{
+			//Updated for each mipmap loaded, to point to the next mipmap.
+			int compressed_data_offset = 0;
+			for (uint32_t mip = 0; mip < compressed_texture.mip_levels; ++mip)
+			{
+				const uint32_t mip_width = compressed_texture.mipmaps_width_height[mip].first;
+				const uint32_t mip_height = compressed_texture.mipmaps_width_height[mip].second;
+				const uint32_t mip_data_size = compressed_texture.compressed_data_size[mip];
 
-		///*
-		//	Note: If BCx is supported on android, then load that (as ETC2 doesn't have 1 or 2 channel compression and has to resort to uncompressed for those).
-		//	When loading, load BC first (Windows, Android if possible), then ETC2 (Android if extension not supported), then uncompressed (png, jpg).
-		//	When loading uncompressed check if texture is already loaded (via other methods like BC or ETC2)
+				glCompressedTexImage2D(
+					GL_TEXTURE_2D,
+					static_cast<GLint>(mip),  // Mipmap level
+					compressed_texture.compressed_type,           // Internal compressed format (e.g. GL_COMPRESSED_RGBA_S3TC_DXT5_EXT)
+					static_cast<GLsizei>(mip_width),
+					static_cast<GLsizei>(mip_height),
+					0,                        // Border, must be 0
+					static_cast<GLsizei>(mip_data_size),
+					static_cast<const void*>(&compressed_texture.data[compressed_data_offset])
+				);
+				//Move offset to next mipmap.
+				compressed_data_offset += mip_data_size;
+			}
+		}
 
-		//	For SRGB, use the respective opengl srgb formats. Format the compressed texture was stored in stays the same, Format to upload is different.
-		//*/
+		glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
-		///*
-		//	Standard Image Formats (png, jpg) --> stbi
-		//	Compressed Texture (dxt5, etc2) --> gli
-		//*/
-		////For compressed texture loading, i believe it support isSRGB and cubemaps.
-		////Code taken from GLI documentation		
-		//constexpr std::string compressed_extension[]{ ".DDS", ".dds", ".ktx", ".ktx2" };
-		//if (std::find(std::begin(compressed_extension), std::end(compressed_extension), std::filesystem::path(filename).extension().string()) != std::end(compressed_extension))
-		//{
-		//	std::vector<unsigned char> buffer = EngineFramework::AssetManagerSystem::GetDataFromFile(filename);
-		//	gli::texture Texture = gli::load((const char*)buffer.data(), buffer.size()); //Self-Managed via RAII
-		//	if (Texture.empty()) throw std::runtime_error(std::string("Failed to load texture: ") + filename);
+		//Check for error when uploading.
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			return std::string("Error when uploading texture: ERR_CODE ") + std::to_string(err);
+		}
 
-		//	//There's no need to flip texture, since it should already flipped during compression process.
-
-		//	gli::gl GL(gli::gl::PROFILE_ES30);
-		//	gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
-		//	GLenum Target = GL.translate(Texture.target());
-
-		//	GLuint TextureName = 0;
-		//	glGenTextures(1, &TextureName);
-		//	glBindTexture(Target, TextureName);
-		//	glTexParameteri(Target, GL_TEXTURE_BASE_LEVEL, 0);
-		//	glTexParameteri(Target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-		//	glTexParameteri(Target, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
-		//	glTexParameteri(Target, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
-		//	glTexParameteri(Target, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
-		//	glTexParameteri(Target, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
-
-		//	glm::tvec3<GLsizei> const extent(Texture.extent());
-		//	GLsizei const FaceTotal = static_cast<GLsizei>(Texture.layers() * Texture.faces());
-
-		//	switch (Texture.target())
-		//	{
-		//	case gli::TARGET_1D_ARRAY:
-		//	case gli::TARGET_2D:
-		//	case gli::TARGET_CUBE:
-		//		glTexStorage2D(
-		//			Target, static_cast<GLint>(Texture.levels()), Format.Internal,
-		//			extent.x, Texture.target() == gli::TARGET_2D ? extent.y : FaceTotal);
-		//		break;
-		//	case gli::TARGET_2D_ARRAY:
-		//	case gli::TARGET_3D:
-		//	case gli::TARGET_CUBE_ARRAY:
-		//		glTexStorage3D(
-		//			Target, static_cast<GLint>(Texture.levels()), Format.Internal,
-		//			extent.x, extent.y,
-		//			Texture.target() == gli::TARGET_3D ? extent.z : FaceTotal);
-		//		break;
-		//	default:
-		//		assert(0);
-		//		break;
-		//	}
-
-		//	for (std::size_t Layer = 0; Layer < Texture.layers(); ++Layer)
-		//		for (std::size_t Face = 0; Face < Texture.faces(); ++Face)
-		//			for (std::size_t Level = 0; Level < Texture.levels(); ++Level)
-		//			{
-		//				GLsizei const LayerGL = static_cast<GLsizei>(Layer);
-		//				glm::tvec3<GLsizei> Extent(Texture.extent(Level));
-		//				Target = gli::is_target_cube(Texture.target())
-		//					? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face)
-		//					: Target;
-
-		//				switch (Texture.target())
-		//				{
-		//				case gli::TARGET_1D_ARRAY:
-		//				case gli::TARGET_2D:
-		//				case gli::TARGET_CUBE:
-		//					if (gli::is_compressed(Texture.format()))
-		//						glCompressedTexSubImage2D(
-		//							Target, static_cast<GLint>(Level),
-		//							0, 0,
-		//							Extent.x,
-		//							Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent.y,
-		//							Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
-		//							Texture.data(Layer, Face, Level));
-		//					else
-		//						glTexSubImage2D(
-		//							Target, static_cast<GLint>(Level),
-		//							0, 0,
-		//							Extent.x,
-		//							Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent.y,
-		//							Format.External, Format.Type,
-		//							Texture.data(Layer, Face, Level));
-		//					break;
-		//				case gli::TARGET_2D_ARRAY:
-		//				case gli::TARGET_3D:
-		//				case gli::TARGET_CUBE_ARRAY:
-		//					if (gli::is_compressed(Texture.format()))
-		//						glCompressedTexSubImage3D(
-		//							Target, static_cast<GLint>(Level),
-		//							0, 0, 0,
-		//							Extent.x, Extent.y,
-		//							Texture.target() == gli::TARGET_3D ? Extent.z : LayerGL,
-		//							Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
-		//							Texture.data(Layer, Face, Level));
-		//					else
-		//						glTexSubImage3D(
-		//							Target, static_cast<GLint>(Level),
-		//							0, 0, 0,
-		//							Extent.x, Extent.y,
-		//							Texture.target() == gli::TARGET_3D ? Extent.z : LayerGL,
-		//							Format.External, Format.Type,
-		//							Texture.data(Layer, Face, Level));
-		//					break;
-		//				default: assert(0); break;
-		//				}
-		//			}
-		//	return TextureName;
-		//}
+		loaded_texture = texID;
+		return {}; //No Error.
 	}
 
 	/*
@@ -1003,6 +827,10 @@ namespace
 	{
 		return "At least one compression type should be selected.";
 	}
+			
+
+		//Mimic loading of BCx precompressed texture. For now it just uses runtime-compression instead.
+	//CompressedTextureData compressed_texture(std::move(CompressTexture(file_path, is_srgb, CompressionTextureType::BC_X, 0.88f)));
 	//TODO: CompressAndWriteTexture for storing texture as compressed texture files with different extensions.
 	UNREFERENCED_PARAMETER(src_path);
 	UNREFERENCED_PARAMETER(compress_BCx);
