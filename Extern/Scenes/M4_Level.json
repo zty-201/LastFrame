@@ -85575,6 +85575,114 @@
 			"visible": false
 		}
 	},
+	"821": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				16964946010757644289,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "OpenInventory",
+			"hover_texture": [
+				16964946010757644289,
+				3711223656383638553
+			],
+			"idle_texture": [
+				16964946010757644289,
+				3711223656383638553
+			]
+		},
+		"NameComponent": {
+			"name": "android_inventory_open_state"
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				670.0499877929688,
+				528.75
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				148.90000915527344,
+				117.5
+			],
+			"size_NDC": [
+				0.10000000149011612,
+				0.10000000149011612
+			],
+			"textureid": [
+				16964946010757644289,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
+	"822": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				16964946010757644291,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "OpenInventory",
+			"hover_texture": [
+				16964946010757644291,
+				3711223656383638553
+			],
+			"idle_texture": [
+				16964946010757644291,
+				3711223656383638553
+			]
+		},
+		"NameComponent": {
+			"name": "android_inventory_close_state"
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				670.0499877929688,
+				528.75
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				148.90000915527344,
+				117.5
+			],
+			"size_NDC": [
+				0.10000000149011612,
+				0.10000000149011612
+			],
+			"textureid": [
+				16964946010757644291,
+				3711223656383638553
+			],
+			"visible": true
+		}
+	},
 	"83": {
 		"ColliderComponent": {
 			"maxBounds": [
