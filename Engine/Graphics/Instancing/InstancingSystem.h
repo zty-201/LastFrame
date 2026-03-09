@@ -96,6 +96,8 @@ namespace EngineFramework
 
         void Initialize(size_t maxTotalInstances = 50000);
 
+        void SetDynamicUpdatesEnabled(bool enabled);
+
         // Gathers all entities, culls them, and builds the batches/SSBO data
         void BuildSceneBatches();
         void UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj, const std::vector<glm::mat4>& spotProj);
@@ -103,15 +105,23 @@ namespace EngineFramework
         // Getters for the GraphicsSystem to use during rendering
         const std::vector<RenderBatch>& GetBatches() const { return m_activeBatches; }
         const std::vector<entt::entity>& GetAnimatedEntities() const { return m_animatedEntities; }
-        GLuint GetInstanceSSBO() const { return m_instanceSSBO; }
-        GLuint GetIndirectBuffer() const { return m_indirectBuffer; }
-        GLuint GetVisibleIndicesBuffer() const { return m_visibleIndicesBuffer; }
+        GLuint GetInstanceSSBO() const { return m_instanceSSBOs[m_currentFrame % FRAMES_IN_FLIGHT]; }
+        GLuint GetIndirectBuffer() const { return m_indirectBuffers[m_currentFrame % FRAMES_IN_FLIGHT]; }
+        GLuint GetVisibleIndicesBuffer() const { return m_visibleIndicesBuffers[m_currentFrame % FRAMES_IN_FLIGHT]; }
         size_t GetActiveBatchCount() const { return m_activeBatches.size(); }
+
+        static constexpr uint32_t INVALID_BATCH = 0xFFFFFFFF;
+
     private:
-        GLuint m_instanceSSBO = 0;
-        GLuint m_indirectBuffer = 0;
+        static const int FRAMES_IN_FLIGHT = 3;
+        uint32_t m_currentFrame = 0;
+
+        // Replace single GLuints with arrays
+        GLuint m_instanceSSBOs[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        GLuint m_indirectBuffers[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        GLuint m_visibleIndicesBuffers[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+
         size_t m_maxTotalInstances = 0;
-        GLuint m_visibleIndicesBuffer = 0;
 
         xresource::full_guid culling_shader_guid;
         
@@ -120,9 +130,21 @@ namespace EngineFramework
         std::vector<RenderBatch> m_activeBatches;
         std::vector<DrawElementsIndirectCommand> m_indirectCommands;
         std::vector<entt::entity> m_animatedEntities;
+		std::vector<uint32_t> m_freeSSBOIndices; // The Free List that handles obj creation/destruction
 
 		// Helper functions
         void CalculateModelMatrix(TransformComponent& transform, glm::mat4& modelMatrix);
+
+		// callback functions for registry listeners
+        void OnMeshAdded(entt::registry& reg, entt::entity entity);
+        void OnMeshRemoved(entt::registry& reg, entt::entity entity);
+        void OnBatchBreakingChange(entt::registry& reg, entt::entity entity); // New
+        void ProcessNewInstance(entt::entity entity); // New (Deferred logic)
+
+        // reactive variables
+        bool m_isListening = false;
+        bool m_needsBatchRebuild = false;
+        std::vector<entt::entity> m_pendingCreations;
     };
 }
 #endif // INSTANCINGSYSTEM_H

@@ -39,6 +39,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetWindow.hpp"
 #include "UISystem.hpp"
 #include "MenuManager.hpp"
+#include "ObjectManager.hpp"
 namespace EngineFramework
 {
     Save::Save() {
@@ -124,6 +125,7 @@ namespace EngineFramework
 
         if (!save_Archtypes()) return false;
         if (!save_Instances(filename)) return false;
+        ObjectManager::SaveFiltersForScene(filename);
         
         
         InputManager::GetInstance().key_mapping_codegen();

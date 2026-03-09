@@ -70,7 +70,9 @@ namespace EngineFramework
 
     void GraphicsSystem::Initialize()
     {
+#ifdef PLATFORM_WINDOWS
         SetupGLFW();
+#endif
         SetupGraphics();
 
         // Initialize Instancing System
@@ -137,11 +139,11 @@ namespace EngineFramework
         FBO tempFBO(FBO::Texture, WIDTH, HEIGHT, &sceneTextureID);
         mainFBO = std::move(tempFBO);
 
-        // Create the shadow map framebuffer
+		// Create the shadow map framebuffer for directional light cascades
         FBO tempShadowFBO(FBO::DepthTextureArray, SHADOW_WIDTH, SHADOW_HEIGHT, &m_csmTextureArray, CASCADE_COUNT);
         m_shadowFBO = std::move(tempShadowFBO);
 
-        // Create the shadow map framebuffer
+		// Create the shadow map framebuffer for spotlights (using texture array to store multiple shadow maps)
         FBO tempSpotShadowFBO(FBO::DepthTextureArray, SHADOW_WIDTH, SHADOW_HEIGHT, &m_spotTextureArray, MAX_SHADOW_CASTING_SPOTLIGHTS);
         m_spotShadowFBO = std::move(tempSpotShadowFBO);
 
@@ -178,7 +180,6 @@ namespace EngineFramework
         glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
         glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, 0);
-
 
         // Get shader GUIDs 
         mesh_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Mesh");
@@ -300,29 +301,32 @@ namespace EngineFramework
 
         glm::mat4 viewProj = P * V;
 
+		// ---------------------------- Prerocessing -----------------------------
+		// Update cascade splits and matrices
         UpdateCascadeMatrices(*active_camera, V);
 
-        // 1. Update point light SSBO
+        // Update point light SSBO
         UpdateLightSSBO();
 
-		// Preprocessing (around 0.8ms) to implement ring buffers to reduce stalls + fix instance count buffer orphaning
+		// Update the instancing system (modelmatrix update + batch building + compute culling dispatch)
         m_instancingSystem->UpdateAndDispatchCompute(viewProj, m_cascadeViewProjMatrices, m_spotLightViewProjMatrices);
 
-        // 2. Shadow pass (directional + point) (around 1 to 2ms)
+		// ---------------------------- Rendering Passes -----------------------------
+        // 1. Shadow pass (directional + point) (around 1 to 2ms)
         ShadowPass();
-        // 3. Global uniform buffers (camera, light, cascades) 
+        // 2. Global uniform buffers (camera, light, cascades) 
         UpdateUBOs(*active_camera, V, P);
-        // 4. Volumetric light injection
+        // 3. Volumetric light injection
         VolumetricLightInjectionPass();
-        // 5. Volumetric ray march
+        // 4. Volumetric ray march
         VolumetricRayMarchPass();
-        // 6. Mesh pass (2-3ms)
+        // 5. Mesh pass (2-3ms)
         MeshPass();
-        // 7. Skybox pass
+        // 6. Skybox pass
         SkyboxPass();
-		// 8. UI pass
+		// 7. UI pass
 		RenderUI();
-        // 9. Copy to screen if we are not in level editor
+        // 8. Copy to screen if we are not in level editor
         if (!m_isRenderingToFBO) {
             glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -345,8 +349,10 @@ namespace EngineFramework
         // We separate them immediately so we don't need to sort later.
 		static std::vector<entt::entity> pointEntities; // prevent reallocation every frame
         static std::vector<entt::entity> spotEntities;
+
 		pointEntities.clear();
 		spotEntities.clear();
+
         auto EulerToDirection = [](const glm::vec3& eulerDegrees) {
             float pitch = glm::radians(eulerDegrees.x);
             float yaw = glm::radians(eulerDegrees.y);
@@ -383,7 +389,7 @@ namespace EngineFramework
             data.spot_cutoffs = glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f);
 
             // --- SIMPLE ASSIGNMENT ---
-            // Just take the next slot! No sorting.
+            // Just take the next slot, No sorting.
             int shadowIndex = -1;
             if (pointShadowCount < MAX_SHADOW_CASTING_POINT_LIGHTS) {
                 shadowIndex = pointShadowCount++;
@@ -450,6 +456,9 @@ namespace EngineFramework
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
+    /*
+		Rendering the directional light shadow map using cascaded shadow mapping.
+    */
     void GraphicsSystem::RenderDirectionalShadow()
     {
         TransformComponent* dirLightTransform = nullptr;
@@ -500,6 +509,9 @@ namespace EngineFramework
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
 
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.0f, 1.0f); // Hardware slope-scaled depth bias
+
         // Bind our Indirect Commands buffer globally for this pass
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_instancingSystem->GetInstanceSSBO()); // Required for ShadowMap.vert instances[]
@@ -530,13 +542,14 @@ namespace EngineFramework
                 // Calculate the memory jump for the indirect command
                 void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
 
-                // The single draw call!
+                // indirect draw call for gpu processing
                 glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
 
                 batchIndex++;
             }
         }
 
+        glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // Unbind
         const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
@@ -662,7 +675,8 @@ namespace EngineFramework
 
         shader->disuse();
         glCullFace(GL_BACK);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
     }
 
@@ -1523,7 +1537,14 @@ namespace EngineFramework
         if (!dirLightTransform) return;
 
         CalculateCascadeSplits(camera.nearPlane, camera.farPlane);
-        glm::vec3 lightDir = dirLightTransform->rotation;
+        float pitch = glm::radians(dirLightTransform->rotation.x);
+        float yaw = glm::radians(dirLightTransform->rotation.y);
+
+        glm::vec3 lightDir;
+        lightDir.x = cos(pitch) * sin(yaw);
+        lightDir.y = -sin(pitch);
+        lightDir.z = cos(pitch) * cos(yaw);
+        lightDir = glm::normalize(lightDir);
         glm::vec3 up = glm::abs(lightDir.y) > 0.999f ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
         glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f), lightDir, up);
 

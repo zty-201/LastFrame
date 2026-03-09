@@ -12,6 +12,8 @@ local gyroEnabled      = true
 local camera      = nil
 local transform   = nil
 local yaw, pitch  = 0.0, 0.0
+local lensMenuName = "DirtyLens"
+local lensVisible  = false
 
 -- Recenter smoothing
 local recenterActive        = false
@@ -37,6 +39,38 @@ end
 local function setMouseLookActive(active)
     Input.SetCursorLocked(active)       -- FPS: lock + unlimited deltas
     Input.SetCursorVisible(not active)  -- hide cursor while locked
+end
+
+local function setLensOverlayVisible(active)
+    if active then
+        if not lensVisible and UI_DisplayMenu ~= nil then
+            UI_DisplayMenu(lensMenuName)
+            lensVisible = true
+        end
+    else
+        if lensVisible then
+            if UI_CloseMenu ~= nil then
+                UI_CloseMenu(lensMenuName)
+            elseif UI_CloseAllMenus ~= nil then
+                UI_CloseAllMenus()
+            end
+            lensVisible = false
+        end
+    end
+end
+
+local function updateLensOverlayVisibility()
+    local cutscene = false
+    if UI_IsCutscenePlaying ~= nil then
+        cutscene = UI_IsCutscenePlaying()
+    end
+
+    local startMenu = false
+    if UI_IsMenuActive ~= nil then
+        startMenu = UI_IsMenuActive("StartMenu")
+    end
+
+    setLensOverlayVisible(not cutscene and not startMenu)
 end
 
 -- ============================================================
@@ -71,6 +105,7 @@ function on_create(self)
     SHARED.POV.cam   = camera   -- <<<<<< THE FIX
 
     print("[player_pov_camera] Initialized. yaw=", yaw, " pitch=", pitch)
+    updateLensOverlayVisibility()
 end
 
 
@@ -133,6 +168,8 @@ end
 
 function on_update(self, dt)
     if not camera or not transform then return end
+
+    updateLensOverlayVisibility()
 
     local SHARED = getGlobalShared()
 

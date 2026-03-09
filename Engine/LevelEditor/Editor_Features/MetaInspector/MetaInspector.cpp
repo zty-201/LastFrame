@@ -978,6 +978,34 @@ namespace EditorFeatures {
 				// ----- CATEGORY -----
 				draw_category_combo("Category", slot.category);
 
+				// ----- AMBIENCE SUB-TYPE -----
+				if (slot.category == AudioComponent::AudioCategory::Ambience)
+				{
+					const char* ambiencePreview = "General";
+					switch (slot.ambienceType)
+					{
+						case AudioComponent::AmbienceType::Outdoor: ambiencePreview = "Outdoor";
+							break;
+						case AudioComponent::AmbienceType::Indoor:	ambiencePreview = "Indoor";
+							break;
+						default: break;
+					}
+
+					if (ImGui::BeginCombo("Ambience Type", ambiencePreview))
+					{
+						auto pick = [&](AudioComponent::AmbienceType v, const char* name)
+						{
+							bool selected = (slot.ambienceType == v);
+							if (ImGui::Selectable(name, selected)) slot.ambienceType = v;
+							if (selected) ImGui::SetItemDefaultFocus();
+						};
+						pick(AudioComponent::AmbienceType::General, "General");
+						pick(AudioComponent::AmbienceType::Outdoor, "Outdoor");
+						pick(AudioComponent::AmbienceType::Indoor, "Indoor");
+						ImGui::EndCombo();
+					}
+				}
+
 				// ----- ASSET PICKER -----
 				if (has_sources)
 				{
@@ -1014,7 +1042,7 @@ namespace EditorFeatures {
 				
 				// ----- VOLUME -----
 				if (slot.volume < 0.0f) slot.volume = 0.0f;
-				ImGui::SliderFloat("Volume", &slot.volume, 0.0f, 1.0f);
+				ImGui::SliderFloat("Volume", &slot.volume, 0.0f, 5.0f);
 
 				// ----- SPATIAL -----
 				draw_spatial_combo("Spatial", slot.spatial);
@@ -1323,6 +1351,7 @@ namespace EditorFeatures {
 				if (edited) {
 					v = { values[0], values[1] };
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 			else if (field.type() == entt::resolve<glm::vec3>()) {
@@ -1371,6 +1400,7 @@ namespace EditorFeatures {
 					draw_vec4_drag(label.c_str(), v);
 					update_field_history(entity, component_name, data, obj);
 					data.set(obj, v);
+					any_change = true;
 				}
 			}
 
@@ -1381,6 +1411,7 @@ namespace EditorFeatures {
 						if (!descriptor.sources.empty() && draw_asset_guid_picker(label.c_str(), guid, tag->kind, descriptor.none_label, descriptor.sources, descriptor.formatter)) {
 							commit_instant_history(entity, component_name, data, obj, [&]() {
 								data.set(obj, guid);
+								any_change = true;
 							});
 						}
 					}
@@ -1494,6 +1525,22 @@ namespace EditorFeatures {
 
 			ImGui::PopID();
 		}
+
+		// --- ADD THIS BLOCK HERE ---
+		if (any_change) {
+			// Trigger EnTT on_update signals so the InstancingSystem knows to rebuild batches
+			if (mt == entt::resolve<MaterialComponent>()) {
+				registry.patch<MaterialComponent>(entity);
+			}
+			else if (mt == entt::resolve<MeshComponent>()) {
+				registry.patch<MeshComponent>(entity);
+			}
+			else if (mt == entt::resolve<AnimationComponent>()) {
+				registry.patch<AnimationComponent>(entity);
+			}
+		}
+		// ---------------------------
+
 		return any_change;
 	}
 }

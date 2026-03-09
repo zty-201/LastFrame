@@ -160,7 +160,11 @@ namespace EngineFramework
             }
 
             std::unique_ptr<Record> record = history_system ? history_system->start_track(entity, "MaterialComponent", "albedoMap") : nullptr;
-            registry.get<MaterialComponent>(entity).albedoMap = texture_guid;
+
+            registry.patch<MaterialComponent>(entity, [&](auto& mat) {
+                mat.albedoMap = texture_guid;
+                });
+
             if (history_system) {
                 history_system->end_track(record, entt::meta_any{ texture_guid });
             }
@@ -1344,7 +1348,12 @@ namespace EngineFramework
 
             GraphicsSystem::GetInstance().CalculateModelMatrix(transform, model);*/
 
-            glm::mat4 model = object.modelMatrix;
+            float matrixTranslation[3] = { object.position.x, object.position.y, object.position.z };
+            float matrixRotation[3] = { object.rotation.x, object.rotation.y, object.rotation.z };
+            float matrixScale[3] = { object.scale.x, object.scale.y, object.scale.z };
+
+            glm::mat4 model;
+            ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, glm::value_ptr(model));
 
             ImGuizmo::SetOrthographic(false); //because we have perspective
 
