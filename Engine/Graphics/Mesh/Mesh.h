@@ -206,17 +206,28 @@ namespace Mesh {
 			auto ioSystem = new AssetIOSystem(filePath);
 			importer.SetIOHandler(ioSystem);
 
-			// Set Assimp properties to handle large meshes with 16-bit indices.
-			importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 65000);
-			importer.SetPropertyInteger(AI_CONFIG_PP_SLM_TRIANGLE_LIMIT, 65000);
+			unsigned int importFlags = aiProcess_Triangulate |
+				aiProcess_GenSmoothNormals |
+				aiProcess_CalcTangentSpace;
+
+			std::filesystem::path p(filePath);
+			std::string fileName = p.filename().string();
+			bool isSkeletalMesh = (fileName.find("SK_") == 0);
+
+			if (!isSkeletalMesh) {
+				// STATIC MESH: Safe to split!
+				importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 65000);
+				importer.SetPropertyInteger(AI_CONFIG_PP_SLM_TRIANGLE_LIMIT, 65000);
+				importFlags |= aiProcess_SplitLargeMeshes;
+			}
+			else {
+				// SKELETAL MESH: Do NOT split (preserves bone weights)
+				LOGI("Skeletal Mesh '%s' detected. Bypassing Assimp splitting.", fileName.c_str());
+			}
 
 			// Now we can use ReadFile() instead of ReadFileFromMemory()!
 			// Assimp will use our custom IOSystem to load both .obj AND .mtl
-			const aiScene* scene = importer.ReadFile(
-				filePath,
-				aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace |
-				aiProcess_SplitLargeMeshes
-			);
+			const aiScene* scene = importer.ReadFile(filePath, importFlags);
 
 			if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 				throw std::runtime_error("Assimp Error: " + std::string(importer.GetErrorString()));
@@ -360,6 +371,13 @@ namespace Mesh {
 		// Extracts vertex data from a single Assimp mesh.
 		void processSubMesh(aiMesh* mesh, const aiScene* scene, EngineFramework::Skeleton* skeleton) {
 			UNREFERENCED_PARAMETER(scene);
+
+			if (mesh->mNumVertices > 65535) {
+				LOGE("FATAL: Submesh '%s' has %u vertices! 16-bit indices will overflow. Split it in Blender!",
+					mesh->mName.C_Str(), mesh->mNumVertices);
+			}
+			//
+
 			SubMesh subMesh;
 			subMesh.name = mesh->mName.C_Str();
 			subMesh.materialIndex = mesh->mMaterialIndex;
