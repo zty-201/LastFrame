@@ -116,8 +116,23 @@ struct Scene
         At least one must not be blank, otherwise none will be generated and an error will be returned.
         \return Returns an error string if unsuccessful.
     */
-    [[nodiscard]] std::optional<std::string> CompressAndWriteTexture(const std::filesystem::path& src_path, const std::filesystem::path& folder_BCx = {}, const std::filesystem::path& folder_ETC2 = {});
+    static [[nodiscard]] std::optional<std::string> CompressAndWriteTexture(const std::filesystem::path& src_path, const std::filesystem::path& folder_BCx = {}, const std::filesystem::path& folder_ETC2 = {});
 #endif
+
+    /*
+        Returns list of accepted file extensions for compressed texture files
+    */
+    static inline std::vector<std::string> GetCompressedTextureExtensions()
+    {
+        return { ".compiled_bc", ".compiled_etc2" };
+    }
+    /*
+        Returns list of accepted file extensions for uncompressed texture files
+    */
+    static inline std::vector<std::string> GetUncompressedTextureExtensions()
+    {
+        return { ".png", ".jpg", ".jpeg"};
+    }
 };
 
 #endif
