@@ -374,6 +374,11 @@ namespace Engine
         return m_parameters;
     }
 
+    bool StateMachine::HasCurrentState() const
+    {
+        return m_currentState != nullptr;
+    }
+
     void StateMachine::Reset()
     {
         if (m_currentState)

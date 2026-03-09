@@ -1,0 +1,78 @@
+{
+	"838": {
+		"NameComponent": {
+			"name": "SplashScreenDPLogo"
+		},
+		"UIComponent": {
+			"Overlay_name": "Splash_1",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				247.75
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1920.0,
+				495.5
+			],
+			"size_NDC": [
+				1.0,
+				0.5
+			],
+			"textureid": [
+				10225669856270499841,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"839": {
+		"NameComponent": {
+			"name": "SplashScreenBG"
+		},
+		"UIComponent": {
+			"Overlay_name": "Splash_1",
+			"color": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1920.0,
+				991.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}

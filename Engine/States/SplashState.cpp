@@ -17,29 +17,33 @@ void SplashState::OnEnter(Engine::StateMachine& machine)
 
     auto& ui = EngineFramework::UI_System::GetInstance();
     ui.closeAllMenu();
-    ui.displayMenu("SplashMenu");
+    ui.StartSplashSequence();
 }
 
 void SplashState::OnExit(Engine::StateMachine& machine)
 {
     UNREFERENCED_PARAMETER(machine);
 
-    EngineFramework::UI_System::GetInstance().closeAllMenu();
+    auto& ui = EngineFramework::UI_System::GetInstance();
+    ui.StopCutsceneSequence(true);
+
     LOGI("[State] Exit Splash");
 }
 
 void SplashState::Update(Engine::StateMachine& machine, float dt)
 {
-    m_timer += dt;
+    UNREFERENCED_PARAMETER(dt);
 
-    if (m_timer >= m_duration)
+    auto& ui = EngineFramework::UI_System::GetInstance();
+
+    if (!ui.IsCutscenePlaying())
     {
         LOGI("[State] Splash finished -> MainMenu");
         machine.SetBool("SplashFinished", true);
     }
 
-    // Optional skip
-    // if (Input pressed)
+    // Optional skip support later:
+    // if (InputManager::GetInstance().GetAction("JUMP"))
     // {
     //     machine.SetTrigger("SkipSplash");
     // }

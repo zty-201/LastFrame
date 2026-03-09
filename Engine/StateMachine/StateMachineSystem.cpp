@@ -8,6 +8,18 @@
 
 namespace EngineFramework
 {
+    StateMachineSystem* StateMachineSystem::this_instance = nullptr;
+
+    StateMachineSystem::StateMachineSystem()
+    {
+        this_instance = this;
+    }
+
+    StateMachineSystem& StateMachineSystem::GetInstance()
+    {
+        return *this_instance;
+    }
+
     void StateMachineSystem::Initialize()
     {
         LOGI("[StateMachineSystem] Registering ordered states");
@@ -35,11 +47,15 @@ namespace EngineFramework
     {
         if (!m_started)
         {
-            LOGI("[StateMachineSystem] Starting ordered flow at Splash");
-            m_stateMachine.SetInitialState("Splash");
+            if (!m_stateMachine.GetCurrentState())
+            {
+                LOGI("[StateMachineSystem] Starting ordered flow at Splash");
+                m_stateMachine.SetInitialState("Splash");
+            }
             m_started = true;
         }
 
         m_stateMachine.Update(dt);
     }
+
 }

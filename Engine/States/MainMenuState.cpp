@@ -13,9 +13,8 @@ void MainMenuState::OnEnter(Engine::StateMachine& machine)
 
     LOGI("[State] Enter MainMenu");
 
-    auto& ui = EngineFramework::UI_System::GetInstance();
-    ui.closeAllMenu();
-    ui.displayMenu("StartMenu");
+    EngineFramework::UI_System::GetInstance().closeAllMenu();
+    EngineFramework::UI_System::GetInstance().displayMenu("StartMenu");
 }
 
 void MainMenuState::OnExit(Engine::StateMachine& machine)

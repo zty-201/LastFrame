@@ -412,13 +412,13 @@ namespace EngineFramework
 
     void UI_System::displayMenu(std::string menuname)
     {
-        std::cout << "[UI_System] displayMenu('" << menuname << "')\n";
+        //std::cout << "[UI_System] displayMenu('" << menuname << "')\n";
 
         auto it = Menu_Mapping.find(menuname);
 
         if (it != Menu_Mapping.end() && it->second.first)
         {
-            std::cout << "[UI_System] displayMenu success: " << menuname << "\n";
+            //std::cout << "[UI_System] displayMenu success: " << menuname << "\n";
 
             it->second.first->draw_elements();
             current_menu = menuname;
@@ -522,6 +522,17 @@ namespace EngineFramework
                 closeAllMenu();
                 //displayMenu("StartMenu");
             }
+        );
+    }
+
+    void UI_System::StartSplashSequence()
+    {
+        std::cout << "[UI_System] StartSplashSequence() called\n";
+
+        StartCutsceneSequence(
+            { "Splash_1", "Splash_2", "Splash_3" },
+            1.5f,
+            true
         );
     }
 

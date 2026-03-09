@@ -787,7 +787,7 @@
 			"name": "SF_Ceiling"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				394,
 				184,
@@ -842,7 +842,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				5,
 				2,
@@ -851,7 +851,7 @@
 			"name": "Player"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				9,
 				10,
@@ -936,7 +936,7 @@
 			"name": "UI"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				825,
 				826,

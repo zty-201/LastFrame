@@ -95,58 +95,41 @@ function on_create(self)
     print("[PlayButtonController] ===== on_create CALLED =====")
     print("[PlayButtonController] EntityID=" .. tostring(EntityID))
 
-    self.cutscene_started = false
-    self._reload_cooldown = 0.0
-
-    -- Debug: check bindings exist
-    if UI_StartPseudoCutscene == nil then
-        print("[PlayButtonController] ERROR: UI_StartPseudoCutscene is NIL (binding missing)")
+    if StateMachine_SetTrigger == nil then
+        print("[PlayButtonController] ERROR: StateMachine_SetTrigger is NIL (binding missing)")
     else
-        print("[PlayButtonController] UI_StartPseudoCutscene exists")
-    end
-
-    if Script_RequestReloadEntity == nil then
-        print("[PlayButtonController] NOTE: Script_RequestReloadEntity is NIL (reload binding not exposed yet)")
-    else
-        print("[PlayButtonController] Script_RequestReloadEntity exists (reload supported)")
+        print("[PlayButtonController] StateMachine_SetTrigger exists")
     end
 end
 
 function on_update(self, dt)
-    -- Cooldown to prevent spamming reload every frame
-    if self._reload_cooldown > 0.0 then
-        self._reload_cooldown = self._reload_cooldown - dt
+    -- No cutscene logic here anymore.
+end
+
+function on_button_PlayButton(self)
+    print("[PlayButtonController] ===== PLAY BUTTON PRESSED =====")
+
+    _G.GAME_STATE = "GAME"
+    _G.INDOOR_COUNT = 0
+
+    if StateMachine_SetTrigger == nil then
+        print("[PlayButtonController] ERROR: StateMachine_SetTrigger binding missing")
+        return
     end
 
-    -- Press F5 to reload this entity's scripts (Windows)
-    -- (GLFW_KEY_F5 is usually 294; if you already bind constants, use that instead)
-    if self._reload_cooldown <= 0.0 then
-        local F5 = 294
-        if Input.GetKeyDown ~= nil and Input.GetKeyDown(F5) then
-            if try_reload_self("F5") then
-                self._reload_cooldown = 0.5
-            end
-        end
+    local ok, err = pcall(function()
+        StateMachine_SetTrigger("StartIntro")
+    end)
+
+    if ok then
+        print("[PlayButtonController] Requested MainMenu -> IntroCutscene")
+    else
+        print("[PlayButtonController] ERROR triggering StartIntro: " .. tostring(err))
     end
+end
 
-    -- ------------------------------------------------------------
-    -- CUTSCENE ADVANCE (1 scene per press)
-    -- ------------------------------------------------------------
-    if self.cutscene_started then
-        -- If you added UI_IsCutscenePlaying, you can guard with it:
-        -- if UI_IsCutscenePlaying ~= nil and not UI_IsCutscenePlaying() then return end
-
-        if is_skip_pressed() then
-            if UI_StopPseudoCutscene ~= nil then
-                UI_StopPseudoCutscene()
-            else
-                -- fallback: at least close menus
-                if UI_CloseAllMenus ~= nil then UI_CloseAllMenus() end
-            end
-
-            self.cutscene_started = false
-        end
-    end
+function on_destroy(self)
+    print("[PlayButtonController] Destroyed. EntityID=" .. tostring(EntityID))
 end
 
 -- IMPORTANT: C++ builds handlerName = "on_button_" + e.Event_Name
@@ -156,23 +139,20 @@ function on_button_PlayButton(self)
 
     _G.GAME_STATE = "GAME"
     _G.INDOOR_COUNT = 0
-    
-    if self.cutscene_started then
-        print("[PlayButtonController] Cutscene already playing, ignoring")
+
+    if StateMachine_SetTrigger == nil then
+        print("[PlayButtonController] ERROR: StateMachine_SetTrigger binding missing")
         return
     end
 
-    self.cutscene_started = true
-
     local ok, err = pcall(function()
-        UI_StartPseudoCutscene()
+        StateMachine_SetTrigger("StartIntro")
     end)
 
     if ok then
-        print("[PlayButtonController] Cutscene sequence started!")
+        print("[PlayButtonController] Requested MainMenu -> IntroCutscene")
     else
-        print("[PlayButtonController] ERROR calling UI_StartPseudoCutscene: " .. tostring(err))
-        self.cutscene_started = false
+        print("[PlayButtonController] ERROR triggering StartIntro: " .. tostring(err))
     end
 end
 
@@ -181,8 +161,4 @@ end
 function on_button_ReloadPlayScript(self)
     print("[PlayButtonController] ===== RELOAD BUTTON PRESSED =====")
     try_reload_self("button ReloadPlayScript")
-end
-
-function on_destroy(self)
-    print("[PlayButtonController] Destroyed. EntityID=" .. tostring(EntityID))
 end

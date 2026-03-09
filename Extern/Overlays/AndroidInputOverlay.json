@@ -1,5 +1,5 @@
 {
-	"820": {
+	"590": {
 		"JoystickComponent": {
 			"baseCenter": [
 				350.4000244140625,
@@ -48,7 +48,7 @@
 			"visible": false
 		}
 	},
-	"821": {
+	"591": {
 		"NameComponent": {
 			"name": "js"
 		},

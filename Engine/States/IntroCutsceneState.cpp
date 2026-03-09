@@ -45,12 +45,6 @@ void IntroCutsceneState::Update(Engine::StateMachine& machine, float dt)
         LOGI("[State] IntroCutscene finished -> Gameplay");
         machine.SetBool("IntroCutsceneFinished", true);
     }
-
-    // Optional skip:
-    // if (skip key pressed)
-    // {
-    //     machine.SetTrigger("SkipIntro");
-    // }
 }
 
 void IntroCutsceneState::Render(Engine::StateMachine& machine)

@@ -8,8 +8,10 @@ namespace EngineFramework
     class StateMachineSystem : public ISystem
     {
     public:
-        StateMachineSystem() = default;
+        StateMachineSystem();
         ~StateMachineSystem() override = default;
+
+        static StateMachineSystem& GetInstance();
 
         Engine::StateMachine& GetMachine() { return m_stateMachine; }
         const Engine::StateMachine& GetMachine() const { return m_stateMachine; }
@@ -17,12 +19,15 @@ namespace EngineFramework
     private:
         void Initialize() override;
         void Update(float dt) override;
-        //void PostUpdate(float dt) override {}
+        void PostUpdate(float dt) override
+        {
+            UNREFERENCED_PARAMETER(dt);
+        }
 
     private:
-        Engine::StateMachine m_stateMachine;
+        static StateMachineSystem* this_instance;
 
-        // Add this line
+        Engine::StateMachine m_stateMachine;
         bool m_started = false;
     };
 }

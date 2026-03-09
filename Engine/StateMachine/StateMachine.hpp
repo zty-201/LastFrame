@@ -76,7 +76,8 @@ namespace Engine
 
         StateParameters& GetParameters();
         const StateParameters& GetParameters() const;
-
+        
+        bool HasCurrentState() const;
         void Reset();
 
     private:
