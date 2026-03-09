@@ -12,6 +12,7 @@ namespace EngineFramework
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_instanceSSBOs);
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_indirectBuffers);
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_visibleIndicesBuffers);
+            glDeleteBuffers(FRAMES_IN_FLIGHT, m_cullingMatrixUBOs);
         }
     }
 
@@ -24,7 +25,7 @@ namespace EngineFramework
         glGenBuffers(FRAMES_IN_FLIGHT, m_instanceSSBOs);
         glGenBuffers(FRAMES_IN_FLIGHT, m_indirectBuffers);
         glGenBuffers(FRAMES_IN_FLIGHT, m_visibleIndicesBuffers);
-
+        glGenBuffers(FRAMES_IN_FLIGHT, m_cullingMatrixUBOs);
         // Pre-allocate memory for all frames in flight
         for (int i = 0; i < FRAMES_IN_FLIGHT; ++i) {
             // Instance Data
@@ -38,10 +39,15 @@ namespace EngineFramework
             // Visible Indices
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_visibleIndicesBuffers[i]);
             glBufferData(GL_SHADER_STORAGE_BUFFER, MAX_INSTANCES * NUM_PASSES * sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
+
+			// Culling Matrices UBO
+            glBindBuffer(GL_UNIFORM_BUFFER, m_cullingMatrixUBOs[i]);
+            // Pre-allocate the 8.4 KB block
+            glBufferData(GL_UNIFORM_BUFFER, sizeof(CullingMatrixData), nullptr, GL_DYNAMIC_DRAW);
         }
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
         // Reserve memory to prevent CPU reallocations during gathering
         m_globalInstanceData.reserve(m_maxTotalInstances);
         m_indirectCommands.reserve(1000);
@@ -179,7 +185,12 @@ namespace EngineFramework
 
     }
 
-    void InstancingSystem::UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj, const std::vector<glm::mat4>& spotProj) {
+    void InstancingSystem::UpdateAndDispatchCompute(
+        const glm::mat4& mainViewProj,
+        const std::array<glm::mat4, 3>& cascadeProj,
+        const std::vector<glm::mat4>& spotProj,
+        const std::vector<glm::mat4>& pointProj
+    ) {
 
         // --- 1. HANDLE DIRTY BATCHES (From Level Editor UI) ---
         if (m_needsBatchRebuild) {
@@ -257,19 +268,22 @@ namespace EngineFramework
 
         cullingShader->use();
 
-        // For directional light cascade culling
-        cullingShader->setUniform("u_MainViewProj", mainViewProj);
-        for (int i = 0; i < 3; i++) {
-            cullingShader->setUniform("u_CascadeViewProj[" + std::to_string(i) + "]", cascadeProj[i]);
-        }
-
-		// For spotlight culling
-        cullingShader->setUniform("u_NumSpotLights", (int)spotProj.size());
-        for (size_t i = 0; i < spotProj.size(); ++i) {
-            cullingShader->setUniform("u_SpotLightViewProj[" + std::to_string(i) + "]", spotProj[i]);
-        }
-
+        // 1. Set the standard integers
         cullingShader->setUniform("u_TotalInstances", (uint32_t)m_globalInstanceData.size());
+        cullingShader->setUniform("u_NumSpotLights", (int)spotProj.size());
+        cullingShader->setUniform("u_NumPointLightFaces", (int)pointProj.size());
+
+        // 2. Pack all 132 matrices into our strict struct
+        CullingMatrixData matrixData = {}; // Initializes with zeros
+        matrixData.mainViewProj = mainViewProj;
+        for (int i = 0; i < 3; i++) matrixData.cascadeViewProj[i] = cascadeProj[i];
+        for (size_t i = 0; i < spotProj.size(); i++) matrixData.spotLightViewProj[i] = spotProj[i];
+        for (size_t i = 0; i < pointProj.size(); i++) matrixData.pointLightViewProj[i] = pointProj[i];
+
+        // 3. Upload the entire 8.4KB block in a single API call
+        glBindBuffer(GL_UNIFORM_BUFFER, m_cullingMatrixUBOs[ringIdx]);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CullingMatrixData), &matrixData);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_cullingMatrixUBOs[ringIdx]); // Bind to binding = 0
 
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_instanceSSBOs[ringIdx]);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_indirectBuffers[ringIdx]);

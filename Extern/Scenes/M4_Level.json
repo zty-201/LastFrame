@@ -85264,6 +85264,33 @@
 			]
 		}
 	},
+	"817": {
+		"AnimationComponent": {
+			"animationName": "test_animation",
+			"currentClip": 0
+		},
+		"MeshComponent": {
+			"meshName": "PocongTest",
+			"visibility": true
+		},
+		"TransformComponent": {
+			"position": [
+				378.4480285644531,
+				296.7563781738281,
+				-1001.382568359375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
 	"82": {
 		"ColliderComponent": {
 			"maxBounds": [

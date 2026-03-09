@@ -44,11 +44,16 @@ layout(std430, binding = 2) writeonly buffer VisibleIndicesBuffer {
 // UNIFORMS
 // ------------------------------------------------------------------
 
-uniform mat4 u_MainViewProj;
-uniform mat4 u_CascadeViewProj[3];
-uniform mat4 u_SpotLightViewProj[32];
+layout(std140, binding = 0) uniform CullingMatrices {
+    mat4 u_MainViewProj;
+    mat4 u_CascadeViewProj[3];
+    mat4 u_SpotLightViewProj[32];
+    mat4 u_PointLightViewProj[96];
+};
+
 uniform uint u_TotalInstances;
 uniform int u_NumSpotLights;
+uniform int u_NumPointLightFaces;
 
 // Hardcoded based on C++ constants (MAX_BATCHES and MAX_INSTANCES)
 const uint MAX_BATCHES = 1000u;
@@ -168,6 +173,20 @@ void main() {
             uint cmdIndex = (passIdx * MAX_BATCHES) + batchID;
             uint slotIdx = atomicAdd(commands[cmdIndex].instanceCount, 1u);
             
+            uint writeIdx = (passIdx * MAX_INSTANCES) + inst.instanceOffset + slotIdx;
+            visibleIndices[writeIdx] = idx;
+        }
+    }
+
+    // --- PASS 36+: POINT LIGHT FACES ---
+    for (int i = 0; i < u_NumPointLightFaces; i++) {
+        vec4 pointPlanes[6];
+        ExtractPlanes(u_PointLightViewProj[i], pointPlanes);
+        
+        if (IsSphereInFrustum(worldCenter, worldRadius, pointPlanes)) {
+            uint passIdx = 36u + uint(i); // Passes start at 36
+            uint cmdIndex = (passIdx * MAX_BATCHES) + batchID;
+            uint slotIdx = atomicAdd(commands[cmdIndex].instanceCount, 1u);
             uint writeIdx = (passIdx * MAX_INSTANCES) + inst.instanceOffset + slotIdx;
             visibleIndices[writeIdx] = idx;
         }
