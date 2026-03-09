@@ -14,7 +14,9 @@ function on_button_ReturnButton(self)
 
     -- Close any currently open menus
     UI_CloseAllMenus()
-    UI_DisplayMenu_InvisibleLayer("Android_Inventory_Buttons")
+    if PLATFORM == "android" then
+        UI_DisplayMenu_InvisibleLayer("Android_Inventory_Buttons")
+    end
 
     -- Display Main Menu
     -- UI_DisplayMenu("StartMenu")
