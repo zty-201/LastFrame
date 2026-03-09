@@ -1,0 +1,128 @@
+{
+	"592": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				16964946010757644289,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "CloseInventory",
+			"hover_texture": [
+				16964946010757644291,
+				3711223656383638553
+			],
+			"idle_texture": [
+				16388485258454220805,
+				3711223656383638553
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 9182418038774349825
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "android_inventory_open_state"
+		},
+		"UIComponent": {
+			"Overlay_name": "Android_Inventory_Buttons",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				1203.75,
+				731.25
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				267.5,
+				162.5
+			],
+			"size_NDC": [
+				0.10000000149011612,
+				0.10000000149011612
+			],
+			"textureid": [
+				16388485258454220805,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"593": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				16964946010757644289,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "OpenInventory",
+			"hover_texture": [
+				16964946010757644291,
+				3711223656383638553
+			],
+			"idle_texture": [
+				16388485258454220805,
+				3711223656383638553
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 9182418038774349825
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "android_inventory_close_state"
+		},
+		"UIComponent": {
+			"Overlay_name": "Android_Inventory_Buttons",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"luminance": 1.0,
+			"position": [
+				1203.75,
+				731.25
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				267.5,
+				162.5
+			],
+			"size_NDC": [
+				0.10000000149011612,
+				0.10000000149011612
+			],
+			"textureid": [
+				16388485258454220805,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	}
+}

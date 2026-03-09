@@ -3,6 +3,8 @@
 ----------------------------------------------------------------
 local DEBUG = true
 
+local EXPLODE_AUDIO_SLOT = "ChairExplode"
+
 -- Chair piece entity IDs
 local CHAIR_PART_IDS = {
     201, 510, 511, 512, 513, 514, 515,
@@ -53,6 +55,17 @@ function on_create(Self)
         s.done = true
 
         log("Explosion triggered!")
+
+        ------------------------------------------------
+        -- Play explosion audio from this entity
+        ------------------------------------------------
+        if type(Audio_PlaySlot) == "function" then
+            Audio_PlaySlot(EntityID, EXPLODE_AUDIO_SLOT)
+
+            if DEBUG then
+                print("[ChairScatter] Played explode SFX:", EXPLODE_AUDIO_SLOT)
+            end
+        end
 
         ----------------------------------------------------------------
         -- 1. For each piece, pick a target landing spot in the safe zone

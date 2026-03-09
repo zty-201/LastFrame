@@ -68,7 +68,9 @@ namespace EngineFramework
 
     void GraphicsSystem::Initialize()
     {
+#ifdef PLATFORM_WINDOWS
         SetupGLFW();
+#endif
         SetupGraphics();
 
         // Initialize Instancing System

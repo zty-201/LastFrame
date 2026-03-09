@@ -178,6 +178,10 @@ namespace EngineFramework
         }
 #endif
 
+    private:
+        bool LoadKeyMappingFromJson();
+        void PopulateDefaultKeyMappingData();
+
 
     };
 
