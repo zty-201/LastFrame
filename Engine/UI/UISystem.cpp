@@ -27,10 +27,15 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
-#include "System_GameObjectSystem.hpp"
-#endif
 
+#endif
+#include "System_GameObjectSystem.hpp"
 #include "AssetManager.hpp"
+#include "JoystickComponent.h"
+#include "UIComponent.h"
+#include "Input/InputManager.hpp"
+#include "NameComponent.h"
+#include "Script.hpp"
 
 namespace EngineFramework
 {
@@ -194,6 +199,112 @@ namespace EngineFramework
                 if (menu.second)
                 {
                     menu.first->Update(); //only update those active ones
+                    if (name == "AndroidInputOverlay") {
+                        //update joysticks
+                        update_Joysticks();
+                    }
+                }
+            }
+        }
+    }
+
+    void UI_System::update_Joysticks()
+    {
+        auto view = GameObjectSystem::GetRegistry().view<JoystickComponent>();
+
+        std::pair<double, double> mousePos = InputManager::GetInstance().GetMousePosition();
+        bool isTouchDown = InputManager::GetInstance().GetMouseButton(0);
+
+        float screenWidth = (float)InputManager::GetInstance().GetScreenSize().first;
+        float screenHeight = (float)InputManager::GetInstance().GetScreenSize().second;
+
+        for (auto [entity, joystick] : view.each())
+        {
+            for (auto [e, nameComp] : registry.view<NameComponent>().each())
+            {
+                if (nameComp.name == joystick.knobTargetName)
+                {
+                    joystick.knobEntity = e;
+                    break;
+                }
+            }
+
+            if (registry.all_of<UIComponent>(entity))
+            {
+                auto& bgUI = registry.get<UIComponent>(entity);
+                if (bgUI.is_NDC)
+                {
+                    float trueCenterX = bgUI.position_NDC.x + (bgUI.size_NDC.x / 2.f);
+                    float trueCenterY = bgUI.position_NDC.y + (bgUI.size_NDC.y / 2.f);
+
+                    joystick.baseCenter.x = ((trueCenterX + 1.f) / 2.f) * screenWidth;
+                    joystick.baseCenter.y = ((1.f - trueCenterY) / 2.f) * screenHeight;
+                }
+            }
+
+            glm::vec2 currentOffset{ 0.f, 0.f };
+            if (isTouchDown)
+            {
+                //Check if clicked inside joystick area to start dragging
+                if (!joystick.isBeingDragged)
+                {
+                    float dist = glm::distance(glm::vec2(mousePos.first, mousePos.second), joystick.baseCenter);
+                    if (dist <= joystick.maxRadius)
+                    {
+                        joystick.isBeingDragged = true;
+                    }
+                }
+
+                if (joystick.isBeingDragged)
+                {
+                    glm::vec2 touchPos = { (float)mousePos.first, (float)mousePos.second };
+                    currentOffset = touchPos - joystick.baseCenter;
+
+                    //Clamp distance
+                    float dist = glm::length(currentOffset);
+                    if (dist > joystick.maxRadius)
+                    {
+                        currentOffset = (currentOffset / dist) * joystick.maxRadius;
+                    }
+
+                    joystick.outputX = currentOffset.x / joystick.maxRadius;
+                    joystick.outputY = currentOffset.y / joystick.maxRadius;
+                }
+
+                auto& lua = Engine::ScriptSystem::GetLuaState();
+                lua["SHARED"]["UI"]["joystickX"] = joystick.outputX;
+                lua["SHARED"]["UI"]["joystickY"] = joystick.outputY;
+            }
+            else
+            {
+                //Release touch -> snap back to center
+                if (joystick.isBeingDragged)
+                {
+                    joystick.isBeingDragged = false;
+                    joystick.outputX = joystick.outputY = 0.f;
+                }
+                auto& lua = Engine::ScriptSystem::GetLuaState();
+                lua["SHARED"]["UI"]["joystickX"] = 0.0f;
+                lua["SHARED"]["UI"]["joystickY"] = 0.0f;
+            }
+
+            if (registry.valid(joystick.knobEntity) && registry.all_of<UIComponent>(joystick.knobEntity))
+            {
+                auto& knobUI = registry.get<UIComponent>(joystick.knobEntity);
+                glm::vec2 targetPixelPos = joystick.baseCenter + currentOffset;
+
+                if (knobUI.is_NDC)
+                {
+                    float targetNdcX = (targetPixelPos.x / screenWidth) * 2.f - 1.f;
+                    float targetNdcY = 1.f - (targetPixelPos.y / screenHeight) * 2.f;
+
+                    knobUI.position_NDC.x = targetNdcX - (knobUI.size_NDC.x / 2.f);
+                    knobUI.position_NDC.y = targetNdcY - (knobUI.size_NDC.y / 2.f);
+                }
+                else
+                {
+                    knobUI.position.x = targetPixelPos.x - (knobUI.size.x / 2.f);
+                    knobUI.position.y = targetPixelPos.y - (knobUI.size.y / 2.f);
                 }
             }
         }
@@ -296,6 +407,7 @@ namespace EngineFramework
     void UI_System::Load_Start_Menu()
     {
         displayMenu("StartMenu");
+        //displayMenu("AndroidInputOverlay"); //remember to set if end flags for android build.
     }
 
     void UI_System::displayMenu(std::string menuname)
@@ -381,6 +493,14 @@ namespace EngineFramework
         current_menu.clear();
 
         std::cout << "=========================== CLOSEEEEE ALLLLLL MENU () ======================================\n";
+    }
+
+    bool UI_System::IsMenuActive(const std::string& menuname) const
+    {
+        auto it = Menu_Mapping.find(menuname);
+        if (it == Menu_Mapping.end() || !it->second.first)
+            return false;
+        return it->second.second;
     }
 
     // -------------------------------------------------------------------------
