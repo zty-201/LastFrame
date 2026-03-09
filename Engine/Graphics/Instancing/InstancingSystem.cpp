@@ -158,7 +158,7 @@ namespace EngineFramework
                 m_indirectCommands[cmdIndex].instanceCount = 0;
                 m_indirectCommands[cmdIndex].firstIndex = firstIndex;
                 m_indirectCommands[cmdIndex].baseVertex = baseVert;   // Injected into hardware struct!
-                m_indirectCommands[cmdIndex].baseInstance = 0;
+                m_indirectCommands[cmdIndex].baseInstance = (pass * MAX_INSTANCES) + static_cast<GLuint>(batch.instanceOffset);
             }
 
             size_t batchBaseOffset = currentOffset;

@@ -59,6 +59,7 @@ namespace EngineFramework
     GraphicsSystem::~GraphicsSystem()
     {
         m_instancingSystem.reset();
+        m_geometryBuffer.reset();
 #ifdef PLATFORM_WINDOWS
         // Clean up GLFW
         glfwTerminate();
@@ -309,7 +310,7 @@ namespace EngineFramework
 
 		// ---------------------------- Rendering Passes -----------------------------
         m_geometryBuffer->Bind();
-        // 1. Shadow pass (directional + point) (around 4ms)
+        // 1. Shadow pass (directional + point) (around 2ms)
         ShadowPass();
         // 2. Global uniform buffers (camera, light, cascades) 
         UpdateUBOs(*active_camera, V, P);
@@ -524,24 +525,20 @@ namespace EngineFramework
             int passOffset = cascade + 1; // Pass 1, 2, or 3
             int batchIndex = 0;
 
+            // Strict OpenGL ES 3.2 Fallback (Fast Loop)
+            // Zero state changes means this loop is blazing fast on the mobile CPU
             for (const auto& batch : m_instancingSystem->GetBatches()) {
-                auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(
-                    AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
-                if (!meshData || meshData->subMeshes.empty()) meshData = meshCache[batch.key.meshName];
-                if (!meshData || meshData->subMeshes.empty()) { batchIndex++; continue; }
 
-                // Tell Vertex Shader where to read this batch's visible IDs
                 int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
                 shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
 
-                // Calculate the memory jump for the indirect command
                 void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
 
-                // indirect draw call for gpu processing (Now 16-bit!)
                 glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectCmdAddress);
 
                 batchIndex++;
             }
+
         }
 
         glDisable(GL_POLYGON_OFFSET_FILL);
@@ -752,23 +749,16 @@ namespace EngineFramework
 
             shader->setUniform("u_LightMatrix", lightData.view_proj);
 
-            // --- Execute Indirect Batch Draw ---
             int passOffset = 4 + shadowIndex; // Passes 4+ belong to Spotlights
             int batchIndex = 0;
 
             for (const auto& batch : m_instancingSystem->GetBatches()) {
-                auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(
-                    AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
-                if (!meshData || meshData->subMeshes.empty()) meshData = meshCache[batch.key.meshName];
-                if (!meshData || meshData->subMeshes.empty()) { batchIndex++; continue; }
 
-                // Shift offset to the correct pass window
                 int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
                 shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
 
                 void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
 
-                // Now 16-bit!
                 glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectCmdAddress);
 
                 batchIndex++;
@@ -790,9 +780,9 @@ namespace EngineFramework
 
     void GraphicsSystem::ShadowPass()
     {
-        RenderDirectionalShadow();
+        //RenderDirectionalShadow();
         RenderPointLightShadows();
-		RenderSpotLightShadows();
+		//RenderSpotLightShadows();
     }
 
     void GraphicsSystem::UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P)
