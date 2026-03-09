@@ -654,8 +654,9 @@ namespace EngineFramework {
 			LOGI("Compressing Textures");
 
 			//Create directory for compressed types if doesn't exist, does nothing otherwise.
-			std::filesystem::create_directories(compressed_bc_folderpath);
-			std::filesystem::create_directories(compressed_etc2_folderpath);
+			//Asset folder prefix is needed to give the full relative path, since the function may directly read/write to files instead of using AssetManagerSystem functions.
+			std::filesystem::create_directories(asset_folder_prefix / compressed_bc_folderpath);
+			std::filesystem::create_directories(asset_folder_prefix / compressed_etc2_folderpath);
 
 			//==Compress textures and write to directories, if they should be compressed.
 			//Asset folder prefix is needed to give the full relative path, since the function may directly read/write to files instead of using AssetManagerSystem functions.
