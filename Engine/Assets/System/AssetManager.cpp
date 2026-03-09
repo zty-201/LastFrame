@@ -8,6 +8,8 @@
 */
 #include "pch.hpp"
 #include <set>
+#include <thread>
+#include <chrono>
 #include "AssetManager.hpp"
 #include "Audio.hpp"
 #include "Scripting/ScriptAsset.hpp" //For script asset type registration.

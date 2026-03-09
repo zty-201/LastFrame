@@ -15,11 +15,11 @@
 #define VOXEL_GRID_SIZE_Y 90
 #define VOXEL_GRID_SIZE_Z 128
 #define NUM_BLUE_NOISE_TEXTURES 16
-#define SHADOW_WIDTH 4096
-#define SHADOW_HEIGHT 4096
+#define SHADOW_WIDTH 2048
+#define SHADOW_HEIGHT 2048
 #define POINT_SHADOW_SIZE 512
 #define MAX_LIGHTS 128
-#define MAX_SHADOW_CASTING_SPOTLIGHTS 32
+#define MAX_SHADOW_CASTING_SPOTLIGHTS 16
 #define MAX_SHADOW_CASTING_POINT_LIGHTS 16
 
 #ifdef PLATFORM_WINDOWS
@@ -733,7 +733,6 @@ namespace EngineFramework
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_instancingSystem->GetInstanceSSBO()); // Required for ShadowMap.vert instances[]
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_instancingSystem->GetVisibleIndicesBuffer());
-
         for (size_t i = 0; i < m_LightData.size(); i++) {
             const auto& lightData = m_LightData[i];
 
@@ -750,7 +749,6 @@ namespace EngineFramework
             // Bind appropriate texture layer
             glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_spotTextureArray, 0, shadowIndex);
             glClear(GL_DEPTH_BUFFER_BIT);
-
             shader->setUniform("u_LightMatrix", lightData.view_proj);
 
             // --- Execute Indirect Batch Draw ---
@@ -777,7 +775,6 @@ namespace EngineFramework
 
             if (lightComp.isStatic) lightComp._isDirty = false;
         }
-
         glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // unbind indirect buffer
@@ -789,11 +786,12 @@ namespace EngineFramework
 
     }
 
+
     void GraphicsSystem::ShadowPass()
     {
-        RenderDirectionalShadow();
-        RenderPointLightShadows();
-		RenderSpotLightShadows();
+        RenderDirectionalShadow(); //200-300mb
+        RenderPointLightShadows(); //100mb?
+		RenderSpotLightShadows();  //1.8gb??
     }
 
     void GraphicsSystem::UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P)

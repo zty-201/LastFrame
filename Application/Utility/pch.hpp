@@ -58,6 +58,7 @@
 #include <EGL/egl.h>
 //For opengl es 3.2
 #include <GLES3/gl32.h>
+#include <gles3/gl32.h>
 #endif
 
 
