@@ -519,7 +519,9 @@ namespace EngineFramework
         {
             
             closeAllMenu();
-            displayMenu_InvisibleLayer("Android_Inventory_Buttons");           
+#if defined(PLATFORM_ANDROID)
+            displayMenu_InvisibleLayer("Android_Inventory_Buttons"); 
+#endif
         }
     }
 
@@ -553,7 +555,9 @@ namespace EngineFramework
                 // OR trigger scene load / gameplay start etc.
                 // For now: return to StartMenu
                 closeAllMenu();
+#if defined(PLATFORM_ANDROID)
                 displayMenu("Android_Inventory_Buttons");
+#endif
             }
         );
 
