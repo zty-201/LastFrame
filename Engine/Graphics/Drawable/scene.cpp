@@ -138,7 +138,7 @@ namespace
 
 
 
-
+#ifdef PLATFORM_WINDOWS
 	//======================================================================
 	[[nodiscard]] std::optional<std::string> CompressedTextureData::WriteDataToFile(const std::filesystem::path& file_path) const
 	{
@@ -168,6 +168,7 @@ namespace
 
 		return {};
 	}
+#endif
 	[[nodiscard]] std::optional<std::string> CompressedTextureData::ReadDataFromFile(const std::filesystem::path& file_path)
 	{
 		std::vector<unsigned char> file_data;

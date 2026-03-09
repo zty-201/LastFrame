@@ -708,7 +708,8 @@ namespace EngineFramework {
 					if (loaded_resources.back()->id == 0)
 					{
 						//Invalid texture
-						throw std::exception("texture ID 0 returned after creation");
+                        loaded_resources.pop_back();
+						throw std::runtime_error("texture ID 0 returned after creation");
 					}
 					//Done if resource loading is a success.
 					asset_names_set.insert(name); 
@@ -744,7 +745,8 @@ namespace EngineFramework {
 					if (loaded_resources.back()->id == 0)
 					{
 						//Invalid texture
-						throw std::exception("texture ID 0 returned after creation");
+						loaded_resources.pop_back();
+						throw std::runtime_error("texture ID 0 returned after creation");
 					}
 					//Done if resource loading is a success.
 					asset_names_set.insert(name);
