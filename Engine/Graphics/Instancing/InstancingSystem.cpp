@@ -87,7 +87,7 @@ namespace EngineFramework
             // Get Mesh Data
             xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp.meshName);
             auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-            if (!meshData || meshData->vao == 0) continue;
+            if (!meshData || meshData->subMeshes.empty()) continue;
 
             const MaterialComponent* overrideMat = registry.try_get<MaterialComponent>(entity);
 
@@ -148,7 +148,8 @@ namespace EngineFramework
                 AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, key.meshName));
 
             GLuint indexCount = meshData->subMeshes[key.subMeshIndex].indexCount;
-            GLuint firstIndex = meshData->subMeshes[key.subMeshIndex].baseIndex;
+            GLuint firstIndex = meshData->subMeshes[key.subMeshIndex].firstIndex; // Pulls Mega-IBO offset
+            GLuint baseVert = meshData->subMeshes[key.subMeshIndex].baseVertex; // Pulls Mega-VBO offset
 
             // Setup base Indirect Commands
             for (int pass = 0; pass < NUM_PASSES; pass++) {
@@ -156,9 +157,10 @@ namespace EngineFramework
                 m_indirectCommands[cmdIndex].count = indexCount;
                 m_indirectCommands[cmdIndex].instanceCount = 0;
                 m_indirectCommands[cmdIndex].firstIndex = firstIndex;
-                m_indirectCommands[cmdIndex].baseVertex = 0;
+                m_indirectCommands[cmdIndex].baseVertex = baseVert;   // Injected into hardware struct!
                 m_indirectCommands[cmdIndex].baseInstance = 0;
             }
+
             size_t batchBaseOffset = currentOffset;
             for (auto& inst : instances) {
                 inst.data.batchID = batchIndex;
@@ -385,7 +387,7 @@ namespace EngineFramework
 
         xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp->meshName);
         auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-        if (!meshData || meshData->vao == 0) return;
+        if (!meshData || meshData->subMeshes.empty()) return;
 
         const MaterialComponent* overrideMat = registry.try_get<MaterialComponent>(entity);
         auto& meta = registry.get_or_emplace<InstanceMetadata>(entity);

@@ -23,7 +23,7 @@
 #include "ISystem.hpp"
 #include "scene.h"
 #include "InstancingSystem.h"
-
+#include "GeometryDataBuffer.h"
 
 namespace EngineFramework
 {
@@ -55,7 +55,6 @@ namespace EngineFramework
         void PostUpdate(float deltaTime) override;
 
         void RenderScene(); 
-        void LoadAndCacheMesh(const std::string& meshName);
 
         static GraphicsSystem& GetInstance(){ return *this_graphics_ptr; }
 
@@ -140,7 +139,7 @@ namespace EngineFramework
 
 		// Getter for instancing system
 		std::unique_ptr<InstancingSystem>& GetInstancingSystem() { return m_instancingSystem; }
-
+        std::unique_ptr<GeometryDataBuffer>& GetGeometryBuffer() { return m_geometryBuffer; }
 		// Frustum Culling Functions
         bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
         bool IsBoxInFrustum(const float min[3], const float max[3], const glm::mat4& model, const glm::mat4& viewProj);
@@ -195,7 +194,8 @@ namespace EngineFramework
 
 		// Instancing system for batching and culling
         std::unique_ptr<InstancingSystem> m_instancingSystem;
-        
+        std::unique_ptr<GeometryDataBuffer> m_geometryBuffer;
+
 		// Shader GUIDs
         xresource::full_guid mesh_shader_guid;
         xresource::full_guid mesh_instanced_shader_guid;

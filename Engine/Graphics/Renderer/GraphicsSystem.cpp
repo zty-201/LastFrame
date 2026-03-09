@@ -74,6 +74,12 @@ namespace EngineFramework
         m_instancingSystem = std::make_unique<InstancingSystem>();
         m_instancingSystem->Initialize(MAX_INSTANCES);
 
+        m_geometryBuffer = std::make_unique<GeometryDataBuffer>();
+        m_geometryBuffer->Initialize(10000000, 30000000);
+
+        LoadBlueNoiseTextures();
+        PreGeneratePrimitives();
+
         // Listen for events
         event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&GraphicsSystem::HANDLE_EVENT_LevelEditorToggled>(this);
         event_dispatcher.sink<Event_Window_Resized>().connect<&GraphicsSystem::HANDLE_EVENT_WindowResized>(this);
@@ -252,8 +258,7 @@ namespace EngineFramework
         }
         glBindTexture(GL_TEXTURE_3D, 0);
 
-        LoadBlueNoiseTextures();
-        PreGeneratePrimitives();
+        
     }
 
     void GraphicsSystem::Update(float deltaTime)
@@ -296,14 +301,15 @@ namespace EngineFramework
 		// Update cascade splits and matrices
         UpdateCascadeMatrices(*active_camera, V);
 
-        // Update point light SSBO
+        // Update point light SSBO (1ms)
         UpdateLightSSBO();
 
 		// Update the instancing system (modelmatrix update + batch building + compute culling dispatch)
         m_instancingSystem->UpdateAndDispatchCompute(viewProj, m_cascadeViewProjMatrices, m_spotLightViewProjMatrices);
 
 		// ---------------------------- Rendering Passes -----------------------------
-        // 1. Shadow pass (directional + point) (around 1 to 2ms)
+        m_geometryBuffer->Bind();
+        // 1. Shadow pass (directional + point) (around 4ms)
         ShadowPass();
         // 2. Global uniform buffers (camera, light, cascades) 
         UpdateUBOs(*active_camera, V, P);
@@ -311,7 +317,7 @@ namespace EngineFramework
         VolumetricLightInjectionPass();
         // 4. Volumetric ray march
         VolumetricRayMarchPass();
-        // 5. Mesh pass (2-3ms)
+        // 5. Mesh pass (3ms)
         MeshPass();
         // 6. Skybox pass
         SkyboxPass();
@@ -326,7 +332,7 @@ namespace EngineFramework
                               GL_COLOR_BUFFER_BIT, GL_NEAREST);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
-
+        m_geometryBuffer->Unbind();
         m_prev_view_projection = viewProj;
         m_frame_idx++;
     }
@@ -521,10 +527,8 @@ namespace EngineFramework
             for (const auto& batch : m_instancingSystem->GetBatches()) {
                 auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(
                     AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
-                if (!meshData || meshData->vao == 0) meshData = meshCache[batch.key.meshName];
-                if (!meshData || meshData->vao == 0) { batchIndex++; continue; }
-
-                glBindVertexArray(meshData->vao);
+                if (!meshData || meshData->subMeshes.empty()) meshData = meshCache[batch.key.meshName];
+                if (!meshData || meshData->subMeshes.empty()) { batchIndex++; continue; }
 
                 // Tell Vertex Shader where to read this batch's visible IDs
                 int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
@@ -533,8 +537,8 @@ namespace EngineFramework
                 // Calculate the memory jump for the indirect command
                 void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
 
-                // indirect draw call for gpu processing
-                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
+                // indirect draw call for gpu processing (Now 16-bit!)
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectCmdAddress);
 
                 batchIndex++;
             }
@@ -652,14 +656,18 @@ namespace EngineFramework
                 xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(
                     AssetManagerSystem::MESH_GUID, caster.mesh->meshName);
                 auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-                if (!meshData || meshData->vao == 0) meshData = meshCache[caster.mesh->meshName];
-                if (!meshData || meshData->vao == 0) continue;
+                if (!meshData || meshData->subMeshes.empty()) meshData = meshCache[caster.mesh->meshName];
+                if (!meshData || meshData->subMeshes.empty()) continue;
 
                 shader->setUniform("u_Model", caster.transform->modelMatrix);
-                glBindVertexArray(meshData->vao);
                 for (const auto& subMesh : meshData->subMeshes) {
-                    glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT,
-                        (void*)(sizeof(unsigned int) * subMesh.baseIndex));
+                    glDrawElementsBaseVertex(
+                        GL_TRIANGLES,
+                        subMesh.indexCount,
+                        GL_UNSIGNED_SHORT,
+                        (void*)(subMesh.firstIndex * sizeof(Mesh::IndexType)),
+                        subMesh.baseVertex
+                    );
                 }
             }
         }
@@ -751,17 +759,17 @@ namespace EngineFramework
             for (const auto& batch : m_instancingSystem->GetBatches()) {
                 auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(
                     AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
-                if (!meshData || meshData->vao == 0) meshData = meshCache[batch.key.meshName];
-                if (!meshData || meshData->vao == 0) { batchIndex++; continue; }
-
-                glBindVertexArray(meshData->vao);
+                if (!meshData || meshData->subMeshes.empty()) meshData = meshCache[batch.key.meshName];
+                if (!meshData || meshData->subMeshes.empty()) { batchIndex++; continue; }
 
                 // Shift offset to the correct pass window
                 int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
                 shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
 
                 void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
-                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
+
+                // Now 16-bit!
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectCmdAddress);
 
                 batchIndex++;
             }
@@ -1015,10 +1023,8 @@ namespace EngineFramework
 
             for (const auto& batch : m_instancingSystem->GetBatches()) {
                 auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
-                if (!meshData || meshData->vao == 0) meshData = meshCache[batch.key.meshName];
-                if (!meshData || meshData->vao == 0) continue;
-
-                glBindVertexArray(meshData->vao);
+                if (!meshData || meshData->subMeshes.empty()) meshData = meshCache[batch.key.meshName];
+                if (!meshData || meshData->subMeshes.empty()) continue;
 
                 // Set the batch-wide material factors
                 instanced_shader->setUniform("u_AlbedoFactor", batch.material.albedoFactor);
@@ -1059,7 +1065,7 @@ namespace EngineFramework
                 void* indirectCmdAddress = (void*)(((0 * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
 
                 // The single draw call!
-                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectCmdAddress);
 
                 batchIndex++;
             }
@@ -1122,15 +1128,13 @@ namespace EngineFramework
                 auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
 
                 // Fall back to cached mesh if not a resource mesh
-                if (!meshData || meshData->vao == 0) {
+                if (!meshData || meshData->subMeshes.empty()) {
                     meshData = meshCache[meshComp.meshName];
                 }
 
-                if (!meshData || meshData->vao == 0) continue;
+                if (!meshData || meshData->subMeshes.empty()) continue;
 
                 standard_shader->setUniform("u_Model", transformComp.modelMatrix);
-
-                glBindVertexArray(meshData->vao);
 
                 const MaterialComponent* override_material = registry.try_get<MaterialComponent>(entity);
 
@@ -1203,9 +1207,13 @@ namespace EngineFramework
                         logged_first = true;
                     }
 
-                    glDrawElements(GL_TRIANGLES, subMesh.indexCount,
-                        GL_UNSIGNED_INT,
-                        (void*)(sizeof(unsigned int) * subMesh.baseIndex));
+                    glDrawElementsBaseVertex(
+                        GL_TRIANGLES,
+                        subMesh.indexCount,
+                        GL_UNSIGNED_SHORT,
+                        (void*)(subMesh.firstIndex * sizeof(Mesh::IndexType)),
+                        subMesh.baseVertex
+                    );
                 }
             }
 
@@ -1236,17 +1244,30 @@ namespace EngineFramework
 
         auto skybox_view = registry.view<MeshComponent, SkyboxRenderPass>();
         for (auto [entity, meshComp] : skybox_view.each()) {
-            if (meshCache.find(meshComp.meshName) == meshCache.end())
-                LoadAndCacheMesh(meshComp.meshName);
 
-            auto& meshData = meshCache[meshComp.meshName];
-            if (!meshData || meshData->vao == 0) continue;
+            // 1. Try to get it from Asset Manager (if it's a custom skybox model)
+            /*xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp.meshName);
+            auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);*/
 
-            glBindVertexArray(meshData->vao);
+            // for skybox, we always use pregenerated cube
+            auto meshData = meshCache[meshComp.meshName];
+
+            // 2. Fallback to primitive cache (for the default "SkyBox" generated at startup)
+            /*if (!meshData || meshData->subMeshes.empty()) {
+                meshData = meshCache[meshComp.meshName];
+            }*/
+
+            if (!meshData || meshData->subMeshes.empty()) continue;
 
             if (!meshData->subMeshes.empty()) {
-                glDrawElements(GL_TRIANGLES, meshData->subMeshes[0].indexCount,
-                               GL_UNSIGNED_INT, 0);
+                glDrawElementsBaseVertex(
+                    GL_TRIANGLES,
+                    meshData->subMeshes[0].indexCount,
+                    GL_UNSIGNED_SHORT, // Now 16-bit!
+                    (void*)(meshData->subMeshes[0].firstIndex * sizeof(Mesh::IndexType)),
+                    meshData->subMeshes[0].baseVertex
+                );
+
             }
             else {
                 LOGE("Skybox mesh '%s' has no submeshes!", meshComp.meshName.c_str());
@@ -1286,7 +1307,6 @@ namespace EngineFramework
 
         // 4. Get the Quad Mesh (We reuse the existing 3D quad)
         auto meshData = meshCache["Quad"];
-        glBindVertexArray(meshData->vao);
 
         // 5. Iterate all UI Elements
         // We sort them by 'layer' so background panels draw before text/icons
@@ -1388,7 +1408,13 @@ namespace EngineFramework
             shader->setUniform("s_Texture", 0);
 
             // --- DRAW ---
-            glDrawElements(GL_TRIANGLES, meshData->subMeshes[0].indexCount, GL_UNSIGNED_INT, 0);
+            glDrawElementsBaseVertex(
+                GL_TRIANGLES,
+                meshData->subMeshes[0].indexCount,
+                GL_UNSIGNED_SHORT,
+                (void*)(meshData->subMeshes[0].firstIndex * sizeof(Mesh::IndexType)),
+                meshData->subMeshes[0].baseVertex
+            );
                 
         }
 
@@ -1403,34 +1429,6 @@ namespace EngineFramework
         glDisable(GL_BLEND); // (Or keep enabled if your 3D engine uses it)
     }
 
-    void GraphicsSystem::LoadAndCacheMesh(const std::string& meshName)
-    {
-        // Primitive meshes should be generated by PreGeneratePrimitives, not loaded from file
-        if (meshName == "Quad" || meshName == "Plane" ||
-            meshName == "Cube" || meshName == "Sphere" ||
-            meshName == "SkyBox")
-        {
-            // Primitive meshes should be generated by PreGeneratePrimitives, not loaded from fileZZZ
-            LOGE("Attempted to load primitive '%s' via file loader. Primitives should be pre-generated.", meshName.c_str());
-            return;
-        }
-
-        try {
-            LOGI("Loading mesh from file: %s", meshName.c_str());
-
-            auto meshData = std::make_shared<Mesh::MeshData>(meshName);
-
-            if (!meshData || meshData->vao == 0) {
-                LOGE("Mesh '%s' loaded but VAO is 0!", meshName.c_str());
-            }
-
-            meshCache[meshName] = meshData;
-        }
-        catch (const std::exception& e) {
-            LOGE("Failed to load mesh: %s. Error: %s", meshName.c_str(), e.what());
-            meshCache[meshName] = nullptr;
-        }
-    }
 
     void GraphicsSystem::LoadBlueNoiseTextures()
     {
@@ -1465,10 +1463,25 @@ namespace EngineFramework
     void GraphicsSystem::PreGeneratePrimitives()
     {
         LOGI("Pre-generating primitive meshes...");
-        meshCache["Cube"] = Mesh::generateCube();
-        meshCache["Sphere"] = Mesh::generateSphere();
-        meshCache["Quad"] = Mesh::generateQuad();
-        meshCache["SkyBox"] = Mesh::generateSkyBox();
+
+        auto uploadPrimitive = [&](std::shared_ptr<Mesh::MeshData> meshData) {
+            auto [megaBaseVert, megaFirstIdx] = m_geometryBuffer->AppendMesh(meshData->vertices, meshData->indices);
+
+            for (auto& subMesh : meshData->subMeshes) {
+                subMesh.baseVertex += megaBaseVert;
+                subMesh.firstIndex += megaFirstIdx;
+            }
+
+            meshData->vertices.clear();
+            meshData->indices.clear();
+            return meshData;
+            };
+
+        meshCache["Cube"] = uploadPrimitive(Mesh::generateCube());
+        meshCache["Sphere"] = uploadPrimitive(Mesh::generateSphere());
+        meshCache["Quad"] = uploadPrimitive(Mesh::generateQuad());
+        meshCache["SkyBox"] = uploadPrimitive(Mesh::generateSkyBox());
+
         LOGI("Primitive meshes cached.");
     }
 
