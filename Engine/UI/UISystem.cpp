@@ -518,8 +518,11 @@ namespace EngineFramework
         gCutscene.Stop();
         if (closeAll)
         {
+
             
             closeAllMenu();
+            displayMenu("Android_Inventory_Buttons");
+
 #if defined(PLATFORM_ANDROID)
             displayMenu_InvisibleLayer("Android_Inventory_Buttons"); 
 #endif
