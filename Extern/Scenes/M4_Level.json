@@ -49569,6 +49569,28 @@
 		}
 	},
 	"483": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						5864127129932644357,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Candles",
+					"loop": false,
+					"maxDistance": 250.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.003000020980835
+				}
+			]
+		},
 		"LightComponent": {
 			"castShadows": true,
 			"color": [
@@ -49591,23 +49613,45 @@
 		},
 		"TransformComponent": {
 			"position": [
-				646.4500122070313,
+				647.1500244140625,
 				145.60000610351563,
-				170.3000030517578
+				171.47743225097656
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
 	"484": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						5864127129932644357,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Candles",
+					"loop": false,
+					"maxDistance": 250.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
 		"LightComponent": {
 			"castShadows": true,
 			"color": [
@@ -49647,6 +49691,28 @@
 		}
 	},
 	"485": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						5864127129932644357,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Candles",
+					"loop": false,
+					"maxDistance": 250.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
 		"LightComponent": {
 			"castShadows": true,
 			"color": [
@@ -49765,7 +49831,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 166.06117248535156,
+			"intensity": 164.4110870361328,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -49923,7 +49989,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 297.032958984375,
+			"intensity": 265.859130859375,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50105,7 +50171,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 362.67559814453125,
+			"intensity": 366.5005187988281,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50197,7 +50263,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 303.68707275390625,
+			"intensity": 264.48126220703125,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50289,7 +50355,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 257.5923767089844,
+			"intensity": 194.3414764404297,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50381,7 +50447,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 294.14849853515625,
+			"intensity": 304.2184753417969,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -59877,7 +59943,7 @@
 			],
 			"rotation": [
 				0.0,
-				26.309040069580078,
+				39.1267204284668,
 				0.0
 			],
 			"scale": [
@@ -60012,7 +60078,7 @@
 			],
 			"rotation": [
 				0.0,
-				26.309040069580078,
+				39.1267204284668,
 				0.0
 			],
 			"scale": [
@@ -87033,7 +87099,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 26038.4375,
+			"intensity": 50000.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,

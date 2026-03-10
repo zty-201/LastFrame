@@ -15,16 +15,20 @@ local TOOLBOX_LOCKED_ID = 479   -- closed toolbox (hide on success)
 local TOOLBOX_OPEN_ID   = 480   -- open toolbox   (show on success)
 local BOLT_CUTTER_ID    = 481   -- bolt cutter    (move into toolbox position on success)
 
+-- Light entities dimmed on each fail (fail 1 -> 485, fail 2 -> 484, fail 3 -> 483)
+local FAIL_LIGHTS = { 485, 484, 483 }
+
 -- Position of the closed toolbox — bolt cutter moves here on success
 local TOOLBOX_POS_X = 642.8716430664063
 local TOOLBOX_POS_Y = 68.80591583251953
 local TOOLBOX_POS_Z = 235.96548461914063
 
-local pressed       = {}   -- set of currently pressed digit indices
-local pressed_count = 0
-local was_open      = false
-local do_close      = false   -- deferred: close on next on_update
-local do_success    = false   -- deferred: success on next on_update
+local pressed            = {}   -- set of currently pressed digit indices
+local pressed_count      = 0
+local was_open           = false
+local do_close           = false   -- deferred: close on next on_update
+local do_success         = false   -- deferred: success on next on_update
+local pending_fail_light = nil     -- light entity whose blowout SFX fires on next on_update
 
 -- -----------------------------------------------
 -- Helpers
@@ -36,6 +40,12 @@ end
 
 local function is_open()
     return SHARED and SHARED[UI_TABLE] == true
+end
+
+local function play_sfx(entityId, slotId)
+    if type(Audio_PlaySlot) == "function" and slotId ~= nil then
+        Audio_PlaySlot(entityId, slotId)
+    end
 end
 
 local function handle_digit(digit)
@@ -66,6 +76,15 @@ local function handle_digit(digit)
         else
             -- Wrong combo -> failure
             SHARED.LOCK_FAIL_COUNT = (SHARED.LOCK_FAIL_COUNT or 0) + 1
+
+            -- Dim the light and queue blowout SFX for next on_update
+            local lightId = FAIL_LIGHTS[SHARED.LOCK_FAIL_COUNT]
+            if lightId then
+                local light = Query.GetLight(lightId)
+                if light then light:SetIntensity(0) end
+                pending_fail_light = lightId
+            end
+
             if SHARED.LOCK_FAIL_COUNT >= MAX_FAILS then
                 SHARED.LOCK_DISABLED = true
             end
@@ -119,6 +138,10 @@ function on_update(self, dt)
         SHARED[UI_TABLE] = false
         reset_pressed()
         UI_CloseAllMenus()
+        if pending_fail_light then
+            play_sfx(pending_fail_light, "Candles")
+            pending_fail_light = nil
+        end
         print("[LockManager] Wrong combo. Fails: " .. tostring(SHARED.LOCK_FAIL_COUNT))
     end
 end
