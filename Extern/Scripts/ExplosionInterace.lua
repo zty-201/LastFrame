@@ -5,12 +5,10 @@
 --
 -- Shows/hides interface based on:
 --   SHARED.EXPLOSION_TOY_UI_OPEN[378]
--- Also enforces:
---   entity 378 scale != (0,0,0)
 --
 -- Captures UI input ONLY on transitions:
 --   when open  -> cursor visible + unlocked
---   when closed -> cursor hidden + locked
+--   when closed -> cursor visible + unlocked (game uses hold-to-look, cursor always visible)
 -- IMPORTANT: does NOT force cursor state on_create (prevents cursor disappearing at game start)
 ----------------------------------------------------------------
 
@@ -26,23 +24,19 @@ local UI = nil
 -- nil = uninitialized (prevents forcing cursor lock at startup)
 local uiWasOpen = nil
 
-local function scale_ok()
-    local tr = Query.GetTransform(TOY_ID)
-    if tr == nil then return false end
-    local sx, sy, sz = tr:GetScale()
-    return not (sx == 0 and sy == 0 and sz == 0)
-end
-
 local function want_open()
     return SHARED and SHARED[UI_TABLE] and SHARED[UI_TABLE][TOY_ID] == true
 end
 
 local function set_ui_input(open)
+    -- Cursor is always visible + unlocked in this game (camera uses hold-to-look via RMB).
+    -- player_pov_camera only changes cursor on RMB state transitions, so it won't
+    -- restore cursor after a close. We must always restore to visible+unlocked here.
     if Input ~= nil and Input.SetCursorVisible ~= nil then
-        Input.SetCursorVisible(open)
+        Input.SetCursorVisible(true)
     end
     if Input ~= nil and Input.SetCursorLocked ~= nil then
-        Input.SetCursorLocked(not open) -- unlock when UI open
+        Input.SetCursorLocked(false)
     end
 end
 
@@ -71,7 +65,7 @@ end
 function on_update(self, dt)
     if not UI then return end
 
-    local open = want_open() and scale_ok()
+    local open = want_open()
     UI:SetVisible(open)
 
     -- First update: initialize state WITHOUT forcing cursor changes

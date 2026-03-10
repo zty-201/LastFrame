@@ -552,7 +552,7 @@
 			"name": "Bedroom"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				39,
 				163,
@@ -609,7 +609,7 @@
 			"name": "Storeroom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				408,
 				409,
@@ -846,7 +846,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				5,
 				2,

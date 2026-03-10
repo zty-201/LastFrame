@@ -1,7 +1,7 @@
 {
 	"622": {
 		"LuaScriptComponent": {
-			"Enabled": false,
+			"Enabled": true,
 			"Scripts": [
 				{
 					"Loaded": true,
