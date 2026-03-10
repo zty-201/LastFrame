@@ -401,12 +401,6 @@ namespace
 		return {}; //No Error.
 	}
 
-	void flipTextureVertical(CMP_MipSet& mipset) {
-		UNREFERENCED_PARAMETER(mipset);
-		//use dwLinearSize / dwHeight for row size for each mipmap level separately.
-
-	}
-
 	/*
 		Returns compressed data of the texture data passed in.
 		\param texture_data
@@ -488,10 +482,6 @@ namespace
 			dst_texture.nBlockWidth = astc_block_size;
 			dst_texture.nBlockDepth = 1;
 			dst_texture.nBlockHeight = astc_block_size;
-		}
-		if (CMP_IsCompressedFormat(CMP_FORMAT_ASTC))
-		{
-			LOGD("yes");
 		}
 		dst_texture.dwDataSize = CMP_CalculateBufferSize(&dst_texture);
 		std::vector<std::byte> output_data(dst_texture.dwDataSize);

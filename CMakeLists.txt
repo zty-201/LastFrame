@@ -380,42 +380,32 @@ endif()
 #Copying of dlls
 #Copies fmod dll to executable path
 if(WIN32)
-  add_custom_command(
-	TARGET application_executable
-	PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			${IMGUI_DEFAULT_LAYOUT_BIN}
-			$<TARGET_FILE_DIR:application_executable>/imgui.ini
-	COMMENT "Copying default ImGui layout to executable directory"
-  )
-
-  add_custom_command(
-	TARGET application_executable
-	POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy
-			$<TARGET_FILE:fmod>
-			$<TARGET_FILE_DIR:application_executable>
-	COMMENT "Copying fmod dll to executable directory"
-  )
-
-  #For Tester, use the same things as Application
-  add_custom_command(
-	TARGET tester_executable
-	PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			${IMGUI_DEFAULT_LAYOUT_BIN}
-			$<TARGET_FILE_DIR:tester_executable>/imgui.ini
-	COMMENT "Copying default ImGui layout to executable directory"
-  )
-
-  add_custom_command(
-	TARGET tester_executable
-	POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy
-			$<TARGET_FILE:fmod>
-			$<TARGET_FILE_DIR:tester_executable>
-	COMMENT "Copying fmod dll to executable directory"
-  )
+  foreach(EXEC_TARGET application_executable tester_executable)
+    add_custom_command(
+      TARGET ${EXEC_TARGET}
+      PRE_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              ${IMGUI_DEFAULT_LAYOUT_BIN}
+              $<TARGET_FILE_DIR:${EXEC_TARGET}>/imgui.ini
+      COMMENT "Copying default ImGui layout to executable directory"
+    )
+    add_custom_command(
+      TARGET ${EXEC_TARGET}
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy
+              $<TARGET_FILE:fmod>
+              $<TARGET_FILE_DIR:${EXEC_TARGET}>
+      COMMENT "Copying fmod dll to executable directory"
+    )
+    add_custom_command(
+      TARGET ${EXEC_TARGET}
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              $<TARGET_FILE:compressonator>
+              $<TARGET_FILE_DIR:${EXEC_TARGET}>
+      COMMENT "Copying Compressonator dll to executable directory"
+    )
+  endforeach()
 endif()
 
  

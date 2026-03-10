@@ -11,12 +11,18 @@ Textures mentioned in do_not_compress.meta will not be compressed.
 - Textures mentioned in this folder is typically due to being 1-2 channel textures which fail to compress into ETC2 on mobile (no valid compression format yet).
 
 It is safe to delete Texture/compressed_* folders as long as do_not_compress.meta file is also deleted to ensure full regeneration of compressed textures.
-Delete both folders + meta if the textures are corrupted, e.g. if the game is closed while compressing new textures.
+Delete both folders + meta if the textures are corrupted (or just meta + the last few textures compressed), e.g. if the game is closed while compressing new textures.
+
+Do note that texture compression to ASTC can take very long. 
 
 ## Compressed
 Compressed textures are split into two parts
 - BCx: For Windows platform
-- ETC2: For Android platform.
+- ASTC: For Android platform.
+
+CompressAndWrite==
+Quality can be specified on the scale of 0 to 1 in , where time to compress grows exponentially(?).
+For ASTC, block sizes come in 4x4, 5x5, ..., 12x12. The larger the block size the smaller the compressed texture but the higher the quality loss.
 
 Only one type is loaded, although both are generated on first load.
 
