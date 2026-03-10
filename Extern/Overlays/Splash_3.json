@@ -16,19 +16,54 @@
 			"luminance": 1.0,
 			"position": [
 				0.0,
-				247.75
+				0.0
 			],
 			"position_NDC": [
 				0.0,
 				0.0
 			],
 			"size": [
-				1920.0,
-				495.5
+				755.0,
+				490.0
 			],
 			"size_NDC": [
 				1.0,
-				0.5
+				1.0
+			],
+			"textureid": [
+				10554036806325616643,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"844": {
+		"UIComponent": {
+			"Overlay_name": "Splash_3",
+			"color": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				755.0,
+				490.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
 			],
 			"textureid": [
 				0,
