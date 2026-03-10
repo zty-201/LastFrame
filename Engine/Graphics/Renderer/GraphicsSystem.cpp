@@ -142,7 +142,7 @@ namespace EngineFramework
             throw std::runtime_error("Failed to initialize GLAD");
         }
 
-        m_androidPlatform = true;
+        m_androidPlatform = false;
 
         InputManager::RegisterCallbacks(pWindow);
 #endif
@@ -354,9 +354,9 @@ namespace EngineFramework
         // 2. Global uniform buffers (camera, light, cascades) 
         UpdateUBOs(*active_camera, V, P);
         // 3. Volumetric light injection
-        //VolumetricLightInjectionPass();
+        VolumetricLightInjectionPass();
         //// 4. Volumetric ray march
-        //VolumetricRayMarchPass();
+        VolumetricRayMarchPass();
         // 5. Mesh pass (3ms)
         MeshPass();
         // 6. Skybox pass

@@ -93,31 +93,18 @@ uniform samplerCubeArrayShadow s_PointShadowArray;
 
 vec3 apply_analytical_fog(vec3 color, vec3 world_pos, vec3 camera_pos) 
 {
-    // 1. Calculate distance from camera to pixel
-    float dist = length(camera_pos - world_pos);
+    float density = aniso_density_scattering_absorption.y / 1000.0f; // adjust to match pc
 
-    // Extract your existing density variable from the UBO
-    float density = aniso_density_scattering_absorption.y; 
+    float dist = length(world_pos - camera_pos);
+    vec3  rayDir = (world_pos - camera_pos) / dist;
 
-    // 2. Base Exponential Distance Fog
-    // pow(..., 2.0) gives it a softer, more realistic falloff than a linear exp()
-    float distanceFogVisibility = exp(-pow(dist * density, 2.0));
+    // Pure exponential distance fog — density slider has direct linear control
+    float fogAmount  = density * dist;
+    float visibility = clamp(exp(-fogAmount), 0.0, 1.0);
 
-    // 3. Height Falloff (Makes fog settle in valleys/ground)
-    float fogBaseHeight = 0.0;    // Y-level where fog is thickest
-    float heightFalloff = 0.15;   // How fast fog thins out as you go up
-    float heightVisibility = exp(-heightFalloff * (world_pos.y - fogBaseHeight));
+    vec3  fogColor  = vec3(0.5, 0.7, 1.0) * light_color.w;
 
-    // 4. Combine and Clamp (0.0 = completely hidden by fog, 1.0 = fully visible)
-    float finalVisibility = clamp(distanceFogVisibility * heightVisibility, 0.0, 1.0);
-
-    // 5. Calculate Fog Color
-    // We reuse your ambient sky color so the fog blends seamlessly with the horizon
-    vec3 skyColor = vec3(0.5, 0.7, 1.0); 
-    vec3 fogColor = skyColor * light_color.w; // Tinted by your ambient intensity
-
-    // Mix the original lit pixel color with the fog color based on visibility
-    return mix(fogColor, color, finalVisibility);
+    return mix(fogColor, color, visibility);
 }
 
 // ------------------------------------------------------------------
