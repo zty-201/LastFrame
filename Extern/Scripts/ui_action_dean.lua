@@ -33,14 +33,9 @@ local function ensureUIShared()
 end
 
 function on_button_InteractAction(self)
+    SHARED.UI_FLASHLIGHT = SHARED.UI_FLASHLIGHT or true
 
-    local Shared = getShared()
-    local platform = (Shared and Shared.PLATFORM) or PLATFORM
-    local uiShared = ensureUIShared()
-    if Shared then
-        uiShared.actionRequested = true
-    end
-
+    SHARED.UI_FLASHLIGHT = true
     debug_print("on_button_InteractAction")
 end
 
@@ -60,7 +55,10 @@ function on_create(self)
         --return
     end
 
-    
+    --SHARED.UI_INVENTORY_OPEN = SHARED.UI_INVENTORY_OPEN or false
+
+    SHARED.UI_FLASHLIGHT = false
+
     if not UI_is_MenuOpen("Android_Inventory_Buttons") then
         UI:SetVisible(false)
     else
@@ -74,6 +72,7 @@ function on_update(self, dt)
     
     -- Windows: nothing (UI hidden, flashlight probably on a key)
     if platform == "windows" then
+        --SetVisible(false)
         --return
     end
 

@@ -107,6 +107,14 @@ function on_update(self, dt)
             uiShared.actionRequested = true
         end
 
+        local A_input = SHARED.UI_FLASHLIGHT
+
+        if A_input then
+            print("[ui_action] E pressed (action) YYYYYYOOOOOO")
+            uiShared.actionRequested = true
+            SHARED.UI_FLASHLIGHT = false
+        end
+
         prevEDown = isEDown
         return
     end
