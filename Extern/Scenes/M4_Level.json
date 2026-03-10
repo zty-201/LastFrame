@@ -12767,9 +12767,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-81.41554260253906,
+				486.7745666503906,
 				190.6817626953125,
-				309.34393310546875
+				-439.333740234375
 			],
 			"rotation": [
 				-0.0,
@@ -15216,7 +15216,7 @@
 					"fadeDuration": 1.0,
 					"id": "KeyPickup",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 100.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
@@ -15745,13 +15745,13 @@
 					"fadeDuration": 1.0,
 					"id": "HorseRock",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 200.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 0.34700000286102295
 				}
 			]
 		},
@@ -16027,13 +16027,13 @@
 					"fadeDuration": 1.0,
 					"id": "TTLS_Start",
 					"loop": false,
-					"maxDistance": 10.0,
+					"maxDistance": 300.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 2.0199999809265137
+					"volume": 0.33399999141693115
 				},
 				{
 					"ambienceType": 0,
@@ -16045,13 +16045,13 @@
 					"fadeDuration": 1.0,
 					"id": "DiscInsert",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 100.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 2.0209999084472656
+					"volume": 0.32100000977516174
 				},
 				{
 					"ambienceType": 0,
@@ -16063,13 +16063,13 @@
 					"fadeDuration": 1.0,
 					"id": "TTLS_End",
 					"loop": false,
-					"maxDistance": 10.0,
+					"maxDistance": 250.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 0.12800000607967377
 				},
 				{
 					"ambienceType": 0,
@@ -21235,24 +21235,6 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						17288307986077253649,
-						11537445004664754516
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"id": "OpenDoor",
-					"loop": false,
-					"maxDistance": 500.0,
-					"minDistance": 300.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"useFade": false,
-					"volume": 1.0
-				},
-				{
-					"ambienceType": 0,
-					"audio_guid": [
 						11523700463043018791,
 						11537445004664754516
 					],
@@ -21260,13 +21242,13 @@
 					"fadeDuration": 1.0,
 					"id": "OpenMaindoor",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 150.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.003000020980835
+					"volume": 0.25699999928474426
 				},
 				{
 					"ambienceType": 0,
@@ -21278,13 +21260,13 @@
 					"fadeDuration": 1.0,
 					"id": "CloseMaindoor",
 					"loop": false,
-					"maxDistance": 500.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 5.0
+					"volume": 0.18000000715255737
 				},
 				{
 					"ambienceType": 0,
@@ -31116,7 +31098,7 @@
 					"fadeDuration": 1.0,
 					"id": "DoorLocked",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 100.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
@@ -31134,7 +31116,7 @@
 					"fadeDuration": 1.0,
 					"id": "DoorUnlock",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 100.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
@@ -31152,7 +31134,7 @@
 					"fadeDuration": 1.0,
 					"id": "DoorOpen",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 100.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
@@ -38279,9 +38261,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-81.41554260253906,
+				486.7745666503906,
 				191.4817657470703,
-				324.34393310546875
+				-424.333740234375
 			],
 			"rotation": [
 				0.0,
@@ -39915,13 +39897,13 @@
 					"fadeDuration": 1.0,
 					"id": "OpenDoor",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 100.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 1.0410000085830688
 				},
 				{
 					"ambienceType": 0,
@@ -39933,13 +39915,13 @@
 					"fadeDuration": 1.0,
 					"id": "CloseDoor",
 					"loop": false,
-					"maxDistance": 50.0,
+					"maxDistance": 500.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.031999945640564
+					"volume": 0.19200000166893005
 				},
 				{
 					"ambienceType": 0,
@@ -39951,13 +39933,13 @@
 					"fadeDuration": 1.0,
 					"id": "DoorLocked",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 100.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 0.9900000095367432
 				}
 			]
 		},
@@ -49651,13 +49633,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightOn",
 					"loop": false,
-					"maxDistance": 120.0,
+					"maxDistance": 300.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 5.0
+					"volume": 0.39899998903274536
 				}
 			]
 		},
@@ -49718,7 +49700,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 95.10829162597656,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -49769,13 +49751,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightOn",
 					"loop": false,
-					"maxDistance": 120.0,
+					"maxDistance": 150.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 5.0
+					"volume": 0.28200000524520874
 				}
 			]
 		},
@@ -49839,13 +49821,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightBlowOut",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 5.0
+					"volume": 3.86899995803833
 				},
 				{
 					"ambienceType": 0,
@@ -49857,13 +49839,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightOn",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 0.48500001430511475
+					"volume": 0.15399999916553497
 				}
 			]
 		},
@@ -49876,7 +49858,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 140.9484405517578,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50021,13 +50003,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightBlowOut",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 5.0
+					"volume": 3.8559999465942383
 				},
 				{
 					"ambienceType": 0,
@@ -50039,13 +50021,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightOn",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 0.5049999952316284
+					"volume": 0.1289999932050705
 				}
 			]
 		},
@@ -50058,7 +50040,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 39.45546340942383,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50113,13 +50095,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightBlowOut",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 5.0
+					"volume": 3.8429999351501465
 				},
 				{
 					"ambienceType": 0,
@@ -50131,13 +50113,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightOn",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 0.4950000047683716
+					"volume": 0.15399999916553497
 				}
 			]
 		},
@@ -50150,7 +50132,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 92.15428924560547,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50205,13 +50187,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightBlowOut",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 5.0
+					"volume": 3.86899995803833
 				},
 				{
 					"ambienceType": 0,
@@ -50223,13 +50205,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightOn",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 0.4950000047683716
+					"volume": 0.12800000607967377
 				}
 			]
 		},
@@ -50242,7 +50224,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 54.51904296875,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50297,13 +50279,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightBlowOut",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 5.0
+					"volume": 3.8429999351501465
 				},
 				{
 					"ambienceType": 0,
@@ -50315,13 +50297,13 @@
 					"fadeDuration": 1.0,
 					"id": "LightOn",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 0.4950000047683716
+					"volume": 0.1420000046491623
 				}
 			]
 		},
@@ -50334,7 +50316,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 125.8345947265625,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50870,13 +50852,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-81.41554260253906,
+				20.16220474243164,
 				190.6817626953125,
-				-820.5714111328125
+				-842.0235595703125
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
@@ -51362,13 +51344,13 @@
 					"fadeDuration": 1.0,
 					"id": "DiscPickup",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 100.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 0.29600000381469727
 				}
 			]
 		},
@@ -51507,24 +51489,6 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						17288307986077253649,
-						11537445004664754516
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"id": "OpenDoor",
-					"loop": false,
-					"maxDistance": 25.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"useFade": false,
-					"volume": 1.0
-				},
-				{
-					"ambienceType": 0,
-					"audio_guid": [
 						11523700463043018775,
 						11537445004664754516
 					],
@@ -51532,13 +51496,13 @@
 					"fadeDuration": 1.0,
 					"id": "OpenMaindoor",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 100.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 5.0
+					"volume": 1.1180000305175781
 				},
 				{
 					"ambienceType": 0,
@@ -51550,13 +51514,13 @@
 					"fadeDuration": 1.0,
 					"id": "CloseMaindoor",
 					"loop": false,
-					"maxDistance": 300.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.003000020980835
+					"volume": 0.43700000643730164
 				}
 			]
 		},
@@ -52997,13 +52961,31 @@
 					"fadeDuration": 1.0,
 					"id": "ChairExplode",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 1000.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
 					"volume": 4.0370001792907715
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						13629370604515147787,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Scary",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 0.25699999928474426
 				}
 			]
 		},
@@ -59822,7 +59804,7 @@
 			],
 			"rotation": [
 				0.0,
-				44.0737190246582,
+				154.31069946289063,
 				0.0
 			],
 			"scale": [
@@ -59957,7 +59939,7 @@
 			],
 			"rotation": [
 				0.0,
-				44.0737190246582,
+				154.31069946289063,
 				0.0
 			],
 			"scale": [
@@ -61895,7 +61877,7 @@
 				0.0
 			],
 			"size": [
-				1320.0,
+				1395.0,
 				833.0
 			],
 			"size_NDC": [
@@ -85595,13 +85577,13 @@
 					"fadeDuration": 1.0,
 					"id": "Running",
 					"loop": false,
-					"maxDistance": 50.0,
+					"maxDistance": 300.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 5.0
+					"volume": 0.39800000190734863
 				}
 			]
 		},
@@ -85689,7 +85671,7 @@
 			"position": [
 				26.635326385498047,
 				9.417980194091797,
-				-523.1233520507813
+				-665.7462158203125
 			],
 			"rotation": [
 				0.0,
@@ -86824,13 +86806,13 @@
 					"fadeDuration": 1.0,
 					"id": "Thunder",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 500.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 2.4769999980926514
+					"volume": 1.2339999675750732
 				},
 				{
 					"ambienceType": 0,
@@ -86848,7 +86830,7 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 0.2150000035762787
+					"volume": 0.2800000011920929
 				},
 				{
 					"ambienceType": 0,
@@ -86860,13 +86842,13 @@
 					"fadeDuration": 1.0,
 					"id": "GirlLaughing",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 500.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 0.09000000357627869
 				}
 			]
 		},
@@ -86978,7 +86960,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 50000.0,
+			"intensity": 40348.875,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,

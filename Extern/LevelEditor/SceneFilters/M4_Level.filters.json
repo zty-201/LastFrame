@@ -192,7 +192,7 @@
 			"name": "Hall"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				32,
 				33,
@@ -805,7 +805,7 @@
 			"name": "SF_Corridor"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				724,
 				725,
@@ -901,7 +901,7 @@
 			"name": "UI"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				825,
 				826,

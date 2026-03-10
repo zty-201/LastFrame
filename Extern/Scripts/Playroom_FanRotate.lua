@@ -13,7 +13,7 @@ local STATE_CP2  = 2
 local STATE_CP3  = 3
 
 -- Degrees per second
-local SPIN_SPEED_DPS = 90.0
+local SPIN_SPEED_DPS = 180.0
 
 function on_create(self)
     print("[Playroom_FanRotate] on_create EntityID =", EntityID)

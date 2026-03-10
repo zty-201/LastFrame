@@ -10,7 +10,7 @@
 
 local closeOffset = -90.0
 local openSpeed  = 60.0
-local closeSpeed = 200.0
+local closeSpeed = 210.0
 
 local openY = 0.0
 local closedY = 0.0
