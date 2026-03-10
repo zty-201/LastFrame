@@ -755,6 +755,17 @@ namespace Engine {
                 EngineFramework::AudioSystem::GetInstance().SetIndoorFactor(factor);
             });
 
+        s_Lua.set_function("Audio_GetSlotFadeDuration",
+            [](uint32_t entityID, const std::string& slotId) -> float
+            {
+                auto& ecs = EngineFramework::GameObjectSystem::GetRegistry();
+                entt::entity entity = static_cast<entt::entity>(entityID);
+                if (!ecs.valid(entity) || !ecs.all_of<AudioComponent>(entity)) return 1.0f;
+                auto& comp = ecs.get<AudioComponent>(entity);
+                const auto* slot = comp.FindSlot(slotId);
+                return slot ? slot->fadeDuration : 1.0f;
+            });
+
         // ===============================================================
         // UIComponent bindings
         // ===============================================================

@@ -332,15 +332,13 @@ namespace EngineFramework
 		auto view = ecs.view<AudioComponent>();
 		view.each([&](entt::entity e, AudioComponent& comp)
 			{
-				//LOGI("[Audio] Found AudioComponent on entity %u, Slots=%zu", (uint32_t)e, comp.Slots.size());
-
 				if (m_playOnStartDone[e]) return;
 
 				for (const auto& slot : comp.Slots)
 				{
 					if (slot.playOnStart && !slot.id.empty())
 					{
-						//LOGI("[Audio] Queuing playOnStart slot '%s' for entity %u", slot.id.c_str(), (uint32_t)e);
+						//LOGI("[Audio] HandlePlayOnStart firing | Slot: %s | Entity: %u", slot.id.c_str(), (uint32_t)e);
 
 						PlayEntitySlot(e, slot.id);
 					}
@@ -460,6 +458,8 @@ namespace EngineFramework
 					//inst = {}; // clear
 				}
 			}
+
+			//LOGI("[Audio] PlaySlot | Slot: %s | useFade=%d | fadeDuration=%.2f", slot->id.c_str(), slot->useFade, slot->fadeDuration);
 
 			m_active.push_back({
 				cmd.entity,
@@ -769,19 +769,17 @@ namespace EngineFramework
 
 	void AudioSystem::SetSimulationMode(bool enabled)
 	{
-		//LOGI("[Audio] SetSimulationMode called | enabled=%d | m_inSimulation=%d", enabled, m_inSimulation);
+		LOGI("[Audio] SetSimulationMode called | enabled=%d | m_inSimulation=%d", enabled, m_inSimulation);
+		
+		if (enabled)
+			m_playOnStartDone.clear();  // always clear when starting, regardless of current state
 		
 		if (m_inSimulation == enabled)
 			return;
 
 		m_inSimulation = enabled;
 
-		if (m_inSimulation)
-		{
-			// Entering simulator: allow playOnStart to trigger again
-			m_playOnStartDone.clear();
-		}
-		else
+		if (!m_inSimulation)
 		{
 			//LOGI("[Audio] Stopping simulation | active instances: %zu", m_active.size());
 
@@ -837,7 +835,7 @@ namespace EngineFramework
 		m_ambienceLowpass->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoff);
 		m_ambienceLowpass->setBypass(m_indoorFactor < 0.01f);
 
-		const float minOutdoorVolume = 1.0f;
+		const float minOutdoorVolume = 0.5f;
 		const float outdoorVol = 1.0f - (m_indoorFactor * (1.0f - minOutdoorVolume));
 
 		if (m_groupAmbienceOutdoor) m_groupAmbienceOutdoor->setVolume(outdoorVol);
