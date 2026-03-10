@@ -11,7 +11,9 @@
 #include "SceneManager.hpp"
 
 #include "stb_image.h"
-
+#ifdef PLATFORM_WINDOWS
+#include "compressonator.h"
+#endif
 #define MAX_LIGHTS 64
 #define NUM_BLUE_NOISE_TEXTURES 16
 
