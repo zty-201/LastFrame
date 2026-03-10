@@ -2,7 +2,7 @@
 -- CanteenLightOffOnTrigger.lua
 -- Attach to CANTEEN lights only
 -- Turns off this light shortly after trigger fires
--- Turns it back on when toy is put down
+-- Turns it back on with a smooth flame-like fade when toy is put down
 ----------------------------------------------------------------
 
 local DEBUG = false
@@ -16,8 +16,13 @@ local LIGHT_BLOWOUT_SFX_ID = "LightBlowOut"
 local LIGHT_ON_SFX_ID = "LightOn"
 
 local SHUTDOWN_DELAY = 1.2
+local FADE_ON_DURATION = 1.0
+
 local shutdownTimer = 0.0
 local waitingForShutdown = false
+
+local fadeOnTimer = 0.0
+local isFadingOn = false
 
 local originalIntensity = 1.0
 local isCurrentlyOff = false
@@ -30,15 +35,24 @@ local function play_3d_sfx(slotId)
     return false
 end
 
+local function clamp(v, lo, hi)
+    if v < lo then return lo end
+    if v > hi then return hi end
+    return v
+end
+
 function on_create(self)
     SHARED = SHARED or {}
     SHARED[LIGHTS_TABLE] = SHARED[LIGHTS_TABLE] or {}
 
     shutdownTimer = 0.0
     waitingForShutdown = false
+
+    fadeOnTimer = 0.0
+    isFadingOn = false
+
     isCurrentlyOff = false
 
-    -- Safe defaults on startup
     if SHARED[LIGHTS_TABLE][EVENT_OFF_KEY] == nil then
         SHARED[LIGHTS_TABLE][EVENT_OFF_KEY] = false
     end
@@ -72,17 +86,33 @@ function on_update(self, dt)
     -- LIGHTS ON REQUEST
     ----------------------------------------------------------------
     if t[EVENT_ON_KEY] == true then
-        if isCurrentlyOff then
-            EntityLight:SetIntensity(originalIntensity)
-            play_3d_sfx(LIGHT_ON_SFX_ID)
-
-            isCurrentlyOff = false
+        if isCurrentlyOff and not isFadingOn then
+            isFadingOn = true
+            fadeOnTimer = 0.0
             waitingForShutdown = false
             shutdownTimer = 0.0
             t[DISABLE_KEY] = false
 
+            play_3d_sfx(LIGHT_ON_SFX_ID)
+
             if DEBUG then
-                print(string.format("[CanteenLightOffOnTrigger] Light ON | Entity=%d", EntityID))
+                print(string.format("[CanteenLightOffOnTrigger] Fade ON started | Entity=%d", EntityID))
+            end
+        end
+    end
+
+    if isFadingOn then
+        fadeOnTimer = fadeOnTimer + dt
+        local alpha = clamp(fadeOnTimer / FADE_ON_DURATION, 0.0, 1.0)
+
+        EntityLight:SetIntensity(originalIntensity * alpha)
+
+        if alpha >= 1.0 then
+            isFadingOn = false
+            isCurrentlyOff = false
+
+            if DEBUG then
+                print(string.format("[CanteenLightOffOnTrigger] Light ON complete | Entity=%d", EntityID))
             end
         end
 
@@ -111,6 +141,9 @@ function on_update(self, dt)
             play_3d_sfx(LIGHT_BLOWOUT_SFX_ID)
 
             isCurrentlyOff = true
+            isFadingOn = false
+            fadeOnTimer = 0.0
+
             waitingForShutdown = false
             shutdownTimer = 0.0
             t[DISABLE_KEY] = true
