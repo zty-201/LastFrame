@@ -62,6 +62,7 @@ namespace EngineFramework
     GraphicsSystem::~GraphicsSystem()
     {
         m_instancingSystem.reset();
+        m_geometryBuffer.reset();
 #ifdef PLATFORM_WINDOWS
         // Clean up GLFW
         glfwTerminate();
@@ -78,6 +79,12 @@ namespace EngineFramework
         // Initialize Instancing System
         m_instancingSystem = std::make_unique<InstancingSystem>();
         m_instancingSystem->Initialize(MAX_INSTANCES);
+
+        m_geometryBuffer = std::make_unique<GeometryDataBuffer>();
+        m_geometryBuffer->Initialize(10000000, 30000000);
+
+        LoadBlueNoiseTextures();
+        PreGeneratePrimitives();
 
         // Listen for events
         event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&GraphicsSystem::HANDLE_EVENT_LevelEditorToggled>(this);
@@ -261,8 +268,7 @@ namespace EngineFramework
         }
         glBindTexture(GL_TEXTURE_3D, 0);
 
-        LoadBlueNoiseTextures();
-        PreGeneratePrimitives();
+        
     }
 
     void GraphicsSystem::Update(float deltaTime)
@@ -305,14 +311,20 @@ namespace EngineFramework
 		// Update cascade splits and matrices
         UpdateCascadeMatrices(*active_camera, V);
 
-        // Update point light SSBO
+        // Update point light SSBO (1ms)
         UpdateLightSSBO();
 
 		// Update the instancing system (modelmatrix update + batch building + compute culling dispatch)
-        m_instancingSystem->UpdateAndDispatchCompute(viewProj, m_cascadeViewProjMatrices, m_spotLightViewProjMatrices);
+        m_instancingSystem->UpdateAndDispatchCompute(
+            viewProj, 
+            m_cascadeViewProjMatrices, 
+            m_spotLightViewProjMatrices, 
+            m_pointLightViewProjMatrices
+        );
 
 		// ---------------------------- Rendering Passes -----------------------------
-        // 1. Shadow pass (directional + point) (around 1 to 2ms)
+        m_geometryBuffer->Bind();
+        // 1. Shadow pass (directional + point) (around 2ms)
         ShadowPass();
         // 2. Global uniform buffers (camera, light, cascades) 
         UpdateUBOs(*active_camera, V, P);
@@ -320,7 +332,7 @@ namespace EngineFramework
         VolumetricLightInjectionPass();
         // 4. Volumetric ray march
         VolumetricRayMarchPass();
-        // 5. Mesh pass (2-3ms)
+        // 5. Mesh pass (3ms)
         MeshPass();
         // 6. Skybox pass
         SkyboxPass();
@@ -335,7 +347,7 @@ namespace EngineFramework
                               GL_COLOR_BUFFER_BIT, GL_NEAREST);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
-
+        m_geometryBuffer->Unbind();
         m_prev_view_projection = viewProj;
         m_frame_idx++;
     }
@@ -373,37 +385,49 @@ namespace EngineFramework
 
         // 2. PROCESS POINT LIGHTS (Indices 0 to 63)
         int pointShadowCount = 0;
+        m_pointLightViewProjMatrices.resize(MAX_SHADOW_CASTING_POINT_LIGHTS * 6, glm::mat4(1.0f)); // Add this
+
         for (auto entity : pointEntities) {
             if (m_LightData.size() >= MAX_LIGHTS) break;
 
-            // Add to list
             m_lightEntityMap.push_back(entity);
             auto& light = registry.get<LightComponent>(entity);
             auto& transform = registry.get<TransformComponent>(entity);
             glm::vec3 lightDir = EulerToDirection(transform.rotation);
-            // Create Data
+
             LightSSBO data;
             data.position_radius = glm::vec4(transform.position, light.radius);
             data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f);
-            data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 1.0f); // Type 1.0
+            data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 1.0f);
             data.spot_cutoffs = glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f);
 
-            // --- SIMPLE ASSIGNMENT ---
-            // Just take the next slot, No sorting.
             int shadowIndex = -1;
             if (pointShadowCount < MAX_SHADOW_CASTING_POINT_LIGHTS) {
                 shadowIndex = pointShadowCount++;
             }
             data.direction_shadow = glm::vec4(lightDir, (float)shadowIndex);
 
-            // DIRTY CHECK
+            // --- CALCULATE THE 6 CUBEMAP MATRICES ---
+            if (shadowIndex != -1) {
+                glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, light.radius);
+                glm::vec3 pos = transform.position;
+                int baseIdx = shadowIndex * 6;
+                m_pointLightViewProjMatrices[baseIdx + 0] = shadowProj * glm::lookAt(pos, pos + glm::vec3(1, 0, 0), glm::vec3(0, -1, 0));
+                m_pointLightViewProjMatrices[baseIdx + 1] = shadowProj * glm::lookAt(pos, pos + glm::vec3(-1, 0, 0), glm::vec3(0, -1, 0));
+                m_pointLightViewProjMatrices[baseIdx + 2] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, 1, 0), glm::vec3(0, 0, 1));
+                m_pointLightViewProjMatrices[baseIdx + 3] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, -1, 0), glm::vec3(0, 0, -1));
+                m_pointLightViewProjMatrices[baseIdx + 4] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, 0, 1), glm::vec3(0, -1, 0));
+                m_pointLightViewProjMatrices[baseIdx + 5] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));
+            }
+
             if (light._lastShadowIndex != shadowIndex) {
                 light._isDirty = true;
                 light._lastShadowIndex = shadowIndex;
             }
-
             m_LightData.push_back(data);
         }
+
+        m_pointLightViewProjMatrices.resize(pointShadowCount * 6);
 
         // 3. PROCESS SPOT LIGHTS (Indices 64 to 127)
         int spotShadowCount = 0;
@@ -527,26 +551,20 @@ namespace EngineFramework
             int passOffset = cascade + 1; // Pass 1, 2, or 3
             int batchIndex = 0;
 
+            // Strict OpenGL ES 3.2 Fallback (Fast Loop)
+            // Zero state changes means this loop is blazing fast on the mobile CPU
             for (const auto& batch : m_instancingSystem->GetBatches()) {
-                auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(
-                    AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
-                if (!meshData || meshData->vao == 0) meshData = meshCache[batch.key.meshName];
-                if (!meshData || meshData->vao == 0) { batchIndex++; continue; }
 
-                glBindVertexArray(meshData->vao);
-
-                // Tell Vertex Shader where to read this batch's visible IDs
                 int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
                 shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
 
-                // Calculate the memory jump for the indirect command
                 void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
 
-                // indirect draw call for gpu processing
-                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectCmdAddress);
 
                 batchIndex++;
             }
+
         }
 
         glDisable(GL_POLYGON_OFFSET_FILL);
@@ -559,66 +577,8 @@ namespace EngineFramework
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
     }
 
-    void GraphicsSystem::RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius)
+    void GraphicsSystem::RenderPointLightShadows()
     {
-        glm::vec3 lightPos = glm::vec3(lightPosRadius);
-        float lightRadius = lightPosRadius.w;
-
-        // --- Pre-Filter Casters ---
-        // Instead of looping 10,000 entities * 6 faces = 60,000 checks
-        // We filter once against the light sphere to get ~50 valid objects.
-        struct ShadowCaster {
-            entt::entity entity; // Keep entity ID if needed for other lookups
-            const MeshComponent* mesh;
-            const TransformComponent* transform;
-        };
-        // Static vector to reuse memory across frames (prevents allocation overhead)
-        static std::vector<ShadowCaster> validCasters;
-        validCasters.clear();
-
-        auto view = registry.view<MeshComponent, TransformComponent>();
-        for (auto [entity, meshComp, transformComp] : view.each()) {
-            if (meshComp.meshName == "SkyBox" || !meshComp.visibility) continue;
-
-            // 1. Calculate World Center & Radius
-            glm::vec3 minV = glm::vec3(meshComp.localMin[0], meshComp.localMin[1], meshComp.localMin[2]);
-            glm::vec3 maxV = glm::vec3(meshComp.localMax[0], meshComp.localMax[1], meshComp.localMax[2]);
-            glm::vec3 center = (minV + maxV) * 0.5f;
-            glm::vec3 extents = (maxV - minV) * 0.5f;
-
-            const glm::mat4& model = transformComp.modelMatrix;
-            glm::vec3 worldCenter = glm::vec3(model * glm::vec4(center, 1.0f));
-
-            // Fast approximation of world radius (scale * max_extent)
-            float maxScale = std::max(transformComp.scale.x, std::max(transformComp.scale.y, transformComp.scale.z));
-            float radius = glm::length(extents) * maxScale;
-
-            // 2. Sphere-Sphere Intersection (Light vs Object)
-            float dist = glm::distance(worldCenter, lightPos);
-            if (dist > lightRadius + radius) continue; // Too far from light
-
-            validCasters.push_back({ entity, &meshComp, &transformComp });
-        }
-
-        // --- SETUP RENDER ---
-        glViewport(0, 0, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
-        glEnable(GL_DEPTH_TEST);
-        glCullFace(GL_FRONT); // Cull Front faces for shadows to prevent self-shadowing acne
-
-        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, lightRadius);
-
-        // Recalculate views (standard)
-        glm::mat4 shadowViews[6] = {
-            glm::lookAt(lightPos, lightPos + glm::vec3(1, 0, 0), glm::vec3(0,-1, 0)),
-            glm::lookAt(lightPos, lightPos + glm::vec3(-1, 0, 0), glm::vec3(0,-1, 0)),
-            glm::lookAt(lightPos, lightPos + glm::vec3(0, 1, 0), glm::vec3(0, 0, 1)),
-            glm::lookAt(lightPos, lightPos + glm::vec3(0,-1, 0), glm::vec3(0, 0,-1)),
-            glm::lookAt(lightPos, lightPos + glm::vec3(0, 0, 1), glm::vec3(0,-1, 0)),
-            glm::lookAt(lightPos, lightPos + glm::vec3(0, 0,-1), glm::vec3(0,-1, 0))
-        };
-
-        // Get Shader
         std::shared_ptr<ShaderProgram> shader{};
         if (point_shadow_shader_guid != xresource::full_guid{}) {
             shader = AssetManagerSystem::GetResource<ShaderProgram>(point_shadow_shader_guid);
@@ -631,83 +591,73 @@ namespace EngineFramework
         if (!shader) return;
 
         shader->use();
-        shader->setUniform("u_LightPos", lightPos);
-        shader->setUniform("u_FarPlane", lightRadius);
 
-        // --- RENDER FACES ---
-        for (int face = 0; face < 6; face++) {
-            // FORMULA: Layer = (LightIndex * 6) + FaceIndex
-            int layer = (cubemapSlot * 6) + face;
+        glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
+        glViewport(0, 0, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT); // Prevent self-shadowing acne
 
-            // Attach specific layer of the array to FBO
-            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                m_pointShadowArray, 0, layer);
+        // Bind Buffers globally for this pass
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_instancingSystem->GetInstanceSSBO());
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_instancingSystem->GetVisibleIndicesBuffer());
 
-            glClear(GL_DEPTH_BUFFER_BIT);
-
-            glm::mat4 lightMatrix = shadowProj * shadowViews[face];
-            shader->setUniform("u_LightMatrix", lightMatrix);
-
-            // Loop through our PRE-FILTERED list
-            for (const auto& caster : validCasters) {
-
-                // 3. Frustum Culling (Face vs Object)
-                // Still needed because an object might touch the Light Sphere but be behind the current face
-                if (!IsBoxInFrustum(caster.mesh->localMin, caster.mesh->localMax, caster.transform->modelMatrix, lightMatrix)) {
-                    continue;
-                }
-
-                // Draw
-                xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(
-                    AssetManagerSystem::MESH_GUID, caster.mesh->meshName);
-                auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-                if (!meshData || meshData->vao == 0) meshData = meshCache[caster.mesh->meshName];
-                if (!meshData || meshData->vao == 0) continue;
-
-                shader->setUniform("u_Model", caster.transform->modelMatrix);
-                glBindVertexArray(meshData->vao);
-                for (const auto& subMesh : meshData->subMeshes) {
-                    glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT,
-                        (void*)(sizeof(unsigned int) * subMesh.baseIndex));
-                }
-            }
-        }
-
-        shader->disuse();
-        glCullFace(GL_BACK);
-        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
-        glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
-    }
-
-    void GraphicsSystem::RenderPointLightShadows()
-    {
         for (size_t i = 0; i < m_LightData.size(); i++) {
             const auto& lightData = m_LightData[i];
 
-            // 1. Check if it has a shadow index
-            if (lightData.direction_shadow.w < 0.0f) continue;
-			if (lightData.attenuation_type.w >= 1.5f) continue; 
+            // Skip if not a valid point light
+            if (lightData.attenuation_type.w >= 1.5f || lightData.direction_shadow.w < 0.0f) continue;
 
-            // 2. Retrieve the component
             entt::entity e = m_lightEntityMap[i];
             auto& lightComp = registry.get<LightComponent>(e);
 
-            // 3. THE OPTIMIZATION
-            // If Static AND Clean, skip all 6 draw calls!
-            if (lightComp.isStatic && !lightComp._isDirty) {
-                continue;
+            if (lightComp.isStatic && !lightComp._isDirty) continue;
+
+            int shadowIndex = (int)lightData.direction_shadow.w;
+            if (shadowIndex >= MAX_SHADOW_CASTING_POINT_LIGHTS) continue;
+
+            glm::vec3 lightPos = glm::vec3(lightData.position_radius);
+            float lightRadius = lightData.position_radius.w;
+            shader->setUniform("u_LightPos", lightPos);
+            shader->setUniform("u_FarPlane", lightRadius);
+
+            // Execute the 6 face passes
+            for (int face = 0; face < 6; face++) {
+                int layer = (shadowIndex * 6) + face;
+
+                glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_pointShadowArray, 0, layer);
+                glClear(GL_DEPTH_BUFFER_BIT);
+
+                glm::mat4 lightMatrix = m_pointLightViewProjMatrices[layer];
+                shader->setUniform("u_LightMatrix", lightMatrix);
+
+                int passOffset = 36 + layer;
+                int batchIndex = 0;
+
+                for (const auto& batch : m_instancingSystem->GetBatches()) {
+
+                    int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
+                    shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
+
+                    void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
+
+                    glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectCmdAddress);
+
+                    batchIndex++;
+                }
+
             }
 
-            // 4. Render
-            int cubemapSlot = int(lightData.direction_shadow.w);
-            RenderShadowCubemap(cubemapSlot, lightData.position_radius);
-
-            // 5. Mark Clean
-            if (lightComp.isStatic) {
-                lightComp._isDirty = false;
-            }
+            if (lightComp.isStatic) lightComp._isDirty = false;
         }
+
+        glCullFace(GL_BACK);
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        shader->disuse();
+        glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
     }
 
     void GraphicsSystem::RenderSpotLightShadows() {
@@ -751,24 +701,17 @@ namespace EngineFramework
             glClear(GL_DEPTH_BUFFER_BIT);
             shader->setUniform("u_LightMatrix", lightData.view_proj);
 
-            // --- Execute Indirect Batch Draw ---
             int passOffset = 4 + shadowIndex; // Passes 4+ belong to Spotlights
             int batchIndex = 0;
 
             for (const auto& batch : m_instancingSystem->GetBatches()) {
-                auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(
-                    AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
-                if (!meshData || meshData->vao == 0) meshData = meshCache[batch.key.meshName];
-                if (!meshData || meshData->vao == 0) { batchIndex++; continue; }
 
-                glBindVertexArray(meshData->vao);
-
-                // Shift offset to the correct pass window
                 int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
                 shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
 
                 void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
-                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
+
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectCmdAddress);
 
                 batchIndex++;
             }
@@ -1022,10 +965,8 @@ namespace EngineFramework
 
             for (const auto& batch : m_instancingSystem->GetBatches()) {
                 auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, batch.key.meshName));
-                if (!meshData || meshData->vao == 0) meshData = meshCache[batch.key.meshName];
-                if (!meshData || meshData->vao == 0) continue;
-
-                glBindVertexArray(meshData->vao);
+                if (!meshData || meshData->subMeshes.empty()) meshData = meshCache[batch.key.meshName];
+                if (!meshData || meshData->subMeshes.empty()) continue;
 
                 // Set the batch-wide material factors
                 instanced_shader->setUniform("u_AlbedoFactor", batch.material.albedoFactor);
@@ -1066,7 +1007,7 @@ namespace EngineFramework
                 void* indirectCmdAddress = (void*)(((0 * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
 
                 // The single draw call!
-                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirectCmdAddress);
+                glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectCmdAddress);
 
                 batchIndex++;
             }
@@ -1092,6 +1033,21 @@ namespace EngineFramework
         if (standard_shader) {
             standard_shader->use();
 
+            // 1. Assign Texture Units to Samplers
+            standard_shader->setUniform("s_Albedo", TextureUnits::MESH_ALBEDO_UNIT);
+            standard_shader->setUniform("s_Normal", TextureUnits::MESH_NORMAL_UNIT);
+            standard_shader->setUniform("s_Roughness", TextureUnits::MESH_ROUGHNESS_UNIT);
+            standard_shader->setUniform("s_Metallic", TextureUnits::MESH_METALLIC_UNIT);
+            standard_shader->setUniform("s_CascadeShadowMaps", TextureUnits::SHADOW_MAP_UNIT);
+            standard_shader->setUniform("s_SpotShadowMaps", TextureUnits::SPOT_LIGHT_MAP_UNIT);
+            standard_shader->setUniform("s_PointShadowArray", TextureUnits::POINT_SHADOW_MAP_UNIT);
+            standard_shader->setUniform("s_VoxelGrid", TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
+
+            // 2. Pass the global light/fog variables
+            standard_shader->setUniform("u_NumPointLights", (int)m_LightData.size());
+            standard_shader->setUniform("u_Tricubic", m_tricubic_filtering);
+            // ------------------------------
+            // 
             // Reusable identity palette for non-skinned meshes
             static std::vector<glm::mat4> s_identityPalette;
 
@@ -1129,15 +1085,13 @@ namespace EngineFramework
                 auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
 
                 // Fall back to cached mesh if not a resource mesh
-                if (!meshData || meshData->vao == 0) {
+                if (!meshData || meshData->subMeshes.empty()) {
                     meshData = meshCache[meshComp.meshName];
                 }
 
-                if (!meshData || meshData->vao == 0) continue;
+                if (!meshData || meshData->subMeshes.empty()) continue;
 
                 standard_shader->setUniform("u_Model", transformComp.modelMatrix);
-
-                glBindVertexArray(meshData->vao);
 
                 const MaterialComponent* override_material = registry.try_get<MaterialComponent>(entity);
 
@@ -1184,35 +1138,13 @@ namespace EngineFramework
                     glActiveTexture(GL_TEXTURE0 + TextureUnits::MESH_METALLIC_UNIT);
                     glBindTexture(GL_TEXTURE_2D, (metalTex && metalTex->id != 0) ? metalTex->id : m_defaultBlackTexture);
 
-
-                    static bool logged_first = false;
-                    if (!logged_first) {
-                        LOGI("=== First Submesh Render Debug ===");
-                        LOGI("Submesh: %s", subMesh.name.c_str());
-                        LOGI("Material: %s", material.name.c_str());
-                        LOGI("  - Albedo: ptr=%p, id=%u, using_fallback=%d",
-                            (void*)albedoTex.get(),
-                            albedoTex ? albedoTex->id : 0,
-                            !(albedoTex && albedoTex->id != 0));
-                        LOGI("  - Normal: ptr=%p, id=%u, using_fallback=%d",
-                            (void*)normalTex.get(),
-                            normalTex ? normalTex->id : 0,
-                            !(normalTex && normalTex->id != 0));
-                        LOGI("  - Roughness: ptr=%p, id=%u, factor=%.2f",
-                            (void*)roughTex.get(),
-                            roughTex ? roughTex->id : 0,
-                            material.roughnessFactor);
-                        LOGI("  - Metallic: ptr=%p, id=%u, factor=%.2f",
-                            (void*)metalTex.get(),
-                            metalTex ? metalTex->id : 0,
-                            material.metallicFactor);
-                        LOGI("Default textures: white=%u, normal=%u", m_defaultWhiteTexture, m_defaultNormalTexture);
-                        logged_first = true;
-                    }
-
-                    glDrawElements(GL_TRIANGLES, subMesh.indexCount,
-                        GL_UNSIGNED_INT,
-                        (void*)(sizeof(unsigned int) * subMesh.baseIndex));
+                    glDrawElementsBaseVertex(
+                        GL_TRIANGLES,
+                        subMesh.indexCount,
+                        GL_UNSIGNED_SHORT,
+                        (void*)(subMesh.firstIndex * sizeof(Mesh::IndexType)),
+                        subMesh.baseVertex
+                    );
                 }
             }
 
@@ -1243,17 +1175,30 @@ namespace EngineFramework
 
         auto skybox_view = registry.view<MeshComponent, SkyboxRenderPass>();
         for (auto [entity, meshComp] : skybox_view.each()) {
-            if (meshCache.find(meshComp.meshName) == meshCache.end())
-                LoadAndCacheMesh(meshComp.meshName);
 
-            auto& meshData = meshCache[meshComp.meshName];
-            if (!meshData || meshData->vao == 0) continue;
+            // 1. Try to get it from Asset Manager (if it's a custom skybox model)
+            /*xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp.meshName);
+            auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);*/
 
-            glBindVertexArray(meshData->vao);
+            // for skybox, we always use pregenerated cube
+            auto meshData = meshCache[meshComp.meshName];
+
+            // 2. Fallback to primitive cache (for the default "SkyBox" generated at startup)
+            /*if (!meshData || meshData->subMeshes.empty()) {
+                meshData = meshCache[meshComp.meshName];
+            }*/
+
+            if (!meshData || meshData->subMeshes.empty()) continue;
 
             if (!meshData->subMeshes.empty()) {
-                glDrawElements(GL_TRIANGLES, meshData->subMeshes[0].indexCount,
-                               GL_UNSIGNED_INT, 0);
+                glDrawElementsBaseVertex(
+                    GL_TRIANGLES,
+                    meshData->subMeshes[0].indexCount,
+                    GL_UNSIGNED_SHORT, // Now 16-bit!
+                    (void*)(meshData->subMeshes[0].firstIndex * sizeof(Mesh::IndexType)),
+                    meshData->subMeshes[0].baseVertex
+                );
+
             }
             else {
                 LOGE("Skybox mesh '%s' has no submeshes!", meshComp.meshName.c_str());
@@ -1293,7 +1238,6 @@ namespace EngineFramework
 
         // 4. Get the Quad Mesh (We reuse the existing 3D quad)
         auto meshData = meshCache["Quad"];
-        glBindVertexArray(meshData->vao);
 
         // 5. Iterate all UI Elements
         // We sort them by 'layer' so background panels draw before text/icons
@@ -1395,7 +1339,13 @@ namespace EngineFramework
             shader->setUniform("s_Texture", 0);
 
             // --- DRAW ---
-            glDrawElements(GL_TRIANGLES, meshData->subMeshes[0].indexCount, GL_UNSIGNED_INT, 0);
+            glDrawElementsBaseVertex(
+                GL_TRIANGLES,
+                meshData->subMeshes[0].indexCount,
+                GL_UNSIGNED_SHORT,
+                (void*)(meshData->subMeshes[0].firstIndex * sizeof(Mesh::IndexType)),
+                meshData->subMeshes[0].baseVertex
+            );
                 
         }
 
@@ -1410,34 +1360,6 @@ namespace EngineFramework
         glDisable(GL_BLEND); // (Or keep enabled if your 3D engine uses it)
     }
 
-    void GraphicsSystem::LoadAndCacheMesh(const std::string& meshName)
-    {
-        // Primitive meshes should be generated by PreGeneratePrimitives, not loaded from file
-        if (meshName == "Quad" || meshName == "Plane" ||
-            meshName == "Cube" || meshName == "Sphere" ||
-            meshName == "SkyBox")
-        {
-            // Primitive meshes should be generated by PreGeneratePrimitives, not loaded from fileZZZ
-            LOGE("Attempted to load primitive '%s' via file loader. Primitives should be pre-generated.", meshName.c_str());
-            return;
-        }
-
-        try {
-            LOGI("Loading mesh from file: %s", meshName.c_str());
-
-            auto meshData = std::make_shared<Mesh::MeshData>(meshName);
-
-            if (!meshData || meshData->vao == 0) {
-                LOGE("Mesh '%s' loaded but VAO is 0!", meshName.c_str());
-            }
-
-            meshCache[meshName] = meshData;
-        }
-        catch (const std::exception& e) {
-            LOGE("Failed to load mesh: %s. Error: %s", meshName.c_str(), e.what());
-            meshCache[meshName] = nullptr;
-        }
-    }
 
     void GraphicsSystem::LoadBlueNoiseTextures()
     {
@@ -1472,28 +1394,26 @@ namespace EngineFramework
     void GraphicsSystem::PreGeneratePrimitives()
     {
         LOGI("Pre-generating primitive meshes...");
-        meshCache["Cube"] = Mesh::generateCube();
-        meshCache["Sphere"] = Mesh::generateSphere();
-        meshCache["Quad"] = Mesh::generateQuad();
-        meshCache["SkyBox"] = Mesh::generateSkyBox();
-        LOGI("Primitive meshes cached.");
-    }
 
-    bool GraphicsSystem::isLightInFrustum(const glm::vec3& pos, float radius, const glm::mat4& viewProj)
-    {
-        // Extract planes (Note: In a real engine, you'd extract these ONCE per frame, not per object)
-        auto planes = ExtractFrustumPlanes(viewProj);
+        auto uploadPrimitive = [&](std::shared_ptr<Mesh::MeshData> meshData) {
+            auto [megaBaseVert, megaFirstIdx] = m_geometryBuffer->AppendMesh(meshData->vertices, meshData->indices);
 
-        for (const auto& plane : planes) {
-            // Distance from point to plane: dot(plane.xyz, pos) + plane.w
-            float distance = glm::dot(glm::vec3(plane), pos) + plane.w;
-
-            // If distance < -radius, the sphere is completely outside this plane
-            if (distance < -radius) {
-                return false;
+            for (auto& subMesh : meshData->subMeshes) {
+                subMesh.baseVertex += megaBaseVert;
+                subMesh.firstIndex += megaFirstIdx;
             }
-        }
-        return true;
+
+            meshData->vertices.clear();
+            meshData->indices.clear();
+            return meshData;
+            };
+
+        meshCache["Cube"] = uploadPrimitive(Mesh::generateCube());
+        meshCache["Sphere"] = uploadPrimitive(Mesh::generateSphere());
+        meshCache["Quad"] = uploadPrimitive(Mesh::generateQuad());
+        meshCache["SkyBox"] = uploadPrimitive(Mesh::generateSkyBox());
+
+        LOGI("Primitive meshes cached.");
     }
 
     void GraphicsSystem::CalculateCascadeSplits(float nearPlane, float farPlane)
@@ -1660,33 +1580,6 @@ namespace EngineFramework
         }
 
         return planes;
-    }
-
-    bool GraphicsSystem::IsBoxInFrustum(const float min[3], const float max[3], const glm::mat4& model, const glm::mat4& viewProj)
-    {
-        // 1. Convert raw arrays to GLM vectors
-        glm::vec3 localMin = glm::vec3(min[0], min[1], min[2]);
-        glm::vec3 localMax = glm::vec3(max[0], max[1], max[2]);
-
-        // 2. Calculate Center and Extents (Half-Size)
-        glm::vec3 localCenter = (localMin + localMax) * 0.5f;
-        glm::vec3 localExtents = (localMax - localMin) * 0.5f;
-
-        // 3. Transform Center to World Space
-        glm::vec3 worldCenter = glm::vec3(model * glm::vec4(localCenter, 1.0f));
-
-        // 4. Calculate World Radius (Safe approximation)
-        // We scale the local extents by the model matrix to see how "big" the box is in world space.
-        // The length of the sum of the scaled axes gives us the radius of a sphere that fully encloses the rotated box.
-        glm::vec3 right = glm::vec3(model[0]) * localExtents.x;
-        glm::vec3 up = glm::vec3(model[1]) * localExtents.y;
-        glm::vec3 forward = glm::vec3(model[2]) * localExtents.z;
-
-        // Radius of the circumscribed sphere of the OBB
-        float worldRadius = glm::length(right + up + forward);
-
-        // 5. Reuse your existing Frustum-Sphere check
-        return isLightInFrustum(worldCenter, worldRadius, viewProj);
     }
 
     void GraphicsSystem::UploadBonePalettes(const std::vector<glm::mat4>& boneMatrices)

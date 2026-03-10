@@ -23,7 +23,7 @@
 #include "ISystem.hpp"
 #include "scene.h"
 #include "InstancingSystem.h"
-
+#include "GeometryDataBuffer.h"
 
 namespace EngineFramework
 {
@@ -55,7 +55,6 @@ namespace EngineFramework
         void PostUpdate(float deltaTime) override;
 
         void RenderScene(); 
-        void LoadAndCacheMesh(const std::string& meshName);
 
         static GraphicsSystem& GetInstance(){ return *this_graphics_ptr; }
 
@@ -140,10 +139,9 @@ namespace EngineFramework
 
 		// Getter for instancing system
 		std::unique_ptr<InstancingSystem>& GetInstancingSystem() { return m_instancingSystem; }
+        std::unique_ptr<GeometryDataBuffer>& GetGeometryBuffer() { return m_geometryBuffer; }
 
-		// Frustum Culling Functions
-        bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
-        bool IsBoxInFrustum(const float min[3], const float max[3], const glm::mat4& model, const glm::mat4& viewProj);
+		// Helper Functions
         bool WorldToScreen(const glm::vec3& worldPos, glm::vec2& outScreenPos, float& outScale);
         std::vector<glm::vec3> GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ);
 
@@ -195,7 +193,8 @@ namespace EngineFramework
 
 		// Instancing system for batching and culling
         std::unique_ptr<InstancingSystem> m_instancingSystem;
-        
+        std::unique_ptr<GeometryDataBuffer> m_geometryBuffer;
+
 		// Shader GUIDs
         xresource::full_guid mesh_shader_guid;
         xresource::full_guid mesh_instanced_shader_guid;
@@ -223,6 +222,9 @@ namespace EngineFramework
 
         std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
         std::vector<glm::mat4> m_spotLightViewProjMatrices;
+        std::vector<glm::mat4> m_pointLightViewProjMatrices;
+
+
         std::vector<entt::entity> m_lightEntityMap;
         std::array<float, CASCADE_COUNT + 1> m_cascadeSplits;
 		std::array<float, CASCADE_COUNT> m_cascadeBiases;
@@ -294,7 +296,6 @@ namespace EngineFramework
 		void RenderDirectionalShadow();
 		void RenderPointLightShadows();
 		void RenderSpotLightShadows();
-        void RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius);
         void CalculateCascadeSplits(float nearPlane, float farPlane);
         std::array<glm::vec4, 6> ExtractFrustumPlanes(const glm::mat4& viewProj);
         void UpdateCascadeMatrices(const CameraComponent& camera, const glm::mat4& camView);

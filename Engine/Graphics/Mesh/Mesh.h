@@ -46,25 +46,38 @@
 #endif
 
 namespace Mesh {
+
+	// ANDROID OPTIMIZATION: 16-bit indices for massive memory bandwidth savings.
+	using IndexType = uint16_t;
+	using IndexBuffer = std::vector<IndexType>;
+
 	// Represents a single drawable part (mesh group) of a larger model.
 	struct SubMesh {
 		std::string name;
 		int materialIndex = -1; // Index into the parent MeshData's materials vector.
 		GLuint indexCount = 0;
-		GLuint baseIndex = 0;
+		GLuint firstIndex = 0;
 		GLuint baseVertex = 0;
 	};
 
 	// A flexible vertex struct for loading any kind of mesh.
 	struct Vertex {
-		glm::vec3 Position;
-		glm::vec3 Normal;
-		glm::vec2 TexCoords;
-		glm::vec4 Tangent; // Using vec4 to include handedness (w component)
+		glm::vec3 Position;       // 12 bytes
+		uint32_t  Normal;         // 4 bytes (Packed GL_INT_2_10_10_10_REV)
+		uint32_t  TexCoords;      // 4 bytes (Packed GL_HALF_FLOAT)
+		uint32_t  Tangent;        // 4 bytes (Packed GL_INT_2_10_10_10_REV)
+		uint8_t   BoneIndices[4]; // 4 bytes 
+		uint8_t   BoneWeights[4]; // 4 bytes 
+		// TOTAL: 32 Bytes!
 
-		// Add skinning data
-		glm::ivec4 BoneIndices = glm::ivec4(0);
-		glm::vec4 BoneWeights = glm::vec4(0.f);
+		// Constructor allows primitive generators to continue working flawlessly
+		Vertex(glm::vec3 p = glm::vec3(0), glm::vec3 n = glm::vec3(0), glm::vec2 uv = glm::vec2(0), glm::vec4 t = glm::vec4(1, 0, 0, 1)) {
+			Position = p;
+			Normal = glm::packSnorm3x10_1x2(glm::vec4(n, 0.0f));
+			TexCoords = glm::packHalf2x16(uv);
+			Tangent = glm::packSnorm3x10_1x2(t);
+			for (int i = 0; i < 4; i++) { BoneIndices[i] = 0; BoneWeights[i] = 0; }
+		}
 	};
 
 	struct AABB {
@@ -86,22 +99,22 @@ namespace Mesh {
 		}
 	};
 
-	using IndexType = GLuint;
-	using IndexBuffer = std::vector<IndexType>;
-
 	// The main MeshData class, handling both loaded and generated meshes.
 	class MeshData {
 	public:
-		// OpenGL handles for the entire model's geometry.
-		GLuint vao = 0;
-		GLuint vertexBuffer = 0;
-		GLuint indexBuffer = 0;
-
-		// A mesh is a collection of sub-meshes and their materials.
+		// Pure Data: No OpenGL handles (VAO, VBO, IBO) exist here anymore!
 		std::vector<SubMesh> subMeshes;
 		std::vector<MaterialComponent> materials;
 
-		// Default constructor.
+		// CPU-side raw data. The AssetManager will read these, upload them 
+		// to the GeometryDataBuffer, and then clear these vectors to save RAM.
+		std::vector<Vertex> vertices;
+		std::vector<IndexType> indices;
+
+		std::string name;
+		int num_vertices = 0;
+		int num_bones = 0;
+
 		MeshData() = default;
 
 		// Constructor for loading a mesh from a file via Assimp. Call LoadWithFilename_AfterThreadJoinCall() after thread joins.
@@ -109,17 +122,18 @@ namespace Mesh {
 			loadWithAssimp(filePath, skeleton);
 		}
 
-		const AABB& GetAABB() const { return m_aabb; }
-		const std::vector<AABB>& GetSubmeshAABBs() const { return m_submeshAABBs; }
-
 		// Constructor for manually creating a mesh from code (for primitives).
-		explicit MeshData(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
+		explicit MeshData(const std::vector<Vertex>& inVertices, const std::vector<IndexType>& inIndices) {
+			vertices = inVertices;
+			indices = inIndices;
+
 			SubMesh primitiveSubMesh;
 			primitiveSubMesh.name = "default";
 			primitiveSubMesh.materialIndex = 0;
-			primitiveSubMesh.baseIndex = 0;
+			// These will be updated when uploaded to the GeometryDataBuffer
+			primitiveSubMesh.firstIndex = 0;
 			primitiveSubMesh.baseVertex = 0;
-			primitiveSubMesh.indexCount = static_cast<GLuint>(indices.size());
+			primitiveSubMesh.indexCount = static_cast<uint32_t>(indices.size());
 			subMeshes.push_back(primitiveSubMesh);
 
 			MaterialComponent defaultMaterial;
@@ -132,9 +146,10 @@ namespace Mesh {
 				m_aabb.expand(v.Position);
 			}
 			m_submeshAABBs = { subBox };
-
-			createGLBuffers(vertices, indices);
 		}
+
+		const AABB& GetAABB() const { return m_aabb; }
+		const std::vector<AABB>& GetSubmeshAABBs() const { return m_submeshAABBs; }
 
 		static void UpdateMeshBounds(entt::entity entity)
 		{
@@ -160,16 +175,14 @@ namespace Mesh {
 			}
 		}
 
-		//To be called after MeshData load with filename completes, as it can only be completed on the main thread.
-		void LoadWithFilename_AfterThreadJoinCall()
-		{
-			createGLBuffers(m_temp_vertices, m_temp_indices);
-			m_temp_vertices.clear();
-			m_temp_indices.clear();
-		}
-		std::string name;
-		int num_vertices{};
-		int num_bones{};
+		////To be called after MeshData load with filename completes, as it can only be completed on the main thread.
+		//void LoadWithFilename_AfterThreadJoinCall()
+		//{
+		//	createGLBuffers(m_temp_vertices, m_temp_indices);
+		//	m_temp_vertices.clear();
+		//	m_temp_indices.clear();
+		//}
+
 	private:
 		AABB m_aabb;                     // whole-mesh AABB (object space)
 		std::vector<AABB> m_submeshAABBs; // per-submesh AABBs
@@ -201,12 +214,28 @@ namespace Mesh {
 			auto ioSystem = new AssetIOSystem(filePath);
 			importer.SetIOHandler(ioSystem);
 
+			unsigned int importFlags = aiProcess_Triangulate |
+				aiProcess_GenSmoothNormals |
+				aiProcess_CalcTangentSpace;
+
+			std::filesystem::path p(filePath);
+			std::string fileName = p.filename().string();
+			bool isSkeletalMesh = (fileName.find("SK_") == 0);
+
+			if (!isSkeletalMesh) {
+				// STATIC MESH: Safe to split!
+				importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 65000);
+				importer.SetPropertyInteger(AI_CONFIG_PP_SLM_TRIANGLE_LIMIT, 65000);
+				importFlags |= aiProcess_SplitLargeMeshes;
+			}
+			else {
+				// SKELETAL MESH: Do NOT split (preserves bone weights)
+				LOGI("Skeletal Mesh '%s' detected. Bypassing Assimp splitting.", fileName.c_str());
+			}
+
 			// Now we can use ReadFile() instead of ReadFileFromMemory()!
 			// Assimp will use our custom IOSystem to load both .obj AND .mtl
-			const aiScene* scene = importer.ReadFile(
-				filePath,
-				aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace
-			);
+			const aiScene* scene = importer.ReadFile(filePath, importFlags);
 
 			if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 				throw std::runtime_error("Assimp Error: " + std::string(importer.GetErrorString()));
@@ -350,64 +379,69 @@ namespace Mesh {
 		// Extracts vertex data from a single Assimp mesh.
 		void processSubMesh(aiMesh* mesh, const aiScene* scene, EngineFramework::Skeleton* skeleton) {
 			UNREFERENCED_PARAMETER(scene);
+
+			if (mesh->mNumVertices > 65535) {
+				LOGE("FATAL: Submesh '%s' has %u vertices! 16-bit indices will overflow. Split it in Blender!",
+					mesh->mName.C_Str(), mesh->mNumVertices);
+			}
+			//
+
 			SubMesh subMesh;
 			subMesh.name = mesh->mName.C_Str();
 			subMesh.materialIndex = mesh->mMaterialIndex;
-			subMesh.baseVertex = static_cast<GLuint>(m_temp_vertices.size());
-			subMesh.baseIndex = static_cast<GLuint>(m_temp_indices.size());
+			// Record where this submesh starts in the CPU vector
+			subMesh.baseVertex = static_cast<uint32_t>(vertices.size());
+			subMesh.firstIndex = static_cast<uint32_t>(indices.size());
 			subMesh.indexCount = 0;
 
 			AABB subBox;
 
 			for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-				Vertex vertex{};
-				vertex.Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
-				vertex.Normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+				glm::vec3 pos = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+				glm::vec3 norm = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+
+				glm::vec2 uv(0.0f);
 				if (mesh->mTextureCoords[0]) {
-					vertex.TexCoords = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+					uv = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
 				}
+
+				glm::vec4 tan(1.0f, 0.0f, 0.0f, 1.0f);
 				if (mesh->mTangents) {
-					// Assimp provides the tangent and bitangent, we use them to calculate the w component
 					glm::vec3 t = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
 					glm::vec3 b = { mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z };
-					float handedness = (glm::dot(glm::cross(vertex.Normal, t), b) < 0.0f) ? -1.0f : 1.0f;
-					vertex.Tangent = glm::vec4(t, handedness);
+					float handedness = (glm::dot(glm::cross(norm, t), b) < 0.0f) ? -1.0f : 1.0f;
+					tan = glm::vec4(t, handedness);
 				}
 				else {
-					// === Generate tangent if Assimp didn't provide one ===
-					glm::vec3 c1 = glm::cross(vertex.Normal, glm::vec3(0.0f, 0.0f, 1.0f));
-					glm::vec3 c2 = glm::cross(vertex.Normal, glm::vec3(0.0f, 1.0f, 0.0f));
+					glm::vec3 c1 = glm::cross(norm, glm::vec3(0.0f, 0.0f, 1.0f));
+					glm::vec3 c2 = glm::cross(norm, glm::vec3(0.0f, 1.0f, 0.0f));
 					glm::vec3 t = glm::length(c1) > glm::length(c2) ? c1 : c2;
-					vertex.Tangent = glm::vec4(glm::normalize(t), 1.0f);
-					//LOGE("Mesh '%s' missing tangents, using generated fallback", mesh->mName.C_Str());
+					tan = glm::vec4(glm::normalize(t), 1.0f);
 				}
 
-				// Add skinning data
-				vertex.BoneIndices = glm::uvec4(0);
-				vertex.BoneWeights = glm::vec4(0.0f);
-
-				subBox.expand(vertex.Position);
-				m_aabb.expand(vertex.Position);
-
-				m_temp_vertices.push_back(vertex);
+				subBox.expand(pos);
+				m_aabb.expand(pos);
+				// The constructor we added automatically packs the floats into hardware uints!
+				vertices.push_back(Vertex(pos, norm, uv, tan));
 			}
 
 			for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
 				aiFace face = mesh->mFaces[i];
 				for (unsigned int j = 0; j < face.mNumIndices; j++) {
-					m_temp_indices.push_back(subMesh.baseVertex + face.mIndices[j]);
+					// FIXED: Do NOT add baseVertex here anymore! The GPU does this automatically.
+					indices.push_back(static_cast<IndexType>(face.mIndices[j]));
 				}
 				subMesh.indexCount += face.mNumIndices;
 			}
 
-			// Fill bone weights and indices
 			if (mesh->HasBones()) {
-				const unsigned int numBones = mesh->mNumBones;
+				// Temporary storage for accumulating float weights
+				std::vector<glm::vec4> tempWeights(mesh->mNumVertices, glm::vec4(0.0f));
+				std::vector<glm::ivec4> tempIndices(mesh->mNumVertices, glm::ivec4(0));
 
+				const unsigned int numBones = mesh->mNumBones;
 				for (unsigned int b = 0; b < numBones; ++b) {
 					const aiBone* bone = mesh->mBones[b];
-
-					// Start with local index, then try to remap via OFBX skeleton
 					unsigned int boneIndex = b;
 					{
 						std::lock_guard<std::mutex> bone_lock{ EngineFramework::g_OFBXBoneIndexByName_mutex };
@@ -415,97 +449,45 @@ namespace Mesh {
 						if (itRemap != EngineFramework::g_OFBXBoneIndexByName.end()) {
 							boneIndex = static_cast<unsigned int>(itRemap->second);
 						}
-						else {
-							LOGE("[SKIN] Assimp bone '%s' not found in OFBX skeleton; using local index %u",
-								bone->mName.C_Str(), boneIndex);
-						}
 					}
-
-
-					//LOGI("[SKIN] Assimp bone %u ('%s') -> OFBX index %u",
-					//	b, bone->mName.C_Str(), boneIndex);
 
 					if (skeleton != nullptr && boneIndex < skeleton->bones.size()) {
 						skeleton->bones[boneIndex].invBind = AssimpToGLM(bone->mOffsetMatrix);
 					}
 
-					//if (skeleton && boneIndex < skeleton->bones.size()) {
-					//    // Overwrite the manual OpenFBX matrix with Assimp's correct matrix
-					//    skeleton->bones[boneIndex].invBind = AssimpToGLM(bone->mOffsetMatrix);
-
-					//    // Optional: Debugging
-					//    // LOGI("Corrected InvBind for bone %s", bone->mName.C_Str());
-					//}
-
-					// Loop through weights for this bone
 					for (unsigned int w = 0; w < bone->mNumWeights; ++w) {
-						const aiVertexWeight& vw = bone->mWeights[w];
-						unsigned int vtxId = vw.mVertexId;   // local to this mesh
-						float weight = vw.mWeight;
+						unsigned int vtxId = bone->mWeights[w].mVertexId;
+						float weight = bone->mWeights[w].mWeight;
 
-						// Get the vertex in global array for this submesh
-						Vertex& v = m_temp_vertices[subMesh.baseVertex + vtxId];
-
-						// Put weight into the first empty slot
 						for (int k = 0; k < 4; ++k) {
-							if (v.BoneWeights[k] == 0.0f) {
-								v.BoneWeights[k] = weight;
-								v.BoneIndices[k] = static_cast<int>(boneIndex);
+							if (tempWeights[vtxId][k] == 0.0f) {
+								tempWeights[vtxId][k] = weight;
+								tempIndices[vtxId][k] = static_cast<int>(boneIndex);
 								break;
 							}
 						}
 					}
 				}
 
-				// Normalize weights so each vertex sums to 1 where possible
+				// Final pass: Normalize floats and pack into 8-bit integers!
 				for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-					Vertex& v = m_temp_vertices[subMesh.baseVertex + i];
-					float sum =
-						v.BoneWeights.x + v.BoneWeights.y +
-						v.BoneWeights.z + v.BoneWeights.w;
+					Vertex& v = vertices[subMesh.baseVertex + i];
+					glm::vec4 w = tempWeights[i];
+					glm::ivec4 idx = tempIndices[i];
 
-					if (sum > 0.0f) {
-						v.BoneWeights /= sum;
+					float sum = w.x + w.y + w.z + w.w;
+					if (sum > 0.0f) { w /= sum; }
+
+					for (int k = 0; k < 4; ++k) {
+						v.BoneIndices[k] = static_cast<uint8_t>(idx[k]);
+						v.BoneWeights[k] = static_cast<uint8_t>(std::round(w[k] * 255.0f));
 					}
 				}
 			}
 
 			subMeshes.push_back(subMesh);
 			m_submeshAABBs.push_back(subBox);
-		}
-
-		// Creates the final OpenGL VAO and buffers.
-		void createGLBuffers(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
-			glGenVertexArrays(1, &vao);
-			glBindVertexArray(vao);
-
-			glGenBuffers(1, &vertexBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
-
-			glGenBuffers(1, &indexBuffer);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
-
-			glEnableVertexAttribArray(0); // Position (location 0)
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
-
-			glEnableVertexAttribArray(1); // TexCoords (location 1)
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
-
-			glEnableVertexAttribArray(2); // Normal (location 2)
-			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-
-			glEnableVertexAttribArray(3); // Tangent (location 3)
-			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
-
-			glEnableVertexAttribArray(4); // Bone Indices (location 5)
-			glVertexAttribIPointer(4, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, BoneIndices));
-
-			glEnableVertexAttribArray(5); // Bone Weights (location 5)
-			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, BoneWeights));
-
-			glBindVertexArray(0);
+		
 		}
 
 	private:
@@ -518,7 +500,8 @@ namespace Mesh {
 	// =========================================================================
 
 	// Generic helper function to calculate tangents for any manually created mesh
-	inline void calculateTangents(std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
+	// Generic helper function to calculate tangents for any manually created mesh
+	inline void calculateTangents(std::vector<Vertex>& vertices, const std::vector<IndexType>& indices) {
 		if (indices.empty() || vertices.empty()) return;
 
 		std::vector<glm::vec3> tan1(vertices.size(), glm::vec3(0.0f));
@@ -528,13 +511,23 @@ namespace Mesh {
 			Vertex& v0 = vertices[indices[i]];
 			Vertex& v1 = vertices[indices[i + 1]];
 			Vertex& v2 = vertices[indices[i + 2]];
+
 			glm::vec3 edge1 = v1.Position - v0.Position;
 			glm::vec3 edge2 = v2.Position - v0.Position;
-			glm::vec2 deltaUV1 = v1.TexCoords - v0.TexCoords;
-			glm::vec2 deltaUV2 = v2.TexCoords - v0.TexCoords;
+
+			// --- UNPACK 16-BIT HALF FLOATS TO DO MATH ---
+			glm::vec2 uv0 = glm::unpackHalf2x16(v0.TexCoords);
+			glm::vec2 uv1 = glm::unpackHalf2x16(v1.TexCoords);
+			glm::vec2 uv2 = glm::unpackHalf2x16(v2.TexCoords);
+
+			glm::vec2 deltaUV1 = uv1 - uv0;
+			glm::vec2 deltaUV2 = uv2 - uv0;
+			// ---------------------------------------------
+
 			float det = (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 			if (std::abs(det) < 1e-6f) continue;
 			float f = 1.0f / det;
+
 			glm::vec3 tangent, bitangent;
 			tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
 			tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
@@ -542,6 +535,7 @@ namespace Mesh {
 			bitangent.x = f * (-deltaUV1.x * edge2.x + deltaUV2.x * edge1.x);
 			bitangent.y = f * (-deltaUV1.x * edge2.y + deltaUV2.x * edge1.y);
 			bitangent.z = f * (-deltaUV1.x * edge2.z + deltaUV2.x * edge1.z);
+
 			tan1[indices[i]] += tangent;
 			tan1[indices[i + 1]] += tangent;
 			tan1[indices[i + 2]] += tangent;
@@ -551,15 +545,21 @@ namespace Mesh {
 		}
 
 		for (size_t i = 0; i < vertices.size(); ++i) {
-			const glm::vec3& n = vertices[i].Normal;
+			// --- UNPACK 10-BIT NORMAL TO DO MATH ---
+			glm::vec3 n = glm::vec3(glm::unpackSnorm3x10_1x2(vertices[i].Normal));
 			const glm::vec3& t = tan1[i];
+
 			if (glm::length(t) < 1e-6f) {
-				vertices[i].Tangent = glm::vec4(1, 0, 0, 1); // Default tangent
+				// Pack a default tangent into uint32_t
+				vertices[i].Tangent = glm::packSnorm3x10_1x2(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 				continue;
 			}
+
 			glm::vec3 tangent = glm::normalize(t - n * glm::dot(n, t));
 			float handedness = (glm::dot(glm::cross(n, t), tan2[i]) < 0.0f) ? -1.0f : 1.0f;
-			vertices[i].Tangent = glm::vec4(tangent, handedness);
+
+			// --- PACK CALCULATED TANGENT BACK TO 10-BIT ---
+			vertices[i].Tangent = glm::packSnorm3x10_1x2(glm::vec4(tangent, handedness));
 		}
 	}
 
@@ -574,7 +574,7 @@ namespace Mesh {
 			{{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}}, {{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f,  0.0f}, {1.0f, 1.0f}}, {{0.5f, -0.5f,  0.5f}, {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}}, {{-0.5f, -0.5f,  0.5f}, {0.0f, -1.0f,  0.0f}, {0.0f, 0.0f}},
 			{{-0.5f,  0.5f, -0.5f}, {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}}, {{0.5f,  0.5f,  0.5f}, {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}}, {{0.5f,  0.5f, -0.5f}, {0.0f,  1.0f,  0.0f}, {1.0f, 1.0f}}, {{-0.5f,  0.5f,  0.5f}, {0.0f,  1.0f,  0.0f}, {0.0f, 0.0f}}
 		};
-		std::vector<GLuint> indices = { 0, 1, 2, 0, 3, 1, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 15, 13, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 23, 21 };
+		std::vector<IndexType> indices = { 0, 1, 2, 0, 3, 1, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 15, 13, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 23, 21 };
 		calculateTangents(vertices, indices);
 		return std::make_shared<MeshData>(vertices, indices);
 	}
@@ -582,7 +582,7 @@ namespace Mesh {
 	// Generates a UV sphere
 	inline std::shared_ptr<MeshData> generateSphere(int xSegments = 64, int ySegments = 64) {
 		std::vector<Vertex> vertices;
-		std::vector<GLuint> indices;
+		std::vector<IndexType> indices;
 		for (int y = 0; y <= ySegments; ++y) {
 			for (int x = 0; x <= xSegments; ++x) {
 				float xSegment = (float)x / (float)xSegments;
@@ -595,12 +595,12 @@ namespace Mesh {
 		}
 		for (int y = 0; y < ySegments; ++y) {
 			for (int x = 0; x < xSegments; ++x) {
-				indices.push_back((y + 1) * (xSegments + 1) + x);
-				indices.push_back(y * (xSegments + 1) + x);
-				indices.push_back(y * (xSegments + 1) + x + 1);
-				indices.push_back((y + 1) * (xSegments + 1) + x);
-				indices.push_back(y * (xSegments + 1) + x + 1);
-				indices.push_back((y + 1) * (xSegments + 1) + x + 1);
+				indices.push_back(static_cast<IndexType>((y + 1) * (xSegments + 1) + x));
+				indices.push_back(static_cast<IndexType>(y * (xSegments + 1) + x));
+				indices.push_back(static_cast<IndexType>(y * (xSegments + 1) + x + 1));
+				indices.push_back(static_cast<IndexType>((y + 1) * (xSegments + 1) + x));
+				indices.push_back(static_cast<IndexType>(y * (xSegments + 1) + x + 1));
+				indices.push_back(static_cast<IndexType>((y + 1) * (xSegments + 1) + x + 1));
 			}
 		}
 		calculateTangents(vertices, indices);
@@ -615,7 +615,7 @@ namespace Mesh {
 			{{ 1.0f,  1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
 			{{-1.0f,  1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}}
 		};
-		std::vector<GLuint> indices = { 0, 1, 2, 2, 3, 0 };
+		std::vector<IndexType> indices = { 0, 1, 2, 2, 3, 0 };
 		calculateTangents(vertices, indices);
 		return std::make_shared<MeshData>(vertices, indices);
 	}
@@ -626,7 +626,7 @@ namespace Mesh {
 			{{-1.0f,  1.0f, -1.0f}}, {{-1.0f, -1.0f, -1.0f}}, {{1.0f, -1.0f, -1.0f}}, {{1.0f,  1.0f, -1.0f}},
 			{{-1.0f, -1.0f,  1.0f}}, {{-1.0f,  1.0f,  1.0f}}, {{1.0f, -1.0f,  1.0f}}, {{1.0f,  1.0f,  1.0f}}
 		};
-		std::vector<GLuint> indices = { 0, 1, 2, 0, 2, 3, 1, 4, 6, 1, 6, 2, 4, 5, 7, 4, 7, 6, 5, 0, 3, 5, 3, 7, 3, 2, 6, 3, 6, 7, 0, 5, 4, 0, 4, 1 };
+		std::vector<IndexType> indices = { 0, 1, 2, 0, 2, 3, 1, 4, 6, 1, 6, 2, 4, 5, 7, 4, 7, 6, 5, 0, 3, 5, 3, 7, 3, 2, 6, 3, 6, 7, 0, 5, 4, 0, 4, 1 };
 		return std::make_shared<MeshData>(vertices, indices);
 	}
 
