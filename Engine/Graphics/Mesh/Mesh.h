@@ -62,14 +62,22 @@ namespace Mesh {
 
 	// A flexible vertex struct for loading any kind of mesh.
 	struct Vertex {
-		glm::vec3 Position;
-		glm::vec3 Normal;
-		glm::vec2 TexCoords;
-		glm::vec4 Tangent; 
+		glm::vec3 Position;       // 12 bytes
+		uint32_t  Normal;         // 4 bytes (Packed GL_INT_2_10_10_10_REV)
+		uint32_t  TexCoords;      // 4 bytes (Packed GL_HALF_FLOAT)
+		uint32_t  Tangent;        // 4 bytes (Packed GL_INT_2_10_10_10_REV)
+		uint8_t   BoneIndices[4]; // 4 bytes 
+		uint8_t   BoneWeights[4]; // 4 bytes 
+		// TOTAL: 32 Bytes!
 
-		// Add skinning data
-		glm::ivec4 BoneIndices = glm::ivec4(0);
-		glm::vec4 BoneWeights = glm::vec4(0.f);
+		// Constructor allows primitive generators to continue working flawlessly
+		Vertex(glm::vec3 p = glm::vec3(0), glm::vec3 n = glm::vec3(0), glm::vec2 uv = glm::vec2(0), glm::vec4 t = glm::vec4(1, 0, 0, 1)) {
+			Position = p;
+			Normal = glm::packSnorm3x10_1x2(glm::vec4(n, 0.0f));
+			TexCoords = glm::packHalf2x16(uv);
+			Tangent = glm::packSnorm3x10_1x2(t);
+			for (int i = 0; i < 4; i++) { BoneIndices[i] = 0; BoneWeights[i] = 0; }
+		}
 	};
 
 	struct AABB {
@@ -389,28 +397,32 @@ namespace Mesh {
 			AABB subBox;
 
 			for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-				Vertex vertex{};
-				vertex.Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
-				vertex.Normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+				glm::vec3 pos = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+				glm::vec3 norm = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+
+				glm::vec2 uv(0.0f);
 				if (mesh->mTextureCoords[0]) {
-					vertex.TexCoords = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+					uv = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
 				}
+
+				glm::vec4 tan(1.0f, 0.0f, 0.0f, 1.0f);
 				if (mesh->mTangents) {
 					glm::vec3 t = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
 					glm::vec3 b = { mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z };
-					float handedness = (glm::dot(glm::cross(vertex.Normal, t), b) < 0.0f) ? -1.0f : 1.0f;
-					vertex.Tangent = glm::vec4(t, handedness);
+					float handedness = (glm::dot(glm::cross(norm, t), b) < 0.0f) ? -1.0f : 1.0f;
+					tan = glm::vec4(t, handedness);
 				}
 				else {
-					glm::vec3 c1 = glm::cross(vertex.Normal, glm::vec3(0.0f, 0.0f, 1.0f));
-					glm::vec3 c2 = glm::cross(vertex.Normal, glm::vec3(0.0f, 1.0f, 0.0f));
+					glm::vec3 c1 = glm::cross(norm, glm::vec3(0.0f, 0.0f, 1.0f));
+					glm::vec3 c2 = glm::cross(norm, glm::vec3(0.0f, 1.0f, 0.0f));
 					glm::vec3 t = glm::length(c1) > glm::length(c2) ? c1 : c2;
-					vertex.Tangent = glm::vec4(glm::normalize(t), 1.0f);
+					tan = glm::vec4(glm::normalize(t), 1.0f);
 				}
 
-				subBox.expand(vertex.Position);
-				m_aabb.expand(vertex.Position);
-				vertices.push_back(vertex);
+				subBox.expand(pos);
+				m_aabb.expand(pos);
+				// The constructor we added automatically packs the floats into hardware uints!
+				vertices.push_back(Vertex(pos, norm, uv, tan));
 			}
 
 			for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
@@ -423,6 +435,10 @@ namespace Mesh {
 			}
 
 			if (mesh->HasBones()) {
+				// Temporary storage for accumulating float weights
+				std::vector<glm::vec4> tempWeights(mesh->mNumVertices, glm::vec4(0.0f));
+				std::vector<glm::ivec4> tempIndices(mesh->mNumVertices, glm::ivec4(0));
+
 				const unsigned int numBones = mesh->mNumBones;
 				for (unsigned int b = 0; b < numBones; ++b) {
 					const aiBone* bone = mesh->mBones[b];
@@ -440,27 +456,31 @@ namespace Mesh {
 					}
 
 					for (unsigned int w = 0; w < bone->mNumWeights; ++w) {
-						const aiVertexWeight& vw = bone->mWeights[w];
-						unsigned int vtxId = vw.mVertexId;
-						float weight = vw.mWeight;
-
-						Vertex& v = vertices[subMesh.baseVertex + vtxId];
+						unsigned int vtxId = bone->mWeights[w].mVertexId;
+						float weight = bone->mWeights[w].mWeight;
 
 						for (int k = 0; k < 4; ++k) {
-							if (v.BoneWeights[k] == 0.0f) {
-								v.BoneWeights[k] = weight;
-								v.BoneIndices[k] = static_cast<int>(boneIndex);
+							if (tempWeights[vtxId][k] == 0.0f) {
+								tempWeights[vtxId][k] = weight;
+								tempIndices[vtxId][k] = static_cast<int>(boneIndex);
 								break;
 							}
 						}
 					}
 				}
 
+				// Final pass: Normalize floats and pack into 8-bit integers!
 				for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
 					Vertex& v = vertices[subMesh.baseVertex + i];
-					float sum = v.BoneWeights.x + v.BoneWeights.y + v.BoneWeights.z + v.BoneWeights.w;
-					if (sum > 0.0f) {
-						v.BoneWeights /= sum;
+					glm::vec4 w = tempWeights[i];
+					glm::ivec4 idx = tempIndices[i];
+
+					float sum = w.x + w.y + w.z + w.w;
+					if (sum > 0.0f) { w /= sum; }
+
+					for (int k = 0; k < 4; ++k) {
+						v.BoneIndices[k] = static_cast<uint8_t>(idx[k]);
+						v.BoneWeights[k] = static_cast<uint8_t>(std::round(w[k] * 255.0f));
 					}
 				}
 			}
@@ -480,6 +500,7 @@ namespace Mesh {
 	// =========================================================================
 
 	// Generic helper function to calculate tangents for any manually created mesh
+	// Generic helper function to calculate tangents for any manually created mesh
 	inline void calculateTangents(std::vector<Vertex>& vertices, const std::vector<IndexType>& indices) {
 		if (indices.empty() || vertices.empty()) return;
 
@@ -490,13 +511,23 @@ namespace Mesh {
 			Vertex& v0 = vertices[indices[i]];
 			Vertex& v1 = vertices[indices[i + 1]];
 			Vertex& v2 = vertices[indices[i + 2]];
+
 			glm::vec3 edge1 = v1.Position - v0.Position;
 			glm::vec3 edge2 = v2.Position - v0.Position;
-			glm::vec2 deltaUV1 = v1.TexCoords - v0.TexCoords;
-			glm::vec2 deltaUV2 = v2.TexCoords - v0.TexCoords;
+
+			// --- UNPACK 16-BIT HALF FLOATS TO DO MATH ---
+			glm::vec2 uv0 = glm::unpackHalf2x16(v0.TexCoords);
+			glm::vec2 uv1 = glm::unpackHalf2x16(v1.TexCoords);
+			glm::vec2 uv2 = glm::unpackHalf2x16(v2.TexCoords);
+
+			glm::vec2 deltaUV1 = uv1 - uv0;
+			glm::vec2 deltaUV2 = uv2 - uv0;
+			// ---------------------------------------------
+
 			float det = (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 			if (std::abs(det) < 1e-6f) continue;
 			float f = 1.0f / det;
+
 			glm::vec3 tangent, bitangent;
 			tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
 			tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
@@ -504,6 +535,7 @@ namespace Mesh {
 			bitangent.x = f * (-deltaUV1.x * edge2.x + deltaUV2.x * edge1.x);
 			bitangent.y = f * (-deltaUV1.x * edge2.y + deltaUV2.x * edge1.y);
 			bitangent.z = f * (-deltaUV1.x * edge2.z + deltaUV2.x * edge1.z);
+
 			tan1[indices[i]] += tangent;
 			tan1[indices[i + 1]] += tangent;
 			tan1[indices[i + 2]] += tangent;
@@ -513,15 +545,21 @@ namespace Mesh {
 		}
 
 		for (size_t i = 0; i < vertices.size(); ++i) {
-			const glm::vec3& n = vertices[i].Normal;
+			// --- UNPACK 10-BIT NORMAL TO DO MATH ---
+			glm::vec3 n = glm::vec3(glm::unpackSnorm3x10_1x2(vertices[i].Normal));
 			const glm::vec3& t = tan1[i];
+
 			if (glm::length(t) < 1e-6f) {
-				vertices[i].Tangent = glm::vec4(1, 0, 0, 1); // Default tangent
+				// Pack a default tangent into uint32_t
+				vertices[i].Tangent = glm::packSnorm3x10_1x2(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 				continue;
 			}
+
 			glm::vec3 tangent = glm::normalize(t - n * glm::dot(n, t));
 			float handedness = (glm::dot(glm::cross(n, t), tan2[i]) < 0.0f) ? -1.0f : 1.0f;
-			vertices[i].Tangent = glm::vec4(tangent, handedness);
+
+			// --- PACK CALCULATED TANGENT BACK TO 10-BIT ---
+			vertices[i].Tangent = glm::packSnorm3x10_1x2(glm::vec4(tangent, handedness));
 		}
 	}
 
