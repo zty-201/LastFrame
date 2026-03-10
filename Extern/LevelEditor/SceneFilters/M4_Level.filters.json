@@ -192,7 +192,7 @@
 			"name": "Hall"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				32,
 				33,
@@ -279,7 +279,10 @@
 				819,
 				822,
 				821,
-				823
+				823,
+				840,
+				841,
+				842
 			],
 			"name": "Playroom"
 		},
@@ -606,7 +609,7 @@
 			"name": "Storeroom"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				408,
 				409,
@@ -649,7 +652,8 @@
 				696,
 				104,
 				186,
-				824
+				824,
+				843
 			],
 			"name": "Lobby"
 		},
@@ -787,7 +791,7 @@
 			"name": "SF_Ceiling"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				394,
 				184,
@@ -805,7 +809,7 @@
 			"name": "SF_Corridor"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				724,
 				725,
@@ -842,7 +846,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				5,
 				2,
