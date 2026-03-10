@@ -25,6 +25,7 @@
 #include "MetaInspector.hpp"
 #include "NameComponent.h"
 #include "ButtonComponent.hpp"
+#include "JoystickComponent.h"
 
 
 /*
@@ -125,6 +126,7 @@ struct adl_serializer<AudioComponent::Slot> {
 		j["playOnStart"] = s.playOnStart;
 		j["minDistance"] = s.minDistance;
 		j["maxDistance"] = s.maxDistance;
+		j["ambienceType"] = static_cast<int>(s.ambienceType);
 		j["category"] = static_cast<int>(s.category);
 		j["spatial"] = static_cast<int>(s.spatial);
 	}
@@ -145,6 +147,7 @@ struct adl_serializer<AudioComponent::Slot> {
 		s.playOnStart = j.value("playOnStart", false);
 		s.minDistance = j.value("minDistance", 1.0f);
 		s.maxDistance = j.value("maxDistance", 25.0f);
+		s.ambienceType = static_cast<AudioComponent::AmbienceType>(j.value("ambienceType", 0));
 		s.category = static_cast<AudioComponent::AudioCategory>(j.value("category", 0));
 		s.spatial = static_cast<AudioComponent::SpatialMode>(j.value("spatial", 1));	// Default to 3D
 	}
@@ -711,7 +714,8 @@ namespace EngineFramework
 			.data<&AudioComponent::Slot::category>("category")
 			.data<&AudioComponent::Slot::spatial>("spatial")
 			.data<&AudioComponent::Slot::minDistance>("minDistance")
-			.data<&AudioComponent::Slot::maxDistance>("maxDistance");
+			.data<&AudioComponent::Slot::maxDistance>("maxDistance")
+			.data<&AudioComponent::Slot::ambienceType>("ambienceType");
 
 		entt::meta_factory<AudioComponent>()
 			.type("AudioComponent")
@@ -890,6 +894,19 @@ namespace EngineFramework
 			.func<&Getter<NameComponent>::GetComponent>("get")
 			.func<&GetRef<NameComponent>>("get_ref");
 
+		// Register joystick component
+		entt::meta_factory<JoystickComponent>()
+			.type("JoystickComponent")
+			.data<&JoystickComponent::maxRadius>("maxRadius")
+			.data<&JoystickComponent::baseCenter>("baseCenter")
+			.data<&JoystickComponent::isBeingDragged>("isBeingDragged")
+			.data<&JoystickComponent::outputX>("outputX")
+			.data<&JoystickComponent::outputY>("outputY")
+			.data<&JoystickComponent::knobTargetName>("knobTargetName")
+			.func<&Emplacer<JoystickComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<JoystickComponent>::RemoveComponent>("remove")
+			.func<&Getter<JoystickComponent>::GetComponent>("get")
+			.func<&GetRef<JoystickComponent>>("get_ref");
 	}
 
 	//Helper function to cast json to the correct data type, and set comp_data.

@@ -18,6 +18,13 @@ struct AudioComponent
 		ThreeD
 	};
 
+	enum class AmbienceType : uint8_t
+	{
+		General = 0,
+		Outdoor,
+		Indoor
+	};
+
 	using AudioCategory = EngineFramework::AudioCategory;
 
 	// A 'Slot' is a designer-authored "audio" in an entity
@@ -42,7 +49,11 @@ struct AudioComponent
 		bool useFade		= false;
 		float fadeDuration	= 1.0f;
 
+		// Default to SFX
 		AudioCategory category = AudioCategory::SFX;
+
+		// Since its default SFX, its a general ambience
+		AmbienceType ambienceType = AmbienceType::General;
 
 		// 2D / 3D Behaviour
 		SpatialMode spatial = SpatialMode::ThreeD;

@@ -121,12 +121,12 @@ namespace EngineFramework
         //std::cout << "=========================================\n";
 
     }
+
     void UI_Menu::Update() {
 
         update_Buttons();
-
-
     }
+
     void UI_Menu::Clean() {
         AllElements_in_this_overlay.clear();
     }
@@ -303,6 +303,7 @@ namespace EngineFramework
         }
 
     }
+
     void UI_Menu::update_Button_State(ButtonComponent& button, entt::entity e) {
 
         button.is_hover = false;
@@ -405,6 +406,7 @@ namespace EngineFramework
 
     void UI_Menu::Trigger_Button_Event(ButtonComponent& button, BUTTON_STATE state) {
 
+
         Button_Event event{};
 
         if (state != HOVER && state != TRIGGERED) {
@@ -416,7 +418,7 @@ namespace EngineFramework
         }
         else if (state == TRIGGERED) {
             event.Event_Name = button.event_trigger;
-            //std::cout << "BUTTON EVENT TRIGGER (Clicked): " << button.event_trigger << std::endl;
+            std::cout << "BUTTON EVENT TRIGGER (Clicked): " << button.event_trigger << std::endl;
         }
         
         event_dispatcher.trigger<Button_Event>(std::move(event));

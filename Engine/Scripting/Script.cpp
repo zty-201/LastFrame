@@ -225,6 +225,7 @@ namespace Engine {
         // Create SHARED table for cross-script communication
         // ===============================================================
         s_Lua["SHARED"] = s_Lua.create_table();
+        s_Lua["SHARED"]["UI"] = s_Lua.create_table();
         LOGI("[ScriptSystem] Created SHARED table for cross-script communication");
 
         // ===============================================================
@@ -246,6 +247,15 @@ namespace Engine {
         // ===============================================================
         // UI bindings (Lua -> UI_System)
         // ===============================================================
+
+        s_Lua.set_function("GetEntityName",
+            [](uint32_t entityId) -> std::string
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                return EngineFramework::GameObjectSystem::GetInstance().GetEntityName(e);
+            });
+
+
         s_Lua.set_function("UI_StartPseudoCutscene", []()
             {
                 // If your UI_System is NOT singleton and is purely static:
@@ -271,13 +281,38 @@ namespace Engine {
                 // EngineFramework::UI_System::displayMenu(menuName);  // static-style
                 EngineFramework::UI_System::GetInstance().displayMenu(menuName);
             });
+        s_Lua.set_function("UI_CloseMenu", [](const std::string& menuName)
+            {
+                EngineFramework::UI_System::GetInstance().closeMenu(menuName);
+            });
+        s_Lua.set_function("UI_IsMenuActive", [](const std::string& menuName) -> bool
+            {
+                return EngineFramework::UI_System::GetInstance().IsMenuActive(menuName);
+            });
 
         s_Lua.set_function("UI_CloseAllMenus", []()
             {
                 // EngineFramework::UI_System::closeAllMenu();
                 EngineFramework::UI_System::GetInstance().closeAllMenu();
             });
+        s_Lua.set_function("UI_CloseMenu", [](const std::string& menuName)
+            {
+                // EngineFramework::UI_System::displayMenu(menuName);  // static-style
+                EngineFramework::UI_System::GetInstance().closeMenu(menuName);
+            });
+        s_Lua.set_function("UI_DisplayMenu_InvisibleLayer", [](const std::string& menuName)
+            {
+                // EngineFramework::UI_System::displayMenu(menuName);  // static-style
+                EngineFramework::UI_System::GetInstance().displayMenu_InvisibleLayer(menuName);
+            });
+        //
 
+        s_Lua.set_function("UI_is_MenuOpen", [](const std::string& menuName) -> bool
+            {
+                return EngineFramework::UI_System::GetInstance().is_MenuOpen(menuName);
+            });
+
+        
 
         // ===============================================================
         // Transform Component bindings
@@ -720,6 +755,17 @@ namespace Engine {
                 EngineFramework::AudioSystem::GetInstance().SetIndoorFactor(factor);
             });
 
+        s_Lua.set_function("Audio_GetSlotFadeDuration",
+            [](uint32_t entityID, const std::string& slotId) -> float
+            {
+                auto& ecs = EngineFramework::GameObjectSystem::GetRegistry();
+                entt::entity entity = static_cast<entt::entity>(entityID);
+                if (!ecs.valid(entity) || !ecs.all_of<AudioComponent>(entity)) return 1.0f;
+                auto& comp = ecs.get<AudioComponent>(entity);
+                const auto* slot = comp.FindSlot(slotId);
+                return slot ? slot->fadeDuration : 1.0f;
+            });
+
         // ===============================================================
         // UIComponent bindings
         // ===============================================================
@@ -754,12 +800,22 @@ namespace Engine {
             "SetLayer", [](UIComponent& ui, int layer) {
                 ui.layer = layer;
             },
-            "GetSizeNDC", [](UIComponent& ui) {
+            "GetPosition_NDC", [](UIComponent& ui) {
+                return std::make_tuple(ui.position_NDC.x, ui.position_NDC.y);
+            },
+            "SetPosition_NDC", [](UIComponent& ui, float x, float y) {
+                ui.position_NDC = glm::vec2(x, y);
+            },
+            "is_NDC", [](UIComponent& ui, bool v) {
+                ui.is_NDC = v;
+            },
+            "GetSize_NDC", [](UIComponent& ui) {
                 return std::make_tuple(ui.size_NDC.x, ui.size_NDC.y);
             },
-            "SetSizeNDC", [](UIComponent& ui, float w, float h) {
-                ui.size_NDC = glm::vec2(w, h);
+            "SetSize_NDC", [](UIComponent& ui, float x, float y) {
+                ui.size_NDC = glm::vec2(x, y);
             }
+            
         );
 
         s_Lua.set_function("Script_RequestReloadEntity",

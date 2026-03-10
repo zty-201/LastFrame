@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate called");
+        org.fmod.FMOD.init(this);
         try {
             binding = ActivityMainBinding.inflate(getLayoutInflater());
             setContentView(binding.getRoot());
@@ -140,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     }
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         Log.d(TAG, "onDestroy called");
         if (isInitialized) {
             try {
@@ -149,6 +149,8 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
                 Log.e(TAG, "Error during cleanup", e);
             }
         }
+        org.fmod.FMOD.close();
+        super.onDestroy();
     }
     // Helper method to show toast from any thread
     private void showToast(final String message) {

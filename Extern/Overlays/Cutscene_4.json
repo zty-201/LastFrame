@@ -1,5 +1,5 @@
 {
-	"622": {
+	"627": {
 		"UIComponent": {
 			"Overlay_name": "Cutscene_4",
 			"color": [
@@ -9,7 +9,7 @@
 			],
 			"event_received": "",
 			"is_NDC": true,
-			"layer": 0,
+			"layer": 3,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -20,8 +20,8 @@
 				0.0
 			],
 			"size": [
-				1620.0,
-				1068.0
+				2675.0,
+				1625.0
 			],
 			"size_NDC": [
 				1.0,

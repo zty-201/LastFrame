@@ -19,7 +19,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "Assets/System/AssetManager.hpp"
 #include "FileDialog.hpp"
 #include "HistorySystem.hpp"
-#include "stb_image.h"
+#include "scene.h"
 #include <cctype>
 #include <system_error>
 
@@ -52,7 +52,6 @@ namespace EngineFramework
 
 	AssetWindow::~AssetWindow()
 	{
-        ClearThumbnailCache();
 	}
 
 	void AssetWindow::Initialize()
@@ -106,7 +105,6 @@ namespace EngineFramework
             if (ImGui::Button("Refresh", ImVec2(buttonWidth, 0))) {
                 AssetManagerSystem::GetInstance().RemoveAllResources();
                 AssetManagerSystem::GetInstance().LoadAllResources();
-                ClearThumbnailCache();
             }
             ImGui::SameLine();
             if (ImGui::Button("Link Component")) {
@@ -473,91 +471,21 @@ namespace EngineFramework
         if (ec) {
             return 0;
         }
-
-        const std::string key = path.string();
-        auto it = thumbnail_cache.find(key);
-        if (it != thumbnail_cache.end()) {
-            auto& entry = it->second;
-            if (!entry.failed && entry.textureId != 0 && entry.lastWrite == writeTime) {
-                return entry.textureId;
-            }
-
-            if (entry.failed && entry.lastWrite == writeTime) {
-                return 0;
-            }
-
-            if (entry.textureId != 0) {
-                GLuint tex = entry.textureId;
-                glDeleteTextures(1, &tex);
-            }
-            thumbnail_cache.erase(it);
+        // we just access it from the entt meta no need to store in local cache as 
+		// lookup time is around same and we need to ensure the data is always up to date,
+        // otherwise we need to monitor file change and update the local cache accordingly which is more complex
+        const std::string key = path.stem().string();
+        using E_AM = EngineFramework::AssetManagerSystem;
+        xresource::full_guid texture_guid = E_AM::GetFullGuid(E_AM::TEXTURE_GUID, key);
+        auto textureId = E_AM::GetResource<Scene::Texture>(texture_guid);
+        if (textureId) {
+            GLuint texId = textureId->id;
+            return texId;
         }
 
-        ThumbnailEntry newEntry{};
-        newEntry.lastWrite = writeTime;
-
-        if (!LoadThumbnailTexture(path, newEntry)) {
-            newEntry.failed = true;
-            thumbnail_cache.emplace(key, newEntry);
-            return 0;
-        }
-
-        thumbnail_cache.emplace(key, newEntry);
-        return newEntry.textureId;
+        return 0;
     }
 
-    // Use stbi_load to decode large image into rgba pixels and create a GL texture, set linear flitering + clamp wrap and uploads these pixels via glTexImage2D
-    // Then restore the unpacked alignment and frees up the cpu buffer
-    // Next, fill up the thumbnail entry with the generated texture id and report success or failure
-    bool AssetWindow::LoadThumbnailTexture(const std::filesystem::path& path, ThumbnailEntry& outEntry) {
-        int width = 0;
-        int height = 0;
-        int channels = 0;
-        stbi_uc* data = stbi_load(path.string().c_str(), &width, &height, &channels, STBI_rgb_alpha);
-        if (!data) {
-            LOGW("[AssetWindow] Failed to load thumbnail for %s: %s", path.string().c_str(), stbi_failure_reason());
-            return false;
-        }
-
-        GLuint texture = 0;
-        glGenTextures(1, &texture);
-        if (texture == 0) {
-            LOGW("[AssetWindow] Failed to create OpenGL texture for thumbnail: %s", path.string().c_str());
-            stbi_image_free(data);
-            return false;
-        }
-
-        GLint previousAlignment = 0;
-        glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
-
-        stbi_image_free(data);
-
-        outEntry.textureId = texture;
-        outEntry.failed = false;
-        return true;
-    }
-
-    // Destroying the assetwindow or refreshing it will clear the cache
-    void AssetWindow::ClearThumbnailCache() {
-        for (auto& [_, entry] : thumbnail_cache) {
-            if (entry.textureId != 0) {
-                GLuint tex = entry.textureId;
-                glDeleteTextures(1, &tex);
-            }
-        }
-        thumbnail_cache.clear();
-    }
 
     /*
     * return false if the component's variable does not exists in the component mapping

@@ -12,6 +12,7 @@ namespace EngineFramework
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_instanceSSBOs);
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_indirectBuffers);
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_visibleIndicesBuffers);
+            glDeleteBuffers(FRAMES_IN_FLIGHT, m_cullingMatrixUBOs);
         }
     }
 
@@ -24,7 +25,7 @@ namespace EngineFramework
         glGenBuffers(FRAMES_IN_FLIGHT, m_instanceSSBOs);
         glGenBuffers(FRAMES_IN_FLIGHT, m_indirectBuffers);
         glGenBuffers(FRAMES_IN_FLIGHT, m_visibleIndicesBuffers);
-
+        glGenBuffers(FRAMES_IN_FLIGHT, m_cullingMatrixUBOs);
         // Pre-allocate memory for all frames in flight
         for (int i = 0; i < FRAMES_IN_FLIGHT; ++i) {
             // Instance Data
@@ -38,10 +39,15 @@ namespace EngineFramework
             // Visible Indices
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_visibleIndicesBuffers[i]);
             glBufferData(GL_SHADER_STORAGE_BUFFER, MAX_INSTANCES * NUM_PASSES * sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
+
+			// Culling Matrices UBO
+            glBindBuffer(GL_UNIFORM_BUFFER, m_cullingMatrixUBOs[i]);
+            // Pre-allocate the 8.4 KB block
+            glBufferData(GL_UNIFORM_BUFFER, sizeof(CullingMatrixData), nullptr, GL_DYNAMIC_DRAW);
         }
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
         // Reserve memory to prevent CPU reallocations during gathering
         m_globalInstanceData.reserve(m_maxTotalInstances);
         m_indirectCommands.reserve(1000);
@@ -87,7 +93,7 @@ namespace EngineFramework
             // Get Mesh Data
             xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp.meshName);
             auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-            if (!meshData || meshData->vao == 0) continue;
+            if (!meshData || meshData->subMeshes.empty()) continue;
 
             const MaterialComponent* overrideMat = registry.try_get<MaterialComponent>(entity);
 
@@ -148,7 +154,8 @@ namespace EngineFramework
                 AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, key.meshName));
 
             GLuint indexCount = meshData->subMeshes[key.subMeshIndex].indexCount;
-            GLuint firstIndex = meshData->subMeshes[key.subMeshIndex].baseIndex;
+            GLuint firstIndex = meshData->subMeshes[key.subMeshIndex].firstIndex; // Pulls Mega-IBO offset
+            GLuint baseVert = meshData->subMeshes[key.subMeshIndex].baseVertex; // Pulls Mega-VBO offset
 
             // Setup base Indirect Commands
             for (int pass = 0; pass < NUM_PASSES; pass++) {
@@ -156,9 +163,10 @@ namespace EngineFramework
                 m_indirectCommands[cmdIndex].count = indexCount;
                 m_indirectCommands[cmdIndex].instanceCount = 0;
                 m_indirectCommands[cmdIndex].firstIndex = firstIndex;
-                m_indirectCommands[cmdIndex].baseVertex = 0;
-                m_indirectCommands[cmdIndex].baseInstance = 0;
+                m_indirectCommands[cmdIndex].baseVertex = baseVert;   // Injected into hardware struct!
+                m_indirectCommands[cmdIndex].baseInstance = (pass * MAX_INSTANCES) + static_cast<GLuint>(batch.instanceOffset);
             }
+
             size_t batchBaseOffset = currentOffset;
             for (auto& inst : instances) {
                 inst.data.batchID = batchIndex;
@@ -177,16 +185,28 @@ namespace EngineFramework
 
     }
 
-    void InstancingSystem::UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj, const std::vector<glm::mat4>& spotProj) {
+    void InstancingSystem::UpdateAndDispatchCompute(
+        const glm::mat4& mainViewProj,
+        const std::array<glm::mat4, 3>& cascadeProj,
+        const std::vector<glm::mat4>& spotProj,
+        const std::vector<glm::mat4>& pointProj
+    ) {
 
         // --- 1. HANDLE DIRTY BATCHES (From Level Editor UI) ---
         if (m_needsBatchRebuild) {
             BuildSceneBatches();
             m_needsBatchRebuild = false;
-            m_pendingCreations.clear(); // Building batches catches everything, clear the queue!
+            m_pendingCreations.clear(); // Building batches catches everything, clear the queue
         }
 
-        // --- 2. HANDLE DEFERRED CREATIONS (From Duplicate/Spawn) ---
+        // --- 2. HANDLE DEFERRED CREATIONS (From Duplicate/Spawn) --- 
+		// not in use currently as it requires a major refactor of how each systems
+        // uses the transform and mesh component. 
+        // Issue 1: when objects are destructed, we need to log the destruction of 
+        // MeshInstance first as the destruction order arent guaranteed. 
+        // There isnt frequent creation/destruction, 
+        // but this is the solution for UI editor bug and future dynamic scenes
+
         if (!m_pendingCreations.empty()) {
             for (entt::entity newEntity : m_pendingCreations) {
                 ProcessNewInstance(newEntity);
@@ -196,6 +216,13 @@ namespace EngineFramework
 
         if (m_globalInstanceData.empty()) return;
 
+		// --- 3. UPDATE INSTANCE DATA & INDIRECT COMMANDS ---
+		// triple buffering logic: we have 3 buffers for the instance data, 
+        // indirect commands, and visible indices. Each frame, we write to 
+        // the next buffer in a circular manner, ensuring the GPU is done 
+        // with that buffer before we write to it again. 
+        // This allows us to avoid stalls and ensures smooth rendering 
+        // even when the CPU updates every frame.
         m_currentFrame++;
         int ringIdx = m_currentFrame % FRAMES_IN_FLIGHT;
 
@@ -217,7 +244,7 @@ namespace EngineFramework
             }
         }
 
-        // 3. ZERO-STALL UPLOAD 
+        // UPLOAD 
         // We upload the ENTIRE vector. The GPU is guaranteed to be done with this specific buffer.
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBOs[ringIdx]);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, m_globalInstanceData.size() * sizeof(InstanceData), m_globalInstanceData.data());
@@ -241,19 +268,22 @@ namespace EngineFramework
 
         cullingShader->use();
 
-        // For directional light cascade culling
-        cullingShader->setUniform("u_MainViewProj", mainViewProj);
-        for (int i = 0; i < 3; i++) {
-            cullingShader->setUniform("u_CascadeViewProj[" + std::to_string(i) + "]", cascadeProj[i]);
-        }
-
-		// For spotlight culling
-        cullingShader->setUniform("u_NumSpotLights", (int)spotProj.size());
-        for (size_t i = 0; i < spotProj.size(); ++i) {
-            cullingShader->setUniform("u_SpotLightViewProj[" + std::to_string(i) + "]", spotProj[i]);
-        }
-
+        // 1. Set the standard integers
         cullingShader->setUniform("u_TotalInstances", (uint32_t)m_globalInstanceData.size());
+        cullingShader->setUniform("u_NumSpotLights", (int)spotProj.size());
+        cullingShader->setUniform("u_NumPointLightFaces", (int)pointProj.size());
+
+        // 2. Pack all 132 matrices into our strict struct
+        CullingMatrixData matrixData = {}; // Initializes with zeros
+        matrixData.mainViewProj = mainViewProj;
+        for (int i = 0; i < 3; i++) matrixData.cascadeViewProj[i] = cascadeProj[i];
+        for (size_t i = 0; i < spotProj.size(); i++) matrixData.spotLightViewProj[i] = spotProj[i];
+        for (size_t i = 0; i < pointProj.size(); i++) matrixData.pointLightViewProj[i] = pointProj[i];
+
+        // 3. Upload the entire 8.4KB block in a single API call
+        glBindBuffer(GL_UNIFORM_BUFFER, m_cullingMatrixUBOs[ringIdx]);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CullingMatrixData), &matrixData);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_cullingMatrixUBOs[ringIdx]); // Bind to binding = 0
 
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_instanceSSBOs[ringIdx]);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_indirectBuffers[ringIdx]);
@@ -371,7 +401,7 @@ namespace EngineFramework
 
         xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp->meshName);
         auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-        if (!meshData || meshData->vao == 0) return;
+        if (!meshData || meshData->subMeshes.empty()) return;
 
         const MaterialComponent* overrideMat = registry.try_get<MaterialComponent>(entity);
         auto& meta = registry.get_or_emplace<InstanceMetadata>(entity);

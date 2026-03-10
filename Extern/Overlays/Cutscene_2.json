@@ -1,5 +1,5 @@
 {
-	"595": {
+	"625": {
 		"NameComponent": {
 			"name": "Cutscene_2"
 		},
@@ -12,7 +12,7 @@
 			],
 			"event_received": "",
 			"is_NDC": true,
-			"layer": 0,
+			"layer": 3,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -23,8 +23,8 @@
 				0.0
 			],
 			"size": [
-				1715.0,
-				1158.0
+				2675.0,
+				1625.0
 			],
 			"size_NDC": [
 				1.0,

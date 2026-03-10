@@ -1,7 +1,10 @@
 ----------------------------------------------------------------
--- ChairScatter_CP1.lua (EXPLOSION VERSION)
+-- ChairScatter_CP1.lua (SAFE ZONE VERSION)
 ----------------------------------------------------------------
 local DEBUG = true
+
+local EXPLODE_AUDIO_SLOT = "ChairExplode"
+local SCARE_AUDIO_SLOT = "Scary"
 
 -- Chair piece entity IDs
 local CHAIR_PART_IDS = {
@@ -15,28 +18,42 @@ local HIDE_ENTITY_ID = 209
 local SCALE_378_ID   = 378
 local SCALE_380_ID   = 380
 
--- Explosion force ranges
-local BURST_XZ   = 400.0   -- horizontal kick
-local BURST_Y    = 350.0   -- upward kick
-local GRAVITY    = 280.0   -- pull down per second squared
+-- Safe zone: pieces will land randomly within this radius of the center
+local ZONE_CENTER_X  = 443.983
+local ZONE_CENTER_Z  = -288.646
+local ZONE_RADIUS    = 150.0    -- tune this if pieces still hit walls
 
--- Y floor: pieces stop here
-local Y_FLOOR    = 40.0
+-- Y settings
+local BURST_Y        = 80.0    -- upward kick on explosion
+local GRAVITY        = 280.0   -- how fast pieces fall
+local Y_FLOOR        = 5.0     -- height pieces stop at (tune to your floor)
+local Y_MAX          = 100.0   -- max height a piece can reach
 
 local function log(...)
     if DEBUG then print("[ChairScatter]", ...) end
 end
 
-local function rand_range(r)
-    return (math.random() * 2.0 - 1.0) * r
+local function play_3d_sfx(slotId)
+    if type(Audio_PlaySlot) == "function" and slotId ~= nil then
+        Audio_PlaySlot(EntityID, slotId)
+        return true
+    end
+    return false
+end
+
+-- Pick a random point within the safe zone circle
+local function random_landing()
+    local angle  = math.random() * math.pi * 2.0
+    local radius = math.random() * ZONE_RADIUS
+    local lx = ZONE_CENTER_X + math.cos(angle) * radius
+    local lz = ZONE_CENTER_Z + math.sin(angle) * radius
+    return lx, lz
 end
 
 function on_create(Self)
     Self.done       = false
     Self.simulating = false
-
-    -- Will hold per-piece state: { id, vx, vy, vz, stopped }
-    Self.pieces = {}
+    Self.pieces     = {}
 
     SHARED.ChairScatter = SHARED.ChairScatter or {}
     SHARED.ChairScatter._self = Self
@@ -48,18 +65,45 @@ function on_create(Self)
 
         log("Explosion triggered!")
 
+        ------------------------------------------------
+        -- Play explosion audio from this entity
+        ------------------------------------------------
+        if type(Audio_PlaySlot) == "function" then
+            play_3d_sfx(EXPLODE_AUDIO_SLOT)
+            play_3d_sfx(SCARE_AUDIO_SLOT)
+
+            if DEBUG then
+                print("[ChairScatter] Played explode SFX:", EXPLODE_AUDIO_SLOT)
+            end
+        end
+
         ----------------------------------------------------------------
-        -- 1. Assign random burst velocities to each chair piece
+        -- 1. For each piece, pick a target landing spot in the safe zone
+        --    then compute a velocity that arcs it toward that spot
         ----------------------------------------------------------------
         s.pieces = {}
         for _, id in ipairs(CHAIR_PART_IDS) do
             local tr = Query.GetTransform(id)
             if tr then
+                local x, y, z = tr:GetPosition()
+
+                -- Pick a random landing spot inside the safe zone
+                local tx, tz = random_landing()
+
+                -- Estimate flight time based on upward burst + gravity
+                local vy = math.random() * BURST_Y * 0.5 + BURST_Y * 0.5
+                local t  = (2.0 * vy) / GRAVITY
+                if t < 0.1 then t = 0.1 end
+
+                -- Work out horizontal velocity needed to reach target in time t
+                local vx = (tx - x) / t
+                local vz = (tz - z) / t
+
                 table.insert(s.pieces, {
                     id      = id,
-                    vx      = rand_range(BURST_XZ),
-                    vy      = math.random() * BURST_Y + 100.0,  -- always pops upward
-                    vz      = rand_range(BURST_XZ),
+                    vx      = vx,
+                    vy      = vy,
+                    vz      = vz,
                     stopped = false
                 })
             else
@@ -67,7 +111,6 @@ function on_create(Self)
             end
         end
 
-        -- Start simulating in on_update
         s.simulating = true
 
         ----------------------------------------------------------------
@@ -122,10 +165,9 @@ function on_update(Self, dt)
         if not p.stopped then
             allStopped = false
 
-            -- Apply gravity to vertical velocity
+            -- Apply gravity
             p.vy = p.vy - GRAVITY * dt
 
-            -- Get current position
             local tr = Query.GetTransform(p.id)
             if tr then
                 local x, y, z = tr:GetPosition()
@@ -134,14 +176,20 @@ function on_update(Self, dt)
                 local ny = y + p.vy * dt
                 local nz = z + p.vz * dt
 
-                -- Hit the floor?
+                -- Clamp max height
+                if ny > Y_MAX then
+                    ny = Y_MAX
+                    p.vy = 0.0
+                end
+
+                -- Hit the floor, stop the piece
                 if ny <= Y_FLOOR then
                     ny = Y_FLOOR
                     p.vy = 0.0
                     p.vx = 0.0
                     p.vz = 0.0
                     p.stopped = true
-                    log("Piece", p.id, "hit floor")
+                    log("Piece", p.id, "landed")
                 end
 
                 tr:SetPosition(nx, ny, nz)
@@ -149,10 +197,9 @@ function on_update(Self, dt)
         end
     end
 
-    -- All pieces landed, stop simulating
     if allStopped then
         Self.simulating = false
-        log("All pieces settled, simulation done")
+        log("All pieces landed, simulation done")
     end
 end
 

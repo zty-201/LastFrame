@@ -1,5 +1,5 @@
 {
-	"626": {
+	"630": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				4199668781989724205,
@@ -14,8 +14,7 @@
 			"idle_texture": [
 				10640027270492504069,
 				3711223656383638553
-			],
-			"stay_clicked": false
+			]
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -32,16 +31,16 @@
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
-				771.75,
-				521.0999755859375
+				1203.75,
+				731.25
 			],
 			"position_NDC": [
 				0.0,
 				0.0
 			],
 			"size": [
-				171.5,
-				115.80000305175781
+				267.5,
+				162.5
 			],
 			"size_NDC": [
 				0.10000000149011612,
@@ -54,7 +53,7 @@
 			"visible": false
 		}
 	},
-	"627": {
+	"631": {
 		"NameComponent": {
 			"name": "Just_A_Texture"
 		},
@@ -92,7 +91,7 @@
 			"visible": false
 		}
 	},
-	"628": {
+	"632": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16964946010757644289,
@@ -107,8 +106,7 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			],
-			"stay_clicked": false
+			]
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -125,16 +123,16 @@
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
-				771.75,
-				694.7999267578125
+				1203.75,
+				975.0
 			],
 			"position_NDC": [
 				0.0,
 				0.30000001192092896
 			],
 			"size": [
-				171.5,
-				115.80000305175781
+				267.5,
+				162.5
 			],
 			"size_NDC": [
 				0.10000000149011612,
@@ -147,7 +145,7 @@
 			"visible": false
 		}
 	},
-	"629": {
+	"633": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				4888147658385178647,
@@ -162,8 +160,7 @@
 			"idle_texture": [
 				12015349190809845763,
 				3711223656383638553
-			],
-			"stay_clicked": false
+			]
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -180,16 +177,16 @@
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
-				771.75,
-				347.3999938964844
+				1203.75,
+				487.5
 			],
 			"position_NDC": [
 				0.0,
 				-0.30000001192092896
 			],
 			"size": [
-				171.5,
-				115.80000305175781
+				267.5,
+				162.5
 			],
 			"size_NDC": [
 				0.10000000149011612,

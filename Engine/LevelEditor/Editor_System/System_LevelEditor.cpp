@@ -35,6 +35,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "InputManager.hpp"
 #include "Level_Editor.hpp"
 #include "AssetManager.hpp"
+#include "Audio.hpp"
 namespace EngineFramework
 {
 	namespace {
@@ -111,6 +112,9 @@ namespace EngineFramework
 				application->Initialize();
 				application->Open();
 
+				// Stop all audio when editor is open
+				AudioSystem::GetInstance().SetSimulationMode(false);
+
 				// Send an enabled event.
 				Event_Level_Editor_Toggled editor_toggled{};
 				editor_toggled.is_enabled = true;
@@ -124,6 +128,9 @@ namespace EngineFramework
 
 				application->Close();
 				application->Clean();
+
+				// Allow playOnStart audios when editor is closed
+				AudioSystem::GetInstance().SetSimulationMode(true);
 
 				// Send a disabled event.
 				Event_Level_Editor_Toggled editor_toggled{};
