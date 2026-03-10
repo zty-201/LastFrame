@@ -695,7 +695,7 @@ namespace EngineFramework {
 		{
 			std::vector<std::filesystem::path> compressed_filepaths{};
 #ifdef PLATFORM_WINDOWS
-			compressed_filepaths = std::move(ListFilesInDirectory(compressed_astc_folderpath, Scene::GetCompressedTextureExtensions()));
+			compressed_filepaths = std::move(ListFilesInDirectory(compressed_bc_folderpath, Scene::GetCompressedTextureExtensions()));
 #elif defined (PLATFORM_ANDROID)
 			compressed_filepaths = std::move(ListFilesInDirectory(compressed_astc_folderpath, Scene::GetCompressedTextureExtensions()));
 #endif
