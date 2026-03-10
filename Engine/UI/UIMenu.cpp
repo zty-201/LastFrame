@@ -83,11 +83,18 @@ namespace EngineFramework
                                    
                 button.is_hover = false;
                 button.is_clicked = false;
-                button.is_released = false; 
+                button.is_released = false;
                 //button.is_active = false;
+                button.clicked_locked = false;
 
                 button.curr_button_state = IDLE;
-                button.prev_button_state = IDLE;
+                button.prev_button_state = NO_STATE; // Force texture reset on first update
+                // Note: stay_clicked is intentionally NOT reset here — it is a designer setting
+
+                // Reset texture back to idle immediately
+                if (registry.all_of<UIComponent>(entity)) {
+                    registry.get<UIComponent>(entity).textureid = button.idle_texture;
+                }
             }
         }
 
@@ -257,6 +264,18 @@ namespace EngineFramework
                     */
                     if (button.curr_button_state == TRIGGERED) {
                         Trigger_Button_Event(button, TRIGGERED);
+                        if (button.stay_clicked) {
+                            if (!button.clicked_locked) {
+                                // First click: lock onto clicked_texture
+                                button.clicked_locked = true;
+                                button.curr_button_state = CLICKED;
+                                registry.get<UIComponent>(entity).textureid = button.clicked_texture;
+                            } else {
+                                // Second click: unlock and revert to idle
+                                button.clicked_locked = false;
+                                registry.get<UIComponent>(entity).textureid = button.idle_texture;
+                            }
+                        }
                         break;
                     }
                     else if (button.curr_button_state == HOVER) {
@@ -268,15 +287,14 @@ namespace EngineFramework
                     */
                     auto& ui = registry.get<UIComponent>(entity);
                     
-                    if (button.prev_button_state != button.curr_button_state) {
+                    if (!button.clicked_locked && button.prev_button_state != button.curr_button_state) {
                         if (button.curr_button_state == IDLE) {
                             ui.textureid = button.idle_texture;
                         }else if (button.curr_button_state == HOVER) {
-                            ui.textureid = button.hover_texture;                          
+                            ui.textureid = button.hover_texture;
                         }else if (button.curr_button_state == CLICKED) {
                             ui.textureid = button.clicked_texture;
                         }
-                        
                     }
                 }
 
@@ -291,7 +309,7 @@ namespace EngineFramework
         button.is_hover = false;
         button.is_clicked = false;
         button.is_released = false;
-       
+
         //checked if clicked
         if (InputManager::GetInstance().GetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {
 
@@ -321,7 +339,7 @@ namespace EngineFramework
         }
 
         if (button.curr_button_state == RELEASED && button.prev_button_state == CLICKED) {
-            button.curr_button_state = TRIGGERED;           
+            button.curr_button_state = TRIGGERED;
         }
      
     }

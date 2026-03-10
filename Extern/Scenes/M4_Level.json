@@ -7847,6 +7847,15 @@
 				}
 			]
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 13156457684173373447
+				}
+			]
+		},
 		"MaterialComponent": {
 			"albedoFactor": [
 				1.0,
@@ -38292,7 +38301,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -38384,7 +38394,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -38438,7 +38449,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -38527,7 +38539,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
@@ -38578,7 +38591,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -38796,7 +38810,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -38850,7 +38865,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -38939,7 +38955,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
@@ -40249,7 +40266,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -40341,7 +40359,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -40395,7 +40414,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -40484,7 +40504,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
@@ -43799,7 +43820,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -43891,7 +43913,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -43945,7 +43968,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -44034,7 +44058,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
@@ -51100,7 +51125,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -51192,7 +51218,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -51246,7 +51273,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -51335,7 +51363,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
@@ -53178,7 +53207,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -53270,7 +53300,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -53324,7 +53355,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -53413,7 +53445,8 @@
 			"idle_texture": [
 				14380961733646991365,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"UIComponent": {
 			"Overlay_name": "Menu_2",
