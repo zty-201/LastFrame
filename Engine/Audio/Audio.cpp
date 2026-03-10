@@ -831,13 +831,13 @@ namespace EngineFramework
 
 		// 0.0 outdoor = clear, 1.0 indoor = muffled
 		const float cutoffOutdoor = 20000.0f;
-		const float cutoffIndoor = 2500.0f;
+		const float cutoffIndoor = 1200.0f;
 		const float cutoff = cutoffOutdoor + (cutoffIndoor - cutoffOutdoor) * m_indoorFactor;
 
 		m_ambienceLowpass->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoff);
 		m_ambienceLowpass->setBypass(m_indoorFactor < 0.01f);
 
-		const float minOutdoorVolume = 0.5f;
+		const float minOutdoorVolume = 1.0f;
 		const float outdoorVol = 1.0f - (m_indoorFactor * (1.0f - minOutdoorVolume));
 
 		if (m_groupAmbienceOutdoor) m_groupAmbienceOutdoor->setVolume(outdoorVol);

@@ -35,29 +35,29 @@ namespace EngineFramework {
 
         // 3. Setup Vertex Attributes (Copied exactly from your old MeshData)
 
-        // Position (location 0)
+        // 0. Position (12 bytes)
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, Position));
 
-        // TexCoords (location 1)
+        // 1. TexCoords (4 bytes) - Packed as 16-bit Half Floats
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, TexCoords));
+        glVertexAttribPointer(1, 2, GL_HALF_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, TexCoords));
 
-        // Normal (location 2)
+        // 2. Normal (4 bytes) - Packed as 10_10_10_2, MUST BE NORMALIZED (GL_TRUE)
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, Normal));
+        glVertexAttribPointer(2, 4, GL_INT_2_10_10_10_REV, GL_TRUE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, Normal));
 
-        // Tangent (location 3)
+        // 3. Tangent (4 bytes) - Packed as 10_10_10_2, MUST BE NORMALIZED (GL_TRUE)
         glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, Tangent));
+        glVertexAttribPointer(3, 4, GL_INT_2_10_10_10_REV, GL_TRUE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, Tangent));
 
-        // Bone Indices (location 4) - Note: Use glVertexAttribIPointer for integers
+        // 4. BoneIndices (4 bytes) - Uses IPointer
         glEnableVertexAttribArray(4);
-        glVertexAttribIPointer(4, 4, GL_INT, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, BoneIndices));
+        glVertexAttribIPointer(4, 4, GL_UNSIGNED_BYTE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, BoneIndices));
 
-        // Bone Weights (location 5)
+        // 5. BoneWeights (4 bytes) - Uses Pointer, MUST BE NORMALIZED (GL_TRUE)
         glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, BoneWeights));
+        glVertexAttribPointer(5, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, BoneWeights));
 
         // Unbind to prevent accidental modification
         glBindVertexArray(0);
