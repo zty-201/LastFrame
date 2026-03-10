@@ -25,6 +25,8 @@
 #include "Audio.hpp"
 #include "SoundAsset.hpp"
 #include "Archtype.hpp"
+#include "GraphicsSystem.h"
+
 
 #include <mutex>
 
@@ -619,9 +621,26 @@ namespace EngineFramework {
 			num_pending_gpu_load--; //Eat one.
 			try {
 				//No need for mutex since the other threads have completed their work on this mesh data already.
-				incomplete_mesh->LoadWithFilename_AfterThreadJoinCall(); //Can only be done on main thread.
+				auto [megaBaseVert, megaFirstIdx] = GraphicsSystem::GetInstance().GetGeometryBuffer()->AppendMesh(
+					incomplete_mesh->vertices,
+					incomplete_mesh->indices
+				);
+
+				// 2. Shift the sub-mesh offsets from local to global Mega-Buffer offsets
+				for (auto& subMesh : incomplete_mesh->subMeshes) {
+					subMesh.baseVertex += megaBaseVert;
+					subMesh.firstIndex += megaFirstIdx;
+				}
+
+				// 3. Free the CPU memory (Crucial for Android memory limits)
+				incomplete_mesh->vertices.clear();
+				incomplete_mesh->vertices.shrink_to_fit();
+				incomplete_mesh->indices.clear();
+				incomplete_mesh->indices.shrink_to_fit();
+
+				// Done
 				loaded_resources.emplace_back(incomplete_mesh);
-				asset_names.emplace_back(incomplete_mesh->name); // Done if resource loading is a success.
+				asset_names.emplace_back(incomplete_mesh->name);
 			}
 			catch (std::exception& e) {
 				LOGE("%s %s %s", "Unable to load Mesh into GPU memory", incomplete_mesh->name.c_str(), e.what());

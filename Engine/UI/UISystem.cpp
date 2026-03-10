@@ -426,6 +426,23 @@ namespace EngineFramework
         }
     }
 
+    void UI_System::displayMenu_InvisibleLayer(std::string menuname)
+    {
+        //std::cout << "[UI_System] displayMenu('" << menuname << "')\n";
+
+        auto it = Menu_Mapping.find(menuname);
+
+        if (it != Menu_Mapping.end() && it->second.first)
+        {
+            std::cout << "[UI_System] displayMenu invisible success: " << menuname << "\n";
+
+            it->second.first->draw_elements(false);
+            current_menu = menuname;
+            it->second.second = true;
+        }
+    }
+
+    
     void UI_System::closeMenu(std::string menuname)
     {
         auto it = Menu_Mapping.find(menuname);
@@ -436,6 +453,18 @@ namespace EngineFramework
             current_menu = "";
             it->second.second = false;
         }
+    }
+
+    bool UI_System::is_MenuOpen(std::string menuname){
+
+        auto it = Menu_Mapping.find(menuname);
+
+        if (it != Menu_Mapping.end() && it->second.first)
+        {
+            return it->second.second;
+        }
+
+        return false;
     }
 
     void UI_System::closeMenu()
@@ -462,6 +491,8 @@ namespace EngineFramework
         }
 
         current_menu.clear();
+
+        std::cout << "=========================== CLOSEEEEE ALLLLLL MENU () ======================================\n";
     }
 
     bool UI_System::IsMenuActive(const std::string& menuname) const
@@ -486,7 +517,11 @@ namespace EngineFramework
         gCutscene.Stop();
         if (closeAll)
         {
+            
             closeAllMenu();
+#if defined(PLATFORM_ANDROID)
+            displayMenu_InvisibleLayer("Android_Inventory_Buttons"); 
+#endif
         }
     }
 
@@ -520,9 +555,13 @@ namespace EngineFramework
                 // OR trigger scene load / gameplay start etc.
                 // For now: return to StartMenu
                 closeAllMenu();
-                //displayMenu("StartMenu");
+#if defined(PLATFORM_ANDROID)
+                displayMenu("Android_Inventory_Buttons");
+#endif
             }
         );
+
+        
     }
 
     void UI_System::StartSplashSequence()

@@ -99,7 +99,9 @@ function on_update(self, dt)
     local joystickActive = true
 
     -- 1. Read from the C++ JoystickComponent via SHARED table
-    if SHARED and SHARED.UI then
+    if PLATFORM == "android" and SHARED and SHARED.UI then
+        UI_DisplayMenu("AndroidInputOverlay")
+        
         local jx = -(SHARED.UI.joystickX or 0.0)
         local jy = -(SHARED.UI.joystickY or 0.0)
         
@@ -119,7 +121,6 @@ function on_update(self, dt)
         if Input.GetAction("MOVE_RIGHT")   then moveX = moveX - 1 end
     end
 
-    UI_DisplayMenu("AndroidInputOverlay")
     local len = math.sqrt(moveX * moveX + moveZ * moveZ)
 
     -- ========================================================

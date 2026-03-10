@@ -46,12 +46,17 @@
 #endif
 
 namespace Mesh {
+
+	// ANDROID OPTIMIZATION: 16-bit indices for massive memory bandwidth savings.
+	using IndexType = uint16_t;
+	using IndexBuffer = std::vector<IndexType>;
+
 	// Represents a single drawable part (mesh group) of a larger model.
 	struct SubMesh {
 		std::string name;
 		int materialIndex = -1; // Index into the parent MeshData's materials vector.
 		GLuint indexCount = 0;
-		GLuint baseIndex = 0;
+		GLuint firstIndex = 0;
 		GLuint baseVertex = 0;
 	};
 
@@ -60,7 +65,7 @@ namespace Mesh {
 		glm::vec3 Position;
 		glm::vec3 Normal;
 		glm::vec2 TexCoords;
-		glm::vec4 Tangent; // Using vec4 to include handedness (w component)
+		glm::vec4 Tangent; 
 
 		// Add skinning data
 		glm::ivec4 BoneIndices = glm::ivec4(0);
@@ -86,22 +91,22 @@ namespace Mesh {
 		}
 	};
 
-	using IndexType = GLuint;
-	using IndexBuffer = std::vector<IndexType>;
-
 	// The main MeshData class, handling both loaded and generated meshes.
 	class MeshData {
 	public:
-		// OpenGL handles for the entire model's geometry.
-		GLuint vao = 0;
-		GLuint vertexBuffer = 0;
-		GLuint indexBuffer = 0;
-
-		// A mesh is a collection of sub-meshes and their materials.
+		// Pure Data: No OpenGL handles (VAO, VBO, IBO) exist here anymore!
 		std::vector<SubMesh> subMeshes;
 		std::vector<MaterialComponent> materials;
 
-		// Default constructor.
+		// CPU-side raw data. The AssetManager will read these, upload them 
+		// to the GeometryDataBuffer, and then clear these vectors to save RAM.
+		std::vector<Vertex> vertices;
+		std::vector<IndexType> indices;
+
+		std::string name;
+		int num_vertices = 0;
+		int num_bones = 0;
+
 		MeshData() = default;
 
 		// Constructor for loading a mesh from a file via Assimp. Call LoadWithFilename_AfterThreadJoinCall() after thread joins.
@@ -109,17 +114,18 @@ namespace Mesh {
 			loadWithAssimp(filePath, skeleton);
 		}
 
-		const AABB& GetAABB() const { return m_aabb; }
-		const std::vector<AABB>& GetSubmeshAABBs() const { return m_submeshAABBs; }
-
 		// Constructor for manually creating a mesh from code (for primitives).
-		explicit MeshData(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
+		explicit MeshData(const std::vector<Vertex>& inVertices, const std::vector<IndexType>& inIndices) {
+			vertices = inVertices;
+			indices = inIndices;
+
 			SubMesh primitiveSubMesh;
 			primitiveSubMesh.name = "default";
 			primitiveSubMesh.materialIndex = 0;
-			primitiveSubMesh.baseIndex = 0;
+			// These will be updated when uploaded to the GeometryDataBuffer
+			primitiveSubMesh.firstIndex = 0;
 			primitiveSubMesh.baseVertex = 0;
-			primitiveSubMesh.indexCount = static_cast<GLuint>(indices.size());
+			primitiveSubMesh.indexCount = static_cast<uint32_t>(indices.size());
 			subMeshes.push_back(primitiveSubMesh);
 
 			MaterialComponent defaultMaterial;
@@ -132,9 +138,10 @@ namespace Mesh {
 				m_aabb.expand(v.Position);
 			}
 			m_submeshAABBs = { subBox };
-
-			createGLBuffers(vertices, indices);
 		}
+
+		const AABB& GetAABB() const { return m_aabb; }
+		const std::vector<AABB>& GetSubmeshAABBs() const { return m_submeshAABBs; }
 
 		static void UpdateMeshBounds(entt::entity entity)
 		{
@@ -160,16 +167,14 @@ namespace Mesh {
 			}
 		}
 
-		//To be called after MeshData load with filename completes, as it can only be completed on the main thread.
-		void LoadWithFilename_AfterThreadJoinCall()
-		{
-			createGLBuffers(m_temp_vertices, m_temp_indices);
-			m_temp_vertices.clear();
-			m_temp_indices.clear();
-		}
-		std::string name;
-		int num_vertices{};
-		int num_bones{};
+		////To be called after MeshData load with filename completes, as it can only be completed on the main thread.
+		//void LoadWithFilename_AfterThreadJoinCall()
+		//{
+		//	createGLBuffers(m_temp_vertices, m_temp_indices);
+		//	m_temp_vertices.clear();
+		//	m_temp_indices.clear();
+		//}
+
 	private:
 		AABB m_aabb;                     // whole-mesh AABB (object space)
 		std::vector<AABB> m_submeshAABBs; // per-submesh AABBs
@@ -201,12 +206,28 @@ namespace Mesh {
 			auto ioSystem = new AssetIOSystem(filePath);
 			importer.SetIOHandler(ioSystem);
 
+			unsigned int importFlags = aiProcess_Triangulate |
+				aiProcess_GenSmoothNormals |
+				aiProcess_CalcTangentSpace;
+
+			std::filesystem::path p(filePath);
+			std::string fileName = p.filename().string();
+			bool isSkeletalMesh = (fileName.find("SK_") == 0);
+
+			if (!isSkeletalMesh) {
+				// STATIC MESH: Safe to split!
+				importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 65000);
+				importer.SetPropertyInteger(AI_CONFIG_PP_SLM_TRIANGLE_LIMIT, 65000);
+				importFlags |= aiProcess_SplitLargeMeshes;
+			}
+			else {
+				// SKELETAL MESH: Do NOT split (preserves bone weights)
+				LOGI("Skeletal Mesh '%s' detected. Bypassing Assimp splitting.", fileName.c_str());
+			}
+
 			// Now we can use ReadFile() instead of ReadFileFromMemory()!
 			// Assimp will use our custom IOSystem to load both .obj AND .mtl
-			const aiScene* scene = importer.ReadFile(
-				filePath,
-				aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace
-			);
+			const aiScene* scene = importer.ReadFile(filePath, importFlags);
 
 			if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 				throw std::runtime_error("Assimp Error: " + std::string(importer.GetErrorString()));
@@ -350,11 +371,19 @@ namespace Mesh {
 		// Extracts vertex data from a single Assimp mesh.
 		void processSubMesh(aiMesh* mesh, const aiScene* scene, EngineFramework::Skeleton* skeleton) {
 			UNREFERENCED_PARAMETER(scene);
+
+			if (mesh->mNumVertices > 65535) {
+				LOGE("FATAL: Submesh '%s' has %u vertices! 16-bit indices will overflow. Split it in Blender!",
+					mesh->mName.C_Str(), mesh->mNumVertices);
+			}
+			//
+
 			SubMesh subMesh;
 			subMesh.name = mesh->mName.C_Str();
 			subMesh.materialIndex = mesh->mMaterialIndex;
-			subMesh.baseVertex = static_cast<GLuint>(m_temp_vertices.size());
-			subMesh.baseIndex = static_cast<GLuint>(m_temp_indices.size());
+			// Record where this submesh starts in the CPU vector
+			subMesh.baseVertex = static_cast<uint32_t>(vertices.size());
+			subMesh.firstIndex = static_cast<uint32_t>(indices.size());
 			subMesh.indexCount = 0;
 
 			AABB subBox;
@@ -367,47 +396,36 @@ namespace Mesh {
 					vertex.TexCoords = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
 				}
 				if (mesh->mTangents) {
-					// Assimp provides the tangent and bitangent, we use them to calculate the w component
 					glm::vec3 t = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
 					glm::vec3 b = { mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z };
 					float handedness = (glm::dot(glm::cross(vertex.Normal, t), b) < 0.0f) ? -1.0f : 1.0f;
 					vertex.Tangent = glm::vec4(t, handedness);
 				}
 				else {
-					// === Generate tangent if Assimp didn't provide one ===
 					glm::vec3 c1 = glm::cross(vertex.Normal, glm::vec3(0.0f, 0.0f, 1.0f));
 					glm::vec3 c2 = glm::cross(vertex.Normal, glm::vec3(0.0f, 1.0f, 0.0f));
 					glm::vec3 t = glm::length(c1) > glm::length(c2) ? c1 : c2;
 					vertex.Tangent = glm::vec4(glm::normalize(t), 1.0f);
-					//LOGE("Mesh '%s' missing tangents, using generated fallback", mesh->mName.C_Str());
 				}
-
-				// Add skinning data
-				vertex.BoneIndices = glm::uvec4(0);
-				vertex.BoneWeights = glm::vec4(0.0f);
 
 				subBox.expand(vertex.Position);
 				m_aabb.expand(vertex.Position);
-
-				m_temp_vertices.push_back(vertex);
+				vertices.push_back(vertex);
 			}
 
 			for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
 				aiFace face = mesh->mFaces[i];
 				for (unsigned int j = 0; j < face.mNumIndices; j++) {
-					m_temp_indices.push_back(subMesh.baseVertex + face.mIndices[j]);
+					// FIXED: Do NOT add baseVertex here anymore! The GPU does this automatically.
+					indices.push_back(static_cast<IndexType>(face.mIndices[j]));
 				}
 				subMesh.indexCount += face.mNumIndices;
 			}
 
-			// Fill bone weights and indices
 			if (mesh->HasBones()) {
 				const unsigned int numBones = mesh->mNumBones;
-
 				for (unsigned int b = 0; b < numBones; ++b) {
 					const aiBone* bone = mesh->mBones[b];
-
-					// Start with local index, then try to remap via OFBX skeleton
 					unsigned int boneIndex = b;
 					{
 						std::lock_guard<std::mutex> bone_lock{ EngineFramework::g_OFBXBoneIndexByName_mutex };
@@ -415,38 +433,19 @@ namespace Mesh {
 						if (itRemap != EngineFramework::g_OFBXBoneIndexByName.end()) {
 							boneIndex = static_cast<unsigned int>(itRemap->second);
 						}
-						else {
-							LOGE("[SKIN] Assimp bone '%s' not found in OFBX skeleton; using local index %u",
-								bone->mName.C_Str(), boneIndex);
-						}
 					}
-
-
-					//LOGI("[SKIN] Assimp bone %u ('%s') -> OFBX index %u",
-					//	b, bone->mName.C_Str(), boneIndex);
 
 					if (skeleton != nullptr && boneIndex < skeleton->bones.size()) {
 						skeleton->bones[boneIndex].invBind = AssimpToGLM(bone->mOffsetMatrix);
 					}
 
-					//if (skeleton && boneIndex < skeleton->bones.size()) {
-					//    // Overwrite the manual OpenFBX matrix with Assimp's correct matrix
-					//    skeleton->bones[boneIndex].invBind = AssimpToGLM(bone->mOffsetMatrix);
-
-					//    // Optional: Debugging
-					//    // LOGI("Corrected InvBind for bone %s", bone->mName.C_Str());
-					//}
-
-					// Loop through weights for this bone
 					for (unsigned int w = 0; w < bone->mNumWeights; ++w) {
 						const aiVertexWeight& vw = bone->mWeights[w];
-						unsigned int vtxId = vw.mVertexId;   // local to this mesh
+						unsigned int vtxId = vw.mVertexId;
 						float weight = vw.mWeight;
 
-						// Get the vertex in global array for this submesh
-						Vertex& v = m_temp_vertices[subMesh.baseVertex + vtxId];
+						Vertex& v = vertices[subMesh.baseVertex + vtxId];
 
-						// Put weight into the first empty slot
 						for (int k = 0; k < 4; ++k) {
 							if (v.BoneWeights[k] == 0.0f) {
 								v.BoneWeights[k] = weight;
@@ -457,13 +456,9 @@ namespace Mesh {
 					}
 				}
 
-				// Normalize weights so each vertex sums to 1 where possible
 				for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-					Vertex& v = m_temp_vertices[subMesh.baseVertex + i];
-					float sum =
-						v.BoneWeights.x + v.BoneWeights.y +
-						v.BoneWeights.z + v.BoneWeights.w;
-
+					Vertex& v = vertices[subMesh.baseVertex + i];
+					float sum = v.BoneWeights.x + v.BoneWeights.y + v.BoneWeights.z + v.BoneWeights.w;
 					if (sum > 0.0f) {
 						v.BoneWeights /= sum;
 					}
@@ -472,40 +467,7 @@ namespace Mesh {
 
 			subMeshes.push_back(subMesh);
 			m_submeshAABBs.push_back(subBox);
-		}
-
-		// Creates the final OpenGL VAO and buffers.
-		void createGLBuffers(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
-			glGenVertexArrays(1, &vao);
-			glBindVertexArray(vao);
-
-			glGenBuffers(1, &vertexBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
-
-			glGenBuffers(1, &indexBuffer);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
-
-			glEnableVertexAttribArray(0); // Position (location 0)
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
-
-			glEnableVertexAttribArray(1); // TexCoords (location 1)
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
-
-			glEnableVertexAttribArray(2); // Normal (location 2)
-			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-
-			glEnableVertexAttribArray(3); // Tangent (location 3)
-			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
-
-			glEnableVertexAttribArray(4); // Bone Indices (location 5)
-			glVertexAttribIPointer(4, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, BoneIndices));
-
-			glEnableVertexAttribArray(5); // Bone Weights (location 5)
-			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, BoneWeights));
-
-			glBindVertexArray(0);
+		
 		}
 
 	private:
@@ -518,7 +480,7 @@ namespace Mesh {
 	// =========================================================================
 
 	// Generic helper function to calculate tangents for any manually created mesh
-	inline void calculateTangents(std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
+	inline void calculateTangents(std::vector<Vertex>& vertices, const std::vector<IndexType>& indices) {
 		if (indices.empty() || vertices.empty()) return;
 
 		std::vector<glm::vec3> tan1(vertices.size(), glm::vec3(0.0f));
@@ -574,7 +536,7 @@ namespace Mesh {
 			{{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}}, {{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f,  0.0f}, {1.0f, 1.0f}}, {{0.5f, -0.5f,  0.5f}, {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}}, {{-0.5f, -0.5f,  0.5f}, {0.0f, -1.0f,  0.0f}, {0.0f, 0.0f}},
 			{{-0.5f,  0.5f, -0.5f}, {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}}, {{0.5f,  0.5f,  0.5f}, {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}}, {{0.5f,  0.5f, -0.5f}, {0.0f,  1.0f,  0.0f}, {1.0f, 1.0f}}, {{-0.5f,  0.5f,  0.5f}, {0.0f,  1.0f,  0.0f}, {0.0f, 0.0f}}
 		};
-		std::vector<GLuint> indices = { 0, 1, 2, 0, 3, 1, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 15, 13, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 23, 21 };
+		std::vector<IndexType> indices = { 0, 1, 2, 0, 3, 1, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 15, 13, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 23, 21 };
 		calculateTangents(vertices, indices);
 		return std::make_shared<MeshData>(vertices, indices);
 	}
@@ -582,7 +544,7 @@ namespace Mesh {
 	// Generates a UV sphere
 	inline std::shared_ptr<MeshData> generateSphere(int xSegments = 64, int ySegments = 64) {
 		std::vector<Vertex> vertices;
-		std::vector<GLuint> indices;
+		std::vector<IndexType> indices;
 		for (int y = 0; y <= ySegments; ++y) {
 			for (int x = 0; x <= xSegments; ++x) {
 				float xSegment = (float)x / (float)xSegments;
@@ -595,12 +557,12 @@ namespace Mesh {
 		}
 		for (int y = 0; y < ySegments; ++y) {
 			for (int x = 0; x < xSegments; ++x) {
-				indices.push_back((y + 1) * (xSegments + 1) + x);
-				indices.push_back(y * (xSegments + 1) + x);
-				indices.push_back(y * (xSegments + 1) + x + 1);
-				indices.push_back((y + 1) * (xSegments + 1) + x);
-				indices.push_back(y * (xSegments + 1) + x + 1);
-				indices.push_back((y + 1) * (xSegments + 1) + x + 1);
+				indices.push_back(static_cast<IndexType>((y + 1) * (xSegments + 1) + x));
+				indices.push_back(static_cast<IndexType>(y * (xSegments + 1) + x));
+				indices.push_back(static_cast<IndexType>(y * (xSegments + 1) + x + 1));
+				indices.push_back(static_cast<IndexType>((y + 1) * (xSegments + 1) + x));
+				indices.push_back(static_cast<IndexType>(y * (xSegments + 1) + x + 1));
+				indices.push_back(static_cast<IndexType>((y + 1) * (xSegments + 1) + x + 1));
 			}
 		}
 		calculateTangents(vertices, indices);
@@ -615,7 +577,7 @@ namespace Mesh {
 			{{ 1.0f,  1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
 			{{-1.0f,  1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}}
 		};
-		std::vector<GLuint> indices = { 0, 1, 2, 2, 3, 0 };
+		std::vector<IndexType> indices = { 0, 1, 2, 2, 3, 0 };
 		calculateTangents(vertices, indices);
 		return std::make_shared<MeshData>(vertices, indices);
 	}
@@ -626,7 +588,7 @@ namespace Mesh {
 			{{-1.0f,  1.0f, -1.0f}}, {{-1.0f, -1.0f, -1.0f}}, {{1.0f, -1.0f, -1.0f}}, {{1.0f,  1.0f, -1.0f}},
 			{{-1.0f, -1.0f,  1.0f}}, {{-1.0f,  1.0f,  1.0f}}, {{1.0f, -1.0f,  1.0f}}, {{1.0f,  1.0f,  1.0f}}
 		};
-		std::vector<GLuint> indices = { 0, 1, 2, 0, 2, 3, 1, 4, 6, 1, 6, 2, 4, 5, 7, 4, 7, 6, 5, 0, 3, 5, 3, 7, 3, 2, 6, 3, 6, 7, 0, 5, 4, 0, 4, 1 };
+		std::vector<IndexType> indices = { 0, 1, 2, 0, 2, 3, 1, 4, 6, 1, 6, 2, 4, 5, 7, 4, 7, 6, 5, 0, 3, 5, 3, 7, 3, 2, 6, 3, 6, 7, 0, 5, 4, 0, 4, 1 };
 		return std::make_shared<MeshData>(vertices, indices);
 	}
 

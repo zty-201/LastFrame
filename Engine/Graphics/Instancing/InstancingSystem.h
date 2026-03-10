@@ -82,9 +82,16 @@ namespace EngineFramework
         size_t instanceCount;       // How many instances to draw
     };
 
+    struct CullingMatrixData {
+        glm::mat4 mainViewProj;
+        glm::mat4 cascadeViewProj[3];
+        glm::mat4 spotLightViewProj[32];
+        glm::mat4 pointLightViewProj[96];
+    };
+
     const size_t MAX_BATCHES = 1000;
     const size_t MAX_INSTANCES = 50000;
-    const size_t NUM_PASSES = 36;
+    const size_t NUM_PASSES = 132;
 
     // ============================================================================
     // 4. INSTANCING SYSTEM
@@ -100,7 +107,12 @@ namespace EngineFramework
 
         // Gathers all entities, culls them, and builds the batches/SSBO data
         void BuildSceneBatches();
-        void UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj, const std::vector<glm::mat4>& spotProj);
+        void UpdateAndDispatchCompute(
+            const glm::mat4& mainViewProj, 
+            const std::array<glm::mat4, 3>& cascadeProj, 
+            const std::vector<glm::mat4>& spotProj, 
+            const std::vector<glm::mat4>& pointProj
+        );
 
         // Getters for the GraphicsSystem to use during rendering
         const std::vector<RenderBatch>& GetBatches() const { return m_activeBatches; }
@@ -120,6 +132,7 @@ namespace EngineFramework
         GLuint m_instanceSSBOs[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
         GLuint m_indirectBuffers[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
         GLuint m_visibleIndicesBuffers[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        GLuint m_cullingMatrixUBOs[FRAMES_IN_FLIGHT] = { 0, 0 };
 
         size_t m_maxTotalInstances = 0;
 
