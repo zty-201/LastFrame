@@ -1,72 +1,4 @@
 {
-	"592": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				7063588723440451587,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "CloseCanteenToyUI",
-			"hover_texture": [
-				8792970980350722049,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8792970980350722049,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 10522353237313241095
-				},
-				{
-					"Loaded": true,
-					"ScriptGuid": 10363451816948613125
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "CrossButton"
-		},
-		"UIComponent": {
-			"Overlay_name": "CanteenToyInterface",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": false,
-			"layer": 0,
-			"luminance": 1.0,
-			"position": [
-				1500.0,
-				1000.0
-			],
-			"position_NDC": [
-				-107374176.0,
-				-107374176.0
-			],
-			"size": [
-				100.0,
-				100.0
-			],
-			"size_NDC": [
-				-107374176.0,
-				-107374176.0
-			],
-			"textureid": [
-				8792970980350722049,
-				3711223656383638553
-			],
-			"visible": false
-		}
-	},
 	"593": {
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -88,7 +20,7 @@
 				1.0
 			],
 			"event_received": "",
-			"is_NDC": false,
+			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
 			"position": [
@@ -96,19 +28,19 @@
 				0.0
 			],
 			"position_NDC": [
-				-107374176.0,
-				-107374176.0
+				0.0,
+				0.0
 			],
 			"size": [
-				1500.0,
-				1000.0
+				1620.0,
+				1068.0
 			],
 			"size_NDC": [
-				-107374176.0,
-				-107374176.0
+				0.3499999940395355,
+				1.0
 			],
 			"textureid": [
-				6336512470224928769,
+				6698726826048897027,
 				3711223656383638553
 			],
 			"visible": false
