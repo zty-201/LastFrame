@@ -44,7 +44,7 @@ namespace
 	enum class CompressionTextureType
 	{
 		BC_X, //For Windows
-		ETC2, //For Android.
+		ASTC, //For Android.
 		UNKNOWN
 	};
 
@@ -82,7 +82,7 @@ namespace
 		{
 		}
 
-		bool isValid() const noexcept { 
+		bool isValid() const noexcept {
 			return !error_str && !data.empty() && mipmaps_width_height.size() > 0 && mip_levels == mipmaps_width_height.size() && compressed_data_size.size() == mip_levels && channels > 0 && compressed_type != 0;
 		}
 #ifdef PLATFORM_WINDOWS  //Only write compressed files in windows, for android just read data.
@@ -183,10 +183,10 @@ namespace
 
 		size_t offset = 0;
 		const auto read = [&](void* dst, size_t size)
-		{
-			std::memcpy(dst, file_data.data() + offset, size);
-			offset += size;
-		};
+			{
+				std::memcpy(dst, file_data.data() + offset, size);
+				offset += size;
+			};
 
 		// Simple non-ptr data.
 		read(&mip_levels, sizeof(mip_levels));
@@ -291,7 +291,7 @@ namespace
 
 		/*
 			Compression:
-			- There are two types of compression, one for BCx (Windows) and one for ETC2 (Android).
+			- There are two types of compression, one for BCx (Windows) and one for ASTC (Android).
 			Among those, there are different formats for channels 1-4.
 
 			is_srgb is defined as the color space and has the same uncompressed/compressed format as non-srgb.
@@ -315,21 +315,21 @@ namespace
 				break;
 			}
 		}
-		else if (compression_type == CompressionTextureType::ETC2)
+		else if (compression_type == CompressionTextureType::ASTC)
 		{
 			switch (uncompressed_format)
 			{
 			case CMP_FORMAT_R_8:
-				return "1 Channel ETC2 unsupported";  //Potential for ASTC or .basis file.
+				compressed_format = CMP_FORMAT_ASTC;  //Potential for ASTC or .basis file.
 				break;
 			case CMP_FORMAT_RG_8:
-				return "2 Channel ETC2 unsupported";
+				compressed_format = CMP_FORMAT_ASTC;
 				break;
 			case CMP_FORMAT_RGB_888:
-				compressed_format = CMP_FORMAT_ETC2_RGB;
+				compressed_format = CMP_FORMAT_ASTC;
 				break;
 			case CMP_FORMAT_RGBA_8888:
-				compressed_format = CMP_FORMAT_ETC2_RGBA;
+				compressed_format = CMP_FORMAT_ASTC;
 				break;
 			}
 		}
@@ -350,10 +350,15 @@ namespace
 		Useful as CMP_FORMAT doesn't inherently store this information.
 		\param [out] compressed_opengl_format
 		The corresponding opengl compressed format.
+		\param astc_block_size
+		Get the opengl format for an astc block_size x block_size.
+		e.g. "6" gives "GL_COMPRESSED_RGBA_ASTC_6x6"
+		Valid: 4,5,6,8,10,12
+		Only used if cmp_format is CMP_FORMAT_ASTC
 		\return
 		Nothing on success, Error string otherwise.
 	*/
-	[[nodiscard]] std::optional<std::string> GetGLTextureFormat(CMP_FORMAT compressed_cmp_format, bool is_srgb, GLenum& compressed_opengl_format)
+	[[nodiscard]] std::optional<std::string> GetGLTextureFormat(CMP_FORMAT compressed_cmp_format, bool is_srgb, GLenum& compressed_opengl_format, int astc_block_size = 6)
 	{
 		switch (compressed_cmp_format)
 		{
@@ -370,8 +375,19 @@ namespace
 		case CMP_FORMAT_BC3:
 			compressed_opengl_format = (is_srgb) ? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT : GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 			break;
-
-			///ETC2 compression.
+			///ASTC compression.
+		case CMP_FORMAT_ASTC:
+			switch (astc_block_size) {
+			case 4:  compressed_opengl_format = is_srgb ? GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4 : GL_COMPRESSED_RGBA_ASTC_4x4;   break;
+			case 5:  compressed_opengl_format = is_srgb ? GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5 : GL_COMPRESSED_RGBA_ASTC_5x5;   break;
+			case 6:  compressed_opengl_format = is_srgb ? GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6 : GL_COMPRESSED_RGBA_ASTC_6x6;   break;
+			case 8:  compressed_opengl_format = is_srgb ? GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8 : GL_COMPRESSED_RGBA_ASTC_8x8;   break;
+			case 10: compressed_opengl_format = is_srgb ? GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10 : GL_COMPRESSED_RGBA_ASTC_10x10; break;
+			case 12: compressed_opengl_format = is_srgb ? GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12 : GL_COMPRESSED_RGBA_ASTC_12x12; break;
+			default: return "Invalid ASTC block size passed in for astc format";
+			}
+			break;
+			//ETC2 compression
 		case CMP_FORMAT_ETC2_RGB:
 			compressed_opengl_format = (is_srgb) ? GL_COMPRESSED_SRGB8_ETC2 : GL_COMPRESSED_RGB8_ETC2;
 			break;
@@ -402,6 +418,8 @@ namespace
 		What type to compress texture to.
 		\param quality
 		From 0 to 1.0. Much higher performance hit at higher levels.
+
+		NOTE: For compression to ASTC (default on mobile platform), the data must be in 4 channels. i.e. add padding for 1-3 channels.
 	*/
 	CompressedTextureData CompressTexture(UnCompressedTextureData& texture_data, CompressionTextureType compression_type, float quality)
 	{
@@ -409,6 +427,7 @@ namespace
 		//TODO: Look into compressing to .basis file, then transcoding during runtime to GPU supported texture (more compatibility, no need to worry about astc).
 		if (quality < 0 || quality > 1.0) return CompressedTextureData("Invalid Compression Quality passed in, must be in range [0, 1]");
 		if (!texture_data.isValid()) return CompressedTextureData("Invalid texture data passed in for compression");
+
 		/*
 			Process
 			1. Get important parameters
@@ -427,7 +446,7 @@ namespace
 		{
 			return CompressedTextureData("Invalid number of channels passed in, logic error?");
 		}
-
+		
 		CMP_FORMAT output_format{};
 		int num_channels{};
 		err_code = GetTextureCompressionFormat(input_format, compression_type, output_format, num_channels);
@@ -436,9 +455,12 @@ namespace
 			return CompressedTextureData(err_code.value());
 		}
 
+		//TODO: May want to lower this to 4 or increase up to 12, depending on number of channels and type of texture (normal texture need more quality).
+		constexpr int astc_block_size = 8;
+
 		//compressed output_format, but as an opengl enum.
 		GLenum compressed_type;
-		err_code = GetGLTextureFormat(output_format, is_srgb, compressed_type);
+		err_code = GetGLTextureFormat(output_format, is_srgb, compressed_type, astc_block_size);
 		if (err_code.has_value())
 		{
 			return CompressedTextureData(err_code.value());
@@ -460,6 +482,17 @@ namespace
 		dst_texture.dwHeight = height;
 		dst_texture.dwPitch = 0;
 		dst_texture.format = output_format;
+		//Specify block dimensions for astc to compress to.
+		if (dst_texture.format == CMP_FORMAT_ASTC)
+		{
+			dst_texture.nBlockWidth = astc_block_size;
+			dst_texture.nBlockDepth = 1;
+			dst_texture.nBlockHeight = astc_block_size;
+		}
+		if (CMP_IsCompressedFormat(CMP_FORMAT_ASTC))
+		{
+			LOGD("yes");
+		}
 		dst_texture.dwDataSize = CMP_CalculateBufferSize(&dst_texture);
 		std::vector<std::byte> output_data(dst_texture.dwDataSize);
 		dst_texture.pData = reinterpret_cast<CMP_BYTE*>(output_data.data());
@@ -470,14 +503,16 @@ namespace
 		options.dwSize = sizeof(options);
 		options.fquality = quality;
 		options.dwnumThreads = 0; //Let it select.
+		options.bDisableMultiThreading = false;
 		options.bDXT1UseAlpha = false; //Only RGB is converted to DXT1 for our case, so disable this because there's no alpha.
 		options.bUseRefinementSteps = true;
 		options.DestFormat = output_format;
 		options.SourceFormat = input_format;
 		//TODO: See if this is needed.
-		//if(is_srgb) options.useSRGBFrames = true;
-		//options.bUseCGCompress = true;
-		
+		if (is_srgb) options.useSRGBFrames = true;
+		options.bUseCGCompress = true;
+		options.nEncodeWith = CMP_GPU_OCL;
+
 
 		CMP_ERROR cmp_status = CMP_ConvertTexture(&src_texture, &dst_texture, &options, nullptr);
 		if (cmp_status != CMP_OK)
@@ -538,7 +573,7 @@ namespace
 			&width, &height, &bytesPerPix, 0), stbi_data_free };
 		if (!stbi_data)
 			return std::string("Unable to process texture data: ") + file_path.string();
-	
+
 
 		//internal_format -> what format to upload as.  current_format -> what format the texture data is prior to upload.
 		GLenum current_format = GL_RGBA;
@@ -627,12 +662,17 @@ namespace
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		//Texture swizzling R and B to account for flipped texture during compression for RGB and RGBA.
-		if (compressed_texture.channels >= 3)
+		switch (compressed_texture.compressed_type)
 		{
+		case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
+		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
+		case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
+		case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+			break;
+			//Otherwise no need to swizzle.
 		}
-
 		//Save previous setting so it can be loaded back afterwards.
 		GLint previousAlignment = 0;
 		glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
@@ -675,7 +715,7 @@ namespace
 		//Check for error when uploading.
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
-			if(texID) glDeleteTextures(1, &texID);
+			if (texID) glDeleteTextures(1, &texID);
 			return std::string("Error when uploading texture: ERR_CODE ") + std::to_string(err);
 		}
 
@@ -728,115 +768,70 @@ namespace
 		}
 		return {}; //No Error.
 	}
-
-	/*
-	* //TODO: This function is currently being unused, as GetGLTextureFormat uses CMP_FORMAT overload version for compressed textures.
-		This overload is for compressed texture.
-		Sets the opengl formats for the current compressed texture type.
-		Function assumes every channel is 8 bits.
-
-		\param [out] current_format
-		Writes what format the compressed texture data is prior to upload.
-		\param channels
-		Number of channels for texture
-		\param is_srgb
-		Whether texture is in srgb (gamma) color space
-		\param compression_type
-		BCx for BC1-5, ETC2 for ETC2 textures.
-		\return
-		Nothing on success, Error string otherwise.
-	*/
-	[[nodiscard]] std::optional<std::string> GetGLTextureFormat(GLenum& current_format, int channels, bool is_srgb, CompressionTextureType compression_type)
-	{
-		//Textures can have 1-4 channels, so switch formats to match that.
-		//SRGB only applies to 3-4 channel (rgb is needed for gamma color space), ignore if 1-2.
-		if (channels < 1 || channels > 4) return "Invalid number of channels";
-		if (compression_type == CompressionTextureType::BC_X)
-		{
-#ifdef PLATFORM_WINDOWS //Compression types might not be exposed for android glad header.
-			switch (channels)
-			{
-			case 1:
-				current_format = GL_COMPRESSED_RED_RGTC1_EXT;
-				break;
-			case 2:
-				current_format = GL_COMPRESSED_RED_GREEN_RGTC2_EXT;
-				break;
-			case 3:
-				/*
-					SRGB / RGB is used instead of the + 1 bit Alpha version of DXT1.
-					Both formats are the same size, but since original data was in RGB format it'll always be opaque.
-				*/
-				current_format = (is_srgb) ? GL_COMPRESSED_SRGB_S3TC_DXT1_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-				break;
-			case 4:
-				current_format = (is_srgb) ? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT : GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-				break;
-			}
-#else
-			return "Android should not load BCx compression formats";
-#endif
-		}
-		else if (compression_type == CompressionTextureType::ETC2)
-		{
-			switch (channels)
-			{
-			case 3:
-				current_format = (is_srgb) ? GL_COMPRESSED_SRGB8_ETC2 : GL_COMPRESSED_RGB8_ETC2;
-				break;
-			case 4:
-				current_format = (is_srgb) ? GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC : GL_COMPRESSED_RGBA8_ETC2_EAC;
-				break;
-			default:
-				return "Current Compression Algorithm does not support 1-2 channel ETC2 compression. Update GetGLTextureFormat if it does.";
-			}
-		}
-		return {}; //No Error
-	}
-
-
 }
 
 
 #ifdef PLATFORM_WINDOWS
 
-[[nodiscard]] std::optional<std::string> Scene::CompressAndWriteTexture(const std::filesystem::path& file_path, const std::filesystem::path& folder_BCx, const std::filesystem::path& folder_ETC2)
+[[nodiscard]] std::optional<std::string> Scene::CompressAndWriteTexture(const std::filesystem::path& file_path, const std::filesystem::path& folder_BCx, const std::filesystem::path& folder_ASTC)
 {
-	if (folder_BCx.empty() && folder_ETC2.empty())
+	if (folder_BCx.empty() && folder_ASTC.empty())
 	{
 		return "At least one compression type should be selected.";
 	}
 
 
-	//==Load texture data into a usable format for CompressTexture.
-	stbi_set_flip_vertically_on_load(true);
-	std::vector<unsigned char> file_data = EngineFramework::AssetManagerSystem::GetDataFromFile(file_path);
-	if (file_data.empty())
-		return std::string("Failed to read texture file: ") + file_path.string();
 
-	//RAII management of stbi data.
-	auto stbi_data_free = [](unsigned char* data) {
-		if (data) stbi_image_free(data);
-		};
-	int width{}, height{}, channels{};
-	std::shared_ptr<unsigned char> stbi_data{
-		stbi_load_from_memory(
-		file_data.data(),
-		static_cast<int>(file_data.size()),
-		&width, &height, &channels, 0), stbi_data_free };
-	if (!stbi_data)
-		return "Unable to process texture data" + file_path.string();
-
-	bool is_srgb = (file_path.string().find("Albedo") != std::string::npos);
-
-	//Copy to usable format
-	UnCompressedTextureData uncompressed_texture(stbi_data, width, height, channels, is_srgb);
-
-	//Logically this should not ever happen, otherwise it could be due to pre-checks failing to validate data correctly.
-	if (!uncompressed_texture.isValid()) return "Unknown error in CompressAndWriteTexture";
 
 	/*
-	*	Compresses texture data, then writes to appropriate file.
+	*	Load texture data from file
+		\param requested_channel
+		Texture data will be loaded with that many channels.
+		Set to 0 to use original texture channels.
+		\param [out] loaded_texture
+		Where loaded texture will be written to.
+		\return
+		Nothing on success, error code otherwise.
+	*/
+	auto LoadTextureData_lambda = [&file_path](UnCompressedTextureData& loaded_texture, uint32_t requested_channel = 0)
+		-> std::optional<std::string>
+		{
+			//==Load texture data into a usable format for CompressTexture.
+			stbi_set_flip_vertically_on_load(true);
+			std::vector<unsigned char> file_data = EngineFramework::AssetManagerSystem::GetDataFromFile(file_path);
+			if (file_data.empty())
+				return std::string("Failed to read texture file: ") + file_path.string();
+
+			//RAII management of stbi data.
+			auto stbi_data_free = [](unsigned char* data) {
+				if (data) stbi_image_free(data);
+				};
+			int width{}, height{}, channels{};
+			std::shared_ptr<unsigned char> stbi_data{
+				stbi_load_from_memory(
+				file_data.data(),
+				static_cast<int>(file_data.size()),
+				&width, &height, &channels, requested_channel), stbi_data_free };
+			//If requested_channel was set, then use that.
+			channels = (requested_channel != 0)? requested_channel : channels;
+			if (!stbi_data)
+				return "Unable to process texture data" + file_path.string();
+
+			bool is_srgb = (file_path.string().find("Albedo") != std::string::npos);
+
+			//Copy to out param.
+			loaded_texture = UnCompressedTextureData(stbi_data, width, height, channels, is_srgb);
+			//Logically this should not ever happen, otherwise it could be due to pre-checks failing to validate data correctly.
+			if (!loaded_texture.isValid()) return "Unknown error when reading/parsing texture data";
+
+			return {};
+		};
+
+	/*
+	 	Compresses texture data, then writes to appropriate file.
+	    \param uncompressed_texture
+	    - Load data into this before passing.
+		- While taken as a non-const reference, it is not changed.
 		\param out_dir
 		The directory to store in
 		\param file_name
@@ -844,35 +839,35 @@ namespace
 		\return
 		Nothing on success, error string otherwise.
 	*/
-	auto CompressAndWriteTextureDir = [&uncompressed_texture](const std::filesystem::path& out_dir, const std::string& file_name, CompressionTextureType compression_type, float quality) -> std::optional<std::string> {
-			/*
-				 Custom extensions used for each compression type.
-				 This denotes that the texture is compressed as X type, but stored in a custom file that does not follow BCx or ETC2 standard headers.
-			*/
-			std::string extension{};
-			switch (compression_type)
-			{
-			case CompressionTextureType::BC_X:
-				extension = ".compiled_bc";
-				break;
-			case CompressionTextureType::ETC2:
-				extension = ".compiled_etc2";
-				break;
-			default:
-				return "Invalid Compression Type";
-			}
+	auto CompressAndWriteTextureDir_lambda = [](UnCompressedTextureData& uncompressed_texture, const std::filesystem::path& out_dir, const std::string& file_name, CompressionTextureType compression_type, float quality) -> std::optional<std::string> {
+		/*
+			 Custom extensions used for each compression type.
+			 This denotes that the texture is compressed as X type, but stored in a custom file that does not follow BCx or ASTC standard headers.
+		*/
+		std::string extension{};
+		switch (compression_type)
+		{
+		case CompressionTextureType::BC_X:
+			extension = ".compiled_bc";
+			break;
+		case CompressionTextureType::ASTC:
+			extension = ".compiled_astc";
+			break;
+		default:
+			return "Invalid Compression Type";
+		}
 
-			//==Compress texture
-			CompressedTextureData compressed_texture(std::move(CompressTexture(uncompressed_texture, compression_type, quality)));
-			if (!compressed_texture.isValid())
-				return compressed_texture.error_str;
+		//==Compress texture
+		CompressedTextureData compressed_texture(std::move(CompressTexture(uncompressed_texture, compression_type, quality)));
+		if (!compressed_texture.isValid())
+			return compressed_texture.error_str;
 
-			//==Write to file in designated folder with the custom extension and same file name.
-			auto err_code = compressed_texture.WriteDataToFile(out_dir / (file_name + extension) );
+		//==Write to file in designated folder with the custom extension and same file name.
+		auto err_code = compressed_texture.WriteDataToFile(out_dir / (file_name + extension));
 
-			if (err_code.has_value()) return err_code;
+		if (err_code.has_value()) return err_code;
 
-			return {};
+		return {};
 		};
 
 	/*
@@ -880,10 +875,20 @@ namespace
 		Write results to respective folders with the appropriate extensions and the same file name.
 	*/
 	std::string file_name = file_path.stem().string(); //Just get the file name by itself.
-	float quality = 0.88f; //0 to 1, where 1 is the highest quality with the longest compression time. Processing time may scale exponentially?
+	float quality = 0.1f; //0 to 1, where 1 is the highest quality with the longest compression time. Processing time may scale exponentially?
 	std::string full_err_code{}; //Accumulate errors, don't return immediately on error but let the other compression type also run.
+	
+	
+	/*
+		BCx -> Can pass in original number of channels
+		ASTC -> Must load texture as 4 channels, even if it's 1-3 channels it should be padded.
+	*/
 	if (!folder_BCx.empty())
 	{
+		UnCompressedTextureData uncompressed_texture;
+		auto file_err = LoadTextureData_lambda(uncompressed_texture);
+		if (file_err) return file_err; //Immediate stop if texture file cannot be read properly.
+
 		//Check if folderpath is invalid, and tell the user instead of silently failing. 
 		if (!std::filesystem::exists(folder_BCx) || !std::filesystem::is_directory(folder_BCx))
 		{
@@ -891,19 +896,23 @@ namespace
 		}
 		else
 		{
-			auto err_code = CompressAndWriteTextureDir(folder_BCx, file_name, CompressionTextureType::BC_X, quality);
+			auto err_code = CompressAndWriteTextureDir_lambda(uncompressed_texture, folder_BCx, file_name, CompressionTextureType::BC_X, quality);
 			if (err_code) full_err_code += err_code.value();
 		}
 	}
-	if (!folder_ETC2.empty())
+	if (!folder_ASTC.empty())
 	{
-		if (!std::filesystem::exists(folder_ETC2) || !std::filesystem::is_directory(folder_ETC2))
+		UnCompressedTextureData uncompressed_texture;
+		auto file_err = LoadTextureData_lambda(uncompressed_texture, 4);
+		if (file_err) return file_err; //Immediate stop if texture file cannot be read properly.
+
+		if (!std::filesystem::exists(folder_ASTC) || !std::filesystem::is_directory(folder_ASTC))
 		{
-			full_err_code += "Invalid directory passed for CompressAndWrite: " + folder_ETC2.string() + " ETC2 not compressed.";
+			full_err_code += "Invalid directory passed for CompressAndWrite: " + folder_ASTC.string() + " ASTC not compressed.";
 		}
 		else
 		{
-			auto err_code = CompressAndWriteTextureDir(folder_ETC2, file_name, CompressionTextureType::ETC2, quality);
+			auto err_code = CompressAndWriteTextureDir_lambda(uncompressed_texture, folder_ASTC, file_name, CompressionTextureType::ASTC, quality);
 			if (err_code) full_err_code += err_code.value();
 		}
 	}
@@ -961,12 +970,12 @@ Scene::Texture::Texture(const std::array<std::string, 6>& filenames, GLuint chan
 	/*
 		There are two types of image loading:
 		- Uncompressed: png, jpg, jpeg
-		- Compressed: ".compiled_etc2", ".compiled_bc"
+		- Compressed: ".compiled_astc", ".compiled_bc"
 
 		Use extensions to determine what type the image is.
 	*/
 	constexpr std::array<const char*, 3> uncompressed_extensions{ ".png", ".jpg", ".jpeg" };
-	constexpr std::array<const char*, 4> compressed_extensions{ ".compiled_etc2", ".compiled_bc" };
+	constexpr std::array<const char*, 4> compressed_extensions{ ".compiled_astc", ".compiled_bc" };
 	static auto isExtensionValid = []<std::size_t N>(const std::array<const char*, N>&extension_arr, const std::string & extension)
 		-> bool
 	{

@@ -471,7 +471,7 @@ namespace EngineFramework {
 	{
 		/*
 			\brief
-			Helper method that compresses 2 types of textures: BCx and ETC2 before writing to appropriate folders.
+			Helper method that compresses 2 types of textures: BCx and ASTC before writing to appropriate folders.
 			Only run on windows.
 			Avoids compressing files mentioned in do_not_compress_meta.
 
@@ -487,7 +487,7 @@ namespace EngineFramework {
 		[[nodiscard]] std::optional<std::string> CompressTexturesIfNeeded(
 			const std::filesystem::path& uncompressed_folderpath, 
 			const std::filesystem::path& compressed_bc_folderpath, 
-			const std::filesystem::path& compressed_etc2_folderpath, 
+			const std::filesystem::path& compressed_astc_folderpath, 
 			const std::filesystem::path& do_not_compress_meta_filepath
 			)
 		{
@@ -553,7 +553,7 @@ namespace EngineFramework {
 			try
 			{
 				bc_filepaths = AssetManagerSystem::ListFilesInDirectory(compressed_bc_folderpath, Scene::GetCompressedTextureExtensions());
-				etc2_filepaths = AssetManagerSystem::ListFilesInDirectory(compressed_etc2_folderpath, Scene::GetCompressedTextureExtensions());
+				etc2_filepaths = AssetManagerSystem::ListFilesInDirectory(compressed_astc_folderpath, Scene::GetCompressedTextureExtensions());
 			}
 			catch (std::exception& e)
 			{
@@ -586,7 +586,7 @@ namespace EngineFramework {
 
 				if (!bc_set.contains(file_name) && !etc2_set.contains(file_name)) //Doing both types at once if not compressed for either, is faster than doing one by one.
 				{
-					err_code = Scene::CompressAndWriteTexture(texture_file, compressed_bc_folderpath, compressed_etc2_folderpath);
+					err_code = Scene::CompressAndWriteTexture(texture_file, compressed_bc_folderpath, compressed_astc_folderpath);
 				}
 				else if (!bc_set.contains(file_name))
 				{
@@ -594,7 +594,7 @@ namespace EngineFramework {
 				}
 				else if (!etc2_set.contains(file_name))
 				{
-					err_code = Scene::CompressAndWriteTexture(texture_file, {}, compressed_etc2_folderpath);
+					err_code = Scene::CompressAndWriteTexture(texture_file, {}, compressed_astc_folderpath);
 				}
 
 				//If there's an error in compressing then add to do_not_compress.
@@ -640,11 +640,11 @@ namespace EngineFramework {
 		*/
 		// Define relevant Folderpaths and Filepaths for compressed texture types + meta file.
 		constexpr char bc_folder[] = "compressed_bc";
-		constexpr char etc2_folder[] = "compressed_etc2";
+		constexpr char astc_folder[] = "compressed_astc";
 		constexpr char do_not_compress_meta_file[] = "do_not_compress.meta";
 		const std::filesystem::path asset_folder_prefix = AssetManagerSystem::GetAssetFolderPrefix();
 		const std::filesystem::path compressed_bc_folderpath = folder_path / bc_folder;
-		const std::filesystem::path compressed_etc2_folderpath = folder_path / etc2_folder;
+		const std::filesystem::path compressed_astc_folderpath = folder_path / astc_folder;
 		//Store in uncompressed directory.
 		const std::filesystem::path do_not_compress_meta_filepath = folder_path / do_not_compress_meta_file;
 
@@ -662,11 +662,11 @@ namespace EngineFramework {
 			//Create directory for compressed types if doesn't exist, does nothing otherwise.
 			//Asset folder prefix is needed to give the full relative path, since the function may directly read/write to files instead of using AssetManagerSystem functions.
 			std::filesystem::create_directories(asset_folder_prefix / compressed_bc_folderpath);
-			std::filesystem::create_directories(asset_folder_prefix / compressed_etc2_folderpath);
+			std::filesystem::create_directories(asset_folder_prefix / compressed_astc_folderpath);
 
 			//==Compress textures and write to directories, if they should be compressed.
 			//Asset folder prefix is needed to give the full relative path, since the function may directly read/write to files instead of using AssetManagerSystem functions.
-			auto compress_err_code = CompressTexturesIfNeeded(asset_folder_prefix / folder_path, asset_folder_prefix / compressed_bc_folderpath, asset_folder_prefix / compressed_etc2_folderpath, asset_folder_prefix / do_not_compress_meta_filepath);
+			auto compress_err_code = CompressTexturesIfNeeded(asset_folder_prefix / folder_path, asset_folder_prefix / compressed_bc_folderpath, asset_folder_prefix / compressed_astc_folderpath, asset_folder_prefix / do_not_compress_meta_filepath);
 			if (compress_err_code.has_value())
 			{
 				LOGE("Error during compression of textures: %s", compress_err_code.value().c_str());
@@ -690,14 +690,14 @@ namespace EngineFramework {
 		/*
 			Load compressed textures first (directory and compression type based on platform).
 			- Windows -> BCx
-			- Android -> ETC2
+			- Android -> ASTC
 		*/
 		{
 			std::vector<std::filesystem::path> compressed_filepaths{};
 #ifdef PLATFORM_WINDOWS
-			compressed_filepaths = std::move(ListFilesInDirectory(compressed_bc_folderpath, Scene::GetCompressedTextureExtensions()));
+			compressed_filepaths = std::move(ListFilesInDirectory(compressed_astc_folderpath, Scene::GetCompressedTextureExtensions()));
 #elif defined (PLATFORM_ANDROID)
-			compressed_filepaths = std::move(ListFilesInDirectory(compressed_etc2_folderpath, Scene::GetCompressedTextureExtensions()));
+			compressed_filepaths = std::move(ListFilesInDirectory(compressed_astc_folderpath, Scene::GetCompressedTextureExtensions()));
 #endif
 
 			//Iterate over all compressed textures

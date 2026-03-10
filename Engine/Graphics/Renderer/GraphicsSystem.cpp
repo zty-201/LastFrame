@@ -89,10 +89,6 @@ namespace EngineFramework
         // Listen for events
         event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&GraphicsSystem::HANDLE_EVENT_LevelEditorToggled>(this);
         event_dispatcher.sink<Event_Window_Resized>().connect<&GraphicsSystem::HANDLE_EVENT_WindowResized>(this);
-
-#ifdef PLATFORM_WINDOWS
-        CMP_InitFramework(); //Initialize compressonator framework.
-#endif
     }
 
     void GraphicsSystem::SetupGLFW()

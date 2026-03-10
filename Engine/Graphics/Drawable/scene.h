@@ -110,13 +110,13 @@ struct Scene
         Does not modify original file.
         \param src_path 
         - The original uncompressed texture file
-        \param folder_BCx, folder_ETC2  
-        - folder_path to folders for compressed BCx and ETC2 files respectively.
+        \param folder_BCx, folder_ASTC  
+        - folder_path to folders for compressed BCx and ASTC files respectively.
         Leave blank if that type should not be generated.
         At least one must not be blank, otherwise none will be generated and an error will be returned.
         \return Returns an error string if unsuccessful.
     */
-    static [[nodiscard]] std::optional<std::string> CompressAndWriteTexture(const std::filesystem::path& src_path, const std::filesystem::path& folder_BCx = {}, const std::filesystem::path& folder_ETC2 = {});
+    static [[nodiscard]] std::optional<std::string> CompressAndWriteTexture(const std::filesystem::path& src_path, const std::filesystem::path& folder_BCx = {}, const std::filesystem::path& folder_ASTC = {});
 #endif
 
     /*
@@ -124,7 +124,7 @@ struct Scene
     */
     static inline std::vector<std::string> GetCompressedTextureExtensions()
     {
-        return { ".compiled_bc", ".compiled_etc2" };
+        return { ".compiled_bc", ".compiled_astc" };
     }
     /*
         Returns list of accepted file extensions for uncompressed texture files

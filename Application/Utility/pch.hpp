@@ -61,6 +61,10 @@
 #include <gles3/gl32.h>
 #endif
 
+//Compressonator, for compression of textures on desktop.
+#ifdef PLATFORM_WINDOWS
+#include "compressonator.h"
+#endif
 
 // GLM (OpenGL Mathematics)
 //TODO: Replace with centralized math lib.
