@@ -11,16 +11,9 @@
 #include "SceneManager.hpp"
 
 #include "stb_image.h"
-#define VOXEL_GRID_SIZE_X 160
-#define VOXEL_GRID_SIZE_Y 90
-#define VOXEL_GRID_SIZE_Z 128
+
+#define MAX_LIGHTS 64
 #define NUM_BLUE_NOISE_TEXTURES 16
-#define SHADOW_WIDTH 2048
-#define SHADOW_HEIGHT 2048
-#define POINT_SHADOW_SIZE 512
-#define MAX_LIGHTS 128
-#define MAX_SHADOW_CASTING_SPOTLIGHTS 32
-#define MAX_SHADOW_CASTING_POINT_LIGHTS 16
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
@@ -28,6 +21,20 @@ class LevelEditor; // forward declaration
 #endif
 
 #if defined(__ANDROID__)
+
+// smaller shadow maps and voxel grids on mobile for performance reasons.
+#define VOXEL_GRID_SIZE_X 64
+#define VOXEL_GRID_SIZE_Y 64
+#define VOXEL_GRID_SIZE_Z 64
+
+#define SHADOW_WIDTH 1024
+#define SHADOW_HEIGHT 1024
+
+#define POINT_SHADOW_SIZE 256
+
+#define MAX_SHADOW_CASTING_SPOTLIGHTS 16
+#define MAX_SHADOW_CASTING_POINT_LIGHTS 8
+
 // On Android, we must use clock_gettime
 #include <time.h>
 
@@ -38,7 +45,20 @@ static inline double get_native_time() {
 }
 
 #else
+
+#define VOXEL_GRID_SIZE_X 160
+#define VOXEL_GRID_SIZE_Y 90
+#define VOXEL_GRID_SIZE_Z 128
+
+#define SHADOW_WIDTH 4096
+#define SHADOW_HEIGHT 4096
+
+#define POINT_SHADOW_SIZE 512
+
+#define MAX_SHADOW_CASTING_SPOTLIGHTS 32
+#define MAX_SHADOW_CASTING_POINT_LIGHTS 16
 // On other platforms (Windows, Linux), we can use GLFW
+
 #include <GLFW/glfw3.h> // Make sure you have this include
 
 static inline double get_native_time() {
