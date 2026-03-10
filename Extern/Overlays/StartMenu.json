@@ -1,5 +1,5 @@
 {
-	"701": {
+	"848": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16345929764767956995,
@@ -14,7 +14,8 @@
 			"idle_texture": [
 				13562766767143288835,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -62,7 +63,7 @@
 			"visible": false
 		}
 	},
-	"836": {
+	"849": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				8275479232520028161,
@@ -77,7 +78,8 @@
 			"idle_texture": [
 				12986306014839865345,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "HowToPlayBtn"
@@ -116,7 +118,7 @@
 			"visible": false
 		}
 	},
-	"837": {
+	"850": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				15193008260161110025,
@@ -131,7 +133,8 @@
 			"idle_texture": [
 				15292149024053559303,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -179,7 +182,7 @@
 			"visible": false
 		}
 	},
-	"838": {
+	"851": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				11734243746340569093,
@@ -194,7 +197,8 @@
 			"idle_texture": [
 				14139227519446712325,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -242,7 +246,7 @@
 			"visible": false
 		}
 	},
-	"839": {
+	"852": {
 		"NameComponent": {
 			"name": "BG"
 		},

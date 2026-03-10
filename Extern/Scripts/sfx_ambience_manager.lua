@@ -7,7 +7,7 @@ local SLOT_OUTDOOR = "Outdoor"
 local SLOT_INDOOR  = "Indoor"
 
 -- Tuning
-local FADE_SECONDS = 1.2
+local FADE_SECONDS = 1.0
 local STOP_EPS     = 0.05
 
 -- 0 = menu, 1 = outdoor, 2 = indoor
@@ -76,7 +76,8 @@ local function applyMode(mode)
     Audio_StopSlot(EntityID, SLOT_MENU)
 
     -- Apply Occlusion
-    Audio_SetIndoorFactor(current)
+    local curved = 1.0 - (1.0 - current) * (1.0 - current)
+    Audio_SetIndoorFactor(curved)
 
     -- Outdoor always plays during gameplay, never stop
     if not indoorPlaying and target == 0.0 then
@@ -111,16 +112,22 @@ end
 function on_create(self)
     print("[AmbienceManager] on_create EntityID =", EntityID)
 
-    if _G.INDOOR_COUNT == nil then
-        _G.INDOOR_COUNT = 0
-    end
+    -- if _G.INDOOR_COUNT == nil then
+    --     _G.INDOOR_COUNT = 0
+    -- end
 
-    if _G.GAME_STATE == nil then
-        _G.GAME_STATE = "MENU"
-    end
+    -- if _G.GAME_STATE == nil then
+    --     _G.GAME_STATE = "MENU"
+    -- end
+
+    _G.INDOOR_COUNT = 0
+    _G.GAME_STATE = "MENU"
 
     local mode = getMode()
     lastMode = mode
+
+    FADE_SECONDS = Audio_GetSlotFadeDuration(EntityID, SLOT_OUTDOOR)
+    --print("[AmbienceManager] FADE_SECONDS =", FADE_SECONDS)
 
     if mode == MODE_MENU then
         applyMode(MODE_MENU)
@@ -144,11 +151,7 @@ function on_update(self, dt)
     _dbgT = _dbgT + dt
     if _dbgT >= 1.0 then
         _dbgT = 0.0
-        print(string.format(
-            -- "[AmbienceManager] GAME_STATE=%s INDOOR_COUNT=%s",
-            tostring(_G.GAME_STATE),
-            tostring(_G.INDOOR_COUNT)
-        ))
+        --print(string.format("[AmbienceManager] GAME_STATE=%s INDOOR_COUNT=%s", tostring(_G.GAME_STATE), tostring(_G.INDOOR_COUNT)))
     end
 
     local mode = getMode()
@@ -184,6 +187,7 @@ function on_update(self, dt)
     current = clamp01(current)
 
     if math.abs(current - prev) > 0.0001 then
+        --print(string.format("[AmbienceManager] current=%.3f target=%.3f speed=%.3f dt=%.4f", current, target, speed, dt))
         applyMode(mode)
     end
 end

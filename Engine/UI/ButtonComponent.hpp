@@ -28,8 +28,10 @@ struct ButtonComponent {
 
     bool is_hover;
     bool is_clicked;
-    bool is_released; //trigger even when it is released
-    bool is_active; //value to let dev know if its functioning (for debug purposes)
+    bool is_released;  //trigger even when it is released
+    bool is_active;    //value to let dev know if its functioning (for debug purposes)
+    bool stay_clicked;    //when true, button locks onto clicked_texture after being triggered (does not auto-revert to idle)
+    bool clicked_locked;  //runtime state: true while button is held in its locked clicked state
 
 };
 
