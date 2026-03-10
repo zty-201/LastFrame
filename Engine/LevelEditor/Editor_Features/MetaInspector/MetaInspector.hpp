@@ -37,7 +37,8 @@ namespace EditorFeatures {
 	enum class AssetPickerKind : std::uint32_t {
 		Texture = 0,
 		Audio = 1,
-		Script = 2
+		Script = 2,
+		Video = 3
 
 	}; // Add on further if any - idk what else to add
 

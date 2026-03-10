@@ -262,6 +262,7 @@ namespace EngineFramework
         bool m_tricubic_filtering = false;
         int m_frame_idx = 0;
         bool m_ping_pong = false;
+        float m_lastFrameDeltaTime = 0.0f;
 
 		// Previous frame matrices for temporal reprojection
         glm::mat4 m_prev_view_projection;

@@ -13,6 +13,7 @@
 struct UIComponent
 {
     xresource::full_guid textureid; // Name of the file to load
+    xresource::full_guid videoid;   // Optional video asset guid
     glm::vec2 position;      // X, Y in Pixels (from Bottom-Left or Top-Left)
     glm::vec2 size;          // Width, Height in Pixels
     glm::vec3 color = glm::vec3(1.0f); // Default White (No tint)

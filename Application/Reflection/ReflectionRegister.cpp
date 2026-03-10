@@ -868,6 +868,8 @@ namespace EngineFramework
 			.type("UIComponent") 
 			.data<&UIComponent::textureid>("textureid")
 				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
+			.data<&UIComponent::videoid>("videoid")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Video })
 			.data<&UIComponent::position>("position")
 			.data<&UIComponent::is_NDC>("is_NDC")
 			.data<&UIComponent::position_NDC>("position_NDC")

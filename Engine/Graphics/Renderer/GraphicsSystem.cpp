@@ -4,6 +4,7 @@
 #include "GraphicsSystem.h"
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
+#include "VideoClip.h"
 #include "MaterialComponent.h"
 #include "AnimationComponent.h"
 
@@ -286,7 +287,7 @@ namespace EngineFramework
 
     void GraphicsSystem::Update(float deltaTime)
     {
-        UNREFERENCED_PARAMETER(deltaTime);
+        m_lastFrameDeltaTime = deltaTime;
         RenderScene();
     }
 
@@ -1265,6 +1266,7 @@ namespace EngineFramework
         };
 
         std::vector<UIRenderItem> drawList;
+        std::unordered_set<VideoClip*> updatedVideos;
 
         for (auto [entity, ui] : view.each())
         {
@@ -1344,12 +1346,35 @@ namespace EngineFramework
             shader->setUniform("u_Color", glm::vec4(ui.color, 1.0f));
             shader->setUniform("u_Luminance", ui.luminance);
 
-            // --- BIND TEXTURE ---
+            // --- BIND TEXTURE OR VIDEO FRAME ---
             glActiveTexture(GL_TEXTURE0);
 
-            auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
-            // Handle missing texture 
-            GLuint texID = (tex) ? tex->id : m_defaultWhiteTexture;
+            GLuint texID = m_defaultWhiteTexture;
+            bool videoBound = false;
+
+            if (ui.videoid.m_Instance != 0)
+            {
+                auto video = AssetManagerSystem::GetResource<VideoClip>(ui.videoid);
+                if (video)
+                {
+                    if (updatedVideos.insert(video.get()).second)
+                    {
+                        video->Update(m_lastFrameDeltaTime);
+                    }
+                    if (video->IsReady())
+                    {
+                        texID = static_cast<GLuint>(video->GetTextureId());
+                        videoBound = true;
+                    }
+                }
+            }
+
+            if (!videoBound)
+            {
+                auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
+                texID = (tex) ? tex->id : m_defaultWhiteTexture;
+            }
+
             glBindTexture(GL_TEXTURE_2D, texID);
             shader->setUniform("s_Texture", 0);
 
