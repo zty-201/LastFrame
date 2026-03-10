@@ -643,13 +643,14 @@ namespace EngineFramework
         );
     }
 
+    //No longer in use?
     void UI_System::StartPseudoCutscene()
     {
         std::cout << "[UI_System] StartPseudoCutscene() called\n";
 
         // Your described chain: cutscene_1 -> cutscene_4, 1.5s interval
         StartCutsceneSequence(
-            { "Cutscene_1", "Cutscene_2", "Cutscene_3", "Cutscene_4" },
+            { "Cutscene_1", "Cutscene_2", "Cutscene_3", "Cutscene_4", "Cutscene_5"},
             1.5f,
             true
         );

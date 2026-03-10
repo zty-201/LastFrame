@@ -18,7 +18,7 @@ void IntroCutsceneState::OnEnter(Engine::StateMachine& machine)
     ui.closeAllMenu();
 
     ui.StartCutsceneSequence(
-        { "Cutscene_1", "Cutscene_2", "Cutscene_3", "Cutscene_4" },
+        { "Cutscene_1", "Cutscene_2", "Cutscene_3", "Cutscene_4", "Cutscene_5"},
         1.5f,
         true
     );
