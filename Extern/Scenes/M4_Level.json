@@ -187,6 +187,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				166.0,
@@ -341,6 +342,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -2690,6 +2692,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				1242.5,
@@ -3802,6 +3805,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				1998.0,
@@ -4749,6 +4753,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				2204.0,
@@ -38325,6 +38330,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -38363,6 +38369,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -38417,6 +38424,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -38471,6 +38479,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -38506,6 +38515,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -38557,6 +38567,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -38611,6 +38622,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -38649,6 +38661,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -38829,6 +38842,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -38883,6 +38897,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -38918,6 +38933,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -38969,6 +38985,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -40282,6 +40299,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -40320,6 +40338,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -40374,6 +40393,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -40428,6 +40448,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -40463,6 +40484,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -40514,6 +40536,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -43792,6 +43815,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -43830,6 +43854,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -43884,6 +43909,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -43938,6 +43964,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -43973,6 +44000,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -44024,6 +44052,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -51093,6 +51122,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -51131,6 +51161,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -51185,6 +51216,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -51239,6 +51271,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -51274,6 +51307,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -51325,6 +51359,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -53171,6 +53206,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -53209,6 +53245,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -53263,6 +53300,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -53317,6 +53355,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -53352,6 +53391,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -53403,6 +53443,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -61311,6 +61352,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61375,6 +61417,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61439,6 +61482,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61629,6 +61673,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61693,6 +61738,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61757,6 +61803,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61821,6 +61868,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61885,6 +61933,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61949,6 +61998,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62013,6 +62063,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62077,6 +62128,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62141,6 +62193,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62205,6 +62258,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62395,6 +62449,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -69024,6 +69079,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -69276,6 +69332,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -69340,6 +69397,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -69404,6 +69462,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -85333,6 +85392,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -85743,6 +85803,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -86113,6 +86174,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 2,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				520.2000122070313,
@@ -86160,6 +86222,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 2,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				520.2000122070313,
@@ -86207,6 +86270,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 2,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -86254,6 +86318,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 2,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				520.2000122070313,
@@ -86301,6 +86366,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 1,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				173.39999389648438,
@@ -87815,6 +87881,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				81.0,

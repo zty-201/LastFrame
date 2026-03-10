@@ -638,7 +638,7 @@ namespace EngineFramework
 
         StartCutsceneSequence(
             { "Splash_1", "Splash_2", "Splash_3" },
-            1.5f,
+            2.5f,
             true
         );
     }

@@ -38,6 +38,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 2,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				1203.75,
@@ -101,6 +102,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 2,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				1203.75,

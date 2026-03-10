@@ -38,6 +38,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 1,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				329.6700134277344,
@@ -101,6 +102,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 1,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				358.1600036621094,
@@ -164,6 +166,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				386.6500244140625,
@@ -227,6 +230,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				415.1399841308594,
@@ -290,6 +294,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				443.6300048828125,
@@ -353,6 +358,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				472.1200256347656,
@@ -416,6 +422,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				529.0999755859375,
@@ -479,6 +486,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				345.95001220703125,
@@ -517,6 +525,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -580,6 +589,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 1,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.6100158691406,
@@ -618,6 +628,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 1,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				219.78001403808594,
@@ -681,6 +692,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 1,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				268.6199951171875,
@@ -744,6 +756,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 1,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				301.17999267578125,
@@ -807,6 +820,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				376.4750061035156,
