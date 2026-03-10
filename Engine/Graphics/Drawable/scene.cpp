@@ -654,14 +654,18 @@ namespace
 		//Texture swizzling R and B to account for flipped texture during compression for RGB and RGBA.
 		switch (compressed_texture.compressed_type)
 		{
-		case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
-		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
-		case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
-		case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+#ifdef PLATFORM_WINDOWS
+			case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
+			case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
+			//case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
+			//case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
 			break;
-			//Otherwise no need to swizzle.
+#endif
+		//Otherwise no need to swizzle.
+			default:
+				break;
 		}
 		//Save previous setting so it can be loaded back afterwards.
 		GLint previousAlignment = 0;

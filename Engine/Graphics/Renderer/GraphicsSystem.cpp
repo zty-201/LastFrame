@@ -23,7 +23,7 @@
 class LevelEditor; // forward declaration
 #endif
 
-#if defined(__ANDROID__)
+#ifdef PLATFORM_ANDROID
 
 // smaller shadow maps and voxel grids on mobile for performance reasons.
 #define VOXEL_GRID_SIZE_X 64
