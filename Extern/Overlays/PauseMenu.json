@@ -171,7 +171,6 @@
 			"layer": 1,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				329.6700134277344,
 				174.21998596191406
@@ -191,12 +190,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -243,7 +236,6 @@
 			"layer": 1,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				358.1600036621094,
 				174.21998596191406
@@ -263,12 +255,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -315,7 +301,6 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				386.6500244140625,
 				174.21998596191406
@@ -335,12 +320,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -387,7 +366,6 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				415.1399841308594,
 				174.21998596191406
@@ -407,12 +385,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -459,7 +431,6 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				443.6300048828125,
 				174.21998596191406
@@ -479,12 +450,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -531,7 +496,6 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				472.1200256347656,
 				174.21998596191406
@@ -551,12 +515,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -603,7 +561,6 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				529.0999755859375,
 				174.21998596191406
@@ -623,12 +580,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -675,7 +626,6 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				345.95001220703125,
 				321.7449951171875
@@ -696,12 +646,6 @@
 				4183906194480545793,
 				3711223656383638553
 			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
 			"visible": false
 		}
 	},
@@ -721,7 +665,6 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -741,12 +684,6 @@
 			"textureid": [
 				1026733325542998017,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -793,7 +730,6 @@
 			"layer": 1,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				500.6100158691406,
 				174.21998596191406
@@ -814,12 +750,6 @@
 				8518163340552814593,
 				3711223656383638553
 			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
 			"visible": false
 		}
 	},
@@ -839,7 +769,6 @@
 			"layer": 1,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				219.78001403808594,
 				168.59999084472656
@@ -859,12 +788,6 @@
 			"textureid": [
 				7066209955997663235,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -911,7 +834,6 @@
 			"layer": 1,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				268.6199951171875,
 				174.21998596191406
@@ -931,12 +853,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}

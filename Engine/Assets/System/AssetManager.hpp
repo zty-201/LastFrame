@@ -85,7 +85,6 @@
 #include "entt/meta/meta.hpp"
 #include "entt/meta/resolve.hpp"
 #include "Animation.hpp"
-#include "VideoClip.h"
 #include "AnimationImporter.hpp"
 
 #ifdef PLATFORM_ANDROID
@@ -228,7 +227,6 @@ namespace EngineFramework {
 		static inline constexpr const char AUDIO[6]{ "audio" };
 		static inline constexpr const char SCRIPT[7]{ "script" };
 		static inline constexpr const char ARCHTYPE[9]{ "archtype" };
-		static inline constexpr const char VIDEO[6]{ "video" };
 		static inline constexpr const char ANIMATION[10]{ "animation" };
 		/*
 			Precomputed type guids.
@@ -240,7 +238,6 @@ namespace EngineFramework {
 		static inline constexpr xresource::type_guid AUDIO_GUID{ AUDIO };
 		static inline constexpr xresource::type_guid SCRIPT_GUID{ SCRIPT };
 		static inline constexpr xresource::type_guid ARCHTYPE_GUID{ ARCHTYPE };
-		static inline constexpr xresource::type_guid VIDEO_GUID{ VIDEO };
 		static inline constexpr xresource::type_guid ANIMATION_GUID{ ANIMATION };
 
 		// Editor-only convenience: re-read all .lua files and rebuild ScriptAsset::code
@@ -312,7 +309,6 @@ namespace EngineFramework {
 		static bool LoadScript(const std::filesystem::path&);
 		static bool LoadArchtype(const std::filesystem::path&);
 		static bool LoadAnimation(const std::filesystem::path&);
-		static bool LoadVideo(const std::filesystem::path&);
 
 
 		static inline AssetManagerSystem* s_instance = nullptr; // singleton pointer

@@ -15,7 +15,6 @@
 			"layer": 100,
 			"lock_luminance": false,
 			"luminance": 0.3499999940395355,
-			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -36,13 +35,7 @@
 				16190863482069467137,
 				3711223656383638553
 			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
+			"visible": true
 		}
 	}
 }

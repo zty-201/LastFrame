@@ -24,12 +24,9 @@
 #include "scene.h"
 #include "InstancingSystem.h"
 #include "GeometryDataBuffer.h"
-#include <unordered_set>
 
 namespace EngineFramework
 {
-    class VideoClip;
-
     namespace TextureUnits
     {
         // Define texture units for the new shader bindings
@@ -209,10 +206,9 @@ namespace EngineFramework
         GLuint m_volumetricUBOs[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
         GLuint m_lightSSBOs[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
 
-        // Cached resources
+		// Cached resources
         std::unordered_map<std::string, std::shared_ptr<Mesh::MeshData>> meshCache;
         std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCacheWire;
-        std::unordered_set<VideoClip*> m_activeVideoAudio;
 
 		// Shadow mapping resources
         static const int CASCADE_COUNT = 3;
@@ -264,7 +260,6 @@ namespace EngineFramework
 		bool m_androidPlatform = false;
         int m_frame_idx = 0;
         bool m_ping_pong = false;
-        float m_lastFrameDeltaTime = 0.0f;
 
 		// Previous frame matrices for temporal reprojection
         glm::mat4 m_prev_view_projection;

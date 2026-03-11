@@ -54,7 +54,6 @@
 			"layer": 0,
 			"lock_luminance": true,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -72,12 +71,6 @@
 				1.0
 			],
 			"textureid": [
-				0,
-				0
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
 				0,
 				0
 			],
