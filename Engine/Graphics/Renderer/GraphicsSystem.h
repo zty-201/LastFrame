@@ -72,12 +72,7 @@ namespace EngineFramework
         std::pair<int, int> GetWindowSize() const { return std::pair<int, int>(static_cast<int>(screen.x), static_cast<int>(screen.y)); }
 
         //==Camera Manipulation
-
-        
-        glm::vec2 Getscreen() {
-
-            return screen;
-        };
+        glm::vec2 Getscreen() const { return screen; };
 
         //Returns the active camera, or sets a random camera as active if none are. Returns entt::null if no camera found.
         entt::entity GetFirstActiveCamera()
@@ -145,10 +140,13 @@ namespace EngineFramework
         bool WorldToScreen(const glm::vec3& worldPos, glm::vec2& outScreenPos, float& outScale);
         std::vector<glm::vec3> GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ);
 
+        
+
     private:
 
+        static constexpr int FRAMES_IN_FLIGHT = 3;
         // Debug Mode
-        int debugMode = 0;
+        int ringIdx = 0;
 
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* pWindow = nullptr;
@@ -170,8 +168,7 @@ namespace EngineFramework
             glm::vec4 camera_position;
             glm::vec4 bias_near_far_pow; // x: bias, y: near, z: far, w: power
             glm::vec4 aniso_density_scattering_absorption;
-            glm::vec4 time; // x: current time
-            glm::ivec4 width_height;
+			glm::vec4 width_height_time; // x: width, y: height, z: time, w: padding
         };
 
         struct LightSSBO {
@@ -206,7 +203,8 @@ namespace EngineFramework
 		xresource::full_guid ui_shader_guid;
 
 		// UBOs
-        GLuint m_volumetricUBO = 0;
+        GLuint m_volumetricUBOs[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        GLuint m_lightSSBOs[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
 
 		// Cached resources
         std::unordered_map<std::string, std::shared_ptr<Mesh::MeshData>> meshCache;
@@ -238,8 +236,7 @@ namespace EngineFramework
 		// FBO texture attachments
         GLuint sceneTextureID;
         
-        // SSBOs
-		GLuint m_lightSSBO = 0;
+		// Light data for SSBO, updated each frame
         std::vector<LightSSBO> m_LightData;
 
         // 3D textures for volumetric fog passes
@@ -260,6 +257,7 @@ namespace EngineFramework
         float m_ambient_light_intensity = 0.4f;
         bool m_temporal_accumulation = true;
         bool m_tricubic_filtering = false;
+		bool m_androidPlatform = false;
         int m_frame_idx = 0;
         bool m_ping_pong = false;
 

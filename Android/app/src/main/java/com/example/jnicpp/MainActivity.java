@@ -7,6 +7,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.opengl.EGL14;
+import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +16,8 @@ import android.view.MotionEvent;
 import android.view.KeyEvent;
 import android.widget.Toast;
 import com.example.jnicpp.databinding.ActivityMainBinding;
+
+import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 public class MainActivity extends AppCompatActivity implements GLSurfaceView.Renderer {
@@ -44,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
             Log.e(TAG, "Failed to load native library", e);
         }
     }
+
     private ActivityMainBinding binding;
     private GLSurfaceView glSurfaceView;
     private boolean isInitialized = false;
@@ -90,10 +95,12 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
 
 // Setup GLSurfaceView
             glSurfaceView = binding.glSurfaceView;
+            //Note: <uses feature> in manifest does not guarantee 3.2 support for sideloaded apk like emulators.
             glSurfaceView.setEGLContextClientVersion(3); // OpenGL ES 3.X, uses highest version.
             glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
             glSurfaceView.setRenderer(this);
             glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+
 // Example of a call to a native method
             String message = stringFromJNI();
             Log.d(TAG, "Native message: " + message);
@@ -165,15 +172,22 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         Log.d(TAG, "Surface created");
+        String version = gl.glGetString(GL10.GL_VERSION);
+        String vendor = gl.glGetString(GL10.GL_VENDOR);
+        String renderer = gl.glGetString(GL10.GL_RENDERER);
+
+        Log.d("OpenGL", "Version: " + version);
+        Log.d("OpenGL", "Vendor: " + vendor);
+        Log.d("OpenGL", "Renderer: " + renderer);
         try {
             // Initialize OpenGL in native code with AssetManager
             boolean success = initGL(getAssets());
             if (success) {
                 isInitialized = true;
-                Log.d(TAG, "OpenGL ES 3.2 initialized successfully");
+                Log.d(TAG, "OpenGL ES initialized successfully");
             } else {
-                Log.e(TAG, "Failed to initialize OpenGL ES 3.2");
-                showToast("Failed to initialize OpenGL ES 3.2");
+                Log.e(TAG, "Failed to initialize OpenGL ES");
+                showToast("Failed to initialize OpenGL ES");
             }
         } catch (Exception e) {
             Log.e(TAG, "Error in onSurfaceCreated", e);

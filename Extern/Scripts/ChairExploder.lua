@@ -4,6 +4,7 @@
 local DEBUG = true
 
 local EXPLODE_AUDIO_SLOT = "ChairExplode"
+local SCARE_AUDIO_SLOT = "Scary"
 
 -- Chair piece entity IDs
 local CHAIR_PART_IDS = {
@@ -30,6 +31,14 @@ local Y_MAX          = 100.0   -- max height a piece can reach
 
 local function log(...)
     if DEBUG then print("[ChairScatter]", ...) end
+end
+
+local function play_3d_sfx(slotId)
+    if type(Audio_PlaySlot) == "function" and slotId ~= nil then
+        Audio_PlaySlot(EntityID, slotId)
+        return true
+    end
+    return false
 end
 
 -- Pick a random point within the safe zone circle
@@ -60,7 +69,8 @@ function on_create(Self)
         -- Play explosion audio from this entity
         ------------------------------------------------
         if type(Audio_PlaySlot) == "function" then
-            Audio_PlaySlot(EntityID, EXPLODE_AUDIO_SLOT)
+            play_3d_sfx(EXPLODE_AUDIO_SLOT)
+            play_3d_sfx(SCARE_AUDIO_SLOT)
 
             if DEBUG then
                 print("[ChairScatter] Played explode SFX:", EXPLODE_AUDIO_SLOT)

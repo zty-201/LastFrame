@@ -1,5 +1,5 @@
 {
-	"636": {
+	"692": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16267019915880398851,
@@ -14,7 +14,8 @@
 			"idle_texture": [
 				8518163340552814593,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -63,7 +64,7 @@
 			"visible": false
 		}
 	},
-	"637": {
+	"693": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16267019915880398851,
@@ -78,7 +79,8 @@
 			"idle_texture": [
 				8518163340552814593,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -127,7 +129,7 @@
 			"visible": false
 		}
 	},
-	"638": {
+	"694": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16267019915880398851,
@@ -142,7 +144,8 @@
 			"idle_texture": [
 				8518163340552814593,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -191,7 +194,7 @@
 			"visible": false
 		}
 	},
-	"639": {
+	"695": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16267019915880398851,
@@ -206,7 +209,8 @@
 			"idle_texture": [
 				8518163340552814593,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -255,7 +259,7 @@
 			"visible": false
 		}
 	},
-	"640": {
+	"697": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16267019915880398851,
@@ -270,7 +274,8 @@
 			"idle_texture": [
 				8518163340552814593,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -319,7 +324,7 @@
 			"visible": false
 		}
 	},
-	"689": {
+	"698": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16267019915880398851,
@@ -334,7 +339,8 @@
 			"idle_texture": [
 				8518163340552814593,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -383,7 +389,7 @@
 			"visible": false
 		}
 	},
-	"692": {
+	"699": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16267019915880398851,
@@ -398,7 +404,8 @@
 			"idle_texture": [
 				8518163340552814593,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -447,7 +454,7 @@
 			"visible": false
 		}
 	},
-	"693": {
+	"700": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				4240253966396063751,
@@ -462,7 +469,8 @@
 			"idle_texture": [
 				4183906194480545793,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -511,7 +519,7 @@
 			"visible": false
 		}
 	},
-	"694": {
+	"701": {
 		"NameComponent": {
 			"name": "BG"
 		},
@@ -550,7 +558,7 @@
 			"visible": false
 		}
 	},
-	"695": {
+	"839": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16267019915880398851,
@@ -565,7 +573,8 @@
 			"idle_texture": [
 				8518163340552814593,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -614,7 +623,7 @@
 			"visible": false
 		}
 	},
-	"697": {
+	"844": {
 		"NameComponent": {
 			"name": "VolumeBtn"
 		},
@@ -653,7 +662,7 @@
 			"visible": false
 		}
 	},
-	"698": {
+	"845": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16267019915880398851,
@@ -668,7 +677,8 @@
 			"idle_texture": [
 				8518163340552814593,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -717,7 +727,7 @@
 			"visible": false
 		}
 	},
-	"699": {
+	"846": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16267019915880398851,
@@ -732,7 +742,8 @@
 			"idle_texture": [
 				8518163340552814593,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -781,7 +792,7 @@
 			"visible": false
 		}
 	},
-	"700": {
+	"847": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				11734243746340569093,
@@ -796,7 +807,8 @@
 			"idle_texture": [
 				14139227519446712325,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"LuaScriptComponent": {
 			"Enabled": true,

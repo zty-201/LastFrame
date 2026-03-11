@@ -17,12 +17,12 @@ local STATE_CP3  = 3
 -- =========================
 local CP1_SLOT_ID = "TTLS_Start"
 local CP1_TENSION_SLOT_ID = "Tension"
-local CP1_LENGTH_SECONDS = 10.0
+local CP1_LENGTH_SECONDS = 10.1
 
 -- =========================
 -- CP2 CONFIG
 -- =========================
-local CP2_DELAY_SECONDS = 1.5
+local CP2_DELAY_SECONDS = 1.6
 local HIDDEN_DOOR_ID = 43
 
 -- =========================
