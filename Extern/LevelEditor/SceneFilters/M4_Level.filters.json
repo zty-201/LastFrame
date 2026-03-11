@@ -144,12 +144,13 @@
 				831,
 				832,
 				833,
-				891
+				891,
+				892
 			],
 			"name": "Walls"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				67,
 				61,
@@ -655,7 +656,8 @@
 				874,
 				876,
 				875,
-				877
+				877,
+				894
 			],
 			"name": "Lobby"
 		},
@@ -851,7 +853,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				5,
 				2,

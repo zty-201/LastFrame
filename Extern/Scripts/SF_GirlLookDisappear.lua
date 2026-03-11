@@ -11,7 +11,7 @@ local LOG_EVERY_N_FRAMES = 15
 
 local MAX_DISTANCE = 3000.0
 local LOOK_DOT_THRESHOLD = 0.85
-local REQUIRED_LOOK_TIME = 0.10
+local REQUIRED_LOOK_TIME = 1.0
 local GIRL_LOOK_HEIGHT_OFFSET = 60.0
 
 -- SET THESE TO THE GIRL'S ACTUAL VISIBLE SCALE
@@ -138,7 +138,7 @@ function on_create(self)
 
     hasTriggered = false
     isVisible = false
-    lookTimer = 0.0
+    lookTimer = 2.0
     frame = 0
 
     local tr = Query.GetTransform(EntityID)
