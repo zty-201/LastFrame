@@ -111,6 +111,26 @@ namespace EngineFramework
                 }
             }
 
+            void Skip()
+            {
+                if (!playing)
+                    return;
+
+                if (index < scenes.size())
+                {
+                    ResetMenuLuminance(scenes[index]);
+                }
+
+                playing = false;
+                timer = 0.0f;
+                index = scenes.size();
+
+                if (onFinishedFn)
+                {
+                    onFinishedFn();
+                }
+            }
+
             void Stop()
             {
                 if (playing && index < scenes.size())
@@ -256,6 +276,16 @@ namespace EngineFramework
 
     void UI_System::Update(float deltaTime)
     {
+        // Allow skipping cutscenes with Space
+        if (gCutscene.playing)
+        {
+            // Replace this line with your engine's exact "space pressed once" function if needed
+            if (InputManager::GetInstance().GetAction("JUMP"))
+            {
+                gCutscene.Skip();
+            }
+        }
+
         // 1) Tick cutscene sequence FIRST (so it can swap menus at the right moment)
         gCutscene.Update(deltaTime);
 
@@ -266,9 +296,9 @@ namespace EngineFramework
             {
                 if (menu.second)
                 {
-                    menu.first->Update(); //only update those active ones
+                    menu.first->Update(); // only update those active ones
                     if (name == "AndroidInputOverlay") {
-                        //update joysticks
+                        // update joysticks
                         update_Joysticks();
                     }
                 }
