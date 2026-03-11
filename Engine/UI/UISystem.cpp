@@ -315,17 +315,37 @@ namespace EngineFramework
 
     void UI_System::Update(float deltaTime)
     {
-        // Allow skipping cutscenes with Space
+        // Allow skipping cutscenes with Space (desktop) or tap anywhere (Android)
         if (gCutscene.playing)
         {
-            // Replace this line with your engine's exact "space pressed once" function if needed
+            bool shouldSkip = false;
+
+            // Desktop / existing input
             if (InputManager::GetInstance().GetAction("JUMP"))
+            {
+                shouldSkip = true;
+            }
+
+#if defined(PLATFORM_ANDROID)
+            // Tap-anywhere skip (rising edge only)
+            static bool wasTouchDownLastFrame = false;
+            bool isTouchDownThisFrame = InputManager::GetInstance().GetMouseButton(0);
+
+            if (isTouchDownThisFrame && !wasTouchDownLastFrame)
+            {
+                shouldSkip = true;
+            }
+
+            wasTouchDownLastFrame = isTouchDownThisFrame;
+#endif
+
+            if (shouldSkip)
             {
                 gCutscene.Skip();
             }
         }
 
-        // 1) Tick cutscene sequence FIRST (so it can swap menus at the right moment)
+        // 1) Tick cutscene sequence FIRST
         gCutscene.Update(deltaTime);
 
         // 2) Update only active menus
@@ -335,9 +355,9 @@ namespace EngineFramework
             {
                 if (menu.second)
                 {
-                    menu.first->Update(); // only update those active ones
-                    if (name == "AndroidInputOverlay") {
-                        // update joysticks
+                    menu.first->Update();
+                    if (name == "AndroidInputOverlay")
+                    {
                         update_Joysticks();
                     }
                 }
