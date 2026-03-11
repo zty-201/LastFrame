@@ -138,7 +138,6 @@ namespace EngineFramework
         void Load_Start_Menu();
 
         // Cutscene controls
-        void StartSplashSequence();
         void StartPseudoCutscene();
         void StartCutsceneSequence(const std::vector<std::string>& sceneMenus,
             float intervalSeconds = 1.5f,

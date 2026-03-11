@@ -7,9 +7,6 @@
  *          assets is performed here.
 */
 #include "pch.hpp"
-#include <set>
-#include <thread>
-#include <chrono>
 #include "AssetManager.hpp"
 #include "Audio.hpp"
 #include "Scripting/ScriptAsset.hpp" //For script asset type registration.
@@ -32,7 +29,7 @@
 
 
 #include <mutex>
-#include <nlohmann/json.hpp>
+
 namespace EngineFramework {
 
 	// -------- lifecycle --------
@@ -231,16 +228,7 @@ namespace EngineFramework {
 		AAssetDir_close(assetDir);
 
 #else
-		//Check if path already has folder prefix.
-		std::string prefix = GetAssetFolderPrefix().string();
-		std::string path_string = folder_path.string();
-		//Not present, so append it.
-		if (path_string.find(prefix) != 0)
-		{
-			path_string = prefix + path_string;
-		}
-		std::filesystem::path asset_folder_path{ path_string };
-
+		std::filesystem::path asset_folder_path = GetAssetFolderPrefix() / folder_path;
 		// Use std::filesystem on Windows / Linux
 		if (std::filesystem::exists(asset_folder_path) && std::filesystem::is_directory(asset_folder_path)) {
 			for (auto& entry : std::filesystem::directory_iterator(asset_folder_path)) {
@@ -409,6 +397,7 @@ namespace EngineFramework {
 		asset_loader_map[AUDIO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAudio);
 		asset_loader_map[SCRIPT] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadScript);
 		asset_loader_map[ARCHTYPE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadArchtype);
+		asset_loader_map[VIDEO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadVideo);
 		//=====================================//
 
 		LoadAllResources();
@@ -466,306 +455,56 @@ namespace EngineFramework {
 			//LOGI("[Asset Trace] <--- Finished Loader: %s", resource_type.c_str());
 		}
 	}
-#ifdef PLATFORM_WINDOWS
-	namespace
-	{
-		/*
-			\brief
-			Helper method that compresses 2 types of textures: BCx and ASTC before writing to appropriate folders.
-			Only run on windows.
-			Avoids compressing files mentioned in do_not_compress_meta.
 
-			Pass in the relative paths inclusive of extern folder prefix.
-
-			\param X_folderpath
-			The folder paths for X type of texture.
-			\param do_not_compress_meta_filepath
-			The filepath for the do_not_compress meta file.
-			This file is written in json and denotes what files to avoid compressing.
-			Creates such a file if not created at this location.
-		*/
-		[[nodiscard]] std::optional<std::string> CompressTexturesIfNeeded(
-			const std::filesystem::path& uncompressed_folderpath, 
-			const std::filesystem::path& compressed_bc_folderpath, 
-			const std::filesystem::path& compressed_astc_folderpath, 
-			const std::filesystem::path& do_not_compress_meta_filepath
-			)
-		{
-			/*
-			* Idea: Check which files are uncompressed + should be compressed, and pass to another function for compression+writing.
-				Process:
-				1a. Get list of all filepaths in compressed files directory (for the respective platform) and original directory. Store as dictionary and list separately.
-				1b. Get list of all file names in do_not_compress.meta, store as dictionary.
-				2. If file is not in compressed files directory dictionary AND it is not in the do_not_compress.meta file dictionary, then compress and store.
-				2b. If compression failed, then add filename to do_not_compress.meta.
-			*/
-
-			//==Read meta file
-			std::unordered_set<std::string> do_not_compress_set{};
-			if (!std::filesystem::exists(do_not_compress_meta_filepath))  //Creates file if it doesn't exist
-			{
-				std::ofstream file(do_not_compress_meta_filepath);
-				//Ensure no error is thrown when trying to read json from newly created file later, by dumping an empty json-valid array.
-				file << nlohmann::json::array().dump(1, '\t');
-			}
-
-			
-			try
-			{
-				std::string data = AssetManagerSystem::GetStringFromFile(do_not_compress_meta_filepath);
-				nlohmann::json meta_json_data = nlohmann::json::parse(data);
-				if (meta_json_data.is_array()) do_not_compress_set = meta_json_data.get<std::unordered_set<std::string>>();
-			}
-			catch(...)
-			{
-				return ("No/Invalid json data in do_not_compress_meta_file: " + do_not_compress_meta_filepath.string());
-			}
-
-			/*
-				Get list of uncompressed textures that should be compressed.
-				- Exclude textures that fall under do_not_compress_meta
-			*/
-			std::vector<std::filesystem::path> uncompressed_filepaths = AssetManagerSystem::ListFilesInDirectory(uncompressed_folderpath, Scene::GetUncompressedTextureExtensions());
-			for (auto it = uncompressed_filepaths.begin(); it != uncompressed_filepaths.end();)
-			{
-				//For comparison across different directories and extensions.
-				std::string file_name = it->stem().string();
-				//Delete if present.
-				if (do_not_compress_set.contains(file_name))
-				{
-					it = uncompressed_filepaths.erase(it);
-					continue;
-				}
-				it++;
-			}
-
-
-
-			/*
-				Get items in compressed directory and do_not_compress.meta file, as stemmed filenames.
-				Sets can be used to indicate if X is already present.
-			*/
-			std::unordered_set<std::string> bc_set;
-			std::unordered_set<std::string> etc2_set;
-
-
-			std::vector<std::filesystem::path> bc_filepaths, etc2_filepaths;
-			try
-			{
-				bc_filepaths = AssetManagerSystem::ListFilesInDirectory(compressed_bc_folderpath, Scene::GetCompressedTextureExtensions());
-				etc2_filepaths = AssetManagerSystem::ListFilesInDirectory(compressed_astc_folderpath, Scene::GetCompressedTextureExtensions());
-			}
-			catch (std::exception& e)
-			{
-				//Better to stop compression process if unable to handle this gracefully.
-				return "Unable to read files in compressed folders: " + std::string(e.what());
-			}
-
-			//Copy to the sets.
-			for (const std::filesystem::path& file : bc_filepaths)
-			{
-				bc_set.insert(file.stem().string());
-			}
-			for (const std::filesystem::path& file : etc2_filepaths)
-			{
-				etc2_set.insert(file.stem().string());
-			}
-
-
-			/*
-				Check under each set to see if the texture has been compressed.
-				If not, then compress it.
-				do_not_compress_meta has already been accounted for and erased from the array.
-			*/
-			std::optional<std::string> err_code{};
-			for (const std::filesystem::path& texture_file : uncompressed_filepaths)
-			{
-				//Compress if not yet compressed for that type.
-				std::string file_name = texture_file.stem().string();
-				if (bc_set.contains(file_name) && etc2_set.contains(file_name)) continue;  //Most common path, just skip since no need to compress.
-
-				if (!bc_set.contains(file_name) && !etc2_set.contains(file_name)) //Doing both types at once if not compressed for either, is faster than doing one by one.
-				{
-					err_code = Scene::CompressAndWriteTexture(texture_file, compressed_bc_folderpath, compressed_astc_folderpath);
-				}
-				else if (!bc_set.contains(file_name))
-				{
-					err_code = Scene::CompressAndWriteTexture(texture_file, compressed_bc_folderpath, {});
-				}
-				else if (!etc2_set.contains(file_name))
-				{
-					err_code = Scene::CompressAndWriteTexture(texture_file, {}, compressed_astc_folderpath);
-				}
-
-				//If there's an error in compressing then add to do_not_compress.
-				//Do not add compressed files to do_not_compress (even though it eliminates need to check what files are already compressed) as may want to recompress if deleted.
-				if (err_code.has_value())
-				{
-					LOGD("Unable to compress texture for both BC and ETC2 types: %s, because %s", texture_file.string().c_str(), err_code.value().c_str());
-					do_not_compress_set.insert(file_name);
-				}
-			}
-
-			//Write back to meta file with new values.
-			nlohmann::json do_not_compress_json = do_not_compress_set;
-			std::ofstream do_not_compress_meta_filestream(do_not_compress_meta_filepath);
-			do_not_compress_meta_filestream << do_not_compress_json.dump(1, '\t');
-
-			return {};
-		}
-	}
-#endif
 
 	//==Asset Loaders==//
 	bool AssetManagerSystem::LoadTexture(const std::filesystem::path& folder_path)
 	{
 		/*
-		* Note: Only one of each texture name is to be loaded, even if there are multiple versions.
 			Process:
-			1. Compress and Write (only in Windows)
-			- Compress textures that are not already compressed, and should be compressed.
-			-> Avoid compressing files in do_not_compress_meta, as it may indicate "unable to compress" or "should not compress, to remain high quality".
-			-> Don't add compressed files under do_not_compress_meta, as may want to recompress again if deleted.
-			- Store as files in respective directories for each compression type.
-			
-			2. Load compiled textures from respective compressed directory based on platform.
+			1. Get list of all filepaths in directory
+			2. If file is not precompiled (non-precompiled extension) then compress it to ETC2 and (DXT5 or BC3)
+			- Compiled texture remains in directory.
+			- Original texture moves to sub-directory called "Source"
+			3. Load compiled textures.
 			- ETC2 for android platform
-			- BCx for windows
-			- Add name to array if successfully loaded.
-			3. For each texture in original directory, load as uncompressed file IF it is not already successfully loaded.
-			- This also acts as a failsafe in case compressed files failed to load for some reason.
-			- Add name to array if successfully loaded.
-			4. Because SetGUIDMappings relies on a name array and not filepath array, no need to worry about guid mapping.
-			Just ensure only one of each name is in the array.
+			- DXT5 for windows
+
+			Compressonator used to load standard image formats and compress to ETC2 / DXT5 or BC3
+			- Mobile supports ETC2
+			- Desktop supports DXT5/BC3. It does not natively support ETC2, meaning there's a performance impact.
+
+
+
 		*/
-		// Define relevant Folderpaths and Filepaths for compressed texture types + meta file.
-		constexpr char bc_folder[] = "compressed_bc";
-		constexpr char astc_folder[] = "compressed_astc";
-		constexpr char do_not_compress_meta_file[] = "do_not_compress.meta";
-		const std::filesystem::path asset_folder_prefix = AssetManagerSystem::GetAssetFolderPrefix();
-		const std::filesystem::path compressed_bc_folderpath = folder_path / bc_folder;
-		const std::filesystem::path compressed_astc_folderpath = folder_path / astc_folder;
-		//Store in uncompressed directory.
-		const std::filesystem::path do_not_compress_meta_filepath = folder_path / do_not_compress_meta_file;
-
-		
-#ifdef PLATFORM_WINDOWS
-		{
-			/*
-				On windows, compress each texture into BCx and ETC2 if not yet compressed.
-				Avoid compressing textures in do_not_compress.meta file, as it may indicate
-				- Unable to compress, so don't waste time trying again
-				- Don't want to compress, should remain as uncompressed for the highest quality.
-			*/
-			LOGI("Compressing Textures");
-
-			//Create directory for compressed types if doesn't exist, does nothing otherwise.
-			//Asset folder prefix is needed to give the full relative path, since the function may directly read/write to files instead of using AssetManagerSystem functions.
-			std::filesystem::create_directories(asset_folder_prefix / compressed_bc_folderpath);
-			std::filesystem::create_directories(asset_folder_prefix / compressed_astc_folderpath);
-
-			//==Compress textures and write to directories, if they should be compressed.
-			//Asset folder prefix is needed to give the full relative path, since the function may directly read/write to files instead of using AssetManagerSystem functions.
-			auto compress_err_code = CompressTexturesIfNeeded(asset_folder_prefix / folder_path, asset_folder_prefix / compressed_bc_folderpath, asset_folder_prefix / compressed_astc_folderpath, asset_folder_prefix / do_not_compress_meta_filepath);
-			if (compress_err_code.has_value())
-			{
-				LOGE("Error during compression of textures: %s", compress_err_code.value().c_str());
-			}
-		}
-#endif
-
 		LOGI("Loading Textures...");
+		//Acceptable files that can be loaded as a texture.
+		std::vector<std::string> texture_extensions{ ".png", ".dds", ".ktx", ".ktx2", ".DDS" };
+		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, texture_extensions);
+
 		/*
-			Essentials for uploading to AssetManagerSystem
 			Asset names used for mapping to guid.
-			- Use a set for fast checking to see if asset is already loaded.
-			- Use a vector to preserve insertion order.
 			Resources are kept in an array until guid mappings are read.
-			- Stores both compressed and uncompressed data.
 		*/
-		std::set<std::string> asset_names_set{};
 		std::vector<std::string> asset_names{};
 		std::vector<std::shared_ptr<Scene::Texture>> loaded_resources{};
 
-		/*
-			Load compressed textures first (directory and compression type based on platform).
-			- Windows -> BCx
-			- Android -> ASTC
-		*/
+		//Iterate through all texture files
+		for (const std::filesystem::path& path : files)
 		{
-			std::vector<std::filesystem::path> compressed_filepaths{};
-#ifdef PLATFORM_WINDOWS
-			compressed_filepaths = std::move(ListFilesInDirectory(compressed_bc_folderpath, Scene::GetCompressedTextureExtensions()));
-#elif defined (PLATFORM_ANDROID)
-			compressed_filepaths = std::move(ListFilesInDirectory(compressed_astc_folderpath, Scene::GetCompressedTextureExtensions()));
-#endif
-
-			//Iterate over all compressed textures
-			for (const std::filesystem::path& path : compressed_filepaths)
+			std::string name = path.stem().string();
+			//Allocate resource
+			try
 			{
-				std::string name = path.stem().string();
-				//Avoid allocating a new texture if already loaded.
-				if (asset_names_set.contains(name)) continue;
-
-				//Allocate resource
-				try
-				{
-					loaded_resources.emplace_back(new Scene::Texture(path.string()));
-					if (loaded_resources.back()->id == 0)
-					{
-						//Invalid texture
-                        loaded_resources.pop_back();
-						throw std::runtime_error("texture ID 0 returned after creation");
-					}
-					//Done if resource loading is a success.
-					asset_names_set.insert(name); 
-					asset_names.emplace_back(name);
-					LOGI("Loaded Compressed Texture: %s", name.c_str());
-				}
-				catch (std::exception& e)
-				{
-					LOGE("%s %s %s", "Unable to Load Compressed Texture", name.c_str(), e.what());
-				}
+				loaded_resources.emplace_back(new Scene::Texture(path.string()));
+				asset_names.emplace_back(name); //Done if resource loading is a success.
+				LOGI("Loaded Texture: %s", name.c_str());
+			}
+			catch (std::exception& e)
+			{
+				LOGE("%s %s %s", "Unable to Load Texture", name.c_str(), e.what());
 			}
 		}
-
-		/*
-			Load uncompressed textures next. 
-			- This includes any compressed textures not successfully loaded in the previous step.
-			- Only load if not already loaded.
-		*/
-		{
-			std::vector<std::filesystem::path> uncompressed_filepaths{ListFilesInDirectory(folder_path, Scene::GetUncompressedTextureExtensions())};
-
-			//Iterate over all uncompressed textures
-			for (const std::filesystem::path& path : uncompressed_filepaths)
-			{
-				std::string name = path.stem().string();
-				//Avoid allocating a new texture if already loaded.
-				if (asset_names_set.contains(name)) continue;
-
-				//Allocate resource
-				try
-				{
-					loaded_resources.emplace_back(new Scene::Texture(path.string()));
-					if (loaded_resources.back()->id == 0)
-					{
-						//Invalid texture
-						loaded_resources.pop_back();
-						throw std::runtime_error("texture ID 0 returned after creation");
-					}
-					//Done if resource loading is a success.
-					asset_names_set.insert(name);
-					asset_names.emplace_back(name);
-					LOGI("Loaded Uncompressed Texture: %s", name.c_str());
-				}
-				catch (std::exception& e)
-				{
-					LOGE("%s %s %s", "Unable to Load Uncompressed Texture", name.c_str(), e.what());
-				}
-			}
-		}
-		
 
 		SetMappings(TEXTURE_GUID, asset_names, loaded_resources, folder_path);
 		return true;
@@ -1230,6 +969,41 @@ namespace EngineFramework {
 		return true;
 	}
 
+	bool AssetManagerSystem::LoadVideo(const std::filesystem::path& folder_path)
+	{
+		LOGI("Loading Videos");
+		std::vector<std::string> video_extensions{ ".mp4", ".mov", ".mkv" };
+		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, video_extensions);
+
+		std::vector<std::string> asset_names{};
+		std::vector<std::shared_ptr<VideoClip>> loaded_resources{};
+
+		for (const std::filesystem::path& path : files)
+		{
+			const std::string name = path.stem().string();
+			try
+			{
+				auto clip = std::make_shared<VideoClip>(path.string());
+				if (!clip || !clip->IsReady())
+				{
+					LOGE("Unable to load video '%s' (decoder initialization failed)", name.c_str());
+					continue;
+				}
+
+				loaded_resources.emplace_back(std::move(clip));
+				asset_names.emplace_back(name);
+				LOGI("Loaded Video: %s", name.c_str());
+			}
+			catch (const std::exception& e)
+			{
+				LOGE("Unable to load video '%s': %s", name.c_str(), e.what());
+			}
+		}
+
+		SetMappings(VIDEO_GUID, asset_names, loaded_resources, folder_path);
+		return true;
+	}
+
 
 	//Delete all resources from the map, calling their destructors.
 	void AssetManagerSystem::RemoveAllResources()
@@ -1336,4 +1110,3 @@ namespace EngineFramework {
 	}
 
 } // namespace EngineFramework
-

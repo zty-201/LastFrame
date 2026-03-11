@@ -1,11 +1,5 @@
 /*
     A file include used for cross-platform compatibility for Windows and Android
-
-    Compatibility Notes:
-    Glad.h has been generated for opengl es 3.2 for android and windows platform.
-
-    Android: ETC2 texture guaranteed, ASTC probably available on most modern phones.
-    Desktop: ETC2 texture may be available but emulated to uncompressed. Use BCx texture (added via extensions) instead.
 */
 #ifndef PLATFORM_H
 #define PLATFORM_H

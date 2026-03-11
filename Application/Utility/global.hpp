@@ -26,16 +26,4 @@ extern entt::registry registry;
 extern entt::dispatcher event_dispatcher;
 
 #define ASSET_CONFIG_FILE "Extern/Config.json"
-
-
-//RAII Helper for easy cleanup
-// Usage — no per-resource class needed
-//OnScopeExit cleanup{ [&handle] { freeResource(handle); } };
-template<typename F>
-struct OnScopeExit {
-    F f;
-    ~OnScopeExit() { f(); }
-};
-
-
 #endif

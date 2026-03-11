@@ -1,33 +1,24 @@
 # Compressonator, a static texture compression library.
 if(WIN32)
-    message("Linking Compressonator")
+message("Linking Compressonator")
+#Since glfw is already pre-compiled, it should be treated as an imported library.
+#Add the keyword GLOBAL, as IMPORTED indicates local scope by default.
+add_library(compressonator STATIC IMPORTED GLOBAL)
 
-    set(CMP_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/bin/x64")
+# Set the location of the library file
+set_target_properties(compressonator PROPERTIES
+    IMPORTED_LOCATION_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/lib/bin/x64/Compressonator_MD.lib"
+    IMPORTED_LOCATION_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/lib/bin/x64/Compressonator_MD.lib"
+    #INTERFACE_LINK_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/binary/glfw3.lib"
+    #INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
 
-    # Validate both import libs exist
-    if(NOT EXISTS "${CMP_LIB_DIR}/Compressonator_MD_DLL.lib")
-        message(FATAL_ERROR "Compressonator release import lib not found")
-    endif()
-    if(NOT EXISTS "${CMP_LIB_DIR}/Compressonator_MDd_DLL.lib")
-        message(FATAL_ERROR "Compressonator debug import lib not found")
-    endif()
+	
+target_include_directories(compressonator INTERFACE
+	${CMAKE_CURRENT_LIST_DIR}/include
+)
 
-    # SHARED IMPORTED because these are DLL import libs
-    add_library(compressonator SHARED IMPORTED GLOBAL)
-
-    set_target_properties(compressonator PROPERTIES
-        # Import libs (.lib stubs) for the linker
-        IMPORTED_IMPLIB_RELEASE "${CMP_LIB_DIR}/Compressonator_MD_DLL.lib"
-        IMPORTED_IMPLIB_DEBUG   "${CMP_LIB_DIR}/Compressonator_MDd_DLL.lib"
-
-        # Actual DLLs needed at runtime
-        IMPORTED_LOCATION_RELEASE "${CMP_LIB_DIR}/Compressonator_MD_DLL.dll"
-        IMPORTED_LOCATION_DEBUG   "${CMP_LIB_DIR}/Compressonator_MDd_DLL.dll"
-
-        INTERFACE_LINK_OPTIONS "/ignore:4099"
-    )
-
-    target_include_directories(compressonator INTERFACE
-        ${CMAKE_CURRENT_LIST_DIR}/include
-    )
+# set(GLFW_INCLUDE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include" CACHE INTERNAL "")
+# set(GLFW_BINARY "${CMAKE_CURRENT_SOURCE_DIR}/binary" CACHE INTERNAL "")
 endif()
+

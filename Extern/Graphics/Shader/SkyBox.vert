@@ -31,7 +31,8 @@ layout(std140, binding = 0) uniform VolumetricUBO
     vec4  camera_position;
     vec4  bias_near_far_pow;
     vec4  aniso_density_scattering_absorption;
-    vec4  width_height_time;
+    vec4  time;
+    ivec4 width_height;
 };
 
 // ------------------------------------------------------------------

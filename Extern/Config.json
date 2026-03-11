@@ -1,5 +1,6 @@
 [
     { "type": "texture", "path": "Extern/Graphics/Texture" },
+    { "type": "video", "path": "Extern/Graphics/Video" },
     { "type": "cubemap", "path": "Extern/Graphics/CubeMap/Config.json" },
     { "type": "shader",  "path": "Extern/Graphics/Shader/Config.json" },
     { "type": "animation", "path": "Extern/Graphics/Animation" },

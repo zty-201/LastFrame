@@ -17,8 +17,7 @@
  */
 #ifndef SCENE_H
 #define SCENE_H
-#include <filesystem>
-#include <optional>
+
 #include "ShaderProgram.h"
 #include "CameraComponent.h"
 #include "LightComponent.h"
@@ -60,8 +59,8 @@
 #define DISABLE     false
 
 // Functions for loading textures
-[[nodiscard]] GLuint setupTexture(const char* filename, bool isSRGB = true);
-[[nodiscard]] GLuint setupHdrCubeMap(const std::array<std::string, 6>&);
+GLuint setupTexture(const char* filename);
+GLuint setupHdrCubeMap(const std::array<std::string, 6>&);
 
 //
 // The main Scene class encapsulates rendering passes, objects, textures, and cameras
@@ -102,37 +101,11 @@ struct Scene
         Texture(const Texture& rhs) = delete;
         Texture& operator=(const Texture& rhs) = delete;
 
-
-    };
 #ifdef PLATFORM_WINDOWS
-    /*
-        Takes the texture file and compresses it, before writing back as file(s) with appropriate extension and the same file name into the respective directories provided.
-        Does not modify original file.
-        \param src_path 
-        - The original uncompressed texture file
-        \param folder_BCx, folder_ASTC  
-        - folder_path to folders for compressed BCx and ASTC files respectively.
-        Leave blank if that type should not be generated.
-        At least one must not be blank, otherwise none will be generated and an error will be returned.
-        \return Returns an error string if unsuccessful.
-    */
-    static [[nodiscard]] std::optional<std::string> CompressAndWriteTexture(const std::filesystem::path& src_path, const std::filesystem::path& folder_BCx = {}, const std::filesystem::path& folder_ASTC = {});
+        //Returns BC3 if true, ETC2 if false.
+        static std::vector<unsigned char> CompressTexture(const char* filename, bool convertBC3 = true);
 #endif
-
-    /*
-        Returns list of accepted file extensions for compressed texture files
-    */
-    static inline std::vector<std::string> GetCompressedTextureExtensions()
-    {
-        return { ".compiled_bc", ".compiled_astc" };
-    }
-    /*
-        Returns list of accepted file extensions for uncompressed texture files
-    */
-    static inline std::vector<std::string> GetUncompressedTextureExtensions()
-    {
-        return { ".png", ".jpg", ".jpeg"};
-    }
+    };
 };
 
 #endif

@@ -4,6 +4,7 @@
 #include "GraphicsSystem.h"
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
+#include "VideoClip.h"
 #include "MaterialComponent.h"
 #include "AnimationComponent.h"
 
@@ -11,24 +12,22 @@
 #include "SceneManager.hpp"
 
 #include "stb_image.h"
-#ifdef PLATFORM_WINDOWS
-#include "compressonator.h"
-#endif
+
 #define MAX_LIGHTS 64
 #define NUM_BLUE_NOISE_TEXTURES 16
-
-#define VOXEL_GRID_SIZE_X 160
-#define VOXEL_GRID_SIZE_Y 90
-#define VOXEL_GRID_SIZE_Z 128
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
 #include "System_LevelEditor.hpp"
 class LevelEditor; // forward declaration
 #endif
 
-#if defined(PLATFORM_ANDROID)
+#if defined(__ANDROID__)
 
 // smaller shadow maps and voxel grids on mobile for performance reasons.
+#define VOXEL_GRID_SIZE_X 64
+#define VOXEL_GRID_SIZE_Y 64
+#define VOXEL_GRID_SIZE_Z 64
+
 #define SHADOW_WIDTH 1024
 #define SHADOW_HEIGHT 1024
 
@@ -46,9 +45,11 @@ static inline double get_native_time() {
     return (double)now.tv_sec + (double)now.tv_nsec / 1e9;
 }
 
-#endif
+#else
 
-#if defined(PLATFORM_WINDOWS)
+#define VOXEL_GRID_SIZE_X 160
+#define VOXEL_GRID_SIZE_Y 90
+#define VOXEL_GRID_SIZE_Z 128
 
 #define SHADOW_WIDTH 4096
 #define SHADOW_HEIGHT 4096
@@ -80,10 +81,6 @@ namespace EngineFramework
     {
         m_instancingSystem.reset();
         m_geometryBuffer.reset();
-        if (m_lightSSBOs[0] != 0) {
-            glDeleteBuffers(FRAMES_IN_FLIGHT, m_lightSSBOs);
-            glDeleteBuffers(FRAMES_IN_FLIGHT, m_volumetricUBOs);
-        }
 #ifdef PLATFORM_WINDOWS
         // Clean up GLFW
         glfwTerminate();
@@ -106,7 +103,7 @@ namespace EngineFramework
 
         LoadBlueNoiseTextures();
         PreGeneratePrimitives();
-            
+
         // Listen for events
         event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&GraphicsSystem::HANDLE_EVENT_LevelEditorToggled>(this);
         event_dispatcher.sink<Event_Window_Resized>().connect<&GraphicsSystem::HANDLE_EVENT_WindowResized>(this);
@@ -144,13 +141,7 @@ namespace EngineFramework
             throw std::runtime_error("Failed to initialize GLAD");
         }
 
-        m_androidPlatform = false;
-
         InputManager::RegisterCallbacks(pWindow);
-#endif
-
-#if defined(PLATFORM_ANDROID)
-		m_androidPlatform = true;
 #endif
 
         // Print OpenGL info
@@ -221,21 +212,13 @@ namespace EngineFramework
         point_shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "PointShadow");
         ui_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "UI");	
         
-        // 1. Create SSBOs for lights
-        glGenBuffers(FRAMES_IN_FLIGHT, m_lightSSBOs);
-        for (int i = 0; i < FRAMES_IN_FLIGHT; ++i) {
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_lightSSBOs[i]);
-            glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * MAX_LIGHTS, nullptr, GL_DYNAMIC_DRAW);
-        }
+        // Create SSBO for lights
+        glGenBuffers(1, &m_lightSSBO);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_lightSSBO);
+        glBufferData(GL_SHADER_STORAGE_BUFFER,
+            sizeof(LightSSBO) * MAX_LIGHTS,
+            nullptr, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-        // 2. Create Volumetric UBOs
-        glGenBuffers(FRAMES_IN_FLIGHT, m_volumetricUBOs);
-        for (int i = 0; i < FRAMES_IN_FLIGHT; ++i) {
-            glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBOs[i]);
-            glBufferData(GL_UNIFORM_BUFFER, sizeof(VolumetricUBO), nullptr, GL_DYNAMIC_DRAW);
-        }
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
         // Initialize skinning UBO (for skeletal animation)
         glGenBuffers(1, &skinningUBO);
@@ -270,6 +253,12 @@ namespace EngineFramework
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
+        // Volumetric UBO
+        glGenBuffers(1, &m_volumetricUBO);
+        glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBO);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(VolumetricUBO), nullptr, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
         // Volumetric fog 3D textures
         glGenTextures(1, &m_ray_march_voxel_grid);
         glBindTexture(GL_TEXTURE_3D, m_ray_march_voxel_grid);
@@ -298,7 +287,7 @@ namespace EngineFramework
 
     void GraphicsSystem::Update(float deltaTime)
     {
-        UNREFERENCED_PARAMETER(deltaTime);
+        m_lastFrameDeltaTime = deltaTime;
         RenderScene();
     }
 
@@ -324,8 +313,6 @@ namespace EngineFramework
             LOGI("No cameras in registry yet, skipping render");
             return;
         }
-
-        ringIdx = m_frame_idx % FRAMES_IN_FLIGHT;
 
         CameraComponent* active_camera = &registry.get<CameraComponent>(active_camera_entity);
         glm::mat4 V = Camera::getLookAt(*active_camera);
@@ -358,7 +345,7 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
         // 3. Volumetric light injection
         VolumetricLightInjectionPass();
-        //// 4. Volumetric ray march
+        // 4. Volumetric ray march
         VolumetricRayMarchPass();
 #endif
         // 5. Mesh pass (3ms)
@@ -374,14 +361,8 @@ namespace EngineFramework
             glBlitFramebuffer(0, 0, (GLint)screen.x, (GLint)screen.y,
                               0, 0, (GLint)screen.x, (GLint)screen.y,
                               GL_COLOR_BUFFER_BIT, GL_NEAREST);
-#if defined(PLATFORM_ANDROID)
-            // Tell the mobile GPU to throw away the depth data from the tile!
-            const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
-            glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, 1, discards);
-#endif
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
-
         m_geometryBuffer->Unbind();
         m_prev_view_projection = viewProj;
         m_frame_idx++;
@@ -510,7 +491,7 @@ namespace EngineFramework
         }
 		m_spotLightViewProjMatrices.resize(spotShadowCount); // Shrink to actual count
         // 4. UPLOAD
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_lightSSBOs[ringIdx]);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_lightSSBO); // Renamed from m_pointLightSSBO
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(LightSSBO) * m_LightData.size(), m_LightData.data());
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
@@ -847,9 +828,11 @@ namespace EngineFramework
             m_scattering,
             m_absorption
         );
-        uboData.width_height_time = glm::vec4(static_cast<float>(SHADOW_WIDTH), static_cast<float>(SHADOW_HEIGHT), static_cast<float>(get_native_time()), 0);
+        uboData.time = glm::vec4(static_cast<float>(get_native_time()), 0, 0, 0);
+        uboData.width_height = glm::ivec4((int)screen.x, (int)screen.y, 0, 0);
 
-        glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBOs[ringIdx]);
+
+        glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBO);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(VolumetricUBO), &uboData);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
@@ -869,9 +852,8 @@ namespace EngineFramework
         }
 
         shader->use();
-
-        glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBOs[ringIdx]);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightSSBOs[ringIdx]);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightSSBO);
 
         uint32_t read_idx = static_cast<uint32_t>(m_ping_pong);
         uint32_t write_idx = static_cast<uint32_t>(!m_ping_pong);
@@ -926,8 +908,7 @@ namespace EngineFramework
         }
 
         shader->use();
-
-        glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBOs[ringIdx]);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
         glBindImageTexture(0, m_ray_march_voxel_grid, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
 
         uint32_t read_idx = static_cast<uint32_t>(m_ping_pong);
@@ -967,8 +948,8 @@ namespace EngineFramework
 
         if (instanced_shader) {
             instanced_shader->use();
-            glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBOs[ringIdx]);
-            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightSSBOs[ringIdx]);
+            glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightSSBO);
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_instancingSystem->GetInstanceSSBO());
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_instancingSystem->GetVisibleIndicesBuffer());
             // Shadow maps
@@ -990,7 +971,7 @@ namespace EngineFramework
             glBindTexture(GL_TEXTURE_3D, m_ray_march_voxel_grid);
             instanced_shader->setUniform("s_VoxelGrid", TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
             instanced_shader->setUniform("u_Tricubic", m_tricubic_filtering);
-			instanced_shader->setUniform("u_AndroidPlatform", m_androidPlatform);
+
             instanced_shader->setUniform("u_NumPointLights", (int)m_LightData.size());
             instanced_shader->setUniform("s_Albedo", TextureUnits::MESH_ALBEDO_UNIT);
             instanced_shader->setUniform("s_Normal", TextureUnits::MESH_NORMAL_UNIT);
@@ -1083,7 +1064,6 @@ namespace EngineFramework
             // 2. Pass the global light/fog variables
             standard_shader->setUniform("u_NumPointLights", (int)m_LightData.size());
             standard_shader->setUniform("u_Tricubic", m_tricubic_filtering);
-            instanced_shader->setUniform("u_AndroidPlatform", m_androidPlatform);
             // ------------------------------
             // 
             // Reusable identity palette for non-skinned meshes
@@ -1206,7 +1186,7 @@ namespace EngineFramework
         }
 
         shader->use();
-        glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBOs[ringIdx]);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBO);
 
         glDepthFunc(GL_LEQUAL);
         glDisable(GL_CULL_FACE);
@@ -1288,6 +1268,7 @@ namespace EngineFramework
         };
 
         std::vector<UIRenderItem> drawList;
+        std::unordered_set<VideoClip*> updatedVideos;
 
         for (auto [entity, ui] : view.each())
         {
@@ -1367,12 +1348,35 @@ namespace EngineFramework
             shader->setUniform("u_Color", glm::vec4(ui.color, 1.0f));
             shader->setUniform("u_Luminance", ui.luminance);
 
-            // --- BIND TEXTURE ---
+            // --- BIND TEXTURE OR VIDEO FRAME ---
             glActiveTexture(GL_TEXTURE0);
 
-            auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
-            // Handle missing texture 
-            GLuint texID = (tex) ? tex->id : m_defaultWhiteTexture;
+            GLuint texID = m_defaultWhiteTexture;
+            bool videoBound = false;
+
+            if (ui.videoid.m_Instance != 0)
+            {
+                auto video = AssetManagerSystem::GetResource<VideoClip>(ui.videoid);
+                if (video)
+                {
+                    if (updatedVideos.insert(video.get()).second)
+                    {
+                        video->Update(m_lastFrameDeltaTime);
+                    }
+                    if (video->IsReady())
+                    {
+                        texID = static_cast<GLuint>(video->GetTextureId());
+                        videoBound = true;
+                    }
+                }
+            }
+
+            if (!videoBound)
+            {
+                auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
+                texID = (tex) ? tex->id : m_defaultWhiteTexture;
+            }
+
             glBindTexture(GL_TEXTURE_2D, texID);
             shader->setUniform("s_Texture", 0);
 

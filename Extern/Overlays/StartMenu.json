@@ -1,5 +1,5 @@
 {
-	"884": {
+	"848": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16345929764767956995,
@@ -38,23 +38,22 @@
 			],
 			"event_received": "",
 			"is_NDC": true,
-			"layer": 0,
-			"lock_luminance": false,
+			"layer": 4,
 			"luminance": 1.0,
 			"position": [
-				440.32000732421875,
-				432.4350280761719
+				1070.0,
+				1031.875
 			],
 			"position_NDC": [
 				0.0,
 				0.3700000047683716
 			],
 			"size": [
-				143.36000061035156,
-				68.0999984741211
+				535.0,
+				162.5
 			],
 			"size_NDC": [
-				0.14000000059604645,
+				0.20000000298023224,
 				0.10000000149011612
 			],
 			"textureid": [
@@ -64,7 +63,7 @@
 			"visible": false
 		}
 	},
-	"885": {
+	"849": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				8275479232520028161,
@@ -94,20 +93,19 @@
 			],
 			"event_received": "",
 			"is_NDC": true,
-			"layer": 0,
-			"lock_luminance": false,
+			"layer": 4,
 			"luminance": 1.0,
 			"position": [
-				409.6000061035156,
-				343.905029296875
+				1070.0,
+				820.625
 			],
 			"position_NDC": [
 				0.0,
 				0.10999999940395355
 			],
 			"size": [
-				204.8000030517578,
-				68.0999984741211
+				535.0,
+				162.5
 			],
 			"size_NDC": [
 				0.20000000298023224,
@@ -120,7 +118,7 @@
 			"visible": false
 		}
 	},
-	"886": {
+	"850": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				15193008260161110025,
@@ -159,20 +157,19 @@
 			],
 			"event_received": "",
 			"is_NDC": true,
-			"layer": 0,
-			"lock_luminance": false,
+			"layer": 4,
 			"luminance": 1.0,
 			"position": [
-				409.6000061035156,
-				251.9700164794922
+				1070.0,
+				601.25
 			],
 			"position_NDC": [
 				0.0,
 				-0.1599999964237213
 			],
 			"size": [
-				204.8000030517578,
-				68.0999984741211
+				535.0,
+				162.5
 			],
 			"size_NDC": [
 				0.20000000298023224,
@@ -185,7 +182,7 @@
 			"visible": false
 		}
 	},
-	"887": {
+	"851": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				11734243746340569093,
@@ -224,23 +221,22 @@
 			],
 			"event_received": "",
 			"is_NDC": true,
-			"layer": 0,
-			"lock_luminance": false,
+			"layer": 4,
 			"luminance": 1.0,
 			"position": [
-				440.32000732421875,
-				163.4400177001953
+				1070.0,
+				390.0000305175781
 			],
 			"position_NDC": [
 				0.0,
 				-0.41999998688697815
 			],
 			"size": [
-				143.36000061035156,
-				68.0999984741211
+				535.0,
+				162.5
 			],
 			"size_NDC": [
-				0.14000000059604645,
+				0.20000000298023224,
 				0.10000000149011612
 			],
 			"textureid": [
@@ -250,7 +246,7 @@
 			"visible": false
 		}
 	},
-	"888": {
+	"852": {
 		"NameComponent": {
 			"name": "BG"
 		},
@@ -263,8 +259,7 @@
 			],
 			"event_received": "",
 			"is_NDC": true,
-			"layer": 0,
-			"lock_luminance": false,
+			"layer": 3,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -275,8 +270,8 @@
 				0.0
 			],
 			"size": [
-				1024.0,
-				681.0
+				2675.0,
+				1625.0
 			],
 			"size_NDC": [
 				1.0,

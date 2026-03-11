@@ -175,7 +175,7 @@ set(USE_STATIC_MSVC_RUNTIME_LIBRARY OFF CACHE BOOL "" FORCE)
 
 # Make sure Debug builds don’t enable the MSVC “checked iterators” level that conflicts with Jolt
 if(WIN32)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
 endif()
 
 # Optional Jolt feature toggles (safe defaults for your engine)
@@ -212,7 +212,7 @@ endif()
 set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp openfbx gli CACHE INTERNAL "")
 
 #Also link important system libraries for opengl drawing
-set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 compressonator CACHE INTERNAL "")
+set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 mfplat mf mfreadwrite mfuuid ole32 oleaut32 CACHE INTERNAL "")
 set(WINDOWS_DEBUG_LIBRARIES imgui CACHE INTERNAL "")
 set(WINDOWS_RELEASE_LIBRARIES CACHE INTERNAL "")
 set(ANDROID_LIBRARIES android log GLESv3 EGL CACHE INTERNAL "")
@@ -229,7 +229,7 @@ foreach(extern_dependency IN LISTS SHARED_LIBRARIES WINDOWS_SHARED_LIBRARIES WIN
 	  target_compile_options(${extern_dependency} PRIVATE
 		$<$<CXX_COMPILER_ID:MSVC>:/analyze->
 		$<$<CXX_COMPILER_ID:GNU>:-fno-analyzer>
-		$<$<CXX_COMPILER_ID:Clang>:-w>
+		$<$<CXX_COMPILER_ID:Clang>:-Wno-analyzer>
 	  )
 	  message("${extern_dependency} analysis off")
 	else()
@@ -380,32 +380,42 @@ endif()
 #Copying of dlls
 #Copies fmod dll to executable path
 if(WIN32)
-  foreach(EXEC_TARGET application_executable tester_executable)
-    add_custom_command(
-      TARGET ${EXEC_TARGET}
-      PRE_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              ${IMGUI_DEFAULT_LAYOUT_BIN}
-              $<TARGET_FILE_DIR:${EXEC_TARGET}>/imgui.ini
-      COMMENT "Copying default ImGui layout to executable directory"
-    )
-    add_custom_command(
-      TARGET ${EXEC_TARGET}
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy
-              $<TARGET_FILE:fmod>
-              $<TARGET_FILE_DIR:${EXEC_TARGET}>
-      COMMENT "Copying fmod dll to executable directory"
-    )
-    add_custom_command(
-      TARGET ${EXEC_TARGET}
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              $<TARGET_FILE:compressonator>
-              $<TARGET_FILE_DIR:${EXEC_TARGET}>
-      COMMENT "Copying Compressonator dll to executable directory"
-    )
-  endforeach()
+  add_custom_command(
+	TARGET application_executable
+	PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			${IMGUI_DEFAULT_LAYOUT_BIN}
+			$<TARGET_FILE_DIR:application_executable>/imgui.ini
+	COMMENT "Copying default ImGui layout to executable directory"
+  )
+
+  add_custom_command(
+	TARGET application_executable
+	POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+			$<TARGET_FILE:fmod>
+			$<TARGET_FILE_DIR:application_executable>
+	COMMENT "Copying fmod dll to executable directory"
+  )
+
+  #For Tester, use the same things as Application
+  add_custom_command(
+	TARGET tester_executable
+	PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			${IMGUI_DEFAULT_LAYOUT_BIN}
+			$<TARGET_FILE_DIR:tester_executable>/imgui.ini
+	COMMENT "Copying default ImGui layout to executable directory"
+  )
+
+  add_custom_command(
+	TARGET tester_executable
+	POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+			$<TARGET_FILE:fmod>
+			$<TARGET_FILE_DIR:tester_executable>
+	COMMENT "Copying fmod dll to executable directory"
+  )
 endif()
 
  

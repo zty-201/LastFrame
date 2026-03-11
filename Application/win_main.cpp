@@ -16,9 +16,6 @@
 //Debug mem leak check
 #include <crtdbg.h>
 
-#include <thread>
-#include <chrono>
-
 //#include <WinBase.h>
 #include <windows.h>
 #include "main.hpp"
