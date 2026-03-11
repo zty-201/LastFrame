@@ -4,7 +4,7 @@
 local DEBUG = true
 
 local DRAG_DISTANCE = 66.0
-local BASE_DRAG_SPEED = 44.0
+local BASE_DRAG_SPEED = 65.0
 
 local DRAG_DIR_X = 0.0
 local DRAG_DIR_Z = 1.0

@@ -21,7 +21,7 @@ local VISIBLE_SCALE_Z = 1.0
 
 local hasTriggered = false
 local isVisible = false
-local lookTimer = 0.0
+local lookTimer = 2.0
 local frame = 0
 
 local SCARE_SOUND_ID = "ScareSound"
