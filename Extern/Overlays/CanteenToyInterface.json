@@ -23,7 +23,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				557.375,
 				0.0
@@ -43,12 +42,6 @@
 			"textureid": [
 				6238928656531521539,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}

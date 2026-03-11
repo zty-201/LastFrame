@@ -40,7 +40,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				1177.0,
 				495.625
@@ -60,12 +59,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -111,7 +104,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				1284.0,
 				495.625
@@ -131,12 +123,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -182,7 +168,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				1391.0001220703125,
 				495.625
@@ -202,12 +187,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -253,7 +232,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				1498.0,
 				495.625
@@ -273,12 +251,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -324,7 +296,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				1605.0,
 				495.625
@@ -344,12 +315,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -395,7 +360,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				1711.9998779296875,
 				495.625
@@ -415,12 +379,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -466,7 +424,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				1926.0,
 				495.625
@@ -486,12 +443,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -537,7 +488,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				1136.875,
 				930.3125
@@ -558,12 +508,6 @@
 				4183906194480545793,
 				3711223656383638553
 			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
 			"visible": false
 		}
 	},
@@ -582,7 +526,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -602,12 +545,6 @@
 			"textureid": [
 				1026733325542998017,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -653,7 +590,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				1819.0,
 				495.625
@@ -674,12 +610,6 @@
 				8518163340552814593,
 				3711223656383638553
 			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
 			"visible": false
 		}
 	},
@@ -698,7 +628,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				655.3750610351563,
 				487.5
@@ -718,12 +647,6 @@
 			"textureid": [
 				7066209955997663235,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -769,7 +692,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				963.0,
 				495.625
@@ -789,12 +711,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -840,7 +756,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				1070.0,
 				495.625
@@ -860,12 +775,6 @@
 			"textureid": [
 				8518163340552814593,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
@@ -911,7 +820,6 @@
 			"is_NDC": true,
 			"layer": 0,
 			"luminance": 1.0,
-			"play_video_audio": true,
 			"position": [
 				1237.1875,
 				727.1875
@@ -931,12 +839,6 @@
 			"textureid": [
 				14139227519446712325,
 				3711223656383638553
-			],
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
 			],
 			"visible": false
 		}
