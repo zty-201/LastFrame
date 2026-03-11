@@ -19,7 +19,6 @@
 
 #ifndef GRAPHICS_SYSTEM_HPP
 #define GRAPHICS_SYSTEM_HPP
-
 #include "ISystem.hpp"
 #include "scene.h"
 #include "InstancingSystem.h"
@@ -233,8 +232,17 @@ namespace EngineFramework
 		FBO m_pointShadowFBO;
 		FBO m_spotShadowFBO;
 
+		// andriod specific god ray resources
+#ifdef PLATFORM_ANDROID
+		FBO m_godRayFBO;
+        GLuint m_godRayTextureID = 0;
+        xresource::full_guid godray_shader_guid;
+        xresource::full_guid composite_shader_guid;
+        float m_currentGodRayIntensity = 0.0f;
+#endif
+
 		// FBO texture attachments
-        GLuint sceneTextureID;
+        GLuint sceneTextureID = 0;
         
 		// Light data for SSBO, updated each frame
         std::vector<LightSSBO> m_LightData;
@@ -283,6 +291,10 @@ namespace EngineFramework
         void VolumetricLightInjectionPass();
         void VolumetricRayMarchPass();
         void RenderUI();
+
+#ifdef PLATFORM_ANDROID
+        void GodRayPass();
+#endif
 
 		// Update methods
         void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
