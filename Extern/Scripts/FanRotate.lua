@@ -4,7 +4,7 @@
 print("[FanRotate] SCRIPT LOADED")
 
 -- Degrees per second (tweak this in code if you don't have inspector vars)
-local SPIN_SPEED_DPS = 60.0
+local SPIN_SPEED_DPS = 180.0
 
 function on_create(self)
     print("[FanRotate] on_create EntityID =", EntityID)
