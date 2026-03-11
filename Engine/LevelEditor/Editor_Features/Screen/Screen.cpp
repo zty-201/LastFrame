@@ -499,7 +499,7 @@ namespace EngineFramework
                 drop_target();
                 colliderbox();
 
-                EngineFramework::TriggerSystem::Update(registry);
+                //EngineFramework::TriggerSystem::Update(registry);
                 auto tfView = registry.view<TransformComponent>();
                 for (auto ent : tfView)
                 {

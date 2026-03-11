@@ -355,10 +355,12 @@ namespace EngineFramework
         ShadowPass();
         // 2. Global uniform buffers (camera, light, cascades) 
         UpdateUBOs(*active_camera, V, P);
+#ifdef PLATFORM_WINDOWS
         // 3. Volumetric light injection
         VolumetricLightInjectionPass();
         //// 4. Volumetric ray march
         VolumetricRayMarchPass();
+#endif
         // 5. Mesh pass (3ms)
         MeshPass();
         // 6. Skybox pass
