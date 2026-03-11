@@ -31,10 +31,13 @@
 				0.0,
 				0.0
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				8792970980350722049,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -70,10 +73,13 @@
 				0.44999998807907104,
 				1.0
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				10947239710736613377,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -130,10 +136,13 @@
 				0.07000000029802322,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				13253082719950307335,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -190,10 +199,13 @@
 				0.07000000029802322,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				13253082719950307335,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -250,10 +262,13 @@
 				0.07000000029802322,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				13253082719950307335,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -310,10 +325,13 @@
 				0.07000000029802322,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				13253082719950307335,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -370,10 +388,13 @@
 				0.07000000029802322,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				13253082719950307335,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -430,10 +451,13 @@
 				0.07000000029802322,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				13253082719950307335,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -490,10 +514,13 @@
 				0.07000000029802322,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				13253082719950307335,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -550,10 +577,13 @@
 				0.07000000029802322,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				13253082719950307335,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -610,10 +640,13 @@
 				0.07000000029802322,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				13253082719950307335,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -670,10 +703,13 @@
 				0.07000000029802322,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				13253082719950307335,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	}

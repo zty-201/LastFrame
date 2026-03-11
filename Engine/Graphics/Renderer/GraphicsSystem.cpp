@@ -1367,10 +1367,18 @@ namespace EngineFramework
             shader->setUniform("u_Color", glm::vec4(ui.color, 1.0f));
             shader->setUniform("u_Luminance", ui.luminance);
 
+            shader->setUniform("u_UseSubtitleReveal", ui.use_subtitle_reveal ? 1 : 0);
+            shader->setUniform("u_SubtitleRevealProgress", ui.subtitle_reveal_progress);
+            shader->setUniform("u_SubtitleRevealSoftness", ui.subtitle_reveal_softness);
+
             // --- BIND TEXTURE ---
             glActiveTexture(GL_TEXTURE0);
 
             auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
+            //if (!tex)
+            //{
+            //    std::cout << "[UI Missing Texture] entity=" << (int)item.entity << "\n";
+            //}
             // Handle missing texture 
             GLuint texID = (tex) ? tex->id : m_defaultWhiteTexture;
             glBindTexture(GL_TEXTURE_2D, texID);

@@ -31,11 +31,14 @@
 				1.0,
 				1.0
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				16190863482069467137,
-				3711223656383638553
+				0,
+				0
 			],
-			"visible": true
+			"use_subtitle_reveal": false,
+			"visible": false
 		}
 	}
 }
