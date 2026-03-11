@@ -13,6 +13,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 100,
+			"lock_luminance": false,
 			"luminance": 0.3499999940395355,
 			"position": [
 				0.0,

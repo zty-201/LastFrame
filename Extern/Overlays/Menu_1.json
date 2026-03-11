@@ -30,18 +30,19 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
-				1203.75,
-				731.25
+				404.54998779296875,
+				320.8500061035156
 			],
 			"position_NDC": [
 				0.0,
 				0.0
 			],
 			"size": [
-				267.5,
-				162.5
+				89.9000015258789,
+				71.30000305175781
 			],
 			"size_NDC": [
 				0.10000000149011612,
@@ -68,6 +69,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -123,18 +125,19 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
-				1203.75,
-				975.0
+				404.54998779296875,
+				427.79998779296875
 			],
 			"position_NDC": [
 				0.0,
 				0.30000001192092896
 			],
 			"size": [
-				267.5,
-				162.5
+				89.9000015258789,
+				71.30000305175781
 			],
 			"size_NDC": [
 				0.10000000149011612,
@@ -178,18 +181,19 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
-				1203.75,
-				487.5
+				404.54998779296875,
+				213.89999389648438
 			],
 			"position_NDC": [
 				0.0,
 				-0.30000001192092896
 			],
 			"size": [
-				267.5,
-				162.5
+				89.9000015258789,
+				71.30000305175781
 			],
 			"size_NDC": [
 				0.10000000149011612,

@@ -1,5 +1,8 @@
 {
 	"627": {
+		"NameComponent": {
+			"name": "Cutscene4"
+		},
 		"UIComponent": {
 			"Overlay_name": "Cutscene_4",
 			"color": [
@@ -9,7 +12,47 @@
 			],
 			"event_received": "",
 			"is_NDC": true,
-			"layer": 3,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"position": [
+				-211.39999389648438,
+				-14.699996948242188
+			],
+			"position_NDC": [
+				-0.05999999865889549,
+				-0.05999999865889549
+			],
+			"size": [
+				1132.5,
+				490.0
+			],
+			"size_NDC": [
+				1.5,
+				1.0
+			],
+			"textureid": [
+				12636907607043506183,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"850": {
+		"NameComponent": {
+			"name": "blackbg_4"
+		},
+		"UIComponent": {
+			"Overlay_name": "Cutscene_4",
+			"color": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": true,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -20,16 +63,16 @@
 				0.0
 			],
 			"size": [
-				2675.0,
-				1625.0
+				755.0,
+				490.0
 			],
 			"size_NDC": [
 				1.0,
 				1.0
 			],
 			"textureid": [
-				12636907607043506183,
-				3711223656383638553
+				0,
+				0
 			],
 			"visible": false
 		}
