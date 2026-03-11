@@ -38,9 +38,9 @@
 		},
 		"MaterialComponent": {
 			"albedoFactor": [
-				0.45821326971054077,
-				0.20422832667827606,
-				0.05942247807979584
+				0.12353728711605072,
+				0.5043227672576904,
+				0.2837524712085724
 			],
 			"albedoMap": [
 				11438888438506422279,
@@ -111,7 +111,7 @@
 			"position": [
 				0.0,
 				0.0,
-				215.2130889892578
+				-931.3409423828125
 			],
 			"rotation": [
 				0.0,
@@ -7050,7 +7050,7 @@
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Hall_SoftToy"
+			"name": "Hall_SoftToy_01 (Sitting)"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -12754,13 +12754,13 @@
 				1.0
 			],
 			"constant": 1.0,
-			"innerConeAngle": 15.0,
+			"innerConeAngle": 5.0,
 			"intensity": 0.0,
 			"isStatic": false,
 			"linear": 0.09000000357627869,
-			"outerConeAngle": 35.0,
+			"outerConeAngle": 30.0,
 			"quadratic": 0.03200000151991844,
-			"radius": 2500.0,
+			"radius": 4000.0,
 			"type": 2
 		},
 		"LuaScriptComponent": {
@@ -12781,9 +12781,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-442.3628845214844,
+				-155.66082763671875,
 				190.6817626953125,
-				462.11724853515625
+				422.4767761230469
 			],
 			"rotation": [
 				-0.0,
@@ -21224,7 +21224,7 @@
 			"position": [
 				-214.37100219726563,
 				471.1184387207031,
-				538.2479858398438
+				582.6300048828125
 			],
 			"rotation": [
 				0.0,
@@ -21307,12 +21307,12 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						0,
-						0
+						4267803376268541969,
+						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"id": "GirlGiggle",
+					"id": "Scary",
 					"loop": false,
 					"maxDistance": 300.0,
 					"minDistance": 1.0,
@@ -21320,7 +21320,7 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 0.29600000381469727
+					"volume": 1.7869999408721924
 				}
 			]
 		},
@@ -21451,7 +21451,7 @@
 			],
 			"rotation": [
 				-179.99989318847656,
-				0.0,
+				90.0,
 				-179.99989318847656
 			],
 			"scale": [
@@ -38297,9 +38297,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-442.3628845214844,
+				-155.66082763671875,
 				191.4817657470703,
-				477.11724853515625
+				452.4767761230469
 			],
 			"rotation": [
 				0.0,
@@ -41994,17 +41994,17 @@
 			"position": [
 				-814.381591796875,
 				10.0,
-				734.4503784179688
+				744.2327270507813
 			],
 			"rotation": [
 				-179.99989318847656,
-				69.99999237060547,
+				88.44999694824219,
 				-179.99989318847656
 			],
 			"scale": [
-				0.9999898672103882,
+				0.9999895691871643,
 				1.0,
-				0.9999898672103882
+				0.9999895691871643
 			]
 		}
 	},
@@ -42750,7 +42750,7 @@
 			"position": [
 				-760.8787231445313,
 				10.0,
-				739.6324462890625
+				780.97021484375
 			],
 			"rotation": [
 				0.0,
@@ -42876,7 +42876,7 @@
 			"position": [
 				-712.9549560546875,
 				10.0,
-				740.970458984375
+				753.2182006835938
 			],
 			"rotation": [
 				-179.99989318847656,
@@ -49926,7 +49926,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 147.78140258789063,
+			"intensity": 342.9838562011719,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50084,7 +50084,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 178.31143188476563,
+			"intensity": 152.98660278320313,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50266,7 +50266,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 218.1142578125,
+			"intensity": 120.8186264038086,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50358,7 +50358,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 258.9314270019531,
+			"intensity": 174.09776306152344,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50450,7 +50450,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 145.4263458251953,
+			"intensity": 131.58380126953125,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50542,7 +50542,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 172.9155731201172,
+			"intensity": 128.8742218017578,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50922,9 +50922,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				31.45919418334961,
+				5.658653259277344,
 				190.6817626953125,
-				-616.87890625
+				-759.3758544921875
 			],
 			"rotation": [
 				0.0,
@@ -51692,7 +51692,7 @@
 			],
 			"rotation": [
 				-179.99989318847656,
-				-5.008955668017734e-06,
+				-90.0,
 				-179.99989318847656
 			],
 			"scale": [
@@ -53008,7 +53008,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.9859999418258667
+					"volume": 1.7029999494552612
 				},
 				{
 					"ambienceType": 0,
@@ -53026,7 +53026,7 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 0.5320000052452087
+					"volume": 0.8100000023841858
 				}
 			]
 		},
@@ -59769,42 +59769,6 @@
 		}
 	},
 	"588": {
-		"ColliderComponent": {
-			"maxBounds": [
-				21.22170639038086,
-				77.23096466064453,
-				20.108415603637695
-			],
-			"minBounds": [
-				-21.64395523071289,
-				1.0200347900390625,
-				-19.07728385925293
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						21.432830810546875,
-						38.105464935302734,
-						19.592849731445313
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						-0.21112346649169922,
-						39.1254997253418,
-						0.5155658721923828
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -59893,7 +59857,7 @@
 			],
 			"rotation": [
 				0.0,
-				211.37832641601563,
+				234.41021728515625,
 				0.0
 			],
 			"scale": [
@@ -59904,42 +59868,6 @@
 		}
 	},
 	"589": {
-		"ColliderComponent": {
-			"maxBounds": [
-				21.22170639038086,
-				77.23096466064453,
-				20.108415603637695
-			],
-			"minBounds": [
-				-21.64395523071289,
-				1.0200347900390625,
-				-19.07728385925293
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						21.432830810546875,
-						38.105464935302734,
-						19.592849731445313
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						-0.21112346649169922,
-						39.1254997253418,
-						0.5155658721923828
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -60028,7 +59956,7 @@
 			],
 			"rotation": [
 				0.0,
-				211.37832641601563,
+				234.41021728515625,
 				0.0
 			],
 			"scale": [
@@ -61344,7 +61272,7 @@
 	},
 	"607": {
 		"LuaScriptComponent": {
-			"Enabled": true,
+			"Enabled": false,
 			"Scripts": [
 				{
 					"Loaded": true,
@@ -61409,7 +61337,7 @@
 	},
 	"608": {
 		"LuaScriptComponent": {
-			"Enabled": true,
+			"Enabled": false,
 			"Scripts": [
 				{
 					"Loaded": true,
@@ -61458,8 +61386,8 @@
 				0.0
 			],
 			"size": [
-				1645.0,
-				1008.0
+				1395.0,
+				833.0
 			],
 			"size_NDC": [
 				1.0,
@@ -86622,7 +86550,7 @@
 		"TransformComponent": {
 			"position": [
 				739.2413940429688,
-				0.0,
+				-149.03077697753906,
 				954.1722412109375
 			],
 			"rotation": [
@@ -86712,7 +86640,7 @@
 		"TransformComponent": {
 			"position": [
 				739.2413940429688,
-				0.0,
+				-168.90084838867188,
 				1408.5159912109375
 			],
 			"rotation": [
@@ -87074,12 +87002,12 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 20253.994140625,
+			"intensity": 0.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
 			"quadratic": 0.03200000151991844,
-			"radius": 20000.0,
+			"radius": 50000.0,
 			"type": 2
 		},
 		"LuaScriptComponent": {
@@ -91790,6 +91718,358 @@
 				0.5,
 				0.3499999940395355,
 				0.9999926686286926
+			]
+		}
+	},
+	"891": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				1990257341920198839,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				15248854644898939065,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				4872561103437316283,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				1413796589616775357,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				13519472387988668607,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "wall_inside_outside",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Outer_Wall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				739.2413940429688,
+				-246.55844116210938,
+				18.93307876586914
+			],
+			"rotation": [
+				0.0,
+				-89.99994659423828,
+				0.0
+			],
+			"scale": [
+				4.5,
+				2.0,
+				0.9999996423721313
+			]
+		}
+	},
+	"892": {
+		"ColliderComponent": {
+			"maxBounds": [
+				176.39169311523438,
+				371.6498718261719,
+				7.194404125213623
+			],
+			"minBounds": [
+				-161.13528442382813,
+				0.34539794921875,
+				-0.7218947410583496
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						168.76348876953125,
+						185.65223693847656,
+						3.9581494331359863
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						7.628204345703125,
+						185.9976348876953,
+						3.2362546920776367
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MeshComponent": {
+			"meshName": "",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Invisible_Wall"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-17.049461364746094,
+				0.0,
+				-785.2431030273438
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"893": {
+		"ColliderComponent": {
+			"maxBounds": [
+				12.998000144958496,
+				35.841835021972656,
+				14.5649995803833
+			],
+			"minBounds": [
+				-15.532000541687012,
+				-20.61383628845215,
+				-27.94300079345703
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						14.265000343322754,
+						28.22783660888672,
+						21.253999710083008
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.2669999599456787,
+						7.613999843597412,
+						-6.689000129699707
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				8811354800417112235,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				10540737057327382701,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				164443515865759919,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				16881805332665041073,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_monkey",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Hall_SoftToy_01 (Fell)"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				22.443645477294922,
+				18.642972946166992,
+				9.674345016479492
+			],
+			"rotation": [
+				-68.8499984741211,
+				-6.349991321563721,
+				62.749977111816406
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
+	"894": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				1.0,
+				0.9985881447792053,
+				0.9711815714836121
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 0.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 31.309999465942383,
+			"quadratic": 0.03200000151991844,
+			"radius": 20000.0,
+			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 17341972997580423169
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Lobby_Flashbang"
+		},
+		"TransformComponent": {
+			"position": [
+				-423.3267517089844,
+				561.0598754882813,
+				681.8554077148438
+			],
+			"rotation": [
+				175.54994201660156,
+				85.04996490478516,
+				-179.99989318847656
+			],
+			"scale": [
+				0.0010000001639127731,
+				0.0010000020265579224,
+				0.0010000001639127731
 			]
 		}
 	},
