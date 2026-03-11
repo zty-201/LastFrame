@@ -62,11 +62,6 @@ android {
             buildConfigField "boolean", "IS_DEBUG_BUILD", "false"
             signingConfig signingConfigs.debug
         }
-        debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "boolean", "IS_DEBUG_BUILD", "true"
-        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11

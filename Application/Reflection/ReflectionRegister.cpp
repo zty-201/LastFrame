@@ -881,7 +881,6 @@ namespace EngineFramework
 			.data<&UIComponent::color>("color")
 			.data<&UIComponent::visible>("visible")
 			.data<&UIComponent::luminance>("luminance")
-			.data<&UIComponent::lock_luminance>("lock_luminance")
 			.data<&UIComponent::layer>("layer")
 			.data<&UIComponent::Overlay_name>("Overlay_name")
 			.data<&UIComponent::event_received>("event_received")

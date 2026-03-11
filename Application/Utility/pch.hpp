@@ -26,8 +26,6 @@
 #include <variant>
 #include <unordered_set>
 #include <tuple>
-#include <set>
-
 
 //Physics
 //#include <Jolt/Jolt.h>
@@ -58,13 +56,8 @@
 #include <EGL/egl.h>
 //For opengl es 3.2
 #include <GLES3/gl32.h>
-#include <gles3/gl32.h>
 #endif
 
-//Compressonator, for compression of textures on desktop.
-#ifdef PLATFORM_WINDOWS
-#include "compressonator.h"
-#endif
 
 // GLM (OpenGL Mathematics)
 //TODO: Replace with centralized math lib.

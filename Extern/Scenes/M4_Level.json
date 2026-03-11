@@ -187,7 +187,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				166.0,
@@ -346,7 +345,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -2700,7 +2698,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				1242.5,
@@ -3817,7 +3814,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				1998.0,
@@ -4769,7 +4765,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				2204.0,
@@ -12801,9 +12796,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-442.3628845214844,
+				529.6676635742188,
 				190.6817626953125,
-				462.11724853515625
+				-233.17698669433594
 			],
 			"rotation": [
 				-0.0,
@@ -15772,7 +15767,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						15379168818435211275,
+						6564102620513615873,
 						11537445004664754516
 					],
 					"category": 0,
@@ -15785,7 +15780,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 0.42800000309944153
+					"volume": 0.34700000286102295
 				}
 			]
 		},
@@ -16108,7 +16103,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						5002875276973588493,
+						16363935409671815171,
 						11537445004664754516
 					],
 					"category": 0,
@@ -16121,7 +16116,7 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 0.703000009059906
+					"volume": 0.0820000022649765
 				}
 			]
 		},
@@ -18596,28 +18591,6 @@
 		}
 	},
 	"240": {
-		"AudioComponent": {
-			"Slots": [
-				{
-					"ambienceType": 0,
-					"audio_guid": [
-						17288307986077253649,
-						11537445004664754516
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"id": "OpenDoor",
-					"loop": false,
-					"maxDistance": 100.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"useFade": false,
-					"volume": 1.0
-				}
-			]
-		},
 		"ColliderComponent": {
 			"maxBounds": [
 				113.95817565917969,
@@ -18740,14 +18713,14 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-452.2381286621094,
+				-451.4081726074219,
 				0.0,
 				897.7496337890625
 			],
 			"rotation": [
-				-1.7000000476837158,
+				0.0001042765288730152,
 				0.0,
-				0.0
+				0.00010427721281303093
 			],
 			"scale": [
 				0.9999986290931702,
@@ -38317,9 +38290,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-442.3628845214844,
+				529.6676635742188,
 				191.4817657470703,
-				477.11724853515625
+				-218.17698669433594
 			],
 			"rotation": [
 				0.0,
@@ -38364,7 +38337,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -38407,7 +38379,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -38467,7 +38438,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -38527,7 +38497,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -38567,7 +38536,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -38624,7 +38592,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -38684,7 +38651,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -38727,7 +38693,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -38913,7 +38878,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -38973,7 +38937,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -39013,7 +38976,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -39070,7 +39032,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -40389,7 +40350,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -40432,7 +40392,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -40492,7 +40451,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -40552,7 +40510,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -40592,7 +40549,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -40649,7 +40605,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -43109,28 +43064,6 @@
 		}
 	},
 	"427": {
-		"AudioComponent": {
-			"Slots": [
-				{
-					"ambienceType": 0,
-					"audio_guid": [
-						3273493020063318023,
-						11537445004664754516
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"id": "ChairDrag",
-					"loop": false,
-					"maxDistance": 200.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"useFade": false,
-					"volume": 1.0
-				}
-			]
-		},
 		"ColliderComponent": {
 			"maxBounds": [
 				21.22170639038086,
@@ -43271,7 +43204,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						3273493020063318023,
+						7452719122196152321,
 						11537445004664754516
 					],
 					"category": 0,
@@ -43799,28 +43732,6 @@
 		}
 	},
 	"431": {
-		"AudioComponent": {
-			"Slots": [
-				{
-					"ambienceType": 0,
-					"audio_guid": [
-						6912014444615630857,
-						11537445004664754516
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"id": "PageFlip",
-					"loop": false,
-					"maxDistance": 100.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"useFade": false,
-					"volume": 1.0
-				}
-			]
-		},
 		"ColliderComponent": {
 			"maxBounds": [
 				10.597131729125977,
@@ -44017,7 +43928,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -44060,7 +43970,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -44120,7 +44029,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -44180,7 +44088,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -44220,7 +44127,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -44277,7 +44183,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -49968,7 +49873,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						18261472579952328705,
+						8124441560211767297,
 						11537445004664754516
 					],
 					"category": 0,
@@ -49981,7 +49886,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 0.17599999904632568
+					"volume": 0.39899998903274536
 				}
 			]
 		},
@@ -50042,7 +49947,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 147.78140258789063,
+			"intensity": 162.97674560546875,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50086,7 +49991,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						18261472579952328705,
+						8124441560211767297,
 						11537445004664754516
 					],
 					"category": 0,
@@ -50099,7 +50004,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 0.1599999964237213
+					"volume": 0.28200000524520874
 				}
 			]
 		},
@@ -50156,7 +50061,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						16532090323042058245,
+						5864127129932644357,
 						11537445004664754516
 					],
 					"category": 0,
@@ -50174,7 +50079,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						18261472579952328705,
+						8124441560211767297,
 						11537445004664754516
 					],
 					"category": 0,
@@ -50200,7 +50105,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 178.31143188476563,
+			"intensity": 198.10447692871094,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50338,7 +50243,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						16532090323042058245,
+						5864127129932644357,
 						11537445004664754516
 					],
 					"category": 0,
@@ -50356,7 +50261,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						18261472579952328705,
+						8124441560211767297,
 						11537445004664754516
 					],
 					"category": 0,
@@ -50382,7 +50287,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 218.1142578125,
+			"intensity": 260.9292907714844,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50430,7 +50335,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						16532090323042058245,
+						5864127129932644357,
 						11537445004664754516
 					],
 					"category": 0,
@@ -50448,7 +50353,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						18261472579952328705,
+						8124441560211767297,
 						11537445004664754516
 					],
 					"category": 0,
@@ -50474,7 +50379,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 258.9314270019531,
+			"intensity": 307.89459228515625,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50522,7 +50427,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						16532090323042058245,
+						5864127129932644357,
 						11537445004664754516
 					],
 					"category": 0,
@@ -50540,7 +50445,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						18261472579952328705,
+						8124441560211767297,
 						11537445004664754516
 					],
 					"category": 0,
@@ -50566,7 +50471,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 145.4263458251953,
+			"intensity": 171.30404663085938,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50614,7 +50519,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						16532090323042058245,
+						5864127129932644357,
 						11537445004664754516
 					],
 					"category": 0,
@@ -50632,7 +50537,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						18261472579952328705,
+						8124441560211767297,
 						11537445004664754516
 					],
 					"category": 0,
@@ -50658,7 +50563,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 172.9155731201172,
+			"intensity": 222.03652954101563,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50765,6 +50670,162 @@
 				-76.69999694824219,
 				195.4499969482422,
 				866.0
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
+	"496": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				0.9279538989067078,
+				0.28881561756134033,
+				0.0
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 17.5,
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 1
+		},
+		"NameComponent": {
+			"name": "Lobby_Light_01"
+		},
+		"TransformComponent": {
+			"position": [
+				-675.4000244140625,
+				317.0,
+				683.3499755859375
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
+	"497": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				0.9279538989067078,
+				0.28881561756134033,
+				0.0
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 17.5,
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 1
+		},
+		"NameComponent": {
+			"name": "Lobby_Light_02"
+		},
+		"TransformComponent": {
+			"position": [
+				-710.0,
+				317.0,
+				615.2000122070313
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
+	"498": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				0.9279538989067078,
+				0.28881561756134033,
+				0.0
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 17.5,
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 1
+		},
+		"NameComponent": {
+			"name": "Lobby_Light_03"
+		},
+		"TransformComponent": {
+			"position": [
+				-795.8499755859375,
+				317.0,
+				615.2000122070313
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
+	"499": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				0.9279538989067078,
+				0.28881561756134033,
+				0.0
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 17.5,
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 1
+		},
+		"NameComponent": {
+			"name": "Lobby_Light_04"
+		},
+		"TransformComponent": {
+			"position": [
+				-837.0999755859375,
+				317.0,
+				706.4000244140625
 			],
 			"rotation": [
 				0.0,
@@ -51038,13 +51099,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				31.45919418334961,
+				529.6676635742188,
 				190.6817626953125,
-				-616.87890625
+				-248.17698669433594
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -51144,6 +51205,45 @@
 			]
 		}
 	},
+	"500": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				0.9279538989067078,
+				0.28881561756134033,
+				0.0
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 17.5,
+			"quadratic": 0.03200000151991844,
+			"radius": 1000.0,
+			"type": 1
+		},
+		"NameComponent": {
+			"name": "Lobby_Light_05"
+		},
+		"TransformComponent": {
+			"position": [
+				-794.7999877929688,
+				317.0,
+				763.8499755859375
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
 	"501": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -51223,7 +51323,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -51266,7 +51365,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -51326,7 +51424,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -51386,7 +51483,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -51426,7 +51522,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -51483,7 +51578,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -53135,7 +53229,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						15955629570738634767,
+						16534632389664342017,
 						11537445004664754516
 					],
 					"category": 0,
@@ -53148,7 +53242,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.9859999418258667
+					"volume": 4.0370001792907715
 				},
 				{
 					"ambienceType": 0,
@@ -53166,7 +53260,7 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 0.5320000052452087
+					"volume": 0.25699999928474426
 				}
 			]
 		},
@@ -53335,7 +53429,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -53378,7 +53471,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -53438,7 +53530,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -53498,7 +53589,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				713.0,
@@ -53538,7 +53628,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				200.0,
@@ -53595,7 +53684,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -59258,44 +59346,6 @@
 				}
 			]
 		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				3143178846513872907,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				14095933140278919181,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				1413796589603602447,
-				3711223656383638553
-			],
-			"name": "Ceiling",
-			"normalMap": [
-				6601943360334413841,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				5449021855727566867,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
 		"MeshComponent": {
 			"meshName": "ceiling",
 			"visibility": true
@@ -59332,12 +59382,12 @@
 		"TransformComponent": {
 			"position": [
 				-129.52008056640625,
-				-3.790668487548828,
+				-3.8550000190734863,
 				1631.3233642578125
 			],
 			"rotation": [
 				0.0,
-				89.99994659423828,
+				89.9999771118164,
 				0.0
 			],
 			"scale": [
@@ -60057,7 +60107,7 @@
 			],
 			"rotation": [
 				0.0,
-				211.37832641601563,
+				49.627140045166016,
 				0.0
 			],
 			"scale": [
@@ -60192,7 +60242,7 @@
 			],
 			"rotation": [
 				0.0,
-				211.37832641601563,
+				49.627140045166016,
 				0.0
 			],
 			"scale": [
@@ -61546,7 +61596,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61615,7 +61664,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61684,7 +61732,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61879,7 +61926,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61948,7 +61994,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -61993,7 +62038,7 @@
 		"TransformComponent": {
 			"position": [
 				-419.0614929199219,
-				116.45037841796875,
+				110.60850524902344,
 				-6.923887252807617
 			],
 			"rotation": [
@@ -62017,7 +62062,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62086,7 +62130,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62155,7 +62198,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62224,7 +62266,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62293,7 +62334,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62362,7 +62402,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62431,7 +62470,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62500,7 +62538,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -62695,7 +62732,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -63164,7 +63200,7 @@
 				1.0
 			],
 			"albedoMap": [
-				3690023162788823053,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -63200,7 +63236,7 @@
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Bedroom_NameTag_09 (Olive)"
+			"name": "Bedroom_NameTag_09"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -63416,7 +63452,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210983,
+				8301709181216210991,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -69329,7 +69365,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -69586,7 +69621,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -69655,7 +69689,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -69724,7 +69757,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -78407,7 +78439,7 @@
 				1.0
 			],
 			"albedoMap": [
-				6572326924305940505,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -78533,7 +78565,7 @@
 				1.0
 			],
 			"albedoMap": [
-				12913395199643598849,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -78659,7 +78691,7 @@
 				1.0
 			],
 			"albedoMap": [
-				14642777456553869333,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -78785,7 +78817,7 @@
 				1.0
 			],
 			"albedoMap": [
-				15219238208857292823,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -79037,7 +79069,7 @@
 				1.0
 			],
 			"albedoMap": [
-				3427239930998554627,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -79073,7 +79105,7 @@
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Bedroom_NameTag_05 (Yasin)"
+			"name": "Bedroom_NameTag_05"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -79163,7 +79195,7 @@
 				1.0
 			],
 			"albedoMap": [
-				5995866172002517021,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -79289,7 +79321,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9454630685823057951,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -79415,7 +79447,7 @@
 				1.0
 			],
 			"albedoMap": [
-				13489855951947022369,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -79541,7 +79573,7 @@
 				1.0
 			],
 			"albedoMap": [
-				15795698961160716291,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -79793,7 +79825,7 @@
 				1.0
 			],
 			"albedoMap": [
-				15219238208857292807,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -79919,7 +79951,7 @@
 				1.0
 			],
 			"albedoMap": [
-				12913395199643598859,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -80045,7 +80077,7 @@
 				1.0
 			],
 			"albedoMap": [
-				3690023162788823049,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -80081,7 +80113,7 @@
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Bedroom_NameTag_13 (Mavis)"
+			"name": "Bedroom_NameTag_13"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -80171,7 +80203,7 @@
 				1.0
 			],
 			"albedoMap": [
-				807719401271705615,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -80423,7 +80455,7 @@
 				1.0
 			],
 			"albedoMap": [
-				7725248428912787473,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -80549,7 +80581,7 @@
 				1.0
 			],
 			"albedoMap": [
-				1384180153575129115,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -80675,7 +80707,7 @@
 				1.0
 			],
 			"albedoMap": [
-				5419405419699093523,
+				6572326924305940485,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -80927,7 +80959,7 @@
 				1.0
 			],
 			"albedoMap": [
-				11184012942733328425,
+				8301709181216210991,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -81179,7 +81211,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8878169933519634475,
+				8301709181216210991,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -81431,7 +81463,7 @@
 				1.0
 			],
 			"albedoMap": [
-				807719401271705645,
+				8301709181216210991,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -81829,7 +81861,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210991,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -82081,7 +82113,7 @@
 				1.0
 			],
 			"albedoMap": [
-				7148787676609364017,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -82333,7 +82365,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9454630685823057971,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -82585,7 +82617,7 @@
 				1.0
 			],
 			"albedoMap": [
-				5419405419699093557,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -82837,7 +82869,7 @@
 				1.0
 			],
 			"albedoMap": [
-				10031091438126481463,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -82963,7 +82995,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210983,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -83431,7 +83463,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210983,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -83557,7 +83589,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210983,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -83683,7 +83715,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210983,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -83809,7 +83841,7 @@
 				1.0
 			],
 			"albedoMap": [
-				11184012942733328425,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -83935,7 +83967,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210983,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -84061,7 +84093,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8878169933519634475,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -84187,7 +84219,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210983,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -84313,7 +84345,7 @@
 				1.0
 			],
 			"albedoMap": [
-				807719401271705645,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -84439,7 +84471,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210983,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -84691,7 +84723,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210991,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -84817,7 +84849,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210983,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -84943,7 +84975,7 @@
 				1.0
 			],
 			"albedoMap": [
-				7148787676609364017,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -85069,7 +85101,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210983,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -85195,7 +85227,7 @@
 				1.0
 			],
 			"albedoMap": [
-				9454630685823057971,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -85321,7 +85353,7 @@
 				1.0
 			],
 			"albedoMap": [
-				8301709181216210983,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -85447,7 +85479,7 @@
 				1.0
 			],
 			"albedoMap": [
-				5419405419699093557,
+				807719401271705637,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
@@ -85658,7 +85690,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -86073,7 +86104,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -86448,7 +86478,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 2,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				520.2000122070313,
@@ -86500,7 +86529,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 2,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				520.2000122070313,
@@ -86552,7 +86580,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 2,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				0.0,
@@ -86604,7 +86631,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 2,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				520.2000122070313,
@@ -86656,7 +86682,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 1,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				173.39999389648438,
@@ -87177,7 +87202,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						15379168818435211273,
+						9758562131409846275,
 						11537445004664754516
 					],
 					"category": 0,
@@ -87338,7 +87363,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 20253.994140625,
+			"intensity": 50000.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -87934,25 +87959,6 @@
 			"type": 0
 		}
 	},
-	"846": {
-		"TransformComponent": {
-			"position": [
-				-391.99322509765625,
-				277.63311767578125,
-				-326.0906982421875
-			],
-			"rotation": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
-		}
-	},
 	"85": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -88100,888 +88106,6 @@
 			]
 		}
 	},
-	"853": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_01"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				0.5692062377929688,
-				543.9405517578125,
-				428.1020812988281
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"854": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_04"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				553.3093872070313,
-				543.9405517578125,
-				143.9895477294922
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"855": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_02"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				169.5250244140625,
-				543.9405517578125,
-				363.92144775390625
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"856": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_03"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				354.3825378417969,
-				543.9405517578125,
-				246.6256561279297
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"857": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_05"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-27.650787353515625,
-				543.9405517578125,
-				200.3688201904297
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"858": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_06"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				158.78570556640625,
-				543.9405517578125,
-				134.85556030273438
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"859": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_07"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				394.8599853515625,
-				543.9405517578125,
-				20.03978729248047
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
 	"86": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -89105,1266 +88229,6 @@
 				0.9999989867210388,
 				1.0,
 				0.9999989867210388
-			]
-		}
-	},
-	"860": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_08"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				593.6400146484375,
-				543.9405517578125,
-				-92.84265899658203
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"861": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_09"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-255.08718872070313,
-				543.9405517578125,
-				188.15921020507813
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"862": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_10"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-201.54367065429688,
-				543.9405517578125,
-				0.9764289855957031
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"863": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_11"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				23.011978149414063,
-				543.9405517578125,
-				-74.05211639404297
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"864": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_12"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				189.30291748046875,
-				543.9405517578125,
-				-95.90155029296875
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"865": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_13"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				378.0430603027344,
-				543.9405517578125,
-				-238.17822265625
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"866": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_14"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				546.186767578125,
-				543.9405517578125,
-				-351.15203857421875
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"867": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_15"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				4.697483062744141,
-				543.9405517578125,
-				-324.90716552734375
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"868": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_16"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				184.89404296875,
-				543.9405517578125,
-				-376.9986267089844
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"869": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_17"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				350.37548828125,
-				543.9405517578125,
-				-436.1434326171875
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
 			]
 		}
 	},
@@ -90494,1192 +88358,6 @@
 			]
 		}
 	},
-	"870": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_18"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				596.5580444335938,
-				543.9405517578125,
-				-550.953125
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"871": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_19"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				22.175987243652344,
-				543.9405517578125,
-				-557.8630981445313
-			],
-			"rotation": [
-				-179.99989318847656,
-				-89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"872": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_20"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				211.80316162109375,
-				543.9405517578125,
-				-606.2562255859375
-			],
-			"rotation": [
-				0.0,
-				-0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"873": {
-		"ColliderComponent": {
-			"maxBounds": [
-				98.36515045166016,
-				80.3809814453125,
-				71.08487701416016
-			],
-			"minBounds": [
-				-80.17244720458984,
-				4.5742645263671875,
-				-66.40082550048828
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						89.268798828125,
-						37.903358459472656,
-						68.74285125732422
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						9.096351623535156,
-						42.477622985839844,
-						2.3420257568359375
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				12718799279760687105,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				9836495518243569667,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				4648348747512758277,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				9836495518243569671,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				2918966490602487817,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "gravestone",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Grave_21"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				427.1534423828125,
-				543.9405517578125,
-				-606.2562255859375
-			],
-			"rotation": [
-				-179.99989318847656,
-				-5.008955668017734e-06,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0,
-				0.9999999403953552,
-				1.0
-			]
-		}
-	},
-	"874": {
-		"ColliderComponent": {
-			"maxBounds": [
-				48.776912689208984,
-				50.9349479675293,
-				36.795249938964844
-			],
-			"minBounds": [
-				-48.776912689208984,
-				-7.62939453125e-06,
-				-36.327354431152344
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						48.776912689208984,
-						25.467477798461914,
-						36.561302185058594
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						0.0,
-						25.467470169067383,
-						0.2339496612548828
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				8875047360903151617,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				17521958645454503939,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				11757351122420269061,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				11180890370116845575,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				5992743599386034185,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "cardboardbox",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Lobby_Box_01"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-338.5751953125,
-				10.0,
-				531.467041015625
-			],
-			"rotation": [
-				-179.99989318847656,
-				87.69999694824219,
-				-179.99989318847656
-			],
-			"scale": [
-				0.9999908208847046,
-				0.9999999403953552,
-				0.9999908208847046
-			]
-		}
-	},
-	"875": {
-		"ColliderComponent": {
-			"maxBounds": [
-				48.776912689208984,
-				50.9349479675293,
-				36.795249938964844
-			],
-			"minBounds": [
-				-48.776912689208984,
-				-7.62939453125e-06,
-				-36.327354431152344
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						48.776912689208984,
-						25.467477798461914,
-						36.561302185058594
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						0.0,
-						25.467470169067383,
-						0.2339496612548828
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				8875047360903151617,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				17521958645454503939,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				11757351122420269061,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				11180890370116845575,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				5992743599386034185,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "cardboardbox",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Lobby_Box_03"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-338.5751953125,
-				10.0,
-				634.7686157226563
-			],
-			"rotation": [
-				0.0,
-				100.9000015258789,
-				0.0
-			],
-			"scale": [
-				0.9999908208847046,
-				0.9999999403953552,
-				0.9999908208847046
-			]
-		}
-	},
-	"876": {
-		"ColliderComponent": {
-			"maxBounds": [
-				48.776912689208984,
-				50.9349479675293,
-				36.795249938964844
-			],
-			"minBounds": [
-				-48.776912689208984,
-				-7.62939453125e-06,
-				-36.327354431152344
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						48.776912689208984,
-						25.467477798461914,
-						36.561302185058594
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						0.0,
-						25.467470169067383,
-						0.2339496612548828
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				8875047360903151617,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				17521958645454503939,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				11757351122420269061,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				11180890370116845575,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				5992743599386034185,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "cardboardbox",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Lobby_Box_02"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-345.2079162597656,
-				61.71760559082031,
-				577.5795288085938
-			],
-			"rotation": [
-				0.0,
-				81.04998779296875,
-				0.0
-			],
-			"scale": [
-				0.9999908208847046,
-				0.9999999403953552,
-				0.9999908208847046
-			]
-		}
-	},
-	"877": {
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				2123869993542172683,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				17198649398227697675,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				8551738113665728515,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				6822355856755458053,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				0,
-				0
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "toy_frog",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "Lobby_SoftToy_02"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-315.895751953125,
-				59.78377914428711,
-				505.2586669921875
-			],
-			"rotation": [
-				-179.99989318847656,
-				-83.79997253417969,
-				-179.99989318847656
-			],
-			"scale": [
-				0.999999463558197,
-				0.9999998807907104,
-				0.999999463558197
-			]
-		}
-	},
-	"878": {
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				5992743599386034187,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				3686900590172340237,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				14063194131633963023,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				3686900590172340241,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				11757351122420269075,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "deco_pencil",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "SF_Pencil"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"TransformComponent": {
-			"position": [
-				-134.94308471679688,
-				638.6651611328125,
-				1089.4044189453125
-			],
-			"rotation": [
-				-179.99989318847656,
-				89.99994659423828,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0000020265579224,
-				0.9999998807907104,
-				1.0000020265579224
-			]
-		}
-	},
-	"879": {
-		"ColliderComponent": {
-			"maxBounds": [
-				0.5,
-				0.5,
-				0.5
-			],
-			"minBounds": [
-				-0.5,
-				-0.5,
-				-0.5
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						0.5,
-						0.5,
-						0.5
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				7145665103992881183,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				12333811874723692577,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				10027968865509998631,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				17521958645454503973,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				13423040818844500017,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "deco_scissors",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "SF_Scissors"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"TransformComponent": {
-			"position": [
-				-127.48463439941406,
-				638.5465087890625,
-				1026.12158203125
-			],
-			"rotation": [
-				-179.99989318847656,
-				-32.349998474121094,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0000020265579224,
-				0.9999999403953552,
-				1.0000020265579224
-			]
-		}
-	},
 	"88": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -91803,131 +88481,6 @@
 				0.15000000596046448,
 				1.0,
 				0.9999996423721313
-			]
-		}
-	},
-	"880": {
-		"ColliderComponent": {
-			"maxBounds": [
-				17.447166442871094,
-				1.1253210306167603,
-				3.510725975036621
-			],
-			"minBounds": [
-				-10.282381057739258,
-				0.632733941078186,
-				-2.3623218536376953
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						13.864773750305176,
-						0.24629351496696472,
-						2.936523914337158
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.582392692565918,
-						0.8790274858474731,
-						0.5742019414901733
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				8875047360903151637,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				2533979085565493271,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				2533979085565493273,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				14639654883937386523,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				1957518333262069789,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "deco_ruler",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "SF_Ruler"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"TransformComponent": {
-			"position": [
-				-128.7008514404297,
-				638.6672973632813,
-				1089.6688232421875
-			],
-			"rotation": [
-				-179.99989318847656,
-				86.89995574951172,
-				-179.99989318847656
-			],
-			"scale": [
-				1.0000020265579224,
-				0.9999999403953552,
-				1.0000020265579224
 			]
 		}
 	},
@@ -92080,7 +88633,6 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				81.0,

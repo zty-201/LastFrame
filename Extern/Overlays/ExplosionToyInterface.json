@@ -22,7 +22,6 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
-			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
