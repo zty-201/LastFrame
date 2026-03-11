@@ -33,9 +33,9 @@ local function ensureUIShared()
 end
 
 function on_button_InteractAction(self)
-    SHARED.UI_FLASHLIGHT = SHARED.UI_FLASHLIGHT or true
+    SHARED.UI_ACTION_INTERACTION = SHARED.UI_ACTION_INTERACTION or true
 
-    SHARED.UI_FLASHLIGHT = true
+    SHARED.UI_ACTION_INTERACTION = true
     debug_print("on_button_InteractAction")
 end
 
@@ -57,7 +57,7 @@ function on_create(self)
 
     --SHARED.UI_INVENTORY_OPEN = SHARED.UI_INVENTORY_OPEN or false
 
-    SHARED.UI_FLASHLIGHT = false
+    SHARED.UI_ACTION_INTERACTION = false
 
     if not UI_is_MenuOpen("Android_Inventory_Buttons") then
         UI:SetVisible(false)
@@ -72,8 +72,8 @@ function on_update(self, dt)
     
     -- Windows: nothing (UI hidden, flashlight probably on a key)
     if platform == "windows" then
-        --SetVisible(false)
-        --return
+        set_visible(false)
+        return
     end
 
     --entering to android

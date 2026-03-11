@@ -22,7 +22,7 @@ local function set_visible(v)
 end
 
 function on_button_AndroidPause(self)
-    SHARED.ANDROID_PAUSE_BUTTON = SHARED.UI_FLASHLIGHT or true
+    SHARED.ANDROID_PAUSE_BUTTON = SHARED.ANDROID_PAUSE_BUTTON or true
 
     SHARED.ANDROID_PAUSE_BUTTON = true
     debug_print("on_button_AndroidPause")
@@ -38,8 +38,8 @@ function on_create(self)
 
     -- Windows: hide the button UI
     if platform == "windows" then
-        --UI:SetVisible(false)
-        --return
+        UI:SetVisible(false)
+        return
     end
 
     SHARED.ANDROID_PAUSE_BUTTON = false
@@ -57,8 +57,8 @@ function on_update(self, dt)
     
     -- Windows: nothing (UI hidden, flashlight probably on a key)
     if platform == "windows" then
-        --SetVisible(false)
-        --return
+        set_visible(false)
+        return
     end
 
     --entering to android

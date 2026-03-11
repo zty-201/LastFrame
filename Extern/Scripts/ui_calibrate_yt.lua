@@ -49,8 +49,8 @@ function on_create(self)
 
     -- Windows: hide the button UI (keyboard handles this)
     if platform == "windows" then
-        --UI:SetVisible(false)
-        --return
+        UI:SetVisible(false)
+        return
     end
     UI:SetVisible(true)
 end
@@ -64,6 +64,7 @@ function on_update(self, dt)
     -- Windows: keyboard only (UI hidden)
     ------------------------------------------------------------
     if platform == "windows" then
+        UI:SetVisible(false)
         local isCDown = Input.GetKey(GLFW_KEY_C)
 
         if isCDown and not prevCDown then
@@ -71,7 +72,7 @@ function on_update(self, dt)
         end
 
         prevCDown = isCDown
-        --return
+        return
     end
 
     --if Android

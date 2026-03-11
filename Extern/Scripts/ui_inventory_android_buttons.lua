@@ -63,6 +63,11 @@ function on_update(self, dt)
         return
     end
 
+    if platform == "windows" then
+        set_visible(false)
+        return
+    end
+
     --update itself is the menu is active, else return
     if not UI_is_MenuOpen("Android_Inventory_Buttons") then
         return

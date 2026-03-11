@@ -521,7 +521,7 @@ namespace EngineFramework
 
             
             closeAllMenu();
-            displayMenu("Android_Inventory_Buttons");
+            //displayMenu("Android_Inventory_Buttons");
 
 #if defined(PLATFORM_ANDROID)
             displayMenu_InvisibleLayer("Android_Inventory_Buttons"); 
