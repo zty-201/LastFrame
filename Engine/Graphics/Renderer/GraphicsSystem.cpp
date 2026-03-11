@@ -5,7 +5,6 @@
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
 #include "VideoClip.h"
-#include "Audio.hpp"
 #include "MaterialComponent.h"
 #include "AnimationComponent.h"
 
@@ -1265,15 +1264,9 @@ namespace EngineFramework
             int layer;
             entt::entity entity;
         };
-        struct VideoAudioParams
-        {
-            AudioGroup group;
-            float volume;
-        };
 
         std::vector<UIRenderItem> drawList;
         std::unordered_set<VideoClip*> updatedVideos;
-        std::unordered_map<VideoClip*, VideoAudioParams> videoAudioRequests;
 
         for (auto [entity, ui] : view.each())
         {
@@ -1336,78 +1329,6 @@ namespace EngineFramework
 
 
 
-            // --- BIND TEXTURE OR VIDEO FRAME ---
-            glActiveTexture(GL_TEXTURE0);
-
-            GLuint texID = m_defaultWhiteTexture;
-            bool videoBound = false;
-            std::shared_ptr<VideoClip> boundVideo;
-
-            if (ui.videoid.m_Instance != 0)
-            {
-                auto video = AssetManagerSystem::GetResource<VideoClip>(ui.videoid);
-                if (video)
-                {
-                    if (updatedVideos.insert(video.get()).second)
-                    {
-                        video->Update(m_lastFrameDeltaTime);
-                    }
-                    if (video->IsReady())
-                    {
-                        texID = static_cast<GLuint>(video->GetTextureId());
-                        videoBound = true;
-                        boundVideo = video;
-                    }
-                }
-            }
-
-            if (videoBound && boundVideo)
-            {
-                auto dims = boundVideo->GetDimensions();
-                if (dims.x > 0 && dims.y > 0 && finalSize.x > 0.0f && finalSize.y > 0.0f)
-                {
-                    float targetAspect = static_cast<float>(dims.x) / static_cast<float>(dims.y);
-                    float quadAspect = finalSize.x / finalSize.y;
-                    const float epsilon = 0.001f;
-                    bool adjusted = false;
-                    glm::vec2 fitted = finalSize;
-                    if (targetAspect > quadAspect + epsilon)
-                    {
-                        fitted.y = finalSize.x / targetAspect;
-                        adjusted = true;
-                    }
-                    else if (targetAspect + epsilon < quadAspect)
-                    {
-                        fitted.x = finalSize.y * targetAspect;
-                        adjusted = true;
-                    }
-                    if (adjusted)
-                    {
-                        glm::vec2 center = finalPos + finalSize * 0.5f;
-                        finalSize = fitted;
-                        finalPos = center - finalSize * 0.5f;
-                    }
-                }
-            }
-
-            if (!videoBound)
-            {
-                auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
-                texID = (tex) ? tex->id : m_defaultWhiteTexture;
-            }
-
-            if (videoBound && boundVideo && boundVideo->HasAudio() && ui.play_video_audio)
-            {
-                int groupValue = ui.video_audio_group;
-                if (groupValue < 0) groupValue = 0;
-                int maxGroup = static_cast<int>(AudioGroup::Ambience);
-                if (groupValue > maxGroup) groupValue = maxGroup;
-                float audioVolume = ui.video_audio_volume;
-                if (audioVolume < 0.0f) audioVolume = 0.0f;
-                if (audioVolume > 1.0f) audioVolume = 1.0f;
-                videoAudioRequests[boundVideo.get()] = { static_cast<AudioGroup>(groupValue), audioVolume };
-            }
-
             // --- CALCULATE MODEL MATRIX ---
             glm::mat4 model = glm::mat4(1.0f);
 
@@ -1425,7 +1346,34 @@ namespace EngineFramework
             shader->setUniform("u_Color", glm::vec4(ui.color, 1.0f));
             shader->setUniform("u_Luminance", ui.luminance);
 
-            shader->setUniform("u_HasVideoFrame", videoBound);
+            // --- BIND TEXTURE OR VIDEO FRAME ---
+            glActiveTexture(GL_TEXTURE0);
+
+            GLuint texID = m_defaultWhiteTexture;
+            bool videoBound = false;
+
+            if (ui.videoid.m_Instance != 0)
+            {
+                auto video = AssetManagerSystem::GetResource<VideoClip>(ui.videoid);
+                if (video)
+                {
+                    if (updatedVideos.insert(video.get()).second)
+                    {
+                        video->Update(m_lastFrameDeltaTime);
+                    }
+                    if (video->IsReady())
+                    {
+                        texID = static_cast<GLuint>(video->GetTextureId());
+                        videoBound = true;
+                    }
+                }
+            }
+
+            if (!videoBound)
+            {
+                auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
+                texID = (tex) ? tex->id : m_defaultWhiteTexture;
+            }
 
             glBindTexture(GL_TEXTURE_2D, texID);
             shader->setUniform("s_Texture", 0);
@@ -1441,20 +1389,8 @@ namespace EngineFramework
                 
         }
 
-        for (VideoClip* clip : m_activeVideoAudio)
-        {
-            if (videoAudioRequests.find(clip) == videoAudioRequests.end())
-            {
-                clip->StopAudioPlayback();
-            }
-        }
-
-        m_activeVideoAudio.clear();
-        for (auto& [clip, params] : videoAudioRequests)
-        {
-            clip->EnsureAudioPlayback(params.group, params.volume);
-            m_activeVideoAudio.insert(clip);
-        }
+            
+        
 
         shader->disuse();
 

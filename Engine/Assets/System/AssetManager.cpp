@@ -983,13 +983,7 @@ namespace EngineFramework {
 			const std::string name = path.stem().string();
 			try
 			{
-				std::filesystem::path resolvedPath = path;
-				if (!resolvedPath.is_absolute())
-				{
-					resolvedPath = std::filesystem::absolute(resolvedPath);
-				}
-
-				auto clip = std::make_shared<VideoClip>(resolvedPath.string());
+				auto clip = std::make_shared<VideoClip>(path.string());
 				if (!clip || !clip->IsReady())
 				{
 					LOGE("Unable to load video '%s' (decoder initialization failed)", name.c_str());
