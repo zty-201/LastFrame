@@ -87338,7 +87338,8 @@
 				0.0,
 				0.0,
 				0.0
-			],
+			]}
+		},
 	"840": {
 		"ColliderComponent": {
 			"maxBounds": [
