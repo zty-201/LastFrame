@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "VideoClip.h"
+#include "Audio.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -37,6 +38,7 @@ namespace EngineFramework
     {
 #ifdef PLATFORM_WINDOWS
         Microsoft::WRL::ComPtr<IMFSourceReader> reader;
+        Microsoft::WRL::ComPtr<IMFSourceReader> audioReader;
 #endif
     };
 
@@ -53,8 +55,10 @@ namespace EngineFramework
         if (m_decoder)
         {
             m_decoder->reader.Reset();
+            m_decoder->audioReader.Reset();
         }
 #endif
+        ReleaseAudioResources();
         if (m_textureId != 0)
         {
             glDeleteTextures(1, &m_textureId);
@@ -214,13 +218,190 @@ namespace EngineFramework
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, 0x80E1 /*GL_BGRA*/, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         m_initialized = DecodeNextSample();
+        InitializeAudio(widePath);
 #else
         LOGW("VideoClip: Runtime video playback is not supported on this platform");
         (void)absolutePath;
+#endif
+    }
+
+    void VideoClip::InitializeAudio(const std::wstring& absolutePath)
+    {
+#ifdef PLATFORM_WINDOWS
+        if (!m_decoder)
+        {
+            return;
+        }
+
+        Microsoft::WRL::ComPtr<IMFAttributes> attributes;
+        HRESULT hr = MFCreateAttributes(&attributes, 1);
+        if (FAILED(hr))
+        {
+            LOGW("VideoClip: MFCreateAttributes failed for audio (0x%08X)", hr);
+            return;
+        }
+
+        hr = MFCreateSourceReaderFromURL(absolutePath.c_str(), attributes.Get(), m_decoder->audioReader.GetAddressOf());
+        if (FAILED(hr))
+        {
+            LOGW("VideoClip: Failed to create audio reader for '%ls' (0x%08X)", absolutePath.c_str(), hr);
+            return;
+        }
+
+        m_decoder->audioReader->SetStreamSelection(static_cast<DWORD>(MF_SOURCE_READER_ALL_STREAMS), FALSE);
+        m_decoder->audioReader->SetStreamSelection(static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM), TRUE);
+
+        Microsoft::WRL::ComPtr<IMFMediaType> audioType;
+        hr = MFCreateMediaType(&audioType);
+        if (FAILED(hr))
+        {
+            LOGW("VideoClip: MFCreateMediaType failed for audio (0x%08X)", hr);
+            return;
+        }
+
+        audioType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
+        audioType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);
+        audioType->SetUINT32(MF_MT_AUDIO_BITS_PER_SAMPLE, 16);
+
+        hr = m_decoder->audioReader->SetCurrentMediaType(static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM), nullptr, audioType.Get());
+        if (FAILED(hr))
+        {
+            LOGW("VideoClip: Failed to set audio media type (0x%08X)", hr);
+            m_decoder->audioReader.Reset();
+            return;
+        }
+
+        Microsoft::WRL::ComPtr<IMFMediaType> outputType;
+        hr = m_decoder->audioReader->GetCurrentMediaType(static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM), &outputType);
+        if (FAILED(hr))
+        {
+            LOGW("VideoClip: Failed to get audio media type (0x%08X)", hr);
+            m_decoder->audioReader.Reset();
+            return;
+        }
+
+        if (FAILED(outputType->GetUINT32(MF_MT_AUDIO_NUM_CHANNELS, &m_audioChannels)))
+        {
+            LOGW("VideoClip: Failed to read audio channel count");
+            m_decoder->audioReader.Reset();
+            return;
+        }
+
+        if (FAILED(outputType->GetUINT32(MF_MT_AUDIO_SAMPLES_PER_SECOND, &m_audioSampleRate)))
+        {
+            LOGW("VideoClip: Failed to read audio sample rate");
+            m_decoder->audioReader.Reset();
+            return;
+        }
+
+        if (FAILED(outputType->GetUINT32(MF_MT_AUDIO_BITS_PER_SAMPLE, &m_audioBitsPerSample)))
+        {
+            LOGW("VideoClip: Failed to read audio bit depth");
+            m_decoder->audioReader.Reset();
+            return;
+        }
+
+        if (m_audioBitsPerSample != 16)
+        {
+            LOGW("VideoClip: Audio bit depth %u not supported, expected 16", m_audioBitsPerSample);
+            m_decoder->audioReader.Reset();
+            return;
+        }
+
+        m_hasAudio = DecodeAudioStream();
+#else
+        (void)absolutePath;
+#endif
+    }
+
+    bool VideoClip::DecodeAudioStream()
+    {
+#ifdef PLATFORM_WINDOWS
+        if (!m_decoder || !m_decoder->audioReader || m_audioChannels == 0 || m_audioSampleRate == 0)
+        {
+            return false;
+        }
+
+        m_audioPCM.clear();
+
+        while (true)
+        {
+            Microsoft::WRL::ComPtr<IMFSample> sample;
+            DWORD flags = 0;
+
+            HRESULT hr = m_decoder->audioReader->ReadSample(
+                static_cast<DWORD>(MF_SOURCE_READER_FIRST_AUDIO_STREAM),
+                0,
+                nullptr,
+                &flags,
+                nullptr,
+                &sample);
+
+            if (FAILED(hr))
+            {
+                LOGE("VideoClip: Audio ReadSample failed (0x%08X)", hr);
+                return false;
+            }
+
+            if (flags & MF_SOURCE_READERF_ENDOFSTREAM)
+            {
+                break;
+            }
+
+            if (!sample)
+            {
+                continue;
+            }
+
+            Microsoft::WRL::ComPtr<IMFMediaBuffer> mediaBuffer;
+            hr = sample->ConvertToContiguousBuffer(&mediaBuffer);
+            if (FAILED(hr))
+            {
+                LOGE("VideoClip: Audio ConvertToContiguousBuffer failed (0x%08X)", hr);
+                return false;
+            }
+
+            BYTE* data = nullptr;
+            DWORD maxLength = 0;
+            DWORD currentLength = 0;
+            hr = mediaBuffer->Lock(&data, &maxLength, &currentLength);
+            if (FAILED(hr))
+            {
+                LOGE("VideoClip: Audio buffer lock failed (0x%08X)", hr);
+                return false;
+            }
+
+            size_t offset = m_audioPCM.size();
+            m_audioPCM.resize(offset + currentLength);
+            std::memcpy(m_audioPCM.data() + offset, data, currentLength);
+            mediaBuffer->Unlock();
+        }
+
+        const bool hasPcm = !m_audioPCM.empty();
+
+#ifndef DISABLE_FMOD
+        if (hasPcm)
+        {
+            auto* audioSystem = AudioSystem::TryGetInstance();
+            if (audioSystem && audioSystem->IsInitialized() && !m_audioSound)
+            {
+                m_audioSound = audioSystem->CreateSoundFromPCM(
+                    m_audioPCM.data(),
+                    m_audioPCM.size(),
+                    m_audioChannels,
+                    m_audioSampleRate,
+                    m_loop);
+            }
+        }
+#endif
+
+        return hasPcm;
+#else
+        return false;
 #endif
     }
 
@@ -342,13 +523,137 @@ namespace EngineFramework
             return;
         }
 
+        const size_t numBytes = static_cast<size_t>(m_width) * static_cast<size_t>(m_height) * 4;
+        if (m_rgbaBuffer.size() < numBytes)
+        {
+            m_rgbaBuffer.resize(numBytes);
+        }
+
+        for (size_t i = 0; i < numBytes; i += 4)
+        {
+            m_rgbaBuffer[i + 0] = frameData[i + 2]; // R
+            m_rgbaBuffer[i + 1] = frameData[i + 1]; // G
+            m_rgbaBuffer[i + 2] = frameData[i + 0]; // B
+            m_rgbaBuffer[i + 3] = frameData[i + 3]; // A
+        }
+
         glBindTexture(GL_TEXTURE_2D, m_textureId);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, 0x80E1 /*GL_BGRA*/, GL_UNSIGNED_BYTE, frameData.data());
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, m_rgbaBuffer.data());
         glBindTexture(GL_TEXTURE_2D, 0);
 #else
         (void)frameData;
 #endif
+    }
+
+    void VideoClip::ReleaseAudioResources()
+    {
+#if !defined(DISABLE_FMOD)
+        auto* audioSystem = AudioSystem::TryGetInstance();
+        if (audioSystem)
+        {
+            if (m_audioChannel)
+            {
+                audioSystem->StopExternalChannel(m_audioChannel);
+            }
+            if (m_audioSound)
+            {
+                audioSystem->ReleaseExternalSound(m_audioSound);
+            }
+        }
+        m_audioChannel = nullptr;
+        m_audioSound = nullptr;
+#endif
+        m_hasAudio = false;
+        m_audioPCM.clear();
+    }
+
+    void VideoClip::EnsureAudioPlayback(AudioGroup group, float volume)
+    {
+#if !defined(DISABLE_FMOD)
+        if (!m_hasAudio)
+        {
+            return;
+        }
+
+        auto* audioSystem = AudioSystem::TryGetInstance();
+        if (!audioSystem || !audioSystem->IsInitialized())
+        {
+            return;
+        }
+
+        if (!m_audioSound && !m_audioPCM.empty())
+        {
+            m_audioSound = audioSystem->CreateSoundFromPCM(
+                m_audioPCM.data(),
+                m_audioPCM.size(),
+                m_audioChannels,
+                m_audioSampleRate,
+                m_loop);
+            if (!m_audioSound)
+            {
+                return;
+            }
+        }
+
+        if (!m_audioSound)
+        {
+            return;
+        }
+
+        if (volume < 0.0f) volume = 0.0f;
+        if (volume > 1.0f) volume = 1.0f;
+
+        bool playing = false;
+        if (m_audioChannel)
+        {
+            FMOD_RESULT result = m_audioChannel->isPlaying(&playing);
+            if (result != FMOD_OK)
+            {
+                playing = false;
+                m_audioChannel = nullptr;
+            }
+        }
+
+        if (!playing)
+        {
+            m_audioChannel = audioSystem->PlayExternalSound(m_audioSound, group, volume);
+        }
+        else if (m_audioChannel)
+        {
+            m_audioChannel->setVolume(volume);
+        }
+#else
+        (void)group;
+        (void)volume;
+#endif
+    }
+
+    void VideoClip::StopAudioPlayback()
+    {
+#if !defined(DISABLE_FMOD)
+        auto* audioSystem = AudioSystem::TryGetInstance();
+        if (audioSystem && m_audioChannel)
+        {
+            audioSystem->StopExternalChannel(m_audioChannel);
+        }
+        m_audioChannel = nullptr;
+#endif
+    }
+
+    bool VideoClip::IsAudioPlaying() const
+    {
+#if !defined(DISABLE_FMOD)
+        if (m_audioChannel)
+        {
+            bool playing = false;
+            if (m_audioChannel->isPlaying(&playing) == FMOD_OK)
+            {
+                return playing;
+            }
+        }
+#endif
+        return false;
     }
 
 #ifdef PLATFORM_WINDOWS

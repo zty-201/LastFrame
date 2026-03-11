@@ -697,36 +697,49 @@ namespace EngineFramework
 
         screen_pos = ImGui::GetCursorScreenPos();
         available_size = ImGui::GetContentRegionAvail();
-        static ImVec2 available_size_old = available_size;
         static bool first_init = true;
+        static int cachedWidth = 0;
+        static int cachedHeight = 0;
 
-        //Resize window on first initialization.
-        if (first_init) {
+        auto quantize = [](float value)
+        {
+            constexpr int MIN_SIZE = 64;
+            constexpr int STEP = 16;
+            if (value <= 0.0f)
+                return 0;
+            int rounded = static_cast<int>(std::round(value / STEP) * STEP);
+            return std::max(rounded, MIN_SIZE);
+        };
+
+        const int quantizedWidth = quantize(available_size.x);
+        const int quantizedHeight = quantize(available_size.y);
+        const bool hasValidSize = (quantizedWidth > 0 && quantizedHeight > 0);
+
+        auto dispatch_resize = [&](int width, int height)
+        {
             Event_Window_Resized window_resize;
-            window_resize.width = static_cast<int>(available_size.x);
-            window_resize.height = static_cast<int>(available_size.y);
+            window_resize.width = width;
+            window_resize.height = height;
             event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
+        };
+
+        if (first_init && hasValidSize)
+        {
+            dispatch_resize(quantizedWidth, quantizedHeight);
+            cachedWidth = quantizedWidth;
+            cachedHeight = quantizedHeight;
             first_init = false;
         }
-
-        
-
-        if (available_size.x != available_size_old.x || available_size.y != available_size_old.y)
+        else if (hasValidSize && (quantizedWidth != cachedWidth || quantizedHeight != cachedHeight))
         {
-            //resize when the screen size changes		
-            //std::cout << "x: " << available_size.x << "y: " << available_size.y << std::endl;
-            
-            Event_Window_Resized window_resize;
-            window_resize.width = static_cast<int>(available_size.x);
-            window_resize.height = static_cast<int>(available_size.y);
-            event_dispatcher.trigger<Event_Window_Resized>(std::move(window_resize));
+            dispatch_resize(quantizedWidth, quantizedHeight);
+            cachedWidth = quantizedWidth;
+            cachedHeight = quantizedHeight;
         }
-        
+
         ImGui::Image((void*)(intptr_t)GraphicsSystem::GetInstance().GetSceneTextureID(),
-            available_size,
+            ImVec2(static_cast<float>(quantizedWidth), static_cast<float>(quantizedHeight)),
             ImVec2(0, 1), ImVec2(1, 0));
-        
-        available_size_old = available_size;
     }
 
     /*void Screen::camera_controls_outside_screen() {
