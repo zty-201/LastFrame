@@ -539,6 +539,39 @@ namespace EngineFramework {
 				it++;
 			}
 
+			/* 
+				Exclude files that do not do well under compression.
+				In the texture assets provided, these keywords are in the form: xxx_keyword.extension
+				Thus, look for "keyword." to avoid excluding unrelated textures.
+			*/
+#ifdef PLATFORM_WINDOWS
+			const std::array<std::string_view, 2> keyword_arr{ "roughness.", "metallic."};
+#elif defined(PLATFORM_ANDROID)
+			const std::array<std::string_view, 1> keyword_arr{ "roughness." };
+#endif
+			for (auto it = uncompressed_filepaths.begin(); it != uncompressed_filepaths.end();)
+			{
+				bool is_found = false;
+				std::string filepath = it->string();
+				std::for_each(filepath.begin(), filepath.end(), [](char &letter) {
+					letter = (char)std::tolower(letter);
+					});
+				for (const std::string_view& keyword : keyword_arr)
+				{
+					if (filepath.find(keyword, 0) != std::string::npos)
+					{
+						is_found = true;
+						break;
+					}
+				}
+				//Delete if present.
+				if (is_found)
+				{
+					it = uncompressed_filepaths.erase(it);
+					continue;
+				}
+				it++;
+			}
 
 
 			/*
