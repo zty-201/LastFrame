@@ -29,6 +29,7 @@ struct UIComponent
     glm::vec3 color = glm::vec3(1.0f); // Default White (No tint)
     bool visible = true;
 	float luminance = 1.0f; // Brightness multiplier
+    bool lock_luminance = false; // NEW: prevents fade system from modifying luminance
     int layer = 0;           // Optional: Render order (0=Back, 10=Front)
     bool is_NDC = false;
     glm::vec2 position_NDC;

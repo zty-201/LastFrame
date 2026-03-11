@@ -13,6 +13,7 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 100,
+			"lock_luminance": false,
 			"luminance": 0.3499999940395355,
 			"play_video_audio": true,
 			"position": [
@@ -41,7 +42,7 @@
 				0,
 				0
 			],
-			"visible": true
+			"visible": false
 		}
 	}
 }
