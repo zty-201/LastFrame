@@ -39,11 +39,6 @@ function on_button_ToggleFlashlight(self)
 end
 
 function on_create(self)
-    UI = EntityUI
-    if not UI then
-        print("[ui_flashlight] ERROR: No UIComponent")
-        return
-    end
 
     local Shared = getShared()
     local platform = (Shared and Shared.PLATFORM) or PLATFORM
@@ -54,11 +49,10 @@ function on_create(self)
         --return
     end
 
-    
     if not UI_is_MenuOpen("Android_Inventory_Buttons") then
-        UI:SetVisible(false)
+        set_visible(false)
     else
-        UI:SetVisible(true)
+        set_visible(true)
     end
 
 end
@@ -74,10 +68,10 @@ function on_update(self, dt)
     --entering to android
     --update itself is the menu is active, else return
     if not UI_is_MenuOpen("Android_Inventory_Buttons") then
-        SetVisible(false) --if not active, then make it gones
+        set_visible(false) --if not active, then make it gones
         return
     end
 
-    SetVisible(true)
+    set_visible(true)
 
 end

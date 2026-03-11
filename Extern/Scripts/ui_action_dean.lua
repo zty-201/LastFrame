@@ -79,10 +79,10 @@ function on_update(self, dt)
     --entering to android
     --update itself is the menu is active, else return
     if not UI_is_MenuOpen("Android_Inventory_Buttons") then
-        SetVisible(false) --if not active, then make it gones
+        set_visible(false) --if not active, then make it gones
         return
     end
 
-    SetVisible(true)
+    set_visible(true)
 
 end

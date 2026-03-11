@@ -80,6 +80,14 @@ function on_update(self, dt)
     if Input and Input.GetAction then
         pauseHeld = Input.GetAction("PAUSE") == true
     end
+    
+    local android_pause = SHARED.ANDROID_PAUSE_BUTTON
+
+    if android_pause then
+        pauseHeld = true
+        android_pause = false
+        SHARED.ANDROID_PAUSE_BUTTON = android_pause
+    end
 
     local pausePressed = pauseHeld and not pauseHeldPrev
     pauseHeldPrev = pauseHeld
