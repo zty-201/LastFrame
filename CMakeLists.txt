@@ -212,7 +212,10 @@ endif()
 set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp openfbx gli CACHE INTERNAL "")
 
 #Also link important system libraries for opengl drawing
-set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 compressonator CACHE INTERNAL "")
+set(WINDOWS_SHARED_LIBRARIES
+    opengl32 gdi32 user32 kernel32 glfw3 compressonator
+    mfplat mfreadwrite mfuuid propsys ole32
+    CACHE INTERNAL "")
 set(WINDOWS_DEBUG_LIBRARIES imgui CACHE INTERNAL "")
 set(WINDOWS_RELEASE_LIBRARIES CACHE INTERNAL "")
 set(ANDROID_LIBRARIES android log GLESv3 EGL CACHE INTERNAL "")
