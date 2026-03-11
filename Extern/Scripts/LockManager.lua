@@ -119,6 +119,7 @@ function on_update(self, dt)
         SHARED.LOCK_DISABLED = true
         reset_pressed()
         UI_CloseAllMenus()
+        UI_DisplayMenu_InvisibleLayer("Android_Inventory_Buttons")
 
         -- Swap toolbox meshes
         local lockedT = Query.GetTransform(TOOLBOX_LOCKED_ID)
@@ -138,6 +139,8 @@ function on_update(self, dt)
         SHARED[UI_TABLE] = false
         reset_pressed()
         UI_CloseAllMenus()
+        UI_DisplayMenu_InvisibleLayer("Android_Inventory_Buttons")
+        
         if pending_fail_light then
             play_sfx(pending_fail_light, "Candles")
             pending_fail_light = nil
