@@ -1,4 +1,134 @@
 {
+	"497": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				16267019915880398851,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "VolumeChange2",
+			"hover_texture": [
+				16267019915880398851,
+				3711223656383638553
+			],
+			"idle_texture": [
+				8518163340552814593,
+				3711223656383638553
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 8526044737832501259
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Vol2"
+		},
+		"UIComponent": {
+			"Overlay_name": "PauseMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"position": [
+				301.17999267578125,
+				174.21998596191406
+			],
+			"position_NDC": [
+				-0.23000000417232513,
+				-0.3400000035762787
+			],
+			"size": [
+				24.420000076293945,
+				22.479999542236328
+			],
+			"size_NDC": [
+				0.029999999329447746,
+				0.03999999910593033
+			],
+			"textureid": [
+				8518163340552814593,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"498": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				11734243746340569093,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "QuitToMenu",
+			"hover_texture": [
+				11734243746340569093,
+				3711223656383638553
+			],
+			"idle_texture": [
+				14139227519446712325,
+				3711223656383638553
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 11503214366706909185
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "QuitBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "PauseMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"position": [
+				376.4750061035156,
+				251.49501037597656
+			],
+			"position_NDC": [
+				0.0,
+				-0.029999999329447746
+			],
+			"size": [
+				61.05000305175781,
+				42.150001525878906
+			],
+			"size_NDC": [
+				0.07500000298023224,
+				0.07500000298023224
+			],
+			"textureid": [
+				14139227519446712325,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
 	"692": {
 		"ButtonComponent": {
 			"clicked_texture": [
@@ -722,136 +852,6 @@
 			],
 			"textureid": [
 				8518163340552814593,
-				3711223656383638553
-			],
-			"visible": false
-		}
-	},
-	"846": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "VolumeChange2",
-			"hover_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 8526044737832501259
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "Vol2"
-		},
-		"UIComponent": {
-			"Overlay_name": "PauseMenu",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 1,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"position": [
-				301.17999267578125,
-				174.21998596191406
-			],
-			"position_NDC": [
-				-0.23000000417232513,
-				-0.3400000035762787
-			],
-			"size": [
-				24.420000076293945,
-				22.479999542236328
-			],
-			"size_NDC": [
-				0.029999999329447746,
-				0.03999999910593033
-			],
-			"textureid": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"visible": false
-		}
-	},
-	"847": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				11734243746340569093,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "QuitToMenu",
-			"hover_texture": [
-				11734243746340569093,
-				3711223656383638553
-			],
-			"idle_texture": [
-				14139227519446712325,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 11503214366706909185
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "QuitBtn"
-		},
-		"UIComponent": {
-			"Overlay_name": "PauseMenu",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"position": [
-				376.4750061035156,
-				251.49501037597656
-			],
-			"position_NDC": [
-				0.0,
-				-0.029999999329447746
-			],
-			"size": [
-				61.05000305175781,
-				42.150001525878906
-			],
-			"size_NDC": [
-				0.07500000298023224,
-				0.07500000298023224
-			],
-			"textureid": [
-				14139227519446712325,
 				3711223656383638553
 			],
 			"visible": false

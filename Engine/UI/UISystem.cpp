@@ -638,7 +638,7 @@ namespace EngineFramework
         std::cout << "[UI_System] StartSplashSequence() called\n";
 
         StartCutsceneSequence(
-            { "Splash_1", "Splash_2", "Splash_3" },
+            { "Splash_1", "Splash_fmod", "Splash_2", "Splash_3" },
             2.5f,
             true
         );

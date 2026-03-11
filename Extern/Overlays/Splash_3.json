@@ -1,5 +1,5 @@
 {
-	"842": {
+	"882": {
 		"NameComponent": {
 			"name": "GameTitle"
 		},
@@ -38,7 +38,7 @@
 			"visible": false
 		}
 	},
-	"844": {
+	"883": {
 		"UIComponent": {
 			"Overlay_name": "Splash_3",
 			"color": [

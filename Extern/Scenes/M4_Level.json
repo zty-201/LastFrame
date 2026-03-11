@@ -44165,6 +44165,7 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
 				500.0,
@@ -87236,19 +87237,6 @@
 			]
 		}
 	},
-	"846": {
-		"TransformComponent": {
-			"position": [
-				-391.99322509765625,
-				277.63311767578125,
-				-326.0906982421875
-			],
-			"rotation": [
-				0.0,
-				0.0,
-				0.0
-			]}
-		},
 	"840": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -87680,6 +87668,25 @@
 			],
 			"radius": 0.5,
 			"type": 0
+		}
+	},
+	"846": {
+		"TransformComponent": {
+			"position": [
+				-391.99322509765625,
+				277.63311767578125,
+				-326.0906982421875
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
 		}
 	},
 	"85": {

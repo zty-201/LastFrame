@@ -1,5 +1,5 @@
 {
-	"840": {
+	"852": {
 		"NameComponent": {
 			"name": "SplashName"
 		},
@@ -38,7 +38,7 @@
 			"visible": false
 		}
 	},
-	"845": {
+	"881": {
 		"UIComponent": {
 			"Overlay_name": "Splash_2",
 			"color": [
