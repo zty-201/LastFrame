@@ -544,11 +544,8 @@ namespace EngineFramework {
 				In the texture assets provided, these keywords are in the form: xxx_keyword.extension
 				Thus, look for "keyword." to avoid excluding unrelated textures.
 			*/
-#ifdef PLATFORM_WINDOWS
 			const std::array<std::string_view, 2> keyword_arr{ "roughness.", "metallic."};
-#elif defined(PLATFORM_ANDROID)
-			const std::array<std::string_view, 1> keyword_arr{ "roughness." };
-#endif
+
 			for (auto it = uncompressed_filepaths.begin(); it != uncompressed_filepaths.end();)
 			{
 				bool is_found = false;
