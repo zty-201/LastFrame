@@ -7,9 +7,9 @@ local inventoryOpen = false
 local prevTogglePressed = false
 
 -- Layout settings (NDC)
-local START_X   = -0.56
+local START_X   = -0.32
 local START_Y   = -0.8
-local SPACING_X =  0.28
+local SPACING_X =  0.17
 
 
 
