@@ -45,16 +45,44 @@ namespace EngineFramework
     // -------------------------------------------------------------------------
     namespace
     {
+        static void SetMenuLuminance(const std::string& menuName, float luminance)
+        {
+            auto it = EngineFramework::UI_System::Menu_Mapping.find(menuName);
+            if (it == EngineFramework::UI_System::Menu_Mapping.end() || !it->second.first)
+                return;
+
+            auto entities = it->second.first->get_Elements();
+            for (auto e : entities)
+            {
+                if (registry.valid(e) && registry.all_of<UIComponent>(e))
+                {
+                    auto& ui = registry.get<UIComponent>(e);
+                    if (!ui.lock_luminance)
+                    {
+                        ui.luminance = luminance;
+                    }
+                }
+            }
+        }
+
+        static void ResetMenuLuminance(const std::string& menuName)
+        {
+            SetMenuLuminance(menuName, 1.0f);
+        }
         struct CutsceneSequence
         {
             bool playing = false;
             std::size_t index = 0;
             float timer = 0.0f;
-            float interval = 1.5f;
+            float interval = 2.0f;
+
+            // Per-screen fade timing inside one interval
+            float fadeInTime = 0.5f;
+            float fadeOutTime = 0.5f;
 
             std::vector<std::string> scenes;
 
-            std::function<void(const std::string&)> showSceneFn; // should "swap" to this menu
+            std::function<void(const std::string&)> showSceneFn;
             std::function<void()> onFinishedFn;
 
             void Start(std::vector<std::string> inScenes,
@@ -71,27 +99,86 @@ namespace EngineFramework
                 index = 0;
                 timer = 0.0f;
 
+                // Clamp fade values so they always fit inside the interval
+                float maxFade = interval * 0.5f;
+                if (fadeInTime > maxFade) fadeInTime = maxFade;
+                if (fadeOutTime > maxFade) fadeOutTime = maxFade;
+
                 if (playing && showSceneFn)
                 {
-                    showSceneFn(scenes[0]); // show first immediately
+                    showSceneFn(scenes[0]);
+                    SetMenuLuminance(scenes[0], 0.0f); // start dark, fade in
+                }
+            }
+
+            void Skip()
+            {
+                if (!playing)
+                    return;
+
+                if (index < scenes.size())
+                {
+                    ResetMenuLuminance(scenes[index]);
+                }
+
+                playing = false;
+                timer = 0.0f;
+                index = scenes.size();
+
+                if (onFinishedFn)
+                {
+                    onFinishedFn();
                 }
             }
 
             void Stop()
             {
+                if (playing && index < scenes.size())
+                {
+                    ResetMenuLuminance(scenes[index]);
+                }
+
                 playing = false;
             }
 
             void Update(float dt)
             {
-                if (!playing || scenes.empty() || !showSceneFn) return;
+                if (!playing || scenes.empty() || !showSceneFn)
+                    return;
 
                 timer += dt;
 
-                // Use while to handle low FPS spikes safely
+                // Animate luminance of the current scene
+                const std::string& currentScene = scenes[index];
+                float luminance = 1.0f;
+
+                if (timer < fadeInTime)
+                {
+                    // Fade in: 0 -> 1
+                    luminance = timer / fadeInTime;
+                }
+                else if (timer > (interval - fadeOutTime))
+                {
+                    // Fade out: 1 -> 0
+                    float t = (timer - (interval - fadeOutTime)) / fadeOutTime;
+                    luminance = 1.0f - t;
+                }
+                else
+                {
+                    // Hold
+                    luminance = 1.0f;
+                }
+
+                luminance = std::clamp(luminance, 0.0f, 1.0f);
+                SetMenuLuminance(currentScene, luminance);
+
                 while (timer >= interval)
                 {
                     timer -= interval;
+
+                    // Ensure previous scene is restored
+                    ResetMenuLuminance(scenes[index]);
+
                     ++index;
 
                     if (index >= scenes.size())
@@ -102,6 +189,7 @@ namespace EngineFramework
                     }
 
                     showSceneFn(scenes[index]);
+                    SetMenuLuminance(scenes[index], 0.0f); // next scene begins faded out
                 }
             }
         };
@@ -140,7 +228,7 @@ namespace EngineFramework
 
         current_menu = ""; // none, i havent set default yet
 
-        Load_Start_Menu();
+        //Load_Start_Menu();
     }
 
     void UI_System::Clean_All()
@@ -188,6 +276,16 @@ namespace EngineFramework
 
     void UI_System::Update(float deltaTime)
     {
+        // Allow skipping cutscenes with Space
+        if (gCutscene.playing)
+        {
+            // Replace this line with your engine's exact "space pressed once" function if needed
+            if (InputManager::GetInstance().GetAction("JUMP"))
+            {
+                gCutscene.Skip();
+            }
+        }
+
         // 1) Tick cutscene sequence FIRST (so it can swap menus at the right moment)
         gCutscene.Update(deltaTime);
 
@@ -198,9 +296,9 @@ namespace EngineFramework
             {
                 if (menu.second)
                 {
-                    menu.first->Update(); //only update those active ones
+                    menu.first->Update(); // only update those active ones
                     if (name == "AndroidInputOverlay") {
-                        //update joysticks
+                        // update joysticks
                         update_Joysticks();
                     }
                 }
@@ -418,7 +516,7 @@ namespace EngineFramework
 
         if (it != Menu_Mapping.end() && it->second.first)
         {
-            std::cout << "[UI_System] displayMenu success: " << menuname << "\n";
+            //std::cout << "[UI_System] displayMenu success: " << menuname << "\n";
 
             it->second.first->Initialize(); // Reset button states before showing
             it->second.first->draw_elements();
@@ -565,13 +663,25 @@ namespace EngineFramework
         
     }
 
+    void UI_System::StartSplashSequence()
+    {
+        std::cout << "[UI_System] StartSplashSequence() called\n";
+
+        StartCutsceneSequence(
+            { "Splash_1", "Splash_fmod", "Splash_2", "Splash_3" },
+            2.5f,
+            true
+        );
+    }
+
+    //No longer in use?
     void UI_System::StartPseudoCutscene()
     {
         std::cout << "[UI_System] StartPseudoCutscene() called\n";
 
         // Your described chain: cutscene_1 -> cutscene_4, 1.5s interval
         StartCutsceneSequence(
-            { "Cutscene_1", "Cutscene_2", "Cutscene_3", "Cutscene_4" },
+            { "Cutscene_1", "Cutscene_2", "Cutscene_3", "Cutscene_4", "Cutscene_5"},
             1.5f,
             true
         );

@@ -26,9 +26,6 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AssetManager.hpp"
 #include "SoundAsset.hpp"
 #include "scene.h"
-#if defined(PLATFORM_WINDOWS)
-#include "VideoClip.h"
-#endif
 #include "HistorySystem.hpp"
 #include "AudioComponent.h"
 #if defined(ENGINE_ENABLE_LUA)
@@ -237,7 +234,6 @@ namespace EditorFeatures {
 		case AssetPickerKind::Texture: return "Textures";
 		case AssetPickerKind::Audio:   return "Audio";
 		case AssetPickerKind::Script:  return "Scripts";
-		case AssetPickerKind::Video:   return "Videos";
 		default: break;
 		}
 		return nullptr;
@@ -281,14 +277,6 @@ namespace EditorFeatures {
 		}
 		case AssetPickerKind::Script: {
 			auto candidate = AssetManagerSystem::GetFullGuid(AssetManagerSystem::SCRIPT_GUID, asset_name);
-			if (!candidate.empty()) {
-				guid = candidate;
-				return true;
-			}
-			break;
-		}
-		case AssetPickerKind::Video: {
-			auto candidate = AssetManagerSystem::GetFullGuid(AssetManagerSystem::VIDEO_GUID, asset_name);
 			if (!candidate.empty()) {
 				guid = candidate;
 				return true;
@@ -638,28 +626,6 @@ namespace EditorFeatures {
 					AssetManagerSystem::AUDIO_GUID));
 			return { "No Audio", { { AssetManagerSystem::AUDIO_GUID, {}, std::move(sounds) } }, {} };
 		}
-#if defined(PLATFORM_WINDOWS)
-		case AssetPickerKind::Video: {
-			auto clips =
-				build_asset_entries(AssetManagerSystem::GetAllResourceOfType<EngineFramework::VideoClip>(
-					AssetManagerSystem::VIDEO_GUID));
-			return {
-				"No Video",
-				{
-					AssetPickerOptions{
-						AssetManagerSystem::VIDEO_GUID,
-						{},
-						std::move(clips)
-					}
-				},
-				{}
-			};
-		}
-#else
-		case AssetPickerKind::Video: {
-			return { "No Video", {}, {} };
-		}
-#endif
 #if defined(ENGINE_ENABLE_LUA)
 		case AssetPickerKind::Script: {
 			auto scripts =

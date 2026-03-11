@@ -156,9 +156,6 @@ namespace EngineFramework
                     ImGui::PushID(fileName.c_str());
 
                     std::string extension = entry.path().extension().string();
-                    std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char c) {
-                        return static_cast<char>(std::tolower(c));
-                        });
                     bool isTextureFile = is_image_extension(extension);
                     unsigned int thumbnailId = isTextureFile ? GetThumbnailTexture(entry.path()) : 0;
                     ImTextureID previewHandle = thumbnailId ? static_cast<ImTextureID>(thumbnailId) : ImTextureID_Invalid;
@@ -182,13 +179,9 @@ namespace EngineFramework
                         std::string pathStr = entry.path().string();
 
                         //*****Set payload type for targets with specific requirements*****
-                        const char* payloadType = "GENERAL";
-                        if (extension == ".png" || extension == ".jpg" || extension == ".jpeg") {
-                            payloadType = "Textures";
-                        }
-                        else if (extension == ".mp4" || extension == ".mov" || extension == ".mkv") {
-                            payloadType = "Videos";
-                        }
+                        const char* payloadType;
+                        if (extension == ".png") payloadType = "Textures";
+                        else payloadType = "GENERAL";
 
                         ImGui::SetDragDropPayload(payloadType, pathStr.c_str(), pathStr.size() + 1);
 

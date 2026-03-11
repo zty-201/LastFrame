@@ -8,7 +8,7 @@ local delayTimer = 0.0
 local waitingForDelay = false
 
 local DRAG_DISTANCE = 44.0
-local BASE_DRAG_SPEED = 30.0
+local BASE_DRAG_SPEED = 40.0
 
 local DRAG_DIR_X = 0.0
 local DRAG_DIR_Z = 1.0
