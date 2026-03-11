@@ -1,0 +1,77 @@
+{
+	"882": {
+		"NameComponent": {
+			"name": "GameTitle"
+		},
+		"UIComponent": {
+			"Overlay_name": "Splash_3",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1024.0,
+				681.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				10554036806325616643,
+				3711223656383638553
+			],
+			"visible": false
+		}
+	},
+	"883": {
+		"UIComponent": {
+			"Overlay_name": "Splash_3",
+			"color": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": true,
+			"luminance": 1.0,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1024.0,
+				681.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"textureid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}
