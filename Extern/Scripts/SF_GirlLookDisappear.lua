@@ -21,7 +21,7 @@ local VISIBLE_SCALE_Z = 1.0
 
 local hasTriggered = false
 local isVisible = false
-local lookTimer = 2.0
+local lookTimer = 0.0
 local frame = 0
 
 local SCARE_SOUND_ID = "ScareSound"
@@ -115,9 +115,12 @@ local function trigger_scare()
     -- Lightning trigger
     SHARED = SHARED or {}
     SHARED.LIGHTNING_CMD = SHARED.LIGHTNING_CMD or {}
+    SHARED.LIGHTNING_EVENT_ID = (SHARED.LIGHTNING_EVENT_ID or 0) + 1
+
     SHARED.LIGHTNING_CMD["GHOST_GIRL_SCARE"] = {
         trigger = true,
-        by = EntityID
+        by = EntityID,
+        eventId = SHARED.LIGHTNING_EVENT_ID
     }
 
     -- Play scare sounds
@@ -138,7 +141,7 @@ function on_create(self)
 
     hasTriggered = false
     isVisible = false
-    lookTimer = 2.0
+    lookTimer = 0.0
     frame = 0
 
     local tr = Query.GetTransform(EntityID)
