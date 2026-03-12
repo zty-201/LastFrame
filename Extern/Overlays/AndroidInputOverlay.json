@@ -1,5 +1,16 @@
 {
 	"590": {
+		"JoystickComponent": {
+			"baseCenter": [
+				201.60003662109375,
+				911.7424926757813
+			],
+			"isBeingDragged": false,
+			"knobTargetName": "js",
+			"maxRadius": 100.0,
+			"outputX": 0.0,
+			"outputY": 0.0
+		},
 		"NameComponent": {
 			"name": "jsBG"
 		},
@@ -66,12 +77,12 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				66.42000579833984,
-				39.87499237060547
+				73.8000259399414,
+				43.9999885559082
 			],
 			"position_NDC": [
-				-0.824999988079071,
-				-0.7850000262260437
+				-0.809999942779541,
+				-0.7700000405311584
 			],
 			"size": [
 				39.36000061035156,
