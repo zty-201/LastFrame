@@ -507,6 +507,24 @@ namespace EngineFramework
 #endif
 	}
 
+	void AudioSystem::SetEntitySlotVolume(entt::entity entity, const std::string& slotId, float volume)
+	{
+#ifndef DISABLE_FMOD
+		for (auto& inst : m_active)
+		{
+			if (inst.entity == entity && inst.slotId == slotId && inst.channel)
+			{
+				inst.targetVolume = std::clamp(volume, 0.0f, 5.0f);
+				// Apply immediately if not mid-fade
+				if (!inst.useFade || inst.currentFadeVolume >= 1.0f)
+					inst.channel->setVolume(inst.targetVolume);
+			}
+		}
+#else
+		(void)entity; (void)slotId; (void)volume;
+#endif
+	}
+
 	void AudioSystem::ProcessStopAllForEntity(const AudioCommand& cmd)
 	{
 #ifndef DISABLE_FMOD

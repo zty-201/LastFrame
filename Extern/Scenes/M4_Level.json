@@ -12831,9 +12831,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-12.989997863769531,
+				-403.79547119140625,
 				189.90533447265625,
-				-424.738037109375
+				776.2841186523438
 			],
 			"rotation": [
 				-0.0,
@@ -20225,20 +20225,74 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						2876789178491666467,
+						15921659061987917825,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"id": "Laughter",
+					"id": "GirlLaughing",
 					"loop": true,
-					"maxDistance": 25.0,
+					"maxDistance": 500.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						3691342623965118479,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "SubtleJingle",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						9417264931441426433,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "StopLooking",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						4982459319963795463,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "EpicSound",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.6319999694824219
 				}
 			]
 		},
@@ -20283,7 +20337,7 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 16438974836715732999
+					"ScriptGuid": 2107157476456726529
 				}
 			]
 		},
@@ -38365,9 +38419,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-12.989997863769531,
+				-403.79547119140625,
 				190.70533752441406,
-				-394.738037109375
+				806.2841186523438
 			],
 			"rotation": [
 				0.0,
@@ -51257,9 +51311,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-12.989997863769531,
+				-403.79547119140625,
 				189.90533447265625,
-				-424.738037109375
+				776.2841186523438
 			],
 			"rotation": [
 				0.0,
@@ -60312,7 +60366,7 @@
 			],
 			"rotation": [
 				0.0,
-				299.11138916015625,
+				105.95358276367188,
 				0.0
 			],
 			"scale": [
@@ -60411,7 +60465,7 @@
 			],
 			"rotation": [
 				0.0,
-				299.11138916015625,
+				105.95358276367188,
 				0.0
 			],
 			"scale": [
@@ -87620,7 +87674,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 0.0,
+			"intensity": 40852.984375,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -93270,7 +93324,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 0.0,
+			"intensity": 5683.76123046875,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -102630,6 +102684,104 @@
 				20.0,
 				1.0
 			]
+		}
+	},
+	"991": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 8448225751794384899
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Bedroom_Enter_Trigger"
+		},
+		"TransformComponent": {
+			"position": [
+				-160.0104217529297,
+				93.76690673828125,
+				1190.6004638671875
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				1000.0,
+				100.0,
+				250.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	}
 }
