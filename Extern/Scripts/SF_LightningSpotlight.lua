@@ -78,7 +78,7 @@ end
 
 local function set_intensity(v)
     if EntityLight ~= nil then
-        if (_G.ROOFTOP_COUNT or 0) > 0 then
+        if _G.ROOFTOP_ACTIVE == true then
             EntityLight:SetIntensity(OFF_INTENSITY)
         else
             EntityLight:SetIntensity(v)

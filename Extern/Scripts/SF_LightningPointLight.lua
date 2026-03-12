@@ -27,6 +27,9 @@ local STATE_IDLE = 0
 local STATE_HOLD = 1
 local STATE_FADE = 2
 
+local hasSeenFirstUpdate = false
+local wasPlayerOnRooftop = false
+
 local state = STATE_IDLE
 local timer = 0.0
 local duration = 0.0
@@ -93,13 +96,15 @@ function on_update(self, dt)
 
     local lightningTable = SHARED[LIGHTNING_TABLE]
     local lightningData = lightningTable[ROOFTOP_KEY]
-    local isPlayerOnRooftop = ((_G.ROOFTOP_COUNT or 0) > 0)
+    local isPlayerOnRooftop = (_G.ROOFTOP_ACTIVE == true)
 
     ------------------------------------------------
-    -- If player is NOT on rooftop:
-    -- consume latest event silently and keep light off
+    -- First update: initialize rooftop state, but do NOT flash
     ------------------------------------------------
-    if not isPlayerOnRooftop then
+    if not hasSeenFirstUpdate then
+        hasSeenFirstUpdate = true
+        wasPlayerOnRooftop = isPlayerOnRooftop
+
         if lightningData ~= nil then
             lastProcessedEventId = lightningData.eventId
         end
@@ -109,7 +114,42 @@ function on_update(self, dt)
     end
 
     ------------------------------------------------
-    -- LISTEN FOR NEXT NEW ROOFTOP LIGHTNING CUE
+    -- Detect rising edge: player JUST entered rooftop detector
+    ------------------------------------------------
+    local justEnteredRooftop = (not wasPlayerOnRooftop) and isPlayerOnRooftop
+    local justExitedRooftop  = wasPlayerOnRooftop and (not isPlayerOnRooftop)
+
+    ------------------------------------------------
+    -- If player is outside rooftop detector:
+    -- keep light off and consume latest event silently
+    ------------------------------------------------
+    if not isPlayerOnRooftop then
+        if lightningData ~= nil then
+            lastProcessedEventId = lightningData.eventId
+        end
+
+        begin_idle()
+        wasPlayerOnRooftop = false
+        return
+    end
+
+    ------------------------------------------------
+    -- If player just entered:
+    -- consume current event so only NEXT strike can flash
+    ------------------------------------------------
+    if justEnteredRooftop then
+        if lightningData ~= nil then
+            lastProcessedEventId = lightningData.eventId
+        end
+
+        begin_idle()
+        wasPlayerOnRooftop = true
+        return
+    end
+
+    ------------------------------------------------
+    -- Inside rooftop detector:
+    -- only react to NEW lightning events
     ------------------------------------------------
     if lightningData ~= nil and lightningData.eventId ~= lastProcessedEventId then
         lastProcessedEventId = lightningData.eventId
@@ -144,6 +184,8 @@ function on_update(self, dt)
             begin_idle()
         end
     end
+
+    wasPlayerOnRooftop = true
 end
 
 ------------------------------------------------

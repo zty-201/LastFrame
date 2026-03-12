@@ -54,8 +54,9 @@ function on_create(self)
         return
     end
 
-    baseIntensity = EntityLight:GetIntensity()
-    currentIntensity = baseIntensity
+    baseIntensity = 500.0
+    currentIntensity = 500.0
+    EntityLight:SetIntensity(500.0)
 
     math.randomseed(os.time() + EntityID)
     schedule_next_flicker()

@@ -869,7 +869,7 @@ namespace
 		Write results to respective folders with the appropriate extensions and the same file name.
 	*/
 	std::string file_name = file_path.stem().string(); //Just get the file name by itself.
-	float quality = 0.1f; //0 to 1, where 1 is the highest quality with the longest compression time. Processing time may scale exponentially?
+	float bc_quality = 1.0f, astc_quality = 0.3f; //0 to 1, where 1 is the highest quality with the longest compression time. Processing time may scale exponentially?
 	std::string full_err_code{}; //Accumulate errors, don't return immediately on error but let the other compression type also run.
 	
 	
@@ -890,7 +890,7 @@ namespace
 		}
 		else
 		{
-			auto err_code = CompressAndWriteTextureDir_lambda(uncompressed_texture, folder_BCx, file_name, CompressionTextureType::BC_X, quality);
+			auto err_code = CompressAndWriteTextureDir_lambda(uncompressed_texture, folder_BCx, file_name, CompressionTextureType::BC_X, bc_quality);
 			if (err_code) full_err_code += err_code.value();
 		}
 	}
@@ -906,7 +906,7 @@ namespace
 		}
 		else
 		{
-			auto err_code = CompressAndWriteTextureDir_lambda(uncompressed_texture, folder_ASTC, file_name, CompressionTextureType::ASTC, quality);
+			auto err_code = CompressAndWriteTextureDir_lambda(uncompressed_texture, folder_ASTC, file_name, CompressionTextureType::ASTC, astc_quality);
 			if (err_code) full_err_code += err_code.value();
 		}
 	}

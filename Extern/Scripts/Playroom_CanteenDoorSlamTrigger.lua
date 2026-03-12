@@ -3,7 +3,7 @@
 -- BUT only after the hidden wall has already been removed.
 
 local DEBUG = true
-local PLAYER_ENTITY_ID = 5
+local PLAYER_ENTITY_ID = 381
 
 local WALL_ENTITY_ID = 43
 local CANTEEN_DOOR_ID = 400
