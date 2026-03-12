@@ -847,6 +847,73 @@ namespace EngineFramework
 #endif
 	}
 
+#ifndef DISABLE_FMOD
+	FMOD::Sound* AudioSystem::CreateSoundFromPCM(const void* data, size_t numBytes, uint32_t channels, uint32_t sampleRate, bool loop)
+	{
+		if (!m_system || !data || numBytes == 0 || channels == 0 || sampleRate == 0)
+		{
+			return nullptr;
+		}
+
+		FMOD_CREATESOUNDEXINFO exinfo{};
+		exinfo.cbsize = sizeof(exinfo);
+		exinfo.length = static_cast<unsigned int>(numBytes);
+		exinfo.numchannels = channels;
+		exinfo.defaultfrequency = sampleRate;
+		exinfo.format = FMOD_SOUND_FORMAT_PCM16;
+
+		FMOD_MODE mode = FMOD_OPENMEMORY | FMOD_OPENRAW | FMOD_CREATESAMPLE | FMOD_2D;
+		mode |= loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
+
+		FMOD::Sound* sound = nullptr;
+		FMOD_RESULT result = m_system->createSound(reinterpret_cast<const char*>(data), mode, &exinfo, &sound);
+		logFmodError(result, "AudioSystem::CreateSoundFromPCM");
+		if (result != FMOD_OK)
+		{
+			return nullptr;
+		}
+		return sound;
+	}
+
+	FMOD::Channel* AudioSystem::PlayExternalSound(FMOD::Sound* sound, AudioGroup group, float volume)
+	{
+		if (!m_system || !sound)
+		{
+			return nullptr;
+		}
+
+		FMOD::ChannelGroup* channelGroup = pickGroup(group);
+		FMOD::Channel* channel = nullptr;
+		FMOD_RESULT result = m_system->playSound(sound, channelGroup, true, &channel);
+		logFmodError(result, "AudioSystem::PlayExternalSound");
+		if (result != FMOD_OK || !channel)
+		{
+			return nullptr;
+		}
+
+		channel->setVolume(volume);
+		channel->setPaused(false);
+		return channel;
+	}
+
+	void AudioSystem::StopExternalChannel(FMOD::Channel*& channel)
+	{
+		if (channel)
+		{
+			channel->stop();
+			channel = nullptr;
+		}
+	}
+
+	void AudioSystem::ReleaseExternalSound(FMOD::Sound*& sound)
+	{
+		if (sound)
+		{
+			sound->release();
+			sound = nullptr;
+		}
+	}
+#endif
 
 
 } // namespace EngineFramework

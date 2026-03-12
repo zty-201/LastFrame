@@ -25,6 +25,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "MaterialComponent.h"
 #include "AssetManager.hpp"
 #include "SoundAsset.hpp"
+#include "VideoClip.h"
 #include "scene.h"
 #include "HistorySystem.hpp"
 #include "AudioComponent.h"
@@ -234,6 +235,7 @@ namespace EditorFeatures {
 		case AssetPickerKind::Texture: return "Textures";
 		case AssetPickerKind::Audio:   return "Audio";
 		case AssetPickerKind::Script:  return "Scripts";
+		case AssetPickerKind::Video:   return "Videos";
 		default: break;
 		}
 		return nullptr;
@@ -277,6 +279,14 @@ namespace EditorFeatures {
 		}
 		case AssetPickerKind::Script: {
 			auto candidate = AssetManagerSystem::GetFullGuid(AssetManagerSystem::SCRIPT_GUID, asset_name);
+			if (!candidate.empty()) {
+				guid = candidate;
+				return true;
+			}
+			break;
+		}
+		case AssetPickerKind::Video: {
+			auto candidate = AssetManagerSystem::GetFullGuid(AssetManagerSystem::VIDEO_GUID, asset_name);
 			if (!candidate.empty()) {
 				guid = candidate;
 				return true;
@@ -638,6 +648,12 @@ namespace EditorFeatures {
 			return { "No Script", {}, {} };
 		}
 #endif
+		case AssetPickerKind::Video: {
+			auto videos =
+				build_asset_entries(AssetManagerSystem::GetAllResourceOfType<EngineFramework::VideoClip>(
+					AssetManagerSystem::VIDEO_GUID));
+			return { "No Video", { { AssetManagerSystem::VIDEO_GUID, {}, std::move(videos) } }, {} };
+		}
 		}
 		return { "None", {}, {} };
 	}
