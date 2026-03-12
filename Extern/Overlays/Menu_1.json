@@ -32,6 +32,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				404.54998779296875,
 				320.8500061035156
@@ -55,6 +56,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -74,6 +81,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				200.0
@@ -97,6 +105,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -133,6 +147,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				404.54998779296875,
 				427.79998779296875
@@ -156,6 +171,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -192,6 +213,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				404.54998779296875,
 				213.89999389648438
@@ -215,6 +237,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	}

@@ -19,6 +19,7 @@
 
 #ifndef GRAPHICS_SYSTEM_HPP
 #define GRAPHICS_SYSTEM_HPP
+#include <unordered_set>
 #include "ISystem.hpp"
 #include "scene.h"
 #include "InstancingSystem.h"
@@ -26,6 +27,8 @@
 
 namespace EngineFramework
 {
+    class VideoClip;
+
     namespace TextureUnits
     {
         // Define texture units for the new shader bindings
@@ -220,6 +223,8 @@ namespace EngineFramework
         std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
         std::vector<glm::mat4> m_spotLightViewProjMatrices;
         std::vector<glm::mat4> m_pointLightViewProjMatrices;
+        std::unordered_set<VideoClip*> m_activeVideoAudio;
+        float m_lastFrameDeltaTime = 0.0f;
 
 
         std::vector<entt::entity> m_lightEntityMap;

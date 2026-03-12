@@ -13,6 +13,7 @@
 #include "AssetManager.hpp"
 #include "Audio.hpp"
 #include "Scripting/ScriptAsset.hpp" //For script asset type registration.
+#include "VideoClip.h"
 #include <system_error>
 #include <mutex>
 
@@ -409,6 +410,7 @@ namespace EngineFramework {
 		asset_loader_map[AUDIO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadAudio);
 		asset_loader_map[SCRIPT] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadScript);
 		asset_loader_map[ARCHTYPE] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadArchtype);
+		asset_loader_map[VIDEO] = std::function<bool(const std::filesystem::path&)>(&AssetManagerSystem::LoadVideo);
 		//=====================================//
 
 		LoadAllResources();
@@ -1115,6 +1117,47 @@ namespace EngineFramework {
 		return true;
 	}
 
+	bool AssetManagerSystem::LoadVideo(const std::filesystem::path& folder_path)
+	{
+		LOGI("Loading Videos");
+		std::vector<std::string> video_extensions{ ".mp4", ".mov", ".mkv" };
+		std::vector<std::filesystem::path> files = ListFilesInDirectory(folder_path, video_extensions);
+
+		std::vector<std::string> asset_names{};
+		std::vector<std::shared_ptr<VideoClip>> loaded_resources{};
+
+		for (const std::filesystem::path& path : files)
+		{
+			const std::string name = path.stem().string();
+			try
+			{
+				std::filesystem::path resolvedPath = path;
+				if (!resolvedPath.is_absolute())
+				{
+					resolvedPath = std::filesystem::absolute(resolvedPath);
+				}
+
+				auto clip = std::make_shared<VideoClip>(resolvedPath.string());
+				if (!clip || !clip->IsReady())
+				{
+					LOGE("Unable to load video '%s' (decoder initialization failed)", name.c_str());
+					continue;
+				}
+
+				loaded_resources.emplace_back(std::move(clip));
+				asset_names.emplace_back(name);
+				LOGI("Loaded Video: %s", name.c_str());
+			}
+			catch (const std::exception& e)
+			{
+				LOGE("Unable to load video '%s': %s", name.c_str(), e.what());
+			}
+		}
+
+		SetMappings(VIDEO_GUID, asset_names, loaded_resources, folder_path);
+		return true;
+	}
+
 	bool AssetManagerSystem::LoadScript(const std::filesystem::path& folder_path)
 	{
 		LOGD("Loading Script");
@@ -1336,4 +1379,3 @@ namespace EngineFramework {
 	}
 
 } // namespace EngineFramework
-

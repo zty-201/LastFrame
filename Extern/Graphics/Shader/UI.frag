@@ -20,6 +20,7 @@ in vec2 FS_IN_TexCoord;
 uniform sampler2D s_Texture;
 uniform vec4 u_Color; 
 uniform float u_Luminance;
+uniform bool u_HasVideoFrame;
 
 uniform int u_UseSubtitleReveal;
 uniform float u_SubtitleRevealProgress;
@@ -31,7 +32,11 @@ uniform float u_SubtitleRevealSoftness;
 void main()
 {
     vec4 texColor = texture(s_Texture, FS_IN_TexCoord);
-
+    if (u_HasVideoFrame)
+    {
+        texColor.a = 1.0;
+    }
+    
     // Base tint + luminance
     vec4 finalColor = texColor * u_Color;
     finalColor.rgb *= u_Luminance;
@@ -47,17 +52,10 @@ void main()
 
         finalColor.rgb *= reveal;
         finalColor.a *= reveal;
-
-	FS_OUT_Color = finalColor;
     }
 
-    else
-    {
-
-    	 FS_OUT_Color = texColor * u_Color * u_Luminance;
-
-    }
+    FS_OUT_Color = finalColor;
 
     // Optional: Discard fully transparent pixels to save fill rate
-    if (FS_OUT_Color.a < 0.01) discard;
+    if (!u_HasVideoFrame && FS_OUT_Color.a < 0.01) discard;
 }

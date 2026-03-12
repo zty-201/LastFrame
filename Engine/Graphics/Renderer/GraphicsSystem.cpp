@@ -1,9 +1,14 @@
 #include "pch.hpp"
+#include <algorithm>
+#include <unordered_map>
+#include <unordered_set>
 #include "global.hpp"
 #include "Debug.h"
 #include "GraphicsSystem.h"
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
+#include "VideoClip.h"
+#include "Audio.hpp"
 #include "MaterialComponent.h"
 #include "AnimationComponent.h"
 
@@ -620,6 +625,7 @@ namespace EngineFramework
         const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
         glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind framebuffer
+
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
     }
@@ -1299,7 +1305,15 @@ namespace EngineFramework
             entt::entity entity;
         };
 
+        struct VideoAudioParams
+        {
+            AudioGroup group;
+            float volume;
+        };
+
         std::vector<UIRenderItem> drawList;
+        std::unordered_set<VideoClip*> updatedVideos;
+        std::unordered_map<VideoClip*, VideoAudioParams> videoAudioRequests;
 
         for (auto [entity, ui] : view.each())
         {
@@ -1359,44 +1373,89 @@ namespace EngineFramework
                 }
             }
 
+            glActiveTexture(GL_TEXTURE0);
 
+            GLuint texID = m_defaultWhiteTexture;
+            bool videoBound = false;
+            std::shared_ptr<VideoClip> boundVideo;
 
+            if (!ui.videoid.empty())
+            {
+                auto video = AssetManagerSystem::GetResource<VideoClip>(ui.videoid);
+                if (video)
+                {
+                    if (updatedVideos.insert(video.get()).second)
+                    {
+                        video->Update(m_lastFrameDeltaTime);
+                    }
+                    if (video->IsReady())
+                    {
+                        texID = static_cast<GLuint>(video->GetTextureId());
+                        videoBound = true;
+                        boundVideo = video;
+                    }
+                }
+            }
 
-            // --- CALCULATE MODEL MATRIX ---
+            if (videoBound && boundVideo)
+            {
+                auto dims = boundVideo->GetDimensions();
+                if (dims.x > 0 && dims.y > 0 && finalSize.x > 0.0f && finalSize.y > 0.0f)
+                {
+                    float targetAspect = static_cast<float>(dims.x) / static_cast<float>(dims.y);
+                    float quadAspect = finalSize.x / finalSize.y;
+                    const float epsilon = 0.001f;
+                    bool adjusted = false;
+                    glm::vec2 fitted = finalSize;
+                    if (targetAspect > quadAspect + epsilon)
+                    {
+                        fitted.y = finalSize.x / targetAspect;
+                        adjusted = true;
+                    }
+                    else if (targetAspect + epsilon < quadAspect)
+                    {
+                        fitted.x = finalSize.y * targetAspect;
+                        adjusted = true;
+                    }
+                    if (adjusted)
+                    {
+                        glm::vec2 center = finalPos + finalSize * 0.5f;
+                        finalSize = fitted;
+                        finalPos = center - finalSize * 0.5f;
+                    }
+                }
+            }
+
+            if (!videoBound)
+            {
+                auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
+                texID = (tex) ? tex->id : m_defaultWhiteTexture;
+            }
+
+            if (videoBound && boundVideo && boundVideo->HasAudio() && ui.play_video_audio)
+            {
+                int groupValue = std::max(0, std::min(ui.video_audio_group, static_cast<int>(AudioGroup::Ambience)));
+                float audioVolume = std::clamp(ui.video_audio_volume, 0.0f, 1.0f);
+                videoAudioRequests[boundVideo.get()] = { static_cast<AudioGroup>(groupValue), audioVolume };
+            }
+
             glm::mat4 model = glm::mat4(1.0f);
-
-            // Use 'finalPos' instead of 'ui.position'
             model = glm::translate(model, glm::vec3(finalPos.x, finalPos.y, 0.0f));
-
-            // Use 'finalSize' instead of 'ui.size'
             model = glm::scale(model, glm::vec3(finalSize.x, finalSize.y, 1.0f));
-
-            // --- COMPENSATION FOR -1 TO 1 MESH ---
             model = glm::translate(model, glm::vec3(0.5f, 0.5f, 0.0f));
             model = glm::scale(model, glm::vec3(0.5f, 0.5f, 1.0f));
 
             shader->setUniform("u_Model", model);
             shader->setUniform("u_Color", glm::vec4(ui.color, 1.0f));
             shader->setUniform("u_Luminance", ui.luminance);
-
             shader->setUniform("u_UseSubtitleReveal", ui.use_subtitle_reveal ? 1 : 0);
             shader->setUniform("u_SubtitleRevealProgress", ui.subtitle_reveal_progress);
             shader->setUniform("u_SubtitleRevealSoftness", ui.subtitle_reveal_softness);
+            shader->setUniform("u_HasVideoFrame", videoBound);
 
-            // --- BIND TEXTURE ---
-            glActiveTexture(GL_TEXTURE0);
-
-            auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
-            //if (!tex)
-            //{
-            //    std::cout << "[UI Missing Texture] entity=" << (int)item.entity << "\n";
-            //}
-            // Handle missing texture 
-            GLuint texID = (tex) ? tex->id : m_defaultWhiteTexture;
             glBindTexture(GL_TEXTURE_2D, texID);
             shader->setUniform("s_Texture", 0);
 
-            // --- DRAW ---
             glDrawElementsBaseVertex(
                 GL_TRIANGLES,
                 meshData->subMeshes[0].indexCount,
@@ -1407,8 +1466,23 @@ namespace EngineFramework
                 
         }
 
-            
         
+        
+
+        for (VideoClip* clip : m_activeVideoAudio)
+        {
+            if (videoAudioRequests.find(clip) == videoAudioRequests.end())
+            {
+                clip->StopAudioPlayback();
+            }
+        }
+
+        m_activeVideoAudio.clear();
+        for (auto& [clip, params] : videoAudioRequests)
+        {
+            clip->EnsureAudioPlayback(params.group, params.volume);
+            m_activeVideoAudio.insert(clip);
+        }
 
         shader->disuse();
 

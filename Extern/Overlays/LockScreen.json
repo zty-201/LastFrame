@@ -15,6 +15,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				857.5,
 				579.0
@@ -38,6 +39,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -57,6 +64,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				471.625,
 				0.0
@@ -80,6 +88,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -120,6 +134,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				720.2999267578125,
 				579.0
@@ -143,6 +158,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -183,6 +204,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				720.2999267578125,
 				694.7999267578125
@@ -206,6 +228,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -246,6 +274,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				720.2999267578125,
 				347.3999938964844
@@ -269,6 +298,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -309,6 +344,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				720.2999267578125,
 				231.60000610351563
@@ -332,6 +368,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -372,6 +414,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				874.6500244140625,
 				694.7999267578125
@@ -395,6 +438,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -435,6 +484,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				874.6500244140625,
 				579.0
@@ -458,6 +508,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -498,6 +554,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				874.6500244140625,
 				463.1999816894531
@@ -521,6 +578,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -561,6 +624,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				874.6500244140625,
 				347.3999938964844
@@ -584,6 +648,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -624,6 +694,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				720.2999267578125,
 				463.1999816894531
@@ -647,6 +718,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -687,6 +764,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				874.6500244140625,
 				231.60000610351563
@@ -710,6 +788,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	}
