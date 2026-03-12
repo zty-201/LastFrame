@@ -29,8 +29,6 @@ function on_button_ToggleFlashlight(self)
     --local platform = (Shared and Shared.PLATFORM) or PLATFORM
     
     if Shared then
-
-        --uiShared.actionRequested = true
         Shared.FLASHLIGHT = Shared.FLASHLIGHT or {}
         Shared.FLASHLIGHT.requestToggle = true
     end
@@ -61,9 +59,10 @@ end
 function on_update(self, dt)
     
     -- Windows: nothing (UI hidden, flashlight probably on a key)
-    local Shared = getShared()
-    local platform = (Shared and Shared.PLATFORM) or PLATFORM
-    if platform == "windows" then
+    --local Shared = getShared()
+    --local platform = (Shared and Shared.PLATFORM) or PLATFORM
+    if PLATFORM == "windows" then
+        set_visible(false)
         return
     end
 
