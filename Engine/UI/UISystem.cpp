@@ -681,7 +681,8 @@ namespace EngineFramework
             //displayMenu("Android_Inventory_Buttons");
 
 #if defined(PLATFORM_ANDROID)
-            displayMenu_InvisibleLayer("Android_Inventory_Buttons"); 
+            displayMenu_InvisibleLayer("Android_Inventory_Buttons");
+            displayMenu("AndroidInputOverlay");
 #endif
         }
     }
@@ -718,6 +719,7 @@ namespace EngineFramework
                 closeAllMenu();
 #if defined(PLATFORM_ANDROID)
                 displayMenu("Android_Inventory_Buttons");
+                displayMenu("AndroidInputOverlay");
 #endif
             }
         );

@@ -108,7 +108,7 @@ function on_update(self, dt)
 
     -- 1. Read from the C++ JoystickComponent via SHARED table
     if PLATFORM == "android" and SHARED and SHARED.UI then
-        UI_DisplayMenu("AndroidInputOverlay")
+        --UI_DisplayMenu("AndroidInputOverlay")
         
         local jx = -(SHARED.UI.joystickX or 0.0)
         local jy = -(SHARED.UI.joystickY or 0.0)

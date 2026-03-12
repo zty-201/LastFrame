@@ -100,6 +100,10 @@ namespace EngineFramework
 		{
 			//Check for collision.
 			if (!other_box.enabled) continue;
+			//Ignore scale 0 objects, as they can do a false positive for Overlap check even when they shouldn't be collidable in anything.
+			if (other_tf.scale.x == 0
+				&& other_tf.scale.y == 0
+				&& other_tf.scale.z == 0) continue;
 			other_box.is_collided_this_frame = false;
 			if (other_id == detector_id) continue;
 
