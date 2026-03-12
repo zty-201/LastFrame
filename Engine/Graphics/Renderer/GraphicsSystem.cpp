@@ -312,6 +312,11 @@ namespace EngineFramework
 
     void GraphicsSystem::RenderScene()
     {
+        // Call for ApplyPendingResize function at the top here once
+        // This is so that the framebuffer reallocation happens exactly once per frame and never mid-resize event
+        // which prevents the flickering previously seen
+        ApplyPendingResize();
+
         if (m_windowMinimized)
         {
             return;
@@ -1684,6 +1689,33 @@ namespace EngineFramework
         return true;
     }
 
+    // Check if a resize was requested via the flag set by the event handler
+    // If it is requested, clamp the pending width & height to at least 1 pixel to avoid zero-sized fbos
+    // Save the currently bound GL_Texture 2D 
+    // Then call for mainFBO.resize function with the new dimensions and update the screen vector
+    // And restore the previous  texture binding and clear the pending flag
+    void GraphicsSystem::ApplyPendingResize()
+    {
+        if (!m_pendingResize)
+        {
+            return;
+        }
+
+        int newWidth = (m_pendingWidth > 0) ? m_pendingWidth : 1;
+        int newHeight = (m_pendingHeight > 0) ? m_pendingHeight : 1;
+
+        GLint prevTexture = 0;
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &prevTexture);
+
+        mainFBO.resize(newWidth, newHeight);
+        screen.x = static_cast<float>(newWidth);
+        screen.y = static_cast<float>(newHeight);
+
+        glBindTexture(GL_TEXTURE_2D, prevTexture);
+
+        m_pendingResize = false;
+    }
+
     // Event Handlers
 
     void GraphicsSystem::HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled& editor_toggled)
@@ -1697,22 +1729,14 @@ namespace EngineFramework
         if (window_resize.width <= 0 || window_resize.height <= 0)
         {
             m_windowMinimized = true;
+            m_pendingResize = false;
             return;
         }
 
         m_windowMinimized = false;
-
-        // Save current texture binding
-        GLint prevTexture;
-        glGetIntegerv(GL_TEXTURE_BINDING_2D, &prevTexture);
-
-        // Resize framebuffer and update screen size
-        mainFBO.resize(window_resize.width, window_resize.height);
-        screen.x = static_cast<float>(window_resize.width);
-        screen.y = static_cast<float>(window_resize.height);
-
-        // Restore previous texture binding
-        glBindTexture(GL_TEXTURE_2D, prevTexture);
+        m_pendingWidth = window_resize.width;
+        m_pendingHeight = window_resize.height;
+        m_pendingResize = true;
     }
 
 } // namespace EngineFramework
