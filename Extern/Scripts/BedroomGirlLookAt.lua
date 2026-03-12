@@ -19,7 +19,7 @@ local LAUGH_SLOT       = "GirlLaughing"
 local LAUGH_VOL_MIN    = 0.3   -- volume when player is not looking
 local LAUGH_VOL_MAX    = 1.0   -- volume at full 3s look threshold
 
-local TRIGGER_ZONE_ID  = 853   -- player must be inside this zone for look to activate
+local TRIGGER_ZONE_ID  = 991   -- player must be inside this zone for look to activate
 
 local isLooking         = false   -- player is currently looking at girl
 local thresholdMet      = false   -- 3s look threshold reached; silence delay counting
