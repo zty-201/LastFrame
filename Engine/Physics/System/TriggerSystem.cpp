@@ -5,7 +5,8 @@
 #include "TriggerEvents.hpp"
 #include "TransformComponent.h"
 #include "TriggerBoxComponent.h"
-
+#include "NameComponent.h"
+#include "ColliderComponent.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
