@@ -164,64 +164,6 @@
 			]
 		}
 	},
-	"10": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 6719529442629517315
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "UI_Joystick"
-		},
-		"UIComponent": {
-			"Overlay_name": "",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": false,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				166.0,
-				54.0
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				180.0,
-				180.0
-			],
-			"size_NDC": [
-				0.0,
-				0.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				3601763066940784643,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
-	},
 	"100": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -2689,64 +2631,6 @@
 			]
 		}
 	},
-	"12": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 17128755557071454211
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "UI_Calibrate"
-		},
-		"UIComponent": {
-			"Overlay_name": "",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": false,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				1242.5,
-				106.5
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				75.0,
-				75.0
-			],
-			"size_NDC": [
-				0.0,
-				0.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
-	},
 	"120": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -3788,86 +3672,6 @@
 				1.0,
 				1.0
 			]
-		}
-	},
-	"13": {
-		"AudioComponent": {
-			"Slots": [
-				{
-					"ambienceType": 0,
-					"audio_guid": [
-						0,
-						0
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"id": "Slot1",
-					"loop": false,
-					"maxDistance": 25.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"useFade": false,
-					"volume": 1.0
-				}
-			]
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 5023079758699560965
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "UI_Flashlight"
-		},
-		"UIComponent": {
-			"Overlay_name": "",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": false,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				1998.0,
-				94.0
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				100.0,
-				100.0
-			],
-			"size_NDC": [
-				0.0,
-				0.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				14675252536616468483,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
 		}
 	},
 	"130": {
@@ -86770,8 +86574,8 @@
 				117.5
 			],
 			"size_NDC": [
-				0.11999999731779099,
-				0.07999999821186066
+				0.05999999865889549,
+				0.03999999910593033
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
@@ -86820,21 +86624,21 @@
 				528.75
 			],
 			"position_NDC": [
-				0.0,
-				0.0
+				0.019999999552965164,
+				-0.800000011920929
 			],
 			"size": [
 				115.5999984741211,
 				117.5
 			],
 			"size_NDC": [
-				0.11999999731779099,
-				0.07999999821186066
+				0.05999999865889549,
+				0.03999999910593033
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				9908834583171940357,
+				18294756997713952773,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
@@ -86878,21 +86682,21 @@
 				0.0
 			],
 			"position_NDC": [
-				0.0,
-				0.0
+				-0.15000000596046448,
+				-0.800000011920929
 			],
 			"size": [
 				0.0,
 				0.0
 			],
 			"size_NDC": [
-				0.11999999731779099,
-				0.07999999821186066
+				0.05999999865889549,
+				0.03999999910593033
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				17979285115419869185,
+				16565374740803682305,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
@@ -86936,21 +86740,21 @@
 				528.75
 			],
 			"position_NDC": [
-				0.0,
-				0.0
+				-0.3199999928474426,
+				-0.800000011920929
 			],
 			"size": [
 				115.5999984741211,
 				117.5
 			],
 			"size_NDC": [
-				0.11999999731779099,
-				0.07999999821186066
+				0.05999999865889549,
+				0.03999999910593033
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				5873609317047975939,
+				2730316685521518599,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
@@ -87002,13 +86806,13 @@
 				117.5
 			],
 			"size_NDC": [
-				0.699999988079071,
+				0.5,
 				0.10000000149011612
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				1838384050924011527,
+				11377227970072870915,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
@@ -92743,64 +92547,6 @@
 				0.0010000020265579224,
 				0.0010000001639127731
 			]
-		}
-	},
-	"9": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 13060597717967175685
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "UI_JoystickBG"
-		},
-		"UIComponent": {
-			"Overlay_name": "",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": false,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				81.0,
-				-31.0
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				350.0,
-				350.0
-			],
-			"size_NDC": [
-				0.0,
-				0.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				13373202070917185537,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
 		}
 	},
 	"90": {
