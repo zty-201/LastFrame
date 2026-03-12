@@ -41,13 +41,13 @@ class LevelEditor; // forward declaration
 #if defined(PLATFORM_ANDROID)
 
 // smaller shadow maps and voxel grids on mobile for performance reasons.
-#define SHADOW_WIDTH 1024
-#define SHADOW_HEIGHT 1024
+#define SHADOW_WIDTH 512
+#define SHADOW_HEIGHT 512
 
 #define POINT_SHADOW_SIZE 256
 
-#define MAX_SHADOW_CASTING_SPOTLIGHTS 16
-#define MAX_SHADOW_CASTING_POINT_LIGHTS 8
+#define MAX_SHADOW_CASTING_SPOTLIGHTS 4
+#define MAX_SHADOW_CASTING_POINT_LIGHTS 4
 
 // On Android, we must use clock_gettime
 #include <time.h>
