@@ -14,6 +14,7 @@ local transform   = nil
 local yaw, pitch  = 0.0, 0.0
 local lensMenuName = "DirtyLens"
 local lensVisible  = false
+local lensSuppressed = false -- true when player manually hides the overlay
 
 -- Recenter smoothing
 local recenterActive        = false
@@ -41,8 +42,28 @@ local function setMouseLookActive(active)
     Input.SetCursorVisible(not active)  -- hide cursor while locked
 end
 
+local function syncLensOverlayState()
+    if UI_IsMenuActive == nil then
+        return
+    end
+
+    local actualActive = UI_IsMenuActive(lensMenuName)
+    if lensVisible and not actualActive then
+        -- Player/level-editor hid the overlay manually, so respect it.
+        lensVisible = false
+        lensSuppressed = true
+    elseif (not lensVisible) and actualActive then
+        -- Player re-enabled it manually; resume automatic control.
+        lensVisible = true
+        lensSuppressed = false
+    end
+end
+
 local function setLensOverlayVisible(active)
     if active then
+        if lensSuppressed then
+            return
+        end
         if not lensVisible and UI_DisplayMenu ~= nil then
             UI_DisplayMenu(lensMenuName)
             lensVisible = true
@@ -55,11 +76,15 @@ local function setLensOverlayVisible(active)
                 UI_CloseAllMenus()
             end
             lensVisible = false
+            -- If we explicitly hid it, allow automatic control to resume later.
+            lensSuppressed = false
         end
     end
 end
 
 local function updateLensOverlayVisibility()
+    syncLensOverlayState()
+
     local cutscene = false
     if UI_IsCutscenePlaying ~= nil then
         cutscene = UI_IsCutscenePlaying()
