@@ -45,8 +45,8 @@ function on_create(self)
 
     -- Windows: hide the button UI
     if platform == "windows" then
-        --UI:SetVisible(false)
-        --return
+        UI:SetVisible(false)
+        return
     end
 
     if not UI_is_MenuOpen("Android_Inventory_Buttons") then
@@ -62,7 +62,7 @@ function on_update(self, dt)
     
     -- Windows: nothing (UI hidden, flashlight probably on a key)
     if platform == "windows" then
-        --return
+        return
     end
 
     --entering to android
