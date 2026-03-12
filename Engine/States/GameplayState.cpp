@@ -17,6 +17,10 @@ void GameplayState::OnEnter(Engine::StateMachine& machine)
     ui.closeAllMenu();
 
     // Put your gameplay scene/runtime-start logic here.
+#if defined(PLATFORM_ANDROID)
+    ui.displayMenu_InvisibleLayer("Android_Inventory_Buttons");
+    ui.displayMenu("AndroidInputOverlay");
+#endif
 }
 
 void GameplayState::OnExit(Engine::StateMachine& machine)
