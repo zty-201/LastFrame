@@ -40,6 +40,10 @@ namespace EngineFramework
         m_stateMachine.AddBoolTransition("IntroCutscene", "Gameplay", "IntroCutsceneFinished", true);
         m_stateMachine.AddTriggerTransition("IntroCutscene", "Gameplay", "SkipIntro");
 
+        // Gameplay to main menu
+        m_stateMachine.AddTriggerTransition("Gameplay", "MainMenu", "ReturnToMenu");
+
+
         m_started = false;
     }
 

@@ -27,18 +27,25 @@ local shakeTickTimer   = 0.0
 local SHAKE_TICK       = 0.04
 
 local function tickShake(dt)
-    if shakeTimer >= shakeDuration then return end
-    shakeTimer     = shakeTimer     + dt
+    if shakeTimer >= shakeDuration then
+        shakeOffsetYaw = 0.0
+        shakeOffsetPitch = 0.0
+        return
+    end
+
+    shakeTimer     = shakeTimer + dt
     shakeTickTimer = shakeTickTimer + dt
-    local t     = shakeTimer / shakeDuration
+
+    local t = shakeTimer / shakeDuration
+    if t > 1.0 then t = 1.0 end
+
     local decay = 1.0 - t * t
+
     if shakeTickTimer >= shakeSpeed then
         shakeTickTimer = 0.0
-        shakeOffsetYaw   = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay
-        shakeOffsetPitch = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay * 0.6
+        shakeOffsetYaw   = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay * 0.7
+        shakeOffsetPitch = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay * 0.7
     end
-    yaw   = yaw   + shakeOffsetYaw
-    pitch = pitch + shakeOffsetPitch
 end
 
 -- Camera pull (toward lock target during shake)
@@ -175,9 +182,15 @@ end
 -- Apply rotation + smoothing
 -- ============================================================
 local function applyLook(overrideX, overrideY, overrideZ)
-    -- Clamp pitch
+    -- Clamp base pitch first
     if pitch > pitchLimit then pitch = pitchLimit end
     if pitch < -pitchLimit then pitch = -pitchLimit end
+
+    local finalYaw = yaw + shakeOffsetYaw
+    local finalPitch = pitch + shakeOffsetPitch
+
+    if finalPitch > pitchLimit then finalPitch = pitchLimit end
+    if finalPitch < -pitchLimit then finalPitch = -pitchLimit end
 
     -- Make player model face where camera is yawing (keep existing pitch/roll)
     --local rx, ry, rz = transform:GetRotation()
@@ -190,14 +203,14 @@ local function applyLook(overrideX, overrideY, overrideZ)
     --local x, y, z = transform:GetPosition()
 
     if Transform_SetRotation then
-        Transform_SetRotation(EntityID, 0.0, yaw, 0.0)
+        Transform_SetRotation(EntityID, 0.0, finalYaw, 0.0)
     else
-        transform:SetRotation(0.0, yaw, 0.0)
+        transform:SetRotation(0.0, finalYaw, 0.0)
     end
 
     -- Compute forward vector
-    local radYaw   = math.rad(yaw)
-    local radPitch = math.rad(pitch)
+    local radYaw   = math.rad(finalYaw)
+    local radPitch = math.rad(finalPitch)
     local cosPitch = math.cos(radPitch)
 
     local fx = cosPitch * math.sin(radYaw)
