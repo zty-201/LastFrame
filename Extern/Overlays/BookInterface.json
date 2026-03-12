@@ -31,7 +31,7 @@
 			]
 		},
 		"NameComponent": {
-			"name": "CrossButton"
+			"name": "Lobby_BookInterface"
 		},
 		"UIComponent": {
 			"Overlay_name": "BookInterface",
@@ -41,7 +41,7 @@
 				1.0
 			],
 			"event_received": "",
-			"is_NDC": false,
+			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
@@ -51,16 +51,16 @@
 				1000.0
 			],
 			"position_NDC": [
-				-107374176.0,
-				-107374176.0
+				0.0,
+				0.0
 			],
 			"size": [
 				100.0,
 				100.0
 			],
 			"size_NDC": [
-				-107374176.0,
-				-107374176.0
+				1.0,
+				1.0
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,

@@ -3,7 +3,7 @@
 -- When player enters, trigger two chairs to drag across the floor
 
 local DEBUG = true
-local PLAYER_ENTITY_ID = 5
+local PLAYER_ENTITY_ID = 381
 
 local CHAIR_A_ID = 427
 local CHAIR_B_ID = 428

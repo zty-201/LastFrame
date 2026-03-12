@@ -1,7 +1,7 @@
 -- indoor_detector.lua
 print("[IndoorAudio] script file loaded")
 
-local PLAYER_ENTITY_ID = 5
+local PLAYER_ENTITY_ID = 381
 
 -- Shared across ALL zone scripts
 if _G.INDOOR_COUNT == nil then

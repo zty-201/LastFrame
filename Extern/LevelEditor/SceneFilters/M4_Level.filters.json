@@ -614,7 +614,7 @@
 			"name": "Storeroom"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				408,
 				409,
@@ -658,7 +658,10 @@
 				876,
 				875,
 				877,
-				894
+				894,
+				529,
+				530,
+				594
 			],
 			"name": "Lobby"
 		},
@@ -859,7 +862,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				5,
 				2,
@@ -908,8 +911,6 @@
 				524,
 				526,
 				503,
-				529,
-				530,
 				527,
 				502,
 				623
