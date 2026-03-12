@@ -1,4 +1,292 @@
 {
+	"496": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				5783730844627861507,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "InteractAction",
+			"hover_texture": [
+				5783730844627861507,
+				3711223656383638553
+			],
+			"idle_texture": [
+				8666034606144978945,
+				3711223656383638553
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 12790786505652355073
+				}
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "Android_Inventory_Buttons",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				833.8499755859375,
+				26.59999656677246
+			],
+			"position_NDC": [
+				0.800000011920929,
+				-0.800000011920929
+			],
+			"size": [
+				98.0999984741211,
+				53.20000076293945
+			],
+			"size_NDC": [
+				0.10000000149011612,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				8666034606144978945,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"497": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				6936652349234708497,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "ToggleFlashlight",
+			"hover_texture": [
+				7513113101538131987,
+				3711223656383638553
+			],
+			"idle_texture": [
+				6936652349234708497,
+				3711223656383638553
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 14082809425275846657
+				}
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "Android_Inventory_Buttons",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				873.0899658203125,
+				93.09999084472656
+			],
+			"position_NDC": [
+				0.8299999833106995,
+				-0.6000000238418579
+			],
+			"size": [
+				49.04999923706055,
+				26.600000381469727
+			],
+			"size_NDC": [
+				0.05000000074505806,
+				0.05000000074505806
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				6936652349234708497,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"498": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				13277720624572366863,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "AndroidPause",
+			"hover_texture": [
+				13277720624572366863,
+				3711223656383638553
+			],
+			"idle_texture": [
+				1172044826200473613,
+				3711223656383638553
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 17214236134338396161
+				}
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "Android_Inventory_Buttons",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				833.8499755859375,
+				452.1999816894531
+			],
+			"position_NDC": [
+				0.800000011920929,
+				0.800000011920929
+			],
+			"size": [
+				98.0999984741211,
+				53.20000076293945
+			],
+			"size_NDC": [
+				0.10000000149011612,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				1172044826200473613,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"499": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				1172044826200473607,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "AndroidCalibrate",
+			"hover_texture": [
+				1172044826200473607,
+				3711223656383638553
+			],
+			"idle_texture": [
+				3477887835414167557,
+				3711223656383638553
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 17190082062911111169
+				}
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "Android_Inventory_Buttons",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				1091.2000732421875,
+				88.12499237060547
+			],
+			"position_NDC": [
+				0.6000000238418579,
+				-0.800000011920929
+			],
+			"size": [
+				70.4000015258789,
+				58.75
+			],
+			"size_NDC": [
+				0.05000000074505806,
+				0.05000000074505806
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				3477887835414167557,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
 	"592": {
 		"ButtonComponent": {
 			"clicked_texture": [
@@ -133,254 +421,10 @@
 				0.05000000074505806,
 				0.05000000074505806
 			],
-			"textureid": [
-				1748505578503897097,
-				3711223656383638553
-			],
-			"visible": false
-		}
-	},
-	"853": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				5783730844627861507,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "InteractAction",
-			"hover_texture": [
-				5783730844627861507,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8666034606144978945,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 12790786505652355073
-				}
-			]
-		},
-		"UIComponent": {
-			"Overlay_name": "Android_Inventory_Buttons",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 2,
-			"luminance": 1.0,
-			"position": [
-				833.8499755859375,
-				26.59999656677246
-			],
-			"position_NDC": [
-				0.800000011920929,
-				-0.800000011920929
-			],
-			"size": [
-				98.0999984741211,
-				53.20000076293945
-			],
-			"size_NDC": [
-				0.10000000149011612,
-				0.10000000149011612
-			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				8666034606144978945,
-				3711223656383638553
-			],
-			"visible": false
-		}
-	},
-	"854": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				6936652349234708497,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "ToggleFlashlight",
-			"hover_texture": [
-				7513113101538131987,
-				3711223656383638553
-			],
-			"idle_texture": [
-				6936652349234708497,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 14082809425275846657
-				}
-			]
-		},
-		"UIComponent": {
-			"Overlay_name": "Android_Inventory_Buttons",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 2,
-			"luminance": 1.0,
-			"position": [
-				873.0899658203125,
-				93.09999084472656
-			],
-			"position_NDC": [
-				0.8299999833106995,
-				-0.6000000238418579
-			],
-			"size": [
-				49.04999923706055,
-				26.600000381469727
-			],
-			"size_NDC": [
-				0.05000000074505806,
-				0.05000000074505806
-			],
-			"textureid": [
-				6936652349234708497,
-				3711223656383638553
-			],
-			"visible": false
-		}
-	},
-	"855": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				13277720624572366863,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "AndroidPause",
-			"hover_texture": [
-				13277720624572366863,
-				3711223656383638553
-			],
-			"idle_texture": [
-				1172044826200473613,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 17214236134338396161
-				}
-			]
-		},
-		"UIComponent": {
-			"Overlay_name": "Android_Inventory_Buttons",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 2,
-			"luminance": 1.0,
-			"position": [
-				833.8499755859375,
-				452.1999816894531
-			],
-			"position_NDC": [
-				0.800000011920929,
-				0.800000011920929
-			],
-			"size": [
-				98.0999984741211,
-				53.20000076293945
-			],
-			"size_NDC": [
-				0.10000000149011612,
-				0.10000000149011612
-			],
-			"textureid": [
-				1172044826200473613,
-				3711223656383638553
-			],
-			"visible": false
-		}
-	},
-	"856": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				1172044826200473607,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "AndroidCalibrate",
-			"hover_texture": [
-				1172044826200473607,
-				3711223656383638553
-			],
-			"idle_texture": [
-				3477887835414167557,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 17190082062911111169
-				}
-			]
-		},
-		"UIComponent": {
-			"Overlay_name": "Android_Inventory_Buttons",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 2,
-			"luminance": 1.0,
-			"position": [
-				1091.2000732421875,
-				88.12499237060547
-			],
-			"position_NDC": [
-				0.6000000238418579,
-				-0.800000011920929
-			],
-			"size": [
-				70.4000015258789,
-				58.75
-			],
-			"size_NDC": [
-				0.05000000074505806,
-				0.05000000074505806
-			],
-			"textureid": [
-				3477887835414167557,
+				1748505578503897097,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,

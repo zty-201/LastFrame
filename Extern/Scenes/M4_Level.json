@@ -164,57 +164,6 @@
 			]
 		}
 	},
-	"10": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 6719529442629517315
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "UI_Joystick"
-		},
-		"UIComponent": {
-			"Overlay_name": "",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": false,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"position": [
-				166.0,
-				54.0
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				180.0,
-				180.0
-			],
-			"size_NDC": [
-				0.0,
-				0.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				3601763066940784643,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"visible": false
-		}
-	},
 	"100": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -347,6 +296,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -370,6 +320,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -2675,57 +2631,6 @@
 			]
 		}
 	},
-	"12": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 17128755557071454211
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "UI_Calibrate"
-		},
-		"UIComponent": {
-			"Overlay_name": "",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": false,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"position": [
-				1242.5,
-				106.5
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				75.0,
-				75.0
-			],
-			"size_NDC": [
-				0.0,
-				0.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"visible": false
-		}
-	},
 	"120": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -3769,79 +3674,6 @@
 			]
 		}
 	},
-	"13": {
-		"AudioComponent": {
-			"Slots": [
-				{
-					"ambienceType": 0,
-					"audio_guid": [
-						0,
-						0
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"id": "Slot1",
-					"loop": false,
-					"maxDistance": 25.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"useFade": false,
-					"volume": 1.0
-				}
-			]
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 5023079758699560965
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "UI_Flashlight"
-		},
-		"UIComponent": {
-			"Overlay_name": "",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": false,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"position": [
-				1998.0,
-				94.0
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				100.0,
-				100.0
-			],
-			"size_NDC": [
-				0.0,
-				0.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				14675252536616468483,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"visible": false
-		}
-	},
 	"130": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -4767,6 +4599,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				2204.0,
 				44.0
@@ -4790,6 +4623,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -38057,7 +37896,7 @@
 			"Enabled": true,
 			"Scripts": [
 				{
-					"Loaded": true,
+					"Loaded": false,
 					"ScriptGuid": 11594544244919762945
 				}
 			]
@@ -38379,6 +38218,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				512.5
@@ -38402,6 +38242,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -38421,6 +38267,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				200.0
@@ -38444,6 +38291,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -38480,6 +38333,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				336.25
@@ -38503,6 +38357,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -38539,6 +38399,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				688.75
@@ -38562,6 +38423,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -38578,6 +38445,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				200.0,
 				500.0
@@ -38601,6 +38469,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -38634,6 +38508,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				500.0
@@ -38657,6 +38532,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -38693,6 +38574,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				512.5
@@ -38716,6 +38598,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -38735,6 +38623,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				200.0
@@ -38758,6 +38647,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -38920,6 +38815,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				336.25
@@ -38943,6 +38839,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -38979,6 +38881,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				688.75
@@ -39002,6 +38905,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -39018,6 +38927,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				200.0,
 				500.0
@@ -39041,6 +38951,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -39074,6 +38990,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				500.0
@@ -39097,6 +39014,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -40392,6 +40315,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				512.5
@@ -40415,6 +40339,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -40434,6 +40364,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				200.0
@@ -40457,6 +40388,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -40493,6 +40430,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				336.25
@@ -40516,6 +40454,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -40552,6 +40496,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				688.75
@@ -40575,6 +40520,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -40591,6 +40542,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				200.0,
 				500.0
@@ -40614,6 +40566,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -40647,6 +40605,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				500.0
@@ -40670,6 +40629,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -44014,6 +43979,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				512.5
@@ -44037,6 +44003,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -44056,6 +44028,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				200.0
@@ -44079,6 +44052,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -44115,6 +44094,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				336.25
@@ -44138,6 +44118,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -44174,6 +44160,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				688.75
@@ -44197,6 +44184,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -44213,6 +44206,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				200.0,
 				500.0
@@ -44236,6 +44230,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -44269,6 +44269,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				500.0
@@ -44292,6 +44293,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -51027,13 +51034,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-910.1929321289063,
-				741.7752075195313,
-				787.9464721679688
+				42.07599639892578,
+				167.2401123046875,
+				-610.2456665039063
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
@@ -51214,6 +51221,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				512.5
@@ -51237,6 +51245,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -51256,6 +51270,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				200.0
@@ -51279,6 +51294,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -51315,6 +51336,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				336.25
@@ -51338,6 +51360,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -51374,6 +51402,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				688.75
@@ -51397,6 +51426,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -51413,6 +51448,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				200.0,
 				500.0
@@ -51436,6 +51472,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -51469,6 +51511,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				500.0
@@ -51492,6 +51535,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -53320,6 +53369,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				512.5
@@ -53343,6 +53393,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -53362,6 +53418,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				200.0
@@ -53385,6 +53442,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -53421,6 +53484,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				336.25
@@ -53444,6 +53508,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -53480,6 +53550,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				713.0,
 				688.75
@@ -53503,6 +53574,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -53519,6 +53596,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				200.0,
 				500.0
@@ -53542,6 +53620,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -53575,6 +53659,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				500.0
@@ -53598,6 +53683,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -61453,6 +61544,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -61476,6 +61568,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -61521,6 +61619,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -61544,6 +61643,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -61589,6 +61694,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -61612,6 +61718,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -61783,6 +61895,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -61806,6 +61919,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -61851,6 +61970,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -61874,6 +61994,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -61919,6 +62045,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -61942,6 +62069,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -61987,6 +62120,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -62010,6 +62144,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -62055,6 +62195,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -62078,6 +62219,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -62123,6 +62270,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -62146,6 +62294,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -62191,6 +62345,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -62214,6 +62369,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -62259,6 +62420,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -62282,6 +62444,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -62327,6 +62495,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -62350,6 +62519,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -62395,6 +62570,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -62418,6 +62594,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -62589,6 +62771,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -62612,6 +62795,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -69222,6 +69411,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -69245,6 +69435,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -69478,6 +69674,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -69501,6 +69698,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -69546,6 +69749,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -69569,6 +69773,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -69614,6 +69824,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -69637,6 +69848,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -85460,6 +85677,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -85483,6 +85701,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -85874,6 +86098,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -85897,6 +86122,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -86248,6 +86479,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				520.2000122070313,
 				528.75
@@ -86261,8 +86493,8 @@
 				117.5
 			],
 			"size_NDC": [
-				0.11999999731779099,
-				0.07999999821186066
+				0.05999999865889549,
+				0.03999999910593033
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
@@ -86271,6 +86503,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -86299,6 +86537,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				520.2000122070313,
 				528.75
@@ -86312,8 +86551,8 @@
 				117.5
 			],
 			"size_NDC": [
-				0.11999999731779099,
-				0.07999999821186066
+				0.05999999865889549,
+				0.03999999910593033
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
@@ -86322,6 +86561,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -86350,6 +86595,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -86363,8 +86609,8 @@
 				0.0
 			],
 			"size_NDC": [
-				0.11999999731779099,
-				0.07999999821186066
+				0.05999999865889549,
+				0.03999999910593033
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
@@ -86373,6 +86619,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -86401,6 +86653,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				520.2000122070313,
 				528.75
@@ -86414,8 +86667,8 @@
 				117.5
 			],
 			"size_NDC": [
-				0.11999999731779099,
-				0.07999999821186066
+				0.05999999865889549,
+				0.03999999910593033
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
@@ -86424,6 +86677,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -86452,6 +86711,7 @@
 			"layer": 1,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				173.39999389648438,
 				58.74999237060547
@@ -86475,6 +86735,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -92202,57 +92468,6 @@
 			]
 		}
 	},
-	"9": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 13060597717967175685
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "UI_JoystickBG"
-		},
-		"UIComponent": {
-			"Overlay_name": "",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": false,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"position": [
-				81.0,
-				-31.0
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				350.0,
-				350.0
-			],
-			"size_NDC": [
-				0.0,
-				0.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				13373202070917185537,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"visible": false
-		}
-	},
 	"90": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -92464,6 +92679,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -92487,6 +92703,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
