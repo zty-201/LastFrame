@@ -14,6 +14,27 @@ local transform   = nil
 local yaw, pitch  = 0.0, 0.0
 local lensMenuName = "DirtyLens"
 local lensVisible  = false
+local lensSuppressed = false -- true when player manually hides the overlay
+
+-- Camera shake
+local shakeTimer       = 0.0
+local shakeDuration    = 0.0
+local shakeAmplitude   = 0.0
+local shakeSpeed       = 0.0
+local shakeOffsetYaw   = 0.0
+local shakeOffsetPitch = 0.0
+local shakeTickTimer   = 0.0
+local SHAKE_TICK       = 0.04
+
+-- Camera pull (toward lock target during shake)
+local pullActive   = false
+local pullDuration = 0.0
+local pullTimer    = 0.0
+local pullAmount   = 0.0
+local pullStartX,  pullStartY,  pullStartZ  = 0.0, 0.0, 0.0
+local pullTargetX, pullTargetY, pullTargetZ = 0.0, 0.0, 0.0
+-- Holds the last pulled position so camera stays there after pull ends (while still locked)
+local lockedCamX, lockedCamY, lockedCamZ   = nil, nil, nil
 
 -- Recenter smoothing
 local recenterActive        = false
@@ -41,8 +62,28 @@ local function setMouseLookActive(active)
     Input.SetCursorVisible(not active)  -- hide cursor while locked
 end
 
+local function syncLensOverlayState()
+    if UI_IsMenuActive == nil then
+        return
+    end
+
+    local actualActive = UI_IsMenuActive(lensMenuName)
+    if lensVisible and not actualActive then
+        -- Player/level-editor hid the overlay manually, so respect it.
+        lensVisible = false
+        lensSuppressed = true
+    elseif (not lensVisible) and actualActive then
+        -- Player re-enabled it manually; resume automatic control.
+        lensVisible = true
+        lensSuppressed = false
+    end
+end
+
 local function setLensOverlayVisible(active)
     if active then
+        if lensSuppressed then
+            return
+        end
         if not lensVisible and UI_DisplayMenu ~= nil then
             UI_DisplayMenu(lensMenuName)
             lensVisible = true
@@ -55,11 +96,15 @@ local function setLensOverlayVisible(active)
                 UI_CloseAllMenus()
             end
             lensVisible = false
+            -- If we explicitly hid it, allow automatic control to resume later.
+            lensSuppressed = false
         end
     end
 end
 
 local function updateLensOverlayVisibility()
+    syncLensOverlayState()
+
     local cutscene = false
     if UI_IsCutscenePlaying ~= nil then
         cutscene = UI_IsCutscenePlaying()
@@ -100,9 +145,10 @@ function on_create(self)
         print("[player_pov_camera] Created SHARED.POV")
     end
 
-    SHARED.POV.yaw   = yaw
-    SHARED.POV.pitch = pitch
-    SHARED.POV.cam   = camera   -- <<<<<< THE FIX
+    SHARED.POV.yaw    = yaw
+    SHARED.POV.pitch  = pitch
+    SHARED.POV.cam    = camera   -- <<<<<< THE FIX
+    SHARED.POV.locked = false
 
     print("[player_pov_camera] Initialized. yaw=", yaw, " pitch=", pitch)
     updateLensOverlayVisibility()
@@ -113,7 +159,7 @@ end
 -- ============================================================
 -- Apply rotation + smoothing
 -- ============================================================
-local function applyLook()
+local function applyLook(overrideX, overrideY, overrideZ)
     -- Clamp pitch
     if pitch > pitchLimit then pitch = pitchLimit end
     if pitch < -pitchLimit then pitch = -pitchLimit end
@@ -143,16 +189,18 @@ local function applyLook()
     local fy = math.sin(radPitch)
     local fz = cosPitch * math.cos(radYaw)
 
-    -- -------------------------------
-    -- Smoothed camera follow
-    -- -------------------------------
-    local x, y, z = transform:GetPosition()
-    local smooth = 1.0
-
-    local cx, cy, cz = camera:GetPosition()
-    local nx = cx + (x - cx) * smooth
-    local ny = cy + (y - cy) * smooth
-    local nz = cz + (z - cz) * smooth
+    -- Use override position if provided (pull sequence), otherwise follow transform
+    local nx, ny, nz
+    if overrideX then
+        nx, ny, nz = overrideX, overrideY, overrideZ
+    else
+        local x, y, z = transform:GetPosition()
+        local smooth = 1.0
+        local cx, cy, cz = camera:GetPosition()
+        nx = cx + (x - cx) * smooth
+        ny = cy + (y - cy) * smooth
+        nz = cz + (z - cz) * smooth
+    end
 
     camera:SetPosition(nx, ny, nz)
     camera:LookAt(nx + fx, ny + fy, nz + fz)
@@ -186,6 +234,112 @@ function on_update(self, dt)
         recenterTargetPitch = 0.0
 
         SHARED.UI.recenterRequested = false
+    end
+
+    -- ======================================
+    -- CAMERA LOCK (scare sequences)
+    -- If SHARED.POV.lockTargetEntity is set, smoothly rotate toward it
+    -- ======================================
+    if SHARED and SHARED.POV and SHARED.POV.locked then
+        local targetEntityID = SHARED.POV.lockTargetEntity
+        if targetEntityID then
+            local targetTr = Query.GetTransform(targetEntityID)
+            if targetTr and transform then
+                local tx, ty, tz = targetTr:GetPosition()
+                local px, py, pz = transform:GetPosition()
+
+                local dx = tx - px
+                local dy = (ty + 60.0) - py
+                local dz = tz - pz
+                local hlen = math.sqrt(dx * dx + dz * dz)
+
+                local targetYaw   = math.deg(math.atan(dx, dz))
+                local targetPitch = math.deg(math.atan(dy, hlen))
+
+                local speed = 5.0
+                local function lerpAngle(a, b, t)
+                    local diff = (b - a + 540.0) % 360.0 - 180.0
+                    return a + diff * t
+                end
+                yaw   = lerpAngle(yaw,   targetYaw,   math.min(speed * dt, 1.0))
+                pitch = lerpAngle(pitch, targetPitch, math.min(speed * dt, 1.0))
+            end
+        end
+
+        -- Start shake if requested
+        if SHARED.POV.shake then
+            SHARED.POV.shake = false
+            shakeTimer     = 0.0
+            shakeTickTimer = 0.0
+            shakeDuration  = SHARED.POV.shakeDuration  or 1.2
+            shakeAmplitude = SHARED.POV.shakeAmplitude or 8.0
+            shakeSpeed     = SHARED.POV.shakeSpeed     or 0.04
+            shakeOffsetYaw   = 0.0
+            shakeOffsetPitch = 0.0
+
+            -- Start pull: bake start + target from player transform
+            pullActive   = true
+            pullTimer    = 0.0
+            pullDuration = shakeDuration
+            pullAmount   = SHARED.POV.shakePullAmount or 150.0
+            local px, py, pz = transform:GetPosition()
+            pullStartX, pullStartY, pullStartZ = px, py, pz
+            -- Compute target position (pullAmount units toward the doll)
+            if targetEntityID then
+                local tTr = Query.GetTransform(targetEntityID)
+                if tTr then
+                    local tx, ty, tz = tTr:GetPosition()
+                    ty = ty + 80.0   -- aim toward head, not base
+                    local dx, dy, dz = tx - px, ty - py, tz - pz
+                    local len = math.sqrt(dx*dx + dy*dy + dz*dz)
+                    if len > 0.001 then
+                        local move = math.min(pullAmount, len * 0.96)
+                        pullTargetX = px + (dx/len) * move
+                        pullTargetY = py + (dy/len) * move
+                        pullTargetZ = pz + (dz/len) * move
+                    else
+                        pullTargetX, pullTargetY, pullTargetZ = px, py, pz
+                    end
+                end
+            end
+        end
+
+        -- Apply shake offset on top of lock-on
+        if shakeTimer < shakeDuration then
+            shakeTimer     = shakeTimer + dt
+            shakeTickTimer = shakeTickTimer + dt
+            local t = shakeTimer / shakeDuration
+            local decay = 1.0 - t * t
+
+            if shakeTickTimer >= shakeSpeed then
+                shakeTickTimer = 0.0
+                shakeOffsetYaw   = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay
+                shakeOffsetPitch = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay * 0.6
+            end
+
+            yaw   = yaw   + shakeOffsetYaw
+            pitch = pitch + shakeOffsetPitch
+        end
+
+        -- Pull: compute lerped position and pass directly into applyLook (bypasses physics)
+        if pullActive then
+            pullTimer = pullTimer + dt
+            local t = math.min(pullTimer / pullDuration, 1.0)
+            if t >= 1.0 then pullActive = false end
+
+            lockedCamX = pullStartX + (pullTargetX - pullStartX) * t
+            lockedCamY = pullStartY + (pullTargetY - pullStartY) * t
+            lockedCamZ = pullStartZ + (pullTargetZ - pullStartZ) * t
+        end
+
+        -- Always use lockedCamX/Y/Z if set, so camera never snaps back while locked
+        if lockedCamX then
+            applyLook(lockedCamX, lockedCamY, lockedCamZ)
+        else
+            applyLook()
+        end
+
+        return
     end
 
     -- ======================================
@@ -271,6 +425,12 @@ end
 
 -- ============================================================
 function on_destroy()
+    local SHARED = getGlobalShared()
+    if SHARED and SHARED.POV then
+        SHARED.POV.locked           = false
+        SHARED.POV.lockTargetEntity = nil
+    end
+    lockedCamX, lockedCamY, lockedCamZ = nil, nil, nil
     if PLATFORM == "windows" then
         Input.SetCursorLocked(false)
         Input.SetCursorVisible(true)

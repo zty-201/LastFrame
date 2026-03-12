@@ -20,6 +20,8 @@ local FLASH_INTENSITY = 150000.0   -- big room-filling burst
 local FLASH_HOLD_TIME = 0.2       -- very brief peak
 local FLASH_FADE_TIME = 0.6       -- quick fade out
 
+local lastProcessedEventId = -1
+
 -- =========================
 -- INTERNAL STATE
 -- =========================
@@ -97,12 +99,15 @@ function on_update(self, dt)
     ------------------------------------------------
     -- TRIGGER FROM GHOST GIRL SCARE
     ------------------------------------------------
-    if not hasTriggered and lightningTable[SCARE_KEY] ~= nil then
+    local scareData = lightningTable[SCARE_KEY]
+
+    if scareData ~= nil and scareData.eventId ~= lastProcessedEventId then
+        lastProcessedEventId = scareData.eventId
         hasTriggered = true
         begin_flash_hold()
 
         if DEBUG then
-            print("[SF_FlashbangPointLight] Ghost scare flash triggered")
+            print("[SF_FlashbangPointLight] Ghost scare flash triggered, eventId = " .. tostring(scareData.eventId))
         end
     end
 

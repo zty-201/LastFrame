@@ -49,6 +49,7 @@ function on_create(self)
     SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
     SHARED.CANTEEN_DOOR_LOCKED = SHARED.CANTEEN_DOOR_LOCKED or {}
     SHARED.CANTEEN_DOOR_OPEN = SHARED.CANTEEN_DOOR_OPEN or {}
+    SHARED.CANTEEN_DOOR_OPENED_ONCE = SHARED.CANTEEN_DOOR_OPENED_ONCE or {}
     SHARED.SF_GIRL_ACTIVE = SHARED.SF_GIRL_ACTIVE or false
 
     local rx, ry, rz = tr:GetRotation()
@@ -67,6 +68,7 @@ function on_create(self)
     SHARED.CANTEEN_DOOR_LOCKED[EntityID] = false
     SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
     SHARED.SF_GIRL_ACTIVE = false
+    SHARED.CANTEEN_DOOR_OPENED_ONCE[EntityID] = false
 
     tr:SetRotation(rx, currentY, rz)
 
@@ -109,6 +111,7 @@ function on_update(self, dt)
                     isOpen = true
                     hasBeenOpenedByPlayer = true
                     SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
+                    SHARED.CANTEEN_DOOR_OPENED_ONCE[EntityID] = true
 
                     activate_sf_girl()
                     play_3d_sfx(DOOR_OPEN_SFX_ID)
@@ -126,6 +129,7 @@ function on_update(self, dt)
                 isOpen = true
                 hasBeenOpenedByPlayer = true
                 SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
+                SHARED.CANTEEN_DOOR_OPENED_ONCE[EntityID] = true
 
                 activate_sf_girl()
                 play_3d_sfx(DOOR_OPEN_SFX_ID)

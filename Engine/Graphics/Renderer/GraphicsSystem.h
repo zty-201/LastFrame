@@ -19,6 +19,7 @@
 
 #ifndef GRAPHICS_SYSTEM_HPP
 #define GRAPHICS_SYSTEM_HPP
+#include <unordered_set>
 #include "ISystem.hpp"
 #include "scene.h"
 #include "InstancingSystem.h"
@@ -26,6 +27,8 @@
 
 namespace EngineFramework
 {
+    class VideoClip;
+
     namespace TextureUnits
     {
         // Define texture units for the new shader bindings
@@ -220,6 +223,8 @@ namespace EngineFramework
         std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
         std::vector<glm::mat4> m_spotLightViewProjMatrices;
         std::vector<glm::mat4> m_pointLightViewProjMatrices;
+        std::unordered_set<VideoClip*> m_activeVideoAudio;
+        float m_lastFrameDeltaTime = 0.0f;
 
 
         std::vector<entt::entity> m_lightEntityMap;
@@ -272,9 +277,12 @@ namespace EngineFramework
 		// Previous frame matrices for temporal reprojection
         glm::mat4 m_prev_view_projection;
         
-	// Screen dimensions
+	    // Screen dimensions - pending for resizing (to fix flickers)
         glm::vec2 screen = { WIDTH,HEIGHT };
 		bool m_windowMinimized = false;
+        bool m_pendingResize = false;
+        int m_pendingWidth = WIDTH;
+        int m_pendingHeight = HEIGHT;
         
 		// Other flags
         bool show_debugDraw = false;
@@ -309,9 +317,10 @@ namespace EngineFramework
         void CalculateCascadeSplits(float nearPlane, float farPlane);
         std::array<glm::vec4, 6> ExtractFrustumPlanes(const glm::mat4& viewProj);
         void UpdateCascadeMatrices(const CameraComponent& camera, const glm::mat4& camView);
-        //==Event Handlers, one for each type of event.
+        // Event Handlers, one for each type of event to fix flicker issue when resizing
         void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);
+        void ApplyPendingResize();
 
         static inline GraphicsSystem* this_graphics_ptr = nullptr;
 

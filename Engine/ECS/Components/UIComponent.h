@@ -10,9 +10,20 @@
     - For game elements like those pop up icons, managed by scripts
 */
 
+#include <cstdint>
+
+namespace EngineFramework
+{
+    enum class AudioGroup : uint8_t;
+}
+
 struct UIComponent
 {
     xresource::full_guid textureid; // Name of the file to load
+    xresource::full_guid videoid;   // Optional video asset guid
+    bool play_video_audio = true;
+    float video_audio_volume = 1.0f;
+    int video_audio_group = 1; // matches EngineFramework::AudioGroup enum
     glm::vec2 position;      // X, Y in Pixels (from Bottom-Left or Top-Left)
     glm::vec2 size;          // Width, Height in Pixels
     glm::vec3 color = glm::vec3(1.0f); // Default White (No tint)

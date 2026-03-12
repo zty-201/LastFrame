@@ -26,6 +26,7 @@
 			"layer": 1,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				287.5625,
 				12.187484741210938
@@ -49,6 +50,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
@@ -68,6 +75,7 @@
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				287.5625,
 				12.187530517578125
@@ -91,6 +99,12 @@
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	}

@@ -13,7 +13,7 @@ local targetY = 0.0
 local MAINDOOR_CLOSE_SFX_ID = "CloseMaindoor"
 local SCARY_SFX_ID    = "Scary"
 
-local GIGGLE_DELAY_SECONDS = 0.0
+local GIGGLE_DELAY_SECONDS = 0.5
 
 -- Which entities are the “main doors”
 local MAIN_DOORS = {
