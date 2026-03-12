@@ -20,10 +20,10 @@ function on_create(self)
 end
 
 function on_trigger_enter(self, otherID)
-    print(string.format("[IndoorAudio] Trigger ENTER | Zone=%d | Other=%d", EntityID, otherID))
+    -- print(string.format("[IndoorAudio] Trigger ENTER | Zone=%d | Other=%d", EntityID, otherID))
 
     if otherID ~= PLAYER_ENTITY_ID then
-        print(string.format("[IndoorAudio] ENTER ignored: not player (PlayerID=%d).", PLAYER_ENTITY_ID))
+        -- print(string.format("[IndoorAudio] ENTER ignored: not player (PlayerID=%d).", PLAYER_ENTITY_ID))
         return
     end
 
@@ -38,10 +38,10 @@ function on_trigger_enter(self, otherID)
 end
 
 function on_trigger_exit(self, otherID)
-    print(string.format("[IndoorAudio] Trigger EXIT | Zone=%d | Other=%d", EntityID, otherID))
+    -- print(string.format("[IndoorAudio] Trigger EXIT | Zone=%d | Other=%d", EntityID, otherID))
 
     if otherID ~= PLAYER_ENTITY_ID then
-        print(string.format("[IndoorAudio] EXIT ignored: not player (PlayerID=%d).", PLAYER_ENTITY_ID))
+        -- print(string.format("[IndoorAudio] EXIT ignored: not player (PlayerID=%d).", PLAYER_ENTITY_ID))
         return
     end
 

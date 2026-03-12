@@ -1,10 +1,8 @@
 ----------------------------------------------------------------
--- SFX_Rooftop_SoftLightning.lua
--- Plays soft lightning SFX whenever the spotlight sends
--- a rooftop lightning cue.
+-- SFX_LightningEmitter.lua
 ----------------------------------------------------------------
 
-print("[RooftopSoftLightning] Script loaded")
+print("[LightningEmitter] Script loaded")
 
 local DEBUG = true
 
@@ -14,6 +12,7 @@ local LIGHTNING_TABLE = "LIGHTNING_CMD"
 local ROOFTOP_KEY = "ROOFTOP_LIGHTNING"
 
 local lastProcessedEventId = -1
+local myEntityID = -1
 
 local function play_3d_sfx(slotId)
     if slotId == nil then
@@ -21,11 +20,11 @@ local function play_3d_sfx(slotId)
     end
 
     if type(Audio_StopSlot) == "function" then
-        Audio_StopSlot(EntityID, slotId)
+        Audio_StopSlot(myEntityID, slotId)
     end
 
     if type(Audio_PlaySlot) == "function" then
-        Audio_PlaySlot(EntityID, slotId)
+        Audio_PlaySlot(myEntityID, slotId)
         return true
     end
 
@@ -33,14 +32,14 @@ local function play_3d_sfx(slotId)
 end
 
 function on_create(self)
+    myEntityID = EntityID
+
     SHARED = SHARED or {}
     SHARED[LIGHTNING_TABLE] = SHARED[LIGHTNING_TABLE] or {}
 
     lastProcessedEventId = -1
 
-    if DEBUG then
-        print("[RooftopSoftLightning] on_create EntityID =", EntityID)
-    end
+    print("[RooftopSoftLightning] on_create EntityID = " .. tostring(myEntityID))
 end
 
 function on_update(self, dt)
@@ -52,16 +51,17 @@ function on_update(self, dt)
 
     if lightningData ~= nil and lightningData.eventId ~= lastProcessedEventId then
         lastProcessedEventId = lightningData.eventId
+
+        print("[RooftopSoftLightning] EntityID = " .. tostring(myEntityID) ..
+              " received eventId = " .. tostring(lightningData.eventId))
+
         play_3d_sfx(LIGHTNING_SLOT_ID)
 
-        if DEBUG then
-            print("[RooftopSoftLightning] Played soft lightning for eventId = " .. tostring(lightningData.eventId))
-        end
+        print("[RooftopSoftLightning] EntityID = " .. tostring(myEntityID) ..
+              " played sound for eventId = " .. tostring(lightningData.eventId))
     end
 end
 
 function on_destroy(self)
-    if DEBUG then
-        print("[RooftopSoftLightning] destroyed")
-    end
+    print("[RooftopSoftLightning] destroyed EntityID = " .. tostring(myEntityID))
 end
