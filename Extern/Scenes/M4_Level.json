@@ -164,6 +164,86 @@
 			]
 		}
 	},
+	"10": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						12476449099908300817,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Scary",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 17509195523426107401
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Roof_TriggerBox"
+		},
+		"TransformComponent": {
+			"position": [
+				-12.612171173095703,
+				605.1454467773438,
+				740.4647827148438
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				150.0,
+				100.0,
+				150.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
+		}
+	},
 	"100": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -12635,9 +12715,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-403.79547119140625,
-				189.90533447265625,
-				776.2841186523438
+				-970.5499877929688,
+				723.7326049804688,
+				816.3548583984375
 			],
 			"rotation": [
 				-0.0,
@@ -20058,9 +20138,9 @@
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": false,
-					"volume": 5.0
+					"volume": 0.9860000014305115
 				},
 				{
 					"ambienceType": 0,
@@ -20076,14 +20156,14 @@
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": false,
 					"volume": 5.0
 				},
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						4982459319963795463,
+						13629370604515147787,
 						11537445004664754516
 					],
 					"category": 0,
@@ -20094,9 +20174,45 @@
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": false,
-					"volume": 1.6319999694824219
+					"volume": 1.5010000467300415
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						5002875276973588493,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Tension",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						15379168818435211273,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Lightning",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 0.5630000233650208
 				}
 			]
 		},
@@ -20184,7 +20300,7 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "little_girl",
+			"meshName": "girl",
 			"visibility": true
 		},
 		"NameComponent": {
@@ -20224,7 +20340,7 @@
 			],
 			"rotation": [
 				-0.00010427424422232434,
-				86.80000305175781,
+				90.0,
 				-0.00010427424422232434
 			],
 			"scale": [
@@ -38223,9 +38339,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-403.79547119140625,
-				190.70533752441406,
-				806.2841186523438
+				-970.5499877929688,
+				724.5325927734375,
+				846.3548583984375
 			],
 			"rotation": [
 				0.0,
@@ -40221,7 +40337,7 @@
 			"halfExtents": [
 				70.0,
 				100.0,
-				10.0
+				30.0
 			],
 			"localEulerDeg": [
 				0.0,
@@ -51115,13 +51231,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-403.79547119140625,
-				189.90533447265625,
-				776.2841186523438
+				-419.8573913574219,
+				129.453125,
+				707.4357299804688
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
@@ -60170,7 +60286,7 @@
 			],
 			"rotation": [
 				0.0,
-				105.95358276367188,
+				118.29222106933594,
 				0.0
 			],
 			"scale": [
@@ -60269,7 +60385,7 @@
 			],
 			"rotation": [
 				0.0,
-				105.95358276367188,
+				118.29222106933594,
 				0.0
 			],
 			"scale": [
@@ -78302,7 +78418,7 @@
 				},
 				{
 					"Loaded": true,
-					"ScriptGuid": 16102277991515799559
+					"ScriptGuid": 11168127248082157575
 				}
 			]
 		},
@@ -78349,7 +78465,7 @@
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "SF_Evidence_Folder"
+			"name": "SF_Evidence (Interactable)"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -78432,7 +78548,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -78440,13 +78556,22 @@
 			"radius": 600.0,
 			"type": 1
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6930785349034000389
+				}
+			]
+		},
 		"NameComponent": {
 			"name": "SF_Light_01"
 		},
 		"TransformComponent": {
 			"position": [
-				-140.77444458007813,
-				685.0228271484375,
+				-140.71043395996094,
+				685.3240966796875,
 				1062.279541015625
 			],
 			"rotation": [
@@ -78455,9 +78580,9 @@
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
@@ -86087,7 +86212,7 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "little_girl",
+			"meshName": "girl",
 			"visibility": true
 		},
 		"NameComponent": {
@@ -86485,7 +86610,7 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "little_girl",
+			"meshName": "girl",
 			"visibility": true
 		},
 		"NameComponent": {
@@ -87418,7 +87543,7 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "little_girl",
+			"meshName": "girl",
 			"visibility": true
 		},
 		"NameComponent": {
@@ -87478,7 +87603,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 40852.984375,
+			"intensity": 37866.25,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -92549,6 +92674,81 @@
 			]
 		}
 	},
+	"9": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 11744588000385581061
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "SF_Evidence_Icon"
+		},
+		"TransformComponent": {
+			"position": [
+				-112.35972595214844,
+				649.165771484375,
+				1059.4071044921875
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1434.0,
+				1053.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				15304296428018171923,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
 	"90": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -92724,7 +92924,7 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 5919903112755232771
+					"ScriptGuid": 13473970257275371523
 				}
 			]
 		},
@@ -92799,20 +92999,20 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						17288307986077253649,
+						11523700463043018791,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
 					"id": "OpenDoor",
 					"loop": false,
-					"maxDistance": 100.0,
+					"maxDistance": 200.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0410000085830688
+					"volume": 0.8299999833106995
 				}
 			]
 		},
@@ -92861,7 +93061,7 @@
 				},
 				{
 					"Loaded": true,
-					"ScriptGuid": 6496363865058656257
+					"ScriptGuid": 5403519725027442689
 				}
 			]
 		},
@@ -92944,7 +93144,7 @@
 			],
 			"rotation": [
 				-0.00010427392408018932,
-				89.99994659423828,
+				90.0,
 				2.049999952316284
 			],
 			"scale": [
@@ -92963,9 +93163,9 @@
 			],
 			"enabled": true,
 			"halfExtents": [
-				70.0,
+				60.0,
 				100.0,
-				10.0
+				30.0
 			],
 			"localEulerDeg": [
 				0.0,
@@ -93070,12 +93270,12 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 5683.76123046875,
+			"intensity": 50000.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
 			"quadratic": 0.03200000151991844,
-			"radius": 50000.0,
+			"radius": 2500.0,
 			"type": 2
 		},
 		"LuaScriptComponent": {

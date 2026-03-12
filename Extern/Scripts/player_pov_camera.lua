@@ -79,44 +79,44 @@ local function syncLensOverlayState()
     end
 end
 
-local function setLensOverlayVisible(active)
-    if active then
-        if lensSuppressed then
-            return
-        end
-        if not lensVisible and UI_DisplayMenu ~= nil then
-            UI_DisplayMenu(lensMenuName)
-            lensVisible = true
-        end
-    else
-        if lensVisible then
-            if UI_CloseMenu ~= nil then
-                UI_CloseMenu(lensMenuName)
-            elseif UI_CloseAllMenus ~= nil then
-                UI_CloseAllMenus()
-            end
-            lensVisible = false
-            -- If we explicitly hid it, allow automatic control to resume later.
-            lensSuppressed = false
-        end
-    end
-end
+-- local function setLensOverlayVisible(active)
+--     if active then
+--         if lensSuppressed then
+--             return
+--         end
+--         if not lensVisible and UI_DisplayMenu ~= nil then
+--             UI_DisplayMenu(lensMenuName)
+--             lensVisible = true
+--         end
+--     else
+--         if lensVisible then
+--             if UI_CloseMenu ~= nil then
+--                 UI_CloseMenu(lensMenuName)
+--             elseif UI_CloseAllMenus ~= nil then
+--                 UI_CloseAllMenus()
+--             end
+--             lensVisible = false
+--             -- If we explicitly hid it, allow automatic control to resume later.
+--             lensSuppressed = false
+--         end
+--     end
+-- end
 
-local function updateLensOverlayVisibility()
-    syncLensOverlayState()
+-- local function updateLensOverlayVisibility()
+--     syncLensOverlayState()
 
-    local cutscene = false
-    if UI_IsCutscenePlaying ~= nil then
-        cutscene = UI_IsCutscenePlaying()
-    end
+--     local cutscene = false
+--     if UI_IsCutscenePlaying ~= nil then
+--         cutscene = UI_IsCutscenePlaying()
+--     end
 
-    local startMenu = false
-    if UI_IsMenuActive ~= nil then
-        startMenu = UI_IsMenuActive("StartMenu")
-    end
+--     local startMenu = false
+--     if UI_IsMenuActive ~= nil then
+--         startMenu = UI_IsMenuActive("StartMenu")
+--     end
 
-    setLensOverlayVisible(not cutscene and not startMenu)
-end
+--     setLensOverlayVisible(not cutscene and not startMenu)
+-- end
 
 -- ============================================================
 function on_create(self)
@@ -151,7 +151,7 @@ function on_create(self)
     SHARED.POV.locked = false
 
     print("[player_pov_camera] Initialized. yaw=", yaw, " pitch=", pitch)
-    updateLensOverlayVisibility()
+    -- updateLensOverlayVisibility()
 end
 
 
@@ -217,7 +217,7 @@ end
 function on_update(self, dt)
     if not camera or not transform then return end
 
-    updateLensOverlayVisibility()
+    -- updateLensOverlayVisibility()
 
     local SHARED = getGlobalShared()
 
