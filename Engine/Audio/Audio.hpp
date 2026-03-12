@@ -67,6 +67,7 @@ namespace EngineFramework
         void PostUpdate(float delta_time) override;
 
         static AudioSystem& GetInstance() { return *this_system; }
+        static AudioSystem* TryGetInstance() { return this_system; }
 
         void SetPathResolver(std::function<std::string(const std::string&)> resolver);
         std::string ResolvePath(const std::string& logicalOrPath) const;
@@ -104,6 +105,12 @@ namespace EngineFramework
 
         void SetSimulationMode(bool enabled);
         void SetIndoorFactor(float factor); // 0.0 = outdoor, 1.0 = indoor
+#ifndef DISABLE_FMOD
+        FMOD::Sound* CreateSoundFromPCM(const void* data, size_t numBytes, uint32_t channels, uint32_t sampleRate, bool loop);
+        FMOD::Channel* PlayExternalSound(FMOD::Sound* sound, AudioGroup group, float volume);
+        void StopExternalChannel(FMOD::Channel*& channel);
+        void ReleaseExternalSound(FMOD::Sound*& sound);
+#endif
 
         AudioSystem();
         ~AudioSystem() override;

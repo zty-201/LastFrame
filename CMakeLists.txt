@@ -212,7 +212,10 @@ endif()
 set(SHARED_LIBRARIES entt glm json fmod glad Jolt stb_image xresource lua sol assimp openfbx gli CACHE INTERNAL "")
 
 #Also link important system libraries for opengl drawing
-set(WINDOWS_SHARED_LIBRARIES opengl32 gdi32 user32 kernel32 glfw3 compressonator CACHE INTERNAL "")
+set(WINDOWS_SHARED_LIBRARIES
+    opengl32 gdi32 user32 kernel32 glfw3 compressonator
+    mfplat mfreadwrite mfuuid propsys ole32
+    CACHE INTERNAL "")
 set(WINDOWS_DEBUG_LIBRARIES imgui CACHE INTERNAL "")
 set(WINDOWS_RELEASE_LIBRARIES CACHE INTERNAL "")
 set(ANDROID_LIBRARIES android log GLESv3 EGL CACHE INTERNAL "")
@@ -278,6 +281,10 @@ endif()
 # Get all cpp files in the engine, application folder and its subdirectories (including main.cpp)
 file(GLOB_RECURSE ENGINE_SOURCE "Engine/*.cpp" "Engine/*.c" "Engine/*.hpp" "Engine/*.h" "Application/*.cpp" "Application/*.c" "Application/*.hpp" "Application/*.h")
 list(REMOVE_ITEM ENGINE_SOURCE "Application/win_main.cpp") #Exclude files belonging to application_executable
+list(APPEND ENGINE_SOURCE
+    ${CMAKE_CURRENT_LIST_DIR}/Engine/Graphics/VideoClip.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Engine/Graphics/VideoClip.h
+)
 # Get only the main file for windows.
 file(GLOB APPLICATION_SOURCE "Application/win_main.cpp")
 # Get all cpp/hpp testing files

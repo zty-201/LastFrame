@@ -1,9 +1,14 @@
 #include "pch.hpp"
+#include <algorithm>
+#include <unordered_map>
+#include <unordered_set>
 #include "global.hpp"
 #include "Debug.h"
 #include "GraphicsSystem.h"
 #include "InputManager.hpp"
 #include "AssetManager.hpp"
+#include "VideoClip.h"
+#include "Audio.hpp"
 #include "MaterialComponent.h"
 #include "AnimationComponent.h"
 
@@ -14,6 +19,13 @@
 #ifdef PLATFORM_WINDOWS
 #include "compressonator.h"
 #endif
+
+// If want test android build on desktop : 
+// 1. uncomment this and set m_androidPlatform to true in SetupGLFW. 
+// 2. uncomment the variables in header
+// 3. comment everything under #if defined(PLATFORM_ANDROID) below.
+// #define PLATFORM_ANDROID  
+
 #define MAX_LIGHTS 64
 #define NUM_BLUE_NOISE_TEXTURES 16
 
@@ -181,6 +193,11 @@ namespace EngineFramework
         FBO tempPointShadowFBO(FBO::Default, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE);
         m_pointShadowFBO = std::move(tempPointShadowFBO);
 
+#ifdef PLATFORM_ANDROID
+		FBO tempGodRayFBO(FBO::Texture, WIDTH / 2, HEIGHT / 2, &m_godRayTextureID);
+		m_godRayFBO = std::move(tempGodRayFBO);
+#endif
+
         // Create framebuffer handle for point shadows
         glGenFramebuffers(1, &m_pointShadowFBO.handle);
         glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
@@ -210,16 +227,6 @@ namespace EngineFramework
         glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
         glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, 0);
-
-        // Get shader GUIDs 
-        mesh_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Mesh");
-        mesh_instanced_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "MeshInstanced");
-        skybox_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Skybox");
-        shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Shadow");
-        light_injection_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "LightInjection");
-        ray_march_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "RayMarch");
-        point_shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "PointShadow");
-        ui_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "UI");	
         
         // 1. Create SSBOs for lights
         glGenBuffers(FRAMES_IN_FLIGHT, m_lightSSBOs);
@@ -312,6 +319,11 @@ namespace EngineFramework
 
     void GraphicsSystem::RenderScene()
     {
+        // Call for ApplyPendingResize function at the top here once
+        // This is so that the framebuffer reallocation happens exactly once per frame and never mid-resize event
+        // which prevents the flickering previously seen
+        ApplyPendingResize();
+
         if (m_windowMinimized)
         {
             return;
@@ -355,16 +367,39 @@ namespace EngineFramework
         ShadowPass();
         // 2. Global uniform buffers (camera, light, cascades) 
         UpdateUBOs(*active_camera, V, P);
+
+#ifdef PLATFORM_WINDOWS
         // 3. Volumetric light injection
         VolumetricLightInjectionPass();
         //// 4. Volumetric ray march
         VolumetricRayMarchPass();
+#endif
         // 5. Mesh pass (3ms)
         MeshPass();
         // 6. Skybox pass
         SkyboxPass();
+
+#ifdef PLATFORM_ANDROID
+        GodRayPass();
+#endif
 		// 7. UI pass
 		RenderUI();
+
+#if defined(PLATFORM_ANDROID)
+        const GLenum depthDiscard[] = { GL_DEPTH_ATTACHMENT };
+
+        // Shadow maps no longer needed
+        glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_spotShadowFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+
+        // Main FBO depth no longer needed either
+        glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+#endif
         // 8. Copy to screen if we are not in level editor
         if (!m_isRenderingToFBO) {
             glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
@@ -372,11 +407,6 @@ namespace EngineFramework
             glBlitFramebuffer(0, 0, (GLint)screen.x, (GLint)screen.y,
                               0, 0, (GLint)screen.x, (GLint)screen.y,
                               GL_COLOR_BUFFER_BIT, GL_NEAREST);
-#if defined(PLATFORM_ANDROID)
-            // Tell the mobile GPU to throw away the depth data from the tile!
-            const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
-            glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, 1, discards);
-#endif
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 
@@ -603,8 +633,6 @@ namespace EngineFramework
         glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // Unbind
-        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind framebuffer
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
@@ -686,8 +714,6 @@ namespace EngineFramework
 
         glCullFace(GL_BACK);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
@@ -757,8 +783,6 @@ namespace EngineFramework
         glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // unbind indirect buffer
-        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind framebuffer
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
@@ -1081,7 +1105,7 @@ namespace EngineFramework
             // 2. Pass the global light/fog variables
             standard_shader->setUniform("u_NumPointLights", (int)m_LightData.size());
             standard_shader->setUniform("u_Tricubic", m_tricubic_filtering);
-            instanced_shader->setUniform("u_AndroidPlatform", m_androidPlatform);
+            standard_shader->setUniform("u_AndroidPlatform", m_androidPlatform);
             // ------------------------------
             // 
             // Reusable identity palette for non-skinned meshes
@@ -1285,7 +1309,15 @@ namespace EngineFramework
             entt::entity entity;
         };
 
+        struct VideoAudioParams
+        {
+            AudioGroup group;
+            float volume;
+        };
+
         std::vector<UIRenderItem> drawList;
+        std::unordered_set<VideoClip*> updatedVideos;
+        std::unordered_map<VideoClip*, VideoAudioParams> videoAudioRequests;
 
         for (auto [entity, ui] : view.each())
         {
@@ -1345,36 +1377,89 @@ namespace EngineFramework
                 }
             }
 
+            glActiveTexture(GL_TEXTURE0);
 
+            GLuint texID = m_defaultWhiteTexture;
+            bool videoBound = false;
+            std::shared_ptr<VideoClip> boundVideo;
 
+            if (!ui.videoid.empty())
+            {
+                auto video = AssetManagerSystem::GetResource<VideoClip>(ui.videoid);
+                if (video)
+                {
+                    if (updatedVideos.insert(video.get()).second)
+                    {
+                        video->Update(m_lastFrameDeltaTime);
+                    }
+                    if (video->IsReady())
+                    {
+                        texID = static_cast<GLuint>(video->GetTextureId());
+                        videoBound = true;
+                        boundVideo = video;
+                    }
+                }
+            }
 
-            // --- CALCULATE MODEL MATRIX ---
+            if (videoBound && boundVideo)
+            {
+                auto dims = boundVideo->GetDimensions();
+                if (dims.x > 0 && dims.y > 0 && finalSize.x > 0.0f && finalSize.y > 0.0f)
+                {
+                    float targetAspect = static_cast<float>(dims.x) / static_cast<float>(dims.y);
+                    float quadAspect = finalSize.x / finalSize.y;
+                    const float epsilon = 0.001f;
+                    bool adjusted = false;
+                    glm::vec2 fitted = finalSize;
+                    if (targetAspect > quadAspect + epsilon)
+                    {
+                        fitted.y = finalSize.x / targetAspect;
+                        adjusted = true;
+                    }
+                    else if (targetAspect + epsilon < quadAspect)
+                    {
+                        fitted.x = finalSize.y * targetAspect;
+                        adjusted = true;
+                    }
+                    if (adjusted)
+                    {
+                        glm::vec2 center = finalPos + finalSize * 0.5f;
+                        finalSize = fitted;
+                        finalPos = center - finalSize * 0.5f;
+                    }
+                }
+            }
+
+            if (!videoBound)
+            {
+                auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
+                texID = (tex) ? tex->id : m_defaultWhiteTexture;
+            }
+
+            if (videoBound && boundVideo && boundVideo->HasAudio() && ui.play_video_audio)
+            {
+                int groupValue = std::max(0, std::min(ui.video_audio_group, static_cast<int>(AudioGroup::Ambience)));
+                float audioVolume = std::clamp(ui.video_audio_volume, 0.0f, 1.0f);
+                videoAudioRequests[boundVideo.get()] = { static_cast<AudioGroup>(groupValue), audioVolume };
+            }
+
             glm::mat4 model = glm::mat4(1.0f);
-
-            // Use 'finalPos' instead of 'ui.position'
             model = glm::translate(model, glm::vec3(finalPos.x, finalPos.y, 0.0f));
-
-            // Use 'finalSize' instead of 'ui.size'
             model = glm::scale(model, glm::vec3(finalSize.x, finalSize.y, 1.0f));
-
-            // --- COMPENSATION FOR -1 TO 1 MESH ---
             model = glm::translate(model, glm::vec3(0.5f, 0.5f, 0.0f));
             model = glm::scale(model, glm::vec3(0.5f, 0.5f, 1.0f));
 
             shader->setUniform("u_Model", model);
             shader->setUniform("u_Color", glm::vec4(ui.color, 1.0f));
             shader->setUniform("u_Luminance", ui.luminance);
+            shader->setUniform("u_UseSubtitleReveal", ui.use_subtitle_reveal ? 1 : 0);
+            shader->setUniform("u_SubtitleRevealProgress", ui.subtitle_reveal_progress);
+            shader->setUniform("u_SubtitleRevealSoftness", ui.subtitle_reveal_softness);
+            shader->setUniform("u_HasVideoFrame", videoBound);
 
-            // --- BIND TEXTURE ---
-            glActiveTexture(GL_TEXTURE0);
-
-            auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
-            // Handle missing texture 
-            GLuint texID = (tex) ? tex->id : m_defaultWhiteTexture;
             glBindTexture(GL_TEXTURE_2D, texID);
             shader->setUniform("s_Texture", 0);
 
-            // --- DRAW ---
             glDrawElementsBaseVertex(
                 GL_TRIANGLES,
                 meshData->subMeshes[0].indexCount,
@@ -1385,8 +1470,23 @@ namespace EngineFramework
                 
         }
 
-            
         
+        
+
+        for (VideoClip* clip : m_activeVideoAudio)
+        {
+            if (videoAudioRequests.find(clip) == videoAudioRequests.end())
+            {
+                clip->StopAudioPlayback();
+            }
+        }
+
+        m_activeVideoAudio.clear();
+        for (auto& [clip, params] : videoAudioRequests)
+        {
+            clip->EnsureAudioPlayback(params.group, params.volume);
+            m_activeVideoAudio.insert(clip);
+        }
 
         shader->disuse();
 
@@ -1396,7 +1496,171 @@ namespace EngineFramework
         glDisable(GL_BLEND); // (Or keep enabled if your 3D engine uses it)
     }
 
+#ifdef PLATFORM_ANDROID
+    void GraphicsSystem::GodRayPass()
+    {
+        // 1. Get the Active Camera
+        auto active_camera_entity = GetFirstActiveCamera();
+        if (active_camera_entity == entt::null) return;
 
+        CameraComponent& camera = registry.get<CameraComponent>(active_camera_entity);
+        glm::mat4 V = Camera::getLookAt(camera);
+        float aspect = (screen.y > 0) ? (float)screen.x / screen.y : 1.0f;
+        glm::mat4 P = Camera::getPerspective(camera, aspect);
+        glm::mat4 viewProj = P * V;
+
+        // 2. Find the Directional Light
+        TransformComponent* dirLightTransform = nullptr;
+        for (auto [entity, light] : registry.view<LightComponent>().each()) {
+            if (light.type == LightComponent::DIRECTIONAL) {
+                if (auto* transform = registry.try_get<TransformComponent>(entity)) {
+                    dirLightTransform = transform;
+                }
+                break;
+            }
+        }
+
+        if (!dirLightTransform) return; // No sun, no god rays!
+
+        // 3. Calculate Light Direction (Reusing your existing Euler math)
+        float pitch = glm::radians(dirLightTransform->rotation.x);
+        float yaw = glm::radians(dirLightTransform->rotation.y);
+        glm::vec3 lightDir;
+        lightDir.x = cos(pitch) * sin(yaw);
+        lightDir.y = -sin(pitch);
+        lightDir.z = cos(pitch) * cos(yaw);
+        lightDir = glm::normalize(lightDir);
+
+        // 4. Pretend the sun is a physical point far away in the sky
+        // Light direction points FROM the sun, so we subtract it from the camera
+        glm::vec3 sunWorldPos = camera.position - (lightDir * camera.farPlane * 0.5f);
+
+        // 5. Project that 3D point onto our 2D screen
+        glm::vec4 clipSpace = viewProj * glm::vec4(sunWorldPos, 1.0f);
+
+        // 6. Calculate God Ray Intensity (Fade out if the sun is behind the camera)
+        // 6. Calculate God Ray Target Intensity
+        float targetIntensity = 1.0f;
+        glm::vec3 ndc = glm::vec3(clipSpace) / clipSpace.w;
+        glm::vec2 sunUV = (glm::vec2(ndc.x, ndc.y) + 1.0f) * 0.5f;
+
+        if (clipSpace.w <= 0.0f) {
+            targetIntensity = 0.0f; // Sun is behind us
+        }
+        else {
+            // SPATIAL FADE: Fade out smoothly as the sun moves off-screen
+            // ndc.x and ndc.y are 0.0 at the exact center of the screen
+            float distFromCenter = glm::length(glm::vec2(ndc.x, ndc.y));
+
+            // Starts fading when the sun is 80% to the edge, fully invisible at 150%
+            targetIntensity = 1.0f - glm::smoothstep(0.8f, 1.5f, distFromCenter);
+        }
+
+        // TEMPORAL FADE: Smoothly interpolate current intensity toward target intensity
+        // The 0.05f is the "fade speed". Lower = slower fade, Higher = faster fade.
+        m_currentGodRayIntensity = glm::mix(m_currentGodRayIntensity, targetIntensity, 0.05f);
+
+        
+
+        // --- At this point, sunUV is the exact 2D coordinate of your sun! ---
+
+        // --- STEP 3: EXECUTE THE RADIAL BLUR ---
+
+        // 1. Bind our new Half-Resolution God Ray FBO
+        glBindFramebuffer(GL_FRAMEBUFFER, m_godRayFBO.handle);
+
+        // Dynamically scale viewport to half of the current screen size
+        glViewport(0, 0, (GLsizei)(screen.x * 0.5f), (GLsizei)(screen.y * 0.5f));
+        glClear(GL_COLOR_BUFFER_BIT); // No depth buffer needed for 2D passes
+
+        // 2. Fetch the Shader
+        std::shared_ptr<ShaderProgram> shader{};
+        if (godray_shader_guid != xresource::full_guid{}) {
+            shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(godray_shader_guid);
+        }
+        else {
+            using E_AM = EngineFramework::AssetManagerSystem;
+            godray_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "GodRay");
+            shader = E_AM::GetResource<ShaderProgram>(godray_shader_guid);
+        }
+
+        if (!shader) return;
+        shader->use();
+
+        // 3. Bind the unblurred main scene texture as the input
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, sceneTextureID);
+        shader->setUniform("s_Texture", 0);
+
+        // 4. Send the CPU math to the GPU
+        shader->setUniform("u_SunPos", sunUV);
+        shader->setUniform("u_Intensity", m_currentGodRayIntensity);
+
+        // 5. Disable 3D states
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+
+        // 6. Draw the Full-Screen Quad
+        auto meshData = meshCache["Quad"];
+        glDrawElementsBaseVertex(
+            GL_TRIANGLES,
+            meshData->subMeshes[0].indexCount,
+            GL_UNSIGNED_SHORT,
+            (void*)(meshData->subMeshes[0].firstIndex * sizeof(Mesh::IndexType)),
+            meshData->subMeshes[0].baseVertex
+        );
+
+        shader->disuse();
+        // ==========================================
+        // --- STEP 4: THE COMPOSITE PASS ---
+        // ==========================================
+
+        // 1. Bind the main FBO to draw over our 3D scene
+        glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
+        glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
+
+        // 2. Enable Additive Blending (This makes the light add to the existing pixels)
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
+
+        // 3. Fetch the Composite Shader
+        std::shared_ptr<ShaderProgram> compShader{};
+        if (composite_shader_guid != xresource::full_guid{}) {
+            compShader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(composite_shader_guid);
+        }
+        else {
+            using E_AM = EngineFramework::AssetManagerSystem;
+            composite_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Composite");
+            compShader = E_AM::GetResource<ShaderProgram>(composite_shader_guid);
+        }
+
+        if (compShader) {
+            compShader->use();
+
+            // 4. Bind the blurred God Ray texture we just created
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_godRayTextureID);
+            compShader->setUniform("s_Texture", 0);
+
+            // 5. Draw the Full-Screen Quad again
+            glDrawElementsBaseVertex(
+                GL_TRIANGLES,
+                meshData->subMeshes[0].indexCount,
+                GL_UNSIGNED_SHORT,
+                (void*)(meshData->subMeshes[0].firstIndex * sizeof(Mesh::IndexType)),
+                meshData->subMeshes[0].baseVertex
+            );
+
+            compShader->disuse();
+        }
+
+        // 6. Restore Global State so we don't break the UI pass!
+        glDisable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+    }
+#endif
     void GraphicsSystem::LoadBlueNoiseTextures()
     {
         m_blue_noise_textures.resize(NUM_BLUE_NOISE_TEXTURES);
@@ -1682,6 +1946,36 @@ namespace EngineFramework
         return true;
     }
 
+    // Check if a resize was requested via the flag set by the event handler
+    // If it is requested, clamp the pending width & height to at least 1 pixel to avoid zero-sized fbos
+    // Save the currently bound GL_Texture 2D 
+    // Then call for mainFBO.resize function with the new dimensions and update the screen vector
+    // And restore the previous  texture binding and clear the pending flag
+    void GraphicsSystem::ApplyPendingResize()
+    {
+        if (!m_pendingResize)
+        {
+            return;
+        }
+
+        int newWidth = (m_pendingWidth > 0) ? m_pendingWidth : 1;
+        int newHeight = (m_pendingHeight > 0) ? m_pendingHeight : 1;
+
+        GLint prevTexture = 0;
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &prevTexture);
+
+        mainFBO.resize(newWidth, newHeight);
+#ifdef PLATFORM_ANDROID
+        m_godRayFBO.resize(std::max(1, newWidth / 2), std::max(1, newHeight / 2));
+#endif
+        screen.x = static_cast<float>(newWidth);
+        screen.y = static_cast<float>(newHeight);
+
+        glBindTexture(GL_TEXTURE_2D, prevTexture);
+
+        m_pendingResize = false;
+    }
+
     // Event Handlers
 
     void GraphicsSystem::HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled& editor_toggled)
@@ -1695,22 +1989,20 @@ namespace EngineFramework
         if (window_resize.width <= 0 || window_resize.height <= 0)
         {
             m_windowMinimized = true;
+            m_pendingResize = false;
             return;
         }
 
         m_windowMinimized = false;
+        m_pendingWidth = window_resize.width;
+        m_pendingHeight = window_resize.height;
+        m_pendingResize = true;
 
-        // Save current texture binding
-        GLint prevTexture;
-        glGetIntegerv(GL_TEXTURE_BINDING_2D, &prevTexture);
-
-        // Resize framebuffer and update screen size
-        mainFBO.resize(window_resize.width, window_resize.height);
-        screen.x = static_cast<float>(window_resize.width);
-        screen.y = static_cast<float>(window_resize.height);
-
-        // Restore previous texture binding
-        glBindTexture(GL_TEXTURE_2D, prevTexture);
+        if (!m_pendingResize)
+        {
+            m_pendingWidth = window_resize.width;
+            m_pendingHeight = window_resize.height;
+        }
     }
 
 } // namespace EngineFramework

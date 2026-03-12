@@ -19,7 +19,7 @@
 
 #ifndef GRAPHICS_SYSTEM_HPP
 #define GRAPHICS_SYSTEM_HPP
-
+#include <unordered_set>
 #include "ISystem.hpp"
 #include "scene.h"
 #include "InstancingSystem.h"
@@ -27,6 +27,8 @@
 
 namespace EngineFramework
 {
+    class VideoClip;
+
     namespace TextureUnits
     {
         // Define texture units for the new shader bindings
@@ -221,6 +223,8 @@ namespace EngineFramework
         std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
         std::vector<glm::mat4> m_spotLightViewProjMatrices;
         std::vector<glm::mat4> m_pointLightViewProjMatrices;
+        std::unordered_set<VideoClip*> m_activeVideoAudio;
+        float m_lastFrameDeltaTime = 0.0f;
 
 
         std::vector<entt::entity> m_lightEntityMap;
@@ -233,8 +237,17 @@ namespace EngineFramework
 		FBO m_pointShadowFBO;
 		FBO m_spotShadowFBO;
 
+		// andriod specific god ray resources
+#ifdef PLATFORM_ANDROID
+		FBO m_godRayFBO;
+        GLuint m_godRayTextureID = 0;
+        xresource::full_guid godray_shader_guid;
+        xresource::full_guid composite_shader_guid;
+        float m_currentGodRayIntensity = 0.0f;
+#endif
+
 		// FBO texture attachments
-        GLuint sceneTextureID;
+        GLuint sceneTextureID = 0;
         
 		// Light data for SSBO, updated each frame
         std::vector<LightSSBO> m_LightData;
@@ -264,9 +277,12 @@ namespace EngineFramework
 		// Previous frame matrices for temporal reprojection
         glm::mat4 m_prev_view_projection;
         
-	// Screen dimensions
+	    // Screen dimensions - pending for resizing (to fix flickers)
         glm::vec2 screen = { WIDTH,HEIGHT };
 		bool m_windowMinimized = false;
+        bool m_pendingResize = false;
+        int m_pendingWidth = WIDTH;
+        int m_pendingHeight = HEIGHT;
         
 		// Other flags
         bool show_debugDraw = false;
@@ -284,6 +300,10 @@ namespace EngineFramework
         void VolumetricRayMarchPass();
         void RenderUI();
 
+#ifdef PLATFORM_ANDROID
+        void GodRayPass();
+#endif
+
 		// Update methods
         void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
 		void UpdateLightSSBO();
@@ -297,9 +317,10 @@ namespace EngineFramework
         void CalculateCascadeSplits(float nearPlane, float farPlane);
         std::array<glm::vec4, 6> ExtractFrustumPlanes(const glm::mat4& viewProj);
         void UpdateCascadeMatrices(const CameraComponent& camera, const glm::mat4& camView);
-        //==Event Handlers, one for each type of event.
+        // Event Handlers, one for each type of event to fix flicker issue when resizing
         void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);
+        void ApplyPendingResize();
 
         static inline GraphicsSystem* this_graphics_ptr = nullptr;
 

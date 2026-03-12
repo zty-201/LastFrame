@@ -200,6 +200,10 @@ namespace EditorFeatures {
 					resolved = to_guid(AssetManagerSystem::SCRIPT_GUID);
 					};
 
+				auto try_video = [&]() {
+					resolved = to_guid(AssetManagerSystem::VIDEO_GUID);
+					};
+
 				if (tag) {
 					switch (tag->kind) {
 					case AssetPickerKind::Texture:
@@ -210,6 +214,9 @@ namespace EditorFeatures {
 						break;
 					case AssetPickerKind::Script:
 						try_script();
+						break;
+					case AssetPickerKind::Video:
+						try_video();
 						break;
 					default:
 						break;
@@ -222,6 +229,9 @@ namespace EditorFeatures {
 					}
 					else if (ext == ".wav" || ext == ".mp3") {
 						try_audio();
+					}
+					else if (ext == ".mp4" || ext == ".mov" || ext == ".mkv") {
+						try_video();
 					}
 					else if (ext == ".lua" || ext == ".json" || ext == ".txt") {
 						try_script();
