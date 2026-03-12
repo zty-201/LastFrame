@@ -1845,8 +1845,7 @@ namespace EngineFramework
                 {
                     color = IM_COL32(255, 165, 0, 255);
                 }
-                else if (!trg.highlightedEntities.empty())
-                {
+                else if (trg.is_collided_this_frame) {
                     color = IM_COL32(255, 255, 0, 255);
                 }
                 else
