@@ -31,5 +31,13 @@
   "MeshInstanced" : {
     "vertex":   "Extern/Graphics/Shader/MeshInstanced.vert",
     "fragment": "Extern/Graphics/Shader/Mesh.frag"
+  },
+  "GodRay" : {
+    "vertex":   "Extern/Graphics/Shader/GodRay.vert",
+    "fragment": "Extern/Graphics/Shader/GodRay.frag"
+  },
+  "Composite" : {
+    "vertex":   "Extern/Graphics/Shader/GodRay.vert",
+    "fragment": "Extern/Graphics/Shader/Composite.frag"
   }
 }

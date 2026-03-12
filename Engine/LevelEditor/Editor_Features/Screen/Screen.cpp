@@ -71,6 +71,10 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 //Audio
 #include "Audio.hpp"
 #include "UISystem.hpp"
+
+//State machine
+#include "StateMachineSystem.hpp"
+
 namespace EngineFramework
 {
     using namespace entt::literals;
@@ -495,7 +499,7 @@ namespace EngineFramework
                 drop_target();
                 colliderbox();
 
-                EngineFramework::TriggerSystem::Update(registry);
+                //EngineFramework::TriggerSystem::Update(registry);
                 auto tfView = registry.view<TransformComponent>();
                 for (auto ent : tfView)
                 {
@@ -1841,8 +1845,7 @@ namespace EngineFramework
                 {
                     color = IM_COL32(255, 165, 0, 255);
                 }
-                else if (!trg.highlightedEntities.empty())
-                {
+                else if (trg.is_collided_this_frame) {
                     color = IM_COL32(255, 255, 0, 255);
                 }
                 else
@@ -2158,14 +2161,23 @@ namespace EngineFramework
         /*
             HERE IS THE PROBLEM
         */
-
-        //SAVE MENU FIRST WHEN SIMULATION IS RUNNING
-        std::unordered_set<entt::entity> except_list = UI_System::GetInstance().Seralise_AllMenus(); 
-        //SERALISE INTO A STRING FOR SCENE FILES NOT MENU ENTITIES
+        // Save editor UI/entities before entering runtime
+        std::unordered_set<entt::entity> except_list = UI_System::GetInstance().Seralise_AllMenus();
         json_backup = EngineFramework::GameObjectSystem::GetInstance().SerializeAllEntityInstances(except_list);
-        //LOAD START MENU OF OVERLAY
-        UI_System::GetInstance().Load_Start_Menu(); //load the first menu
 
+        // Let the state machine drive the runtime flow
+        auto& sm = EngineFramework::StateMachineSystem::GetInstance().GetMachine();
+
+        // Reset runtime flow to Splash if you want full sequence
+        sm.SetBool("SplashFinished", false);
+        sm.SetBool("IntroCutsceneFinished", false);
+        sm.ResetTrigger("SkipSplash");
+        sm.ResetTrigger("StartIntro");
+        sm.ResetTrigger("SkipIntro");
+        sm.ResetTrigger("SkipIntroToGameplay");
+        sm.ResetTrigger("ReturnToMainMenu");
+
+        sm.SetInitialState("Splash");
 
         //get all entity
         //std::vector<entt::entity> entities;
@@ -2324,6 +2336,17 @@ namespace EngineFramework
 
             has_saved_cam_before_sim = false;
         }
+
+        //auto& sm = EngineFramework::StateMachineSystem::GetInstance().GetMachine();
+        //sm.SetBool("SplashFinished", false);
+        //sm.SetBool("IntroCutsceneFinished", false);
+        //sm.ResetTrigger("SkipSplash");
+        //sm.ResetTrigger("StartIntro");
+        //sm.ResetTrigger("SkipIntro");
+        //sm.ResetTrigger("SkipIntroToGameplay");
+        //sm.ResetTrigger("ReturnToMainMenu");
+
+        //sm.SetInitialState("MainMenu");
 
         EngineFramework::AudioSystem::GetInstance().SetSimulationMode(false);
         is_simulator_running = false;

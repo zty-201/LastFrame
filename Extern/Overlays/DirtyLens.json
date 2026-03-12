@@ -13,7 +13,9 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 100,
+			"lock_luminance": false,
 			"luminance": 0.3499999940395355,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -23,16 +25,25 @@
 				0.0
 			],
 			"size": [
-				2155.0,
+				1715.0,
 				1158.0
 			],
 			"size_NDC": [
 				1.0,
 				1.0
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				16190863482069467137,
-				3711223656383638553
+				0,
+				0
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
 			],
 			"visible": false
 		}

@@ -50,6 +50,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 //For platform android vs windows
 #include "Platform.h"
 
+#include "StateMachineSystem.hpp"
 #include "UISystem.hpp"
 
 namespace Engine {
@@ -255,6 +256,11 @@ namespace Engine {
                 return EngineFramework::GameObjectSystem::GetInstance().GetEntityName(e);
             });
 
+        s_Lua.set_function("StateMachine_SetTrigger", [](const std::string& triggerName)
+            {
+                auto& sm = EngineFramework::StateMachineSystem::GetInstance().GetMachine();
+                sm.SetTrigger(triggerName);
+            });
 
         s_Lua.set_function("UI_StartPseudoCutscene", []()
             {

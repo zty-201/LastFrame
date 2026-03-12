@@ -2,6 +2,7 @@
 -- Playroom Key Pickup 2.0.lua  (MODIFIED)
 -- + Slam mainhall doors shut
 -- + Immediately hide entity 157
+-- + Immediately unhide entity 893
 -- + WAIT 3s, then fade hall lights intensity from 0 -> 500
 -- + ✅ Show key pickup icon when in range
 -- + ✅ After pickup, key icon never shows again
@@ -16,8 +17,9 @@ local ITEM_QTY  = 1
 -- After key pickup, slam these doors shut
 local MAINHALL_DOOR_IDS = { 509, 26 }
 
--- Immediately hide this entity on pickup
-local IMMEDIATE_HIDE_ENTITY_ID = 157
+-- Immediately hide / unhide these entities on pickup
+local IMMEDIATE_HIDE_ENTITY_ID   = 157
+local IMMEDIATE_UNHIDE_ENTITY_ID = 893
 
 -- Lights to turn on (fade 0 -> 500 after a delay)
 -- Ordered cascade (FIRST → LAST)
@@ -81,6 +83,16 @@ local function hide_entity(id)
     local tr = Query.GetTransform(id)
     if tr then
         tr:SetScale(0.0, 0.0, 0.0)
+        return true
+    end
+    return false
+end
+
+local function unhide_entity(id)
+    if id == nil or id == 0 then return false end
+    local tr = Query.GetTransform(id)
+    if tr then
+        tr:SetScale(1.0, 1.0, 1.0)
         return true
     end
     return false
@@ -233,9 +245,10 @@ function on_update(Self, dt)
     end
 
     ----------------------------------------------------------------
-    -- 2) Immediately hide entity 157
+    -- 2) Immediately hide entity 157, then unhide entity 893
     ----------------------------------------------------------------
     hide_entity(IMMEDIATE_HIDE_ENTITY_ID)
+    unhide_entity(IMMEDIATE_UNHIDE_ENTITY_ID)
     play_3d_sfx_from(pickupId, KEY_PICKUP_SFX_ID)
 
     ----------------------------------------------------------------

@@ -20,6 +20,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "FileDialog.hpp"
 #include "HistorySystem.hpp"
 #include "scene.h"
+#include <algorithm>
 #include <cctype>
 #include <system_error>
 
@@ -179,9 +180,18 @@ namespace EngineFramework
                         std::string pathStr = entry.path().string();
 
                         //*****Set payload type for targets with specific requirements*****
-                        const char* payloadType;
-                        if (extension == ".png") payloadType = "Textures";
-                        else payloadType = "GENERAL";
+                        const char* payloadType = "GENERAL";
+                        std::string lowerExt = extension;
+                        std::transform(lowerExt.begin(), lowerExt.end(), lowerExt.begin(),
+                            [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+                        if (lowerExt == ".png" || lowerExt == ".jpg" || lowerExt == ".jpeg")
+                            payloadType = "Textures";
+                        else if (lowerExt == ".wav" || lowerExt == ".mp3")
+                            payloadType = "Audio";
+                        else if (lowerExt == ".lua" || lowerExt == ".json" || lowerExt == ".txt")
+                            payloadType = "Scripts";
+                        else if (lowerExt == ".mp4" || lowerExt == ".mov" || lowerExt == ".mkv")
+                            payloadType = "Videos";
 
                         ImGui::SetDragDropPayload(payloadType, pathStr.c_str(), pathStr.size() + 1);
 
