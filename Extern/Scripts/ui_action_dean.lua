@@ -48,11 +48,10 @@ function on_create(self)
 
     local Shared = getShared()
     local platform = (Shared and Shared.PLATFORM) or PLATFORM
-    local uiShared = ensureUIShared()
     -- Windows: hide the button UI
     if platform == "windows" then
-        --UI:SetVisible(false)
-        --return
+        UI:SetVisible(false)
+        return
     end
 
     --SHARED.UI_INVENTORY_OPEN = SHARED.UI_INVENTORY_OPEN or false
@@ -71,6 +70,8 @@ end
 function on_update(self, dt)
     
     -- Windows: nothing (UI hidden, flashlight probably on a key)
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
     if platform == "windows" then
         set_visible(false)
         return

@@ -26,7 +26,7 @@ end
 function on_button_ToggleFlashlight(self)
 
     local Shared = getShared()
-    local platform = (Shared and Shared.PLATFORM) or PLATFORM
+    --local platform = (Shared and Shared.PLATFORM) or PLATFORM
     
     if Shared then
 
@@ -61,6 +61,8 @@ end
 function on_update(self, dt)
     
     -- Windows: nothing (UI hidden, flashlight probably on a key)
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
     if platform == "windows" then
         return
     end

@@ -13,6 +13,10 @@ local function debug_print(...)
     end
 end
 
+local function getShared()
+    return rawget(_G, "SHARED")
+end
+
 local function set_visible(v)
     if EntityUI == nil then
         print("[UI_Inventory] ERROR: EntityUI is nil on entity " .. tostring(EntityID))
@@ -37,6 +41,8 @@ function on_create(self)
     end
 
     -- Windows: hide the button UI
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
     if platform == "windows" then
         UI:SetVisible(false)
         return
@@ -56,6 +62,8 @@ end
 function on_update(self, dt)
     
     -- Windows: nothing (UI hidden, flashlight probably on a key)
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
     if platform == "windows" then
         set_visible(false)
         return
