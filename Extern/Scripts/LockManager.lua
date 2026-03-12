@@ -7,7 +7,7 @@
 -- Button events from LockScreen number buttons drive this script.
 ----------------------------------------------------------------
 
-local COMBO      = { [0]=true, [1]=true, [2]=true, [4]=true }
+local COMBO      = { [0]=true, [9]=true, [1]=true, [3]=true }
 local MAX_FAILS  = 3
 local UI_TABLE   = "LOCKSCREEN_OPEN"
 

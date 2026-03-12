@@ -26,6 +26,21 @@ local shakeOffsetPitch = 0.0
 local shakeTickTimer   = 0.0
 local SHAKE_TICK       = 0.04
 
+local function tickShake(dt)
+    if shakeTimer >= shakeDuration then return end
+    shakeTimer     = shakeTimer     + dt
+    shakeTickTimer = shakeTickTimer + dt
+    local t     = shakeTimer / shakeDuration
+    local decay = 1.0 - t * t
+    if shakeTickTimer >= shakeSpeed then
+        shakeTickTimer = 0.0
+        shakeOffsetYaw   = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay
+        shakeOffsetPitch = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay * 0.6
+    end
+    yaw   = yaw   + shakeOffsetYaw
+    pitch = pitch + shakeOffsetPitch
+end
+
 -- Camera pull (toward lock target during shake)
 local pullActive   = false
 local pullDuration = 0.0
@@ -222,6 +237,20 @@ function on_update(self, dt)
     local SHARED = getGlobalShared()
 
     -- ======================================
+    -- FREE SHAKE (no camera lock required)
+    -- ======================================
+    if SHARED and SHARED.POV and SHARED.POV.freeShake then
+        SHARED.POV.freeShake = false
+        shakeTimer     = 0.0
+        shakeTickTimer = 0.0
+        shakeDuration  = SHARED.POV.shakeDuration  or 0.8
+        shakeAmplitude = SHARED.POV.shakeAmplitude or 6.0
+        shakeSpeed     = SHARED.POV.shakeSpeed     or 0.04
+        shakeOffsetYaw   = 0.0
+        shakeOffsetPitch = 0.0
+    end
+
+    -- ======================================
     -- HANDLE RECENTER REQUEST FROM UI
     -- ======================================
     if SHARED and SHARED.UI and SHARED.UI.recenterRequested then
@@ -305,21 +334,7 @@ function on_update(self, dt)
         end
 
         -- Apply shake offset on top of lock-on
-        if shakeTimer < shakeDuration then
-            shakeTimer     = shakeTimer + dt
-            shakeTickTimer = shakeTickTimer + dt
-            local t = shakeTimer / shakeDuration
-            local decay = 1.0 - t * t
-
-            if shakeTickTimer >= shakeSpeed then
-                shakeTickTimer = 0.0
-                shakeOffsetYaw   = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay
-                shakeOffsetPitch = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay * 0.6
-            end
-
-            yaw   = yaw   + shakeOffsetYaw
-            pitch = pitch + shakeOffsetPitch
-        end
+        tickShake(dt)
 
         -- Pull: compute lerped position and pass directly into applyLook (bypasses physics)
         if pullActive then
@@ -362,6 +377,7 @@ function on_update(self, dt)
             yaw   = recenterStartYaw   + (recenterTargetYaw   - recenterStartYaw)   * s
             pitch = recenterStartPitch + (recenterTargetPitch - recenterStartPitch) * s
 
+            tickShake(dt)
             applyLook()
             return
         end
@@ -387,7 +403,7 @@ function on_update(self, dt)
             pitch = pitch - dy * mouseSensitivity
         end
 
-
+        tickShake(dt)
         applyLook()
         return
     end
@@ -419,6 +435,7 @@ function on_update(self, dt)
         yaw   = yaw   + math.deg(gx) * dt * gyroSensitivity
         pitch = pitch - math.deg(gy) * dt * gyroSensitivity
 
+        tickShake(dt)
         applyLook()
     end
 end
