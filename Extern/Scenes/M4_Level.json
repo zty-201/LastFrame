@@ -2451,6 +2451,81 @@
 			]
 		}
 	},
+	"12": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 943962135629545477
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Masterroom_Folder_Icon"
+		},
+		"TransformComponent": {
+			"position": [
+				-94.61897277832031,
+				650.8886108398438,
+				1059.60107421875
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1545.0,
+				1158.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				15304296428018171923,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
 	"120": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -43469,9 +43544,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				1029.5682373046875,
-				69.70638275146484,
-				226.09068298339844
+				642.8716430664063,
+				68.80591583251953,
+				235.96548461914063
 			],
 			"rotation": [
 				30.849998474121094,
@@ -43479,9 +43554,9 @@
 				-35.89995193481445
 			],
 			"scale": [
-				0.9999994039535522,
-				0.9999998211860657,
-				0.9999992847442627
+				0.0,
+				0.0,
+				0.0
 			]
 		},
 		"TriggerBoxComponent": {
@@ -44861,9 +44936,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				5.243034362792969,
-				184.99998474121094,
-				-754.434326171875
+				19.717151641845703,
+				682.6803588867188,
+				1066.8643798828125
 			],
 			"rotation": [
 				0.0,
@@ -69055,7 +69130,7 @@
 				},
 				{
 					"Loaded": true,
-					"ScriptGuid": 16102277991515799559
+					"ScriptGuid": 13626098686304862215
 				}
 			]
 		},

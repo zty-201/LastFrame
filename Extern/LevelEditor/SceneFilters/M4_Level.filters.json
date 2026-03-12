@@ -817,7 +817,7 @@
 			"name": "SF_Corridor"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				724,
 				747,
@@ -863,7 +863,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				5,
 				2,
