@@ -1101,7 +1101,7 @@ namespace EngineFramework
             // 2. Pass the global light/fog variables
             standard_shader->setUniform("u_NumPointLights", (int)m_LightData.size());
             standard_shader->setUniform("u_Tricubic", m_tricubic_filtering);
-            instanced_shader->setUniform("u_AndroidPlatform", m_androidPlatform);
+            standard_shader->setUniform("u_AndroidPlatform", m_androidPlatform);
             // ------------------------------
             // 
             // Reusable identity palette for non-skinned meshes
