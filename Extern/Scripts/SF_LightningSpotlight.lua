@@ -19,17 +19,19 @@ local OFF_INTENSITY = 0.0
 -- NORMAL LIGHTNING CONFIG
 -- =========================
 
-local MIN_WAIT = 2.0
-local MAX_WAIT = 5.0
+local MIN_WAIT = 3.0
+local MAX_WAIT = 6.0
 
-local MIN_HOLD_TIME = 0.12
-local MAX_HOLD_TIME = 0.25
+local MIN_HOLD_TIME = 0.3
+local MAX_HOLD_TIME = 0.6
 
-local MIN_FADE_TIME = 0.25
-local MAX_FADE_TIME = 0.50
+local MIN_FADE_TIME = 0.5
+local MAX_FADE_TIME = 1.0
 
 local MIN_FLASHES = 1
-local MAX_FLASHES = 3
+local MAX_FLASHES = 1
+
+local lastProcessedEventId = -1
 
 -- =========================
 -- SCARE LIGHTNING CONFIG
@@ -76,7 +78,11 @@ end
 
 local function set_intensity(v)
     if EntityLight ~= nil then
-        EntityLight:SetIntensity(v)
+        if (_G.ROOFTOP_COUNT or 0) > 0 then
+            EntityLight:SetIntensity(OFF_INTENSITY)
+        else
+            EntityLight:SetIntensity(v)
+        end
     end
 end
 
@@ -107,6 +113,16 @@ local function begin_hold()
     isScareFlash = false
 
     set_intensity(NORMAL_INTENSITY)
+
+    SHARED = SHARED or {}
+    SHARED[LIGHTNING_TABLE] = SHARED[LIGHTNING_TABLE] or {}
+    SHARED.ROOFTOP_LIGHTNING_EVENT_ID = (SHARED.ROOFTOP_LIGHTNING_EVENT_ID or 0) + 1
+
+    SHARED[LIGHTNING_TABLE]["ROOFTOP_LIGHTNING"] = {
+        trigger = true,
+        by = EntityID,
+        eventId = SHARED.ROOFTOP_LIGHTNING_EVENT_ID
+    }
 end
 
 local function begin_scare_hold()
@@ -167,9 +183,10 @@ function on_update(self, dt)
     ------------------------------------------------
     local lightningTable = SHARED[LIGHTNING_TABLE]
 
-    if lightningTable[SCARE_KEY] ~= nil then
+    local scareData = lightningTable[SCARE_KEY]
 
-        lightningTable[SCARE_KEY] = nil
+    if scareData ~= nil and scareData.eventId ~= lastProcessedEventId then
+        lastProcessedEventId = scareData.eventId
 
         flashesRemaining = 1
         begin_scare_hold()
@@ -177,7 +194,7 @@ function on_update(self, dt)
         play_3d_sfx(THUNDER_SFX_ID)
 
         if DEBUG then
-            print("[SF_LightningSpotlight] Forced scare lightning")
+            print("[SF_LightningSpotlight] Forced scare lightning, eventId = " .. tostring(scareData.eventId))
         end
     end
 
