@@ -10,7 +10,10 @@
 // - Angles are in degrees to match typical editor UX.
 // - Local transform is relative to the entity's TransformComponent.
 // - Only one trigger per component. (Multiple triggers per entity = add multiple components or child entities.)
-
+namespace EngineFramework
+{
+    class TriggerSystem; //Forward declarations
+}
 enum class TriggerShapeType : uint8_t {
     Box = 0,
     Sphere,
@@ -44,10 +47,27 @@ struct TriggerBoxComponent
 
     // runtime
     std::unordered_set<entt::entity> currentInside;
-    std::unordered_set<entt::entity> highlightedEntities;
+    bool is_collided_this_frame = false;
 
     // --- runtime (filled by TriggerBuildSystem) ---
     static constexpr uint32_t InvalidId = 0xFFFFFFFFu;
     uint32_t            bodyId = InvalidId;              // engine/Jolt id (opaque here)
     bool                isRegistered = false;                   // created and added to the world this session
+
+private:
+    friend class EngineFramework::TriggerSystem;
+    // Temp values used to indicate any changes in current triggerbox, i.e. need recalculation //
+    glm::vec3 old_localPosition{};
+    glm::vec3 old_localEulerDeg{};
+    glm::vec3 old_halfExtents{};
+    float old_radius{};
+    float old_capHalfHeight{};
+    float old_capRadius{};
+    glm::vec3 old_parent_pos{};
+    glm::vec3 old_parent_rotation{};
+    glm::vec3 old_parent_scale{};
+
+    //Temp value of AABB, stored to prevent unnecessary recalculation.
+    glm::vec3 min{};
+    glm::vec3 max{};
 };
