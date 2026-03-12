@@ -77,6 +77,8 @@ namespace EngineFramework
         void StopEntitySlot(entt::entity entity, const std::string& slotId);
         // Stop all sounds start by this entity
         void StopAllForEntity(entt::entity entity);
+        // Set the volume of a currently playing slot on an entity
+        void SetEntitySlotVolume(entt::entity entity, const std::string& slotId, float volume);
 
         std::shared_ptr<SoundAsset> Load(const std::string& logicalOrPath, bool loop);
 

@@ -727,6 +727,15 @@ namespace Engine {
                 EngineFramework::AudioSystem::GetInstance().StopAllForEntity(e);
             });
 
+        // Set the volume of a specific playing slot on an entity (0.0 - 5.0)
+        // Example: Audio_SetSlotVolume(EntityID, "GirlLaughing", 0.8)
+        s_Lua.set_function("Audio_SetSlotVolume",
+            [](uint32_t entityId, const std::string& slotId, float volume)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                EngineFramework::AudioSystem::GetInstance().SetEntitySlotVolume(e, slotId, volume);
+            });
+
         // ===============================================================
         // AudioSystem  Mixer controls (Lua)
         // ===============================================================

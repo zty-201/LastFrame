@@ -431,7 +431,7 @@
 			"name": "Canteen"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				80,
 				240,
@@ -547,12 +547,13 @@
 				813,
 				814,
 				815,
-				816
+				816,
+				853
 			],
 			"name": "Bedroom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				39,
 				163,
@@ -836,12 +837,11 @@
 			"name": "SF_MasterRoom"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				259,
 				377,
-				379,
-				688
+				379
 			],
 			"name": "SFX"
 		},

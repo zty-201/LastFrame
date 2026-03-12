@@ -12776,9 +12776,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				529.6676635742188,
-				190.6817626953125,
-				-233.17698669433594
+				-426.7277526855469,
+				185.26197814941406,
+				763.0651245117188
 			],
 			"rotation": [
 				-0.0,
@@ -18612,11 +18612,11 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 16305133483762139137
+					"ScriptGuid": 12980210322841108481
 				},
 				{
 					"Loaded": true,
-					"ScriptGuid": 12980210322841108481
+					"ScriptGuid": 16305133483762139137
 				}
 			]
 		},
@@ -20148,20 +20148,74 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						2876789178491666467,
+						15921659061987917825,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 2.0,
+					"id": "GirlLaughing",
+					"loop": true,
+					"maxDistance": 400.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": true,
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						9417264931441426433,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"id": "Laughter",
-					"loop": true,
-					"maxDistance": 25.0,
+					"id": "StopLooking",
+					"loop": false,
+					"maxDistance": 500.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						4982459319963795463,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "EpicSound",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 3.4019999504089355
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						3691342623965118479,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "SubtleJingle",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 5.0
 				}
 			]
 		},
@@ -20206,7 +20260,7 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 16438974836715732999
+					"ScriptGuid": 1102054314682613761
 				}
 			]
 		},
@@ -20289,7 +20343,7 @@
 			],
 			"rotation": [
 				-0.00010427424422232434,
-				86.80000305175781,
+				88.4000015258789,
 				-0.00010427424422232434
 			],
 			"scale": [
@@ -38270,9 +38324,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				529.6676635742188,
-				191.4817657470703,
-				-218.17698669433594
+				-426.7277526855469,
+				186.06198120117188,
+				778.0651245117188
 			],
 			"rotation": [
 				0.0,
@@ -49831,7 +49885,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 162.97674560546875,
+			"intensity": 78.13717651367188,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -49989,7 +50043,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 198.10447692871094,
+			"intensity": 40.32706069946289,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50171,7 +50225,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 260.9292907714844,
+			"intensity": 101.97633361816406,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50263,7 +50317,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 307.89459228515625,
+			"intensity": 154.207275390625,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50355,7 +50409,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 171.30404663085938,
+			"intensity": 37.218788146972656,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50447,7 +50501,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 222.03652954101563,
+			"intensity": 141.1785125732422,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -50983,9 +51037,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				529.6676635742188,
-				190.6817626953125,
-				-248.17698669433594
+				-426.7277526855469,
+				185.26197814941406,
+				748.0651245117188
 			],
 			"rotation": [
 				0.0,
@@ -59943,7 +59997,7 @@
 			],
 			"rotation": [
 				0.0,
-				49.627140045166016,
+				32.451358795166016,
 				0.0
 			],
 			"scale": [
@@ -60078,7 +60132,7 @@
 			],
 			"rotation": [
 				0.0,
-				49.627140045166016,
+				32.451358795166016,
 				0.0
 			],
 			"scale": [
@@ -69155,7 +69209,7 @@
 				0.0
 			],
 			"size": [
-				1695.0,
+				1715.0,
 				1158.0
 			],
 			"size_NDC": [
@@ -69170,31 +69224,15 @@
 		}
 	},
 	"688": {
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 16438974836715732999
-				},
-				{
-					"Loaded": true,
-					"ScriptGuid": 16305133483762139137
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "SFX_Bedroom_Detector_01"
-		},
 		"TransformComponent": {
 			"position": [
-				820.0260009765625,
-				54.98077392578125,
-				1450.6590576171875
+				962.634033203125,
+				317.9293212890625,
+				1055.578125
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -69202,33 +69240,6 @@
 				1.0,
 				1.0
 			]
-		},
-		"TriggerBoxComponent": {
-			"capHalfHeight": 0.5,
-			"capRadius": 0.5,
-			"debugColor": [
-				0.10000000149011612,
-				0.800000011920929,
-				0.20000000298023224
-			],
-			"enabled": false,
-			"halfExtents": [
-				1500.0,
-				202.5500030517578,
-				500.0
-			],
-			"localEulerDeg": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"localPosition": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"radius": 0.5,
-			"type": 0
 		}
 	},
 	"69": {
@@ -87099,7 +87110,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 50000.0,
+			"intensity": 16919.224609375,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -87840,6 +87851,104 @@
 				1.0,
 				0.9999998211860657
 			]
+		}
+	},
+	"853": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 13939872914448990209
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 16305133483762139137
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Bedroom_Girl_Cry_TriggerBox"
+		},
+		"TransformComponent": {
+			"position": [
+				0.8110923767089844,
+				81.95301818847656,
+				1251.46630859375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				1000.0,
+				100.0,
+				250.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
 		}
 	},
 	"86": {
