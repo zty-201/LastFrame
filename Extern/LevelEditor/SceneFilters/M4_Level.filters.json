@@ -1,7 +1,7 @@
 {
 	"filters": [
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				0,
 				3,
@@ -142,7 +142,10 @@
 				829,
 				830,
 				831,
-				832
+				832,
+				833,
+				891,
+				892
 			],
 			"name": "Walls"
 		},
@@ -187,7 +190,8 @@
 				609,
 				1000,
 				612,
-				820
+				820,
+				893
 			],
 			"name": "Hall"
 		},
@@ -652,7 +656,8 @@
 				874,
 				876,
 				875,
-				877
+				877,
+				894
 			],
 			"name": "Lobby"
 		},
@@ -857,7 +862,7 @@
 			"name": "Player"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				9,
 				10,

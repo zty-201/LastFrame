@@ -14,7 +14,7 @@
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
-			"luminance": 1.0,
+			"luminance": 0.13223592936992645,
 			"position": [
 				0.0,
 				0.0
@@ -24,17 +24,20 @@
 				0.0
 			],
 			"size": [
-				1024.0,
-				681.0
+				755.0,
+				490.0
 			],
 			"size_NDC": [
 				1.0,
 				1.0
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				10554036806325616643,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -60,17 +63,20 @@
 				0.0
 			],
 			"size": [
-				1024.0,
-				681.0
+				755.0,
+				490.0
 			],
 			"size_NDC": [
 				1.0,
 				1.0
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				0,
 				0
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	}

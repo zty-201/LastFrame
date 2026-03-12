@@ -14,6 +14,13 @@
 #ifdef PLATFORM_WINDOWS
 #include "compressonator.h"
 #endif
+
+// If want test android build on desktop : 
+// 1. uncomment this and set m_androidPlatform to true in SetupGLFW. 
+// 2. uncomment the variables in header
+// 3. comment everything under #if defined(PLATFORM_ANDROID) below.
+// #define PLATFORM_ANDROID  
+
 #define MAX_LIGHTS 64
 #define NUM_BLUE_NOISE_TEXTURES 16
 
@@ -181,6 +188,11 @@ namespace EngineFramework
         FBO tempPointShadowFBO(FBO::Default, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE);
         m_pointShadowFBO = std::move(tempPointShadowFBO);
 
+#ifdef PLATFORM_ANDROID
+		FBO tempGodRayFBO(FBO::Texture, WIDTH / 2, HEIGHT / 2, &m_godRayTextureID);
+		m_godRayFBO = std::move(tempGodRayFBO);
+#endif
+
         // Create framebuffer handle for point shadows
         glGenFramebuffers(1, &m_pointShadowFBO.handle);
         glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
@@ -210,16 +222,6 @@ namespace EngineFramework
         glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
         glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, 0);
-
-        // Get shader GUIDs 
-        mesh_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Mesh");
-        mesh_instanced_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "MeshInstanced");
-        skybox_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Skybox");
-        shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "Shadow");
-        light_injection_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "LightInjection");
-        ray_march_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "RayMarch");
-        point_shadow_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "PointShadow");
-        ui_shader_guid = AssetMgr::GetFullGuid(AssetMgr::SHADER_GUID, "UI");	
         
         // 1. Create SSBOs for lights
         glGenBuffers(FRAMES_IN_FLIGHT, m_lightSSBOs);
@@ -360,6 +362,7 @@ namespace EngineFramework
         ShadowPass();
         // 2. Global uniform buffers (camera, light, cascades) 
         UpdateUBOs(*active_camera, V, P);
+
 #ifdef PLATFORM_WINDOWS
         // 3. Volumetric light injection
         VolumetricLightInjectionPass();
@@ -370,6 +373,10 @@ namespace EngineFramework
         MeshPass();
         // 6. Skybox pass
         SkyboxPass();
+
+#ifdef PLATFORM_ANDROID
+        GodRayPass();
+#endif
 		// 7. UI pass
 		RenderUI();
         // 8. Copy to screen if we are not in level editor
@@ -1372,10 +1379,18 @@ namespace EngineFramework
             shader->setUniform("u_Color", glm::vec4(ui.color, 1.0f));
             shader->setUniform("u_Luminance", ui.luminance);
 
+            shader->setUniform("u_UseSubtitleReveal", ui.use_subtitle_reveal ? 1 : 0);
+            shader->setUniform("u_SubtitleRevealProgress", ui.subtitle_reveal_progress);
+            shader->setUniform("u_SubtitleRevealSoftness", ui.subtitle_reveal_softness);
+
             // --- BIND TEXTURE ---
             glActiveTexture(GL_TEXTURE0);
 
             auto tex = AssetManagerSystem::GetResource<Scene::Texture>(ui.textureid);
+            //if (!tex)
+            //{
+            //    std::cout << "[UI Missing Texture] entity=" << (int)item.entity << "\n";
+            //}
             // Handle missing texture 
             GLuint texID = (tex) ? tex->id : m_defaultWhiteTexture;
             glBindTexture(GL_TEXTURE_2D, texID);
@@ -1403,7 +1418,171 @@ namespace EngineFramework
         glDisable(GL_BLEND); // (Or keep enabled if your 3D engine uses it)
     }
 
+#ifdef PLATFORM_ANDROID
+    void GraphicsSystem::GodRayPass()
+    {
+        // 1. Get the Active Camera
+        auto active_camera_entity = GetFirstActiveCamera();
+        if (active_camera_entity == entt::null) return;
 
+        CameraComponent& camera = registry.get<CameraComponent>(active_camera_entity);
+        glm::mat4 V = Camera::getLookAt(camera);
+        float aspect = (screen.y > 0) ? (float)screen.x / screen.y : 1.0f;
+        glm::mat4 P = Camera::getPerspective(camera, aspect);
+        glm::mat4 viewProj = P * V;
+
+        // 2. Find the Directional Light
+        TransformComponent* dirLightTransform = nullptr;
+        for (auto [entity, light] : registry.view<LightComponent>().each()) {
+            if (light.type == LightComponent::DIRECTIONAL) {
+                if (auto* transform = registry.try_get<TransformComponent>(entity)) {
+                    dirLightTransform = transform;
+                }
+                break;
+            }
+        }
+
+        if (!dirLightTransform) return; // No sun, no god rays!
+
+        // 3. Calculate Light Direction (Reusing your existing Euler math)
+        float pitch = glm::radians(dirLightTransform->rotation.x);
+        float yaw = glm::radians(dirLightTransform->rotation.y);
+        glm::vec3 lightDir;
+        lightDir.x = cos(pitch) * sin(yaw);
+        lightDir.y = -sin(pitch);
+        lightDir.z = cos(pitch) * cos(yaw);
+        lightDir = glm::normalize(lightDir);
+
+        // 4. Pretend the sun is a physical point far away in the sky
+        // Light direction points FROM the sun, so we subtract it from the camera
+        glm::vec3 sunWorldPos = camera.position - (lightDir * camera.farPlane * 0.5f);
+
+        // 5. Project that 3D point onto our 2D screen
+        glm::vec4 clipSpace = viewProj * glm::vec4(sunWorldPos, 1.0f);
+
+        // 6. Calculate God Ray Intensity (Fade out if the sun is behind the camera)
+        // 6. Calculate God Ray Target Intensity
+        float targetIntensity = 1.0f;
+        glm::vec3 ndc = glm::vec3(clipSpace) / clipSpace.w;
+        glm::vec2 sunUV = (glm::vec2(ndc.x, ndc.y) + 1.0f) * 0.5f;
+
+        if (clipSpace.w <= 0.0f) {
+            targetIntensity = 0.0f; // Sun is behind us
+        }
+        else {
+            // SPATIAL FADE: Fade out smoothly as the sun moves off-screen
+            // ndc.x and ndc.y are 0.0 at the exact center of the screen
+            float distFromCenter = glm::length(glm::vec2(ndc.x, ndc.y));
+
+            // Starts fading when the sun is 80% to the edge, fully invisible at 150%
+            targetIntensity = 1.0f - glm::smoothstep(0.8f, 1.5f, distFromCenter);
+        }
+
+        // TEMPORAL FADE: Smoothly interpolate current intensity toward target intensity
+        // The 0.05f is the "fade speed". Lower = slower fade, Higher = faster fade.
+        m_currentGodRayIntensity = glm::mix(m_currentGodRayIntensity, targetIntensity, 0.05f);
+
+        
+
+        // --- At this point, sunUV is the exact 2D coordinate of your sun! ---
+
+        // --- STEP 3: EXECUTE THE RADIAL BLUR ---
+
+        // 1. Bind our new Half-Resolution God Ray FBO
+        glBindFramebuffer(GL_FRAMEBUFFER, m_godRayFBO.handle);
+
+        // Dynamically scale viewport to half of the current screen size
+        glViewport(0, 0, (GLsizei)(screen.x * 0.5f), (GLsizei)(screen.y * 0.5f));
+        glClear(GL_COLOR_BUFFER_BIT); // No depth buffer needed for 2D passes
+
+        // 2. Fetch the Shader
+        std::shared_ptr<ShaderProgram> shader{};
+        if (godray_shader_guid != xresource::full_guid{}) {
+            shader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(godray_shader_guid);
+        }
+        else {
+            using E_AM = EngineFramework::AssetManagerSystem;
+            godray_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "GodRay");
+            shader = E_AM::GetResource<ShaderProgram>(godray_shader_guid);
+        }
+
+        if (!shader) return;
+        shader->use();
+
+        // 3. Bind the unblurred main scene texture as the input
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, sceneTextureID);
+        shader->setUniform("s_Texture", 0);
+
+        // 4. Send the CPU math to the GPU
+        shader->setUniform("u_SunPos", sunUV);
+        shader->setUniform("u_Intensity", m_currentGodRayIntensity);
+
+        // 5. Disable 3D states
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+
+        // 6. Draw the Full-Screen Quad
+        auto meshData = meshCache["Quad"];
+        glDrawElementsBaseVertex(
+            GL_TRIANGLES,
+            meshData->subMeshes[0].indexCount,
+            GL_UNSIGNED_SHORT,
+            (void*)(meshData->subMeshes[0].firstIndex * sizeof(Mesh::IndexType)),
+            meshData->subMeshes[0].baseVertex
+        );
+
+        shader->disuse();
+        // ==========================================
+        // --- STEP 4: THE COMPOSITE PASS ---
+        // ==========================================
+
+        // 1. Bind the main FBO to draw over our 3D scene
+        glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
+        glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
+
+        // 2. Enable Additive Blending (This makes the light add to the existing pixels)
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
+
+        // 3. Fetch the Composite Shader
+        std::shared_ptr<ShaderProgram> compShader{};
+        if (composite_shader_guid != xresource::full_guid{}) {
+            compShader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(composite_shader_guid);
+        }
+        else {
+            using E_AM = EngineFramework::AssetManagerSystem;
+            composite_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Composite");
+            compShader = E_AM::GetResource<ShaderProgram>(composite_shader_guid);
+        }
+
+        if (compShader) {
+            compShader->use();
+
+            // 4. Bind the blurred God Ray texture we just created
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_godRayTextureID);
+            compShader->setUniform("s_Texture", 0);
+
+            // 5. Draw the Full-Screen Quad again
+            glDrawElementsBaseVertex(
+                GL_TRIANGLES,
+                meshData->subMeshes[0].indexCount,
+                GL_UNSIGNED_SHORT,
+                (void*)(meshData->subMeshes[0].firstIndex * sizeof(Mesh::IndexType)),
+                meshData->subMeshes[0].baseVertex
+            );
+
+            compShader->disuse();
+        }
+
+        // 6. Restore Global State so we don't break the UI pass!
+        glDisable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+    }
+#endif
     void GraphicsSystem::LoadBlueNoiseTextures()
     {
         m_blue_noise_textures.resize(NUM_BLUE_NOISE_TEXTURES);
@@ -1737,6 +1916,22 @@ namespace EngineFramework
         m_pendingWidth = window_resize.width;
         m_pendingHeight = window_resize.height;
         m_pendingResize = true;
+
+        // Save current texture binding
+        GLint prevTexture;
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &prevTexture);
+
+        // Resize framebuffer and update screen size
+        mainFBO.resize(window_resize.width, window_resize.height);
+
+#ifdef PLATFORM_ANDROID
+        m_godRayFBO.resize(window_resize.width / 2, window_resize.height / 2);
+#endif
+        screen.x = static_cast<float>(window_resize.width);
+        screen.y = static_cast<float>(window_resize.height);
+
+        // Restore previous texture binding
+        glBindTexture(GL_TEXTURE_2D, prevTexture);
     }
 
 } // namespace EngineFramework

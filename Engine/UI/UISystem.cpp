@@ -69,6 +69,39 @@ namespace EngineFramework
         {
             SetMenuLuminance(menuName, 1.0f);
         }
+
+        static void SetMenuSubtitleReveal(const std::string& menuName, float progress)
+        {
+            auto it = EngineFramework::UI_System::Menu_Mapping.find(menuName);
+            if (it == EngineFramework::UI_System::Menu_Mapping.end() || !it->second.first)
+                return;
+
+            progress = std::clamp(progress, 0.0f, 1.0f);
+
+            auto entities = it->second.first->get_Elements();
+            for (auto e : entities)
+            {
+                if (registry.valid(e) && registry.all_of<UIComponent>(e))
+                {
+                    auto& ui = registry.get<UIComponent>(e);
+
+                    // Only apply to subtitle-like elements if you want all elements in the menu to reveal
+                    // then leave this unconditional.
+                    if (ui.use_subtitle_reveal)
+                    {
+                        ui.subtitle_reveal_progress = progress;
+                        std::cout << "[SubtitleReveal] " << menuName
+                            << " progress = " << progress << "\n";
+                    }
+                }
+            }
+        }
+
+        //static void ResetMenuSubtitleReveal(const std::string& menuName)
+        //{
+        //    SetMenuSubtitleReveal(menuName, 1.0f);
+        //}
+
         struct CutsceneSequence
         {
             bool playing = false;
@@ -150,6 +183,12 @@ namespace EngineFramework
 
                 // Animate luminance of the current scene
                 const std::string& currentScene = scenes[index];
+
+                // Subtitle reveal timing
+                float subtitleDuration = 1.0f;
+                float subtitleProgress = std::clamp(timer / subtitleDuration, 0.0f, 1.0f);
+                SetMenuSubtitleReveal(currentScene, subtitleProgress);
+
                 float luminance = 1.0f;
 
                 if (timer < fadeInTime)
@@ -276,17 +315,37 @@ namespace EngineFramework
 
     void UI_System::Update(float deltaTime)
     {
-        // Allow skipping cutscenes with Space
+        // Allow skipping cutscenes with Space (desktop) or tap anywhere (Android)
         if (gCutscene.playing)
         {
-            // Replace this line with your engine's exact "space pressed once" function if needed
+            bool shouldSkip = false;
+
+            // Desktop / existing input
             if (InputManager::GetInstance().GetAction("JUMP"))
+            {
+                shouldSkip = true;
+            }
+
+#if defined(PLATFORM_ANDROID)
+            // Tap-anywhere skip (rising edge only)
+            static bool wasTouchDownLastFrame = false;
+            bool isTouchDownThisFrame = InputManager::GetInstance().GetMouseButton(0);
+
+            if (isTouchDownThisFrame && !wasTouchDownLastFrame)
+            {
+                shouldSkip = true;
+            }
+
+            wasTouchDownLastFrame = isTouchDownThisFrame;
+#endif
+
+            if (shouldSkip)
             {
                 gCutscene.Skip();
             }
         }
 
-        // 1) Tick cutscene sequence FIRST (so it can swap menus at the right moment)
+        // 1) Tick cutscene sequence FIRST
         gCutscene.Update(deltaTime);
 
         // 2) Update only active menus
@@ -296,9 +355,9 @@ namespace EngineFramework
             {
                 if (menu.second)
                 {
-                    menu.first->Update(); // only update those active ones
-                    if (name == "AndroidInputOverlay") {
-                        // update joysticks
+                    menu.first->Update();
+                    if (name == "AndroidInputOverlay")
+                    {
                         update_Joysticks();
                     }
                 }

@@ -16,25 +16,28 @@
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"position": [
-				-211.39999389648438,
-				-14.699996948242188
+				-235.20001220703125,
+				-16.8900146484375
 			],
 			"position_NDC": [
 				-0.05999999865889549,
 				-0.05999999865889549
 			],
 			"size": [
-				1132.5,
-				490.0
+				1260.0,
+				563.0
 			],
 			"size_NDC": [
 				1.5,
 				1.0
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				12636907607043506183,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
 			"visible": false
 		}
 	},
@@ -63,17 +66,59 @@
 				0.0
 			],
 			"size": [
-				755.0,
-				490.0
+				840.0,
+				563.0
 			],
 			"size_NDC": [
 				1.0,
 				1.0
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				0,
 				0
 			],
+			"use_subtitle_reveal": false,
+			"visible": false
+		}
+	},
+	"898": {
+		"UIComponent": {
+			"Overlay_name": "Cutscene_4",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"position": [
+				42.0,
+				25.335004806518555
+			],
+			"position_NDC": [
+				0.0,
+				-0.8299999833106995
+			],
+			"size": [
+				756.0,
+				45.03999710083008
+			],
+			"size_NDC": [
+				0.8999999761581421,
+				0.07999999821186066
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				5213638463684034567,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": true,
 			"visible": false
 		}
 	}

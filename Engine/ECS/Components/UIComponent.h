@@ -23,6 +23,9 @@ struct UIComponent
     bool is_NDC = false;
     glm::vec2 position_NDC;
     glm::vec2 size_NDC;
+    bool use_subtitle_reveal = false;
+    float subtitle_reveal_progress = 1.0f; // 0 = fully hidden, 1 = fully shown
+    float subtitle_reveal_softness = 0.03f; // soft edge width
 
     //================ extra stuff for overlays =====================
     bool belong_to_menu;
