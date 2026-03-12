@@ -384,6 +384,22 @@ namespace EngineFramework
 #endif
 		// 7. UI pass
 		RenderUI();
+
+#if defined(PLATFORM_ANDROID)
+        const GLenum depthDiscard[] = { GL_DEPTH_ATTACHMENT };
+
+        // Shadow maps no longer needed
+        glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_spotShadowFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+
+        // Main FBO depth no longer needed either
+        glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+#endif
         // 8. Copy to screen if we are not in level editor
         if (!m_isRenderingToFBO) {
             glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
@@ -391,11 +407,6 @@ namespace EngineFramework
             glBlitFramebuffer(0, 0, (GLint)screen.x, (GLint)screen.y,
                               0, 0, (GLint)screen.x, (GLint)screen.y,
                               GL_COLOR_BUFFER_BIT, GL_NEAREST);
-#if defined(PLATFORM_ANDROID)
-            // Tell the mobile GPU to throw away the depth data from the tile!
-            const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
-            glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, 1, discards);
-#endif
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 
@@ -622,10 +633,7 @@ namespace EngineFramework
         glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // Unbind
-        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind framebuffer
-
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
     }
@@ -706,8 +714,6 @@ namespace EngineFramework
 
         glCullFace(GL_BACK);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
@@ -777,8 +783,6 @@ namespace EngineFramework
         glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // unbind indirect buffer
-        const GLenum discards[] = { GL_DEPTH_ATTACHMENT };
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, discards);
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind framebuffer
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
