@@ -1961,6 +1961,9 @@ namespace EngineFramework
         glGetIntegerv(GL_TEXTURE_BINDING_2D, &prevTexture);
 
         mainFBO.resize(newWidth, newHeight);
+#ifdef PLATFORM_ANDROID
+        m_godRayFBO.resize(std::max(1, newWidth / 2), std::max(1, newHeight / 2));
+#endif
         screen.x = static_cast<float>(newWidth);
         screen.y = static_cast<float>(newHeight);
 
@@ -1991,21 +1994,11 @@ namespace EngineFramework
         m_pendingHeight = window_resize.height;
         m_pendingResize = true;
 
-        // Save current texture binding
-        GLint prevTexture;
-        glGetIntegerv(GL_TEXTURE_BINDING_2D, &prevTexture);
-
-        // Resize framebuffer and update screen size
-        mainFBO.resize(window_resize.width, window_resize.height);
-
-#ifdef PLATFORM_ANDROID
-        m_godRayFBO.resize(window_resize.width / 2, window_resize.height / 2);
-#endif
-        screen.x = static_cast<float>(window_resize.width);
-        screen.y = static_cast<float>(window_resize.height);
-
-        // Restore previous texture binding
-        glBindTexture(GL_TEXTURE_2D, prevTexture);
+        if (!m_pendingResize)
+        {
+            m_pendingWidth = window_resize.width;
+            m_pendingHeight = window_resize.height;
+        }
     }
 
 } // namespace EngineFramework
