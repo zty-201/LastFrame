@@ -843,7 +843,7 @@ namespace EngineFramework
 
 	void AudioSystem::HANDLE_EVENT_Pause_Event(Pause_Event& event) {
 		
-		std::cout << "==================================hello pause event here from audio \n";
+		//std::cout << "==================================hello pause event here from audio \n";
 		event.is_pause = false;
 	}
 
