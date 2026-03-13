@@ -96,8 +96,20 @@ namespace EngineFramework
 		{
 			g_RequestQuit = true;
 		}
+
+		static void SetPaused(bool isPaused)
+		{
+			g_IsPaused = isPaused;
+		}
+
+		static bool IsPaused()
+		{
+			return g_IsPaused;
+		}
+
 		static inline bool g_RequestSceneRestart = false;
 		static inline bool g_RequestQuit = false;
+		static inline bool g_IsPaused = false;
 
 	private:
 		//Keep it private, as a singleton it should not have multiple instances. Call GetInstance instead.

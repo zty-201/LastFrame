@@ -28,6 +28,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "fmod_errors.h"
 #include "fmod_dsp.h"
 #include "SoundAsset.hpp"
+#include "event_structures.hpp"
 #endif
 
 struct AudioComponent;
@@ -107,6 +108,18 @@ namespace EngineFramework
 
         void SetSimulationMode(bool enabled);
         void SetIndoorFactor(float factor); // 0.0 = outdoor, 1.0 = indoor
+
+
+
+
+        //event_dispatcher.trigger<Pause_Event>(std::move(pause_event));
+        void HANDLE_EVENT_Pause_Event(Pause_Event& ello);
+
+
+
+
+
+
 #ifndef DISABLE_FMOD
         FMOD::Sound* CreateSoundFromPCM(const void* data, size_t numBytes, uint32_t channels, uint32_t sampleRate, bool loop);
         FMOD::Channel* PlayExternalSound(FMOD::Sound* sound, AudioGroup group, float volume);

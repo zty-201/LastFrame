@@ -202,6 +202,8 @@ namespace EngineFramework
 
 		m_inSimulation = true;
 
+		event_dispatcher.sink<Pause_Event>().connect<&AudioSystem::HANDLE_EVENT_Pause_Event>(this);
+
 	}
 
 	void AudioSystem::SetPathResolver(std::function<std::string(const std::string&)> resolver)
@@ -837,6 +839,16 @@ namespace EngineFramework
 #endif
 		}
 	}
+
+
+	void AudioSystem::HANDLE_EVENT_Pause_Event(Pause_Event& event) {
+		
+		//std::cout << "==================================hello pause event here from audio \n";
+		event.is_pause = false;
+	}
+
+
+
 
 	void AudioSystem::SetIndoorFactor(float factor)
 	{

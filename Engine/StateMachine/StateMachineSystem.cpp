@@ -28,6 +28,10 @@ namespace EngineFramework
         m_stateMachine.AddState(std::make_unique<MainMenuState>());
         m_stateMachine.AddState(std::make_unique<IntroCutsceneState>());
         m_stateMachine.AddState(std::make_unique<GameplayState>());
+        m_stateMachine.AddState(std::make_unique<PauseState>());
+        m_stateMachine.AddState(std::make_unique<EndCreditState>());
+        //
+
 
         // Splash -> Main Menu
         m_stateMachine.AddBoolTransition("Splash", "MainMenu", "SplashFinished", true);
@@ -41,7 +45,19 @@ namespace EngineFramework
         m_stateMachine.AddTriggerTransition("IntroCutscene", "Gameplay", "SkipIntro");
 
         // Gameplay to main menu
-        m_stateMachine.AddTriggerTransition("Gameplay", "MainMenu", "ReturnToMenu");
+        m_stateMachine.AddTriggerTransition("Gameplay", "MainMenu", "ReturnToMenu"); //should be removed, leave here for now
+
+        // Gameplay to main menu
+        m_stateMachine.AddTriggerTransition("Pause", "MainMenu", "ReturnToMenu");
+
+        // Gameplay to main menu
+        m_stateMachine.AddTriggerTransition("Gameplay", "Pause", "PauseGame");
+        m_stateMachine.AddTriggerTransition("Pause", "Gameplay", "BacktoGame");
+
+        // Gameplay to main menu
+        m_stateMachine.AddTriggerTransition("Gameplay", "EndCredit", "ToEndCredit");
+        m_stateMachine.AddTriggerTransition("Pause", "EndCredit", "ToEndCredit");
+        m_stateMachine.AddTriggerTransition("MainMenu", "EndCredit", "ToEndCredit");
 
 
         m_started = false;

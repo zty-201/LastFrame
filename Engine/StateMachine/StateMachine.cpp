@@ -259,6 +259,18 @@ namespace Engine
             return;
         }
 
+
+        //if (m_currentState->GetName() == "Pause" /*&& !triggered_already*/) {
+        //    //trigger event
+
+        //    /*Pause_Event pause_event{};
+        //    pause_event.is_pause = true;
+        //    event_dispatcher.trigger<Pause_Event>(std::move(pause_event));
+        //    */
+        //    std::cout << "hello, i already triggered this bitch =================================\n";
+        //}
+
+
         if (EvaluateTransitions(true))
         {
             if (!m_currentState)
@@ -400,6 +412,8 @@ namespace Engine
         {
             return false;
         }
+
+
 
         for (const Transition& transition : m_transitions)
         {

@@ -58,6 +58,13 @@ function on_destroy(self)
 end
 
 function on_update(self, dt)
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name == "Pause" then
+        return
+    end
+
+
+
     dt = dt or 0.016
 
     -- Heartbeat
@@ -96,6 +103,9 @@ function on_update(self, dt)
         if UI_IsCutscenePlaying == nil or not UI_IsCutscenePlaying() then
             UI_CloseAllMenus()
             UI_DisplayMenu("PauseMenu")
+            StateMachine_SetTrigger("PauseGame")
+            print("========================================= PauseGame Trigger ============================================================")
+            
         end
         return 
     end

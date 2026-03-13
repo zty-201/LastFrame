@@ -642,6 +642,7 @@ namespace EngineFramework
             it->second.first->draw_elements(false);
             current_menu = "";
             it->second.second = false;
+            it->second.first->set_AllbuttonState();
         }
     }
 
@@ -653,6 +654,7 @@ namespace EngineFramework
             {
                 menu.first->draw_elements(false);
                 menu.second = false;
+                menu.first->set_AllbuttonState();
             }
         }
 

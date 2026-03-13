@@ -435,6 +435,24 @@ namespace EngineFramework
         
     }
 
+    void UI_Menu::set_AllbuttonState(BUTTON_STATE state) {
+
+        for (auto entity : AllElements_in_this_overlay) {
+
+            if (registry.all_of<ButtonComponent>(entity)) {
+
+                /*
+                    SWAPPING OF TEXTURES FOR UI COMPONENT
+                */
+                auto& b = registry.get<ButtonComponent>(entity);
+                b.curr_button_state = state;
+                b.prev_button_state = state;
+
+            }
+        }
+
+    }
+
     void UI_Menu::draw_elements(bool value) {
 
         /*

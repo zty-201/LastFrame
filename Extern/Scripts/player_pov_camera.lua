@@ -5,7 +5,7 @@
 -- ============================================================
 
 local mouseSensitivity = 0.08
-local gyroSensitivity  = 5.0
+local gyroSensitivity  = 1.0
 local pitchLimit       = 89.0
 local gyroEnabled      = true
 
@@ -73,6 +73,39 @@ local lookButton   = GLFW_MOUSE_BUTTON_RIGHT
 local prevLookHeld = false
 
 -- ============================================================
+-- Gyro smoothing: dead zone + exponential moving average (EMA)
+--
+-- Two-stage pipeline:
+--   1. Dead zone: readings below GYRO_DEAD_ZONE rad/s are clamped to zero.
+--      The threshold is subtracted from surviving values so there is no
+--      sudden jump at the boundary.
+--   2. EMA: blends the dead-zoned value toward the accumulator each frame.
+--      This cuts out the remaining frame-to-frame variance without
+--      introducing any trigonometric functions.
+--
+-- Tuning:
+--   GYRO_DEAD_ZONE  raise if still jittery at rest (try 0.03), lower if
+--                   small intentional tilts feel unresponsive (try 0.01)
+--   GYRO_ALPHA      0.10 = very smooth/laggy, 0.25 = balanced, 0.40 = snappy
+-- ============================================================
+local GYRO_DEAD_ZONE = 0.02
+local GYRO_ALPHA     = 0.20
+
+local smoothedGx = 0.0
+local smoothedGy = 0.0
+
+local function applyDeadZone(rate)
+    local sign = 1.0
+    if rate < 0.0 then sign = -1.0 end
+    local abs = rate * sign
+    if abs < GYRO_DEAD_ZONE then
+        return 0.0
+    end
+    -- Subtract dead zone so output starts from 0, no pop at threshold
+    return sign * (abs - GYRO_DEAD_ZONE)
+end
+
+-- ============================================================
 -- Access true global table
 -- ============================================================
 local function getGlobalShared()
@@ -91,54 +124,13 @@ local function syncLensOverlayState()
 
     local actualActive = UI_IsMenuActive(lensMenuName)
     if lensVisible and not actualActive then
-        -- Player/level-editor hid the overlay manually, so respect it.
         lensVisible = false
         lensSuppressed = true
     elseif (not lensVisible) and actualActive then
-        -- Player re-enabled it manually; resume automatic control.
         lensVisible = true
         lensSuppressed = false
     end
 end
-
--- local function setLensOverlayVisible(active)
---     if active then
---         if lensSuppressed then
---             return
---         end
---         if not lensVisible and UI_DisplayMenu ~= nil then
---             UI_DisplayMenu(lensMenuName)
---             lensVisible = true
---         end
---     else
---         if lensVisible then
---             if UI_CloseMenu ~= nil then
---                 UI_CloseMenu(lensMenuName)
---             elseif UI_CloseAllMenus ~= nil then
---                 UI_CloseAllMenus()
---             end
---             lensVisible = false
---             -- If we explicitly hid it, allow automatic control to resume later.
---             lensSuppressed = false
---         end
---     end
--- end
-
--- local function updateLensOverlayVisibility()
---     syncLensOverlayState()
-
---     local cutscene = false
---     if UI_IsCutscenePlaying ~= nil then
---         cutscene = UI_IsCutscenePlaying()
---     end
-
---     local startMenu = false
---     if UI_IsMenuActive ~= nil then
---         startMenu = UI_IsMenuActive("StartMenu")
---     end
-
---     setLensOverlayVisible(not cutscene and not startMenu)
--- end
 
 -- ============================================================
 function on_create(self)
@@ -169,14 +161,11 @@ function on_create(self)
 
     SHARED.POV.yaw    = yaw
     SHARED.POV.pitch  = pitch
-    SHARED.POV.cam    = camera   -- <<<<<< THE FIX
+    SHARED.POV.cam    = camera
     SHARED.POV.locked = false
 
     print("[player_pov_camera] Initialized. yaw=", yaw, " pitch=", pitch)
-    -- updateLensOverlayVisibility()
 end
-
-
 
 -- ============================================================
 -- Apply rotation + smoothing
@@ -191,16 +180,6 @@ local function applyLook(overrideX, overrideY, overrideZ)
 
     if finalPitch > pitchLimit then finalPitch = pitchLimit end
     if finalPitch < -pitchLimit then finalPitch = -pitchLimit end
-
-    -- Make player model face where camera is yawing (keep existing pitch/roll)
-    --local rx, ry, rz = transform:GetRotation()
-
-    -- Common convention: yaw around Y axis
-    -- If your model faces the wrong direction, add +/-90 or 180 offset.
-    --transform:SetRotation(rx, yaw, rz)
-
-    -- Player position
-    --local x, y, z = transform:GetPosition()
 
     if Transform_SetRotation then
         Transform_SetRotation(EntityID, 0.0, finalYaw, 0.0)
@@ -233,19 +212,17 @@ local function applyLook(overrideX, overrideY, overrideZ)
     camera:SetPosition(nx, ny, nz)
     camera:LookAt(nx + fx, ny + fy, nz + fz)
 
-    -- <<<<<< UPDATE SHARED.POV EVERY FRAME
+    -- Update SHARED.POV every frame
     local SHARED = rawget(_G, "SHARED")
     if SHARED and SHARED.POV then
         SHARED.POV.yaw   = yaw
         SHARED.POV.pitch = pitch
-        SHARED.POV.cam   = camera   -- <<<<<< REQUIRED for raycast
+        SHARED.POV.cam   = camera
     end
 end
 
 function on_update(self, dt)
     if not camera or not transform then return end
-
-    -- updateLensOverlayVisibility()
 
     local SHARED = getGlobalShared()
 
@@ -267,12 +244,11 @@ function on_update(self, dt)
     -- HANDLE RECENTER REQUEST FROM UI
     -- ======================================
     if SHARED and SHARED.UI and SHARED.UI.recenterRequested then
-        -- Start a smooth recenter animation from current yaw/pitch
         recenterActive      = true
         recenterTime        = 0.0
         recenterStartYaw    = yaw
         recenterStartPitch  = pitch
-        recenterTargetYaw   = 0.0   -- change these if your "centre" is different
+        recenterTargetYaw   = 0.0
         recenterTargetPitch = 0.0
 
         SHARED.UI.recenterRequested = false
@@ -280,7 +256,6 @@ function on_update(self, dt)
 
     -- ======================================
     -- CAMERA LOCK (scare sequences)
-    -- If SHARED.POV.lockTargetEntity is set, smoothly rotate toward it
     -- ======================================
     if SHARED and SHARED.POV and SHARED.POV.locked then
         local targetEntityID = SHARED.POV.lockTargetEntity
@@ -319,19 +294,18 @@ function on_update(self, dt)
             shakeOffsetYaw   = 0.0
             shakeOffsetPitch = 0.0
 
-            -- Start pull: bake start + target from player transform
             pullActive   = true
             pullTimer    = 0.0
             pullDuration = shakeDuration
             pullAmount   = SHARED.POV.shakePullAmount or 150.0
             local px, py, pz = transform:GetPosition()
             pullStartX, pullStartY, pullStartZ = px, py, pz
-            -- Compute target position (pullAmount units toward the doll)
+
             if targetEntityID then
                 local tTr = Query.GetTransform(targetEntityID)
                 if tTr then
                     local tx, ty, tz = tTr:GetPosition()
-                    ty = ty + 80.0   -- aim toward head, not base
+                    ty = ty + 80.0
                     local dx, dy, dz = tx - px, ty - py, tz - pz
                     local len = math.sqrt(dx*dx + dy*dy + dz*dz)
                     if len > 0.001 then
@@ -346,10 +320,8 @@ function on_update(self, dt)
             end
         end
 
-        -- Apply shake offset on top of lock-on
         tickShake(dt)
 
-        -- Pull: compute lerped position and pass directly into applyLook (bypasses physics)
         if pullActive then
             pullTimer = pullTimer + dt
             local t = math.min(pullTimer / pullDuration, 1.0)
@@ -360,7 +332,6 @@ function on_update(self, dt)
             lockedCamZ = pullStartZ + (pullTargetZ - pullStartZ) * t
         end
 
-        -- Always use lockedCamX/Y/Z if set, so camera never snaps back while locked
         if lockedCamX then
             applyLook(lockedCamX, lockedCamY, lockedCamZ)
         else
@@ -376,7 +347,6 @@ function on_update(self, dt)
     if PLATFORM == "windows" then
 
         if recenterActive then
-            -- Progress smoothing
             recenterTime = recenterTime + dt
             local t = recenterTime / recenterDuration
             if t >= 1.0 then
@@ -384,7 +354,6 @@ function on_update(self, dt)
                 recenterActive = false
             end
 
-            -- Smoothstep (nicer than linear)
             local s = t * t * (3.0 - 2.0 * t)
 
             yaw   = recenterStartYaw   + (recenterTargetYaw   - recenterStartYaw)   * s
@@ -395,21 +364,16 @@ function on_update(self, dt)
             return
         end
 
-        -- Normal mouse look when not recentering
-        
-        -- FPS-style mouse look (hold RMB to look)
         local lookHeld = true
         if holdToLook then
             lookHeld = Input.GetMouseButton(lookButton)
         end
 
-        -- Toggle cursor lock/visibility when state changes
         if lookHeld ~= prevLookHeld then
             setMouseLookActive(lookHeld)
             prevLookHeld = lookHeld
         end
 
-        -- Apply look while locked
         if lookHeld then
             local dx, dy = Input.GetMouseDelta()
             yaw   = yaw + dx * mouseSensitivity
@@ -445,8 +409,17 @@ function on_update(self, dt)
 
         local gx, gy, gz = Input.GetGyroscopeRotatioRate()
 
-        yaw   = yaw   + math.deg(gx) * dt * gyroSensitivity
-        pitch = pitch - math.deg(gy) * dt * gyroSensitivity
+        -- Step 1: Dead zone — discard readings too small to be intentional
+        local dzGx = applyDeadZone(gx)
+        local dzGy = applyDeadZone(gy)
+
+        -- Step 2: EMA — smooths frame-to-frame variance on surviving values
+        smoothedGx = smoothedGx + (dzGx - smoothedGx) * GYRO_ALPHA
+        smoothedGy = smoothedGy + (dzGy - smoothedGy) * GYRO_ALPHA
+
+        -- Step 3: Apply to yaw/pitch
+        yaw   = yaw   + math.deg(smoothedGx) * dt * gyroSensitivity
+        pitch = pitch - math.deg(smoothedGy) * dt * gyroSensitivity
 
         tickShake(dt)
         applyLook()
