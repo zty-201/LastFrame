@@ -50,6 +50,7 @@ namespace EngineFramework
 
         // Gameplay to main menu
         m_stateMachine.AddTriggerTransition("Gameplay", "Pause", "PauseGame");
+        m_stateMachine.AddTriggerTransition("Pause", "Gameplay", "BacktoGame");
 
 
         m_started = false;
