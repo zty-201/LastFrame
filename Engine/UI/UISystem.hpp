@@ -80,6 +80,7 @@ namespace EngineFramework
         std::vector<entt::entity> get_Elements(){
             return AllElements_in_this_overlay;
         };
+        void set_AllbuttonState(BUTTON_STATE state = NO_STATE); //draw if overlay is active
 
     private:
 

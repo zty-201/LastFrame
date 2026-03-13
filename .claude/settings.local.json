@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python3 -c \"\nimport json\nwith open\\('C:/Users/foosh/Desktop/Gam300/LastFrame-Cheerios/Extern/Scenes/M4_Level.json'\\) as f:\n    data = json.load\\(f\\)\nentity = data.get\\('378'\\) or data.get\\(378\\)\nif entity:\n    print\\(json.dumps\\(entity, indent=2\\)\\)\nelse:\n    print\\('Entity 378 not found, keys sample:', list\\(data.keys\\(\\)\\)[:20]\\)\n\")"
-    ]
-  }
-}

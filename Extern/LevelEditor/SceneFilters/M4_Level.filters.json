@@ -435,7 +435,7 @@
 			"name": "Canteen"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				80,
 				240,
@@ -553,7 +553,8 @@
 				815,
 				816,
 				904,
-				991
+				991,
+				1002
 			],
 			"name": "Bedroom"
 		},
@@ -661,8 +662,7 @@
 				877,
 				894,
 				529,
-				530,
-				594
+				530
 			],
 			"name": "Lobby"
 		},
@@ -844,7 +844,9 @@
 				879,
 				880,
 				901,
-				902
+				902,
+				9,
+				1003
 			],
 			"name": "SF_MasterRoom"
 		},
@@ -863,7 +865,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				5,
 				2,
@@ -915,7 +917,7 @@
 			"name": "UI"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				825,
 				826,
