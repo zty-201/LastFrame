@@ -435,7 +435,7 @@
 			"name": "Canteen"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				80,
 				240,
