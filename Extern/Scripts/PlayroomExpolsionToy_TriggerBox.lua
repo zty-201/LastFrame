@@ -39,8 +39,7 @@ local function scale_ok()
     local tr = Query.GetTransform(TOY_ID)
     if tr == nil then return false end
     local sx, sy, sz = tr:GetScale()
-    local eps = 0.01
-    return not (sx < eps and sy < eps and sz < eps)
+    return not (sx == 0 and sy == 0 and sz == 0)
 end
 
 local function consume_toggle(id)

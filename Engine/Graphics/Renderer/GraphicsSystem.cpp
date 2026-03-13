@@ -24,7 +24,7 @@
 // 1. uncomment this and set m_androidPlatform to true in SetupGLFW. 
 // 2. uncomment the variables in header
 // 3. comment everything under #if defined(PLATFORM_ANDROID) below.
-//#define PLATFORM_ANDROID  
+// #define PLATFORM_ANDROID  
 
 #define MAX_LIGHTS 64
 #define NUM_BLUE_NOISE_TEXTURES 16
@@ -41,21 +41,21 @@ class LevelEditor; // forward declaration
 #if defined(PLATFORM_ANDROID)
 
 // smaller shadow maps and voxel grids on mobile for performance reasons.
-#define SHADOW_WIDTH 512
-#define SHADOW_HEIGHT 512
+#define SHADOW_WIDTH 1024
+#define SHADOW_HEIGHT 1024
 
 #define POINT_SHADOW_SIZE 256
 
-#define MAX_SHADOW_CASTING_SPOTLIGHTS 4
-#define MAX_SHADOW_CASTING_POINT_LIGHTS 4
+#define MAX_SHADOW_CASTING_SPOTLIGHTS 16
+#define MAX_SHADOW_CASTING_POINT_LIGHTS 8
 
 // On Android, we must use clock_gettime
 #include <time.h>
 
 static inline double get_native_time() {
-   struct timespec now;
-   clock_gettime(CLOCK_MONOTONIC, &now);
-   return (double)now.tv_sec + (double)now.tv_nsec / 1e9;
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    return (double)now.tv_sec + (double)now.tv_nsec / 1e9;
 }
 
 #endif
@@ -76,7 +76,6 @@ static inline double get_native_time() {
 static inline double get_native_time() {
     return glfwGetTime();
 }
-
 #endif
 
 namespace EngineFramework
@@ -354,8 +353,6 @@ namespace EngineFramework
         // Update point light SSBO (1ms)
         UpdateLightSSBO();
 
-        //->BuildSceneBatches();
-        //->BuildSceneBatches();
 		// Update the instancing system (modelmatrix update + batch building + compute culling dispatch)
         m_instancingSystem->UpdateAndDispatchCompute(
             viewProj, 
@@ -364,7 +361,6 @@ namespace EngineFramework
             m_pointLightViewProjMatrices
         );
 
-		
 		// ---------------------------- Rendering Passes -----------------------------
         m_geometryBuffer->Bind();
         // 1. Shadow pass (directional + point) (around 2ms)
@@ -393,12 +389,12 @@ namespace EngineFramework
         const GLenum depthDiscard[] = { GL_DEPTH_ATTACHMENT };
 
         // Shadow maps no longer needed
-        /*glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
         glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
         glBindFramebuffer(GL_FRAMEBUFFER, m_spotShadowFBO.handle);
         glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
         glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);*/
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
 
         // Main FBO depth no longer needed either
         glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);

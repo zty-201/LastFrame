@@ -74,10 +74,7 @@ function on_update(self, dt)
 
     -- Only on transitions do we change cursor/lock
     if open ~= uiWasOpen then
-        if open then
-            set_ui_input(true)   -- opening: show cursor, unlock mouse
-        end
-        -- closing: do NOT hide cursor here; camera's hold-to-look (RMB) manages it
+        set_ui_input(open)
         uiWasOpen = open
         if DEBUG then
             print("[BookInterface_Root] UI open changed ->", tostring(open))
