@@ -233,8 +233,10 @@ function on_update(self, dt)
         if rotateTimer >= ROTATE_AFTER_PULL_DELAY then
             rotateAfterPull = false
             Transform_SetRotation(EntityID, 0.0, 270.0, 0.0)
+            SHARED = SHARED or {}
+            SHARED.PLAYER_DEAD = true
             if DEBUG then
-                print("[EvidenceGirlLookAt] Pull done -> rotated girl to 270 degrees")
+                print("[EvidenceGirlLookAt] Pull done -> rotated girl to 270 degrees, signalling game over")
             end
         end
     end
