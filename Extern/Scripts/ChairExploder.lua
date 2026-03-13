@@ -71,17 +71,6 @@ function on_create(Self)
         log("Explosion triggered!")
 
         ------------------------------------------------
-        -- Camera shake
-        ------------------------------------------------
-        local SH = rawget(_G, "SHARED")
-        if SH and SH.POV then
-            SH.POV.freeShake    = true
-            SH.POV.shakeDuration  = 0.8
-            SH.POV.shakeAmplitude = 7.0
-            SH.POV.shakeSpeed     = 0.04
-        end
-
-        ------------------------------------------------
         -- Play explosion audio from this entity
         ------------------------------------------------
         if type(Audio_PlaySlot) == "function" then

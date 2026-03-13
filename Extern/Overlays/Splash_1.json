@@ -1,5 +1,5 @@
 {
-	"884": {
+	"882": {
 		"NameComponent": {
 			"name": "SplashScreenDPLogo"
 		},
@@ -18,15 +18,15 @@
 			"play_video_audio": true,
 			"position": [
 				0.0,
-				258.0
+				170.25
 			],
 			"position_NDC": [
 				0.0,
 				0.0
 			],
 			"size": [
-				1725.0,
-				516.0
+				1024.0,
+				340.5
 			],
 			"size_NDC": [
 				1.0,
@@ -48,7 +48,7 @@
 			"visible": false
 		}
 	},
-	"885": {
+	"883": {
 		"NameComponent": {
 			"name": "SplashScreenBG"
 		},
@@ -74,8 +74,8 @@
 				0.0
 			],
 			"size": [
-				1725.0,
-				1032.0
+				1024.0,
+				681.0
 			],
 			"size_NDC": [
 				1.0,

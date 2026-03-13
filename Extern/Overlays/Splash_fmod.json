@@ -1,5 +1,5 @@
 {
-	"890": {
+	"889": {
 		"NameComponent": {
 			"name": "Logo_fmod"
 		},
@@ -17,7 +17,7 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				73.79998779296875,
+				75.5,
 				137.5
 			],
 			"position_NDC": [
@@ -25,7 +25,7 @@
 				0.0
 			],
 			"size": [
-				590.4000244140625,
+				604.0,
 				275.0
 			],
 			"size_NDC": [
@@ -48,7 +48,7 @@
 			"visible": false
 		}
 	},
-	"992": {
+	"890": {
 		"NameComponent": {
 			"name": "blackbg_fmod"
 		},
@@ -74,7 +74,7 @@
 				0.0
 			],
 			"size": [
-				738.0,
+				755.0,
 				550.0
 			],
 			"size_NDC": [

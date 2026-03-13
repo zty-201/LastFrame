@@ -374,19 +374,15 @@ namespace EngineFramework
 
         float screenWidth = (float)InputManager::GetInstance().GetScreenSize().first;
         float screenHeight = (float)InputManager::GetInstance().GetScreenSize().second;
-        auto& lua = Engine::ScriptSystem::GetLuaState();
 
         for (auto [entity, joystick] : view.each())
         {
-            if (!registry.valid(joystick.knobEntity))
+            for (auto [e, nameComp] : registry.view<NameComponent>().each())
             {
-                for (auto [e, nameComp] : registry.view<NameComponent>().each())
+                if (nameComp.name == joystick.knobTargetName)
                 {
-                    if (nameComp.name == joystick.knobTargetName)
-                    {
-                        joystick.knobEntity = e;
-                        break;
-                    }
+                    joystick.knobEntity = e;
+                    break;
                 }
             }
 
@@ -395,16 +391,11 @@ namespace EngineFramework
                 auto& bgUI = registry.get<UIComponent>(entity);
                 if (bgUI.is_NDC)
                 {
-                    float trueCenterX = bgUI.position_NDC.x;
-                    float trueCenterY = bgUI.position_NDC.y;
+                    float trueCenterX = bgUI.position_NDC.x + (bgUI.size_NDC.x / 2.f);
+                    float trueCenterY = bgUI.position_NDC.y + (bgUI.size_NDC.y / 2.f);
 
                     joystick.baseCenter.x = ((trueCenterX + 1.f) / 2.f) * screenWidth;
                     joystick.baseCenter.y = ((1.f - trueCenterY) / 2.f) * screenHeight;
-                }
-                else
-                {
-                    joystick.baseCenter.x = bgUI.position.x;
-                    joystick.baseCenter.y = bgUI.position.y;
                 }
             }
 
@@ -436,6 +427,10 @@ namespace EngineFramework
                     joystick.outputX = currentOffset.x / joystick.maxRadius;
                     joystick.outputY = currentOffset.y / joystick.maxRadius;
                 }
+
+                auto& lua = Engine::ScriptSystem::GetLuaState();
+                lua["SHARED"]["UI"]["joystickX"] = joystick.outputX;
+                lua["SHARED"]["UI"]["joystickY"] = joystick.outputY;
             }
             else
             {
@@ -443,15 +438,12 @@ namespace EngineFramework
                 if (joystick.isBeingDragged)
                 {
                     joystick.isBeingDragged = false;
-                    joystick.outputX = 0.f;
-                    joystick.outputY = 0.f;
+                    joystick.outputX = joystick.outputY = 0.f;
                 }
+                auto& lua = Engine::ScriptSystem::GetLuaState();
+                lua["SHARED"]["UI"]["joystickX"] = 0.0f;
+                lua["SHARED"]["UI"]["joystickY"] = 0.0f;
             }
-
-            std::string luaKeyX = joystick.knobTargetName + "_X";
-            std::string luaKeyY = joystick.knobTargetName + "_Y";
-            lua["SHARED"]["UI"][luaKeyX] = joystick.outputX;
-            lua["SHARED"]["UI"][luaKeyY] = joystick.outputY;
 
             if (registry.valid(joystick.knobEntity) && registry.all_of<UIComponent>(joystick.knobEntity))
             {
@@ -463,13 +455,13 @@ namespace EngineFramework
                     float targetNdcX = (targetPixelPos.x / screenWidth) * 2.f - 1.f;
                     float targetNdcY = 1.f - (targetPixelPos.y / screenHeight) * 2.f;
 
-                    knobUI.position_NDC.x = targetNdcX;
-                    knobUI.position_NDC.y = targetNdcY;
+                    knobUI.position_NDC.x = targetNdcX - (knobUI.size_NDC.x / 2.f);
+                    knobUI.position_NDC.y = targetNdcY - (knobUI.size_NDC.y / 2.f);
                 }
                 else
                 {
-                    knobUI.position.x = targetPixelPos.x;
-                    knobUI.position.y = targetPixelPos.y;
+                    knobUI.position.x = targetPixelPos.x - (knobUI.size.x / 2.f);
+                    knobUI.position.y = targetPixelPos.y - (knobUI.size.y / 2.f);
                 }
             }
         }
@@ -642,7 +634,6 @@ namespace EngineFramework
             it->second.first->draw_elements(false);
             current_menu = "";
             it->second.second = false;
-            it->second.first->set_AllbuttonState();
         }
     }
 
@@ -654,7 +645,6 @@ namespace EngineFramework
             {
                 menu.first->draw_elements(false);
                 menu.second = false;
-                menu.first->set_AllbuttonState();
             }
         }
 

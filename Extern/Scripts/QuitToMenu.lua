@@ -19,7 +19,7 @@ function on_button_QuitToMenu(self)
         SHARED.UI_INVENTORY_OPEN = false
         SHARED.UI_INVENTORY_ANDROID_STATE = false
     end
-    StateMachine_SetTrigger("ReturnToMenu")
+
     Scene_RequestRestart()
     UI_CloseAllMenus()
 
