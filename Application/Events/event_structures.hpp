@@ -30,5 +30,10 @@ struct Menu_Event {
 	std::string Event_Name;
 };
 
+struct Pause_Event
+{
+	bool is_pause{};
+};
+
 
 #endif

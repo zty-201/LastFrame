@@ -28,6 +28,8 @@ namespace EngineFramework
         m_stateMachine.AddState(std::make_unique<MainMenuState>());
         m_stateMachine.AddState(std::make_unique<IntroCutsceneState>());
         m_stateMachine.AddState(std::make_unique<GameplayState>());
+        m_stateMachine.AddState(std::make_unique<PauseState>());
+
 
         // Splash -> Main Menu
         m_stateMachine.AddBoolTransition("Splash", "MainMenu", "SplashFinished", true);
@@ -39,6 +41,16 @@ namespace EngineFramework
         // Intro -> Gameplay
         m_stateMachine.AddBoolTransition("IntroCutscene", "Gameplay", "IntroCutsceneFinished", true);
         m_stateMachine.AddTriggerTransition("IntroCutscene", "Gameplay", "SkipIntro");
+
+        // Gameplay to main menu
+        m_stateMachine.AddTriggerTransition("Gameplay", "MainMenu", "ReturnToMenu"); //should be removed, leave here for now
+
+        // Gameplay to main menu
+        m_stateMachine.AddTriggerTransition("Pause", "MainMenu", "ReturnToMenu");
+
+        // Gameplay to main menu
+        m_stateMachine.AddTriggerTransition("Gameplay", "Pause", "PauseGame");
+
 
         m_started = false;
     }

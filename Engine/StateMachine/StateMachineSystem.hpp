@@ -16,6 +16,12 @@ namespace EngineFramework
         Engine::StateMachine& GetMachine() { return m_stateMachine; }
         const Engine::StateMachine& GetMachine() const { return m_stateMachine; }
 
+        //bind this scripting.cpp
+        std::string get_currentState_name() const {
+
+            return m_stateMachine.GetCurrentStateName();
+        }
+
     private:
         void Initialize() override;
         void Update(float dt) override;
