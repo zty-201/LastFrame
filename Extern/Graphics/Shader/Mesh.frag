@@ -166,7 +166,7 @@ float visibility_cascade(vec3 p, int cascade)
     vec3 proj_coords = light_space_pos.xyz / light_space_pos.w;
     proj_coords = proj_coords * 0.5 + 0.5;
     
-    if (any(greaterThan(proj_coords.xy, vec2(1.0f))) || any(lessThan(proj_coords.xy, vec2(0.0f))))
+    if (any(greaterThan(proj_coords.xy, vec2(1.0f))) || any(lessThan(proj_coords.xy, vec2(0.0f))) || proj_coords.z > 1.0f)
         return 1.0f;
 
     float shadow_map_size     = width_height_time.x;

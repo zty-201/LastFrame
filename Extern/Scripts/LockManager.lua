@@ -102,6 +102,15 @@ function on_create(self)
     SHARED.LOCK_FAIL_COUNT = 0
     SHARED.LOCK_DISABLED   = false
     reset_pressed()
+
+    -- Pre-position bolt cutter at the toolbox now (hidden at scale 0) so its
+    -- physics trigger is registered before the player arrives. Teleporting it
+    -- on success skips Jolt's trigger_enter detection entirely.
+    local boltT = Query.GetTransform(BOLT_CUTTER_ID)
+    if boltT then
+        boltT:SetPosition(TOOLBOX_POS_X, TOOLBOX_POS_Y, TOOLBOX_POS_Z)
+        boltT:SetScale(0, 0, 0)
+    end
 end
 
 function on_update(self, dt)
@@ -129,9 +138,14 @@ function on_update(self, dt)
         local openT   = Query.GetTransform(TOOLBOX_OPEN_ID)
         local boltT   = Query.GetTransform(BOLT_CUTTER_ID)
 
-        if lockedT then lockedT:SetPosition(0, -99999, 0) end          -- hide closed toolbox
-        if openT   then openT:SetScale(1, 1, 1) end                    -- reveal open toolbox
-        if boltT   then boltT:SetPosition(TOOLBOX_POS_X, TOOLBOX_POS_Y, TOOLBOX_POS_Z) end  -- place bolt cutter
+        if lockedT then lockedT:SetPosition(0, -99999, 0) end  -- hide closed toolbox
+        if openT   then openT:SetScale(1, 1, 1) end            -- reveal open toolbox
+        if boltT   then boltT:SetScale(1, 1, 1) end            -- reveal bolt cutter (already positioned in on_create)
+
+        -- Remove locked toolbox from interaction tracking so it no longer
+        -- steals E-press commands from the bolt cutter
+        if SHARED.INTERACTABLE then SHARED.INTERACTABLE[TOOLBOX_LOCKED_ID] = nil end
+        if SHARED.INTERACT_IN_ZONE then SHARED.INTERACT_IN_ZONE[TOOLBOX_LOCKED_ID] = nil end
 
         print("[LockManager] Lock opened successfully!")
         return
