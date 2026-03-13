@@ -264,6 +264,9 @@ namespace EngineFramework
                     */
                     if (button.curr_button_state == TRIGGERED) {
                         Trigger_Button_Event(button, TRIGGERED);
+                        button.curr_button_state = NO_STATE;
+                        //button.curr_button_state = IDLE;
+
                         if (button.stay_clicked) {
                             if (!button.clicked_locked) {
                                 // First click: lock onto clicked_texture
@@ -418,7 +421,8 @@ namespace EngineFramework
         }
         else if (state == TRIGGERED) {
             event.Event_Name = button.event_trigger;
-            std::cout << "BUTTON EVENT TRIGGER (Clicked): " << button.event_trigger << std::endl;
+            //std::cout << "BUTTON EVENT TRIGGER (Clicked): " << button.event_trigger << std::endl;
+            LOGI("BUTTON EVENT TRIGGER (CLICKED)");
         }
         
         event_dispatcher.trigger<Button_Event>(std::move(event));
