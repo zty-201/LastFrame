@@ -121,7 +121,8 @@ namespace EngineFramework
         GLuint GetIndirectBuffer() const { return m_indirectBuffers[m_currentFrame % FRAMES_IN_FLIGHT]; }
         GLuint GetVisibleIndicesBuffer() const { return m_visibleIndicesBuffers[m_currentFrame % FRAMES_IN_FLIGHT]; }
         size_t GetActiveBatchCount() const { return m_activeBatches.size(); }
-
+        GLuint GetInstanceTexture() const { return m_instanceTextures[m_currentFrame % FRAMES_IN_FLIGHT]; }
+        GLuint GetVisibleIndicesTexture() const { return m_visibleIndicesTextures[m_currentFrame % FRAMES_IN_FLIGHT]; }
         static constexpr uint32_t INVALID_BATCH = 0xFFFFFFFF;
 
     private:
@@ -133,6 +134,9 @@ namespace EngineFramework
         GLuint m_indirectBuffers[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
         GLuint m_visibleIndicesBuffers[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
         GLuint m_cullingMatrixUBOs[FRAMES_IN_FLIGHT] = { 0, 0 };
+
+        GLuint m_instanceTextures[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        GLuint m_visibleIndicesTextures[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
 
         size_t m_maxTotalInstances = 0;
 

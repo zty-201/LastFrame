@@ -13,6 +13,8 @@ namespace EngineFramework
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_indirectBuffers);
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_visibleIndicesBuffers);
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_cullingMatrixUBOs);
+            glDeleteTextures(FRAMES_IN_FLIGHT, m_instanceTextures);
+            glDeleteTextures(FRAMES_IN_FLIGHT, m_visibleIndicesTextures);
         }
     }
 
@@ -26,6 +28,10 @@ namespace EngineFramework
         glGenBuffers(FRAMES_IN_FLIGHT, m_indirectBuffers);
         glGenBuffers(FRAMES_IN_FLIGHT, m_visibleIndicesBuffers);
         glGenBuffers(FRAMES_IN_FLIGHT, m_cullingMatrixUBOs);
+
+        glGenTextures(FRAMES_IN_FLIGHT, m_instanceTextures);
+        glGenTextures(FRAMES_IN_FLIGHT, m_visibleIndicesTextures);
+
         // Pre-allocate memory for all frames in flight
         for (int i = 0; i < FRAMES_IN_FLIGHT; ++i) {
             // Instance Data
@@ -44,6 +50,15 @@ namespace EngineFramework
             glBindBuffer(GL_UNIFORM_BUFFER, m_cullingMatrixUBOs[i]);
             // Pre-allocate the 8.4 KB block
             glBufferData(GL_UNIFORM_BUFFER, sizeof(CullingMatrixData), nullptr, GL_DYNAMIC_DRAW);
+
+            // NEW: Link the buffer data to the texture handles
+            // 1 Texel = 1 vec4 (16 bytes). 
+            glBindTexture(GL_TEXTURE_BUFFER, m_instanceTextures[i]);
+            glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_instanceSSBOs[i]);
+
+            // 1 Texel = 1 uint (4 bytes).
+            glBindTexture(GL_TEXTURE_BUFFER, m_visibleIndicesTextures[i]);
+            glTexBuffer(GL_TEXTURE_BUFFER, GL_R32UI, m_visibleIndicesBuffers[i]);
         }
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
