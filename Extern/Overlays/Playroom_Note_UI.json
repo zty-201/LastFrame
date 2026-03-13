@@ -1,5 +1,5 @@
 {
-	"9": {
+	"883": {
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": []
@@ -21,7 +21,7 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				308.9999694824219,
+				345.0,
 				0.0
 			],
 			"position_NDC": [
@@ -29,8 +29,8 @@
 				0.0
 			],
 			"size": [
-				927.0000610351563,
-				1158.0
+				1035.0,
+				1032.0
 			],
 			"size_NDC": [
 				0.6000000238418579,

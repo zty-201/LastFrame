@@ -865,7 +865,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				5,
 				2,
@@ -874,7 +874,7 @@
 			"name": "Player"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				14,
 				382,
