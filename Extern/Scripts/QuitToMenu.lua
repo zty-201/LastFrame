@@ -15,8 +15,18 @@ end
 function on_button_QuitToMenu(self)
     print("[QuitButton] Returning to Start Menu")
 
+    if SHARED ~= nil then
+        SHARED.UI_INVENTORY_OPEN = false
+        SHARED.UI_INVENTORY_ANDROID_STATE = false
+    end
+    StateMachine_SetTrigger("ReturnToMenu")
     Scene_RequestRestart()
+    UI_CloseAllMenus()
 
+if PLATFORM == "android" then
+    UI_DisplayMenu_InvisibleLayer("Android_Inventory_Buttons")
+    UI_DisplayMenu("AndroidInputOverlay")
+end
     _G.GAME_STATE = "MENU"
 end
 

@@ -6,8 +6,8 @@ local DEBUG = true
 local is_removed = false;
 local is_added = false;
 
-local SIZE_X =  0.120
-local SIZE_Y =  0.08
+local SIZE_X =  0.06
+local SIZE_Y =  0.04
 
 local function debug_print(...)
     if DEBUG then

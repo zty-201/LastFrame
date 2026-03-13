@@ -7,9 +7,9 @@ local inventoryOpen = false
 local prevTogglePressed = false
 
 -- Layout settings (NDC)
-local START_X   = -0.56
+local START_X   = -0.32
 local START_Y   = -0.8
-local SPACING_X =  0.28
+local SPACING_X =  0.17
 
 
 
@@ -208,11 +208,9 @@ end
 
 function on_update(self, dt)
 
-    --UI_DisplayMenu("Android_Inventory_Buttons")
     ensure_tables()
 
     
-
     -- Android state control
     if PLATFORM == "android" then
         if SHARED.UI_INVENTORY_ANDROID_STATE ~= nil then
@@ -236,24 +234,26 @@ function on_update(self, dt)
                 end
             end
         end
+    end
     -- PC control
-        elseif PLATFORM == "windows" then
-            local pressed = is_toggle_pressed()
-            if pressed and not prevTogglePressed then
-                inventoryOpen = not inventoryOpen
-                SHARED.UI_INVENTORY_OPEN = inventoryOpen
-                set_visible(inventoryOpen)
-                if inventoryOpen then
-                    SHARED.UI_INVENTORY.RecalculatePositions()
-                    debug_print("Inventory opened")
-                    
-                else
-                    debug_print("Inventory closed")
-                end
+    if PLATFORM == "windows" then
+        local pressed = is_toggle_pressed()
+        if pressed and not prevTogglePressed then
+            inventoryOpen = not inventoryOpen
+            SHARED.UI_INVENTORY_OPEN = inventoryOpen
+            set_visible(inventoryOpen)
+            if inventoryOpen then
+                SHARED.UI_INVENTORY.RecalculatePositions()
+                debug_print("Inventory opened")
+                
+            else
+                debug_print("Inventory closed")
             end
-
+        end
         prevTogglePressed = pressed
     end
+    
+        
 end
 
 function on_destroy(self)

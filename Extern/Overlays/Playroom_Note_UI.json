@@ -1,0 +1,55 @@
+{
+	"9": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "UI"
+		},
+		"UIComponent": {
+			"Overlay_name": "Playroom_Note_UI",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				308.9999694824219,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				927.0000610351563,
+				1158.0
+			],
+			"size_NDC": [
+				0.6000000238418579,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				6650260355653173261,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}

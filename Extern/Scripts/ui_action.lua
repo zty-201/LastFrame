@@ -68,28 +68,20 @@ function on_create(self)
     local Shared = getShared()
     local platform = (Shared and Shared.PLATFORM) or PLATFORM
 
-    -- Windows: hide the button UI (keyboard handles actions)
-    if platform == "windows" then
-        UI:SetVisible(false)
-        return
-    end
+    -- Does not matter about the platform ya
+    UI:SetVisible(false)
 
-    -- Android: show + position
-    local uiShared = ensureUIShared()
-    local screenW, screenH = getCanvasSize(uiShared)
-
-    local centerX = ANCHOR_X * screenW
-    local centerY = ANCHOR_Y * screenH
-
-    UI:SetSize(ICON_SIZE, ICON_SIZE)
-    UI:SetPosition(centerX - ICON_SIZE * 0.5, centerY - ICON_SIZE * 0.5)
-    UI:SetVisible(true)
+    
 end
 
 -- ============================================================
 -- on_update
 -- ============================================================
 function on_update(self, dt)
+
+    -- Does not matter about the platform ya
+    UI:SetVisible(false)
+    
     local uiShared = ensureUIShared()
     if not uiShared then return end
 
@@ -111,16 +103,29 @@ function on_update(self, dt)
         return
     end
 
+    if platform == "android" then
+        
+        local A_input = SHARED.UI_ACTION_INTERACTION
+
+        if A_input then
+            print("[ui_action] E pressed (action) YYYYYYOOOOOO")
+            uiShared.actionRequested = true
+            SHARED.UI_ACTION_INTERACTION = false
+        end
+
+        return
+    end
+
     ------------------------------------------------------------
     -- Android: tap icon only
     ------------------------------------------------------------
-    if not UI then UI = EntityUI end
-    if not UI then return end
-    if not UI:IsVisible() then return end
+    -- if not UI then UI = EntityUI end
+    -- if not UI then return end
+    -- if not UI:IsVisible() then return end
 
-    local downMouse = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
-    if downMouse and isPointerOver() then
-        print("[ui_action] Icon pressed")
-        uiShared.actionRequested = true
-    end
+    -- local downMouse = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
+    -- if downMouse and isPointerOver() then
+    --     print("[ui_action] Icon pressed")
+    --     uiShared.actionRequested = true
+    -- end
 end

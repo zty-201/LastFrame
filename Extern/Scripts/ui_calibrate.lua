@@ -57,7 +57,7 @@ local function isPointerOver()
     local w, h = UI:GetSize()
 
     return mx >= x and mx <= x + w
-       and my >= y and my <= y + h
+    and my >= y and my <= y + h
 end
 
 
@@ -91,15 +91,15 @@ function on_create(self)
     end
 
     -- Android: show + position
-    local uiShared = ensureUIShared()
-    local screenW, screenH = getCanvasSize(uiShared)
+    -- local uiShared = ensureUIShared()
+    -- local screenW, screenH = getCanvasSize(uiShared)
 
-    local centerX = ANCHOR_X * screenW
-    local centerY = ANCHOR_Y * screenH
+    -- local centerX = ANCHOR_X * screenW
+    -- local centerY = ANCHOR_Y * screenH
 
-    UI:SetSize(ICON_SIZE, ICON_SIZE)
-    UI:SetPosition(centerX - ICON_SIZE * 0.5, centerY - ICON_SIZE * 0.5)
-    UI:SetVisible(true)
+    -- UI:SetSize(ICON_SIZE, ICON_SIZE)
+    -- UI:SetPosition(centerX - ICON_SIZE * 0.5, centerY - ICON_SIZE * 0.5)
+    -- UI:SetVisible(true)
 end
 
 function on_update(self, dt)

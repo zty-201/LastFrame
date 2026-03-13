@@ -8,6 +8,10 @@ local function debug_print(...)
     end
 end
 
+local function getShared()
+    return rawget(_G, "SHARED")
+end
+
 local function set_visible(v)
     if EntityUI == nil then
         print("[UI_Inventory] ERROR: EntityUI is nil on entity " .. tostring(EntityID))
@@ -60,6 +64,14 @@ end
 function on_update(self, dt)
 
     if _G.GAME_STATE ~= "GAME" then
+        return
+    end
+
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
+
+    if platform == "windows" then
+        set_visible(false)
         return
     end
 

@@ -7,7 +7,7 @@
 -- Button events from LockScreen number buttons drive this script.
 ----------------------------------------------------------------
 
-local COMBO      = { [0]=true, [1]=true, [2]=true, [4]=true }
+local COMBO      = { [0]=true, [9]=true, [1]=true, [3]=true }
 local MAX_FAILS  = 3
 local UI_TABLE   = "LOCKSCREEN_OPEN"
 
@@ -102,6 +102,15 @@ function on_create(self)
     SHARED.LOCK_FAIL_COUNT = 0
     SHARED.LOCK_DISABLED   = false
     reset_pressed()
+
+    -- Pre-position bolt cutter at the toolbox now (hidden at scale 0) so its
+    -- physics trigger is registered before the player arrives. Teleporting it
+    -- on success skips Jolt's trigger_enter detection entirely.
+    local boltT = Query.GetTransform(BOLT_CUTTER_ID)
+    if boltT then
+        boltT:SetPosition(TOOLBOX_POS_X, TOOLBOX_POS_Y, TOOLBOX_POS_Z)
+        boltT:SetScale(0, 0, 0)
+    end
 end
 
 function on_update(self, dt)
@@ -119,15 +128,24 @@ function on_update(self, dt)
         SHARED.LOCK_DISABLED = true
         reset_pressed()
         UI_CloseAllMenus()
+        if PLATFORM == "android" then
+            UI_DisplayMenu_InvisibleLayer("Android_Inventory_Buttons")
+            UI_DisplayMenu("AndroidInputOverlay")
+        end
 
         -- Swap toolbox meshes
         local lockedT = Query.GetTransform(TOOLBOX_LOCKED_ID)
         local openT   = Query.GetTransform(TOOLBOX_OPEN_ID)
         local boltT   = Query.GetTransform(BOLT_CUTTER_ID)
 
-        if lockedT then lockedT:SetPosition(0, -99999, 0) end          -- hide closed toolbox
-        if openT   then openT:SetScale(1, 1, 1) end                    -- reveal open toolbox
-        if boltT   then boltT:SetPosition(TOOLBOX_POS_X, TOOLBOX_POS_Y, TOOLBOX_POS_Z) end  -- place bolt cutter
+        if lockedT then lockedT:SetPosition(0, -99999, 0) end  -- hide closed toolbox
+        if openT   then openT:SetScale(1, 1, 1) end            -- reveal open toolbox
+        if boltT   then boltT:SetScale(1, 1, 1) end            -- reveal bolt cutter (already positioned in on_create)
+
+        -- Remove locked toolbox from interaction tracking so it no longer
+        -- steals E-press commands from the bolt cutter
+        if SHARED.INTERACTABLE then SHARED.INTERACTABLE[TOOLBOX_LOCKED_ID] = nil end
+        if SHARED.INTERACT_IN_ZONE then SHARED.INTERACT_IN_ZONE[TOOLBOX_LOCKED_ID] = nil end
 
         print("[LockManager] Lock opened successfully!")
         return
@@ -138,6 +156,11 @@ function on_update(self, dt)
         SHARED[UI_TABLE] = false
         reset_pressed()
         UI_CloseAllMenus()
+        if PLATFORM == "android" then
+            UI_DisplayMenu_InvisibleLayer("Android_Inventory_Buttons")
+            UI_DisplayMenu("AndroidInputOverlay")
+        end
+        
         if pending_fail_light then
             play_sfx(pending_fail_light, "Candles")
             pending_fail_light = nil
