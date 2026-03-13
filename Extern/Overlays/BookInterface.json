@@ -1,83 +1,4 @@
 {
-	"594": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				7063588723440451587,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "CloseBookUI",
-			"hover_texture": [
-				8792970980350722049,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8792970980350722049,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 5149523697750753283
-				},
-				{
-					"Loaded": true,
-					"ScriptGuid": 8031827459267870721
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "Lobby_BookInterface"
-		},
-		"UIComponent": {
-			"Overlay_name": "BookInterface",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				1500.0,
-				1000.0
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				100.0,
-				100.0
-			],
-			"size_NDC": [
-				1.0,
-				1.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				8792970980350722049,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
-	},
 	"595": {
 		"LuaScriptComponent": {
 			"Enabled": true,
@@ -99,31 +20,31 @@
 				1.0
 			],
 			"event_received": "",
-			"is_NDC": false,
+			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				0.0,
+				156.20001220703125,
 				0.0
 			],
 			"position_NDC": [
-				-107374176.0,
-				-107374176.0
+				0.0,
+				0.0
 			],
 			"size": [
-				1500.0,
-				1000.0
+				1249.5999755859375,
+				1158.0
 			],
 			"size_NDC": [
-				-107374176.0,
-				-107374176.0
+				0.800000011920929,
+				1.0
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				12676621967646883843,
+				6073799603349749777,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,

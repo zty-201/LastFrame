@@ -98,8 +98,20 @@ namespace EngineFramework
 		auto triggers = reg.view<TransformComponent, TriggerBoxComponent>();
 		for (auto [other_id, other_tf, other_box] : triggers.each())
 		{
-			//Check for collision.
-			if (!other_box.enabled) continue;
+			/*
+			*   Ignore scale 0 objects, as they can do a false positive for Overlap check even when they shouldn't be collidable in anything.
+				Before early continue, ensure boxes send exit events if they come out of the player's range.
+			*/
+			if (!other_box.enabled || (abs(other_tf.scale.x) < 0.005f && abs(other_tf.scale.z) < 0.005f))
+			{
+				if (other_box.currentInside.find(detector_id) != other_box.currentInside.end())
+				{
+					other_box.currentInside.erase(detector_id);
+					event_dispatcher.trigger(Event_OnTriggerExit{ other_id, detector_id });
+				}
+				continue;
+			}
+		
 			other_box.is_collided_this_frame = false;
 			if (other_id == detector_id) continue;
 
@@ -123,8 +135,12 @@ namespace EngineFramework
 			}
 
 			//Player stores this obj id.
-			if (reg.all_of<TriggerBoxComponent>(detector_id)) reg.get<TriggerBoxComponent>(detector_id).currentInside.insert(other_id);
-
+			if (reg.all_of<TriggerBoxComponent>(detector_id))
+			{
+				auto &player_tf = reg.get<TriggerBoxComponent>(detector_id);
+				player_tf.currentInside.insert(other_id);
+				player_tf.is_collided_this_frame = true;
+			}
 
 			if (other_box.currentInside.find(detector_id) == other_box.currentInside.end())
 			{

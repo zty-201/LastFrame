@@ -264,6 +264,9 @@ namespace EngineFramework
                     */
                     if (button.curr_button_state == TRIGGERED) {
                         Trigger_Button_Event(button, TRIGGERED);
+                        button.curr_button_state = IDLE;
+                        //button.curr_button_state = IDLE;
+
                         if (button.stay_clicked) {
                             if (!button.clicked_locked) {
                                 // First click: lock onto clicked_texture
@@ -278,10 +281,11 @@ namespace EngineFramework
                         }
                         break;
                     }
+#if defined(PLATFORM_WINDOWS) //ONLY WINDOWS HAVE THIS
                     else if (button.curr_button_state == HOVER) {
                         Trigger_Button_Event(button, HOVER);
                     }
-
+#endif
                     /*
                         SWAPPING OF TEXTURES FOR UI COMPONENT
                     */
@@ -290,9 +294,14 @@ namespace EngineFramework
                     if (!button.clicked_locked && button.prev_button_state != button.curr_button_state) {
                         if (button.curr_button_state == IDLE) {
                             ui.textureid = button.idle_texture;
-                        }else if (button.curr_button_state == HOVER) {
+                        }
+#if defined(PLATFORM_WINDOWS) //ONLY WINDOWS HAVE THIS
+                        else if (button.curr_button_state == HOVER) {
+                            //Trigger_Button_Event(button, HOVER);
                             ui.textureid = button.hover_texture;
-                        }else if (button.curr_button_state == CLICKED) {
+                        }
+#endif
+                        else if (button.curr_button_state == CLICKED) {
                             ui.textureid = button.clicked_texture;
                         }
                     }
@@ -418,11 +427,30 @@ namespace EngineFramework
         }
         else if (state == TRIGGERED) {
             event.Event_Name = button.event_trigger;
-            std::cout << "BUTTON EVENT TRIGGER (Clicked): " << button.event_trigger << std::endl;
+            //std::cout << "BUTTON EVENT TRIGGER (Clicked): " << button.event_trigger << std::endl;
+            LOGI("BUTTON EVENT TRIGGER (CLICKED)");
         }
         
         event_dispatcher.trigger<Button_Event>(std::move(event));
         
+    }
+
+    void UI_Menu::set_AllbuttonState(BUTTON_STATE state) {
+
+        for (auto entity : AllElements_in_this_overlay) {
+
+            if (registry.all_of<ButtonComponent>(entity)) {
+
+                /*
+                    SWAPPING OF TEXTURES FOR UI COMPONENT
+                */
+                auto& b = registry.get<ButtonComponent>(entity);
+                b.curr_button_state = state;
+                b.prev_button_state = state;
+
+            }
+        }
+
     }
 
     void UI_Menu::draw_elements(bool value) {

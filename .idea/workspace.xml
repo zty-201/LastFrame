@@ -6,17 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="6c23128e-b3fb-4acf-a44e-eabb7a9882ab" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Events/event_structures.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Events/event_structures.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/Audio/Audio.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/Audio/Audio.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/Audio/Audio.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/Audio/Audio.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/ECS/System/CoreEngine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/ECS/System/CoreEngine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/ECS/System/CoreEngine.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/ECS/System/CoreEngine.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/StateMachine/StateMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/StateMachine/StateMachine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/StateMachine/StateMachineSystem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/StateMachine/StateMachineSystem.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/StateMachine/StateMachineSystem.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/StateMachine/StateMachineSystem.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/States/GameplayState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/States/GameplayState.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/States/GameplayState.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/States/GameplayState.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Scripts/player_movement_charctr.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Scripts/player_movement_charctr.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,19 +26,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Adroid__Input&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "main"
   }
-}</component>
+}]]></component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="6c23128e-b3fb-4acf-a44e-eabb7a9882ab" name="Changes" comment="" />
