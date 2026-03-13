@@ -536,42 +536,6 @@
 				}
 			]
 		},
-		"ColliderComponent": {
-			"maxBounds": [
-				20.74808120727539,
-				56.69184875488281,
-				44.615543365478516
-			],
-			"minBounds": [
-				-23.681381225585938,
-				0.236175537109375,
-				-25.593196868896484
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						22.214731216430664,
-						28.22783660888672,
-						35.1043701171875
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						-1.4666500091552734,
-						28.464012145996094,
-						9.5111722946167
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -44024,7 +43988,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						5864127129932644357,
+						16532090323042058245,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44037,7 +44001,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.003000020980835
+					"volume": 2.2079999446868896
 				}
 			]
 		},
@@ -44085,7 +44049,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						5864127129932644357,
+						16532090323042058245,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44098,7 +44062,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 2.3540000915527344
 				}
 			]
 		},
@@ -44146,7 +44110,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						5864127129932644357,
+						16532090323042058245,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44159,7 +44123,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 2.1640000343322754
 				}
 			]
 		},
@@ -45277,9 +45241,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-377.87689208984375,
+				4.086117744445801,
 				169.37667846679688,
-				791.38427734375
+				-722.4871215820313
 			],
 			"rotation": [
 				0.0,
