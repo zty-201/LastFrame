@@ -14,19 +14,19 @@
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
-			"luminance": 0.9034230709075928,
+			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				-390.5999755859375,
-				-26.279998779296875
+				-211.39999389648438,
+				-15.240005493164063
 			],
 			"position_NDC": [
 				-0.05999999865889549,
 				-0.05999999865889549
 			],
 			"size": [
-				2092.5,
-				876.0
+				1132.5,
+				508.0
 			],
 			"size_NDC": [
 				1.5,
@@ -74,8 +74,8 @@
 				0.0
 			],
 			"size": [
-				1395.0,
-				876.0
+				755.0,
+				508.0
 			],
 			"size_NDC": [
 				1.0,
@@ -112,25 +112,25 @@
 			"is_NDC": true,
 			"layer": 1,
 			"lock_luminance": false,
-			"luminance": 0.9034230709075928,
+			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				69.75,
-				39.420005798339844
+				37.75,
+				22.860004425048828
 			],
 			"position_NDC": [
 				0.0,
 				-0.8299999833106995
 			],
 			"size": [
-				1255.5,
-				70.08000183105469
+				679.5,
+				40.63999938964844
 			],
 			"size_NDC": [
 				0.8999999761581421,
 				0.07999999821186066
 			],
-			"subtitle_reveal_progress": 0.4517115354537964,
+			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				8672402977504575491,
