@@ -58,9 +58,10 @@ function on_destroy(self)
 end
 
 function on_update(self, dt)
-
-    --local state_name == "pause" then
-    --return 
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name == "Pause" then
+        return
+    end
 
 
 
