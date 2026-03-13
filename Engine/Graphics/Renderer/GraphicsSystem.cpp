@@ -354,8 +354,8 @@ namespace EngineFramework
         // Update point light SSBO (1ms)
         UpdateLightSSBO();
 
-        m_instancingSystem->BuildSceneBatches();
-        m_instancingSystem->BuildSceneBatches();
+        //->BuildSceneBatches();
+        //->BuildSceneBatches();
 		// Update the instancing system (modelmatrix update + batch building + compute culling dispatch)
         m_instancingSystem->UpdateAndDispatchCompute(
             viewProj, 
