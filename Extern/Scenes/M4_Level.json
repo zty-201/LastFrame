@@ -329,6 +329,347 @@
 			"visible": false
 		}
 	},
+	"1002": {
+		"ColliderComponent": {
+			"maxBounds": [
+				0.5,
+				0.5,
+				0.5
+			],
+			"minBounds": [
+				-0.5,
+				-0.5,
+				-0.5
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						0.5,
+						0.5,
+						0.5
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 625649121934032897
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Bedroom_CPTriggerBox"
+		},
+		"TransformComponent": {
+			"position": [
+				550.1052856445313,
+				93.76690673828125,
+				1201.6234130859375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		},
+		"TriggerBoxComponent": {
+			"capHalfHeight": 0.5,
+			"capRadius": 0.5,
+			"debugColor": [
+				0.10000000149011612,
+				0.800000011920929,
+				0.20000000298023224
+			],
+			"enabled": true,
+			"halfExtents": [
+				100.0,
+				100.0,
+				100.0
+			],
+			"localEulerDeg": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"localPosition": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"radius": 0.5,
+			"type": 0
+		}
+	},
+	"1003": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						15921659061987917825,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "GirlLaughing",
+					"loop": true,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						3691342623965118479,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "SubtleJingle",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.1260000467300415
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						9417264931441426433,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "StopLooking",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						4982459319963795463,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "EpicSound",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 3.0139999389648438
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						15379168818435211273,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Lightning",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 2.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						5002875276973588493,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Tension",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 5.0
+				}
+			]
+		},
+		"ColliderComponent": {
+			"maxBounds": [
+				20.74808120727539,
+				56.69184875488281,
+				44.615543365478516
+			],
+			"minBounds": [
+				-23.681381225585938,
+				0.236175537109375,
+				-25.593196868896484
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						22.214731216430664,
+						28.22783660888672,
+						35.1043701171875
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-1.4666500091552734,
+						28.464012145996094,
+						9.5111722946167
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 11578403415739432963
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				13556160950506864641,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1450485152134971395,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				10097396436686323723,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				7215092675169206277,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				18167846968934252557,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "little_girl",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "SF_Master_Girl"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				378.6258239746094,
+				602.0543212890625,
+				1062.2496337890625
+			],
+			"rotation": [
+				-0.00010427423694636673,
+				86.80000305175781,
+				-0.00010427423694636673
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
 	"101": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -6623,9 +6964,9 @@
 				-179.99989318847656
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -9825,7 +10166,7 @@
 			],
 			"rotation": [
 				0.0,
-				-90.0,
+				-89.9999771118164,
 				0.0
 			],
 			"scale": [
@@ -11774,13 +12115,13 @@
 		},
 		"TransformComponent": {
 			"position": [
-				290.6634521484375,
-				183.9430694580078,
-				748.2708129882813
+				189.03634643554688,
+				782.7438354492188,
+				1054.1346435546875
 			],
 			"rotation": [
-				23.1200008392334,
-				91.19999694824219,
+				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -18497,9 +18838,9 @@
 				-0.00010427424422232434
 			],
 			"scale": [
-				0.9999998211860657,
-				1.0,
-				0.9999998211860657
+				0.0,
+				0.0,
+				0.0
 			]
 		}
 	},
@@ -32727,9 +33068,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				290.6634521484375,
-				184.74307250976563,
-				778.2708129882813
+				189.03634643554688,
+				783.5438232421875,
+				1084.1346435546875
 			],
 			"rotation": [
 				0.0,
@@ -44098,7 +44439,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 482.8993225097656,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -44372,7 +44713,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 474.866455078125,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -44556,7 +44897,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 486.27838134765625,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -44855,8 +45196,8 @@
 			"gravityFactor": 25.0,
 			"groundNormal": [
 				0.0,
-				0.9999926686286926,
-				0.003839715151116252
+				1.0,
+				0.0
 			],
 			"height": 350.0,
 			"isGrounded": true,
@@ -44936,13 +45277,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				290.6634521484375,
-				183.9430694580078,
-				748.2708129882813
+				308.5498962402344,
+				757.4262084960938,
+				1042.670654296875
 			],
 			"rotation": [
 				0.0,
-				91.19999694824219,
+				-0.0,
 				0.0
 			],
 			"scale": [
@@ -53919,7 +54260,7 @@
 			],
 			"rotation": [
 				0.0,
-				81.50093841552734,
+				112.23585510253906,
 				0.0
 			],
 			"scale": [
@@ -54018,7 +54359,7 @@
 			],
 			"rotation": [
 				0.0,
-				81.50093841552734,
+				112.23585510253906,
 				0.0
 			],
 			"scale": [
@@ -61795,8 +62136,8 @@
 				0.0
 			],
 			"size": [
-				1725.0,
-				1032.0
+				1695.0,
+				1158.0
 			],
 			"size_NDC": [
 				1.0,
@@ -78177,7 +78518,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 8592.5107421875,
+			"intensity": 41006.84765625,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -82740,7 +83081,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 0.0,
+			"intensity": 12178.3154296875,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,

@@ -553,7 +553,8 @@
 				815,
 				816,
 				904,
-				991
+				991,
+				1002
 			],
 			"name": "Bedroom"
 		},
@@ -817,7 +818,7 @@
 			"name": "SF_Corridor"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				724,
 				747,
@@ -844,7 +845,8 @@
 				880,
 				901,
 				902,
-				9
+				9,
+				1003
 			],
 			"name": "SF_MasterRoom"
 		},
@@ -863,7 +865,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				5,
 				2,

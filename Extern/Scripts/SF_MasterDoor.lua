@@ -4,7 +4,7 @@
 -- Opens ONCE, then ignores future interaction forever.
 -- Publishes SHARED.BEDROOM_DOOR_OPENED_ONCE[EntityID] for one-time icon logic.
 
-local closedAngle = 90.0
+local closedAngle = 90.0 -- set to 90.0
 local openAngle   = 220
 local rotateSpeed = 30.0
 
