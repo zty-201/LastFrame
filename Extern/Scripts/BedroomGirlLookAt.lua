@@ -32,6 +32,12 @@ local lookTimer         = 0.0
 local silenceTimer      = 0.0
 local frame             = 0
 
+local VISIBLE_SCALE_X = 1.0
+local VISIBLE_SCALE_Y = 1.0
+local VISIBLE_SCALE_Z = 1.0
+
+local isGirlVisible = false
+
 local rotateAfterPull       = false   -- waiting to rotate girl after pull finishes
 local rotateTimer           = 0.0
 local ROTATE_AFTER_PULL_DELAY = 1.2   -- matches shakeDuration
@@ -111,18 +117,63 @@ local function reset_look_state()
     Audio_PlaySlot(EntityID, LAUGH_SLOT)
 end
 
+local function deactivate_look_state()
+    isLooking         = false
+    thresholdMet      = false
+    stopLookingPlayed = false
+    epicSoundPlayed   = false
+    lookTimer         = 0.0
+    silenceTimer      = 0.0
+
+    stop_tension()
+
+    if type(Audio_StopSlot) == "function" then
+        Audio_StopSlot(EntityID, LAUGH_SLOT)
+    end
+end
+
+local function show_girl()
+    local tr = Query.GetTransform(EntityID)
+    if tr then
+        tr:SetScale(VISIBLE_SCALE_X, VISIBLE_SCALE_Y, VISIBLE_SCALE_Z)
+        isGirlVisible = true
+        if DEBUG then
+            print("[BedroomGirlLookAt] Girl shown")
+        end
+    end
+end
+
+local function hide_girl()
+    local tr = Query.GetTransform(EntityID)
+    if tr then
+        tr:SetScale(0.0, 0.0, 0.0)
+        isGirlVisible = false
+        if DEBUG then
+            print("[BedroomGirlLookAt] Girl hidden")
+        end
+    end
+end
+
 ------------------------------------------------
 
 function on_create(self)
+    SHARED = SHARED or {}
+    SHARED.BEDROOM_GIRL_ACTIVE = SHARED.BEDROOM_GIRL_ACTIVE or false
+    SHARED.BEDROOM_CP_REACHED = SHARED.BEDROOM_CP_REACHED or false
+    SHARED.BEDROOM_GIRL_DONE = SHARED.BEDROOM_GIRL_DONE or false
+
     isLooking         = false
     thresholdMet      = false
     stopLookingPlayed = false
     epicSoundPlayed   = false
     jinglePlayed      = false
-    tensionPlaying   = false
+    tensionPlaying    = false
     lookTimer         = 0.0
     silenceTimer      = 0.0
     frame             = 0
+    isGirlVisible     = false
+
+    hide_girl()
 
     if DEBUG then
         print("[BedroomGirlLookAt] Ready on entity " .. tostring(EntityID))
@@ -131,6 +182,20 @@ end
 
 function on_update(self, dt)
     dt = dt or 0.016
+
+    local girlDone   = SHARED and SHARED.BEDROOM_GIRL_DONE == true
+    local girlActive = SHARED and SHARED.BEDROOM_GIRL_ACTIVE == true and not girlDone
+
+    if girlActive and not isGirlVisible then
+        show_girl()
+    elseif ((not girlActive) or girlDone) and isGirlVisible then
+        hide_girl()
+    end
+
+    if (not girlActive) or girlDone then
+        deactivate_look_state()
+        return
+    end
 
     -- Rotate girl to 270 degrees after pull finishes
     if rotateAfterPull then
