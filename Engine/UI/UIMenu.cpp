@@ -264,7 +264,7 @@ namespace EngineFramework
                     */
                     if (button.curr_button_state == TRIGGERED) {
                         Trigger_Button_Event(button, TRIGGERED);
-                        button.curr_button_state = NO_STATE;
+                        button.curr_button_state = IDLE;
                         //button.curr_button_state = IDLE;
 
                         if (button.stay_clicked) {
@@ -281,10 +281,11 @@ namespace EngineFramework
                         }
                         break;
                     }
+#if defined(PLATFORM_WINDOWS) //ONLY WINDOWS HAVE THIS
                     else if (button.curr_button_state == HOVER) {
                         Trigger_Button_Event(button, HOVER);
                     }
-
+#endif
                     /*
                         SWAPPING OF TEXTURES FOR UI COMPONENT
                     */
@@ -293,9 +294,14 @@ namespace EngineFramework
                     if (!button.clicked_locked && button.prev_button_state != button.curr_button_state) {
                         if (button.curr_button_state == IDLE) {
                             ui.textureid = button.idle_texture;
-                        }else if (button.curr_button_state == HOVER) {
+                        }
+#if defined(PLATFORM_WINDOWS) //ONLY WINDOWS HAVE THIS
+                        else if (button.curr_button_state == HOVER) {
+                            //Trigger_Button_Event(button, HOVER);
                             ui.textureid = button.hover_texture;
-                        }else if (button.curr_button_state == CLICKED) {
+                        }
+#endif
+                        else if (button.curr_button_state == CLICKED) {
                             ui.textureid = button.clicked_texture;
                         }
                     }
