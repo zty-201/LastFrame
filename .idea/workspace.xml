@@ -5,30 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6c23128e-b3fb-4acf-a44e-eabb7a9882ab" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Engine/ECS/Components/JoystickComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Android/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Android/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Reflection/ReflectionRegister.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Reflection/ReflectionRegister.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/Input/InputManager_codegen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/Input/InputManager_codegen.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/Input/Key_Action.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/Input/Key_Action.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/UI/UIMenu.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/UI/UIMenu.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/UI/UISystem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/UI/UISystem.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/UI/UISystem.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/UI/UISystem.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Input/key_mapping_data.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Input/key_mapping_data.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Overlays/BookInterface.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Overlays/BookInterface.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Overlays/CanteenToyInterface.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Overlays/CanteenToyInterface.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Overlays/Cutscene_1.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Overlays/Cutscene_1.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Overlays/Cutscene_2.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Overlays/Cutscene_2.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Overlays/Cutscene_3.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Overlays/Cutscene_3.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Overlays/Cutscene_4.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Overlays/Cutscene_4.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Overlays/ExplosionToyInterface.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Overlays/ExplosionToyInterface.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Overlays/Menu_1.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Overlays/Menu_1.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Overlays/Menu_2.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Overlays/Menu_2.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Overlays/PauseMenu.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Overlays/PauseMenu.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Overlays/StartMenu.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Overlays/StartMenu.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Scenes/M4_Level.json" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Scenes/M4_Level.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Extern/Scripts/A1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Scripts/A1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Events/event_structures.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Events/event_structures.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/Audio/Audio.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/Audio/Audio.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/Audio/Audio.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/Audio/Audio.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/ECS/System/CoreEngine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/ECS/System/CoreEngine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/ECS/System/CoreEngine.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/ECS/System/CoreEngine.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/StateMachine/StateMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/StateMachine/StateMachine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/StateMachine/StateMachineSystem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/StateMachine/StateMachineSystem.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/StateMachine/StateMachineSystem.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/StateMachine/StateMachineSystem.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/States/GameplayState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/States/GameplayState.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/States/GameplayState.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/States/GameplayState.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Extern/Scripts/player_movement_charctr.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Extern/Scripts/player_movement_charctr.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
