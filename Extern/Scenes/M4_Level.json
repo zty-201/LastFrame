@@ -43852,7 +43852,7 @@
 		},
 		"MeshComponent": {
 			"meshName": "bot_cutter_close",
-			"visibility": true
+			"visibility": false
 		},
 		"NameComponent": {
 			"name": "Storeroom_BoltCutter"
@@ -43895,9 +43895,9 @@
 				-35.89995193481445
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				1.0,
+				1.0,
+				1.0
 			]
 		},
 		"TriggerBoxComponent": {
