@@ -71,3 +71,35 @@ void PauseState::Render(Engine::StateMachine& machine)
 {
     UNREFERENCED_PARAMETER(machine);
 }
+
+//
+
+const std::string& EndCreditState::GetName() const
+{
+    return m_name;
+}
+
+void EndCreditState::OnEnter(Engine::StateMachine& machine)
+{
+    UNREFERENCED_PARAMETER(machine);
+
+    LOGI("[State] Enter EndCredit state");
+}
+
+void EndCreditState::OnExit(Engine::StateMachine& machine)
+{
+    UNREFERENCED_PARAMETER(machine);
+    LOGI("[State] Exit EndCredit state");
+}
+
+void EndCreditState::Update(Engine::StateMachine& machine, float dt)
+{
+    UNREFERENCED_PARAMETER(machine);
+    UNREFERENCED_PARAMETER(dt);
+    //LOGI("[State] Update EndCredit state");
+}
+
+void EndCreditState::Render(Engine::StateMachine& machine)
+{
+    UNREFERENCED_PARAMETER(machine);
+}
