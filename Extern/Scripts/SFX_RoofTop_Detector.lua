@@ -1,7 +1,7 @@
 print("[SFX_Rooftop_Detector] script loaded")
 
 local DEBUG = true
-local PLAYER_ID = 5
+local PLAYER_ID = 381
 
 function on_create(self)
     _G.ROOFTOP_COUNT = 0

@@ -11,8 +11,8 @@ print("[PlayroomNotes_TriggerBox] ===== SCRIPT FILE LOADED =====")
 
 local DEBUG = true
 
-local NOTES_ID   = 432                    -- <<<<<< CHANGE THIS to your actual interactable ID
-local MENU_NAME  = "PlayroomNotesInterface" -- <<<<<< CHANGE THIS to your actual menu name
+local NOTES_ID   = 822
+local MENU_NAME  = "Playroom_Note_UI"
 
 local DOOR_CMD_TABLE = "DOOR_CMD"
 local UI_TABLE       = "PLAYROOM_NOTES_UI_OPEN"
@@ -46,13 +46,22 @@ function on_update(self, dt)
         print("[PlayroomNotes_TriggerBox] Interact received for", NOTES_ID)
     end
 
-    if UI_DisplayMenu ~= nil then
-        UI_DisplayMenu(MENU_NAME)
+    local wasOpen = (SHARED[UI_TABLE][NOTES_ID] == true)
+    if wasOpen then
+        if UI_CloseMenu ~= nil then
+            UI_CloseMenu(MENU_NAME)
+        else
+            print("[PlayroomNotes_TriggerBox] ERROR: UI_CloseMenu binding missing")
+        end
     else
-        print("[PlayroomNotes_TriggerBox] ERROR: UI_DisplayMenu binding missing")
+        if UI_DisplayMenu ~= nil then
+            UI_DisplayMenu(MENU_NAME)
+        else
+            print("[PlayroomNotes_TriggerBox] ERROR: UI_DisplayMenu binding missing")
+        end
     end
 
-    SHARED[UI_TABLE][NOTES_ID] = not (SHARED[UI_TABLE][NOTES_ID] == true)
+    SHARED[UI_TABLE][NOTES_ID] = not wasOpen
 
     if DEBUG then
         print("[PlayroomNotes_TriggerBox] UI open =", tostring(SHARED[UI_TABLE][NOTES_ID]))

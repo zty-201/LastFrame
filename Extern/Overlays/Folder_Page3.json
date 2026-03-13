@@ -1,0 +1,60 @@
+{
+	"996": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 4979187401764225037
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Page3"
+		},
+		"UIComponent": {
+			"Overlay_name": "Folder_Page3",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				463.5,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				618.0,
+				1158.0
+			],
+			"size_NDC": [
+				0.4000000059604645,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				8430281722478215175,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}
