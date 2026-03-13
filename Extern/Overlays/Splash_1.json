@@ -1,5 +1,5 @@
 {
-	"882": {
+	"884": {
 		"NameComponent": {
 			"name": "SplashScreenDPLogo"
 		},
@@ -48,7 +48,7 @@
 			"visible": false
 		}
 	},
-	"883": {
+	"885": {
 		"NameComponent": {
 			"name": "SplashScreenBG"
 		},
