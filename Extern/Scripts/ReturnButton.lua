@@ -19,10 +19,6 @@ function on_button_ReturnButton(self)
         UI_DisplayMenu_InvisibleLayer("Android_Inventory_Buttons")
     end
 
-    StateMachine_SetTrigger("BacktoGame")
-
-    
-
     -- Display Main Menu
     -- UI_DisplayMenu("StartMenu")
 end
