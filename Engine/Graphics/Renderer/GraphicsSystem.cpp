@@ -108,6 +108,9 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
         SetupGLFW();
 #endif
+#if defined(PLATFORM_ANDROID)
+        m_androidPlatform = true;
+#endif
         SetupGraphics();
 
         // Initialize Instancing System
@@ -162,9 +165,7 @@ namespace EngineFramework
         InputManager::RegisterCallbacks(pWindow);
 #endif
 
-#if defined(PLATFORM_ANDROID)
-		m_androidPlatform = true;
-#endif
+
 
         // Print OpenGL info
         LOGI("OpenGL Version: %s", glGetString(GL_VERSION));
@@ -191,7 +192,7 @@ namespace EngineFramework
         m_spotShadowFBO = std::move(tempSpotShadowFBO);
 
         // Create the point shadow map framebuffer (we use default and setup manually as we need multiple cube map faces)
-        FBO tempPointShadowFBO(FBO::Default, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE);
+        FBO tempPointShadowFBO(FBO::ShadowCube, POINT_SHADOW_SIZE, POINT_SHADOW_SIZE, &m_pointShadowArray, MAX_SHADOW_CASTING_POINT_LIGHTS);
         m_pointShadowFBO = std::move(tempPointShadowFBO);
 
 #ifdef PLATFORM_ANDROID
@@ -199,35 +200,6 @@ namespace EngineFramework
 		m_godRayFBO = std::move(tempGodRayFBO);
 #endif
 
-        // Create framebuffer handle for point shadows
-        glGenFramebuffers(1, &m_pointShadowFBO.handle);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
-
-        // Explicitly tell OpenGL this FBO has no color buffers
-        GLenum drawBuffers[] = { GL_NONE };
-        glDrawBuffers(1, drawBuffers);
-        glReadBuffer(GL_NONE);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        glGenTextures(1, &m_pointShadowArray); // Add this to header!
-        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, m_pointShadowArray);
-        // Allocate storage: 6 faces * MAX_LIGHTS
-        // width, height, layers (count * 6)
-        glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 1, GL_DEPTH_COMPONENT24,
-            POINT_SHADOW_SIZE, POINT_SHADOW_SIZE,
-            MAX_SHADOW_CASTING_POINT_LIGHTS * 6);
-
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-        // Hardware PCF Comparison
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-
-        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, 0);
         
         // 1. Create SSBOs for lights
         glGenBuffers(FRAMES_IN_FLIGHT, m_lightSSBOs);
@@ -640,7 +612,9 @@ namespace EngineFramework
             }
 
         }
-
+        // Explicitly detach the texture from the depth attachment before unbinding.
+        // This is required on Mali/Adreno to avoid feedback loop UB when sampling later.
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 0, 0, 0);
         glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // Unbind
@@ -728,7 +702,9 @@ namespace EngineFramework
 
             if (lightComp.isStatic) lightComp._isDirty = false;
         }
-
+        // Explicitly detach the texture from the depth attachment before unbinding.
+        // This is required on Mali/Adreno to avoid feedback loop UB when sampling later.
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 0, 0, 0);
         glCullFace(GL_BACK);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -802,6 +778,9 @@ namespace EngineFramework
             if (lightComp.isStatic) lightComp._isDirty = false;
         }
 
+        // Explicitly detach the texture from the depth attachment before unbinding.
+        // This is required on Mali/Adreno to avoid feedback loop UB when sampling later.
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 0, 0, 0);
         glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // unbind indirect buffer

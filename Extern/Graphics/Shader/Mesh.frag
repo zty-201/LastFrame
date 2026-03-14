@@ -93,18 +93,18 @@ uniform samplerCubeArrayShadow s_PointShadowArray;
 
 vec3 apply_analytical_fog(vec3 color, vec3 world_pos, vec3 camera_pos) 
 {
-    float density = aniso_density_scattering_absorption.y / 1000.0f; // adjust to match pc
-
+    float density = clamp(aniso_density_scattering_absorption.y / 1000.0, 0.0, 1.0);
     float dist = length(world_pos - camera_pos);
-    vec3  rayDir = (world_pos - camera_pos) / dist;
 
-    // Pure exponential distance fog — density slider has direct linear control
     float fogAmount  = density * dist;
-    float visibility = clamp(exp(-fogAmount), 0.0, 1.0);
+    
+    // FIX 1: Rename to fogFactor to avoid function name collision!
+    // FIX 2: Add 0.0001 to prevent exp(-0.0) NaN driver bugs
+    float fogFactor = clamp(exp(-max(fogAmount, 0.0001)), 0.0, 1.0);
+    
+    vec3 fogColor = vec3(0.5, 0.7, 1.0) * light_color.w;
 
-    vec3  fogColor  = vec3(0.5, 0.7, 1.0) * light_color.w;
-
-    return mix(fogColor, color, visibility);
+    return mix(fogColor, color, fogFactor);
 }
 
 // ------------------------------------------------------------------
@@ -465,12 +465,18 @@ vec3 calculatePointLight(int lightIndex, vec3 worldPos, vec3 N, vec3 Wo, vec3 F0
     return brdf * light.color_intensity.rgb * attenuation * shadow * NdotL * spotIntensity;
 }
 
+vec3 Uncharted2Tonemap(vec3 x) {
+    float A = 0.15, B = 0.50, C = 0.10, D = 0.20, E = 0.02, F = 0.30;
+    return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
+}
+
 // ------------------------------------------------------------------
 // MAIN -------------------------------------------------------------
 // ------------------------------------------------------------------
 
 void main()
 {
+
     // Sample material properties
     vec3  albedo    = texture(s_Albedo, FS_IN_TexCoord).rgb * u_AlbedoFactor;
     float roughness = texture(s_Roughness, FS_IN_TexCoord).r * u_RoughnessFactor;

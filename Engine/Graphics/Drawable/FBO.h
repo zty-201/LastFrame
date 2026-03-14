@@ -287,29 +287,29 @@ struct FBO
             glDeleteTextures(1, pTexture);
         }
 
-        // Create cubemap texture
-        glGenTextures(1, pTexture);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, *pTexture);
+       
 
-        for (int i = 0; i < 6; i++) {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT24,
-                width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-        }
+        glGenTextures(1, pTexture); // Add this to header!
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, *pTexture);
+        // Allocate storage: 6 faces * MAX_LIGHTS
+        // width, height, layers (count * 6)
+        glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 1, GL_DEPTH_COMPONENT24,
+            width, height, cascadeCount * 6);
 
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-        // Create FBO
+        // Create framebuffer handle for point shadows
         glGenFramebuffers(1, &handle);
         glBindFramebuffer(GL_FRAMEBUFFER, handle);
-
         // We'll attach cube faces dynamically during rendering
-        glDrawBuffers(0, nullptr);
+        GLenum drawBuffers[] = { GL_NONE };
+        glDrawBuffers(1, drawBuffers);
         glReadBuffer(GL_NONE);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -324,6 +324,7 @@ struct FBO
         if (pTexture && *pTexture) {
             glDeleteTextures(1, pTexture);
         }
+        GLfloat border[] = { 1.0f, 0.0f,0.0f,0.0f };
         // Create 2D texture array for cascaded shadow maps
         glGenTextures(1, pTexture);
         glBindTexture(GL_TEXTURE_2D_ARRAY, *pTexture);
@@ -333,13 +334,17 @@ struct FBO
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, border);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
         // Create FBO
         glGenFramebuffers(1, &handle);
         glBindFramebuffer(GL_FRAMEBUFFER, handle);
         // We'll attach layers dynamically during rendering
-        glDrawBuffers(0, nullptr);
+        GLenum drawBuffers[] = { GL_NONE };
+        glDrawBuffers(1, drawBuffers);
         glReadBuffer(GL_NONE);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
