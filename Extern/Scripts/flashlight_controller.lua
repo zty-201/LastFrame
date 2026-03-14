@@ -58,6 +58,11 @@ function Flashlight_Toggle()
 end
 
 function on_update(self, dt)
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        return
+    end
+    
     if not camera or not EntityTransform then return end
 
     -- 1. Get Base Camera Position

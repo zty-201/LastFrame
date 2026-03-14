@@ -207,9 +207,12 @@ function on_create(self)
 end
 
 function on_update(self, dt)
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        return
+    end
 
     ensure_tables()
-
     
     -- Android state control
     if PLATFORM == "android" then

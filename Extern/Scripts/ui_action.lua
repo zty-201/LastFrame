@@ -78,7 +78,10 @@ end
 -- on_update
 -- ============================================================
 function on_update(self, dt)
-
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        return
+    end
     -- Does not matter about the platform ya
     UI:SetVisible(false)
     

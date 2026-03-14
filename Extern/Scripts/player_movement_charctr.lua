@@ -59,12 +59,10 @@ end
 
 function on_update(self, dt)
     local state_name = StateMachine_GetCurrentStateName()
-    if state_name == "Pause" then
+    if state_name ~= "Gameplay" then
         return
     end
-
-
-
+    
     dt = dt or 0.016
 
     -- Heartbeat
