@@ -1,7 +1,7 @@
 #version 320 es
 precision highp float;
-precision highp samplerBuffer;
-precision highp usamplerBuffer;
+precision highp usampler2D;
+precision highp sampler2D;
 // ------------------------------------------------------------------
 // INPUT VARIABLES --------------------------------------------------
 // ------------------------------------------------------------------
@@ -43,27 +43,37 @@ layout(std140, binding = 0) uniform VolumetricUBO {
 
 uniform int u_VisibleIndexOffset; 
 uniform vec4 u_UVTransform;
-uniform samplerBuffer s_InstanceData;
-uniform usamplerBuffer s_VisibleIndices; // 'u' because it's a uint texture
+uniform highp sampler2D s_InstanceData;
+uniform highp usampler2D s_VisibleIndices;
+
+// ------------------------------------------------------------------
+// HELPER -----------------------------------------------------------
+// ------------------------------------------------------------------
+
+vec4 fetchInstanceData(int index) {
+    int x = index % 1024;
+    int y = index / 1024;
+    return texelFetch(s_InstanceData, ivec2(x, y), 0);
+}
+
+uint fetchVisibleIndex(int index) {
+    int x = index % 2048;
+    int y = index / 2048;
+    return texelFetch(s_VisibleIndices, ivec2(x, y), 0).r;
+}
 
 // ------------------------------------------------------------------
 // MAIN -------------------------------------------------------------
 // ------------------------------------------------------------------
 void main() {   
-    // 1. Fetch the actual Instance ID using texelFetch
-    uint actualInstanceID = texelFetch(s_VisibleIndices, u_VisibleIndexOffset + gl_InstanceID).r;
-
-    // 2. Fetch the Model Matrix
-    // Each InstanceData struct is 96 bytes (six vec4 texels).
+    uint actualInstanceID = fetchVisibleIndex(u_VisibleIndexOffset + gl_InstanceID);
     int baseTexel = int(actualInstanceID) * 6;
-    
-    // The matrix starts at texel offset 1 (skipping batchID/padding at offset 0)
     mat4 model = mat4(
-        texelFetch(s_InstanceData, baseTexel + 1),
-        texelFetch(s_InstanceData, baseTexel + 2),
-        texelFetch(s_InstanceData, baseTexel + 3),
-        texelFetch(s_InstanceData, baseTexel + 4)
-    );
+        fetchInstanceData(baseTexel + 1),
+        fetchInstanceData(baseTexel + 2),
+        fetchInstanceData(baseTexel + 3),
+        fetchInstanceData(baseTexel + 4)
+    );  
 
     vec4 world_pos = model * vec4(VS_IN_Position, 1.0f);
     FS_IN_WorldPos = world_pos.xyz;

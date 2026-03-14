@@ -216,7 +216,8 @@ namespace Mesh {
 
 			unsigned int importFlags = aiProcess_Triangulate |
 				aiProcess_GenSmoothNormals |
-				aiProcess_CalcTangentSpace;
+				aiProcess_CalcTangentSpace |
+				aiProcess_JoinIdenticalVertices;
 
 			std::filesystem::path p(filePath);
 			std::string fileName = p.filename().string();

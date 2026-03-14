@@ -608,11 +608,11 @@ namespace EngineFramework
         //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_instancingSystem->GetInstanceSSBO()); // Required for ShadowMap.vert instances[]
         //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_instancingSystem->GetVisibleIndicesBuffer());
         glActiveTexture(GL_TEXTURE0 + TextureUnits::INSTANCE_DATA_UNIT);
-        glBindTexture(GL_TEXTURE_BUFFER, m_instancingSystem->GetInstanceTexture());
+        glBindTexture(GL_TEXTURE_2D, m_instancingSystem->GetInstanceTexture());
         shader->setUniform("s_InstanceData", TextureUnits::INSTANCE_DATA_UNIT);
 
         glActiveTexture(GL_TEXTURE0 + TextureUnits::VISIBLE_INDICES_UNIT);
-        glBindTexture(GL_TEXTURE_BUFFER, m_instancingSystem->GetVisibleIndicesTexture());
+        glBindTexture(GL_TEXTURE_2D, m_instancingSystem->GetVisibleIndicesTexture());
         shader->setUniform("s_VisibleIndices", TextureUnits::VISIBLE_INDICES_UNIT);
 
         for (int cascade = 0; cascade < CASCADE_COUNT; cascade++) {
@@ -671,12 +671,13 @@ namespace EngineFramework
 
         // Bind Buffers globally for this pass
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
+
         glActiveTexture(GL_TEXTURE0 + TextureUnits::INSTANCE_DATA_UNIT);
-        glBindTexture(GL_TEXTURE_BUFFER, m_instancingSystem->GetInstanceTexture());
+        glBindTexture(GL_TEXTURE_2D, m_instancingSystem->GetInstanceTexture());
         shader->setUniform("s_InstanceData", TextureUnits::INSTANCE_DATA_UNIT);
 
         glActiveTexture(GL_TEXTURE0 + TextureUnits::VISIBLE_INDICES_UNIT);
-        glBindTexture(GL_TEXTURE_BUFFER, m_instancingSystem->GetVisibleIndicesTexture());
+        glBindTexture(GL_TEXTURE_2D, m_instancingSystem->GetVisibleIndicesTexture());
         shader->setUniform("s_VisibleIndices", TextureUnits::VISIBLE_INDICES_UNIT);
 
         for (size_t i = 0; i < m_LightData.size(); i++) {
@@ -757,11 +758,11 @@ namespace EngineFramework
         // Bind Buffers globally for this pass
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
         glActiveTexture(GL_TEXTURE0 + TextureUnits::INSTANCE_DATA_UNIT);
-        glBindTexture(GL_TEXTURE_BUFFER, m_instancingSystem->GetInstanceTexture());
+        glBindTexture(GL_TEXTURE_2D, m_instancingSystem->GetInstanceTexture());
         shader->setUniform("s_InstanceData", TextureUnits::INSTANCE_DATA_UNIT);
 
         glActiveTexture(GL_TEXTURE0 + TextureUnits::VISIBLE_INDICES_UNIT);
-        glBindTexture(GL_TEXTURE_BUFFER, m_instancingSystem->GetVisibleIndicesTexture());
+        glBindTexture(GL_TEXTURE_2D, m_instancingSystem->GetVisibleIndicesTexture());
         shader->setUniform("s_VisibleIndices", TextureUnits::VISIBLE_INDICES_UNIT);
 
         for (size_t i = 0; i < m_LightData.size(); i++) {
@@ -1013,11 +1014,11 @@ namespace EngineFramework
             glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBOs[ringIdx]);
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightSSBOs[ringIdx]);
             glActiveTexture(GL_TEXTURE0 + TextureUnits::INSTANCE_DATA_UNIT);
-            glBindTexture(GL_TEXTURE_BUFFER, m_instancingSystem->GetInstanceTexture());
+            glBindTexture(GL_TEXTURE_2D, m_instancingSystem->GetInstanceTexture());
             instanced_shader->setUniform("s_InstanceData", TextureUnits::INSTANCE_DATA_UNIT);
 
             glActiveTexture(GL_TEXTURE0 + TextureUnits::VISIBLE_INDICES_UNIT);
-            glBindTexture(GL_TEXTURE_BUFFER, m_instancingSystem->GetVisibleIndicesTexture());
+            glBindTexture(GL_TEXTURE_2D, m_instancingSystem->GetVisibleIndicesTexture());
             instanced_shader->setUniform("s_VisibleIndices", TextureUnits::VISIBLE_INDICES_UNIT);
             // Shadow maps
             glActiveTexture(GL_TEXTURE0 + TextureUnits::SHADOW_MAP_UNIT);
