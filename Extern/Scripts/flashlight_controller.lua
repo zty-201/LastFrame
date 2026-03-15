@@ -167,7 +167,7 @@ function on_update(self, dt)
     local rz = -math.sin(radYaw)
 
     -- 5. Apply Realistic Positional Offsets
-    local forwardOffset = 0.0
+    local forwardOffset = 15.0
     local rightOffset   = 0.0
     local upOffset      = 0.0
 
