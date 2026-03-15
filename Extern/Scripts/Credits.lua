@@ -72,6 +72,17 @@ function on_update(self, dt)
     if y >= END_Y then
         playing = false
         print("[Credits] Reached END_Y (" .. END_Y .. ") -> ReturnToMenu")
+
+        -- Reset scene state so pressing Play again starts fresh
+        SHARED = SHARED or {}
+        SHARED.PLAYER_DEAD                = false
+        SHARED.UI_INVENTORY_OPEN          = false
+        SHARED.UI_INVENTORY_ANDROID_STATE = false
+        SHARED.EVIDENCE_FOLDER_FINISHED   = false
+        _G.GAME_STATE = "MENU"
+
+        if Scene_RequestRestart then Scene_RequestRestart() end
+        if UI_CloseAllMenus    then UI_CloseAllMenus()     end
         if StateMachine_SetTrigger then
             StateMachine_SetTrigger("ReturnToMenu")
         end
