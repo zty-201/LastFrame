@@ -27,7 +27,7 @@
 			]
 		},
 		"NameComponent": {
-			"name": "QuitBtn"
+			"name": "QuitGameBtn"
 		},
 		"UIComponent": {
 			"Overlay_name": "StartMenu",
@@ -124,6 +124,28 @@
 		}
 	},
 	"993": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						11185332403909623813,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S1",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
 		"ButtonComponent": {
 			"clicked_texture": [
 				16345929764767956995,
@@ -151,7 +173,7 @@
 			]
 		},
 		"NameComponent": {
-			"name": "PlayBtn"
+			"name": "UI_PlayButton (Cutscenes)"
 		},
 		"UIComponent": {
 			"Overlay_name": "StartMenu",
@@ -165,7 +187,7 @@
 			"layer": 1,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
+			"play_video_audio": false,
 			"position": [
 				741.75,
 				655.3200073242188

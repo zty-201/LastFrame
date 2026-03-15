@@ -17,6 +17,16 @@ local MENU_NAME  = "Playroom_Note_UI"
 local DOOR_CMD_TABLE = "DOOR_CMD"
 local UI_TABLE       = "PLAYROOM_NOTES_UI_OPEN"
 
+local PAGE_FLIP_SFX_ID = "PageFlip"
+
+local function play_3d_sfx(slotId)
+    if type(Audio_PlaySlot) == "function" and slotId ~= nil then
+        Audio_PlaySlot(EntityID, slotId)
+        return true
+    end
+    return false
+end
+
 local function consume_toggle(id)
     if SHARED == nil then return false end
     local t = SHARED[DOOR_CMD_TABLE]

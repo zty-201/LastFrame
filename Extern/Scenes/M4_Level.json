@@ -634,6 +634,131 @@
 			]
 		}
 	},
+	"1007": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						6912014444615630857,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S1",
+					"loop": false,
+					"maxDistance": 50000.0,
+					"minDistance": 10000.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0160000324249268
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						6912014444615630857,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S2",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						7150107137785659393,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S3",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						1961960367054848003,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S4",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						11185332403909623813,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S5",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 9791908129717747713
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "SFX_Cutscene_Manager"
+		},
+		"TransformComponent": {
+			"position": [
+				0.0,
+				401.6575622558594,
+				-635.1781005859375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
 	"101": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -12079,9 +12204,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				308.5498962402344,
-				757.4262084960938,
-				1042.670654296875
+				4.086117744445801,
+				169.37667846679688,
+				-757.1651000976563
 			],
 			"rotation": [
 				-0.0,
@@ -33032,9 +33157,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				308.5498962402344,
-				758.2261962890625,
-				1072.670654296875
+				4.086117744445801,
+				170.1766815185547,
+				-727.1651000976563
 			],
 			"rotation": [
 				0.0,
@@ -43859,9 +43984,9 @@
 				-35.89995193481445
 			],
 			"scale": [
-				1.0,
-				1.0,
-				1.0
+				0.0,
+				0.0,
+				0.0
 			]
 		},
 		"TriggerBoxComponent": {
@@ -45243,11 +45368,11 @@
 			"position": [
 				4.086117744445801,
 				169.37667846679688,
-				-722.4871215820313
+				-757.1651000976563
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -54224,7 +54349,7 @@
 			],
 			"rotation": [
 				0.0,
-				136.7146759033203,
+				99.57362365722656,
 				0.0
 			],
 			"scale": [
@@ -54323,7 +54448,7 @@
 			],
 			"rotation": [
 				0.0,
-				136.7146759033203,
+				99.57362365722656,
 				0.0
 			],
 			"scale": [
@@ -78482,7 +78607,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 26852.564453125,
+			"intensity": 92090.53125,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -83045,7 +83170,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 50000.0,
+			"intensity": 92090.53125,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
