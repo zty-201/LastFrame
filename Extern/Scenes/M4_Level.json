@@ -12415,9 +12415,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-475.8907165527344,
+				522.2564697265625,
 				169.37667846679688,
-				458.9837646484375
+				727.6064453125
 			],
 			"rotation": [
 				-0.0,
@@ -33368,9 +33368,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-475.8907165527344,
+				522.2564697265625,
 				170.1766815185547,
-				488.9837646484375
+				757.6064453125
 			],
 			"rotation": [
 				0.0,
@@ -43597,20 +43597,56 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						8064935949222477869,
+						9794318206132748331,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"id": "BoxOpen",
+					"id": "ViewLock",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 150.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 1.2419999837875366
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						8064935949222477843,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Unlock",
+					"loop": false,
+					"maxDistance": 100000.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.100000023841858
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16511674366032265229,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Discovery",
+					"loop": false,
+					"maxDistance": 100000.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.1330000162124634
 				}
 			]
 		},
@@ -44279,7 +44315,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						16532090323042058245,
+						1085543999116279813,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44292,7 +44328,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 2.2079999446868896
+					"volume": 1.0130000114440918
 				}
 			]
 		},
@@ -44340,7 +44376,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						16532090323042058245,
+						1085543999116279813,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44353,7 +44389,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 2.3540000915527344
+					"volume": 0.7519999742507935
 				}
 			]
 		},
@@ -44401,7 +44437,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						16532090323042058245,
+						1085543999116279813,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44414,7 +44450,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 2.1640000343322754
+					"volume": 0.5120000243186951
 				}
 			]
 		},
@@ -45532,13 +45568,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-475.8907165527344,
+				-1.4415416717529297,
 				169.37667846679688,
-				458.9837646484375
+				-758.1339721679688
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
@@ -54515,7 +54551,7 @@
 			],
 			"rotation": [
 				0.0,
-				207.1656951904297,
+				122.45945739746094,
 				0.0
 			],
 			"scale": [
@@ -54614,7 +54650,7 @@
 			],
 			"rotation": [
 				0.0,
-				207.1656951904297,
+				122.45945739746094,
 				0.0
 			],
 			"scale": [
@@ -62474,6 +62510,54 @@
 			],
 			"radius": 0.5,
 			"type": 0
+		}
+	},
+	"689": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				0.9279538989067078,
+				0.28881561756134033,
+				0.0
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 17.5,
+			"quadratic": 0.03200000151991844,
+			"radius": 1200.0,
+			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 8260517130811506689
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Storeroom_Glow_01"
+		},
+		"TransformComponent": {
+			"position": [
+				630.916748046875,
+				141.6713104248047,
+				159.4846649169922
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
 		}
 	},
 	"69": {
@@ -78795,7 +78879,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 16192.0927734375,
+			"intensity": 0.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -79281,6 +79365,54 @@
 			],
 			"radius": 0.5,
 			"type": 0
+		}
+	},
+	"846": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				0.9279538989067078,
+				0.28881561756134033,
+				0.0
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 17.5,
+			"quadratic": 0.03200000151991844,
+			"radius": 1200.0,
+			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 8260517130811506689
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Storeroom_Glow_02"
+		},
+		"TransformComponent": {
+			"position": [
+				640.556396484375,
+				144.3446502685547,
+				163.15179443359375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
 		}
 	},
 	"85": {
@@ -82412,6 +82544,54 @@
 			]
 		}
 	},
+	"883": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				0.9279538989067078,
+				0.28881561756134033,
+				0.0
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 17.5,
+			"quadratic": 0.03200000151991844,
+			"radius": 1200.0,
+			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 8260517130811506689
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Storeroom_Glow_03"
+		},
+		"TransformComponent": {
+			"position": [
+				649.8399658203125,
+				141.6713104248047,
+				166.74795532226563
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
 	"89": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -83339,7 +83519,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 21807.85546875,
+			"intensity": 50000.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -92758,7 +92938,7 @@
 			"position": [
 				-160.0104217529297,
 				93.76690673828125,
-				1190.6004638671875
+				1277.7330322265625
 			],
 			"rotation": [
 				0.0,

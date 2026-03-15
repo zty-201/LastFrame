@@ -139,6 +139,15 @@ end
 function on_update(self, dt)
     local open = is_open()
 
+    local FAIL_GLOW_LIGHTS = {
+        [485] = 689,
+        [484] = 846,
+        [483] = 883,
+    }
+
+    SHARED = SHARED or {}
+    SHARED.STOREROOM_FLICKER_OFF = SHARED.STOREROOM_FLICKER_OFF or {}
+
     -- Reset tracking when overlay is freshly opened
     if open and not was_open then
         reset_pressed()
@@ -161,9 +170,9 @@ function on_update(self, dt)
         local openT   = Query.GetTransform(TOOLBOX_OPEN_ID)
         local boltT   = Query.GetTransform(BOLT_CUTTER_ID)
 
-        if lockedT then lockedT:SetPosition(0, -99999, 0) end  -- hide closed toolbox
-        if openT   then openT:SetScale(1, 1, 1) end            -- reveal open toolbox
-        if boltT   then boltT:SetScale(1, 1, 1) end            -- reveal bolt cutter (already positioned in on_create)
+        if lockedT then lockedT:SetPosition(0, -99999, 0) end
+        if openT   then openT:SetScale(1, 1, 1) end
+        if boltT   then boltT:SetScale(1, 1, 1) end
 
         -- Remove locked toolbox from interaction tracking so it no longer
         -- steals E-press commands from the bolt cutter
@@ -217,6 +226,13 @@ function on_update(self, dt)
                 -- No camera or candle transform — blow out immediately
                 local light = Query.GetLight(pending_fail_light)
                 if light then light:SetIntensity(0) end
+
+                local glowId = FAIL_GLOW_LIGHTS[pending_fail_light]
+                if glowId then
+                    SHARED.STOREROOM_FLICKER_OFF[glowId] = true
+                    print("[LockManager] Queued glow light OFF for entity " .. tostring(glowId))
+                end
+
                 play_sfx(pending_fail_light, "Candles")
                 pending_fail_light = nil
             end
@@ -248,6 +264,13 @@ function on_update(self, dt)
                 -- Blow out the candle at peak zoom
                 local light = Query.GetLight(pending_fail_light)
                 if light then light:SetIntensity(0) end
+
+                local glowId = FAIL_GLOW_LIGHTS[pending_fail_light]
+                if glowId then
+                    SHARED.STOREROOM_FLICKER_OFF[glowId] = true
+                    print("[LockManager] Queued glow light OFF for entity " .. tostring(glowId))
+                end
+
                 play_sfx(pending_fail_light, "Candles")
             end
 
@@ -279,7 +302,6 @@ function on_update(self, dt)
 
             if cinematic_timer >= ZOOM_OUT_TIME then
                 -- Restore exactly and hand control back to camera script
-                cinematic_cam:SetFOV(c_from_fov)
                 cinematic_cam   = nil
                 cinematic_phase = 0
                 pending_fail_light = nil
