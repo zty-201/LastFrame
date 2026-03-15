@@ -30,6 +30,7 @@ function on_button_AndroidPause(self)
 
     SHARED.ANDROID_PAUSE_BUTTON = true
     debug_print("on_button_AndroidPause")
+    StateMachine_SetTrigger("PauseGame")
 end
 
 function on_create(self)
