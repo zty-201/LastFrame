@@ -46,6 +46,10 @@ local rotateAfterPull         = false
 local rotateTimer             = 0.0
 local ROTATE_AFTER_PULL_DELAY = 1.2
 
+local creditsCountdown        = false
+local creditsTimer            = 0.0
+local CREDITS_DELAY           = 0.5
+
 ------------------------------------------------
 local function get_camera()
     local SHARED = rawget(_G, "SHARED")
@@ -207,6 +211,10 @@ function on_create(self)
     lookTimer         = 0.0
     silenceTimer      = 0.0
     frame             = 0
+    rotateAfterPull   = false
+    rotateTimer       = 0.0
+    creditsCountdown  = false
+    creditsTimer      = 0.0
 
     hide_girl()
 
@@ -231,12 +239,25 @@ function on_update(self, dt)
     if rotateAfterPull then
         rotateTimer = rotateTimer + dt
         if rotateTimer >= ROTATE_AFTER_PULL_DELAY then
-            rotateAfterPull = false
+            rotateAfterPull  = false
             Transform_SetRotation(EntityID, 0.0, 270.0, 0.0)
-            SHARED = SHARED or {}
-            SHARED.PLAYER_DEAD = true
+            creditsCountdown = true
+            creditsTimer     = 0.0
             if DEBUG then
-                print("[EvidenceGirlLookAt] Pull done -> rotated girl to 270 degrees, signalling game over")
+                print("[EvidenceGirlLookAt] Pull done -> rotated girl, starting credits countdown")
+            end
+        end
+    end
+
+    if creditsCountdown then
+        creditsTimer = creditsTimer + dt
+        if creditsTimer >= CREDITS_DELAY then
+            creditsCountdown = false
+            if DEBUG then
+                print("[EvidenceGirlLookAt] Credits delay elapsed -> triggering ToEndCredit")
+            end
+            if StateMachine_SetTrigger then
+                StateMachine_SetTrigger("ToEndCredit")
             end
         end
     end
@@ -349,4 +370,6 @@ function on_destroy(self)
     jinglePlayed      = false
     lookTimer         = 0.0
     silenceTimer      = 0.0
+    creditsCountdown  = false
+    creditsTimer      = 0.0
 end

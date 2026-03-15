@@ -1270,6 +1270,14 @@ namespace Engine {
                 return EngineFramework::StateMachineSystem::GetInstance().get_currentState_name();
             });
 
+
+        //get_prevState_name
+
+        s_Lua.set_function("StateMachine_GetPrevStateName", []() -> std::string
+            {
+                return EngineFramework::StateMachineSystem::GetInstance().get_prevState_name();
+            });
+
         // ===============================================================
         // GLFW Key Constants
         // ===============================================================

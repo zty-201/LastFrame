@@ -28,8 +28,9 @@ function on_button_Settings(self)
     end
 
     print("[SettingsButton] Settings button clicked -> opening PauseMenu")
-    UI_CloseAllMenus()
-    UI_DisplayMenu("PauseMenu")
+    --UI_CloseAllMenus()
+    --UI_DisplayMenu("PauseMenu")
+    StateMachine_SetTrigger("PauseGame")
 end
 
 function on_destroy(self)
