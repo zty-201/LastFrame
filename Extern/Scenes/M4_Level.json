@@ -634,6 +634,217 @@
 			]
 		}
 	},
+	"1007": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						15921659061987917825,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "GirlLaughing",
+					"loop": true,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						3691342623965118479,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "SubtleJingle",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.1260000467300415
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						9417264931441426433,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "StopLooking",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						4982459319963795463,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "EpicSound",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 3.0139999389648438
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						15379168818435211273,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Lightning",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 2.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						5002875276973588493,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Tension",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 5.0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 1421959426128855041
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				13556160950506864641,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1450485152134971395,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				10097396436686323723,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				7215092675169206277,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				18167846968934252557,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "little_girl",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Storeroom_Girl"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				527.8832397460938,
+				9.120782852172852,
+				715.9349365234375
+			],
+			"rotation": [
+				179.99989318847656,
+				2.3500027656555176,
+				179.99989318847656
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
 	"101": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -12079,9 +12290,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				308.5498962402344,
-				757.4262084960938,
-				1042.670654296875
+				568.6651000976563,
+				169.37667846679688,
+				376.42730712890625
 			],
 			"rotation": [
 				-0.0,
@@ -33032,9 +33243,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				308.5498962402344,
-				758.2261962890625,
-				1072.670654296875
+				568.6651000976563,
+				170.1766815185547,
+				406.42730712890625
 			],
 			"rotation": [
 				0.0,
@@ -43816,7 +44027,7 @@
 		},
 		"MeshComponent": {
 			"meshName": "bot_cutter_close",
-			"visibility": false
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_BoltCutter"
@@ -43854,14 +44065,14 @@
 				235.96548461914063
 			],
 			"rotation": [
-				30.849998474121094,
-				-24.44999885559082,
+				30.84999656677246,
+				-24.449993133544922,
 				-35.89995193481445
 			],
 			"scale": [
-				1.0,
-				1.0,
-				1.0
+				0.0,
+				0.0,
+				0.0
 			]
 		},
 		"TriggerBoxComponent": {
@@ -45241,13 +45452,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				4.086117744445801,
+				568.6651000976563,
 				169.37667846679688,
-				-722.4871215820313
+				376.42730712890625
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -54224,7 +54435,7 @@
 			],
 			"rotation": [
 				0.0,
-				136.7146759033203,
+				164.46109008789063,
 				0.0
 			],
 			"scale": [
@@ -54323,7 +54534,7 @@
 			],
 			"rotation": [
 				0.0,
-				136.7146759033203,
+				164.46109008789063,
 				0.0
 			],
 			"scale": [
@@ -78482,7 +78693,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 26852.564453125,
+			"intensity": 25708.775390625,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
