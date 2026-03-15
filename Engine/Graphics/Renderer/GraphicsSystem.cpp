@@ -118,7 +118,7 @@ namespace EngineFramework
         m_instancingSystem->Initialize(MAX_INSTANCES);
 
         m_geometryBuffer = std::make_unique<GeometryDataBuffer>();
-        m_geometryBuffer->Initialize(10000000, 30000000);
+        m_geometryBuffer->Initialize(5000000, 15000000);
 
         LoadBlueNoiseTextures();
         PreGeneratePrimitives();

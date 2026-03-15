@@ -9,6 +9,7 @@
 namespace EngineFramework
 {
     StateMachineSystem* StateMachineSystem::this_instance = nullptr;
+    std::string EngineFramework::StateMachineSystem::prev_state = "";
 
     StateMachineSystem::StateMachineSystem()
     {
@@ -54,6 +55,10 @@ namespace EngineFramework
         m_stateMachine.AddTriggerTransition("Gameplay", "Pause", "PauseGame");
         m_stateMachine.AddTriggerTransition("Pause", "Gameplay", "BacktoGame");
 
+        //main menu and settings
+        m_stateMachine.AddTriggerTransition("MainMenu", "Pause", "PauseGame");
+        m_stateMachine.AddTriggerTransition("Pause", "MainMenu", "BacktoMainMenu");
+
         // Gameplay to main menu
         m_stateMachine.AddTriggerTransition("Gameplay", "EndCredit", "ToEndCredit");
         m_stateMachine.AddTriggerTransition("Pause", "EndCredit", "ToEndCredit");
@@ -75,9 +80,23 @@ namespace EngineFramework
                 m_stateMachine.SetInitialState("Splash");
             }
             m_started = true;
+            prev_state = get_currentState_name();
         }
 
+        std::string oldState = get_currentState_name();
+
         m_stateMachine.Update(dt);
+
+        std::string newState = get_currentState_name();
+
+        if (oldState != newState)
+        {
+            prev_state = oldState; // store where we came from
+
+            LOGI("[StateMachineSystem] State changed: %s -> %s",
+                prev_state.c_str(), newState.c_str());
+        }
+        
     }
 
 }
