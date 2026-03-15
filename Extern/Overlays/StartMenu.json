@@ -27,7 +27,7 @@
 			]
 		},
 		"NameComponent": {
-			"name": "QuitBtn"
+			"name": "QuitGameBtn"
 		},
 		"UIComponent": {
 			"Overlay_name": "StartMenu",
@@ -43,16 +43,16 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				324.6499938964844,
-				80.8499984741211
+				812.7000122070313,
+				150.47999572753906
 			],
 			"position_NDC": [
 				0.0,
 				-0.5699999928474426
 			],
 			"size": [
-				105.69999694824219,
-				49.0
+				264.6000061035156,
+				91.20000457763672
 			],
 			"size_NDC": [
 				0.14000000059604645,
@@ -100,8 +100,8 @@
 				0.0
 			],
 			"size": [
-				755.0,
-				490.0
+				1890.0,
+				912.0
 			],
 			"size_NDC": [
 				1.0,
@@ -167,16 +167,16 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				302.0,
-				142.10000610351563
+				756.0,
+				264.4800109863281
 			],
 			"position_NDC": [
 				0.0,
 				-0.3199999928474426
 			],
 			"size": [
-				151.0,
-				49.0
+				378.0,
+				91.20000457763672
 			],
 			"size_NDC": [
 				0.20000000298023224,
@@ -198,148 +198,7 @@
 			"visible": false
 		}
 	},
-	"993": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				16345929764767956995,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "PlayButton",
-			"hover_texture": [
-				16345929764767956995,
-				3711223656383638553
-			],
-			"idle_texture": [
-				13562766767143288835,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 5982082694360776705
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "PlayBtn"
-		},
-		"UIComponent": {
-			"Overlay_name": "StartMenu",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 1,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				324.6499938964844,
-				338.1000061035156
-			],
-			"position_NDC": [
-				0.0,
-				0.47999998927116394
-			],
-			"size": [
-				105.69999694824219,
-				49.0
-			],
-			"size_NDC": [
-				0.14000000059604645,
-				0.10000000149011612
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				13562766767143288835,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
-	},
-	"994": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				8275479232520028161,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "",
-			"hover_texture": [
-				8275479232520028161,
-				3711223656383638553
-			],
-			"idle_texture": [
-				12986306014839865345,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"NameComponent": {
-			"name": "HowToPlayBtn"
-		},
-		"UIComponent": {
-			"Overlay_name": "StartMenu",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 1,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				302.0,
-				271.95001220703125
-			],
-			"position_NDC": [
-				0.0,
-				0.20999999344348907
-			],
-			"size": [
-				151.0,
-				49.0
-			],
-			"size_NDC": [
-				0.20000000298023224,
-				0.10000000149011612
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				12986306014839865345,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
-	},
-	"995": {
+	"1009": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				15193008260161110025,
@@ -383,16 +242,16 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				302.0,
-				210.6999969482422
+				756.0,
+				392.15997314453125
 			],
 			"position_NDC": [
 				0.0,
 				-0.03999999910593033
 			],
 			"size": [
-				151.0,
-				49.0
+				378.0,
+				91.20000457763672
 			],
 			"size_NDC": [
 				0.20000000298023224,
@@ -402,6 +261,169 @@
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				15292149024053559303,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"994": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						11185332403909623813,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S1",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
+		"ButtonComponent": {
+			"clicked_texture": [
+				16345929764767956995,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "PlayButton",
+			"hover_texture": [
+				16345929764767956995,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13562766767143288835,
+				3711223656383638553
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 5982082694360776705
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "UI_PlayButton (Cutscenes)"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": false,
+			"position": [
+				812.7000122070313,
+				629.280029296875
+			],
+			"position_NDC": [
+				0.0,
+				0.47999998927116394
+			],
+			"size": [
+				264.6000061035156,
+				91.20000457763672
+			],
+			"size_NDC": [
+				0.14000000059604645,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13562766767143288835,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"995": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				8275479232520028161,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "",
+			"hover_texture": [
+				8275479232520028161,
+				3711223656383638553
+			],
+			"idle_texture": [
+				12986306014839865345,
+				3711223656383638553
+			],
+			"stay_clicked": false
+		},
+		"NameComponent": {
+			"name": "HowToPlayBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				756.0,
+				506.1600036621094
+			],
+			"position_NDC": [
+				0.0,
+				0.20999999344348907
+			],
+			"size": [
+				378.0,
+				91.20000457763672
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				12986306014839865345,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,

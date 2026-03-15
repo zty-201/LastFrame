@@ -26,6 +26,9 @@
 				}
 			]
 		},
+		"NameComponent": {
+			"name": "UIAndroid_Action"
+		},
 		"UIComponent": {
 			"Overlay_name": "Android_Inventory_Buttons",
 			"color": [
@@ -97,6 +100,9 @@
 					"ScriptGuid": 14082809425275846657
 				}
 			]
+		},
+		"NameComponent": {
+			"name": "UIAndroid_Torchlight"
 		},
 		"UIComponent": {
 			"Overlay_name": "Android_Inventory_Buttons",
@@ -170,6 +176,9 @@
 				}
 			]
 		},
+		"NameComponent": {
+			"name": "UIAndroid_Pause"
+		},
 		"UIComponent": {
 			"Overlay_name": "Android_Inventory_Buttons",
 			"color": [
@@ -241,6 +250,9 @@
 					"ScriptGuid": 17190082062911111169
 				}
 			]
+		},
+		"NameComponent": {
+			"name": "UIAndroid_Calibrate"
 		},
 		"UIComponent": {
 			"Overlay_name": "Android_Inventory_Buttons",
@@ -315,7 +327,7 @@
 			]
 		},
 		"NameComponent": {
-			"name": "android_inventory_open_state"
+			"name": "UIAndroid_InventoryOpen"
 		},
 		"UIComponent": {
 			"Overlay_name": "Android_Inventory_Buttons",
@@ -390,7 +402,7 @@
 			]
 		},
 		"NameComponent": {
-			"name": "android_inventory_close_state"
+			"name": "UIAndroid_InventoryClose"
 		},
 		"UIComponent": {
 			"Overlay_name": "Android_Inventory_Buttons",

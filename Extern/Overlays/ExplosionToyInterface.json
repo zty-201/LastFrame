@@ -10,7 +10,7 @@
 			]
 		},
 		"NameComponent": {
-			"name": "StandInUi"
+			"name": "PlayroomFrog_Ui"
 		},
 		"UIComponent": {
 			"Overlay_name": "ExplosionToyInterface",

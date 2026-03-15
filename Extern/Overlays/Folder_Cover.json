@@ -126,7 +126,7 @@
 			]
 		},
 		"NameComponent": {
-			"name": "Root"
+			"name": "Folder"
 		},
 		"UIComponent": {
 			"Overlay_name": "Folder_Cover",

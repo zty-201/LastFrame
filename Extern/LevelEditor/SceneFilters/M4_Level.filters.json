@@ -286,7 +286,9 @@
 				823,
 				840,
 				841,
-				842
+				842,
+				884,
+				622
 			],
 			"name": "Playroom"
 		},
@@ -435,7 +437,7 @@
 			"name": "Canteen"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				80,
 				240,
@@ -559,7 +561,7 @@
 			"name": "Bedroom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				39,
 				163,
@@ -611,7 +613,11 @@
 				605,
 				606,
 				619,
-				620
+				620,
+				1007,
+				689,
+				846,
+				883
 			],
 			"name": "Storeroom"
 		},
@@ -662,7 +668,8 @@
 				877,
 				894,
 				529,
-				530
+				530,
+				595
 			],
 			"name": "Lobby"
 		},
@@ -818,7 +825,7 @@
 			"name": "SF_Corridor"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				724,
 				747,
@@ -860,12 +867,13 @@
 				900,
 				903,
 				725,
-				905
+				905,
+				1010
 			],
 			"name": "SFX"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				5,
 				2,

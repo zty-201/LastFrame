@@ -14,6 +14,7 @@ local DOOR_CMD_TABLE = "DOOR_CMD"
 local UI_TABLE       = "BOOK_UI_OPEN"
 
 local PAGE_FLIP_SFX_ID = "PageFlip"
+local DISCOVERY_SFX_ID = "Discovery"
 
 local function play_3d_sfx(slotId)
     if type(Audio_PlaySlot) == "function" and slotId ~= nil then
@@ -68,6 +69,7 @@ function on_update(self, dt)
     -- Play page flip sound when opening
     if isNowOpen then
         play_3d_sfx(PAGE_FLIP_SFX_ID)
+        play_3d_sfx(DISCOVERY_SFX_ID)
 
         if DEBUG then
             print("[Book_TriggerBox] Page flipped")
