@@ -935,6 +935,131 @@
 			]
 		}
 	},
+	"1010": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						6912014444615630857,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S1",
+					"loop": false,
+					"maxDistance": 50000.0,
+					"minDistance": 10000.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.2089999914169312
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						6912014444615630857,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S2",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.2209999561309814
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						7150107137785659393,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S3",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						1961960367054848003,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S4",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						11185332403909623813,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S5",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 9791908129717747713
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "SFX_Cutscene_Manager"
+		},
+		"TransformComponent": {
+			"position": [
+				0.0,
+				401.6575622558594,
+				-635.1781005859375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
 	"102": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -12290,9 +12415,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				568.6651000976563,
+				-475.8907165527344,
 				169.37667846679688,
-				376.42730712890625
+				458.9837646484375
 			],
 			"rotation": [
 				-0.0,
@@ -33243,9 +33368,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				568.6651000976563,
+				-475.8907165527344,
 				170.1766815185547,
-				406.42730712890625
+				488.9837646484375
 			],
 			"rotation": [
 				0.0,
@@ -38735,6 +38860,24 @@
 					"spatial": 0,
 					"useFade": false,
 					"volume": 1.8309999704360962
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16511674366032265229,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Discovery",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 0.36399999260902405
 				}
 			]
 		},
@@ -39148,69 +39291,6 @@
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				10640027270492504069,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
-	},
-	"437": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				1122364430668251137,
-				3711223656383638553
-			],
-			"event_hover": "i am hovering",
-			"event_trigger": "i am triggering",
-			"hover_texture": [
-				9192814962916179971,
-				3711223656383638553
-			],
-			"idle_texture": [
-				14380961733646991365,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"UIComponent": {
-			"Overlay_name": "Menu_2",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": false,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				500.0,
-				500.0
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				150.0,
-				150.0
-			],
-			"size_NDC": [
-				0.0,
-				0.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				14380961733646991365,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
@@ -44583,7 +44663,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 3.86899995803833
+					"volume": 0.9089999794960022
 				},
 				{
 					"ambienceType": 0,
@@ -44765,7 +44845,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 3.8559999465942383
+					"volume": 0.8700000047683716
 				},
 				{
 					"ambienceType": 0,
@@ -44857,7 +44937,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 3.8429999351501465
+					"volume": 0.9610000252723694
 				},
 				{
 					"ambienceType": 0,
@@ -44949,7 +45029,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 3.86899995803833
+					"volume": 0.7400000095367432
 				},
 				{
 					"ambienceType": 0,
@@ -45041,7 +45121,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 3.8429999351501465
+					"volume": 0.9350000023841858
 				},
 				{
 					"ambienceType": 0,
@@ -45452,9 +45532,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				568.6651000976563,
+				-475.8907165527344,
 				169.37667846679688,
-				376.42730712890625
+				458.9837646484375
 			],
 			"rotation": [
 				0.0,
@@ -54435,7 +54515,7 @@
 			],
 			"rotation": [
 				0.0,
-				100.6416015625,
+				207.1656951904297,
 				0.0
 			],
 			"scale": [
@@ -54534,7 +54614,7 @@
 			],
 			"rotation": [
 				0.0,
-				100.6416015625,
+				207.1656951904297,
 				0.0
 			],
 			"scale": [
@@ -77500,6 +77580,28 @@
 		}
 	},
 	"822": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						6912014444615630857,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "PageFlip",
+					"loop": false,
+					"maxDistance": 100.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -78693,7 +78795,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 39490.2421875,
+			"intensity": 16192.0927734375,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -79140,7 +79242,7 @@
 			"position": [
 				-490.49932861328125,
 				110.41413879394531,
-				593.9658203125
+				665.412109375
 			],
 			"rotation": [
 				0.0,
@@ -79179,25 +79281,6 @@
 			],
 			"radius": 0.5,
 			"type": 0
-		}
-	},
-	"846": {
-		"TransformComponent": {
-			"position": [
-				-391.99322509765625,
-				277.63311767578125,
-				-326.0906982421875
-			],
-			"rotation": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"scale": [
-				1.0,
-				1.0,
-				1.0
-			]
 		}
 	},
 	"85": {
@@ -83256,7 +83339,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 6488.4775390625,
+			"intensity": 21807.85546875,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,

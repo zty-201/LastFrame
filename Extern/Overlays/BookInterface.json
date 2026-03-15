@@ -10,7 +10,7 @@
 			]
 		},
 		"NameComponent": {
-			"name": "Standin"
+			"name": "Lobby_BookUI"
 		},
 		"UIComponent": {
 			"Overlay_name": "BookInterface",
@@ -26,20 +26,20 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				156.20001220703125,
-				0.0
+				373.5999755859375,
+				91.19998168945313
 			],
 			"position_NDC": [
 				0.0,
 				0.0
 			],
 			"size": [
-				1249.5999755859375,
-				1158.0
+				1120.800048828125,
+				729.6000366210938
 			],
 			"size_NDC": [
-				0.800000011920929,
-				1.0
+				0.6000000238418579,
+				0.800000011920929
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,

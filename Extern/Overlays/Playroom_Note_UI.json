@@ -1,11 +1,11 @@
 {
-	"883": {
+	"884": {
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": []
 		},
 		"NameComponent": {
-			"name": "UI"
+			"name": "PlayroomNote_UI"
 		},
 		"UIComponent": {
 			"Overlay_name": "Playroom_Note_UI",
@@ -19,7 +19,7 @@
 			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
-			"play_video_audio": true,
+			"play_video_audio": false,
 			"position": [
 				345.0,
 				0.0
@@ -33,8 +33,8 @@
 				1032.0
 			],
 			"size_NDC": [
-				0.6000000238418579,
-				1.0
+				0.30000001192092896,
+				0.8999999761581421
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,

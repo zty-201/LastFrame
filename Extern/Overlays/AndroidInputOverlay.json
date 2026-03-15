@@ -12,7 +12,7 @@
 			"outputY": 0.0
 		},
 		"NameComponent": {
-			"name": "jsBG"
+			"name": "UIAndroid_JoystickBG"
 		},
 		"UIComponent": {
 			"Overlay_name": "AndroidInputOverlay",
@@ -61,7 +61,7 @@
 	},
 	"591": {
 		"NameComponent": {
-			"name": "js"
+			"name": "UIAndroid_Joystick"
 		},
 		"UIComponent": {
 			"Overlay_name": "AndroidInputOverlay",

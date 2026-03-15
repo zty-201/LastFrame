@@ -66,6 +66,7 @@ function on_update(self, dt)
     else
         if UI_DisplayMenu ~= nil then
             UI_DisplayMenu(MENU_NAME)
+            play_3d_sfx(PAGE_FLIP_SFX_ID)
         else
             print("[PlayroomNotes_TriggerBox] ERROR: UI_DisplayMenu binding missing")
         end

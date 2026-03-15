@@ -1,5 +1,5 @@
 {
-	"890": {
+	"992": {
 		"NameComponent": {
 			"name": "Logo_fmod"
 		},
@@ -29,7 +29,7 @@
 				516.0
 			],
 			"size_NDC": [
-				0.800000011920929,
+				0.5,
 				0.5
 			],
 			"subtitle_reveal_progress": 1.0,
@@ -48,7 +48,7 @@
 			"visible": false
 		}
 	},
-	"992": {
+	"993": {
 		"NameComponent": {
 			"name": "blackbg_fmod"
 		},
