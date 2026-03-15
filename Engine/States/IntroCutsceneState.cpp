@@ -19,7 +19,7 @@ void IntroCutsceneState::OnEnter(Engine::StateMachine& machine)
 
     ui.StartCutsceneSequence(
         { "Cutscene_1", "Cutscene_2", "Cutscene_3", "Cutscene_4", "Cutscene_5"},
-        3.0f,
+        5.0f,
         true
     );
 }

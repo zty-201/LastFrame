@@ -2,7 +2,7 @@
 -- flashlight_controller.lua
 -- Author: Benjamin Lau Rey Jun
 -- Date: October 2025
--- 
+--
 -- Holds flashlight cone info in SHARED.FLASHLIGHT
 -- and provides Flashlight_Toggle() for UI.
 -- Attach this to the same entity as player_pov_camera.
@@ -17,40 +17,117 @@ local camera = nil
 local isOn = false
 local baseIntensity = 10000.0
 
--- Helper to safely get the SHARED table (used to grab player Yaw/Pitch)
+-- -----------------------------------------------
+-- Battery / flicker config
+-- -----------------------------------------------
+local STABLE_TIME  = 15.0   -- seconds of stable light before flickering
+local FLICKER_TIME = 10.0   -- seconds of flickering before auto-off
+
+-- -----------------------------------------------
+-- Runtime state
+-- -----------------------------------------------
+local onTimer      = 0.0    -- time since flashlight was turned on
+local flickerTimer = 0.0    -- countdown to next flicker toggle
+local flickerIsOn  = true   -- current flicker sub-state
+local flickering   = false
+
+local deathCount   = 0      -- how many times it has auto-died
+local autoDied     = false  -- true when light is off due to battery death
+local pressCount   = 0      -- F presses accumulated while trying to revive
+
+local function required_presses()
+    -- First death: 1 press. Every death after: 5 presses.
+    return deathCount <= 1 and 1 or 5
+end
+
+local function get_flicker_interval()
+    -- Flicker gets more frantic as the 10s window runs out
+    local flickerProgress = math.min((onTimer - STABLE_TIME) / FLICKER_TIME, 1.0)
+    local maxInt = 0.4 * (1.0 - flickerProgress * 0.85)   -- shrinks from 0.4 -> 0.06
+    local minInt = 0.04
+    maxInt = math.max(maxInt, minInt)
+    return minInt + math.random() * (maxInt - minInt)
+end
+
 local function getGlobalShared()
     return rawget(_G, "SHARED")
+end
+
+-- -----------------------------------------------
+-- Auto-die (called when battery runs out)
+-- -----------------------------------------------
+local function auto_die()
+    isOn        = false
+    autoDied    = true
+    deathCount  = deathCount + 1
+    pressCount  = 0
+    onTimer     = 0.0
+    flickering  = false
+    flickerIsOn = true
+    flickerTimer = 0.0
+
+    if EntityLight then EntityLight:SetIntensity(0.0) end
+
+    if type(Audio_PlaySlot) == "function" then
+        Audio_StopSlot(EntityID, "Flashlight")
+        Audio_PlaySlot(EntityID, "Flashlight")
+    end
+end
+
+-- -----------------------------------------------
+-- Revive attempt (called on F press / UI tap when off)
+-- -----------------------------------------------
+local function try_revive()
+    pressCount = pressCount + 1
+    if pressCount >= required_presses() then
+        autoDied    = false
+        pressCount  = 0
+        isOn        = true
+        onTimer     = 0.0
+        flickering  = false
+        flickerIsOn = true
+        flickerTimer = 0.0
+
+        if EntityLight then EntityLight:SetIntensity(baseIntensity) end
+
+        if type(Audio_PlaySlot) == "function" then
+            Audio_StopSlot(EntityID, "Flashlight")
+            Audio_PlaySlot(EntityID, "Flashlight")
+        end
+    end
 end
 
 function on_create(self)
     camera = GetMainCamera()
 
     if EntityLight then
-        -- Store the intensity you set in the editor Inspector
         local current = EntityLight:GetIntensity()
         if current > 0.0 then
             baseIntensity = current
         end
-
-        -- Start the flashlight OFF
         EntityLight:SetIntensity(0.0)
         isOn = false
     end
 end
 
 function Flashlight_Toggle()
-    isOn = not isOn
-
-    -- Toggle the Light Component
-    if EntityLight then
-        if isOn then
-            EntityLight:SetIntensity(baseIntensity)
-        else
-            EntityLight:SetIntensity(0.0)
-        end
+    if autoDied then
+        try_revive()
+        return
     end
 
-    -- Play the toggle sound using the new Audio API
+    isOn = not isOn
+
+    if EntityLight then
+        EntityLight:SetIntensity(isOn and baseIntensity or 0.0)
+    end
+
+    -- Reset flicker when manually toggled
+    onTimer      = 0.0
+    flickering   = false
+    flickerIsOn  = true
+    flickerTimer = 0.0
+
     if type(Audio_PlaySlot) == "function" then
         Audio_StopSlot(EntityID, "Flashlight")
         Audio_PlaySlot(EntityID, "Flashlight")
@@ -58,6 +135,9 @@ function Flashlight_Toggle()
 end
 
 function on_update(self, dt)
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then return end
+
     if not camera or not EntityTransform then return end
 
     -- 1. Get Base Camera Position
@@ -80,16 +160,16 @@ function on_update(self, dt)
     local cosPitch = math.cos(radPitch)
 
     local fx = cosPitch * math.sin(radYaw)
-    local fy = -math.sin(radPitch) 
+    local fy = -math.sin(radPitch)
     local fz = cosPitch * math.cos(radYaw)
 
     local rx = math.cos(radYaw)
     local rz = -math.sin(radYaw)
 
     -- 5. Apply Realistic Positional Offsets
-    local forwardOffset = 0.0   -- 0.5 units in front of the camera
-    local rightOffset   = 0.0   -- 0.3 units to the right (held in right hand)
-    local upOffset      = 0.0  -- Slightly below eye-level
+    local forwardOffset = 0.0
+    local rightOffset   = 0.0
+    local upOffset      = 0.0
 
     local lx = cx + (fx * forwardOffset) + (rx * rightOffset)
     local ly = cy + (fy * forwardOffset) + upOffset
@@ -97,15 +177,54 @@ function on_update(self, dt)
 
     EntityTransform:SetPosition(lx, ly, lz)
 
-    -- 6. Keyboard Toggle (Press F to toggle)
+    -- 6. Keyboard Toggle (Press F)
     if PLATFORM == "windows" and Input.GetKeyDown(GLFW_KEY_F) then
-        Flashlight_Toggle()
+        if autoDied then
+            try_revive()
+        elseif isOn then
+            Flashlight_Toggle()   -- manual off while on
+        else
+            Flashlight_Toggle()   -- manual on while off (not dead)
+        end
     end
-    
+
     -- 7. UI Toggle hook
     if SHARED and SHARED.FLASHLIGHT and SHARED.FLASHLIGHT.requestToggle then
         SHARED.FLASHLIGHT.requestToggle = false
-        Flashlight_Toggle()
+        if autoDied then
+            try_revive()
+        else
+            Flashlight_Toggle()
+        end
+    end
+
+    -- 8. Battery lifecycle (only while on)
+    if not isOn then return end
+
+    onTimer = onTimer + dt
+
+    -- Phase 1: stable (0 -> STABLE_TIME) — nothing to do
+
+    -- Phase 2: flicker (STABLE_TIME -> STABLE_TIME + FLICKER_TIME)
+    if onTimer >= STABLE_TIME then
+        if not flickering then
+            flickering   = true
+            flickerTimer = get_flicker_interval()
+        end
+
+        flickerTimer = flickerTimer - dt
+        if flickerTimer <= 0.0 then
+            flickerIsOn  = not flickerIsOn
+            flickerTimer = get_flicker_interval()
+            if EntityLight then
+                EntityLight:SetIntensity(flickerIsOn and baseIntensity or 0.0)
+            end
+        end
+    end
+
+    -- Phase 3: auto-off after full duration
+    if onTimer >= STABLE_TIME + FLICKER_TIME then
+        auto_die()
     end
 end
 

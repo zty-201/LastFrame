@@ -1,5 +1,5 @@
 {
-	"884": {
+	"886": {
 		"NameComponent": {
 			"name": "SplashScreenDPLogo"
 		},
@@ -14,7 +14,7 @@
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
-			"luminance": 1.0,
+			"luminance": 0.831265926361084,
 			"play_video_audio": true,
 			"position": [
 				0.0,
@@ -29,7 +29,7 @@
 				516.0
 			],
 			"size_NDC": [
-				1.0,
+				0.800000011920929,
 				0.5
 			],
 			"subtitle_reveal_progress": 1.0,
@@ -48,7 +48,7 @@
 			"visible": false
 		}
 	},
-	"885": {
+	"887": {
 		"NameComponent": {
 			"name": "SplashScreenBG"
 		},

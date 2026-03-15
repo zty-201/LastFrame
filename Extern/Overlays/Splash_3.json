@@ -1,5 +1,5 @@
 {
-	"888": {
+	"890": {
 		"NameComponent": {
 			"name": "GameTitle"
 		},
@@ -25,8 +25,8 @@
 				0.0
 			],
 			"size": [
-				738.0,
-				550.0
+				1624.0,
+				912.0
 			],
 			"size_NDC": [
 				1.0,
@@ -48,7 +48,7 @@
 			"visible": false
 		}
 	},
-	"889": {
+	"992": {
 		"UIComponent": {
 			"Overlay_name": "Splash_3",
 			"color": [
@@ -71,8 +71,8 @@
 				0.0
 			],
 			"size": [
-				738.0,
-				550.0
+				1624.0,
+				912.0
 			],
 			"size_NDC": [
 				1.0,

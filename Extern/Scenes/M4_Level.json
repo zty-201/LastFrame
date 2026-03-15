@@ -634,6 +634,217 @@
 			]
 		}
 	},
+	"1007": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						15921659061987917825,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "GirlLaughing",
+					"loop": true,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						3691342623965118479,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "SubtleJingle",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.1260000467300415
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						9417264931441426433,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "StopLooking",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						4982459319963795463,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "EpicSound",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 3.0139999389648438
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						15379168818435211273,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Lightning",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 2.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						5002875276973588493,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Tension",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 5.0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 1421959426128855041
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				13556160950506864641,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1450485152134971395,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				10097396436686323723,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				7215092675169206277,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				18167846968934252557,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "little_girl",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Storeroom_Girl"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				527.8832397460938,
+				9.120782852172852,
+				715.9349365234375
+			],
+			"rotation": [
+				179.99989318847656,
+				2.3500027656555176,
+				179.99989318847656
+			],
+			"scale": [
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	},
 	"101": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -714,6 +925,131 @@
 			],
 			"rotation": [
 				0.2199999988079071,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			]
+		}
+	},
+	"1010": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						6912014444615630857,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S1",
+					"loop": false,
+					"maxDistance": 50000.0,
+					"minDistance": 10000.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.2089999914169312
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						6912014444615630857,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S2",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.2209999561309814
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						7150107137785659393,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S3",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						1961960367054848003,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S4",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						11185332403909623813,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "S5",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 9791908129717747713
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "SFX_Cutscene_Manager"
+		},
+		"TransformComponent": {
+			"position": [
+				0.0,
+				401.6575622558594,
+				-635.1781005859375
+			],
+			"rotation": [
+				0.0,
 				-0.0,
 				0.0
 			],
@@ -12079,9 +12415,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				308.5498962402344,
-				757.4262084960938,
-				1042.670654296875
+				522.2564697265625,
+				169.37667846679688,
+				727.6064453125
 			],
 			"rotation": [
 				-0.0,
@@ -33032,9 +33368,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				308.5498962402344,
-				758.2261962890625,
-				1072.670654296875
+				522.2564697265625,
+				170.1766815185547,
+				757.6064453125
 			],
 			"rotation": [
 				0.0,
@@ -38524,6 +38860,24 @@
 					"spatial": 0,
 					"useFade": false,
 					"volume": 1.8309999704360962
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16511674366032265229,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Discovery",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 0.36399999260902405
 				}
 			]
 		},
@@ -38937,69 +39291,6 @@
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				10640027270492504069,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
-	},
-	"437": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				1122364430668251137,
-				3711223656383638553
-			],
-			"event_hover": "i am hovering",
-			"event_trigger": "i am triggering",
-			"hover_texture": [
-				9192814962916179971,
-				3711223656383638553
-			],
-			"idle_texture": [
-				14380961733646991365,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"UIComponent": {
-			"Overlay_name": "Menu_2",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": false,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				500.0,
-				500.0
-			],
-			"position_NDC": [
-				0.0,
-				0.0
-			],
-			"size": [
-				150.0,
-				150.0
-			],
-			"size_NDC": [
-				0.0,
-				0.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				14380961733646991365,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
@@ -43306,20 +43597,56 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						8064935949222477869,
+						9794318206132748331,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"id": "BoxOpen",
+					"id": "ViewLock",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 150.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 1.2419999837875366
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						8064935949222477843,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Unlock",
+					"loop": false,
+					"maxDistance": 100000.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.100000023841858
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16511674366032265229,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "Discovery",
+					"loop": false,
+					"maxDistance": 100000.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.1330000162124634
 				}
 			]
 		},
@@ -43816,7 +44143,7 @@
 		},
 		"MeshComponent": {
 			"meshName": "bot_cutter_close",
-			"visibility": false
+			"visibility": true
 		},
 		"NameComponent": {
 			"name": "Storeroom_BoltCutter"
@@ -43854,14 +44181,14 @@
 				235.96548461914063
 			],
 			"rotation": [
-				30.849998474121094,
-				-24.44999885559082,
+				30.84999656677246,
+				-24.449993133544922,
 				-35.89995193481445
 			],
 			"scale": [
-				1.0,
-				1.0,
-				1.0
+				0.0,
+				0.0,
+				0.0
 			]
 		},
 		"TriggerBoxComponent": {
@@ -43988,7 +44315,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						16532090323042058245,
+						1085543999116279813,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44001,7 +44328,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 2.2079999446868896
+					"volume": 1.0130000114440918
 				}
 			]
 		},
@@ -44049,7 +44376,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						16532090323042058245,
+						1085543999116279813,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44062,7 +44389,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 2.3540000915527344
+					"volume": 0.7519999742507935
 				}
 			]
 		},
@@ -44110,7 +44437,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						16532090323042058245,
+						1085543999116279813,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44123,7 +44450,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 2.1640000343322754
+					"volume": 0.5120000243186951
 				}
 			]
 		},
@@ -44372,7 +44699,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 3.86899995803833
+					"volume": 0.9089999794960022
 				},
 				{
 					"ambienceType": 0,
@@ -44554,7 +44881,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 3.8559999465942383
+					"volume": 0.8700000047683716
 				},
 				{
 					"ambienceType": 0,
@@ -44646,7 +44973,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 3.8429999351501465
+					"volume": 0.9610000252723694
 				},
 				{
 					"ambienceType": 0,
@@ -44738,7 +45065,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 3.86899995803833
+					"volume": 0.7400000095367432
 				},
 				{
 					"ambienceType": 0,
@@ -44830,7 +45157,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 3.8429999351501465
+					"volume": 0.9350000023841858
 				},
 				{
 					"ambienceType": 0,
@@ -45241,9 +45568,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				4.086117744445801,
+				-1.4415416717529297,
 				169.37667846679688,
-				-722.4871215820313
+				-758.1339721679688
 			],
 			"rotation": [
 				0.0,
@@ -54224,7 +54551,7 @@
 			],
 			"rotation": [
 				0.0,
-				136.7146759033203,
+				122.45945739746094,
 				0.0
 			],
 			"scale": [
@@ -54323,7 +54650,7 @@
 			],
 			"rotation": [
 				0.0,
-				136.7146759033203,
+				122.45945739746094,
 				0.0
 			],
 			"scale": [
@@ -62183,6 +62510,54 @@
 			],
 			"radius": 0.5,
 			"type": 0
+		}
+	},
+	"689": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				0.9279538989067078,
+				0.28881561756134033,
+				0.0
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 17.5,
+			"quadratic": 0.03200000151991844,
+			"radius": 1200.0,
+			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 8260517130811506689
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Storeroom_Glow_01"
+		},
+		"TransformComponent": {
+			"position": [
+				630.916748046875,
+				141.6713104248047,
+				159.4846649169922
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
 		}
 	},
 	"69": {
@@ -77289,6 +77664,28 @@
 		}
 	},
 	"822": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						6912014444615630857,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"id": "PageFlip",
+					"loop": false,
+					"maxDistance": 100.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -78482,7 +78879,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 26852.564453125,
+			"intensity": 0.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -78929,7 +79326,7 @@
 			"position": [
 				-490.49932861328125,
 				110.41413879394531,
-				593.9658203125
+				665.412109375
 			],
 			"rotation": [
 				0.0,
@@ -78971,21 +79368,50 @@
 		}
 	},
 	"846": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				0.9279538989067078,
+				0.28881561756134033,
+				0.0
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 17.5,
+			"quadratic": 0.03200000151991844,
+			"radius": 1200.0,
+			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 8260517130811506689
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Storeroom_Glow_02"
+		},
 		"TransformComponent": {
 			"position": [
-				-391.99322509765625,
-				277.63311767578125,
-				-326.0906982421875
+				640.556396484375,
+				144.3446502685547,
+				163.15179443359375
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
-				1.0,
-				1.0,
-				1.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
@@ -82115,6 +82541,54 @@
 				1.0000020265579224,
 				0.9999999403953552,
 				1.0000020265579224
+			]
+		}
+	},
+	"883": {
+		"LightComponent": {
+			"castShadows": true,
+			"color": [
+				0.9279538989067078,
+				0.28881561756134033,
+				0.0
+			],
+			"constant": 4.699999809265137,
+			"innerConeAngle": 12.5,
+			"intensity": 100.0,
+			"isStatic": true,
+			"linear": 0.09000000357627869,
+			"outerConeAngle": 17.5,
+			"quadratic": 0.03200000151991844,
+			"radius": 1200.0,
+			"type": 1
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 8260517130811506689
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Storeroom_Glow_03"
+		},
+		"TransformComponent": {
+			"position": [
+				649.8399658203125,
+				141.6713104248047,
+				166.74795532226563
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
@@ -92464,7 +92938,7 @@
 			"position": [
 				-160.0104217529297,
 				93.76690673828125,
-				1190.6004638671875
+				1277.7330322265625
 			],
 			"rotation": [
 				0.0,

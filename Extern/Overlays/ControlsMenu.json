@@ -1,0 +1,126 @@
+{
+	"10": {
+		"NameComponent": {
+			"name": "ControlsPng"
+		},
+		"UIComponent": {
+			"Overlay_name": "ControlsMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				755.0,
+				370.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				10756074274378055681,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"1013": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				606077809587716097,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "ControlsToMenu",
+			"hover_texture": [
+				606077809587716097,
+				3711223656383638553
+			],
+			"idle_texture": [
+				606077809587716097,
+				3711223656383638553
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16292511144440971265
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "ReturnToMenuBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "ControlsMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				7.62939453125e-06,
+				-5.549997329711914
+			],
+			"position_NDC": [
+				-0.8999999761581421,
+				-0.8299999833106995
+			],
+			"size": [
+				75.5,
+				74.0
+			],
+			"size_NDC": [
+				0.10000000149011612,
+				0.20000000298023224
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				606077809587716097,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}

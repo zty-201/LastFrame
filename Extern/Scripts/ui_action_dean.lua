@@ -68,7 +68,10 @@ end
 
 
 function on_update(self, dt)
-    
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        return
+    end
     -- Windows: nothing (UI hidden, flashlight probably on a key)
     local Shared = getShared()
     local platform = (Shared and Shared.PLATFORM) or PLATFORM

@@ -234,6 +234,121 @@ namespace EngineFramework
         };
 
         CutsceneSequence gCutscene;
+
+        struct CreditsRoll
+        {
+            bool playing = false;
+            std::string menuName;
+
+            float speedPixelsPerSecond = 120.0f;
+            float endYThreshold = 8.26f;
+            float speedMultiplier = 1.0f;  // ADD THIS
+
+            std::vector<std::pair<entt::entity, glm::vec2>> startPositions;
+
+            void Start(const std::string& inMenuName,
+                float inSpeedPixelsPerSecond,
+                float inEndYThreshold)
+            {
+                menuName = inMenuName;
+                speedPixelsPerSecond = (inSpeedPixelsPerSecond > 0.0f) ? inSpeedPixelsPerSecond : 120.0f;
+                endYThreshold = inEndYThreshold;
+                speedMultiplier = 1.0f;
+                startPositions.clear();
+
+                auto it = EngineFramework::UI_System::Menu_Mapping.find(menuName);
+                if (it != EngineFramework::UI_System::Menu_Mapping.end() && it->second.first)
+                {
+                    auto entities = it->second.first->get_Elements();
+                    for (auto e : entities)
+                    {
+                        if (registry.valid(e) && registry.all_of<UIComponent>(e))
+                        {
+                            auto& ui = registry.get<UIComponent>(e);
+                            glm::vec2 pos = ui.is_NDC ? ui.position_NDC : ui.position;
+                            startPositions.push_back({ e, pos });
+                        }
+                    }
+                }
+
+                playing = !menuName.empty();
+            }
+
+            void Stop()
+            {
+                for (auto& [e, savedPos] : startPositions)
+                {
+                    if (registry.valid(e) && registry.all_of<UIComponent>(e))
+                    {
+                        auto& ui = registry.get<UIComponent>(e);
+                        if (ui.is_NDC)
+                            ui.position_NDC = savedPos;
+                        else
+                            ui.position = savedPos;
+                    }
+                }
+                startPositions.clear();
+                playing = false;
+                menuName.clear();
+            }
+
+            void Update(float dt)
+            {
+                if (!playing || menuName.empty())
+                    return;
+
+                auto it = EngineFramework::UI_System::Menu_Mapping.find(menuName);
+                if (it == EngineFramework::UI_System::Menu_Mapping.end() || !it->second.first)
+                {
+                    playing = false;
+                    return;
+                }
+
+                auto entities = it->second.first->get_Elements();
+                if (entities.empty())
+                {
+                    playing = false;
+                    return;
+                }
+
+                bool allPastThreshold = true;
+
+                const float screenHeight =
+                    static_cast<float>(EngineFramework::InputManager::GetInstance().GetScreenSize().second);
+
+                const float effectiveSpeed = speedPixelsPerSecond * speedMultiplier;  // USE MULTIPLIER
+
+                for (auto e : entities)
+                {
+                    if (!registry.valid(e) || !registry.all_of<UIComponent>(e))
+                        continue;
+
+                    auto& ui = registry.get<UIComponent>(e);
+
+                    if (ui.is_NDC)
+                    {
+                        float deltaNDC = (effectiveSpeed * dt / screenHeight) * 2.0f;
+                        ui.position_NDC.y += deltaNDC;
+
+                        if (ui.position_NDC.y < endYThreshold)
+                            allPastThreshold = false;
+                    }
+                    else
+                    {
+                        ui.position.y += effectiveSpeed * dt;
+
+                        float topPixel = ui.position.y + ui.size.y;
+                        if (topPixel < endYThreshold)
+                            allPastThreshold = false;
+                    }
+                }
+
+                if (allPastThreshold)
+                    playing = false;
+            }
+        };
+
+        CreditsRoll gCreditsRoll;
     }
 
     // -------------------------------------------------------------------------
@@ -347,6 +462,8 @@ namespace EngineFramework
 
         // 1) Tick cutscene sequence FIRST
         gCutscene.Update(deltaTime);
+        // 2) Tick rolling credits
+        gCreditsRoll.Update(deltaTime);
 
         // 2) Update only active menus
         for (auto& [name, menu] : Menu_Mapping)
@@ -759,6 +876,42 @@ namespace EngineFramework
             1.5f,
             true
         );
+    }
+
+    // In UISystem.cpp
+    void UI_System::StartCreditsRoll(const std::string& menuName,
+        float speedPixelsPerSecond, float endYThreshold, bool closeOthersFirst)
+    {
+        std::cout << "[UI_System] StartCreditsRoll('" << menuName << "')\n";
+        if (closeOthersFirst)
+            closeAllMenu();
+
+        displayMenu(menuName);
+        ResetMenuLuminance(menuName);
+        gCreditsRoll.Start(menuName, speedPixelsPerSecond, endYThreshold);
+    }
+
+    void UI_System::StopCreditsRoll(bool closeAll)
+    {
+        gCreditsRoll.Stop();
+        if (closeAll)
+        {
+            closeAllMenu();
+#if defined(PLATFORM_ANDROID)
+            displayMenu("Android_Inventory_Buttons");
+            displayMenu("AndroidInputOverlay");
+#endif
+        }
+    }
+
+    bool UI_System::IsCreditsRolling() const
+    {
+        return gCreditsRoll.playing;
+    }
+
+    void UI_System::SetCreditsSpeedMultiplier(float multiplier)
+    {
+        gCreditsRoll.speedMultiplier = multiplier;
     }
 
 }

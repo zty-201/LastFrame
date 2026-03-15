@@ -16,7 +16,10 @@ local TARGET_ENTITY_ID = 0
 
 local MENU_NAME       = "LockScreen"
 local UI_TABLE        = "LOCKSCREEN_OPEN"
-local BOX_OPEN_SFX_ID = "BoxOpen"
+
+local VIEW_LOCK_SFX_ID = "ViewLock"
+local UNLOCK_SFX_ID = "Unlock"
+local DISCOVERY_SFX_ID = "Discovery"
 
 local isOpen = false
 
@@ -64,11 +67,12 @@ function on_create(self)
         print("[ToolboxOpenMechanic] on_create EntityID=" .. tostring(EntityID))
     end
 
-    SHARED.DOOR_CMD         = SHARED.DOOR_CMD         or {}
-    SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
-    SHARED.TRIGGER_ICON_CMD = SHARED.TRIGGER_ICON_CMD or {}
-    SHARED[UI_TABLE]        = false
-    SHARED.LOCK_DISABLED    = false
+    SHARED.DOOR_CMD                  = SHARED.DOOR_CMD         or {}
+    SHARED.INTERACT_IN_ZONE          = SHARED.INTERACT_IN_ZONE or {}
+    SHARED.TRIGGER_ICON_CMD          = SHARED.TRIGGER_ICON_CMD or {}
+    SHARED[UI_TABLE]                 = false
+    SHARED.LOCK_DISABLED             = false
+    SHARED.TOOLBOX_UNLOCK_AUDIO_PLAYED = false
 end
 
 function on_update(self, dt)
@@ -80,6 +84,22 @@ function on_update(self, dt)
     if SHARED and SHARED[UI_TABLE] == false and isOpen then
         isOpen = false
         if DEBUG then print("[ToolboxOpenMechanic] isOpen synced to false from SHARED") end
+    end
+
+    ----------------------------------------------------------------
+    -- If lock has just been disabled (success), play unlock audio
+    ----------------------------------------------------------------
+    if SHARED and SHARED.LOCK_DISABLED and not SHARED.TOOLBOX_UNLOCK_AUDIO_PLAYED then
+        SHARED.TOOLBOX_UNLOCK_AUDIO_PLAYED = true
+
+        if type(Audio_PlaySlot) == "function" then
+            Audio_PlaySlot(id, UNLOCK_SFX_ID)
+            Audio_PlaySlot(id, DISCOVERY_SFX_ID)
+        end
+
+        if DEBUG then
+            print("[ToolboxOpenMechanic] Unlock audio triggered")
+        end
     end
 
     ----------------------------------------------------------------
@@ -105,10 +125,11 @@ function on_update(self, dt)
     -- Toggle LockScreen open/close
     ----------------------------------------------------------------
     if not isOpen then
-        -- Opening
+        -- Opening (view lock)
         if SHARED.LOCK_DISABLED then return end
+
         if type(Audio_PlaySlot) == "function" then
-            Audio_PlaySlot(id, BOX_OPEN_SFX_ID)
+            Audio_PlaySlot(id, VIEW_LOCK_SFX_ID)
         end
 
         if UI_DisplayMenu ~= nil then

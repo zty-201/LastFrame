@@ -42,7 +42,10 @@ namespace EngineFramework
         const int VOLUMETRIC_HISTORY_UNIT = 7;
 		const int SHADOW_MAP_UNIT = 8;
 		const int SPOT_LIGHT_MAP_UNIT = 9;
-		const int POINT_SHADOW_MAP_UNIT = 10;
+        const int INSTANCE_DATA_UNIT = 10;
+        const int VISIBLE_INDICES_UNIT = 11;
+		const int POINT_SHADOW_MAP_UNIT = 12;
+        
     }
 
     class GraphicsSystem : public ISystem

@@ -109,6 +109,10 @@ namespace EngineFramework {
         m_currentVertexOffset += static_cast<uint32_t>(vertices.size());
         m_currentIndexOffset += static_cast<uint32_t>(indices.size());
 
+        LOGI("GeometryBuffer state: %u / %u verts used, %u / %u indices used",
+            m_currentVertexOffset, m_maxVertices,
+            m_currentIndexOffset, m_maxIndices);
+
         return { baseVertex, firstIndex };
     }
 

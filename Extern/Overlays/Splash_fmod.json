@@ -1,5 +1,5 @@
 {
-	"890": {
+	"993": {
 		"NameComponent": {
 			"name": "Logo_fmod"
 		},
@@ -17,19 +17,19 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				73.79998779296875,
-				137.5
+				172.5,
+				258.0
 			],
 			"position_NDC": [
 				0.0,
 				0.0
 			],
 			"size": [
-				590.4000244140625,
-				275.0
+				1380.0,
+				516.0
 			],
 			"size_NDC": [
-				0.800000011920929,
+				0.5,
 				0.5
 			],
 			"subtitle_reveal_progress": 1.0,
@@ -48,7 +48,7 @@
 			"visible": false
 		}
 	},
-	"992": {
+	"994": {
 		"NameComponent": {
 			"name": "blackbg_fmod"
 		},
@@ -74,8 +74,8 @@
 				0.0
 			],
 			"size": [
-				738.0,
-				550.0
+				1725.0,
+				1032.0
 			],
 			"size_NDC": [
 				1.0,

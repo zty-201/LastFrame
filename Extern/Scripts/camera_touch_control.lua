@@ -46,7 +46,11 @@ function on_update(self, dt)
     
     if not camera then return end
 
-    if not camera then 
+    -- Yield control while a cinematic is playing
+    local _shared = rawget(_G, "SHARED")
+    if _shared and _shared.CINEMATIC_CAMERA then return end
+
+    if not camera then
         if counter % 60 == 0 then
             --print("[Lua] ERROR: Camera is nil, skipping update")
         end
