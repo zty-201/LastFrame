@@ -148,6 +148,9 @@ function on_update(self, dt)
     if tr == nil then return end
     dt = dt or 0.016
 
+    -- Update icons every frame so they show/hide as player enters/leaves range
+    update_icons()
+
     local isRotating = math.abs(targetY - currentY) > 0.05
 
     if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
@@ -156,103 +159,47 @@ function on_update(self, dt)
 
         local cmd = cmdObj.cmd
 
-        -- Ignore interaction commands while the door is still rotating
         if not isRotating then
-            if cmd == "toggle" then
-                if isLocked then
-                    play_3d_sfx(DOOR_LOCKED_SFX_ID)
-                    print(string.format("[CanteenDoor] TOGGLE blocked, door is LOCKED by=%s", tostring(cmdObj.by)))
-                else
-                    if isOpen then
-                        if hasBeenOpenedByPlayer then
-                            print(string.format("[CanteenDoor] TOGGLE ignored, door cannot be closed anymore by=%s", tostring(cmdObj.by)))
-                        else
-                            targetY = closedY
-                            isOpen = false
-                            SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
-
-                            play_3d_sfx(DOOR_CLOSE_SFX_ID)
-
-                            print(string.format("[CanteenDoor] TOGGLE -> CLOSE by=%s", tostring(cmdObj.by)))
+            if cmd == "toggle" or cmd == "open" then
+                if isOpen then
+                    print("[Level2Gate] Already open, ignoring command")
+                elseif not isUnlocked then
+                    -- Try to unlock with boltcutter
+                    if inv_has_item(REQUIRED_KEY_ID) then
+                        if consumeOnFirstUse then
+                            inv_consume_item(REQUIRED_KEY_ID)
                         end
+                        isUnlocked = true
+                        play_3d_sfx(SFX_GATE_UNLOCK)
+                        print("[Level2Gate] Unlocked with boltcutter")
+
+                        -- Open immediately after unlocking
+                        targetY = openAngle
+                        isOpen  = true
+                        iconsDisabledForever = true
+                        play_3d_sfx(SFX_GATE_OPEN)
+                        publish_can_unlock()
+                        print("[Level2Gate] Gate opening")
                     else
-                        targetY = openY
-                        isOpen = true
-                        hasBeenOpenedByPlayer = true
-                        SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
-                        SHARED.CANTEEN_DOOR_OPENED_ONCE[EntityID] = true
-
-                        activate_sf_girl()
-                        play_3d_sfx(DOOR_OPEN_SFX_ID)
-
-                        print(string.format("[CanteenDoor] TOGGLE -> OPEN by=%s", tostring(cmdObj.by)))
+                        play_3d_sfx(SFX_GATE_LOCKED)
+                        print("[Level2Gate] Locked - need boltcutter")
                     end
-                end
-
-            elseif cmd == "open" then
-                if isLocked then
-                    play_3d_sfx(DOOR_LOCKED_SFX_ID)
-                    print(string.format("[CanteenDoor] OPEN blocked, door is LOCKED by=%s", tostring(cmdObj.by)))
                 else
-                    targetY = openY
-                    isOpen = true
-                    hasBeenOpenedByPlayer = true
-                    SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
-                    SHARED.CANTEEN_DOOR_OPENED_ONCE[EntityID] = true
-
-                    activate_sf_girl()
-                    play_3d_sfx(DOOR_OPEN_SFX_ID)
-
-                    print(string.format("[CanteenDoor] OPEN command received by=%s", tostring(cmdObj.by)))
+                    targetY = openAngle
+                    isOpen  = true
+                    iconsDisabledForever = true
+                    play_3d_sfx(SFX_GATE_OPEN)
+                    print("[Level2Gate] Gate opening")
                 end
-
-            elseif cmd == "close" then
-                if not hasClosedAndLocked and not hasBeenOpenedByPlayer then
-                    targetY = closedY
-                    isOpen = false
-                    SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
-
-                    play_3d_sfx(DOOR_CLOSE_SFX_ID)
-
-                    print(string.format("[CanteenDoor] CLOSE command received by=%s", tostring(cmdObj.by)))
-                end
-
-            elseif cmd == "close_and_lock" then
-                if not hasClosedAndLocked then
-                    targetY = closedY
-                    isOpen = false
-                    isLocked = true
-                    hasClosedAndLocked = true
-
-                    SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
-                    SHARED.CANTEEN_DOOR_LOCKED[EntityID] = true
-
-                    play_3d_sfx(DOOR_CLOSE_SFX_ID)
-
-                    print(string.format("[CanteenDoor] CLOSED AND LOCKED by=%s", tostring(cmdObj.by)))
-                end
-
-            elseif cmd == "unlock" then
-                isLocked = false
-                SHARED.CANTEEN_DOOR_LOCKED[EntityID] = false
-
-                print(string.format("[CanteenDoor] UNLOCKED by=%s", tostring(cmdObj.by)))
             end
         end
     end
 
+    -- Rotate gate towards target
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1
-        local speed = closeSpeed
-
-        if targetY == openY then
-            speed = openSpeed
-        else
-            speed = closeSpeed
-        end
-
-        currentY = currentY + dir * speed * dt
+        currentY = currentY + dir * rotateSpeed * dt
 
         if dir > 0 then
             if currentY > targetY then currentY = targetY end
