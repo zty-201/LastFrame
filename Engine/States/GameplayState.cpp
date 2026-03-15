@@ -86,7 +86,7 @@ void EndCreditState::OnEnter(Engine::StateMachine& machine)
     LOGI("[State] Enter EndCredit state");
     auto& ui = EngineFramework::UI_System::GetInstance();
     ui.closeAllMenu();
-    ui.StartCreditsRoll("CreditsMenu", 120.0f, 6.24f, true);
+    ui.StartCreditsRoll("CreditsMenu", 120.0f, 8.54f, true);
 }
 
 void EndCreditState::OnExit(Engine::StateMachine& machine)
@@ -106,7 +106,7 @@ void EndCreditState::Update(Engine::StateMachine& machine, float dt)
     bool speedUp = EngineFramework::InputManager::GetInstance().GetAction("JUMP")
         || EngineFramework::InputManager::GetInstance().GetMouseButton(0);
 
-    ui.SetCreditsSpeedMultiplier(speedUp ? 4.0f : 1.0f);
+    ui.SetCreditsSpeedMultiplier(speedUp ? 8.0f : 1.0f);
 
     if (!ui.IsCreditsRolling())
     {
