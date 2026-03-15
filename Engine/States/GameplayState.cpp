@@ -86,7 +86,7 @@ void EndCreditState::OnEnter(Engine::StateMachine& machine)
     LOGI("[State] Enter EndCredit state");
     auto& ui = EngineFramework::UI_System::GetInstance();
     ui.closeAllMenu();
-    ui.StartCreditsRoll("CreditsMenu", 120.0f, 7.43f, true);
+    ui.StartCreditsRoll("CreditsMenu", 120.0f, 6.24f, true);
 }
 
 void EndCreditState::OnExit(Engine::StateMachine& machine)
