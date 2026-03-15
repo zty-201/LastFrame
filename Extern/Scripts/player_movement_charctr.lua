@@ -118,8 +118,8 @@ function on_update(self, dt)
     if PLATFORM == "android" and SHARED and SHARED.UI then
         --UI_DisplayMenu("AndroidInputOverlay")
         
-        local jx = -(SHARED.UI.js_X or 0.0)
-        local jy = -(SHARED.UI.js_Y or 0.0)
+        local jx = -(SHARED.UI.UIAndroid_Joystick_X or 0.0)
+        local jy = -(SHARED.UI.UIAndroid_Joystick_Y or 0.0)
         
         -- If joystick is moved beyond a tiny threshold, use it
         if math.abs(jx) > 0.01 or math.abs(jy) > 0.01 then

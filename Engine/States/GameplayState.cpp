@@ -52,12 +52,21 @@ void PauseState::OnEnter(Engine::StateMachine& machine)
 {
     UNREFERENCED_PARAMETER(machine);
 
+    auto& ui = EngineFramework::UI_System::GetInstance();
+    ui.closeAllMenu();
+    ui.displayMenu("PauseMenu");
+
+
     LOGI("[State] Enter Pause state");
 }
 
 void PauseState::OnExit(Engine::StateMachine& machine)
 {
     UNREFERENCED_PARAMETER(machine);
+
+    auto& ui = EngineFramework::UI_System::GetInstance();
+    ui.closeAllMenu();
+
     LOGI("[State] Exit Pause state");
 }
 

@@ -10,18 +10,36 @@ end
 -- IMPORTANT:
 -- ButtonComponent.event_trigger MUST be "ReturnButton"
 function on_button_ReturnButton(self)
-    print("[ReturnButton] Return button clicked -> Resuming Game")
+    --print("[ReturnButton] Return button clicked -> Resuming Game")
 
     -- Close any currently open menus
-    UI_CloseAllMenus()
+    --UI_CloseAllMenus()
     --UI_DisplayMenu_InvisibleLayer("Android_Inventory_Buttons")
     if PLATFORM == "android" then
         UI_DisplayMenu_InvisibleLayer("Android_Inventory_Buttons")
     end
 
-    StateMachine_SetTrigger("BacktoGame")
-
+    local state_name = StateMachine_GetCurrentStateName()
+    print("[Current State] state = ", state_name)  
     
+
+    local prev_state_name = StateMachine_GetPrevStateName()
+    print("[Prev State] state = ", prev_state_name)  
+    
+
+
+    if prev_state_name == "Gameplay" then
+        --print("[prev state] Gameplay")
+        StateMachine_SetTrigger("BacktoGame")
+        return
+    end
+
+    if prev_state_name == "MainMenu" then
+        --print("[prev state] MainMenu")
+        --UI_DisplayMenu("Android_Inventory_Buttons")
+        StateMachine_SetTrigger("BacktoMainMenu")
+        return
+    end
 
     -- Display Main Menu
     -- UI_DisplayMenu("StartMenu")

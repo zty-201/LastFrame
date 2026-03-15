@@ -22,6 +22,11 @@ namespace EngineFramework
             return m_stateMachine.GetCurrentStateName();
         }
 
+        std::string get_prevState_name() const {
+
+            return prev_state;
+        }
+
     private:
         void Initialize() override;
         void Update(float dt) override;
@@ -32,6 +37,7 @@ namespace EngineFramework
 
     private:
         static StateMachineSystem* this_instance;
+        static std::string prev_state;
 
         Engine::StateMachine m_stateMachine;
         bool m_started = false;
