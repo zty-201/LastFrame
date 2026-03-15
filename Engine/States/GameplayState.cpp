@@ -84,21 +84,36 @@ void EndCreditState::OnEnter(Engine::StateMachine& machine)
     UNREFERENCED_PARAMETER(machine);
 
     LOGI("[State] Enter EndCredit state");
+    auto& ui = EngineFramework::UI_System::GetInstance();
+    ui.closeAllMenu();
+    ui.StartCreditsRoll("CreditsMenu", 120.0f, 7.43f, true);
 }
 
 void EndCreditState::OnExit(Engine::StateMachine& machine)
 {
     UNREFERENCED_PARAMETER(machine);
     LOGI("[State] Exit EndCredit state");
+    auto& ui = EngineFramework::UI_System::GetInstance();
+    ui.StopCreditsRoll(true);
 }
 
 void EndCreditState::Update(Engine::StateMachine& machine, float dt)
 {
-    UNREFERENCED_PARAMETER(machine);
     UNREFERENCED_PARAMETER(dt);
-    //LOGI("[State] Update EndCredit state");
-}
+    auto& ui = EngineFramework::UI_System::GetInstance();
 
+    // Speed up credits while Jump held or mouse/touch held
+    bool speedUp = EngineFramework::InputManager::GetInstance().GetAction("JUMP")
+        || EngineFramework::InputManager::GetInstance().GetMouseButton(0);
+
+    ui.SetCreditsSpeedMultiplier(speedUp ? 4.0f : 1.0f);
+
+    if (!ui.IsCreditsRolling())
+    {
+        LOGI("[State] EndCredit finished -> returning to MainMenu");
+        machine.SetTrigger("ReturnToMenu");
+    }
+}
 void EndCreditState::Render(Engine::StateMachine& machine)
 {
     UNREFERENCED_PARAMETER(machine);

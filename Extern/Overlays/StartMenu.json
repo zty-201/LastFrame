@@ -43,16 +43,16 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				741.75,
-				247.68002319335938
+				324.6499938964844,
+				80.8499984741211
 			],
 			"position_NDC": [
 				0.0,
-				-0.41999998688697815
+				-0.5699999928474426
 			],
 			"size": [
-				241.5,
-				103.20000457763672
+				105.69999694824219,
+				49.0
 			],
 			"size_NDC": [
 				0.14000000059604645,
@@ -100,8 +100,8 @@
 				0.0
 			],
 			"size": [
-				1725.0,
-				1032.0
+				755.0,
+				490.0
 			],
 			"size_NDC": [
 				1.0,
@@ -111,6 +111,81 @@
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				16486605679922642945,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"1008": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				11970876293170790405,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "Credits",
+			"hover_texture": [
+				11970876293170790405,
+				3711223656383638553
+			],
+			"idle_texture": [
+				12547337045474213891,
+				3711223656383638553
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 18311944568509284359
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "CreditsBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "StartMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				302.0,
+				142.10000610351563
+			],
+			"position_NDC": [
+				0.0,
+				-0.3199999928474426
+			],
+			"size": [
+				151.0,
+				49.0
+			],
+			"size_NDC": [
+				0.20000000298023224,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				12547337045474213891,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
@@ -189,16 +264,16 @@
 			"luminance": 1.0,
 			"play_video_audio": false,
 			"position": [
-				741.75,
-				655.3200073242188
+				324.6499938964844,
+				338.1000061035156
 			],
 			"position_NDC": [
 				0.0,
-				0.3700000047683716
+				0.47999998927116394
 			],
 			"size": [
-				241.5,
-				103.20000457763672
+				105.69999694824219,
+				49.0
 			],
 			"size_NDC": [
 				0.14000000059604645,
@@ -255,16 +330,16 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				690.0,
-				521.1600341796875
+				302.0,
+				271.95001220703125
 			],
 			"position_NDC": [
 				0.0,
-				0.10999999940395355
+				0.20999999344348907
 			],
 			"size": [
-				345.0,
-				103.20000457763672
+				151.0,
+				49.0
 			],
 			"size_NDC": [
 				0.20000000298023224,
@@ -330,16 +405,16 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				690.0,
-				381.8399963378906
+				302.0,
+				210.6999969482422
 			],
 			"position_NDC": [
 				0.0,
-				-0.1599999964237213
+				-0.03999999910593033
 			],
 			"size": [
-				345.0,
-				103.20000457763672
+				151.0,
+				49.0
 			],
 			"size_NDC": [
 				0.20000000298023224,

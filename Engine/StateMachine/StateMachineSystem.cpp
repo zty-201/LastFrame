@@ -47,7 +47,7 @@ namespace EngineFramework
         // Gameplay to main menu
         m_stateMachine.AddTriggerTransition("Gameplay", "MainMenu", "ReturnToMenu"); //should be removed, leave here for now
 
-        // Gameplay to main menu
+        // Pause to main menu
         m_stateMachine.AddTriggerTransition("Pause", "MainMenu", "ReturnToMenu");
 
         // Gameplay to main menu
@@ -59,6 +59,8 @@ namespace EngineFramework
         m_stateMachine.AddTriggerTransition("Pause", "EndCredit", "ToEndCredit");
         m_stateMachine.AddTriggerTransition("MainMenu", "EndCredit", "ToEndCredit");
 
+        // EndCredit -> MainMenu (auto at finish, or manual)
+        m_stateMachine.AddTriggerTransition("EndCredit", "MainMenu", "ReturnToMenu");
 
         m_started = false;
     }
