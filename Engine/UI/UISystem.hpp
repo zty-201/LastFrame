@@ -147,6 +147,10 @@ namespace EngineFramework
         void StopCutsceneSequence(bool closeAll = true);
         bool IsCutscenePlaying() const;
 
+        void StartCreditsRoll(const std::string& menuName, float speedPixelsPerSecond, float endYThreshold, bool closeOthersFirst);
+        void StopCreditsRoll(bool closeAll);
+        bool IsCreditsRolling() const;
+        void SetCreditsSpeedMultiplier(float multiplier);
 
     private:
 
