@@ -114,13 +114,13 @@ local function begin_hold()
     timer = 0.0
     duration = random_range(MIN_HOLD_TIME, MAX_HOLD_TIME)
 
-    startIntensity = 50.0
+    startIntensity = 10.0
     isScareFlash = false
 
     if EntityLight ~= nil then
         EntityLight:SetColor(1.0, 1.0, 1.0)
     end
-    set_intensity(50.0)
+    set_intensity(10.0)
 
     SHARED = SHARED or {}
     SHARED[LIGHTNING_TABLE] = SHARED[LIGHTNING_TABLE] or {}
@@ -158,7 +158,6 @@ end
 ------------------------------------------------
 
 function on_create(self)
-
     if EntityLight == nil then
         print("[SF_LightningSpotlight] ERROR: EntityLight missing")
         return
@@ -167,7 +166,12 @@ function on_create(self)
     SHARED = SHARED or {}
     SHARED[LIGHTNING_TABLE] = SHARED[LIGHTNING_TABLE] or {}
 
-    math.randomseed(os.time() + EntityID)
+    local seedBase = tonumber(EntityID) or 0
+    if os ~= nil and type(os.time) == "function" then
+        math.randomseed(os.time() + seedBase)
+    else
+        math.randomseed(12345 + seedBase)
+    end
 
     EntityLight:SetColor(1.0, 100.0 / 255.0, 100.0 / 255.0)
     EntityLight:SetIntensity(1.0)
@@ -182,7 +186,6 @@ end
 ------------------------------------------------
 
 function on_update(self, dt)
-
     if EntityLight == nil then return end
     dt = dt or 0.016
 
@@ -193,10 +196,9 @@ function on_update(self, dt)
     -- FORCED FLASH FROM GHOST GIRL SCARE
     ------------------------------------------------
     local lightningTable = SHARED[LIGHTNING_TABLE]
-
     local scareData = lightningTable[SCARE_KEY]
 
-    if scareData ~= nil and scareData.eventId ~= lastProcessedEventId then
+    if type(scareData) == "table" and scareData.eventId ~= lastProcessedEventId then
         lastProcessedEventId = scareData.eventId
 
         flashesRemaining = 1
@@ -215,7 +217,6 @@ function on_update(self, dt)
     -- WAIT
     ------------------------------------------------
     if state == STATE_WAIT then
-
         if timer >= duration then
             flashesRemaining = random_int(MIN_FLASHES, MAX_FLASHES)
             begin_hold()
@@ -225,7 +226,6 @@ function on_update(self, dt)
     -- HOLD
     ------------------------------------------------
     elseif state == STATE_HOLD then
-
         if timer >= duration then
             begin_fade()
         end
@@ -234,7 +234,6 @@ function on_update(self, dt)
     -- FADE
     ------------------------------------------------
     elseif state == STATE_FADE then
-
         local t = timer / duration
         if t > 1.0 then t = 1.0 end
 
@@ -242,7 +241,6 @@ function on_update(self, dt)
         set_intensity(intensity)
 
         if timer >= duration then
-
             flashesRemaining = flashesRemaining - 1
 
             if flashesRemaining > 0 then

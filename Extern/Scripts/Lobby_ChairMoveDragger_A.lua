@@ -84,7 +84,12 @@ function on_create(self)
         baseRotX, baseRotY, baseRotZ = tr:GetRotation()
     end
 
-    math.randomseed(os.time() + EntityID)
+    local seedBase = tonumber(EntityID) or 0
+    if os ~= nil and type(os.time) == "function" then
+        math.randomseed(os.time() + seedBase)
+    else
+        math.randomseed(11111 + seedBase)
+    end
 
     if DEBUG then
         print(string.format(
@@ -99,8 +104,11 @@ function on_update(self, dt)
     if tr == nil then return end
     dt = dt or 0.016
 
-    if SHARED and SHARED.CHAIR_DRAG_CMD and SHARED.CHAIR_DRAG_CMD[EntityID] then
-        local cmdObj = SHARED.CHAIR_DRAG_CMD[EntityID]
+    SHARED = SHARED or {}
+    SHARED.CHAIR_DRAG_CMD = SHARED.CHAIR_DRAG_CMD or {}
+
+    local cmdObj = SHARED.CHAIR_DRAG_CMD[EntityID]
+    if cmdObj then
         SHARED.CHAIR_DRAG_CMD[EntityID] = nil
 
         if cmdObj.cmd == "drag" and not isDragging then

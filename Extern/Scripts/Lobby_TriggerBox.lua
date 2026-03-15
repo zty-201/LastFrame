@@ -17,13 +17,11 @@ local function trigger_chair_drag()
     SHARED = SHARED or {}
     SHARED.CHAIR_DRAG_CMD = SHARED.CHAIR_DRAG_CMD or {}
 
-    -- Chair A drags a shorter distance
     SHARED.CHAIR_DRAG_CMD[CHAIR_A_ID] = {
         cmd = "drag",
         by = EntityID
     }
 
-    -- Chair B drags a longer distance
     SHARED.CHAIR_DRAG_CMD[CHAIR_B_ID] = {
         cmd = "drag",
         by = EntityID
@@ -53,14 +51,17 @@ function on_create(self)
 end
 
 function on_trigger_enter(self, otherID)
+    local otherNum = tonumber(otherID)
+    local playerNum = tonumber(PLAYER_ENTITY_ID)
+
     if DEBUG then
         print(string.format(
-            "[Lobby_ChairDragTrigger] Trigger ENTER | Zone=%d | Other=%d",
-            EntityID, otherID
+            "[Lobby_ChairDragTrigger] Trigger ENTER | Zone=%d | Other=%s",
+            EntityID, tostring(otherID)
         ))
     end
 
-    if otherID ~= PLAYER_ENTITY_ID then
+    if otherNum == nil or playerNum == nil or otherNum ~= playerNum then
         return
     end
 
@@ -69,11 +70,17 @@ function on_trigger_enter(self, otherID)
     end
     playerInsideThisZone = true
 
+    SHARED = SHARED or {}
+    SHARED.CHAIR_DRAG_CMD = SHARED.CHAIR_DRAG_CMD or {}
+
     trigger_chair_drag()
 end
 
 function on_trigger_exit(self, otherID)
-    if otherID ~= PLAYER_ENTITY_ID then
+    local otherNum = tonumber(otherID)
+    local playerNum = tonumber(PLAYER_ENTITY_ID)
+
+    if otherNum == nil or playerNum == nil or otherNum ~= playerNum then
         return
     end
 
