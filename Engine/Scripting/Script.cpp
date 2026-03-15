@@ -521,6 +521,12 @@ namespace Engine {
             },
             "SetIntensity", [](LightComponent& light, float i) {
                 light.intensity = i;
+            },
+            "SetColor", [](LightComponent& light, float r, float g, float b) {
+                light.color = glm::vec3(r, g, b);
+			},
+            "GetColor", [](LightComponent& light) {
+                return std::make_tuple(light.color.r, light.color.g, light.color.b);
             }
         );
 
