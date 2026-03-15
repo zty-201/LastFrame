@@ -146,101 +146,113 @@ end
 function on_update(self, dt)
     local tr = Query.GetTransform(EntityID)
     if tr == nil then return end
+    dt = dt or 0.016
 
-    publish_can_unlock()
-    update_icons()
+    local isRotating = math.abs(targetY - currentY) > 0.05
 
-    -- consume interaction command
-    if SHARED.DOOR_CMD and SHARED.DOOR_CMD[INTERACTABLE_ID] then
-        local cmdObj = SHARED.DOOR_CMD[INTERACTABLE_ID]
-        SHARED.DOOR_CMD[INTERACTABLE_ID] = nil
+    if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
+        local cmdObj = SHARED.DOOR_CMD[EntityID]
+        SHARED.DOOR_CMD[EntityID] = nil
 
         local cmd = cmdObj.cmd
 
-        -- ========================================================
-        -- STATE 1/2: LOCKED or UNLOCKABLE -> handle unlock attempt
-        -- ========================================================
-        if (cmd == "toggle" or cmd == "open") and (not isUnlocked) then
-            if not inv_has_item(REQUIRED_KEY_ID) then
-                -- LOCKED
-                play_3d_sfx(SFX_GATE_LOCKED)
-                if DEBUG then
-                    print("[Level2Gate] LOCKED: missing item -> " .. tostring(REQUIRED_KEY_ID))
+        -- Ignore interaction commands while the door is still rotating
+        if not isRotating then
+            if cmd == "toggle" then
+                if isLocked then
+                    play_3d_sfx(DOOR_LOCKED_SFX_ID)
+                    print(string.format("[CanteenDoor] TOGGLE blocked, door is LOCKED by=%s", tostring(cmdObj.by)))
+                else
+                    if isOpen then
+                        if hasBeenOpenedByPlayer then
+                            print(string.format("[CanteenDoor] TOGGLE ignored, door cannot be closed anymore by=%s", tostring(cmdObj.by)))
+                        else
+                            targetY = closedY
+                            isOpen = false
+                            SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
+
+                            play_3d_sfx(DOOR_CLOSE_SFX_ID)
+
+                            print(string.format("[CanteenDoor] TOGGLE -> CLOSE by=%s", tostring(cmdObj.by)))
+                        end
+                    else
+                        targetY = openY
+                        isOpen = true
+                        hasBeenOpenedByPlayer = true
+                        SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
+                        SHARED.CANTEEN_DOOR_OPENED_ONCE[EntityID] = true
+
+                        activate_sf_girl()
+                        play_3d_sfx(DOOR_OPEN_SFX_ID)
+
+                        print(string.format("[CanteenDoor] TOGGLE -> OPEN by=%s", tostring(cmdObj.by)))
+                    end
                 end
-                publish_can_unlock()
-                return
-            end
 
-            -- UNLOCKABLE -> unlock now (and optionally consume), but do NOT open yet
-            if consumeOnFirstUse then
-                local ok = inv_consume_item(REQUIRED_KEY_ID, 1)
-                if not ok then
-                    print("[Level2Gate] ERROR: failed to consume item -> " .. tostring(REQUIRED_KEY_ID))
-                    publish_can_unlock()
-                    return
+            elseif cmd == "open" then
+                if isLocked then
+                    play_3d_sfx(DOOR_LOCKED_SFX_ID)
+                    print(string.format("[CanteenDoor] OPEN blocked, door is LOCKED by=%s", tostring(cmdObj.by)))
+                else
+                    targetY = openY
+                    isOpen = true
+                    hasBeenOpenedByPlayer = true
+                    SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
+                    SHARED.CANTEEN_DOOR_OPENED_ONCE[EntityID] = true
+
+                    activate_sf_girl()
+                    play_3d_sfx(DOOR_OPEN_SFX_ID)
+
+                    print(string.format("[CanteenDoor] OPEN command received by=%s", tostring(cmdObj.by)))
                 end
+
+            elseif cmd == "close" then
+                if not hasClosedAndLocked and not hasBeenOpenedByPlayer then
+                    targetY = closedY
+                    isOpen = false
+                    SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
+
+                    play_3d_sfx(DOOR_CLOSE_SFX_ID)
+
+                    print(string.format("[CanteenDoor] CLOSE command received by=%s", tostring(cmdObj.by)))
+                end
+
+            elseif cmd == "close_and_lock" then
+                if not hasClosedAndLocked then
+                    targetY = closedY
+                    isOpen = false
+                    isLocked = true
+                    hasClosedAndLocked = true
+
+                    SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
+                    SHARED.CANTEEN_DOOR_LOCKED[EntityID] = true
+
+                    play_3d_sfx(DOOR_CLOSE_SFX_ID)
+
+                    print(string.format("[CanteenDoor] CLOSED AND LOCKED by=%s", tostring(cmdObj.by)))
+                end
+
+            elseif cmd == "unlock" then
+                isLocked = false
+                SHARED.CANTEEN_DOOR_LOCKED[EntityID] = false
+
+                print(string.format("[CanteenDoor] UNLOCKED by=%s", tostring(cmdObj.by)))
             end
-
-            isUnlocked = true
-            play_3d_sfx(SFX_GATE_UNLOCK)
-
-            if DEBUG then
-                print("[Level2Gate] UNLOCKED -> SFX (gate still closed)")
-            end
-
-            publish_can_unlock()
-            update_icons()
-            return
-        end
-
-        -- ========================================================
-        -- STATE 3: UNLOCKED -> allow open/toggle
-        -- ========================================================
-        local wasOpen = isOpen
-
-        if cmd == "toggle" then
-            isOpen = not isOpen
-        elseif cmd == "open" then
-            isOpen = true
-        elseif cmd == "close" then
-            isOpen = false
-        end
-
-        targetY = isOpen and openAngle or closedAngle
-
-        -- Play open SFX only when CLOSED -> OPEN
-        if (not wasOpen) and isOpen then
-            play_3d_sfx(SFX_GATE_OPEN)
-            if DEBUG then
-                print("[Level2Gate] OPEN -> SFX")
-            end
-        end
-
-        -- once opened, disable icons forever
-        if isOpen and (not iconsDisabledForever) then
-            iconsDisabledForever = true
-            hide_icons_forever()
-        end
-
-        if DEBUG then
-            print(string.format(
-                "[Level2Gate] CMD=%s by=%s -> unlocked=%s isOpen=%s targetY=%.2f iconsDisabledForever=%s",
-                tostring(cmd),
-                tostring(cmdObj.by),
-                tostring(isUnlocked),
-                tostring(isOpen),
-                targetY,
-                tostring(iconsDisabledForever)
-            ))
         end
     end
 
-    -- rotation
-    dt = dt or 0.016
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1
-        currentY = currentY + dir * rotateSpeed * dt
+        local speed = closeSpeed
+
+        if targetY == openY then
+            speed = openSpeed
+        else
+            speed = closeSpeed
+        end
+
+        currentY = currentY + dir * speed * dt
 
         if dir > 0 then
             if currentY > targetY then currentY = targetY end

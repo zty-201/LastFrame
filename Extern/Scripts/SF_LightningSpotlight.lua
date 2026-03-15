@@ -79,7 +79,8 @@ end
 local function set_intensity(v)
     if EntityLight ~= nil then
         if _G.ROOFTOP_ACTIVE == true then
-            EntityLight:SetIntensity(OFF_INTENSITY)
+            EntityLight:SetIntensity(1.0)
+            EntityLight:SetColor(1.0, 100.0 / 255.0, 100.0 / 255.0)
         else
             EntityLight:SetIntensity(v)
         end
@@ -101,7 +102,11 @@ local function begin_wait()
     timer = 0.0
     duration = random_range(MIN_WAIT, MAX_WAIT)
     isScareFlash = false
-    set_intensity(OFF_INTENSITY)
+
+    if EntityLight ~= nil then
+        EntityLight:SetColor(1.0, 100.0 / 255.0, 100.0 / 255.0)
+    end
+    set_intensity(1.0)
 end
 
 local function begin_hold()
@@ -109,10 +114,13 @@ local function begin_hold()
     timer = 0.0
     duration = random_range(MIN_HOLD_TIME, MAX_HOLD_TIME)
 
-    startIntensity = NORMAL_INTENSITY
+    startIntensity = 50.0
     isScareFlash = false
 
-    set_intensity(NORMAL_INTENSITY)
+    if EntityLight ~= nil then
+        EntityLight:SetColor(1.0, 1.0, 1.0)
+    end
+    set_intensity(50.0)
 
     SHARED = SHARED or {}
     SHARED[LIGHTNING_TABLE] = SHARED[LIGHTNING_TABLE] or {}
@@ -160,6 +168,9 @@ function on_create(self)
     SHARED[LIGHTNING_TABLE] = SHARED[LIGHTNING_TABLE] or {}
 
     math.randomseed(os.time() + EntityID)
+
+    EntityLight:SetColor(1.0, 100.0 / 255.0, 100.0 / 255.0)
+    EntityLight:SetIntensity(1.0)
 
     begin_wait()
 
@@ -246,5 +257,8 @@ end
 ------------------------------------------------
 
 function on_destroy(self)
-    set_intensity(OFF_INTENSITY)
+    if EntityLight ~= nil then
+        EntityLight:SetColor(1.0, 100.0 / 255.0, 100.0 / 255.0)
+    end
+    set_intensity(1.0)
 end

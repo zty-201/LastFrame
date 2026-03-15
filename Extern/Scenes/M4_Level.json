@@ -129,13 +129,13 @@
 		"LightComponent": {
 			"castShadows": true,
 			"color": [
-				0.019607843831181526,
-				0.03921568766236305,
-				0.1568627506494522
+				1.0,
+				1.0,
+				1.0
 			],
 			"constant": 0.0,
 			"innerConeAngle": 12.5,
-			"intensity": 5.0,
+			"intensity": 46.70329666137695,
 			"isStatic": true,
 			"linear": 0.0,
 			"outerConeAngle": 17.5,
@@ -143,18 +143,27 @@
 			"radius": 0.0,
 			"type": 0
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 10645049978284752899
+				}
+			]
+		},
 		"NameComponent": {
 			"name": "DirectionalLight"
 		},
 		"TransformComponent": {
 			"position": [
-				-10.0,
-				80.0,
-				50.0
+				-98.8499984741211,
+				111.0,
+				59.79999923706055
 			],
 			"rotation": [
-				141.64999389648438,
-				90.0,
+				174.3000030517578,
+				84.9000015258789,
 				0.0
 			],
 			"scale": [
@@ -10292,7 +10301,7 @@
 					"fadeDuration": 1.0,
 					"id": "DoorLocked",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 150.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
@@ -10310,7 +10319,7 @@
 					"fadeDuration": 1.0,
 					"id": "DoorUnlock",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 150.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
@@ -10328,13 +10337,13 @@
 					"fadeDuration": 1.0,
 					"id": "DoorOpen",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 150.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 1.0149999856948853
 				}
 			]
 		},
@@ -12415,9 +12424,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				522.2564697265625,
+				-188.8895263671875,
 				169.37667846679688,
-				727.6064453125
+				358.11456298828125
 			],
 			"rotation": [
 				-0.0,
@@ -33368,9 +33377,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				522.2564697265625,
+				-188.8895263671875,
 				170.1766815185547,
-				757.6064453125
+				388.11456298828125
 			],
 			"rotation": [
 				0.0,
@@ -35294,7 +35303,7 @@
 			"halfExtents": [
 				70.0,
 				100.0,
-				10.0
+				30.0
 			],
 			"localEulerDeg": [
 				0.0,
@@ -44080,7 +44089,7 @@
 					"fadeDuration": 1.0,
 					"id": "ItemPickup",
 					"loop": false,
-					"maxDistance": 25.0,
+					"maxDistance": 150.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
@@ -45568,9 +45577,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-1.4415416717529297,
-				169.37667846679688,
-				-758.1339721679688
+				9.585073471069336,
+				194.8917236328125,
+				-769.4901123046875
 			],
 			"rotation": [
 				0.0,
@@ -54551,7 +54560,7 @@
 			],
 			"rotation": [
 				0.0,
-				122.45945739746094,
+				120.88981628417969,
 				0.0
 			],
 			"scale": [
@@ -54650,7 +54659,7 @@
 			],
 			"rotation": [
 				0.0,
-				122.45945739746094,
+				120.88981628417969,
 				0.0
 			],
 			"scale": [
@@ -61298,6 +61307,44 @@
 		}
 	},
 	"676": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4296100351133892731,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				4872561103437316221,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				15825315397202362495,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				5449021855740739713,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				18131158406416056451,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
 		"MeshComponent": {
 			"meshName": "roof",
 			"visibility": true
@@ -64459,6 +64506,44 @@
 		}
 	},
 	"715": {
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				4296100351133892731,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				4872561103437316221,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				15825315397202362495,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				5449021855740739713,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				18131158406416056451,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
 		"MeshComponent": {
 			"meshName": "roof",
 			"visibility": true
@@ -78874,12 +78959,12 @@
 			"castShadows": true,
 			"color": [
 				1.0,
-				0.9985881447792053,
-				0.9711815714836121
+				1.0,
+				1.0
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 0.0,
+			"intensity": 32.40966033935547,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 31.309999465942383,
@@ -78888,7 +78973,7 @@
 			"type": 2
 		},
 		"LuaScriptComponent": {
-			"Enabled": true,
+			"Enabled": false,
 			"Scripts": [
 				{
 					"Loaded": true,
@@ -78897,22 +78982,22 @@
 			]
 		},
 		"NameComponent": {
-			"name": "SF_Light_Lightning"
+			"name": "SF_Spotlight_Lightning (Inactive)"
 		},
 		"TransformComponent": {
 			"position": [
 				-29.26523208618164,
-				695.029052734375,
+				1175.0994873046875,
 				825.4061279296875
 			],
 			"rotation": [
-				-184.4499969482422,
+				175.54994201660156,
 				85.04996490478516,
 				-179.99989318847656
 			],
 			"scale": [
 				0.0010000001639127731,
-				0.0009999999310821295,
+				0.0010000020265579224,
 				0.0010000001639127731
 			]
 		}
@@ -83173,7 +83258,7 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 5919903112755232771
+					"ScriptGuid": 13473970257275371523
 				}
 			]
 		},
@@ -83248,7 +83333,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						17288307986077253649,
+						11523700463043018791,
 						11537445004664754516
 					],
 					"category": 0,
@@ -83310,7 +83395,7 @@
 				},
 				{
 					"Loaded": true,
-					"ScriptGuid": 6496363865058656257
+					"ScriptGuid": 5403519725027442689
 				}
 			]
 		},
@@ -83393,7 +83478,7 @@
 			],
 			"rotation": [
 				-0.00010427392408018932,
-				89.99994659423828,
+				90.0,
 				2.049999952316284
 			],
 			"scale": [
@@ -83414,7 +83499,7 @@
 			"halfExtents": [
 				70.0,
 				100.0,
-				10.0
+				30.0
 			],
 			"localEulerDeg": [
 				0.0,
@@ -83506,54 +83591,6 @@
 				0.9999926686286926,
 				0.9999991655349731,
 				1.100000023841858
-			]
-		}
-	},
-	"904": {
-		"LightComponent": {
-			"castShadows": true,
-			"color": [
-				1.0,
-				0.9985881447792053,
-				0.9711815714836121
-			],
-			"constant": 4.699999809265137,
-			"innerConeAngle": 12.5,
-			"intensity": 50000.0,
-			"isStatic": true,
-			"linear": 0.09000000357627869,
-			"outerConeAngle": 31.309999465942383,
-			"quadratic": 0.03200000151991844,
-			"radius": 50000.0,
-			"type": 2
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 2371172208165699595
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "Bedroom_Light_Lightning"
-		},
-		"TransformComponent": {
-			"position": [
-				918.5023803710938,
-				254.89405822753906,
-				1202.1866455078125
-			],
-			"rotation": [
-				167.69996643066406,
-				85.04996490478516,
-				-179.99989318847656
-			],
-			"scale": [
-				0.0010000001639127731,
-				0.001000002957880497,
-				0.0010000001639127731
 			]
 		}
 	},
@@ -83670,7 +83707,7 @@
 			"position": [
 				612.1363525390625,
 				1443.4383544921875,
-				435.602294921875
+				806.0050659179688
 			],
 			"rotation": [
 				90.0,
@@ -83678,7 +83715,7 @@
 				0.0
 			],
 			"scale": [
-				0.0009999920148402452,
+				0.000999986077658832,
 				0.0010000019101426005,
 				0.0010000001639127731
 			]

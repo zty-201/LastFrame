@@ -49,6 +49,8 @@ function on_update(Self, dt)
     if tr == nil then return end
     dt = dt or 0.016
 
+    local isRotating = math.abs(targetY - currentY) > 0.05
+
     -- Consume interaction command (from InteractionBox)
     if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
         local cmdObj = SHARED.DOOR_CMD[EntityID]
@@ -56,7 +58,8 @@ function on_update(Self, dt)
 
         local cmd = cmdObj.cmd
 
-        if not hasOpenedOnce then
+        -- Only allow one valid interaction ever, and never while rotating
+        if not hasOpenedOnce and not isRotating then
             if cmd == "open" or cmd == "toggle" then
                 hasOpenedOnce = true
                 targetY = openAngle
@@ -67,7 +70,7 @@ function on_update(Self, dt)
                 print(string.format("[BedroomDoor] OPENED ONCE by=%s -> now disabled", tostring(cmdObj.by)))
             end
         end
-        -- if opened once: ignore forever
+        -- if opened once or rotating: ignore forever / ignore until done
     end
 
     -- Rotate toward target
