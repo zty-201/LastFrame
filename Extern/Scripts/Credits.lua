@@ -1,6 +1,7 @@
 ----------------------------------------------------------------
 -- Credits.lua
--- Attach to the CreditsPng entity (entity 1014) inside CreditsMenu.
+-- Attach to any persistent entity (e.g. 1014).
+-- Controls entity 13 (CreditsPng) inside CreditsMenu.
 --
 -- Detects when the StateMachine enters "EndCredit" and:
 --   1. Resets position_NDC.y to START_Y  (-9)  every time (no leftover state)
@@ -8,13 +9,14 @@
 --   3. When y >= END_Y (9) fires ReturnToMenu
 ----------------------------------------------------------------
 
-local CREDITS_STATE = "EndCredit"
-local START_Y       = -9.0
-local END_Y         =  9.0
-local SPEED         = 0.3       -- NDC units per second (tweak to taste)
+local CREDITS_STATE  = "EndCredit"
+local CREDITS_ENTITY = 13          -- entity with the Credits.png UIComponent
+local START_Y        = -9.0
+local END_Y          =  9.0
+local SPEED          = 0.3         -- NDC units per second (tweak to taste)
 
-local wasInCredits  = false
-local playing       = false
+local wasInCredits   = false
+local playing        = false
 
 ----------------------------------------------------------------
 
@@ -36,9 +38,10 @@ function on_update(self, dt)
         playing      = true
 
         -- Always reset to the top so replaying starts fresh
-        if EntityUI then
-            local x, _ = EntityUI:GetPosition_NDC()
-            EntityUI:SetPosition_NDC(x, START_Y)
+        local img = GetEntityUI(CREDITS_ENTITY)
+        if img then
+            local x, _ = img:GetPosition_NDC()
+            img:SetPosition_NDC(x, START_Y)
         end
 
         print("[Credits] Entering EndCredit -> reset y to " .. START_Y)
@@ -55,12 +58,15 @@ function on_update(self, dt)
         return
     end
 
-    if not playing or not EntityUI then return end
+    if not playing then return end
 
     -- Scroll upward
-    local x, y = EntityUI:GetPosition_NDC()
+    local img = GetEntityUI(CREDITS_ENTITY)
+    if not img then return end
+
+    local x, y = img:GetPosition_NDC()
     y = y + SPEED * dt
-    EntityUI:SetPosition_NDC(x, y)
+    img:SetPosition_NDC(x, y)
 
     -- Finished
     if y >= END_Y then
