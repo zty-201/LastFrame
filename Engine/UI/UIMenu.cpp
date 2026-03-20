@@ -319,36 +319,54 @@ namespace EngineFramework
         button.is_clicked = false;
         button.is_released = false;
 
-        //checked if clicked
-        if (InputManager::GetInstance().GetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {
+        bool mousePressed = InputManager::GetInstance().GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT);
+        bool mouseHeld = InputManager::GetInstance().GetMouseButton(GLFW_MOUSE_BUTTON_LEFT);
+        bool mouseReleased = InputManager::GetInstance().GetMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT);
+        bool touching = check_touch(e);
 
-            if (check_touch(e)) {
+        button.curr_button_state = IDLE;
 
+        if (mousePressed)
+        {
+            if (touching && active_pressed_button == entt::null)
+            {
+                active_pressed_button = e;
                 button.curr_button_state = CLICKED;
                 button.is_clicked = true;
-                //std::cout << "CLICKED!!!\n";
             }
-            
-        }else if (InputManager::GetInstance().GetMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT)) {
-            button.curr_button_state = RELEASED;  
-            button.is_released = true;
-            //std::cout << "RELEASED!!!\n";
         }
-        else if(check_touch(e)){
+        else if (mouseHeld)
+        {
+            if (active_pressed_button == e)
+            {
+                button.curr_button_state = CLICKED;
+                button.is_clicked = true;
+            }
+        }
+        else if (mouseReleased)
+        {
+            if (active_pressed_button == e)
+            {
+                button.curr_button_state = RELEASED;
+                button.is_released = true;
 
-#if defined(PLATFORM_WINDOWS) //ONLY WINDOWS HAVE THIS
-            button.curr_button_state = HOVER;
-            button.is_hover = true;
-            /*std::cout << "HOVER!!!\n";*/
+                if (touching)
+                {
+                    button.curr_button_state = TRIGGERED;
+                }
+
+                active_pressed_button = entt::null;
+            }
+        }
+        else
+        {
+#if defined(PLATFORM_WINDOWS)
+            if (touching)
+            {
+                button.curr_button_state = HOVER;
+                button.is_hover = true;
+            }
 #endif
-            
-        }
-        else {
-            button.curr_button_state = IDLE;          
-        }
-
-        if (button.curr_button_state == RELEASED && button.prev_button_state == CLICKED) {
-            button.curr_button_state = TRIGGERED;
         }
      
     }

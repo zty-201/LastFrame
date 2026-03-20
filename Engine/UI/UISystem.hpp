@@ -66,6 +66,8 @@ namespace EngineFramework
         void Update();
         void Clean();
 
+        entt::entity active_pressed_button = entt::null;
+
    
         void removeAllEntities_Reg();
         bool Deseralise(std::string); //Reading from files
