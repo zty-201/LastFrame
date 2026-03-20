@@ -1143,11 +1143,24 @@ glm::vec3 PhysicsWorld::UpdateCharacter(entt::entity entity, const glm::vec3& in
     character->SetLinearVelocity(targetVel);
 
     JPH::DefaultBroadPhaseLayerFilter bpFilter(*m_objectVsBroadPhaseLayerFilter, Layers::DYNAMIC);
-    JPH::DefaultObjectLayerFilter layerFilter(*m_objectLayerPairFilter, Layers::DYNAMIC);
+    
+    struct CharacterObjectLayerFilter : public JPH::ObjectLayerFilter
+    {
+        virtual bool ShouldCollide(JPH::ObjectLayer inLayer) const override
+        {
+            return inLayer == Layers::STATIC || inLayer == Layers::DYNAMIC;
+        }
+    };
+    CharacterObjectLayerFilter layerFilter;
+
     JPH::BodyFilter bodyFilter;
     JPH::ShapeFilter shapeFilter;
 
-    character->Update(dt, globalGravity, bpFilter, layerFilter, bodyFilter, shapeFilter, *m_tempAllocator);
+    JPH::CharacterVirtual::ExtendedUpdateSettings updateSettings;
+    updateSettings.mStickToFloorStepDown = JPH::Vec3(0.f, -10.f, 0.f);
+    updateSettings.mWalkStairsStepUp = JPH::Vec3(0.f, 0.4f, 0.f);
+
+    character->ExtendedUpdate(dt, globalGravity, updateSettings, bpFilter, layerFilter, bodyFilter, shapeFilter, *m_tempAllocator);
 
     JPH::RVec3 pos = character->GetPosition();
     JPH::Vec3 gn = character->GetGroundNormal();

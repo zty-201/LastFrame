@@ -155,6 +155,11 @@ function on_update(self, dt)
     local isSprinting = sprintHeld and (len > deadZone)
     local speedMul = isSprinting and sprintMultiplier or 1.0
 
+        local grounded = false
+    if type(Character_IsGrounded) == "function" then
+        grounded = Character_IsGrounded(EntityID)
+    end
+
     -- ========================================================
     -- APPLY PHYSICS VELOCITY
     -- ========================================================
@@ -175,6 +180,11 @@ function on_update(self, dt)
         local finalX = (rightX * moveX) + (forwardX * moveZ)
         local finalZ = (rightZ * moveX) + (forwardZ * moveZ)
 
+        local finalY = 0.0
+        if grounded then
+            finalY = -1.5 * moveSpeed
+        end
+
         if type(Character_SetVelocity) == "function" then
             Character_SetVelocity(EntityID, finalX * moveSpeed * speedMul, 0, finalZ * moveSpeed * speedMul)
         end
@@ -188,11 +198,6 @@ function on_update(self, dt)
     -- FOOTSTEPS
     -- ========================================================
     local inputMoving = (len > footstepDeadzone)
-
-    local grounded = false
-    if type(Character_IsGrounded) == "function" then
-        grounded = Character_IsGrounded(EntityID)
-    end
 
     _groundGrace = _groundGrace or 0.0
     local GRACE_SECONDS = 0.15 
