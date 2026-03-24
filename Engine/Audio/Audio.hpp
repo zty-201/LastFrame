@@ -109,8 +109,9 @@ namespace EngineFramework
         void SetSimulationMode(bool enabled);
         void SetIndoorFactor(float factor); // 0.0 = outdoor, 1.0 = indoor
 
-
-
+        // OS-level Audio Thread Management
+        void SuspendMixer();
+        void ResumeMixer();
 
         //event_dispatcher.trigger<Pause_Event>(std::move(pause_event));
         void HANDLE_EVENT_Pause_Event(Pause_Event& ello);

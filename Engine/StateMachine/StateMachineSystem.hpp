@@ -27,6 +27,9 @@ namespace EngineFramework
             return prev_state;
         }
 
+        // event handler for OS-level pause signals
+        void HANDLE_OS_PAUSE(Pause_Event& event);
+
     private:
         void Initialize() override;
         void Update(float dt) override;

@@ -56,6 +56,10 @@ void PauseState::OnEnter(Engine::StateMachine& machine)
     ui.closeAllMenu();
     ui.displayMenu("PauseMenu");
 
+    // Trigger complete audio silence
+    Pause_Event pause_event;
+    pause_event.is_pause = true;
+    event_dispatcher.trigger<Pause_Event>(std::move(pause_event));
 
     LOGI("[State] Enter Pause state");
 }
@@ -66,6 +70,11 @@ void PauseState::OnExit(Engine::StateMachine& machine)
 
     auto& ui = EngineFramework::UI_System::GetInstance();
     ui.closeAllMenu();
+
+    // Wake the audio back up
+    Pause_Event pause_event;
+    pause_event.is_pause = false;
+    event_dispatcher.trigger<Pause_Event>(std::move(pause_event));
 
     LOGI("[State] Exit Pause state");
 }

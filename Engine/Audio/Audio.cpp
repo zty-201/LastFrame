@@ -201,7 +201,6 @@ namespace EngineFramework
 		LOGI("%s", "[AudioSystem] Initialization Successful!");
 
 		m_inSimulation = true;
-
 		event_dispatcher.sink<Pause_Event>().connect<&AudioSystem::HANDLE_EVENT_Pause_Event>(this);
 
 	}
@@ -843,8 +842,14 @@ namespace EngineFramework
 
 	void AudioSystem::HANDLE_EVENT_Pause_Event(Pause_Event& event) {
 		
-		//std::cout << "==================================hello pause event here from audio \n";
-		event.is_pause = false;
+		if (event.is_pause) {
+			LOGI("[Audio] Received Pause_Event: PAUSE");
+			PauseAll(true);
+		}
+		else {
+			LOGI("[Audio] Received Pause_Event: RESUME");
+			PauseAll(false);
+		}
 	}
 
 
@@ -944,6 +949,30 @@ namespace EngineFramework
 		}
 	}
 #endif
+
+	void AudioSystem::SuspendMixer()
+	{
+#ifndef DISABLE_FMOD
+		if (m_initialized && m_system)
+		{
+			// Locks the FMOD DSP thread and completely halts audio output
+			m_system->mixerSuspend();
+			LOGI("[AudioSystem] FMOD Mixer Suspended");
+		}
+#endif
+	}
+
+	void AudioSystem::ResumeMixer()
+	{
+#ifndef DISABLE_FMOD
+		if (m_initialized && m_system)
+		{
+			// Unlocks the FMOD DSP thread
+			m_system->mixerResume();
+			LOGI("[AudioSystem] FMOD Mixer Resumed");
+		}
+#endif
+	}
 
 
 } // namespace EngineFramework

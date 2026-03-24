@@ -68,6 +68,9 @@ namespace EngineFramework
         m_stateMachine.AddTriggerTransition("EndCredit", "MainMenu", "ReturnToMenu");
 
         m_started = false;
+
+		// connect to the event dispatcher to handle OS-level pause signals (e.g., app going to background on mobile)
+        event_dispatcher.sink<Pause_Event>().connect<&StateMachineSystem::HANDLE_OS_PAUSE>(this);
     }
 
     void StateMachineSystem::Update(float dt)
@@ -97,6 +100,24 @@ namespace EngineFramework
                 prev_state.c_str(), newState.c_str());
         }
         
+    }
+
+	// This function is called when the OS sends a pause event (e.g., app is backgrounded on mobile)
+    void StateMachineSystem::HANDLE_OS_PAUSE(Pause_Event& event)
+    {
+        // Only act if the OS is telling us the app is being backgrounded
+        if (event.is_pause)
+        {
+            // Safety check: Only trigger Pause if we are currently in Gameplay!
+            // This prevents the game from trying to pause while in the Main Menu or Splash screen.
+            if (get_currentState_name() == "Gameplay")
+            {
+                LOGI("[StateMachineSystem] OS Pause detected. Triggering 'PauseGame' transition.");
+
+                // This sets the trigger that the StateMachine checks during its next Update()
+                m_stateMachine.SetTrigger("PauseGame");
+            }
+        }
     }
 
 }
