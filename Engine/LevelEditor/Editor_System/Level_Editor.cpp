@@ -23,10 +23,13 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "global.hpp"
 #include "LFeature.hpp"
 //File management, JSON file parser/writer
+#include <array>
 #include <filesystem>
 #include <fstream>
+#include <initializer_list>
 #include <nlohmann/json.hpp>
 #include <sstream>
+#include <string_view>
 
 //Entt reflection system
 #include <entt/meta/meta.hpp>
@@ -119,6 +122,102 @@ namespace EngineFramework
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.FontScaleMain = 1.0f;       // replaces FontGlobalScale in 1.92+
+
+		const std::filesystem::path asset_prefix = AssetManagerSystem::GetAssetFolderPrefix();
+		const std::array<std::filesystem::path, 2> font_search_roots = {
+			asset_prefix / "Extern/Fonts",
+			asset_prefix / "Lib/Windows_x64/Debug/imgui/misc/fonts"
+		};
+
+		auto resolveFontPath = [&](std::string_view filename) -> std::filesystem::path
+		{
+			for (const auto& root : font_search_roots)
+			{
+				if (root.empty())
+				{
+					continue;
+				}
+
+				const auto candidate = root / filename;
+				if (std::filesystem::exists(candidate))
+				{
+					return std::filesystem::weakly_canonical(candidate);
+				}
+			}
+			return {};
+		};
+
+		auto loadFont = [&](std::string_view filename, float size_px, const char* label) -> ImFont*
+		{
+			const auto full_path = resolveFontPath(filename);
+			if (full_path.empty())
+			{
+				LOGW("LevelEditor: font '%s' not found in search paths.", label);
+				return nullptr;
+			}
+
+			if (ImFont* font = io.Fonts->AddFontFromFileTTF(full_path.string().c_str(), size_px))
+			{
+				return font;
+			}
+
+			LOGW("LevelEditor: failed to load font '%s' (%s).", label, full_path.string().c_str());
+			return nullptr;
+		};
+
+		ImFont* karlaFont = loadFont("Karla-Regular.ttf", 18.0f, "Karla Regular");
+		if (!karlaFont)
+		{
+			LOGW("LevelEditor: falling back to ImGui default font.");
+			karlaFont = io.Fonts->AddFontDefault();
+		}
+
+		io.FontDefault = karlaFont;
+
+		ImGui::StyleColorsDark();
+
+		// Neutral areas be black
+		const ImVec4 kNearBlack = ImVec4(0.02f, 0.02f, 0.02f, 1.0f);
+		style.Colors[ImGuiCol_WindowBg] = kNearBlack;
+		style.Colors[ImGuiCol_ChildBg] = kNearBlack;
+		style.Colors[ImGuiCol_PopupBg] = kNearBlack;
+		style.Colors[ImGuiCol_MenuBarBg] = kNearBlack;
+		style.Colors[ImGuiCol_DockingEmptyBg] = kNearBlack;
+		style.Colors[ImGuiCol_TitleBg] = kNearBlack;
+		style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.05f, 0.05f, 0.05f, 1.0f);
+
+		// Frames/panels should read as dark charcoal
+		style.Colors[ImGuiCol_FrameBg] = ImVec4(0.12f, 0.12f, 0.12f, 1.0f);
+		style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.16f, 0.16f, 0.16f, 1.0f);
+		style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.20f, 0.20f, 0.20f, 1.0f);
+		style.Colors[ImGuiCol_TabUnfocused] = style.Colors[ImGuiCol_FrameBg];
+		style.Colors[ImGuiCol_TabUnfocusedActive] = style.Colors[ImGuiCol_FrameBgHovered];
+
+		// Replace every accent with an IDE-style red
+		const ImVec4 kRed = ImVec4(0.52f, 0.04f, 0.07f, 1.0f);  // dark, saturated red
+		const ImVec4 kRedHover = ImVec4(0.62f, 0.08f, 0.11f, 1.0f);  // slightly brighter for hover
+		const ImVec4 kRedActive = ImVec4(0.44f, 0.03f, 0.06f, 1.0f);  // darker for active/pressed
+		style.Colors[ImGuiCol_Header] = kRed;
+		style.Colors[ImGuiCol_HeaderHovered] = kRedHover;
+		style.Colors[ImGuiCol_HeaderActive] = kRedActive;
+		style.Colors[ImGuiCol_Button] = kRed;
+		style.Colors[ImGuiCol_ButtonHovered] = kRedHover;
+		style.Colors[ImGuiCol_ButtonActive] = kRedActive;
+		style.Colors[ImGuiCol_Tab] = kRed;
+		style.Colors[ImGuiCol_TabHovered] = kRedHover;
+		style.Colors[ImGuiCol_TabActive] = kRed;
+		style.Colors[ImGuiCol_SliderGrab] = kRed;
+		style.Colors[ImGuiCol_SliderGrabActive] = kRedActive;
+		style.Colors[ImGuiCol_ResizeGrip] = kRed;
+		style.Colors[ImGuiCol_ResizeGripHovered] = kRedHover;
+		style.Colors[ImGuiCol_ResizeGripActive] = kRedActive;
+
+		// Light text so it stays readable on black
+		style.Colors[ImGuiCol_Text] = ImVec4(0.95f, 0.95f, 0.95f, 1.0f);
+		style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.0f);
 		io.ConfigWindowsResizeFromEdges = true; // allow resize from any edge
 		ImGui::GetIO().ConfigDockingTransparentPayload = false;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -516,7 +615,7 @@ namespace EngineFramework
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		ImGui::GetIO().FontGlobalScale = 2.0f;
+		ImGui::GetIO().FontGlobalScale = 1.0f;
 
 		//Disable keyboard if it's being used by imgui, like an imgui text field being active.
 		if (ImGui::GetIO().WantCaptureKeyboard && ImGui::IsAnyItemActive())
@@ -525,7 +624,7 @@ namespace EngineFramework
 		}
 		ImGuiIO& io = ImGui::GetIO();
 		//ImGuiIO& io = ImGui::GetIO();
-		io.FontGlobalScale = 2.0f;   // DEFAULT
+		io.FontGlobalScale = 1.0f;   // DEFAULT
 
 		//DOCKING =================================================		
 		docking();
@@ -561,4 +660,3 @@ namespace EngineFramework
 
 }
 #endif
-
