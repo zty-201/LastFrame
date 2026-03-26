@@ -359,6 +359,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
+					"gameStateTag": 0,
 					"id": "S1",
 					"loop": false,
 					"maxDistance": 25.0,

@@ -41545,27 +41545,27 @@
 				1.0
 			],
 			"albedoMap": [
-				2123869993542172683,
+				991381892607950855,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				17198649398227697675,
+				8485371672552456201,
 				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				8551738113665728515,
+				11944136186372997143,
 				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				6822355856755458053,
+				14826439947890114571,
 				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				3297224901821644825,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -41577,11 +41577,11 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_frog",
+			"meshName": "cardboardbox",
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Storeroom_ToyFrog_01"
+			"name": "Storeroom_Cardboardbox_02"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -41608,22 +41608,21 @@
 			"layer": 1,
 			"restitution": 0.0
 		},
-		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				625.4676513671875,
-				160.3030548095703,
-				629.2021484375
+				652.1344604492188,
+				163.5998992919922,
+				603.506103515625
 			],
 			"rotation": [
 				0.0,
-				-43.349998474121094,
+				-90.0,
 				0.0
 			],
 			"scale": [
+				0.9999999403953552,
 				1.0,
-				1.0,
-				1.0
+				0.9999999403953552
 			]
 		}
 	},
@@ -41635,27 +41634,27 @@
 				1.0
 			],
 			"albedoMap": [
-				8811354800417112235,
+				991381892607950855,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				10540737057327382701,
+				8485371672552456201,
 				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				164443515865759919,
+				11944136186372997143,
 				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				16881805332665041073,
+				14826439947890114571,
 				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				3297224901821644825,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -41667,11 +41666,11 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_monkey",
+			"meshName": "cardboardbox",
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Storeroom_ToyMonkey_02"
+			"name": "Storeroom_cardboardbox_03"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -41701,13 +41700,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				622.3107299804688,
+				655.2880859375,
 				95.18037414550781,
 				536.0851440429688
 			],
 			"rotation": [
 				0.0,
-				-87.64998626708984,
+				45.0,
 				0.0
 			],
 			"scale": [
@@ -42083,27 +42082,27 @@
 				1.0
 			],
 			"albedoMap": [
-				8811354800417112235,
+				991381892607950855,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				10540737057327382701,
+				8485371672552456201,
 				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				164443515865759919,
+				11944136186372997143,
 				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				16881805332665041073,
+				14826439947890114571,
 				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				0,
-				0
+				3297224901821644825,
+				3711223656383638553
 			],
 			"uvOffset": [
 				0.0,
@@ -42115,11 +42114,11 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "toy_monkey",
+			"meshName": "cardboardbox",
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Storeroom_ToyMonkey_03"
+			"name": "Storeroom_cardboardbox_04"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -42149,13 +42148,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				630.7964477539063,
-				39.9542121887207,
-				425.0628967285156
+				657.5926513671875,
+				40.0,
+				418.6672058105469
 			],
 			"rotation": [
 				0.0,
-				-62.599998474121094,
+				16.99999237060547,
 				0.0
 			],
 			"scale": [
@@ -42262,26 +42261,26 @@
 				1.0
 			],
 			"albedoMap": [
-				13423040818844500109,
+				991381892607950855,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				16881805332665041039,
+				8485371672552456201,
 				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				1893825772776030353,
+				11944136186372997143,
 				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				9964276305023959187,
+				14826439947890114571,
 				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				5929051038899994773,
+				3297224901821644825,
 				3711223656383638553
 			],
 			"uvOffset": [
@@ -42294,11 +42293,11 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "rocking_horse",
+			"meshName": "cardboardbox",
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Storeroom_Horse_02"
+			"name": "Storeroom_Cardboardbox_01"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -42327,13 +42326,13 @@
 		},
 		"TransformComponent": {
 			"position": [
-				457.2700500488281,
+				469.4682922363281,
 				223.327880859375,
-				187.18222045898438
+				152.78189086914063
 			],
 			"rotation": [
 				0.0,
-				-13.350000381469727,
+				25.999990463256836,
 				0.0
 			],
 			"scale": [

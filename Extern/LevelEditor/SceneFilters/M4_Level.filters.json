@@ -559,7 +559,7 @@
 			"name": "Bedroom"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				39,
 				163,
@@ -570,7 +570,6 @@
 				229,
 				230,
 				231,
-				457,
 				458,
 				459,
 				460,
