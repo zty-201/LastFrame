@@ -5450,12 +5450,12 @@
 			"position": [
 				-1053.788818359375,
 				537.1326293945313,
-				840.6687622070313
+				835.191650390625
 			],
 			"rotation": [
-				0.20292167365550995,
+				0.20291493833065033,
 				89.99974060058594,
-				0.06266722828149796
+				0.06266720592975616
 			],
 			"scale": [
 				0.999992847442627,
@@ -10716,7 +10716,7 @@
 			"position": [
 				-1000.6920166015625,
 				253.871826171875,
-				600.7041015625
+				569.0092163085938
 			],
 			"rotation": [
 				-179.99989318847656,
@@ -34345,132 +34345,6 @@
 	"394": {
 		"ColliderComponent": {
 			"maxBounds": [
-				7.022693634033203,
-				301.20001220703125,
-				133.25897216796875
-			],
-			"minBounds": [
-				-6.600379943847656,
-				1.1999969482421875,
-				-149.55914306640625
-			],
-			"mode": 0,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						6.81153678894043,
-						150.0,
-						141.4090576171875
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						0.21115708351135254,
-						151.1999969482422,
-						-8.150077819824219
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				14095933140278919249,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				15248854644885766227,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				3143178846513872981,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				5449021855727566935,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				15248854644885766233,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "railing_bar",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "SF_Railing_01"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-745.012939453125,
-				534.8739013671875,
-				705.8648071289063
-			],
-			"rotation": [
-				0.0,
-				88.5999755859375,
-				0.0
-			],
-			"scale": [
-				0.9999926686286926,
-				0.9999991655349731,
-				1.100000023841858
-			]
-		}
-	},
-	"395": {
-		"ColliderComponent": {
-			"maxBounds": [
 				19.77971649169922,
 				310.0,
 				17.97845458984375
@@ -34548,7 +34422,7 @@
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "SF_RailingPost_01"
+			"name": "SF_RailingPost_02"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -34578,9 +34452,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-915.0943603515625,
+				-352.2422790527344,
 				525.6277465820313,
-				709.89501953125
+				724.7056274414063
 			],
 			"rotation": [
 				0.0,
@@ -34588,9 +34462,135 @@
 				0.0
 			],
 			"scale": [
-				0.9999916553497314,
+				0.9999909996986389,
 				0.9999991655349731,
-				0.9999963641166687
+				0.9999957084655762
+			]
+		}
+	},
+	"395": {
+		"ColliderComponent": {
+			"maxBounds": [
+				18.906177520751953,
+				310.0,
+				152.1049041748047
+			],
+			"minBounds": [
+				-11.093822479248047,
+				10.0,
+				-147.8950958251953
+			],
+			"mode": 1,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						15.0,
+						150.0,
+						150.0
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						3.906177520751953,
+						160.0,
+						2.1049041748046875
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17554697654112632945,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1413796589616775283,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				14672393892595515509,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				8907786369561280631,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				8907786369561280633,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "railing",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "SF_railing_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-499.0402526855469,
+				563.469970703125,
+				721.151611328125
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				0.9999909996986389,
+				0.9999991655349731,
+				0.9999957084655762
 			]
 		}
 	},
@@ -34723,29 +34723,29 @@
 	"397": {
 		"ColliderComponent": {
 			"maxBounds": [
-				7.022693634033203,
-				301.20001220703125,
-				133.25897216796875
+				18.906177520751953,
+				310.0,
+				152.1049041748047
 			],
 			"minBounds": [
-				-6.600379943847656,
-				1.1999969482421875,
-				-149.55914306640625
+				-11.093822479248047,
+				10.0,
+				-147.8950958251953
 			],
-			"mode": 0,
+			"mode": 1,
 			"shapes": [
 				{
 					"boxHalfExtents": [
-						6.81153678894043,
+						15.0,
 						150.0,
-						141.4090576171875
+						150.0
 					],
 					"capsuleHeight": 1.0,
 					"capsuleRadius": 0.25,
 					"offsetPosition": [
-						0.21115708351135254,
-						151.1999969482422,
-						-8.150077819824219
+						3.906177520751953,
+						160.0,
+						2.1049041748046875
 					],
 					"offsetRotation": [
 						0.0,
@@ -34764,26 +34764,26 @@
 				1.0
 			],
 			"albedoMap": [
-				14095933140278919249,
+				17554697654112632945,
 				3711223656383638553
 			],
 			"ambientOcclusionMap": [
-				15248854644885766227,
+				1413796589616775283,
 				3711223656383638553
 			],
 			"metallicFactor": 1.0,
 			"metallicMap": [
-				3143178846513872981,
+				14672393892595515509,
 				3711223656383638553
 			],
 			"name": "Floor",
 			"normalMap": [
-				5449021855727566935,
+				8907786369561280631,
 				3711223656383638553
 			],
 			"roughnessFactor": 1.0,
 			"roughnessMap": [
-				15248854644885766233,
+				8907786369561280633,
 				3711223656383638553
 			],
 			"uvOffset": [
@@ -34796,11 +34796,11 @@
 			]
 		},
 		"MeshComponent": {
-			"meshName": "railing_bar",
+			"meshName": "railing",
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "SF_Railing_02"
+			"name": "SF_railing_01"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -34830,19 +34830,19 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-433.35797119140625,
-				534.8739013671875,
-				704.6064453125
+				-796.736083984375,
+				563.469970703125,
+				721.151611328125
 			],
 			"rotation": [
 				0.0,
-				88.5999755859375,
+				89.99974822998047,
 				0.0
 			],
 			"scale": [
-				0.9999926686286926,
+				0.9999909996986389,
 				0.9999991655349731,
-				1.100000023841858
+				0.9999957084655762
 			]
 		}
 	},
@@ -34926,7 +34926,7 @@
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "SF_RailingPost_02"
+			"name": "SF_RailingPost_01"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -34956,9 +34956,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-599.1168212890625,
+				-650.1402587890625,
 				525.6277465820313,
-				711.7215576171875
+				724.7056274414063
 			],
 			"rotation": [
 				0.0,
