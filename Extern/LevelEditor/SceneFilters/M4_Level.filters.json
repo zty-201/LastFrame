@@ -1,7 +1,7 @@
 {
 	"filters": [
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				0,
 				3,
@@ -559,7 +559,7 @@
 			"name": "Bedroom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				39,
 				163,
@@ -581,15 +581,11 @@
 				466,
 				467,
 				468,
-				469,
 				470,
 				471,
 				472,
-				473,
-				474,
 				475,
 				476,
-				477,
 				478,
 				479,
 				480,
@@ -691,7 +687,7 @@
 			"name": "Ceilings"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				141,
 				142,
