@@ -5,6 +5,8 @@
 #include "MainMenuState.hpp"
 #include "IntroCutsceneState.hpp"
 #include "GameplayState.hpp"
+#include "Audio.hpp"
+#include "ScriptWrapper.hpp"
 
 namespace EngineFramework
 {
@@ -98,6 +100,34 @@ namespace EngineFramework
 
             LOGI("[StateMachineSystem] State changed: %s -> %s",
                 prev_state.c_str(), newState.c_str());
+
+            // Notify audio system of the new game state
+            EngineFramework::AudioSystem::GetInstance().SetGameState(newState);
+
+            // Sync Lua GAME_STATE global — Lua reads this, never writes it
+            auto& lua = Engine::ScriptSystem::GetLuaState();
+
+            if (newState == "Gameplay")
+                lua["GAME_STATE"] = "GAME";
+            else if (newState == "IntroCutscene")
+                lua["GAME_STATE"] = "CUTSCENE";
+            else if (newState == "Pause")
+            {
+            } // do nothing — keep GAME_STATE as is so ambience manager doesn't react
+            else if (oldState == "Pause")
+            {
+            } // returning from pause — keep GAME_STATE as is
+            else
+                lua["GAME_STATE"] = "MENU";
+        }
+
+        // ----- Periodic state print every 5 seconds (debug) -----
+        static float dbgTimer = 0.0f;
+        dbgTimer += dt;
+        if (dbgTimer >= 5.0f)
+        {
+            dbgTimer = 0.0f;
+            LOGI("[StateMachineSystem] Current state: %s", newState.c_str());
         }
         
     }

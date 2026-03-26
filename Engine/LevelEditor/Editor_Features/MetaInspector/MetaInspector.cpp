@@ -1022,6 +1022,41 @@ namespace EditorFeatures {
 					}
 				}
 
+				// ----- GAME STATE TAG -----
+				{
+					const char* gameStatePreview = "Any";
+					switch (slot.gameStateTag)
+					{
+					case AudioComponent::GameStateTag::Splash:        gameStatePreview = "Splash";        break;
+					case AudioComponent::GameStateTag::MainMenu:      gameStatePreview = "MainMenu";      break;
+					case AudioComponent::GameStateTag::IntroCutscene: gameStatePreview = "IntroCutscene"; break;
+					case AudioComponent::GameStateTag::Gameplay:      gameStatePreview = "Gameplay";      break;
+					case AudioComponent::GameStateTag::Pause:         gameStatePreview = "Pause";         break;
+					case AudioComponent::GameStateTag::EndCredit:     gameStatePreview = "EndCredit";     break;
+					default:                                          gameStatePreview = "Any";           break;
+					}
+
+					if (ImGui::BeginCombo("Game State Tag", gameStatePreview))
+					{
+						if (ImGui::Selectable("Any", slot.gameStateTag == AudioComponent::GameStateTag::Any))
+							slot.gameStateTag = AudioComponent::GameStateTag::Any;
+						if (ImGui::Selectable("Splash", slot.gameStateTag == AudioComponent::GameStateTag::Splash))
+							slot.gameStateTag = AudioComponent::GameStateTag::Splash;
+						if (ImGui::Selectable("MainMenu", slot.gameStateTag == AudioComponent::GameStateTag::MainMenu))
+							slot.gameStateTag = AudioComponent::GameStateTag::MainMenu;
+						if (ImGui::Selectable("IntroCutscene", slot.gameStateTag == AudioComponent::GameStateTag::IntroCutscene))
+							slot.gameStateTag = AudioComponent::GameStateTag::IntroCutscene;
+						if (ImGui::Selectable("Gameplay", slot.gameStateTag == AudioComponent::GameStateTag::Gameplay))
+							slot.gameStateTag = AudioComponent::GameStateTag::Gameplay;
+						if (ImGui::Selectable("Pause", slot.gameStateTag == AudioComponent::GameStateTag::Pause))
+							slot.gameStateTag = AudioComponent::GameStateTag::Pause;
+						if (ImGui::Selectable("EndCredit", slot.gameStateTag == AudioComponent::GameStateTag::EndCredit))
+							slot.gameStateTag = AudioComponent::GameStateTag::EndCredit;
+
+						ImGui::EndCombo();
+					}
+				}
+
 				// ----- ASSET PICKER -----
 				if (has_sources)
 				{

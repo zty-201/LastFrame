@@ -109,6 +109,9 @@ namespace EngineFramework
         void SetSimulationMode(bool enabled);
         void SetIndoorFactor(float factor); // 0.0 = outdoor, 1.0 = indoor
 
+        void SetGameState(const std::string& state); // call when game state changes
+        std::string GetGameState() const { return m_currentGameState; }
+
         // OS-level Audio Thread Management
         void SuspendMixer();
         void ResumeMixer();
@@ -187,6 +190,7 @@ namespace EngineFramework
         void HandlePlayOnStart(entt::registry& ecsRegistry);
 
     private:
+        bool m_isPaused = false;
         float m_indoorFactor = 0.0f;
 
 #ifndef DISABLE_FMOD
@@ -229,7 +233,7 @@ namespace EngineFramework
 
         bool m_inSimulation = false;
 
-        
+        std::string m_currentGameState = "MainMenu";
 
         static AudioSystem* this_system;
 

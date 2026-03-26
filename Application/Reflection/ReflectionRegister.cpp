@@ -127,6 +127,7 @@ struct adl_serializer<AudioComponent::Slot> {
 		j["minDistance"] = s.minDistance;
 		j["maxDistance"] = s.maxDistance;
 		j["ambienceType"] = static_cast<int>(s.ambienceType);
+		j["gameStateTag"] = static_cast<int>(s.gameStateTag);
 		j["category"] = static_cast<int>(s.category);
 		j["spatial"] = static_cast<int>(s.spatial);
 	}
@@ -148,6 +149,7 @@ struct adl_serializer<AudioComponent::Slot> {
 		s.minDistance = j.value("minDistance", 1.0f);
 		s.maxDistance = j.value("maxDistance", 25.0f);
 		s.ambienceType = static_cast<AudioComponent::AmbienceType>(j.value("ambienceType", 0));
+		s.gameStateTag = static_cast<AudioComponent::GameStateTag>(j.value("gameStateTag", 0));
 		s.category = static_cast<AudioComponent::AudioCategory>(j.value("category", 0));
 		s.spatial = static_cast<AudioComponent::SpatialMode>(j.value("spatial", 1));	// Default to 3D
 	}
@@ -715,7 +717,8 @@ namespace EngineFramework
 			.data<&AudioComponent::Slot::spatial>("spatial")
 			.data<&AudioComponent::Slot::minDistance>("minDistance")
 			.data<&AudioComponent::Slot::maxDistance>("maxDistance")
-			.data<&AudioComponent::Slot::ambienceType>("ambienceType");
+			.data<&AudioComponent::Slot::ambienceType>("ambienceType")
+			.data<&AudioComponent::Slot::gameStateTag>("gameStateTag");
 
 		entt::meta_factory<AudioComponent>()
 			.type("AudioComponent")

@@ -292,8 +292,11 @@ namespace EngineFramework
 			HandlePlayOnStart(ecs);
 #endif
 
-		// 3) Process queued play/stop commands
-		ProcessCommands(ecs);
+		// 3) Process queued play/stop commands — skip new play commands when paused
+		if (m_isPaused)
+			m_commands.clear(); // discard all commands while paused
+		else
+			ProcessCommands(ecs);
 
 		// 4) Update looping 3D instances to follow entity transforms
 		//if(m_inSimulation)
@@ -323,13 +326,7 @@ namespace EngineFramework
 
 	void AudioSystem::HandlePlayOnStart(entt::registry& ecs)
 	{
-		static bool printedOnce = false;
-		if (!printedOnce)
-		{
-			LOGI("[Audio] HandlePlayOnStart() is running");
-			printedOnce = true;
-		}
-
+		
 		auto view = ecs.view<AudioComponent>();
 		view.each([&](entt::entity e, AudioComponent& comp)
 			{
@@ -340,7 +337,6 @@ namespace EngineFramework
 					if (slot.playOnStart && !slot.id.empty())
 					{
 						//LOGI("[Audio] HandlePlayOnStart firing | Slot: %s | Entity: %u", slot.id.c_str(), (uint32_t)e);
-
 						PlayEntitySlot(e, slot.id);
 					}
 				}
@@ -365,6 +361,7 @@ namespace EngineFramework
 
 	void AudioSystem::ProcessPlaySlot(entt::registry& ecs, const AudioCommand& cmd)
 	{
+
 		if (!ecs.valid(cmd.entity)) return;
 		if (!ecs.all_of<AudioComponent, TransformComponent>(cmd.entity)) return;
 
@@ -375,10 +372,14 @@ namespace EngineFramework
 		if (!slot) return;
 
 #ifndef DISABLE_FMOD
-		// Load sound via AssetManager GUID (your existing approach)
 		using EngineFramework::AssetManagerSystem;
 		std::shared_ptr<SoundAsset> sound = AssetManagerSystem::GetResource<SoundAsset>(slot->audio_guid);
-		if (!sound || !sound->sound) return;
+		if (!sound || !sound->sound)
+		{
+			LOGI("[Audio] ProcessPlaySlot FAILED | Sound asset not loaded for Slot '%s' on Entity: %u",
+				cmd.slotId.c_str(), (uint32_t)cmd.entity);
+			return;
+		}
 
 		FMOD::Channel* channel = nullptr;
 		auto r = m_system->playSound(sound->sound, nullptr, true, &channel);
@@ -434,49 +435,40 @@ namespace EngineFramework
 
 		channel->setPaused(false);
 
-		// Track only if looping or if you want follow-up control by slot
-		//if (slot->loop || is3D)
-		//{
-			// If an instance with same entity+slot exists, stop it and replace (optional policy)
-			for (auto& inst : m_active)
+		// If an instance with same entity+slot exists, stop it and replace (optional policy)
+		for (auto& inst : m_active)
+		{
+			if (inst.entity == cmd.entity && inst.slotId == cmd.slotId)
 			{
-				if (inst.entity == cmd.entity && inst.slotId == cmd.slotId)
+				if (inst.isFadingOut) continue;
+
+				if (inst.useFade && inst.fadeDuration > 0.0f)
 				{
-					if (inst.isFadingOut) continue;
-
-					if (inst.useFade && inst.fadeDuration > 0.0f)
-					{
-						//LOGI("[Audio] Marking isFadingOut=true | Slot: %s | Triggered by PlaySlot command for: %s", inst.slotId.c_str(), cmd.slotId.c_str());
-						inst.isFadingOut = true;
-					}
-					else
-					{
-						if (inst.channel) inst.channel->stop();
-						inst.channel = nullptr;
-					}
-
-					//if (inst.channel) inst.channel->stop();
-					//inst = {}; // clear
+					inst.isFadingOut = true;
+				}
+				else
+				{
+					if (inst.channel) inst.channel->stop();
+					inst.channel = nullptr;
 				}
 			}
+		}
 
-			//LOGI("[Audio] PlaySlot | Slot: %s | useFade=%d | fadeDuration=%.2f", slot->id.c_str(), slot->useFade, slot->fadeDuration);
+		m_active.push_back({
+			cmd.entity,
+			cmd.slotId,
+			channel,
+			slot->useFade,					// Designer's choice to fade or not
+			slot->fadeDuration,
+			slot->useFade ? 0.0f : 1.0f,	// Current fade volume (start at 0 if fade, 1 if not)
+			finalTargetVolume,				// Ramp up to this volume
+			false,							// isFadingOut
+			is3D,
+			slot->loop,
+			slot->minDistance,
+			slot->maxDistance
+		});
 
-			m_active.push_back({
-				cmd.entity,
-				cmd.slotId,
-				channel,
-				slot->useFade,					// Designer's choice to fade or not
-				slot->fadeDuration,
-				slot->useFade ? 0.0f : 1.0f,	// Current fade volume (start at 0 if fade, 1 if not)
-				finalTargetVolume,				// Ramp up to this volume
-				false,							// isFadingOut
-				is3D,
-				slot->loop,
-				slot->minDistance,
-				slot->maxDistance
-				});
-		//}
 #else
 		(void)tf; (void)slot;
 #endif
@@ -485,7 +477,6 @@ namespace EngineFramework
 	void AudioSystem::ProcessStopSlot(const AudioCommand& cmd)
 	{
 #ifndef DISABLE_FMOD
-		//LOGI("[Audio] ProcessStopSlot called | Slot: %s", cmd.slotId.c_str());
 		for (auto& inst : m_active)
 		{
 			if (inst.entity == cmd.entity && inst.slotId == cmd.slotId)
@@ -495,7 +486,6 @@ namespace EngineFramework
 
 				if (inst.useFade && inst.fadeDuration > 0.0f)
 				{
-					//LOGI("[Audio] Marking isFadingOut=true | Slot: %s | Triggered by StopSlot", inst.slotId.c_str());
 					inst.isFadingOut = true;
 				}
 				else
@@ -557,9 +547,6 @@ namespace EngineFramework
 				{
 					instance.currentFadeVolume -= fadeStep;
 
-					// Print during fade-out
-					//LOGI("[Audio] Fading OUT | Slot: %s | Multiplier: %.2f", instance.slotId.c_str(), instance.currentFadeVolume);
-
 					if (instance.currentFadeVolume <= 0.0f)
 					{
 						instance.currentFadeVolume = 0.0f;
@@ -571,9 +558,6 @@ namespace EngineFramework
 				else if (instance.currentFadeVolume < 1.0f)
 				{
 					instance.currentFadeVolume = std::min(1.0f, instance.currentFadeVolume + fadeStep);
-
-					// Print during fade-in
-					//LOGI("[Audio] Fading IN | Slot: %s | Multiplier: %.2f", instance.slotId.c_str(), instance.currentFadeVolume);
 				}
 			}
 			else
@@ -757,9 +741,17 @@ namespace EngineFramework
 
 	void AudioSystem::PauseAll(bool paused)
 	{
+		LOGI("[Audio] PauseAll | paused=%d", paused);
 		if (!m_initialized) return;
 #ifndef DISABLE_FMOD
 		if (m_groupMaster) m_groupMaster->setPaused(paused);
+
+		// Also pause each tracked channel explicitly as catch-all
+		for (auto& inst : m_active)
+		{
+			if (inst.channel)
+				inst.channel->setPaused(paused);
+		}
 #endif
 	}
 
@@ -788,8 +780,6 @@ namespace EngineFramework
 
 	void AudioSystem::SetSimulationMode(bool enabled)
 	{
-		LOGI("[Audio] SetSimulationMode called | enabled=%d | m_inSimulation=%d", enabled, m_inSimulation);
-		
 		if (enabled)
 			m_playOnStartDone.clear();  // always clear when starting, regardless of current state
 		
@@ -800,14 +790,11 @@ namespace EngineFramework
 
 		if (!m_inSimulation)
 		{
-			//LOGI("[Audio] Stopping simulation | active instances: %zu", m_active.size());
-
 			// Stop all tracked channels explicitly
 			for (auto& inst : m_active)
 			{
 				if (inst.channel)
 				{
-					//LOGI("[Audio] Stopping channel | Slot: %s", inst.slotId.c_str());
 					inst.channel->stop();
 					inst.channel = nullptr;
 				}
@@ -841,13 +828,16 @@ namespace EngineFramework
 
 
 	void AudioSystem::HANDLE_EVENT_Pause_Event(Pause_Event& event) {
-		
+		LOGI("[Audio] HANDLE_EVENT_Pause_Event | is_pause: %d", event.is_pause);
+
 		if (event.is_pause) {
 			LOGI("[Audio] Received Pause_Event: PAUSE");
+			m_isPaused = true;
 			PauseAll(true);
 		}
 		else {
 			LOGI("[Audio] Received Pause_Event: RESUME");
+			m_isPaused = false;
 			PauseAll(false);
 		}
 	}
@@ -879,6 +869,72 @@ namespace EngineFramework
 		float confirmedVol = -1.0f;
 		if (m_groupAmbienceOutdoor) m_groupAmbienceOutdoor->getVolume(&confirmedVol);
 		//LOGI("[Audio] SetIndoorFactor=%.2f | OutdoorGroupVol set =%.2f | confirmed=%.2f", m_indoorFactor, outdoorVol, confirmedVol);
+#endif
+	}
+
+	void AudioSystem::SetGameState(const std::string& state)
+	{
+		/*for (auto& inst : m_active)
+		{
+			LOGI("[Audio] Active instance | Slot: %s | Entity: %u | isFadingOut: %d | channel valid: %d",
+				inst.slotId.c_str(),
+				(uint32_t)inst.entity,
+				inst.isFadingOut,
+				inst.channel != nullptr);
+		}*/
+
+		//LOGI("[Audio_State] SetGameState called: %s -> %s | m_active size: %zu", m_currentGameState.c_str(), state.c_str(), m_active.size());
+
+		if (m_currentGameState == state) return;
+
+		LOGI("[Audio_State] SetGameState: %s -> %s", m_currentGameState.c_str(), state.c_str());
+
+		std::string previousState = m_currentGameState;
+		m_currentGameState = state;
+
+#ifndef DISABLE_FMOD
+		// Pause/unpause is handled by PauseAll via Pause_Event — don't stop any sounds
+		if (state == "Pause" || previousState == "Pause")
+			return;
+
+		// Map state string to GameStateTag
+		AudioComponent::GameStateTag		newTag = AudioComponent::GameStateTag::Any;
+
+		if (state == "Splash")				newTag = AudioComponent::GameStateTag::Splash;
+		else if (state == "MainMenu")       newTag = AudioComponent::GameStateTag::MainMenu;
+		else if (state == "IntroCutscene")  newTag = AudioComponent::GameStateTag::IntroCutscene;
+		else if (state == "Gameplay")       newTag = AudioComponent::GameStateTag::Gameplay;
+		else if (state == "EndCredit")      newTag = AudioComponent::GameStateTag::EndCredit;
+
+		auto& ecs = EngineFramework::GameObjectSystem::GetRegistry();
+
+		for (auto& inst : m_active)
+		{
+			if (!inst.channel) continue;
+
+			// Find the slot to check its tag
+			if (!ecs.valid(inst.entity) || !ecs.all_of<AudioComponent>(inst.entity)) continue;
+			auto& comp = ecs.get<AudioComponent>(inst.entity);
+			const auto* slot = comp.FindSlot(inst.slotId);
+			if (!slot) continue;
+
+			// Any tag always plays, skip it
+			if (slot->gameStateTag == AudioComponent::GameStateTag::Any) continue;
+
+			// Stop sounds that don't belong to the new state
+			if (slot->gameStateTag != newTag)
+			{
+				if (inst.useFade && inst.fadeDuration > 0.0f)
+				{
+					inst.isFadingOut = true;
+				}
+				else
+				{
+					inst.channel->stop();
+					inst.channel = nullptr;
+				}
+			}
+		}
 #endif
 	}
 
