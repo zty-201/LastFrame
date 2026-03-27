@@ -224,6 +224,13 @@ end
 function on_update(self, dt)
     if not camera or not transform then return end
 
+
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        return
+    end
+    
+
     local SHARED = getGlobalShared()
 
     -- ======================================

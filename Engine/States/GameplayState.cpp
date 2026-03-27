@@ -15,17 +15,26 @@ void GameplayState::OnEnter(Engine::StateMachine& machine)
 
     auto& ui = EngineFramework::UI_System::GetInstance();
     ui.closeAllMenu();
+    ui.resumeActive_Menus();
 
     // Put your gameplay scene/runtime-start logic here.
 #if defined(PLATFORM_ANDROID)
-    ui.displayMenu_InvisibleLayer("Android_Inventory_Buttons");
-    ui.displayMenu("AndroidInputOverlay");
+    static bool init = false;
+
+    if (!init) {
+        ui.displayMenu_InvisibleLayer("Android_Inventory_Buttons");
+        ui.displayMenu("AndroidInputOverlay");
+        init = true;
+    }
+    
 #endif
 }
 
 void GameplayState::OnExit(Engine::StateMachine& machine)
 {
     UNREFERENCED_PARAMETER(machine);
+    auto& ui = EngineFramework::UI_System::GetInstance();
+    ui.closeAllMenu(true);
     LOGI("[State] Exit Gameplay");
 }
 
