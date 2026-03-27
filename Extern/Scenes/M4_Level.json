@@ -3124,74 +3124,74 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 943962135629545477
+					"ScriptGuid": 589857839486533633
 				}
 			]
 		},
-		"NameComponent": {
-			"name": "Masterroom_Folder_Icon"
-		},
-		"TransformComponent": {
-			"position": [
-				-94.61897277832031,
-				650.8886108398438,
-				1059.60107421875
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				0.10000000894069672,
+				0.10000000149011612
 			],
-			"rotation": [
+			"albedoMap": [
+				7230819861274968067,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 0.20000000298023224,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "RedMetalSphere",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 0.800000011920929,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
 				0.0,
-				-0.0,
 				0.0
 			],
-			"scale": [
-				1.0,
+			"uvTiling": [
 				1.0,
 				1.0
 			]
 		},
-		"UIComponent": {
-			"Overlay_name": "",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"is_NDC": true,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
+		"MeshComponent": {
+			"meshName": "Sphere",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Main Menu Camera"
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
 			"position": [
-				0.0,
-				0.0
+				-631.9739379882813,
+				132.5697021484375,
+				1239.29296875
 			],
-			"position_NDC": [
-				0.0,
-				0.0
+			"rotation": [
+				-179.99989318847656,
+				-46.89998245239258,
+				-179.99989318847656
 			],
-			"size": [
-				1545.0,
-				1158.0
-			],
-			"size_NDC": [
+			"scale": [
 				1.0,
+				0.9999999403953552,
 				1.0
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				15304296428018171923,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
+			]
+		},
+		"archtype": 11270566386067177473
 	},
 	"120": {
 		"ColliderComponent": {
@@ -19253,9 +19253,9 @@
 				-0.00010427424422232434
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -36015,21 +36015,92 @@
 		}
 	},
 	"409": {
-		"TransformComponent": {
-			"position": [
-				-330.47100830078125,
-				323.11920166015625,
-				-300.6734313964844
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
 			],
-			"rotation": [
+			"albedoMap": [
+				8811354800417112235,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				10540737057327382701,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				164443515865759919,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				16881805332665041073,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "toy_monkey",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "Bedroom_SoftToy_MM"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
 				0.0,
 				0.0,
 				0.0
 			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-625.5885009765625,
+				67.61377716064453,
+				1188.2779541015625
+			],
+			"rotation": [
+				0.0,
+				-74.5,
+				0.0
+			],
 			"scale": [
+				1.0000079870224,
 				1.0,
-				1.0,
-				1.0
+				1.0000079870224
 			]
 		}
 	},
@@ -42630,6 +42701,291 @@
 			]
 		}
 	},
+	"469": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16309874578476007435,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 0,
+					"id": "Footstep1",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 0.1080000028014183
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						6185210870235774977,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 0,
+					"id": "Footstep2",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 0.11400000005960464
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						13679200650180280323,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 0,
+					"id": "Footstep3",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 0.10599999874830246
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						8491053879449468933,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 0,
+					"id": "Footstep4",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 0.10599999874830246
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						2149985604111810567,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 0,
+					"id": "Footstep5",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 0.1080000028014183
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						4455828613325504521,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 0,
+					"id": "Footstep6",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 0.09399999678134918
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						10220436136359739403,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 0,
+					"id": "Footstep7",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 0.1080000028014183
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						5608750117932351501,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 0,
+					"id": "Footstep8",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 0.1120000034570694
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16287532407446159363,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 0,
+					"id": "Flashlight",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 0.24500000476837158
+				}
+			]
+		},
+		"AudioListenerComponent": {
+			"active": true
+		},
+		"CharacterControllerComponent": {
+			"controlVelocity": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"gravityFactor": 25.0,
+			"groundNormal": [
+				0.0,
+				1.0,
+				0.0
+			],
+			"height": 350.0,
+			"isGrounded": true,
+			"jumpStrength": 10.0,
+			"mass": 70.0,
+			"maxSlopeAngle": 50.0,
+			"maxSpeed": 100.0,
+			"radius": 30.0,
+			"stepHeight": 0.30000001192092896
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 625024547570974721
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 11740093013966520321
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 17584542703313420289
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 5490970403712286721
+				},
+				{
+					"Loaded": true,
+					"ScriptGuid": 12304916665747210243
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				0.10000000894069672,
+				0.10000000149011612
+			],
+			"albedoMap": [
+				0,
+				0
+			],
+			"ambientOcclusionMap": [
+				0,
+				0
+			],
+			"metallicFactor": 0.20000000298023224,
+			"metallicMap": [
+				0,
+				0
+			],
+			"name": "Player",
+			"normalMap": [
+				0,
+				0
+			],
+			"roughnessFactor": 0.800000011920929,
+			"roughnessMap": [
+				0,
+				0
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"NameComponent": {
+			"name": "MainMenu_Camera"
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				27.456275939941406,
+				5.391084671020508,
+				-751.5916137695313
+			],
+			"rotation": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
 	"47": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -44284,7 +44640,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 480.44580078125,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -44445,7 +44801,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 458.07354736328125,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -44629,7 +44985,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 470.4078369140625,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -44723,7 +45079,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 523.4102172851563,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -44817,7 +45173,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 459.85296630859375,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -44911,7 +45267,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 472.8971862792969,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -45300,13 +45656,13 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				9.313644409179688,
+				-576.0862426757813,
 				174.0294952392578,
-				-757.057373046875
+				477.41552734375
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				0.0,
 				0.0
 			],
 			"scale": [
@@ -62297,7 +62653,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 89.07752227783203,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -79200,7 +79556,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 85.47123718261719,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -82377,7 +82733,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 97.1363296508789,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
