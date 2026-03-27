@@ -196,7 +196,7 @@
 			"name": "Hall"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				32,
 				33,
@@ -559,7 +559,7 @@
 			"name": "Bedroom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				39,
 				163,
@@ -615,7 +615,7 @@
 			"name": "Storeroom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				408,
 				410,
@@ -865,7 +865,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				5,
 				2,
