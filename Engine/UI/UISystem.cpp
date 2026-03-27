@@ -45,16 +45,77 @@ namespace EngineFramework
     // -------------------------------------------------------------------------
     namespace
     {
+        static void SetMenuLuminance(const std::string& menuName, float luminance)
+        {
+            auto it = EngineFramework::UI_System::Menu_Mapping.find(menuName);
+            if (it == EngineFramework::UI_System::Menu_Mapping.end() || !it->second.first)
+                return;
+
+            auto entities = it->second.first->get_Elements();
+            for (auto e : entities)
+            {
+                if (registry.valid(e) && registry.all_of<UIComponent>(e))
+                {
+                    auto& ui = registry.get<UIComponent>(e);
+                    if (!ui.lock_luminance)
+                    {
+                        ui.luminance = luminance;
+                    }
+                }
+            }
+        }
+
+        static void ResetMenuLuminance(const std::string& menuName)
+        {
+            SetMenuLuminance(menuName, 1.0f);
+        }
+
+        static void SetMenuSubtitleReveal(const std::string& menuName, float progress)
+        {
+            auto it = EngineFramework::UI_System::Menu_Mapping.find(menuName);
+            if (it == EngineFramework::UI_System::Menu_Mapping.end() || !it->second.first)
+                return;
+
+            progress = std::clamp(progress, 0.0f, 1.0f);
+
+            auto entities = it->second.first->get_Elements();
+            for (auto e : entities)
+            {
+                if (registry.valid(e) && registry.all_of<UIComponent>(e))
+                {
+                    auto& ui = registry.get<UIComponent>(e);
+
+                    // Only apply to subtitle-like elements if you want all elements in the menu to reveal
+                    // then leave this unconditional.
+                    if (ui.use_subtitle_reveal)
+                    {
+                        ui.subtitle_reveal_progress = progress;
+                        std::cout << "[SubtitleReveal] " << menuName
+                            << " progress = " << progress << "\n";
+                    }
+                }
+            }
+        }
+
+        //static void ResetMenuSubtitleReveal(const std::string& menuName)
+        //{
+        //    SetMenuSubtitleReveal(menuName, 1.0f);
+        //}
+
         struct CutsceneSequence
         {
             bool playing = false;
             std::size_t index = 0;
             float timer = 0.0f;
-            float interval = 1.5f;
+            float interval = 2.0f;
+
+            // Per-screen fade timing inside one interval
+            float fadeInTime = 0.5f;
+            float fadeOutTime = 0.5f;
 
             std::vector<std::string> scenes;
 
-            std::function<void(const std::string&)> showSceneFn; // should "swap" to this menu
+            std::function<void(const std::string&)> showSceneFn;
             std::function<void()> onFinishedFn;
 
             void Start(std::vector<std::string> inScenes,
@@ -71,27 +132,92 @@ namespace EngineFramework
                 index = 0;
                 timer = 0.0f;
 
+                // Clamp fade values so they always fit inside the interval
+                float maxFade = interval * 0.5f;
+                if (fadeInTime > maxFade) fadeInTime = maxFade;
+                if (fadeOutTime > maxFade) fadeOutTime = maxFade;
+
                 if (playing && showSceneFn)
                 {
-                    showSceneFn(scenes[0]); // show first immediately
+                    showSceneFn(scenes[0]);
+                    SetMenuLuminance(scenes[0], 0.0f); // start dark, fade in
+                }
+            }
+
+            void Skip()
+            {
+                if (!playing)
+                    return;
+
+                if (index < scenes.size())
+                {
+                    ResetMenuLuminance(scenes[index]);
+                }
+
+                playing = false;
+                timer = 0.0f;
+                index = scenes.size();
+
+                if (onFinishedFn)
+                {
+                    onFinishedFn();
                 }
             }
 
             void Stop()
             {
+                if (playing && index < scenes.size())
+                {
+                    ResetMenuLuminance(scenes[index]);
+                }
+
                 playing = false;
             }
 
             void Update(float dt)
             {
-                if (!playing || scenes.empty() || !showSceneFn) return;
+                if (!playing || scenes.empty() || !showSceneFn)
+                    return;
 
                 timer += dt;
 
-                // Use while to handle low FPS spikes safely
+                // Animate luminance of the current scene
+                const std::string& currentScene = scenes[index];
+
+                // Subtitle reveal timing
+                float subtitleDuration = 1.0f;
+                float subtitleProgress = std::clamp(timer / subtitleDuration, 0.0f, 1.0f);
+                SetMenuSubtitleReveal(currentScene, subtitleProgress);
+
+                float luminance = 1.0f;
+
+                if (timer < fadeInTime)
+                {
+                    // Fade in: 0 -> 1
+                    luminance = timer / fadeInTime;
+                }
+                else if (timer > (interval - fadeOutTime))
+                {
+                    // Fade out: 1 -> 0
+                    float t = (timer - (interval - fadeOutTime)) / fadeOutTime;
+                    luminance = 1.0f - t;
+                }
+                else
+                {
+                    // Hold
+                    luminance = 1.0f;
+                }
+
+                luminance = std::clamp(luminance, 0.0f, 1.0f);
+                SetMenuLuminance(currentScene, luminance);
+
                 while (timer >= interval)
                 {
                     timer -= interval;
+
+                    // Ensure previous scene is restored
+                    ResetMenuLuminance(scenes[index]);
+
                     ++index;
 
                     if (index >= scenes.size())
@@ -102,11 +228,127 @@ namespace EngineFramework
                     }
 
                     showSceneFn(scenes[index]);
+                    SetMenuLuminance(scenes[index], 0.0f); // next scene begins faded out
                 }
             }
         };
 
         CutsceneSequence gCutscene;
+
+        struct CreditsRoll
+        {
+            bool playing = false;
+            std::string menuName;
+
+            float speedPixelsPerSecond = 120.0f;
+            float endYThreshold = 8.26f;
+            float speedMultiplier = 1.0f;  // ADD THIS
+
+            std::vector<std::pair<entt::entity, glm::vec2>> startPositions;
+
+            void Start(const std::string& inMenuName,
+                float inSpeedPixelsPerSecond,
+                float inEndYThreshold)
+            {
+                menuName = inMenuName;
+                speedPixelsPerSecond = (inSpeedPixelsPerSecond > 0.0f) ? inSpeedPixelsPerSecond : 120.0f;
+                endYThreshold = inEndYThreshold;
+                speedMultiplier = 1.0f;
+                startPositions.clear();
+
+                auto it = EngineFramework::UI_System::Menu_Mapping.find(menuName);
+                if (it != EngineFramework::UI_System::Menu_Mapping.end() && it->second.first)
+                {
+                    auto entities = it->second.first->get_Elements();
+                    for (auto e : entities)
+                    {
+                        if (registry.valid(e) && registry.all_of<UIComponent>(e))
+                        {
+                            auto& ui = registry.get<UIComponent>(e);
+                            glm::vec2 pos = ui.is_NDC ? ui.position_NDC : ui.position;
+                            startPositions.push_back({ e, pos });
+                        }
+                    }
+                }
+
+                playing = !menuName.empty();
+            }
+
+            void Stop()
+            {
+                for (auto& [e, savedPos] : startPositions)
+                {
+                    if (registry.valid(e) && registry.all_of<UIComponent>(e))
+                    {
+                        auto& ui = registry.get<UIComponent>(e);
+                        if (ui.is_NDC)
+                            ui.position_NDC = savedPos;
+                        else
+                            ui.position = savedPos;
+                    }
+                }
+                startPositions.clear();
+                playing = false;
+                menuName.clear();
+            }
+
+            void Update(float dt)
+            {
+                if (!playing || menuName.empty())
+                    return;
+
+                auto it = EngineFramework::UI_System::Menu_Mapping.find(menuName);
+                if (it == EngineFramework::UI_System::Menu_Mapping.end() || !it->second.first)
+                {
+                    playing = false;
+                    return;
+                }
+
+                auto entities = it->second.first->get_Elements();
+                if (entities.empty())
+                {
+                    playing = false;
+                    return;
+                }
+
+                bool allPastThreshold = true;
+
+                const float screenHeight =
+                    static_cast<float>(EngineFramework::InputManager::GetInstance().GetScreenSize().second);
+
+                const float effectiveSpeed = speedPixelsPerSecond * speedMultiplier;  // USE MULTIPLIER
+
+                for (auto e : entities)
+                {
+                    if (!registry.valid(e) || !registry.all_of<UIComponent>(e))
+                        continue;
+
+                    auto& ui = registry.get<UIComponent>(e);
+
+                    if (ui.is_NDC)
+                    {
+                        float deltaNDC = (effectiveSpeed * dt / screenHeight) * 2.0f;
+                        ui.position_NDC.y += deltaNDC;
+
+                        if (ui.position_NDC.y < endYThreshold)
+                            allPastThreshold = false;
+                    }
+                    else
+                    {
+                        ui.position.y += effectiveSpeed * dt;
+
+                        float topPixel = ui.position.y + ui.size.y;
+                        if (topPixel < endYThreshold)
+                            allPastThreshold = false;
+                    }
+                }
+
+                if (allPastThreshold)
+                    playing = false;
+            }
+        };
+
+        CreditsRoll gCreditsRoll;
     }
 
     // -------------------------------------------------------------------------
@@ -140,7 +382,7 @@ namespace EngineFramework
 
         current_menu = ""; // none, i havent set default yet
 
-        Load_Start_Menu();
+        //Load_Start_Menu();
     }
 
     void UI_System::Clean_All()
@@ -186,27 +428,86 @@ namespace EngineFramework
         return true;
     }
 
-    void UI_System::Update(float deltaTime)
+void UI_System::Update(float deltaTime)
+{
+    // Allow skipping cutscenes with Space (desktop) or tap anywhere (Android)
+    if (gCutscene.playing)
     {
-        // 1) Tick cutscene sequence FIRST (so it can swap menus at the right moment)
-        gCutscene.Update(deltaTime);
+        bool shouldSkip = false;
 
-        // 2) Update only active menus
-        for (auto& [name, menu] : Menu_Mapping)
+        // Desktop / existing input
+        if (InputManager::GetInstance().GetAction("JUMP"))
         {
-            if (menu.first)
+            shouldSkip = true;
+        }
+
+#if defined(PLATFORM_ANDROID)
+        // Tap-anywhere skip (rising edge only)
+        static bool wasTouchDownLastFrame = false;
+        bool isTouchDownThisFrame = InputManager::GetInstance().GetMouseButton(0);
+
+        if (isTouchDownThisFrame && !wasTouchDownLastFrame)
+        {
+            shouldSkip = true;
+        }
+
+        wasTouchDownLastFrame = isTouchDownThisFrame;
+#endif
+
+        if (shouldSkip)
+        {
+            gCutscene.Skip();
+        }
+    }
+
+    // Fast-forward credits while holding input
+    if (gCreditsRoll.playing)
+    {
+        float creditsMultiplier = 1.0f;
+
+        // Desktop: hold jump / space to scroll faster
+        if (InputManager::GetInstance().GetAction("JUMP"))
+        {
+            creditsMultiplier = 4.0f; // change to 3.0f / 5.0f if you want
+        }
+
+#if defined(PLATFORM_ANDROID)
+        // Android: hold touch to fast-forward
+        if (InputManager::GetInstance().GetMouseButton(0))
+        {
+            creditsMultiplier = 4.0f;
+        }
+#endif
+
+        gCreditsRoll.speedMultiplier = creditsMultiplier;
+    }
+    else
+    {
+        gCreditsRoll.speedMultiplier = 1.0f;
+    }
+
+    // 1) Tick cutscene sequence FIRST
+    gCutscene.Update(deltaTime);
+
+    // 2) Tick rolling credits
+    gCreditsRoll.Update(deltaTime);
+
+    // 3) Update only active menus
+    for (auto& [name, menu] : Menu_Mapping)
+    {
+        if (menu.first)
+        {
+            if (menu.second)
             {
-                if (menu.second)
+                menu.first->Update();
+                if (name == "AndroidInputOverlay")
                 {
-                    menu.first->Update(); //only update those active ones
-                    if (name == "AndroidInputOverlay") {
-                        //update joysticks
-                        update_Joysticks();
-                    }
+                    update_Joysticks();
                 }
             }
         }
     }
+}
 
     void UI_System::update_Joysticks()
     {
@@ -217,15 +518,19 @@ namespace EngineFramework
 
         float screenWidth = (float)InputManager::GetInstance().GetScreenSize().first;
         float screenHeight = (float)InputManager::GetInstance().GetScreenSize().second;
+        auto& lua = Engine::ScriptSystem::GetLuaState();
 
         for (auto [entity, joystick] : view.each())
         {
-            for (auto [e, nameComp] : registry.view<NameComponent>().each())
+            if (!registry.valid(joystick.knobEntity))
             {
-                if (nameComp.name == joystick.knobTargetName)
+                for (auto [e, nameComp] : registry.view<NameComponent>().each())
                 {
-                    joystick.knobEntity = e;
-                    break;
+                    if (nameComp.name == joystick.knobTargetName)
+                    {
+                        joystick.knobEntity = e;
+                        break;
+                    }
                 }
             }
 
@@ -234,11 +539,16 @@ namespace EngineFramework
                 auto& bgUI = registry.get<UIComponent>(entity);
                 if (bgUI.is_NDC)
                 {
-                    float trueCenterX = bgUI.position_NDC.x + (bgUI.size_NDC.x / 2.f);
-                    float trueCenterY = bgUI.position_NDC.y + (bgUI.size_NDC.y / 2.f);
+                    float trueCenterX = bgUI.position_NDC.x;
+                    float trueCenterY = bgUI.position_NDC.y;
 
                     joystick.baseCenter.x = ((trueCenterX + 1.f) / 2.f) * screenWidth;
                     joystick.baseCenter.y = ((1.f - trueCenterY) / 2.f) * screenHeight;
+                }
+                else
+                {
+                    joystick.baseCenter.x = bgUI.position.x;
+                    joystick.baseCenter.y = bgUI.position.y;
                 }
             }
 
@@ -270,10 +580,6 @@ namespace EngineFramework
                     joystick.outputX = currentOffset.x / joystick.maxRadius;
                     joystick.outputY = currentOffset.y / joystick.maxRadius;
                 }
-
-                auto& lua = Engine::ScriptSystem::GetLuaState();
-                lua["SHARED"]["UI"]["joystickX"] = joystick.outputX;
-                lua["SHARED"]["UI"]["joystickY"] = joystick.outputY;
             }
             else
             {
@@ -281,12 +587,15 @@ namespace EngineFramework
                 if (joystick.isBeingDragged)
                 {
                     joystick.isBeingDragged = false;
-                    joystick.outputX = joystick.outputY = 0.f;
+                    joystick.outputX = 0.f;
+                    joystick.outputY = 0.f;
                 }
-                auto& lua = Engine::ScriptSystem::GetLuaState();
-                lua["SHARED"]["UI"]["joystickX"] = 0.0f;
-                lua["SHARED"]["UI"]["joystickY"] = 0.0f;
             }
+
+            std::string luaKeyX = joystick.knobTargetName + "_X";
+            std::string luaKeyY = joystick.knobTargetName + "_Y";
+            lua["SHARED"]["UI"][luaKeyX] = joystick.outputX;
+            lua["SHARED"]["UI"][luaKeyY] = joystick.outputY;
 
             if (registry.valid(joystick.knobEntity) && registry.all_of<UIComponent>(joystick.knobEntity))
             {
@@ -298,13 +607,13 @@ namespace EngineFramework
                     float targetNdcX = (targetPixelPos.x / screenWidth) * 2.f - 1.f;
                     float targetNdcY = 1.f - (targetPixelPos.y / screenHeight) * 2.f;
 
-                    knobUI.position_NDC.x = targetNdcX - (knobUI.size_NDC.x / 2.f);
-                    knobUI.position_NDC.y = targetNdcY - (knobUI.size_NDC.y / 2.f);
+                    knobUI.position_NDC.x = targetNdcX;
+                    knobUI.position_NDC.y = targetNdcY;
                 }
                 else
                 {
-                    knobUI.position.x = targetPixelPos.x - (knobUI.size.x / 2.f);
-                    knobUI.position.y = targetPixelPos.y - (knobUI.size.y / 2.f);
+                    knobUI.position.x = targetPixelPos.x;
+                    knobUI.position.y = targetPixelPos.y;
                 }
             }
         }
@@ -418,8 +727,9 @@ namespace EngineFramework
 
         if (it != Menu_Mapping.end() && it->second.first)
         {
-            std::cout << "[UI_System] displayMenu success: " << menuname << "\n";
+            //std::cout << "[UI_System] displayMenu success: " << menuname << "\n";
 
+            it->second.first->Initialize(); // Reset button states before showing
             it->second.first->draw_elements();
             current_menu = menuname;
             it->second.second = true;
@@ -476,6 +786,7 @@ namespace EngineFramework
             it->second.first->draw_elements(false);
             current_menu = "";
             it->second.second = false;
+            it->second.first->set_AllbuttonState();
         }
     }
 
@@ -498,6 +809,7 @@ namespace EngineFramework
                 
                 menu.first->draw_elements(false);
                 menu.second = false;
+                menu.first->set_AllbuttonState();
             }
         }
 
@@ -538,10 +850,14 @@ namespace EngineFramework
         gCutscene.Stop();
         if (closeAll)
         {
+
             
             closeAllMenu();
+            //displayMenu("Android_Inventory_Buttons");
+
 #if defined(PLATFORM_ANDROID)
-            displayMenu_InvisibleLayer("Android_Inventory_Buttons"); 
+            displayMenu_InvisibleLayer("Android_Inventory_Buttons");
+            displayMenu("AndroidInputOverlay");
 #endif
         }
     }
@@ -578,6 +894,7 @@ namespace EngineFramework
                 closeAllMenu();
 #if defined(PLATFORM_ANDROID)
                 displayMenu("Android_Inventory_Buttons");
+                displayMenu("AndroidInputOverlay");
 #endif
             }
         );
@@ -585,16 +902,64 @@ namespace EngineFramework
         
     }
 
+    void UI_System::StartSplashSequence()
+    {
+        std::cout << "[UI_System] StartSplashSequence() called\n";
+
+        StartCutsceneSequence(
+            { "Splash_1", "Splash_fmod", "Splash_2", "Splash_3" },
+            2.5f,
+            true
+        );
+    }
+
+    //No longer in use?
     void UI_System::StartPseudoCutscene()
     {
         std::cout << "[UI_System] StartPseudoCutscene() called\n";
 
         // Your described chain: cutscene_1 -> cutscene_4, 1.5s interval
         StartCutsceneSequence(
-            { "Cutscene_1", "Cutscene_2", "Cutscene_3", "Cutscene_4" },
+            { "Cutscene_1", "Cutscene_2", "Cutscene_3", "Cutscene_4", "Cutscene_5"},
             1.5f,
             true
         );
+    }
+
+    // In UISystem.cpp
+    void UI_System::StartCreditsRoll(const std::string& menuName,
+        float speedPixelsPerSecond, float endYThreshold, bool closeOthersFirst)
+    {
+        std::cout << "[UI_System] StartCreditsRoll('" << menuName << "')\n";
+        if (closeOthersFirst)
+            closeAllMenu();
+
+        displayMenu(menuName);
+        ResetMenuLuminance(menuName);
+        gCreditsRoll.Start(menuName, speedPixelsPerSecond, endYThreshold);
+    }
+
+    void UI_System::StopCreditsRoll(bool closeAll)
+    {
+        gCreditsRoll.Stop();
+        if (closeAll)
+        {
+            closeAllMenu();
+#if defined(PLATFORM_ANDROID)
+            displayMenu("Android_Inventory_Buttons");
+            displayMenu("AndroidInputOverlay");
+#endif
+        }
+    }
+
+    bool UI_System::IsCreditsRolling() const
+    {
+        return gCreditsRoll.playing;
+    }
+
+    void UI_System::SetCreditsSpeedMultiplier(float multiplier)
+    {
+        gCreditsRoll.speedMultiplier = multiplier;
     }
 
 }

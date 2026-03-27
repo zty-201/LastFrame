@@ -1,0 +1,100 @@
+{
+	"993": {
+		"NameComponent": {
+			"name": "Logo_fmod"
+		},
+		"UIComponent": {
+			"Overlay_name": "Splash_fmod",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				479.5,
+				274.5
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				959.0,
+				549.0
+			],
+			"size_NDC": [
+				0.5,
+				0.5
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				7855800089000853505,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"994": {
+		"NameComponent": {
+			"name": "blackbg_fmod"
+		},
+		"UIComponent": {
+			"Overlay_name": "Splash_fmod",
+			"color": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": true,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1918.0,
+				1098.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				0,
+				0
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}

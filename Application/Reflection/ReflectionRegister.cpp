@@ -127,6 +127,7 @@ struct adl_serializer<AudioComponent::Slot> {
 		j["minDistance"] = s.minDistance;
 		j["maxDistance"] = s.maxDistance;
 		j["ambienceType"] = static_cast<int>(s.ambienceType);
+		j["gameStateTag"] = static_cast<int>(s.gameStateTag);
 		j["category"] = static_cast<int>(s.category);
 		j["spatial"] = static_cast<int>(s.spatial);
 	}
@@ -148,6 +149,7 @@ struct adl_serializer<AudioComponent::Slot> {
 		s.minDistance = j.value("minDistance", 1.0f);
 		s.maxDistance = j.value("maxDistance", 25.0f);
 		s.ambienceType = static_cast<AudioComponent::AmbienceType>(j.value("ambienceType", 0));
+		s.gameStateTag = static_cast<AudioComponent::GameStateTag>(j.value("gameStateTag", 0));
 		s.category = static_cast<AudioComponent::AudioCategory>(j.value("category", 0));
 		s.spatial = static_cast<AudioComponent::SpatialMode>(j.value("spatial", 1));	// Default to 3D
 	}
@@ -587,6 +589,7 @@ namespace EngineFramework
 			.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
 			.data<&ButtonComponent::event_hover>("event_hover")
 			.data<&ButtonComponent::event_trigger>("event_trigger")
+			.data<&ButtonComponent::stay_clicked>("stay_clicked")
 			.func<&Emplacer<ButtonComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<ButtonComponent>::RemoveComponent>("remove")
 			.func<&Getter<ButtonComponent>::GetComponent>("get")
@@ -714,7 +717,8 @@ namespace EngineFramework
 			.data<&AudioComponent::Slot::spatial>("spatial")
 			.data<&AudioComponent::Slot::minDistance>("minDistance")
 			.data<&AudioComponent::Slot::maxDistance>("maxDistance")
-			.data<&AudioComponent::Slot::ambienceType>("ambienceType");
+			.data<&AudioComponent::Slot::ambienceType>("ambienceType")
+			.data<&AudioComponent::Slot::gameStateTag>("gameStateTag");
 
 		entt::meta_factory<AudioComponent>()
 			.type("AudioComponent")
@@ -867,6 +871,11 @@ namespace EngineFramework
 			.type("UIComponent") 
 			.data<&UIComponent::textureid>("textureid")
 				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Texture })
+			.data<&UIComponent::videoid>("videoid")
+				.custom<EditorFeatures::AssetPickerTag>(EditorFeatures::AssetPickerTag{ EditorFeatures::AssetPickerKind::Video })
+			.data<&UIComponent::play_video_audio>("play_video_audio")
+			.data<&UIComponent::video_audio_volume>("video_audio_volume")
+			.data<&UIComponent::video_audio_group>("video_audio_group")
 			.data<&UIComponent::position>("position")
 			.data<&UIComponent::is_NDC>("is_NDC")
 			.data<&UIComponent::position_NDC>("position_NDC")
@@ -875,6 +884,10 @@ namespace EngineFramework
 			.data<&UIComponent::color>("color")
 			.data<&UIComponent::visible>("visible")
 			.data<&UIComponent::luminance>("luminance")
+			.data<&UIComponent::lock_luminance>("lock_luminance")
+			.data<&UIComponent::use_subtitle_reveal>("use_subtitle_reveal")
+			.data<&UIComponent::subtitle_reveal_progress>("subtitle_reveal_progress")
+			.data<&UIComponent::subtitle_reveal_softness>("subtitle_reveal_softness")
 			.data<&UIComponent::layer>("layer")
 			.data<&UIComponent::Overlay_name>("Overlay_name")
 			.data<&UIComponent::event_received>("event_received")

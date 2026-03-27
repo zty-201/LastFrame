@@ -1,7 +1,7 @@
 {
 	"625": {
 		"NameComponent": {
-			"name": "Cutscene_2"
+			"name": "Cutscene2"
 		},
 		"UIComponent": {
 			"Overlay_name": "Cutscene_2",
@@ -12,8 +12,59 @@
 			],
 			"event_received": "",
 			"is_NDC": true,
-			"layer": 3,
+			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				-537.0399780273438,
+				-32.94000244140625
+			],
+			"position_NDC": [
+				-0.05999999865889549,
+				-0.05999999865889549
+			],
+			"size": [
+				2877.0,
+				1098.0
+			],
+			"size_NDC": [
+				1.5,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				17248593625470894083,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"848": {
+		"NameComponent": {
+			"name": "blackbg_2"
+		},
+		"UIComponent": {
+			"Overlay_name": "Cutscene_2",
+			"color": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": true,
+			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				0.0,
 				0.0
@@ -23,16 +74,74 @@
 				0.0
 			],
 			"size": [
-				2675.0,
-				1625.0
+				1918.0,
+				1098.0
 			],
 			"size_NDC": [
 				1.0,
 				1.0
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				17248593625470894083,
+				0,
+				0
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"896": {
+		"NameComponent": {
+			"name": "Sub2"
+		},
+		"UIComponent": {
+			"Overlay_name": "Cutscene_2",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				95.9000244140625,
+				49.410011291503906
+			],
+			"position_NDC": [
+				0.0,
+				-0.8299999833106995
+			],
+			"size": [
+				1726.199951171875,
+				87.83999633789063
+			],
+			"size_NDC": [
+				0.8999999761581421,
+				0.07999999821186066
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				8672402977504575491,
 				3711223656383638553
+			],
+			"use_subtitle_reveal": true,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
 			],
 			"visible": false
 		}

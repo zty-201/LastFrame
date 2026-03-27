@@ -11,7 +11,7 @@ local STATE_IDLE = 0
 local STATE_CP1  = 1
 
 local ROCK_ANGLE = 10.0
-local ROCK_SPEED = 3.45
+local ROCK_SPEED = 3.42
 
 local ROCK_SOUND_SLOT = "HorseRock"
 

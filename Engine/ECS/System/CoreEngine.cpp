@@ -66,6 +66,18 @@ namespace EngineFramework
 		//Array has already been sorted in update order, in initialize.
 		for (CoreSystem& system : system_arr)
 		{
+			/*if (g_IsPaused)
+			{
+				if (system.name == "PhysicsRuntimeSystem" ||
+					system.name == "GameObjectSystem" ||
+					system.name == "ScriptWrapper" ||
+					system.name == "AnimationSystem" ||
+					system.name == "StateMachineSystem")
+				{
+					continue;
+				}
+			}*/
+
 			// PROFILER CODE - To time each system automatically
 			Diagnostics::Scoped scope{ system.label_update.c_str() }; // To track per system per frame timing
 

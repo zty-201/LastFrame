@@ -5,7 +5,7 @@
 ----------------------------------------------------------------
 
 local DEBUG = true
-local AUDIO_SLOT_ID = "Laughter"   -- ← matches your Audio Slot name
+local AUDIO_SLOT_ID = "GirlLaughing"
 local TARGET_ID = 688              -- interactable entity ID
 
 local wasInRange = false

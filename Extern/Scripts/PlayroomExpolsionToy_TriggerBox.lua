@@ -39,7 +39,8 @@ local function scale_ok()
     local tr = Query.GetTransform(TOY_ID)
     if tr == nil then return false end
     local sx, sy, sz = tr:GetScale()
-    return not (sx == 0 and sy == 0 and sz == 0)
+    local eps = 0.01
+    return not (sx < eps and sy < eps and sz < eps)
 end
 
 local function consume_toggle(id)
@@ -65,6 +66,14 @@ function on_create(self)
 end
 
 function on_update(self, dt)
+    -- Auto-close if player walked out of the zone while the UI was open
+    if SHARED[UI_TABLE][TOY_ID] == true
+       and not (SHARED.INTERACT_IN_ZONE and SHARED.INTERACT_IN_ZONE[TOY_ID] == true) then
+        if UI_CloseMenu ~= nil then UI_CloseMenu(MENU_NAME) end
+        SHARED[UI_TABLE][TOY_ID] = false
+        if DEBUG then print("[ExplosionToy_TriggerBox] Auto-closed: player left zone") end
+    end
+
     if not consume_toggle(TOY_ID) then
         return
     end

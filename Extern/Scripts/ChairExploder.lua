@@ -4,6 +4,7 @@
 local DEBUG = true
 
 local EXPLODE_AUDIO_SLOT = "ChairExplode"
+local SCARE_AUDIO_SLOT = "Scary"
 
 -- Chair piece entity IDs
 local CHAIR_PART_IDS = {
@@ -28,8 +29,18 @@ local GRAVITY        = 280.0   -- how fast pieces fall
 local Y_FLOOR        = 5.0     -- height pieces stop at (tune to your floor)
 local Y_MAX          = 100.0   -- max height a piece can reach
 
+local SCARE_DELAY = 0.3
+
 local function log(...)
     if DEBUG then print("[ChairScatter]", ...) end
+end
+
+local function play_3d_sfx(slotId)
+    if type(Audio_PlaySlot) == "function" and slotId ~= nil then
+        Audio_PlaySlot(EntityID, slotId)
+        return true
+    end
+    return false
 end
 
 -- Pick a random point within the safe zone circle
@@ -46,6 +57,9 @@ function on_create(Self)
     Self.simulating = false
     Self.pieces     = {}
 
+    Self.scareDelayTimer = 0.0
+    Self.waitingForScare = false
+
     SHARED.ChairScatter = SHARED.ChairScatter or {}
     SHARED.ChairScatter._self = Self
 
@@ -57,11 +71,26 @@ function on_create(Self)
         log("Explosion triggered!")
 
         ------------------------------------------------
+        -- Camera shake
+        ------------------------------------------------
+        local SH = rawget(_G, "SHARED")
+        if SH and SH.POV then
+            SH.POV.freeShake    = true
+            SH.POV.shakeDuration  = 0.8
+            SH.POV.shakeAmplitude = 7.0
+            SH.POV.shakeSpeed     = 0.04
+        end
+
+        ------------------------------------------------
         -- Play explosion audio from this entity
         ------------------------------------------------
         if type(Audio_PlaySlot) == "function" then
-            Audio_PlaySlot(EntityID, EXPLODE_AUDIO_SLOT)
+            play_3d_sfx(EXPLODE_AUDIO_SLOT)
 
+            -- Delay scary sound slightly
+            s.scareDelayTimer = 0.0
+            s.waitingForScare = true
+            
             if DEBUG then
                 print("[ChairScatter] Played explode SFX:", EXPLODE_AUDIO_SLOT)
             end
@@ -148,6 +177,20 @@ function on_update(Self, dt)
     if not Self.simulating then return end
 
     dt = dt or 0.016
+
+    -- Delayed horror sound
+    if Self.waitingForScare then
+        Self.scareDelayTimer = Self.scareDelayTimer + dt
+
+        if Self.scareDelayTimer >= SCARE_DELAY then
+            play_3d_sfx(SCARE_AUDIO_SLOT)
+            Self.waitingForScare = false
+
+            if DEBUG then
+                print("[ChairScatter] Played delayed scary sound")
+            end
+        end
+    end
 
     local allStopped = true
 

@@ -1,0 +1,60 @@
+{
+	"1014": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 18369471017337290753
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Credits"
+		},
+		"UIComponent": {
+			"Overlay_name": "Credits",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				-9738.0
+			],
+			"position_NDC": [
+				0.0,
+				2.1164135932922363
+			],
+			"size": [
+				1918.0,
+				10820.0
+			],
+			"size_NDC": [
+				1.0,
+				10.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13700258550081060865,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}

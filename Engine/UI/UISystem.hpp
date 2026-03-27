@@ -66,6 +66,8 @@ namespace EngineFramework
         void Update();
         void Clean();
 
+        entt::entity active_pressed_button = entt::null;
+
    
         void removeAllEntities_Reg();
         bool Deseralise(std::string); //Reading from files
@@ -80,6 +82,7 @@ namespace EngineFramework
         std::vector<entt::entity> get_Elements(){
             return AllElements_in_this_overlay;
         };
+        void set_AllbuttonState(BUTTON_STATE state = NO_STATE); //draw if overlay is active
 
     private:
 
@@ -141,6 +144,7 @@ namespace EngineFramework
         void Load_Start_Menu();
 
         // Cutscene controls
+        void StartSplashSequence();
         void StartPseudoCutscene();
         void StartCutsceneSequence(const std::vector<std::string>& sceneMenus,
             float intervalSeconds = 1.5f,
@@ -148,6 +152,10 @@ namespace EngineFramework
         void StopCutsceneSequence(bool closeAll = true);
         bool IsCutscenePlaying() const;
 
+        void StartCreditsRoll(const std::string& menuName, float speedPixelsPerSecond, float endYThreshold, bool closeOthersFirst);
+        void StopCreditsRoll(bool closeAll);
+        bool IsCreditsRolling() const;
+        void SetCreditsSpeedMultiplier(float multiplier);
 
     private:
 

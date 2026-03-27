@@ -1,0 +1,97 @@
+{
+	"1012": {
+		"UIComponent": {
+			"Overlay_name": "CreditsMenu",
+			"color": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				-462.8662109375
+			],
+			"position_NDC": [
+				0.0,
+				2.4956936836242676
+			],
+			"size": [
+				755.0,
+				7400.0
+			],
+			"size_NDC": [
+				1.0,
+				20.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				0,
+				0
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"13": {
+		"NameComponent": {
+			"name": "CreditsPng"
+		},
+		"UIComponent": {
+			"Overlay_name": "CreditsMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				101.75
+			],
+			"position_NDC": [
+				0.0,
+				-7.048427104949951
+			],
+			"size": [
+				755.0,
+				3330.0
+			],
+			"size_NDC": [
+				1.0,
+				9.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13700258550081060865,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}

@@ -17,12 +17,12 @@ local STATE_CP3  = 3
 -- =========================
 local CP1_SLOT_ID = "TTLS_Start"
 local CP1_TENSION_SLOT_ID = "Tension"
-local CP1_LENGTH_SECONDS = 10.0
+local CP1_LENGTH_SECONDS = 10.1
 
 -- =========================
 -- CP2 CONFIG
 -- =========================
-local CP2_DELAY_SECONDS = 1.5
+local CP2_DELAY_SECONDS = 1.6
 local HIDDEN_DOOR_ID = 43
 
 -- =========================
@@ -193,7 +193,15 @@ local function Checkpoint2(Self, dt)
             end
         end
 
+        SHARED = SHARED or {}
+        SHARED.POV = SHARED.POV or {}
+        SHARED.POV.freeShake      = true
+        SHARED.POV.shakeDuration  = 0.7
+        SHARED.POV.shakeAmplitude = 10.0
+        SHARED.POV.shakeSpeed     = 0.03
+
         if DEBUG then
+            print("[StateController] CP2 -> triggered free camera shake")
             print("[StateController] CP2 complete -> triggering CP3")
         end
 

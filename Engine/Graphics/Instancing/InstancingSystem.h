@@ -82,9 +82,16 @@ namespace EngineFramework
         size_t instanceCount;       // How many instances to draw
     };
 
+    struct CullingMatrixData {
+        glm::mat4 mainViewProj;
+        glm::mat4 cascadeViewProj[3];
+        glm::mat4 spotLightViewProj[32];
+        glm::mat4 pointLightViewProj[96];
+    };
+
     const size_t MAX_BATCHES = 1000;
     const size_t MAX_INSTANCES = 50000;
-    const size_t NUM_PASSES = 36;
+    const size_t NUM_PASSES = 132;
 
     // ============================================================================
     // 4. INSTANCING SYSTEM
@@ -100,16 +107,22 @@ namespace EngineFramework
 
         // Gathers all entities, culls them, and builds the batches/SSBO data
         void BuildSceneBatches();
-        void UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj, const std::vector<glm::mat4>& spotProj);
+        void UpdateAndDispatchCompute(
+            const glm::mat4& mainViewProj, 
+            const std::array<glm::mat4, 3>& cascadeProj, 
+            const std::vector<glm::mat4>& spotProj, 
+            const std::vector<glm::mat4>& pointProj
+        );
 
         // Getters for the GraphicsSystem to use during rendering
         const std::vector<RenderBatch>& GetBatches() const { return m_activeBatches; }
         const std::vector<entt::entity>& GetAnimatedEntities() const { return m_animatedEntities; }
-        GLuint GetInstanceSSBO() const { return m_instanceSSBOs[m_currentFrame % FRAMES_IN_FLIGHT]; }
+        //GLuint GetInstanceSSBO() const { return m_instanceSSBOs[m_currentFrame % FRAMES_IN_FLIGHT]; }
         GLuint GetIndirectBuffer() const { return m_indirectBuffers[m_currentFrame % FRAMES_IN_FLIGHT]; }
-        GLuint GetVisibleIndicesBuffer() const { return m_visibleIndicesBuffers[m_currentFrame % FRAMES_IN_FLIGHT]; }
+        //GLuint GetVisibleIndicesBuffer() const { return m_visibleIndicesBuffers[m_currentFrame % FRAMES_IN_FLIGHT]; }
         size_t GetActiveBatchCount() const { return m_activeBatches.size(); }
-
+        GLuint GetInstanceTexture() const { return m_instanceTextures[m_currentFrame % FRAMES_IN_FLIGHT]; }
+        GLuint GetVisibleIndicesTexture() const { return m_visibleIndicesTextures[m_currentFrame % FRAMES_IN_FLIGHT]; }
         static constexpr uint32_t INVALID_BATCH = 0xFFFFFFFF;
 
     private:
@@ -119,7 +132,16 @@ namespace EngineFramework
         // Replace single GLuints with arrays
         GLuint m_instanceSSBOs[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
         GLuint m_indirectBuffers[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
-        GLuint m_visibleIndicesBuffers[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        //GLuint m_visibleIndicesBuffers[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        GLuint m_cullingMatrixUBOs[FRAMES_IN_FLIGHT] = { 0, 0 };
+
+        GLuint m_instanceTextures[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        GLuint m_visibleIndicesTextures[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        // Add these alongside the existing texture GLuints:
+        int m_instTexWidth = 1024;
+        int m_instTexHeight = 0;
+        int m_visTexWidth = 2048;
+        int m_visTexHeight = 0;
 
         size_t m_maxTotalInstances = 0;
 

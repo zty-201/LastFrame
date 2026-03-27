@@ -22,6 +22,7 @@ local isFlickering = false
 local flickerIntensity = 0.0
 
 local function ensure_shared()
+    SHARED = SHARED or {}
     SHARED.LIGHT_CMD = SHARED.LIGHT_CMD or {}
 end
 
@@ -65,7 +66,13 @@ function on_create(self)
     defaultIntensity = currentIntensity
     isLightOn = currentIntensity > 0.0
 
-    math.randomseed(os.time() + EntityID)
+    local seedBase = tonumber(EntityID) or 0
+    if os ~= nil and type(os.time) == "function" then
+        math.randomseed(os.time() + seedBase)
+    else
+        math.randomseed(54321 + seedBase)
+    end
+
     schedule_next_flicker()
 
     print(string.format(
@@ -78,56 +85,54 @@ end
 function on_update(self, dt)
     if EntityLight == nil then return end
     dt = dt or 0.016
+    ensure_shared()
 
-    if SHARED.LIGHT_CMD ~= nil then
-        local cmdObj = SHARED.LIGHT_CMD[EntityID]
+    local cmdObj = SHARED.LIGHT_CMD[EntityID]
 
-        if cmdObj then
-            SHARED.LIGHT_CMD[EntityID] = nil
-            local cmd = cmdObj.cmd
+    if cmdObj then
+        SHARED.LIGHT_CMD[EntityID] = nil
+        local cmd = cmdObj.cmd
 
-            if cmd == "off" then
-                currentIntensity = 0.0
-                isLightOn = false
-                isFlickering = false
+        if cmd == "off" then
+            currentIntensity = 0.0
+            isLightOn = false
+            isFlickering = false
 
-            elseif cmd == "on" then
-                currentIntensity = defaultIntensity
-                isLightOn = true
-                play_3d_sfx(LIGHT_ON_SFX_ID)
-                schedule_next_flicker()
+        elseif cmd == "on" then
+            currentIntensity = defaultIntensity
+            isLightOn = true
+            play_3d_sfx(LIGHT_ON_SFX_ID)
+            schedule_next_flicker()
 
-            elseif cmd == "set" then
-                local v = cmdObj.value
-                if v ~= nil then
-                    local prevIntensity = currentIntensity
-                    local newIntensity = tonumber(v) or currentIntensity
+        elseif cmd == "set" then
+            local v = cmdObj.value
+            if v ~= nil then
+                local prevIntensity = currentIntensity
+                local newIntensity = tonumber(v) or currentIntensity
 
-                    currentIntensity = newIntensity
-                    isLightOn = currentIntensity > 0.0
+                currentIntensity = newIntensity
+                isLightOn = currentIntensity > 0.0
 
-                    if currentIntensity > 0.0 then
-                        defaultIntensity = currentIntensity
+                if currentIntensity > 0.0 then
+                    defaultIntensity = currentIntensity
 
-                        -- play once when transitioning from off -> on
-                        if prevIntensity <= 0.0 then
-                            play_3d_sfx(LIGHT_ON_SFX_ID)
-                        end
-
-                        schedule_next_flicker()
-                    else
-                        isFlickering = false
+                    if prevIntensity <= 0.0 then
+                        play_3d_sfx(LIGHT_ON_SFX_ID)
                     end
+
+                    schedule_next_flicker()
+                else
+                    isFlickering = false
                 end
             end
-
-            print(string.format(
-                "[Light] CMD=%s by=%s -> intensity=%.2f",
-                tostring(cmd),
-                tostring(cmdObj.by),
-                currentIntensity
-            ))
         end
+
+        print(string.format(
+            "[Light] CMD=%s by=%s -> intensity=%.2f",
+            tostring(cmd),
+            tostring(cmdObj.by),
+            currentIntensity
+        ))
     end
 
     if isLightOn then

@@ -1,0 +1,800 @@
+{
+	"1100": {
+		"NameComponent": {
+			"name": "LockScreen_Root"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				862.5,
+				516.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				0.0,
+				0.0
+			],
+			"size_NDC": [
+				0.0,
+				0.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				8792970980350722049,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"630": {
+		"NameComponent": {
+			"name": "Lock_Interface"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				474.375,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				776.25,
+				1032.0
+			],
+			"size_NDC": [
+				0.44999998807907104,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				10947239710736613377,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"631": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				2876789178488684549,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "LockNum_1",
+			"hover_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"stay_clicked": true
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "Number1_Unpressed"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				724.5,
+				516.0000610351563
+			],
+			"position_NDC": [
+				-0.09000000357627869,
+				0.10000000149011612
+			],
+			"size": [
+				120.75,
+				103.20000457763672
+			],
+			"size_NDC": [
+				0.07000000029802322,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"632": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				2876789178488684549,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "LockNum_0",
+			"hover_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"stay_clicked": true
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "Number0_Unpressed"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				724.5,
+				619.2000122070313
+			],
+			"position_NDC": [
+				-0.09000000357627869,
+				0.30000001192092896
+			],
+			"size": [
+				120.75,
+				103.20000457763672
+			],
+			"size_NDC": [
+				0.07000000029802322,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"633": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				2876789178488684549,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "LockNum_3",
+			"hover_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"stay_clicked": true
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "Number3_Unpressed"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				724.5,
+				309.5999755859375
+			],
+			"position_NDC": [
+				-0.09000000357627869,
+				-0.30000001192092896
+			],
+			"size": [
+				120.75,
+				103.20000457763672
+			],
+			"size_NDC": [
+				0.07000000029802322,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"634": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				2876789178488684549,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "LockNum_4",
+			"hover_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"stay_clicked": true
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "Number4_Unpressed"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				724.5,
+				206.39999389648438
+			],
+			"position_NDC": [
+				-0.09000000357627869,
+				-0.5
+			],
+			"size": [
+				120.75,
+				103.20000457763672
+			],
+			"size_NDC": [
+				0.07000000029802322,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"635": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				2876789178488684549,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "LockNum_5",
+			"hover_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"stay_clicked": true
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "Number5_Unpressed"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				879.75,
+				619.2000122070313
+			],
+			"position_NDC": [
+				0.09000000357627869,
+				0.30000001192092896
+			],
+			"size": [
+				120.75,
+				103.20000457763672
+			],
+			"size_NDC": [
+				0.07000000029802322,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"636": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				2876789178488684549,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "LockNum_6",
+			"hover_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"stay_clicked": true
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "Number6_Unpressed"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				879.75,
+				516.0000610351563
+			],
+			"position_NDC": [
+				0.09000000357627869,
+				0.10000000149011612
+			],
+			"size": [
+				120.75,
+				103.20000457763672
+			],
+			"size_NDC": [
+				0.07000000029802322,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"637": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				2876789178488684549,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "LockNum_7",
+			"hover_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"stay_clicked": true
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "Number7_Unpressed"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				879.75,
+				412.79998779296875
+			],
+			"position_NDC": [
+				0.09000000357627869,
+				-0.10000000149011612
+			],
+			"size": [
+				120.75,
+				103.20000457763672
+			],
+			"size_NDC": [
+				0.07000000029802322,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"836": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				2876789178488684549,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "LockNum_8",
+			"hover_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"stay_clicked": true
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "Number8_Unpressed"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				879.75,
+				309.5999755859375
+			],
+			"position_NDC": [
+				0.09000000357627869,
+				-0.30000001192092896
+			],
+			"size": [
+				120.75,
+				103.20000457763672
+			],
+			"size_NDC": [
+				0.07000000029802322,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"837": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				2876789178488684549,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "LockNum_2",
+			"hover_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"stay_clicked": true
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "Number2_Unpressed"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				724.5,
+				412.79998779296875
+			],
+			"position_NDC": [
+				-0.09000000357627869,
+				-0.10000000149011612
+			],
+			"size": [
+				120.75,
+				103.20000457763672
+			],
+			"size_NDC": [
+				0.07000000029802322,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"838": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				2876789178488684549,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "LockNum_9",
+			"hover_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"idle_texture": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"stay_clicked": true
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "Number9_Unpressed"
+		},
+		"UIComponent": {
+			"Overlay_name": "LockScreen",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				879.75,
+				206.39999389648438
+			],
+			"position_NDC": [
+				0.09000000357627869,
+				-0.5
+			],
+			"size": [
+				120.75,
+				103.20000457763672
+			],
+			"size_NDC": [
+				0.07000000029802322,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				13253082719950307335,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}

@@ -70,6 +70,19 @@ local function send_icon_cmd(targetId, cmd)
     SHARED.ICON_CMD[targetId] = { cmd = cmd, by = PLAYER_ID }
 end
 
+
+local function getShared()
+    return rawget(_G, "SHARED")
+end
+local function ensureUIShared()
+    local Shared = getShared()
+    if not Shared then return nil end
+    Shared.UI = Shared.UI or {}
+    return Shared.UI
+end
+
+
+
 function on_create(self)
     print("[InteractionBox] ready EntityID=" .. tostring(EntityID))
 
@@ -124,7 +137,17 @@ function on_update(self, dt)
     ----------------------------------------------------------------
     -- (KEEP) E press → interact (toggle door)
     ----------------------------------------------------------------
-    if Input.GetKeyDown(GLFW_KEY_E) then
+    
+    local uiShared = ensureUIShared()
+    if not uiShared then return end
+
+    local interact = uiShared.actionRequested
+
+    if interact  then
+
+        interact = false
+        uiShared.actionRequested = interact;
+
         local targetId = GetFirstInteractableInZone()
 
         if targetId ~= nil then

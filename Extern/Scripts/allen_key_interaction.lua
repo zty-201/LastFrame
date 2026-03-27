@@ -104,14 +104,22 @@ function on_update(self, dt)
     ------------------------------------------------------------
     -- INTERACTION
     ------------------------------------------------------------
-    local SH     = rawget(_G, "SHARED")
-    local uiReq  = SH and SH.UI and SH.UI.actionRequested
-    if uiReq then
-        SH.UI.actionRequested = false
-    end
+    -- local SH     = rawget(_G, "SHARED")
+    -- local uiReq  = SH and SH.UI and SH.UI.actionRequested
+    -- if uiReq then
+    --     SH.UI.actionRequested = false
+    -- end
+
+
+    local SH = rawget(_G, "SHARED")
+    local uiReq = SH and SH.UI and SH.UI.actionRequested
 
     if Input.GetKeyDown(GLFW_KEY_E) or uiReq then
         print("[AllenKey] PICKED UP ALLEN KEY!")
+
+        if SH and SH.UI then
+            SH.UI.actionRequested = false
+        end
 
         --------------------------------------------------------
         -- INVENTORY LOGIC

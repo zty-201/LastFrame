@@ -19,17 +19,19 @@ local OFF_INTENSITY = 0.0
 -- NORMAL LIGHTNING CONFIG
 -- =========================
 
-local MIN_WAIT = 2.0
-local MAX_WAIT = 5.0
+local MIN_WAIT = 3.0
+local MAX_WAIT = 6.0
 
-local MIN_HOLD_TIME = 0.12
-local MAX_HOLD_TIME = 0.25
+local MIN_HOLD_TIME = 0.3
+local MAX_HOLD_TIME = 0.6
 
-local MIN_FADE_TIME = 0.25
-local MAX_FADE_TIME = 0.50
+local MIN_FADE_TIME = 0.5
+local MAX_FADE_TIME = 1.0
 
 local MIN_FLASHES = 1
-local MAX_FLASHES = 3
+local MAX_FLASHES = 1
+
+local lastProcessedEventId = -1
 
 -- =========================
 -- SCARE LIGHTNING CONFIG
@@ -76,7 +78,12 @@ end
 
 local function set_intensity(v)
     if EntityLight ~= nil then
-        EntityLight:SetIntensity(v)
+        if _G.ROOFTOP_ACTIVE == true then
+            EntityLight:SetIntensity(1.0)
+            EntityLight:SetColor(1.0, 100.0 / 255.0, 100.0 / 255.0)
+        else
+            EntityLight:SetIntensity(v)
+        end
     end
 end
 
@@ -95,7 +102,11 @@ local function begin_wait()
     timer = 0.0
     duration = random_range(MIN_WAIT, MAX_WAIT)
     isScareFlash = false
-    set_intensity(OFF_INTENSITY)
+
+    if EntityLight ~= nil then
+        EntityLight:SetColor(1.0, 100.0 / 255.0, 100.0 / 255.0)
+    end
+    set_intensity(1.0)
 end
 
 local function begin_hold()
@@ -103,10 +114,23 @@ local function begin_hold()
     timer = 0.0
     duration = random_range(MIN_HOLD_TIME, MAX_HOLD_TIME)
 
-    startIntensity = NORMAL_INTENSITY
+    startIntensity = 10.0
     isScareFlash = false
 
-    set_intensity(NORMAL_INTENSITY)
+    if EntityLight ~= nil then
+        EntityLight:SetColor(1.0, 1.0, 1.0)
+    end
+    set_intensity(10.0)
+
+    SHARED = SHARED or {}
+    SHARED[LIGHTNING_TABLE] = SHARED[LIGHTNING_TABLE] or {}
+    SHARED.ROOFTOP_LIGHTNING_EVENT_ID = (SHARED.ROOFTOP_LIGHTNING_EVENT_ID or 0) + 1
+
+    SHARED[LIGHTNING_TABLE]["ROOFTOP_LIGHTNING"] = {
+        trigger = true,
+        by = EntityID,
+        eventId = SHARED.ROOFTOP_LIGHTNING_EVENT_ID
+    }
 end
 
 local function begin_scare_hold()
@@ -134,7 +158,6 @@ end
 ------------------------------------------------
 
 function on_create(self)
-
     if EntityLight == nil then
         print("[SF_LightningSpotlight] ERROR: EntityLight missing")
         return
@@ -143,7 +166,15 @@ function on_create(self)
     SHARED = SHARED or {}
     SHARED[LIGHTNING_TABLE] = SHARED[LIGHTNING_TABLE] or {}
 
-    math.randomseed(os.time() + EntityID)
+    local seedBase = tonumber(EntityID) or 0
+    if os ~= nil and type(os.time) == "function" then
+        math.randomseed(os.time() + seedBase)
+    else
+        math.randomseed(12345 + seedBase)
+    end
+
+    EntityLight:SetColor(1.0, 100.0 / 255.0, 100.0 / 255.0)
+    EntityLight:SetIntensity(1.0)
 
     begin_wait()
 
@@ -155,7 +186,6 @@ end
 ------------------------------------------------
 
 function on_update(self, dt)
-
     if EntityLight == nil then return end
     dt = dt or 0.016
 
@@ -166,10 +196,10 @@ function on_update(self, dt)
     -- FORCED FLASH FROM GHOST GIRL SCARE
     ------------------------------------------------
     local lightningTable = SHARED[LIGHTNING_TABLE]
+    local scareData = lightningTable[SCARE_KEY]
 
-    if lightningTable[SCARE_KEY] ~= nil then
-
-        lightningTable[SCARE_KEY] = nil
+    if type(scareData) == "table" and scareData.eventId ~= lastProcessedEventId then
+        lastProcessedEventId = scareData.eventId
 
         flashesRemaining = 1
         begin_scare_hold()
@@ -177,7 +207,7 @@ function on_update(self, dt)
         play_3d_sfx(THUNDER_SFX_ID)
 
         if DEBUG then
-            print("[SF_LightningSpotlight] Forced scare lightning")
+            print("[SF_LightningSpotlight] Forced scare lightning, eventId = " .. tostring(scareData.eventId))
         end
     end
 
@@ -187,7 +217,6 @@ function on_update(self, dt)
     -- WAIT
     ------------------------------------------------
     if state == STATE_WAIT then
-
         if timer >= duration then
             flashesRemaining = random_int(MIN_FLASHES, MAX_FLASHES)
             begin_hold()
@@ -197,7 +226,6 @@ function on_update(self, dt)
     -- HOLD
     ------------------------------------------------
     elseif state == STATE_HOLD then
-
         if timer >= duration then
             begin_fade()
         end
@@ -206,7 +234,6 @@ function on_update(self, dt)
     -- FADE
     ------------------------------------------------
     elseif state == STATE_FADE then
-
         local t = timer / duration
         if t > 1.0 then t = 1.0 end
 
@@ -214,7 +241,6 @@ function on_update(self, dt)
         set_intensity(intensity)
 
         if timer >= duration then
-
             flashesRemaining = flashesRemaining - 1
 
             if flashesRemaining > 0 then
@@ -229,5 +255,8 @@ end
 ------------------------------------------------
 
 function on_destroy(self)
-    set_intensity(OFF_INTENSITY)
+    if EntityLight ~= nil then
+        EntityLight:SetColor(1.0, 100.0 / 255.0, 100.0 / 255.0)
+    end
+    set_intensity(1.0)
 end

@@ -36,6 +36,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "PhysicsRuntimeSystem.hpp"
 #include "AnimationSystem.h"
 #include "ScriptWrapper.hpp"
+#include "StateMachineSystem.hpp"
 
 #if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
 #include "System_LevelEditor.hpp"
@@ -141,7 +142,7 @@ void Game_Initialize(void* android_asset_manager)
 			"GraphicsSystem",
 			std::make_unique<EngineFramework::GraphicsSystem>(),
 			1,  // Init Order: First
-			8,  // Update Order: After game logic and editor
+			9,  // Update Order: After game logic and editor
 			8   // Destruct Order: Last
 		);
 
@@ -154,12 +155,20 @@ void Game_Initialize(void* android_asset_manager)
 			6   // Destruct Order: Before Graphics
 		);
 
+		core_engine.AddSystem(
+			"StateMachineSystem",
+			std::make_unique<EngineFramework::StateMachineSystem>(),
+			10,
+			2,
+			5
+		);
+
 		// 3. AudioSystem: Depends on the game state.
 		core_engine.AddSystem(
 			"AudioSystem",
 			std::make_unique<EngineFramework::AudioSystem>(),
 			3,  // Init Order
-			9,  // Update Order: Last
+			10,  // Update Order: Last
 			5   // Destruct Order: First
 		);
 
@@ -168,7 +177,7 @@ void Game_Initialize(void* android_asset_manager)
 			"AssetManager",
 			std::make_unique<EngineFramework::AssetManagerSystem>(),
 			4,  // Init Order
-			4,  // Update Order
+			5,  // Update Order
 			4   // Destruct Order
 		);
 
@@ -177,7 +186,7 @@ void Game_Initialize(void* android_asset_manager)
 			"PhysicsRuntimeSystem",
 			std::make_unique<EngineFramework::PhysicsRuntimeSystem>(),
 			5,  // Init Order: after AssetManager, before GameObjectSystem
-			3,  // Update Order: after Input, before GameObjectSystem & Graphics
+			4,  // Update Order: after Input, before GameObjectSystem & Graphics
 			3   // Destruct Order: before GameObjectSystem/Graphics are gone
 		);
 
@@ -197,7 +206,7 @@ void Game_Initialize(void* android_asset_manager)
 			"ScriptWrapper",
 			std::make_unique<EngineFramework::ScriptWrapper>(),
 			7,  // Init Order: after GameObjectSystem
-			2,  // Update Order: after InputManager
+			3,  // Update Order: after InputManager
 			2   // Destruct Order: before GameObjectSystem is gone
 		);
 
@@ -207,7 +216,7 @@ void Game_Initialize(void* android_asset_manager)
 			"UI_System",
 			std::make_unique<EngineFramework::UI_System>(),
 			8,  // Init Order: after AssetManager, before GameObjectSystem
-			5,  // Update Order: after Input, before GameObjectSystem & Graphics
+			7,  // Update Order: after Input, before GameObjectSystem & Graphics
 			3   // Destruct Order: before GameObjectSystem/Graphics are gone
 		);
 //#endif
@@ -217,7 +226,7 @@ void Game_Initialize(void* android_asset_manager)
 			"AnimationSystem",
 			std::make_unique<EngineFramework::AnimationSystem>(),
 			9,	// Init Order
-			7,	// Update Order
+			8,	// Update Order
 			7	// Destruct Order
 		);
 
@@ -229,7 +238,7 @@ void Game_Initialize(void* android_asset_manager)
 			"LevelEditorSystem",
 			std::make_unique<EngineFramework::LevelEditorSystem>(),
 			100,  // Init Order: After all other game systems
-			10,  // Update Order: After game logic and main graphics update
+			11,  // Update Order: After game logic and main graphics update
 			1   // Destruct Order: With other game systems
 		);
 	#endif
@@ -260,10 +269,21 @@ void Game_Update()
 
 	EngineFramework::CoreEngine& core_engine = EngineFramework::CoreEngine::GetInstance();
 	//Keeps track of the current delta time. Use a small arbitrary value for the first update loop.
-	static float delta_time{ 0.0001f };
-	static std::chrono::steady_clock::time_point time_before_loop{};
-	static std::chrono::steady_clock::time_point time_after_loop{};
-	time_before_loop = std::chrono::steady_clock::now();
+	// 1. Keep track of the previous frame's timestamp across function calls
+	static auto last_time = std::chrono::steady_clock::now();
+
+	// 2. Get the current timestamp right as the frame begins
+	auto current_time = std::chrono::steady_clock::now();
+
+	// 3. Calculate delta time based on the difference (in seconds)
+	static float delta_time = 0.0166f; // Safe default for the very first frame
+	delta_time = std::chrono::duration<float>(current_time - last_time).count();
+
+	// 4. Immediately update last_time for the next frame's calculation
+	last_time = current_time;
+
+	// Limit the delta time value to prevent massive physics explosions on lag spikes
+	delta_time = (delta_time < MAX_DELTA_TIME) ? delta_time : MAX_DELTA_TIME;
 
 #ifdef PLATFORM_WINDOWS
 	//Input update for windows.
@@ -395,12 +415,12 @@ void Game_Update()
 		EngineFramework::UI_System::GetInstance().displayMenu("StartMenu");
 	}
 
-	time_after_loop = std::chrono::steady_clock::now();
+	//time_after_loop = std::chrono::steady_clock::now();
 
-	//Convert microseconds into seconds, set the delta time.
-	delta_time = static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(time_after_loop - time_before_loop).count()) / 1000000.f;
-	//Limit the delta time value.
-	delta_time = (delta_time < MAX_DELTA_TIME) ? delta_time : MAX_DELTA_TIME;
+	////Convert microseconds into seconds, set the delta time.
+	//delta_time = static_cast<float>(std::chrono::duration_cast<std::chrono::microseconds>(time_after_loop - time_before_loop).count()) / 1000000.f;
+	////Limit the delta time value.
+	//delta_time = (delta_time < MAX_DELTA_TIME) ? delta_time : MAX_DELTA_TIME;
 }
 
 void Game_Destroy()

@@ -1,24 +1,19 @@
 -- Door_SharedControlled.lua
 -- Attach to Door entity
--- Opens ONCE, then permanently ignores all interaction
+-- This door is no longer player-interactable.
+-- It only supports a scripted close command.
 
 local closedAngle = 0.0
-local openAngle   = -80.0
-local rotateSpeed = 20.0
+local rotateSpeed = 180.0
 
-local isOpen = false
 local currentY = 0.0
 local targetY = 0.0
 
-local hasOpenedOnce = false
+-- Door audio IDs
+local MAINDOOR_CLOSE_SFX_ID = "CloseMaindoor"
+local SCARY_SFX_ID    = "Scary"
 
--- Door audio IDs (slot IDs)
-local DOOR_OPEN_SFX_ID      = "OpenDoor"       -- normal doors
-local MAINDOOR_OPEN_SFX_ID  = "OpenMaindoor"   -- doors 26 / 509
-local MAINDOOR_CLOSE_SFX_ID = "CloseMaindoor"       -- main door closing sound (set to your actual ID)
-local GIRL_GIGGLE_SFX_ID    = "GirlGiggle"      -- set to your actual ID
-
-local GIGGLE_DELAY_SECONDS = 2.0
+local GIGGLE_DELAY_SECONDS = 0.5
 
 -- Which entities are the “main doors”
 local MAIN_DOORS = {
@@ -35,7 +30,7 @@ end
 
 local function play_3d_sfx(slotId)
     if type(Audio_PlaySlot) == "function" and slotId ~= nil then
-        Audio_PlaySlot(EntityID, slotId) -- 3D from THIS door entity
+        Audio_PlaySlot(EntityID, slotId)
         return true
     end
     return false
@@ -56,10 +51,6 @@ function on_create(Self)
 
     SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
 
-    -- ✅ NEW: shared state table for icons / other scripts
-    SHARED.DOOR_OPENED_ONCE = SHARED.DOOR_OPENED_ONCE or {}
-    SHARED.DOOR_OPENED_ONCE[EntityID] = false
-
     print(string.format("[Door] Start RotY=%.2f", currentY))
 end
 
@@ -68,66 +59,40 @@ function on_update(Self, dt)
     if tr == nil then return end
     dt = dt or 0.016
 
-    -- Handle delayed giggle (main door only)
+    -- Handle delayed giggle
     if gigglePending then
         giggleTimer = giggleTimer + dt
         if giggleTimer >= GIGGLE_DELAY_SECONDS then
             gigglePending = false
             giggleTimer = 0.0
-            play_3d_sfx(GIRL_GIGGLE_SFX_ID)
+            play_3d_sfx(SCARY_SFX_ID)
         end
     end
 
+    -- Only accept scripted close command
     if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
         local cmdObj = SHARED.DOOR_CMD[EntityID]
         SHARED.DOOR_CMD[EntityID] = nil
 
         local cmd = cmdObj.cmd
 
-        -- MAIN DOOR: allow scripted close even after opening once
-        if is_main_door() and cmd == "close" then
-            isOpen = false
+        if cmd == "close" then
             targetY = closedAngle
 
-            -- play close SFX + schedule giggle
-            play_3d_sfx(MAINDOOR_CLOSE_SFX_ID)
-            gigglePending = true
-            giggleTimer = 0.0
-
-            print("[Door] MAIN DOOR scripted CLOSE -> close sound + giggle queued")
-            -- do NOT return; still let rotation run below
-        else
-            -- All other doors: once opened, ignore everything forever
-            if hasOpenedOnce then
-                print("[Door] Ignored interaction (already opened once)")
-                return
-            end
-
-            -- Only allow open/toggle for normal doors (and main doors too)
-            if cmd == "open" or cmd == "toggle" then
-                isOpen = true
-                hasOpenedOnce = true
-                targetY = openAngle
-
-                -- publish opened-once state
-                SHARED.DOOR_OPENED_ONCE = SHARED.DOOR_OPENED_ONCE or {}
-                SHARED.DOOR_OPENED_ONCE[EntityID] = true
-
-                -- play the correct open sound
-                if is_main_door() then
-                    play_3d_sfx(MAINDOOR_OPEN_SFX_ID)
-                else
-                    play_3d_sfx(DOOR_OPEN_SFX_ID)
-                end
-
-                print(string.format("[Door] OPENED ONCE by=%s -> permanently disabled", tostring(cmdObj.by)))
+            if is_main_door() then
+                play_3d_sfx(MAINDOOR_CLOSE_SFX_ID)
+                gigglePending = true
+                giggleTimer = 0.0
+                print("[Door] Scripted CLOSE -> close sound + giggle queued")
             else
-                print("[Door] Ignored cmd:", tostring(cmd))
+                print("[Door] Scripted CLOSE")
             end
+        else
+            print("[Door] Ignored cmd:", tostring(cmd))
         end
     end
 
-    -- Rotation logic (unchanged)
+    -- Rotation logic
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1

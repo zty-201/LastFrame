@@ -25,6 +25,17 @@ struct AudioComponent
 		Indoor
 	};
 
+	enum class GameStateTag : uint8_t
+	{
+		Any = 0,        // plays in all states
+		Splash,
+		MainMenu,
+		IntroCutscene,
+		Gameplay,
+		Pause,
+		EndCredit
+	};
+
 	using AudioCategory = EngineFramework::AudioCategory;
 
 	// A 'Slot' is a designer-authored "audio" in an entity
@@ -54,6 +65,9 @@ struct AudioComponent
 
 		// Since its default SFX, its a general ambience
 		AmbienceType ambienceType = AmbienceType::General;
+
+		// Which game state this slot is allowed to play in
+		GameStateTag gameStateTag = GameStateTag::Any;
 
 		// 2D / 3D Behaviour
 		SpatialMode spatial = SpatialMode::ThreeD;

@@ -83,11 +83,18 @@ namespace EngineFramework
                                    
                 button.is_hover = false;
                 button.is_clicked = false;
-                button.is_released = false; 
+                button.is_released = false;
                 //button.is_active = false;
+                button.clicked_locked = false;
 
                 button.curr_button_state = IDLE;
-                button.prev_button_state = IDLE;
+                button.prev_button_state = NO_STATE; // Force texture reset on first update
+                // Note: stay_clicked is intentionally NOT reset here — it is a designer setting
+
+                // Reset texture back to idle immediately
+                if (registry.all_of<UIComponent>(entity)) {
+                    registry.get<UIComponent>(entity).textureid = button.idle_texture;
+                }
             }
         }
 
@@ -257,26 +264,46 @@ namespace EngineFramework
                     */
                     if (button.curr_button_state == TRIGGERED) {
                         Trigger_Button_Event(button, TRIGGERED);
+                        button.curr_button_state = IDLE;
+                        //button.curr_button_state = IDLE;
+
+                        if (button.stay_clicked) {
+                            if (!button.clicked_locked) {
+                                // First click: lock onto clicked_texture
+                                button.clicked_locked = true;
+                                button.curr_button_state = CLICKED;
+                                registry.get<UIComponent>(entity).textureid = button.clicked_texture;
+                            } else {
+                                // Second click: unlock and revert to idle
+                                button.clicked_locked = false;
+                                registry.get<UIComponent>(entity).textureid = button.idle_texture;
+                            }
+                        }
                         break;
                     }
+#if defined(PLATFORM_WINDOWS) //ONLY WINDOWS HAVE THIS
                     else if (button.curr_button_state == HOVER) {
                         Trigger_Button_Event(button, HOVER);
                     }
-
+#endif
                     /*
                         SWAPPING OF TEXTURES FOR UI COMPONENT
                     */
                     auto& ui = registry.get<UIComponent>(entity);
                     
-                    if (button.prev_button_state != button.curr_button_state) {
+                    if (!button.clicked_locked && button.prev_button_state != button.curr_button_state) {
                         if (button.curr_button_state == IDLE) {
                             ui.textureid = button.idle_texture;
-                        }else if (button.curr_button_state == HOVER) {
-                            ui.textureid = button.hover_texture;                          
-                        }else if (button.curr_button_state == CLICKED) {
+                        }
+#if defined(PLATFORM_WINDOWS) //ONLY WINDOWS HAVE THIS
+                        else if (button.curr_button_state == HOVER) {
+                            //Trigger_Button_Event(button, HOVER);
+                            ui.textureid = button.hover_texture;
+                        }
+#endif
+                        else if (button.curr_button_state == CLICKED) {
                             ui.textureid = button.clicked_texture;
                         }
-                        
                     }
                 }
 
@@ -291,37 +318,55 @@ namespace EngineFramework
         button.is_hover = false;
         button.is_clicked = false;
         button.is_released = false;
-       
-        //checked if clicked
-        if (InputManager::GetInstance().GetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {
 
-            if (check_touch(e)) {
+        bool mousePressed = InputManager::GetInstance().GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT);
+        bool mouseHeld = InputManager::GetInstance().GetMouseButton(GLFW_MOUSE_BUTTON_LEFT);
+        bool mouseReleased = InputManager::GetInstance().GetMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT);
+        bool touching = check_touch(e);
 
+        button.curr_button_state = IDLE;
+
+        if (mousePressed)
+        {
+            if (touching && active_pressed_button == entt::null)
+            {
+                active_pressed_button = e;
                 button.curr_button_state = CLICKED;
                 button.is_clicked = true;
-                //std::cout << "CLICKED!!!\n";
             }
-            
-        }else if (InputManager::GetInstance().GetMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT)) {
-            button.curr_button_state = RELEASED;  
-            button.is_released = true;
-            //std::cout << "RELEASED!!!\n";
         }
-        else if(check_touch(e)){
+        else if (mouseHeld)
+        {
+            if (active_pressed_button == e)
+            {
+                button.curr_button_state = CLICKED;
+                button.is_clicked = true;
+            }
+        }
+        else if (mouseReleased)
+        {
+            if (active_pressed_button == e)
+            {
+                button.curr_button_state = RELEASED;
+                button.is_released = true;
 
-#if defined(PLATFORM_WINDOWS) //ONLY WINDOWS HAVE THIS
-            button.curr_button_state = HOVER;
-            button.is_hover = true;
-            /*std::cout << "HOVER!!!\n";*/
+                if (touching)
+                {
+                    button.curr_button_state = TRIGGERED;
+                }
+
+                active_pressed_button = entt::null;
+            }
+        }
+        else
+        {
+#if defined(PLATFORM_WINDOWS)
+            if (touching)
+            {
+                button.curr_button_state = HOVER;
+                button.is_hover = true;
+            }
 #endif
-            
-        }
-        else {
-            button.curr_button_state = IDLE;          
-        }
-
-        if (button.curr_button_state == RELEASED && button.prev_button_state == CLICKED) {
-            button.curr_button_state = TRIGGERED;           
         }
      
     }
@@ -400,11 +445,30 @@ namespace EngineFramework
         }
         else if (state == TRIGGERED) {
             event.Event_Name = button.event_trigger;
-            std::cout << "BUTTON EVENT TRIGGER (Clicked): " << button.event_trigger << std::endl;
+            //std::cout << "BUTTON EVENT TRIGGER (Clicked): " << button.event_trigger << std::endl;
+            LOGI("BUTTON EVENT TRIGGER (CLICKED)");
         }
         
         event_dispatcher.trigger<Button_Event>(std::move(event));
         
+    }
+
+    void UI_Menu::set_AllbuttonState(BUTTON_STATE state) {
+
+        for (auto entity : AllElements_in_this_overlay) {
+
+            if (registry.all_of<ButtonComponent>(entity)) {
+
+                /*
+                    SWAPPING OF TEXTURES FOR UI COMPONENT
+                */
+                auto& b = registry.get<ButtonComponent>(entity);
+                b.curr_button_state = state;
+                b.prev_button_state = state;
+
+            }
+        }
+
     }
 
     void UI_Menu::draw_elements(bool value) {

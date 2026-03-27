@@ -1,3 +1,10 @@
+local function debug_print(...)
+    if DEBUG then
+        print("[PLAYER PICK UP]", ...)
+    end
+end
+
+
 function on_update(self, dt)
     local item = SHARED.look_target
     if not item then return end
@@ -17,7 +24,7 @@ function on_update(self, dt)
         local inv = SHARED["player_inventory_ref"]
         AddItem(inv, id, data.name, 1)
 
-        print("[Pickup] Picked up:", data.name)
+        debug_print("[Pickup] Picked up:", data.name)
 
         -- Remove from world
         DestroyEntity(item)

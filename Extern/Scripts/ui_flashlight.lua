@@ -49,7 +49,7 @@ local function isPointerOver()
     local w, h = UI:GetSize()
 
     return mx >= x and mx <= x + w
-       and my >= y and my <= y + h
+    and my >= y and my <= y + h
 end
 
 
@@ -70,37 +70,41 @@ function on_create(self)
     end
 
     -- Android: show + position
-    local uiShared = ensureUIShared()
-    local screenW, screenH = getCanvasSize(uiShared)
+    --local uiShared = ensureUIShared()
+    --local screenW, screenH = getCanvasSize(uiShared)
 
-    local centerX = ANCHOR_X * screenW
-    local centerY = ANCHOR_Y * screenH
+    --local centerX = ANCHOR_X * screenW
+    --local centerY = ANCHOR_Y * screenH
 
-    UI:SetSize(ICON_SIZE, ICON_SIZE)
-    UI:SetPosition(centerX - ICON_SIZE * 0.5, centerY - ICON_SIZE * 0.5)
-    UI:SetVisible(true)
+    --UI:SetSize(ICON_SIZE, ICON_SIZE)
+    --UI:SetPosition(centerX - ICON_SIZE * 0.5, centerY - ICON_SIZE * 0.5)
+    --UI:SetVisible(true)
 end
 
 
 function on_update(self, dt)
-    local Shared = getShared()
-    local platform = (Shared and Shared.PLATFORM) or PLATFORM
 
-    -- Windows: nothing (UI hidden, flashlight probably on a key)
-    if platform == "windows" then
-        return
-    end
+    -- UI = EntityUI
 
-    if not UI then UI = EntityUI end
-    if not UI then return end
-    if not UI:IsVisible() then return end
+    -- local Shared = getShared()
+    -- local platform = (Shared and Shared.PLATFORM) or PLATFORM
 
-    local down = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
-    if down and isPointerOver() then
-        Shared = getShared()
-        if Shared then
-            Shared.FLASHLIGHT = Shared.FLASHLIGHT or {}
-            Shared.FLASHLIGHT.requestToggle = true
-        end
-    end
+    -- -- Windows: nothing (UI hidden, flashlight probably on a key)
+    -- if platform == "windows" then
+    --     UI:SetVisible(false)
+    --     return
+    -- end
+
+    -- if not UI then UI = EntityUI end
+    -- if not UI then return end
+    -- if not UI:IsVisible() then return end
+
+    -- local down = Input.GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)
+    -- if down and isPointerOver() then
+    --     Shared = getShared()
+    --     if Shared then
+    --         Shared.FLASHLIGHT = Shared.FLASHLIGHT or {}
+    --         Shared.FLASHLIGHT.requestToggle = true
+    --     end
+    -- end
 end

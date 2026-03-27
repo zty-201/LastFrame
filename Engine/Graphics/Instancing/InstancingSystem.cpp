@@ -11,7 +11,9 @@ namespace EngineFramework
         if (m_instanceSSBOs[0] != 0) {
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_instanceSSBOs);
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_indirectBuffers);
-            glDeleteBuffers(FRAMES_IN_FLIGHT, m_visibleIndicesBuffers);
+            glDeleteBuffers(FRAMES_IN_FLIGHT, m_cullingMatrixUBOs);
+            glDeleteTextures(FRAMES_IN_FLIGHT, m_instanceTextures);
+            glDeleteTextures(FRAMES_IN_FLIGHT, m_visibleIndicesTextures);
         }
     }
 
@@ -23,7 +25,10 @@ namespace EngineFramework
         // Generate buffers
         glGenBuffers(FRAMES_IN_FLIGHT, m_instanceSSBOs);
         glGenBuffers(FRAMES_IN_FLIGHT, m_indirectBuffers);
-        glGenBuffers(FRAMES_IN_FLIGHT, m_visibleIndicesBuffers);
+        glGenBuffers(FRAMES_IN_FLIGHT, m_cullingMatrixUBOs);
+
+        glGenTextures(FRAMES_IN_FLIGHT, m_instanceTextures);
+        glGenTextures(FRAMES_IN_FLIGHT, m_visibleIndicesTextures);
 
         // Pre-allocate memory for all frames in flight
         for (int i = 0; i < FRAMES_IN_FLIGHT; ++i) {
@@ -35,13 +40,31 @@ namespace EngineFramework
             glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffers[i]);
             glBufferData(GL_DRAW_INDIRECT_BUFFER, MAX_BATCHES * NUM_PASSES * sizeof(DrawElementsIndirectCommand), nullptr, GL_DYNAMIC_DRAW);
 
-            // Visible Indices
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_visibleIndicesBuffers[i]);
-            glBufferData(GL_SHADER_STORAGE_BUFFER, MAX_INSTANCES * NUM_PASSES * sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
+			// Culling Matrices UBO
+            glBindBuffer(GL_UNIFORM_BUFFER, m_cullingMatrixUBOs[i]);
+            // Pre-allocate the 8.4 KB block
+            glBufferData(GL_UNIFORM_BUFFER, sizeof(CullingMatrixData), nullptr, GL_DYNAMIC_DRAW);
+
+            int totalInstanceTexels = (int)m_maxTotalInstances * 6;
+            m_instTexHeight = (totalInstanceTexels + m_instTexWidth - 1) / m_instTexWidth;
+            int totalVisibleTexels = (int)(MAX_INSTANCES * NUM_PASSES);
+            m_visTexHeight = (totalVisibleTexels + m_visTexWidth - 1) / m_visTexWidth;
+
+            // Change instance texture back to float format — avoids Mali integer alignment bug
+            glBindTexture(GL_TEXTURE_2D, m_instanceTextures[i]);
+            glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, m_instTexWidth, m_instTexHeight);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+            // Visible indices stays as GL_R32UI — this one is fine since it's written by imageStore
+            glBindTexture(GL_TEXTURE_2D, m_visibleIndicesTextures[i]);
+            glTexStorage2D(GL_TEXTURE_2D, 1, GL_R32UI, m_visTexWidth, m_visTexHeight);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         }
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
         // Reserve memory to prevent CPU reallocations during gathering
         m_globalInstanceData.reserve(m_maxTotalInstances);
         m_indirectCommands.reserve(1000);
@@ -87,7 +110,7 @@ namespace EngineFramework
             // Get Mesh Data
             xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp.meshName);
             auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-            if (!meshData || meshData->vao == 0) continue;
+            if (!meshData || meshData->subMeshes.empty()) continue;
 
             const MaterialComponent* overrideMat = registry.try_get<MaterialComponent>(entity);
 
@@ -148,7 +171,8 @@ namespace EngineFramework
                 AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, key.meshName));
 
             GLuint indexCount = meshData->subMeshes[key.subMeshIndex].indexCount;
-            GLuint firstIndex = meshData->subMeshes[key.subMeshIndex].baseIndex;
+            GLuint firstIndex = meshData->subMeshes[key.subMeshIndex].firstIndex; // Pulls Mega-IBO offset
+            GLuint baseVert = meshData->subMeshes[key.subMeshIndex].baseVertex; // Pulls Mega-VBO offset
 
             // Setup base Indirect Commands
             for (int pass = 0; pass < NUM_PASSES; pass++) {
@@ -156,9 +180,10 @@ namespace EngineFramework
                 m_indirectCommands[cmdIndex].count = indexCount;
                 m_indirectCommands[cmdIndex].instanceCount = 0;
                 m_indirectCommands[cmdIndex].firstIndex = firstIndex;
-                m_indirectCommands[cmdIndex].baseVertex = 0;
+                m_indirectCommands[cmdIndex].baseVertex = baseVert;   // Injected into hardware struct!
                 m_indirectCommands[cmdIndex].baseInstance = 0;
             }
+
             size_t batchBaseOffset = currentOffset;
             for (auto& inst : instances) {
                 inst.data.batchID = batchIndex;
@@ -177,7 +202,12 @@ namespace EngineFramework
 
     }
 
-    void InstancingSystem::UpdateAndDispatchCompute(const glm::mat4& mainViewProj, const std::array<glm::mat4, 3>& cascadeProj, const std::vector<glm::mat4>& spotProj) {
+    void InstancingSystem::UpdateAndDispatchCompute(
+        const glm::mat4& mainViewProj,
+        const std::array<glm::mat4, 3>& cascadeProj,
+        const std::vector<glm::mat4>& spotProj,
+        const std::vector<glm::mat4>& pointProj
+    ) {
 
         // --- 1. HANDLE DIRTY BATCHES (From Level Editor UI) ---
         if (m_needsBatchRebuild) {
@@ -231,15 +261,6 @@ namespace EngineFramework
             }
         }
 
-        // UPLOAD 
-        // We upload the ENTIRE vector. The GPU is guaranteed to be done with this specific buffer.
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBOs[ringIdx]);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, m_globalInstanceData.size() * sizeof(InstanceData), m_globalInstanceData.data());
-
-        // Upload pristine indirect commands
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffers[ringIdx]);
-        glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0, m_indirectCommands.size() * sizeof(DrawElementsIndirectCommand), m_indirectCommands.data());;
-
         // --- 4. DISPATCH COMPUTE SHADER ---
         std::shared_ptr<ShaderProgram> cullingShader{};
         if (culling_shader_guid != xresource::full_guid{})
@@ -255,27 +276,60 @@ namespace EngineFramework
 
         cullingShader->use();
 
-        // For directional light cascade culling
-        cullingShader->setUniform("u_MainViewProj", mainViewProj);
-        for (int i = 0; i < 3; i++) {
-            cullingShader->setUniform("u_CascadeViewProj[" + std::to_string(i) + "]", cascadeProj[i]);
-        }
-
-		// For spotlight culling
-        cullingShader->setUniform("u_NumSpotLights", (int)spotProj.size());
-        for (size_t i = 0; i < spotProj.size(); ++i) {
-            cullingShader->setUniform("u_SpotLightViewProj[" + std::to_string(i) + "]", spotProj[i]);
-        }
-
+        // 1. Set the standard integers
         cullingShader->setUniform("u_TotalInstances", (uint32_t)m_globalInstanceData.size());
+        cullingShader->setUniform("u_NumSpotLights", (int)spotProj.size());
+        cullingShader->setUniform("u_NumPointLightFaces", (int)pointProj.size());
 
+        // 2. Pack all 132 matrices into our strict struct
+        CullingMatrixData matrixData = {}; // Initializes with zeros
+        matrixData.mainViewProj = mainViewProj;
+        for (int i = 0; i < 3; i++) matrixData.cascadeViewProj[i] = cascadeProj[i];
+        for (size_t i = 0; i < spotProj.size(); i++) matrixData.spotLightViewProj[i] = spotProj[i];
+        for (size_t i = 0; i < pointProj.size(); i++) matrixData.pointLightViewProj[i] = pointProj[i];
+
+        glBindBuffer(GL_UNIFORM_BUFFER, m_cullingMatrixUBOs[ringIdx]);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CullingMatrixData), &matrixData);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_cullingMatrixUBOs[ringIdx]);
+
+        // Upload indirect commands
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffers[ringIdx]);
+        glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+            m_indirectCommands.size() * sizeof(DrawElementsIndirectCommand),
+            m_indirectCommands.data());
+
+        // Upload instance data to input SSBO (compute reads this)
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_instanceSSBOs[ringIdx]);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+            m_globalInstanceData.size() * sizeof(InstanceData),
+            m_globalInstanceData.data());
+
+        // Upload instance data ALSO directly to texture (vertex shader reads this)
+        int actualTexels = (int)m_globalInstanceData.size() * 6;
+        int actualRows = (actualTexels + m_instTexWidth - 1) / m_instTexWidth;
+        if (actualRows > 0) {
+            glBindTexture(GL_TEXTURE_2D, m_instanceTextures[ringIdx]);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
+                m_instTexWidth, actualRows,
+                GL_RGBA, GL_FLOAT,
+                m_globalInstanceData.data());
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+
+        // Bind compute inputs
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_instanceSSBOs[ringIdx]);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_indirectBuffers[ringIdx]);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_visibleIndicesBuffers[ringIdx]);
+
+        // Visible indices: written by compute directly into texture via imageStore
+        glBindImageTexture(1, m_visibleIndicesTextures[ringIdx],
+            0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI);
 
         GLuint numGroups = (GLuint)(m_globalInstanceData.size() + 63) / 64;
         glDispatchCompute(numGroups, 1, 1);
-        glMemoryBarrier(GL_COMMAND_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
+            GL_TEXTURE_FETCH_BARRIER_BIT |
+            GL_COMMAND_BARRIER_BIT);
 
         cullingShader->disuse();
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
@@ -385,7 +439,7 @@ namespace EngineFramework
 
         xresource::full_guid mesh_guid = AssetManagerSystem::GetFullGuid(AssetManagerSystem::MESH_GUID, meshComp->meshName);
         auto meshData = AssetManagerSystem::GetResource<Mesh::MeshData>(mesh_guid);
-        if (!meshData || meshData->vao == 0) return;
+        if (!meshData || meshData->subMeshes.empty()) return;
 
         const MaterialComponent* overrideMat = registry.try_get<MaterialComponent>(entity);
         auto& meta = registry.get_or_emplace<InstanceMetadata>(entity);

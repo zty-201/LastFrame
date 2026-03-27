@@ -19,14 +19,16 @@
 
 #ifndef GRAPHICS_SYSTEM_HPP
 #define GRAPHICS_SYSTEM_HPP
-
+#include <unordered_set>
 #include "ISystem.hpp"
 #include "scene.h"
 #include "InstancingSystem.h"
-
+#include "GeometryDataBuffer.h"
 
 namespace EngineFramework
 {
+    class VideoClip;
+
     namespace TextureUnits
     {
         // Define texture units for the new shader bindings
@@ -40,7 +42,10 @@ namespace EngineFramework
         const int VOLUMETRIC_HISTORY_UNIT = 7;
 		const int SHADOW_MAP_UNIT = 8;
 		const int SPOT_LIGHT_MAP_UNIT = 9;
-		const int POINT_SHADOW_MAP_UNIT = 10;
+        const int INSTANCE_DATA_UNIT = 10;
+        const int VISIBLE_INDICES_UNIT = 11;
+		const int POINT_SHADOW_MAP_UNIT = 12;
+        
     }
 
     class GraphicsSystem : public ISystem
@@ -55,7 +60,6 @@ namespace EngineFramework
         void PostUpdate(float deltaTime) override;
 
         void RenderScene(); 
-        void LoadAndCacheMesh(const std::string& meshName);
 
         static GraphicsSystem& GetInstance(){ return *this_graphics_ptr; }
 
@@ -73,12 +77,7 @@ namespace EngineFramework
         std::pair<int, int> GetWindowSize() const { return std::pair<int, int>(static_cast<int>(screen.x), static_cast<int>(screen.y)); }
 
         //==Camera Manipulation
-
-        
-        glm::vec2 Getscreen() {
-
-            return screen;
-        };
+        glm::vec2 Getscreen() const { return screen; };
 
         //Returns the active camera, or sets a random camera as active if none are. Returns entt::null if no camera found.
         entt::entity GetFirstActiveCamera()
@@ -140,17 +139,19 @@ namespace EngineFramework
 
 		// Getter for instancing system
 		std::unique_ptr<InstancingSystem>& GetInstancingSystem() { return m_instancingSystem; }
+        std::unique_ptr<GeometryDataBuffer>& GetGeometryBuffer() { return m_geometryBuffer; }
 
-		// Frustum Culling Functions
-        bool isLightInFrustum(const glm::vec3& lightPos, float radius, const glm::mat4& viewProj);
-        bool IsBoxInFrustum(const float min[3], const float max[3], const glm::mat4& model, const glm::mat4& viewProj);
+		// Helper Functions
         bool WorldToScreen(const glm::vec3& worldPos, glm::vec2& outScreenPos, float& outScale);
         std::vector<glm::vec3> GetFrustumCornersWorldSpace(const CameraComponent& camera, const glm::mat4& view, float nearZ, float farZ);
 
+        
+
     private:
 
+        static constexpr int FRAMES_IN_FLIGHT = 3;
         // Debug Mode
-        int debugMode = 0;
+        int ringIdx = 0;
 
 #ifdef PLATFORM_WINDOWS
         GLFWwindow* pWindow = nullptr;
@@ -172,8 +173,7 @@ namespace EngineFramework
             glm::vec4 camera_position;
             glm::vec4 bias_near_far_pow; // x: bias, y: near, z: far, w: power
             glm::vec4 aniso_density_scattering_absorption;
-            glm::vec4 time; // x: current time
-            glm::ivec4 width_height;
+			glm::vec4 width_height_time; // x: width, y: height, z: time, w: padding
         };
 
         struct LightSSBO {
@@ -195,7 +195,8 @@ namespace EngineFramework
 
 		// Instancing system for batching and culling
         std::unique_ptr<InstancingSystem> m_instancingSystem;
-        
+        std::unique_ptr<GeometryDataBuffer> m_geometryBuffer;
+
 		// Shader GUIDs
         xresource::full_guid mesh_shader_guid;
         xresource::full_guid mesh_instanced_shader_guid;
@@ -207,7 +208,8 @@ namespace EngineFramework
 		xresource::full_guid ui_shader_guid;
 
 		// UBOs
-        GLuint m_volumetricUBO = 0;
+        GLuint m_volumetricUBOs[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+        GLuint m_lightSSBOs[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
 
 		// Cached resources
         std::unordered_map<std::string, std::shared_ptr<Mesh::MeshData>> meshCache;
@@ -223,6 +225,11 @@ namespace EngineFramework
 
         std::array<glm::mat4, CASCADE_COUNT> m_cascadeViewProjMatrices;
         std::vector<glm::mat4> m_spotLightViewProjMatrices;
+        std::vector<glm::mat4> m_pointLightViewProjMatrices;
+        std::unordered_set<VideoClip*> m_activeVideoAudio;
+        float m_lastFrameDeltaTime = 0.0f;
+
+
         std::vector<entt::entity> m_lightEntityMap;
         std::array<float, CASCADE_COUNT + 1> m_cascadeSplits;
 		std::array<float, CASCADE_COUNT> m_cascadeBiases;
@@ -233,11 +240,19 @@ namespace EngineFramework
 		FBO m_pointShadowFBO;
 		FBO m_spotShadowFBO;
 
+		// andriod specific god ray resources
+#ifdef PLATFORM_ANDROID
+		FBO m_godRayFBO;
+        GLuint m_godRayTextureID = 0;
+        xresource::full_guid godray_shader_guid;
+        xresource::full_guid composite_shader_guid;
+        float m_currentGodRayIntensity = 0.0f;
+#endif
+
 		// FBO texture attachments
-        GLuint sceneTextureID;
+        GLuint sceneTextureID = 0;
         
-        // SSBOs
-		GLuint m_lightSSBO = 0;
+		// Light data for SSBO, updated each frame
         std::vector<LightSSBO> m_LightData;
 
         // 3D textures for volumetric fog passes
@@ -258,15 +273,19 @@ namespace EngineFramework
         float m_ambient_light_intensity = 0.4f;
         bool m_temporal_accumulation = true;
         bool m_tricubic_filtering = false;
+		bool m_androidPlatform = false;
         int m_frame_idx = 0;
         bool m_ping_pong = false;
 
 		// Previous frame matrices for temporal reprojection
         glm::mat4 m_prev_view_projection;
         
-	// Screen dimensions
+	    // Screen dimensions - pending for resizing (to fix flickers)
         glm::vec2 screen = { WIDTH,HEIGHT };
 		bool m_windowMinimized = false;
+        bool m_pendingResize = false;
+        int m_pendingWidth = WIDTH;
+        int m_pendingHeight = HEIGHT;
         
 		// Other flags
         bool show_debugDraw = false;
@@ -284,6 +303,10 @@ namespace EngineFramework
         void VolumetricRayMarchPass();
         void RenderUI();
 
+#ifdef PLATFORM_ANDROID
+        void GodRayPass();
+#endif
+
 		// Update methods
         void UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P);
 		void UpdateLightSSBO();
@@ -294,13 +317,13 @@ namespace EngineFramework
 		void RenderDirectionalShadow();
 		void RenderPointLightShadows();
 		void RenderSpotLightShadows();
-        void RenderShadowCubemap(int cubemapSlot, const glm::vec4& lightPosRadius);
         void CalculateCascadeSplits(float nearPlane, float farPlane);
         std::array<glm::vec4, 6> ExtractFrustumPlanes(const glm::mat4& viewProj);
         void UpdateCascadeMatrices(const CameraComponent& camera, const glm::mat4& camView);
-        //==Event Handlers, one for each type of event.
+        // Event Handlers, one for each type of event to fix flicker issue when resizing
         void HANDLE_EVENT_LevelEditorToggled(Event_Level_Editor_Toggled&);
         void HANDLE_EVENT_WindowResized(Event_Window_Resized&);
+        void ApplyPendingResize();
 
         static inline GraphicsSystem* this_graphics_ptr = nullptr;
 

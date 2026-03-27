@@ -58,6 +58,11 @@ function on_destroy(self)
 end
 
 function on_update(self, dt)
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        return
+    end
+    
     dt = dt or 0.016
 
     -- Heartbeat
@@ -80,6 +85,14 @@ function on_update(self, dt)
     if Input and Input.GetAction then
         pauseHeld = Input.GetAction("PAUSE") == true
     end
+    
+    local android_pause = SHARED.ANDROID_PAUSE_BUTTON
+
+    if android_pause then
+        pauseHeld = true
+        android_pause = false
+        SHARED.ANDROID_PAUSE_BUTTON = android_pause
+    end
 
     local pausePressed = pauseHeld and not pauseHeldPrev
     pauseHeldPrev = pauseHeld
@@ -88,6 +101,9 @@ function on_update(self, dt)
         if UI_IsCutscenePlaying == nil or not UI_IsCutscenePlaying() then
             UI_CloseAllMenus()
             UI_DisplayMenu("PauseMenu")
+            StateMachine_SetTrigger("PauseGame")
+            print("========================================= PauseGame Trigger ============================================================")
+            
         end
         return 
     end
@@ -96,14 +112,14 @@ function on_update(self, dt)
     -- MOVEMENT INPUT (Keyboard + UI Joystick)
     -- ========================================================
     local moveX, moveZ = 0.0, 0.0
-    local joystickActive = true
+    local joystickActive = false
 
     -- 1. Read from the C++ JoystickComponent via SHARED table
     if PLATFORM == "android" and SHARED and SHARED.UI then
-        UI_DisplayMenu("AndroidInputOverlay")
+        --UI_DisplayMenu("AndroidInputOverlay")
         
-        local jx = -(SHARED.UI.joystickX or 0.0)
-        local jy = -(SHARED.UI.joystickY or 0.0)
+        local jx = -(SHARED.UI.UIAndroid_Joystick_X or 0.0)
+        local jy = -(SHARED.UI.UIAndroid_Joystick_Y or 0.0)
         
         -- If joystick is moved beyond a tiny threshold, use it
         if math.abs(jx) > 0.01 or math.abs(jy) > 0.01 then
@@ -139,6 +155,11 @@ function on_update(self, dt)
     local isSprinting = sprintHeld and (len > deadZone)
     local speedMul = isSprinting and sprintMultiplier or 1.0
 
+        local grounded = false
+    if type(Character_IsGrounded) == "function" then
+        grounded = Character_IsGrounded(EntityID)
+    end
+
     -- ========================================================
     -- APPLY PHYSICS VELOCITY
     -- ========================================================
@@ -159,6 +180,11 @@ function on_update(self, dt)
         local finalX = (rightX * moveX) + (forwardX * moveZ)
         local finalZ = (rightZ * moveX) + (forwardZ * moveZ)
 
+        local finalY = 0.0
+        if grounded then
+            finalY = -1.5 * moveSpeed
+        end
+
         if type(Character_SetVelocity) == "function" then
             Character_SetVelocity(EntityID, finalX * moveSpeed * speedMul, 0, finalZ * moveSpeed * speedMul)
         end
@@ -172,11 +198,6 @@ function on_update(self, dt)
     -- FOOTSTEPS
     -- ========================================================
     local inputMoving = (len > footstepDeadzone)
-
-    local grounded = false
-    if type(Character_IsGrounded) == "function" then
-        grounded = Character_IsGrounded(EntityID)
-    end
 
     _groundGrace = _groundGrace or 0.0
     local GRACE_SECONDS = 0.15 

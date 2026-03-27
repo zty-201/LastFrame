@@ -25,6 +25,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "MaterialComponent.h"
 #include "AssetManager.hpp"
 #include "SoundAsset.hpp"
+#include "VideoClip.h"
 #include "scene.h"
 #include "HistorySystem.hpp"
 #include "AudioComponent.h"
@@ -234,6 +235,7 @@ namespace EditorFeatures {
 		case AssetPickerKind::Texture: return "Textures";
 		case AssetPickerKind::Audio:   return "Audio";
 		case AssetPickerKind::Script:  return "Scripts";
+		case AssetPickerKind::Video:   return "Videos";
 		default: break;
 		}
 		return nullptr;
@@ -277,6 +279,14 @@ namespace EditorFeatures {
 		}
 		case AssetPickerKind::Script: {
 			auto candidate = AssetManagerSystem::GetFullGuid(AssetManagerSystem::SCRIPT_GUID, asset_name);
+			if (!candidate.empty()) {
+				guid = candidate;
+				return true;
+			}
+			break;
+		}
+		case AssetPickerKind::Video: {
+			auto candidate = AssetManagerSystem::GetFullGuid(AssetManagerSystem::VIDEO_GUID, asset_name);
 			if (!candidate.empty()) {
 				guid = candidate;
 				return true;
@@ -638,6 +648,12 @@ namespace EditorFeatures {
 			return { "No Script", {}, {} };
 		}
 #endif
+		case AssetPickerKind::Video: {
+			auto videos =
+				build_asset_entries(AssetManagerSystem::GetAllResourceOfType<EngineFramework::VideoClip>(
+					AssetManagerSystem::VIDEO_GUID));
+			return { "No Video", { { AssetManagerSystem::VIDEO_GUID, {}, std::move(videos) } }, {} };
+		}
 		}
 		return { "None", {}, {} };
 	}
@@ -1002,6 +1018,41 @@ namespace EditorFeatures {
 						pick(AudioComponent::AmbienceType::General, "General");
 						pick(AudioComponent::AmbienceType::Outdoor, "Outdoor");
 						pick(AudioComponent::AmbienceType::Indoor, "Indoor");
+						ImGui::EndCombo();
+					}
+				}
+
+				// ----- GAME STATE TAG -----
+				{
+					const char* gameStatePreview = "Any";
+					switch (slot.gameStateTag)
+					{
+					case AudioComponent::GameStateTag::Splash:        gameStatePreview = "Splash";        break;
+					case AudioComponent::GameStateTag::MainMenu:      gameStatePreview = "MainMenu";      break;
+					case AudioComponent::GameStateTag::IntroCutscene: gameStatePreview = "IntroCutscene"; break;
+					case AudioComponent::GameStateTag::Gameplay:      gameStatePreview = "Gameplay";      break;
+					case AudioComponent::GameStateTag::Pause:         gameStatePreview = "Pause";         break;
+					case AudioComponent::GameStateTag::EndCredit:     gameStatePreview = "EndCredit";     break;
+					default:                                          gameStatePreview = "Any";           break;
+					}
+
+					if (ImGui::BeginCombo("Game State Tag", gameStatePreview))
+					{
+						if (ImGui::Selectable("Any", slot.gameStateTag == AudioComponent::GameStateTag::Any))
+							slot.gameStateTag = AudioComponent::GameStateTag::Any;
+						if (ImGui::Selectable("Splash", slot.gameStateTag == AudioComponent::GameStateTag::Splash))
+							slot.gameStateTag = AudioComponent::GameStateTag::Splash;
+						if (ImGui::Selectable("MainMenu", slot.gameStateTag == AudioComponent::GameStateTag::MainMenu))
+							slot.gameStateTag = AudioComponent::GameStateTag::MainMenu;
+						if (ImGui::Selectable("IntroCutscene", slot.gameStateTag == AudioComponent::GameStateTag::IntroCutscene))
+							slot.gameStateTag = AudioComponent::GameStateTag::IntroCutscene;
+						if (ImGui::Selectable("Gameplay", slot.gameStateTag == AudioComponent::GameStateTag::Gameplay))
+							slot.gameStateTag = AudioComponent::GameStateTag::Gameplay;
+						if (ImGui::Selectable("Pause", slot.gameStateTag == AudioComponent::GameStateTag::Pause))
+							slot.gameStateTag = AudioComponent::GameStateTag::Pause;
+						if (ImGui::Selectable("EndCredit", slot.gameStateTag == AudioComponent::GameStateTag::EndCredit))
+							slot.gameStateTag = AudioComponent::GameStateTag::EndCredit;
+
 						ImGui::EndCombo();
 					}
 				}

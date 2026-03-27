@@ -2,17 +2,17 @@
 	"590": {
 		"JoystickComponent": {
 			"baseCenter": [
-				700.800048828125,
-				1791.1549072265625
+				383.9999694824219,
+				1753.949951171875
 			],
 			"isBeingDragged": false,
-			"knobTargetName": "js",
+			"knobTargetName": "UIAndroid_Joystick",
 			"maxRadius": 100.0,
 			"outputX": 0.0,
 			"outputY": 0.0
 		},
 		"NameComponent": {
-			"name": "jsBG"
+			"name": "UIAndroid_JoystickBG"
 		},
 		"UIComponent": {
 			"Overlay_name": "AndroidInputOverlay",
@@ -24,33 +24,44 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 1,
+			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
-				287.5625,
-				12.187484741210938
+				66.87495422363281,
+				40.62501525878906
 			],
 			"position_NDC": [
-				-0.6850000023841858,
-				-0.7850000262260437
+				-0.800000011920929,
+				-0.6499999761581421
 			],
 			"size": [
-				267.5,
-				325.0
+				401.2500305175781,
+				487.5000305175781
 			],
 			"size_NDC": [
-				0.10000000149011612,
-				0.20000000298023224
+				0.15000000596046448,
+				0.30000001192092896
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				13373202070917185537,
+				2026726001584914433,
 				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
 			],
 			"visible": false
 		}
 	},
 	"591": {
 		"NameComponent": {
-			"name": "js"
+			"name": "UIAndroid_Joystick"
 		},
 		"UIComponent": {
 			"Overlay_name": "AndroidInputOverlay",
@@ -62,26 +73,37 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 2,
+			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
-				287.5625,
-				12.187530517578125
+				200.62496948242188,
+				203.12503051757813
 			],
 			"position_NDC": [
-				-0.6850000023841858,
-				-0.7849999666213989
+				-0.800000011920929,
+				-0.6499999761581421
 			],
 			"size": [
-				267.5,
-				325.0
+				133.75,
+				162.5
 			],
 			"size_NDC": [
-				0.10000000149011612,
-				0.20000000298023224
+				0.05000000074505806,
+				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				3601763066940784643,
+				7434722321326096385,
 				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
 			],
 			"visible": false
 		}

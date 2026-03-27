@@ -6,6 +6,7 @@
 
 #include "Platform.h"
 #include "InputManager.hpp"
+#include "Audio.hpp"
 
 // Ensure JNI macros are available
 #ifndef JNIEXPORT
@@ -145,4 +146,38 @@ Java_com_example_jnicpp_MainActivity_handleNativeGyroscope(
 
     //Pass raw sensor data to C++ system
     EngineFramework::InputManager::UpdateGyroscope(x, y, z, timestamp);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jnicpp_MainActivity_pauseAudio(
+        JNIEnv* env,
+        jobject /* this */) {
+    LOGI("App backgrounded - Pausing Game and OS Audio");
+    
+    // 1. Force the game into the pause menu state to save the player
+    Pause_Event pause_event;
+    pause_event.is_pause = true; 
+    event_dispatcher.trigger<Pause_Event>(std::move(pause_event));
+
+    // 2. Hard-suspend the FMOD mixer so the phone goes silent
+    auto* audioSys = EngineFramework::AudioSystem::TryGetInstance();
+    if (audioSys) {
+        audioSys->SuspendMixer();
+    }
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jnicpp_MainActivity_resumeAudio(
+        JNIEnv* env,
+        jobject /* this */) {
+    LOGI("App resumed - Waking OS Audio (Game remains paused)");
+    
+    // WAKE UP the audio mixer so the pause menu music starts playing again
+    auto* audioSys = EngineFramework::AudioSystem::TryGetInstance();
+    if (audioSys) {
+        audioSys->ResumeMixer();
+    }
+
+    // NOTICE: We DO NOT trigger a Pause_Event(false) here. 
+    // We want the player to still be in the pause menu when they return!
 }

@@ -1,5 +1,5 @@
 {
-	"630": {
+	"638": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				4199668781989724205,
@@ -14,7 +14,8 @@
 			"idle_texture": [
 				10640027270492504069,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_2"
@@ -29,31 +30,42 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
-				1203.75,
-				731.25
+				776.25,
+				464.3999938964844
 			],
 			"position_NDC": [
 				0.0,
 				0.0
 			],
 			"size": [
-				267.5,
-				162.5
+				172.5,
+				103.20000457763672
 			],
 			"size_NDC": [
 				0.10000000149011612,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				10640027270492504069,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
-	"631": {
+	"639": {
 		"NameComponent": {
 			"name": "Just_A_Texture"
 		},
@@ -67,7 +79,9 @@
 			"event_received": "",
 			"is_NDC": false,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
 				500.0,
 				200.0
@@ -84,14 +98,23 @@
 				0.0,
 				0.0
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				10640027270492504069,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
-	"632": {
+	"640": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				16964946010757644289,
@@ -106,7 +129,8 @@
 			"idle_texture": [
 				16388485258454220805,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_1"
@@ -121,31 +145,42 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
-				1203.75,
-				975.0
+				776.25,
+				619.2000122070313
 			],
 			"position_NDC": [
 				0.0,
 				0.30000001192092896
 			],
 			"size": [
-				267.5,
-				162.5
+				172.5,
+				103.20000457763672
 			],
 			"size_NDC": [
 				0.10000000149011612,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				16388485258454220805,
 				3711223656383638553
 			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
 			"visible": false
 		}
 	},
-	"633": {
+	"692": {
 		"ButtonComponent": {
 			"clicked_texture": [
 				4888147658385178647,
@@ -160,7 +195,8 @@
 			"idle_texture": [
 				12015349190809845763,
 				3711223656383638553
-			]
+			],
+			"stay_clicked": false
 		},
 		"NameComponent": {
 			"name": "Button_3"
@@ -175,26 +211,37 @@
 			"event_received": "",
 			"is_NDC": true,
 			"layer": 0,
+			"lock_luminance": false,
 			"luminance": 1.0,
+			"play_video_audio": true,
 			"position": [
-				1203.75,
-				487.5
+				776.25,
+				309.5999755859375
 			],
 			"position_NDC": [
 				0.0,
 				-0.30000001192092896
 			],
 			"size": [
-				267.5,
-				162.5
+				172.5,
+				103.20000457763672
 			],
 			"size_NDC": [
 				0.10000000149011612,
 				0.10000000149011612
 			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
 				12015349190809845763,
 				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
 			],
 			"visible": false
 		}

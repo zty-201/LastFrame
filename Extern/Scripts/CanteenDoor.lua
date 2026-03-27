@@ -10,7 +10,7 @@
 
 local closeOffset = -90.0
 local openSpeed  = 60.0
-local closeSpeed = 200.0
+local closeSpeed = 210.0
 
 local openY = 0.0
 local closedY = 0.0
@@ -49,6 +49,7 @@ function on_create(self)
     SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
     SHARED.CANTEEN_DOOR_LOCKED = SHARED.CANTEEN_DOOR_LOCKED or {}
     SHARED.CANTEEN_DOOR_OPEN = SHARED.CANTEEN_DOOR_OPEN or {}
+    SHARED.CANTEEN_DOOR_OPENED_ONCE = SHARED.CANTEEN_DOOR_OPENED_ONCE or {}
     SHARED.SF_GIRL_ACTIVE = SHARED.SF_GIRL_ACTIVE or false
 
     local rx, ry, rz = tr:GetRotation()
@@ -67,6 +68,7 @@ function on_create(self)
     SHARED.CANTEEN_DOOR_LOCKED[EntityID] = false
     SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
     SHARED.SF_GIRL_ACTIVE = false
+    SHARED.CANTEEN_DOOR_OPENED_ONCE[EntityID] = false
 
     tr:SetRotation(rx, currentY, rz)
 
@@ -81,89 +83,96 @@ function on_update(self, dt)
     if tr == nil then return end
     dt = dt or 0.016
 
+    local isRotating = math.abs(targetY - currentY) > 0.05
+
     if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
         local cmdObj = SHARED.DOOR_CMD[EntityID]
         SHARED.DOOR_CMD[EntityID] = nil
 
         local cmd = cmdObj.cmd
 
-        if cmd == "toggle" then
-            if isLocked then
-                play_3d_sfx(DOOR_LOCKED_SFX_ID)
-                print(string.format("[CanteenDoor] TOGGLE blocked, door is LOCKED by=%s", tostring(cmdObj.by)))
-            else
-                if isOpen then
-                    if hasBeenOpenedByPlayer then
-                        print(string.format("[CanteenDoor] TOGGLE ignored, door cannot be closed anymore by=%s", tostring(cmdObj.by)))
+        -- Ignore interaction commands while the door is still rotating
+        if not isRotating then
+            if cmd == "toggle" then
+                if isLocked then
+                    play_3d_sfx(DOOR_LOCKED_SFX_ID)
+                    print(string.format("[CanteenDoor] TOGGLE blocked, door is LOCKED by=%s", tostring(cmdObj.by)))
+                else
+                    if isOpen then
+                        if hasBeenOpenedByPlayer then
+                            print(string.format("[CanteenDoor] TOGGLE ignored, door cannot be closed anymore by=%s", tostring(cmdObj.by)))
+                        else
+                            targetY = closedY
+                            isOpen = false
+                            SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
+
+                            play_3d_sfx(DOOR_CLOSE_SFX_ID)
+
+                            print(string.format("[CanteenDoor] TOGGLE -> CLOSE by=%s", tostring(cmdObj.by)))
+                        end
                     else
-                        targetY = closedY
-                        isOpen = false
-                        SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
+                        targetY = openY
+                        isOpen = true
+                        hasBeenOpenedByPlayer = true
+                        SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
+                        SHARED.CANTEEN_DOOR_OPENED_ONCE[EntityID] = true
 
-                        play_3d_sfx(DOOR_CLOSE_SFX_ID)
+                        activate_sf_girl()
+                        play_3d_sfx(DOOR_OPEN_SFX_ID)
 
-                        print(string.format("[CanteenDoor] TOGGLE -> CLOSE by=%s", tostring(cmdObj.by)))
+                        print(string.format("[CanteenDoor] TOGGLE -> OPEN by=%s", tostring(cmdObj.by)))
                     end
+                end
+
+            elseif cmd == "open" then
+                if isLocked then
+                    play_3d_sfx(DOOR_LOCKED_SFX_ID)
+                    print(string.format("[CanteenDoor] OPEN blocked, door is LOCKED by=%s", tostring(cmdObj.by)))
                 else
                     targetY = openY
                     isOpen = true
                     hasBeenOpenedByPlayer = true
                     SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
+                    SHARED.CANTEEN_DOOR_OPENED_ONCE[EntityID] = true
 
                     activate_sf_girl()
                     play_3d_sfx(DOOR_OPEN_SFX_ID)
 
-                    print(string.format("[CanteenDoor] TOGGLE -> OPEN by=%s", tostring(cmdObj.by)))
+                    print(string.format("[CanteenDoor] OPEN command received by=%s", tostring(cmdObj.by)))
                 end
+
+            elseif cmd == "close" then
+                if not hasClosedAndLocked and not hasBeenOpenedByPlayer then
+                    targetY = closedY
+                    isOpen = false
+                    SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
+
+                    play_3d_sfx(DOOR_CLOSE_SFX_ID)
+
+                    print(string.format("[CanteenDoor] CLOSE command received by=%s", tostring(cmdObj.by)))
+                end
+
+            elseif cmd == "close_and_lock" then
+                if not hasClosedAndLocked then
+                    targetY = closedY
+                    isOpen = false
+                    isLocked = true
+                    hasClosedAndLocked = true
+
+                    SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
+                    SHARED.CANTEEN_DOOR_LOCKED[EntityID] = true
+
+                    play_3d_sfx(DOOR_CLOSE_SFX_ID)
+
+                    print(string.format("[CanteenDoor] CLOSED AND LOCKED by=%s", tostring(cmdObj.by)))
+                end
+
+            elseif cmd == "unlock" then
+                isLocked = false
+                SHARED.CANTEEN_DOOR_LOCKED[EntityID] = false
+
+                print(string.format("[CanteenDoor] UNLOCKED by=%s", tostring(cmdObj.by)))
             end
-
-        elseif cmd == "open" then
-            if isLocked then
-                play_3d_sfx(DOOR_LOCKED_SFX_ID)
-                print(string.format("[CanteenDoor] OPEN blocked, door is LOCKED by=%s", tostring(cmdObj.by)))
-            else
-                targetY = openY
-                isOpen = true
-                hasBeenOpenedByPlayer = true
-                SHARED.CANTEEN_DOOR_OPEN[EntityID] = true
-
-                activate_sf_girl()
-                play_3d_sfx(DOOR_OPEN_SFX_ID)
-
-                print(string.format("[CanteenDoor] OPEN command received by=%s", tostring(cmdObj.by)))
-            end
-
-        elseif cmd == "close" then
-            if not hasClosedAndLocked and not hasBeenOpenedByPlayer then
-                targetY = closedY
-                isOpen = false
-                SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
-
-                play_3d_sfx(DOOR_CLOSE_SFX_ID)
-
-                print(string.format("[CanteenDoor] CLOSE command received by=%s", tostring(cmdObj.by)))
-            end
-
-        elseif cmd == "close_and_lock" then
-            if not hasClosedAndLocked then
-                targetY = closedY
-                isOpen = false
-                isLocked = true
-                hasClosedAndLocked = true
-
-                SHARED.CANTEEN_DOOR_OPEN[EntityID] = false
-                SHARED.CANTEEN_DOOR_LOCKED[EntityID] = true
-
-                play_3d_sfx(DOOR_CLOSE_SFX_ID)
-
-                print(string.format("[CanteenDoor] CLOSED AND LOCKED by=%s", tostring(cmdObj.by)))
-            end
-
-        elseif cmd == "unlock" then
-            isLocked = false
-            SHARED.CANTEEN_DOOR_LOCKED[EntityID] = false
-
-            print(string.format("[CanteenDoor] UNLOCKED by=%s", tostring(cmdObj.by)))
         end
     end
 

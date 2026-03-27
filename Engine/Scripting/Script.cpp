@@ -50,6 +50,7 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 //For platform android vs windows
 #include "Platform.h"
 
+#include "StateMachineSystem.hpp"
 #include "UISystem.hpp"
 
 namespace Engine {
@@ -255,6 +256,11 @@ namespace Engine {
                 return EngineFramework::GameObjectSystem::GetInstance().GetEntityName(e);
             });
 
+        s_Lua.set_function("StateMachine_SetTrigger", [](const std::string& triggerName)
+            {
+                auto& sm = EngineFramework::StateMachineSystem::GetInstance().GetMachine();
+                sm.SetTrigger(triggerName);
+            });
 
         s_Lua.set_function("UI_StartPseudoCutscene", []()
             {
@@ -516,6 +522,12 @@ namespace Engine {
             },
             "SetIntensity", [](LightComponent& light, float i) {
                 light.intensity = i;
+            },
+            "SetColor", [](LightComponent& light, float r, float g, float b) {
+                light.color = glm::vec3(r, g, b);
+			},
+            "GetColor", [](LightComponent& light) {
+                return std::make_tuple(light.color.r, light.color.g, light.color.b);
             }
         );
 
@@ -728,6 +740,15 @@ namespace Engine {
                 EngineFramework::AudioSystem::GetInstance().StopAllForEntity(e);
             });
 
+        // Set the volume of a specific playing slot on an entity (0.0 - 5.0)
+        // Example: Audio_SetSlotVolume(EntityID, "GirlLaughing", 0.8)
+        s_Lua.set_function("Audio_SetSlotVolume",
+            [](uint32_t entityId, const std::string& slotId, float volume)
+            {
+                entt::entity e = static_cast<entt::entity>(entityId);
+                EngineFramework::AudioSystem::GetInstance().SetEntitySlotVolume(e, slotId, volume);
+            });
+
         // ===============================================================
         // AudioSystem  Mixer controls (Lua)
         // ===============================================================
@@ -754,6 +775,17 @@ namespace Engine {
             [](float factor)
             {
                 EngineFramework::AudioSystem::GetInstance().SetIndoorFactor(factor);
+            });
+
+        s_Lua.set_function("Audio_GetSlotFadeDuration",
+            [](uint32_t entityID, const std::string& slotId) -> float
+            {
+                auto& ecs = EngineFramework::GameObjectSystem::GetRegistry();
+                entt::entity entity = static_cast<entt::entity>(entityID);
+                if (!ecs.valid(entity) || !ecs.all_of<AudioComponent>(entity)) return 1.0f;
+                auto& comp = ecs.get<AudioComponent>(entity);
+                const auto* slot = comp.FindSlot(slotId);
+                return slot ? slot->fadeDuration : 1.0f;
             });
 
         // ===============================================================
@@ -1232,6 +1264,19 @@ namespace Engine {
             if (registry.all_of<AudioComponent>(e))
                 return &registry.get<AudioComponent>(e);
             return nullptr;
+            });
+
+        s_Lua.set_function("StateMachine_GetCurrentStateName", []() -> std::string
+            {
+                return EngineFramework::StateMachineSystem::GetInstance().get_currentState_name();
+            });
+
+
+        //get_prevState_name
+
+        s_Lua.set_function("StateMachine_GetPrevStateName", []() -> std::string
+            {
+                return EngineFramework::StateMachineSystem::GetInstance().get_prevState_name();
             });
 
         // ===============================================================

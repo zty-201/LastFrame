@@ -7,7 +7,7 @@ local DEBUG = true
 
 -- ===== ROTATION CONFIG =====
 local closedAngle = 0.0
-local openAngle   = 40.0
+local openAngle   = 4.5
 local rotateSpeed = 50.0
 
 local isOpen     = false
@@ -35,6 +35,19 @@ local consumeOnFirstUse = true         -- set false if boltcutter should NOT be 
 
 -- ===== INTERACTABLE ID =====
 local INTERACTABLE_ID = 185 -- ✅ set this to the Level2Gate interactable/trigger EntityID
+
+-- Entity to hide (scale to 0) when the gate unlocks
+local HIDE_ON_UNLOCK_ID = 401
+
+local function hide_entity_401()
+    local tr = Query.GetTransform(HIDE_ON_UNLOCK_ID)
+    if tr then
+        tr:SetScale(0, 0, 0)
+        if DEBUG then print("[Level2Gate] Entity " .. tostring(HIDE_ON_UNLOCK_ID) .. " scaled to 0") end
+    else
+        print("[Level2Gate] WARNING: Could not find transform for entity " .. tostring(HIDE_ON_UNLOCK_ID))
+    end
+end
 
 -- -------------------------
 -- Inventory helpers
@@ -146,97 +159,58 @@ end
 function on_update(self, dt)
     local tr = Query.GetTransform(EntityID)
     if tr == nil then return end
+    dt = dt or 0.016
 
-    publish_can_unlock()
+    -- Update icons every frame so they show/hide as player enters/leaves range
     update_icons()
 
-    -- consume interaction command
-    if SHARED.DOOR_CMD and SHARED.DOOR_CMD[INTERACTABLE_ID] then
-        local cmdObj = SHARED.DOOR_CMD[INTERACTABLE_ID]
-        SHARED.DOOR_CMD[INTERACTABLE_ID] = nil
+    local isRotating = math.abs(targetY - currentY) > 0.05
+
+    if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
+        local cmdObj = SHARED.DOOR_CMD[EntityID]
+        SHARED.DOOR_CMD[EntityID] = nil
 
         local cmd = cmdObj.cmd
 
-        -- ========================================================
-        -- STATE 1/2: LOCKED or UNLOCKABLE -> handle unlock attempt
-        -- ========================================================
-        if (cmd == "toggle" or cmd == "open") and (not isUnlocked) then
-            if not inv_has_item(REQUIRED_KEY_ID) then
-                -- LOCKED
-                play_3d_sfx(SFX_GATE_LOCKED)
-                if DEBUG then
-                    print("[Level2Gate] LOCKED: missing item -> " .. tostring(REQUIRED_KEY_ID))
+        if not isRotating then
+            if cmd == "toggle" or cmd == "open" then
+                if isOpen then
+                    print("[Level2Gate] Already open, ignoring command")
+                elseif not isUnlocked then
+                    -- Try to unlock with boltcutter
+                    if inv_has_item(REQUIRED_KEY_ID) then
+                        if consumeOnFirstUse then
+                            inv_consume_item(REQUIRED_KEY_ID)
+                        end
+                        isUnlocked = true
+                        play_3d_sfx(SFX_GATE_UNLOCK)
+                        print("[Level2Gate] Unlocked with boltcutter")
+
+                        -- Open immediately after unlocking
+                        targetY = openAngle
+                        isOpen  = true
+                        iconsDisabledForever = true
+                        play_3d_sfx(SFX_GATE_OPEN)
+                        hide_entity_401()
+                        publish_can_unlock()
+                        print("[Level2Gate] Gate opening")
+                    else
+                        play_3d_sfx(SFX_GATE_LOCKED)
+                        print("[Level2Gate] Locked - need boltcutter")
+                    end
+                else
+                    targetY = openAngle
+                    isOpen  = true
+                    iconsDisabledForever = true
+                    play_3d_sfx(SFX_GATE_OPEN)
+                    hide_entity_401()
+                    print("[Level2Gate] Gate opening")
                 end
-                publish_can_unlock()
-                return
             end
-
-            -- UNLOCKABLE -> unlock now (and optionally consume), but do NOT open yet
-            if consumeOnFirstUse then
-                local ok = inv_consume_item(REQUIRED_KEY_ID, 1)
-                if not ok then
-                    print("[Level2Gate] ERROR: failed to consume item -> " .. tostring(REQUIRED_KEY_ID))
-                    publish_can_unlock()
-                    return
-                end
-            end
-
-            isUnlocked = true
-            play_3d_sfx(SFX_GATE_UNLOCK)
-
-            if DEBUG then
-                print("[Level2Gate] UNLOCKED -> SFX (gate still closed)")
-            end
-
-            publish_can_unlock()
-            update_icons()
-            return
-        end
-
-        -- ========================================================
-        -- STATE 3: UNLOCKED -> allow open/toggle
-        -- ========================================================
-        local wasOpen = isOpen
-
-        if cmd == "toggle" then
-            isOpen = not isOpen
-        elseif cmd == "open" then
-            isOpen = true
-        elseif cmd == "close" then
-            isOpen = false
-        end
-
-        targetY = isOpen and openAngle or closedAngle
-
-        -- Play open SFX only when CLOSED -> OPEN
-        if (not wasOpen) and isOpen then
-            play_3d_sfx(SFX_GATE_OPEN)
-            if DEBUG then
-                print("[Level2Gate] OPEN -> SFX")
-            end
-        end
-
-        -- once opened, disable icons forever
-        if isOpen and (not iconsDisabledForever) then
-            iconsDisabledForever = true
-            hide_icons_forever()
-        end
-
-        if DEBUG then
-            print(string.format(
-                "[Level2Gate] CMD=%s by=%s -> unlocked=%s isOpen=%s targetY=%.2f iconsDisabledForever=%s",
-                tostring(cmd),
-                tostring(cmdObj.by),
-                tostring(isUnlocked),
-                tostring(isOpen),
-                targetY,
-                tostring(iconsDisabledForever)
-            ))
         end
     end
 
-    -- rotation
-    dt = dt or 0.016
+    -- Rotate gate towards target
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1

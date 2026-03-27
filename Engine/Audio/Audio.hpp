@@ -28,6 +28,7 @@ written consent of DigiPen Institute of Technology is prohibited.
 #include "fmod_errors.h"
 #include "fmod_dsp.h"
 #include "SoundAsset.hpp"
+#include "event_structures.hpp"
 #endif
 
 struct AudioComponent;
@@ -67,6 +68,7 @@ namespace EngineFramework
         void PostUpdate(float delta_time) override;
 
         static AudioSystem& GetInstance() { return *this_system; }
+        static AudioSystem* TryGetInstance() { return this_system; }
 
         void SetPathResolver(std::function<std::string(const std::string&)> resolver);
         std::string ResolvePath(const std::string& logicalOrPath) const;
@@ -77,6 +79,8 @@ namespace EngineFramework
         void StopEntitySlot(entt::entity entity, const std::string& slotId);
         // Stop all sounds start by this entity
         void StopAllForEntity(entt::entity entity);
+        // Set the volume of a currently playing slot on an entity
+        void SetEntitySlotVolume(entt::entity entity, const std::string& slotId, float volume);
 
         std::shared_ptr<SoundAsset> Load(const std::string& logicalOrPath, bool loop);
 
@@ -104,6 +108,28 @@ namespace EngineFramework
 
         void SetSimulationMode(bool enabled);
         void SetIndoorFactor(float factor); // 0.0 = outdoor, 1.0 = indoor
+
+        void SetGameState(const std::string& state); // call when game state changes
+        std::string GetGameState() const { return m_currentGameState; }
+
+        // OS-level Audio Thread Management
+        void SuspendMixer();
+        void ResumeMixer();
+
+        //event_dispatcher.trigger<Pause_Event>(std::move(pause_event));
+        void HANDLE_EVENT_Pause_Event(Pause_Event& ello);
+
+
+
+
+
+
+#ifndef DISABLE_FMOD
+        FMOD::Sound* CreateSoundFromPCM(const void* data, size_t numBytes, uint32_t channels, uint32_t sampleRate, bool loop);
+        FMOD::Channel* PlayExternalSound(FMOD::Sound* sound, AudioGroup group, float volume);
+        void StopExternalChannel(FMOD::Channel*& channel);
+        void ReleaseExternalSound(FMOD::Sound*& sound);
+#endif
 
         AudioSystem();
         ~AudioSystem() override;
@@ -164,6 +190,7 @@ namespace EngineFramework
         void HandlePlayOnStart(entt::registry& ecsRegistry);
 
     private:
+        bool m_isPaused = false;
         float m_indoorFactor = 0.0f;
 
 #ifndef DISABLE_FMOD
@@ -206,7 +233,7 @@ namespace EngineFramework
 
         bool m_inSimulation = false;
 
-        
+        std::string m_currentGameState = "MainMenu";
 
         static AudioSystem* this_system;
 

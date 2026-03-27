@@ -8,6 +8,10 @@ local function debug_print(...)
     end
 end
 
+local function getShared()
+    return rawget(_G, "SHARED")
+end
+
 local function set_visible(v)
     if EntityUI == nil then
         print("[UI_Inventory] ERROR: EntityUI is nil on entity " .. tostring(EntityID))
@@ -63,6 +67,19 @@ function on_update(self, dt)
         return
     end
 
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        return
+    end
+
+    local Shared = getShared()
+    local platform = (Shared and Shared.PLATFORM) or PLATFORM
+
+    if platform == "windows" then
+        set_visible(false)
+        return
+    end
+
     --update itself is the menu is active, else return
     if not UI_is_MenuOpen("Android_Inventory_Buttons") then
         return
@@ -78,14 +95,14 @@ function on_update(self, dt)
         --debug_print("android_inventory_close_state")
     end
 
-    if entity_name == "android_inventory_open_state" then   
+    if entity_name == "UIAndroid_InventoryOpen" then   
         if SHARED.UI_INVENTORY_ANDROID_STATE then
             set_visible(true)
         else
             set_visible(false)
         end
         
-    elseif entity_name == "android_inventory_close_state" then
+    elseif entity_name == "UIAndroid_InventoryClose" then
 
         if SHARED.UI_INVENTORY_ANDROID_STATE then
             set_visible(false)
