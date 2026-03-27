@@ -226,6 +226,15 @@ function on_update(self, dt)
 
     local SHARED = getGlobalShared()
 
+    -- ============================================================
+    -- MENU CAMERA MODE
+    -- When main menu is active, do NOT let the player camera fight
+    -- with the dedicated MainMenuCamera entity.
+    -- ============================================================
+    if _G.GAME_STATE == "MENU" then
+        return
+    end
+
     -- ======================================
     -- FREE SHAKE (no camera lock required)
     -- ======================================
@@ -283,7 +292,6 @@ function on_update(self, dt)
             end
         end
 
-        -- Start shake if requested
         if SHARED.POV.shake then
             SHARED.POV.shake = false
             shakeTimer     = 0.0
@@ -322,16 +330,6 @@ function on_update(self, dt)
 
         tickShake(dt)
 
-        if pullActive then
-            pullTimer = pullTimer + dt
-            local t = math.min(pullTimer / pullDuration, 1.0)
-            if t >= 1.0 then pullActive = false end
-
-            lockedCamX = pullStartX + (pullTargetX - pullStartX) * t
-            lockedCamY = pullStartY + (pullTargetY - pullStartY) * t
-            lockedCamZ = pullStartZ + (pullTargetZ - pullStartZ) * t
-        end
-
         if lockedCamX then
             applyLook(lockedCamX, lockedCamY, lockedCamZ)
         else
@@ -345,7 +343,6 @@ function on_update(self, dt)
     -- WINDOWS LOOK CONTROL
     -- ======================================
     if PLATFORM == "windows" then
-
         if recenterActive then
             recenterTime = recenterTime + dt
             local t = recenterTime / recenterDuration
@@ -389,7 +386,6 @@ function on_update(self, dt)
     -- ANDROID GYRO LOOK
     -- ======================================
     if PLATFORM == "android" and gyroEnabled then
-
         if recenterActive then
             recenterTime = recenterTime + dt
             local t = recenterTime / recenterDuration
@@ -409,15 +405,12 @@ function on_update(self, dt)
 
         local gx, gy, gz = Input.GetGyroscopeRotatioRate()
 
-        -- Step 1: Dead zone — discard readings too small to be intentional
         local dzGx = applyDeadZone(gx)
         local dzGy = applyDeadZone(gy)
 
-        -- Step 2: EMA — smooths frame-to-frame variance on surviving values
         smoothedGx = smoothedGx + (dzGx - smoothedGx) * GYRO_ALPHA
         smoothedGy = smoothedGy + (dzGy - smoothedGy) * GYRO_ALPHA
 
-        -- Step 3: Apply to yaw/pitch
         yaw   = yaw   + math.deg(smoothedGx) * dt * gyroSensitivity
         pitch = pitch - math.deg(smoothedGy) * dt * gyroSensitivity
 
