@@ -479,12 +479,23 @@ namespace EngineFramework
         }
     }
 
-    void UI_System::closeAllMenu()
+    
+    //default saveState = false
+    void UI_System::closeAllMenu(bool saveState)
     {
+        if (saveState) {
+            current_menus.clear();
+        }
+        
         for (auto& [name, menu] : Menu_Mapping)
         {
             if (menu.first)
             {
+                if (saveState) {
+                    //save the menus that were active
+                    current_menus.push_back(name);
+                }
+                
                 menu.first->draw_elements(false);
                 menu.second = false;
             }
@@ -493,6 +504,16 @@ namespace EngineFramework
         current_menu.clear();
 
         std::cout << "=========================== CLOSEEEEE ALLLLLL MENU () ======================================\n";
+    }
+
+    void UI_System::resumeActive_Menus() {
+
+        //resume the menus that were active
+        for (auto& name : current_menus)
+        {
+            displayMenu(name);
+        }
+
     }
 
     bool UI_System::IsMenuActive(const std::string& menuname) const
