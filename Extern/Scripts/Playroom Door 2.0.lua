@@ -210,8 +210,11 @@ function on_update(self, dt)
 
         local cmd = cmdObj.cmd
 
+        -- Once opened, ignore all further interaction commands
+        if iconsDisabledForever then
+            -- command already consumed/cleared above; just let rotation finish
         -- Ignore interaction while the door is still rotating
-        if not isRotating then
+        elseif not isRotating then
             -- ========================================================
             -- STATE 1/2: LOCKED or UNLOCKABLE -> handle unlock attempt
             -- ========================================================

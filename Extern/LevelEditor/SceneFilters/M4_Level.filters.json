@@ -196,7 +196,7 @@
 			"name": "Hall"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				32,
 				33,
