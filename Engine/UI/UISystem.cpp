@@ -428,59 +428,86 @@ namespace EngineFramework
         return true;
     }
 
-    void UI_System::Update(float deltaTime)
+void UI_System::Update(float deltaTime)
+{
+    // Allow skipping cutscenes with Space (desktop) or tap anywhere (Android)
+    if (gCutscene.playing)
     {
-        // Allow skipping cutscenes with Space (desktop) or tap anywhere (Android)
-        if (gCutscene.playing)
+        bool shouldSkip = false;
+
+        // Desktop / existing input
+        if (InputManager::GetInstance().GetAction("JUMP"))
         {
-            bool shouldSkip = false;
-
-            // Desktop / existing input
-            if (InputManager::GetInstance().GetAction("JUMP"))
-            {
-                shouldSkip = true;
-            }
-
-#if defined(PLATFORM_ANDROID)
-            // Tap-anywhere skip (rising edge only)
-            static bool wasTouchDownLastFrame = false;
-            bool isTouchDownThisFrame = InputManager::GetInstance().GetMouseButton(0);
-
-            if (isTouchDownThisFrame && !wasTouchDownLastFrame)
-            {
-                shouldSkip = true;
-            }
-
-            wasTouchDownLastFrame = isTouchDownThisFrame;
-#endif
-
-            if (shouldSkip)
-            {
-                gCutscene.Skip();
-            }
+            shouldSkip = true;
         }
 
-        // 1) Tick cutscene sequence FIRST
-        gCutscene.Update(deltaTime);
-        // 2) Tick rolling credits
-        gCreditsRoll.Update(deltaTime);
+#if defined(PLATFORM_ANDROID)
+        // Tap-anywhere skip (rising edge only)
+        static bool wasTouchDownLastFrame = false;
+        bool isTouchDownThisFrame = InputManager::GetInstance().GetMouseButton(0);
 
-        // 2) Update only active menus
-        for (auto& [name, menu] : Menu_Mapping)
+        if (isTouchDownThisFrame && !wasTouchDownLastFrame)
         {
-            if (menu.first)
+            shouldSkip = true;
+        }
+
+        wasTouchDownLastFrame = isTouchDownThisFrame;
+#endif
+
+        if (shouldSkip)
+        {
+            gCutscene.Skip();
+        }
+    }
+
+    // Fast-forward credits while holding input
+    if (gCreditsRoll.playing)
+    {
+        float creditsMultiplier = 1.0f;
+
+        // Desktop: hold jump / space to scroll faster
+        if (InputManager::GetInstance().GetAction("JUMP"))
+        {
+            creditsMultiplier = 4.0f; // change to 3.0f / 5.0f if you want
+        }
+
+#if defined(PLATFORM_ANDROID)
+        // Android: hold touch to fast-forward
+        if (InputManager::GetInstance().GetMouseButton(0))
+        {
+            creditsMultiplier = 4.0f;
+        }
+#endif
+
+        gCreditsRoll.speedMultiplier = creditsMultiplier;
+    }
+    else
+    {
+        gCreditsRoll.speedMultiplier = 1.0f;
+    }
+
+    // 1) Tick cutscene sequence FIRST
+    gCutscene.Update(deltaTime);
+
+    // 2) Tick rolling credits
+    gCreditsRoll.Update(deltaTime);
+
+    // 3) Update only active menus
+    for (auto& [name, menu] : Menu_Mapping)
+    {
+        if (menu.first)
+        {
+            if (menu.second)
             {
-                if (menu.second)
+                menu.first->Update();
+                if (name == "AndroidInputOverlay")
                 {
-                    menu.first->Update();
-                    if (name == "AndroidInputOverlay")
-                    {
-                        update_Joysticks();
-                    }
+                    update_Joysticks();
                 }
             }
         }
     }
+}
 
     void UI_System::update_Joysticks()
     {
