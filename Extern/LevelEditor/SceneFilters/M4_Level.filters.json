@@ -559,7 +559,7 @@
 			"name": "Bedroom"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				39,
 				163,
@@ -615,10 +615,9 @@
 			"name": "Storeroom"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				408,
-				409,
 				410,
 				411,
 				412,
@@ -818,7 +817,7 @@
 			"name": "SF_Corridor"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				724,
 				747,
