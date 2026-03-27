@@ -56,8 +56,10 @@ function on_create(self)
 end
 
 function on_update(self, dt)
+
     local state_name = StateMachine_GetCurrentStateName()
     if state_name ~= "Gameplay" then
+        UI:SetVisible(false)
         return
     end
     local Shared = getShared()
