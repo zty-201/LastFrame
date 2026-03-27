@@ -86,6 +86,14 @@ function on_update(self, dt)
         if DEBUG then print("[ToolboxOpenMechanic] isOpen synced to false from SHARED") end
     end
 
+    -- Auto-close if player walked out of the zone while LockScreen was open
+    if isOpen and not in_range(id) then
+        if UI_CloseAllMenus ~= nil then UI_CloseAllMenus() end
+        SHARED[UI_TABLE] = false
+        isOpen = false
+        if DEBUG then print("[ToolboxOpenMechanic] Auto-closed: player left zone") end
+    end
+
     ----------------------------------------------------------------
     -- If lock has just been disabled (success), play unlock audio
     ----------------------------------------------------------------

@@ -36,6 +36,19 @@ local consumeOnFirstUse = true         -- set false if boltcutter should NOT be 
 -- ===== INTERACTABLE ID =====
 local INTERACTABLE_ID = 185 -- ✅ set this to the Level2Gate interactable/trigger EntityID
 
+-- Entity to hide (scale to 0) when the gate unlocks
+local HIDE_ON_UNLOCK_ID = 401
+
+local function hide_entity_401()
+    local tr = Query.GetTransform(HIDE_ON_UNLOCK_ID)
+    if tr then
+        tr:SetScale(0, 0, 0)
+        if DEBUG then print("[Level2Gate] Entity " .. tostring(HIDE_ON_UNLOCK_ID) .. " scaled to 0") end
+    else
+        print("[Level2Gate] WARNING: Could not find transform for entity " .. tostring(HIDE_ON_UNLOCK_ID))
+    end
+end
+
 -- -------------------------
 -- Inventory helpers
 -- -------------------------
@@ -178,6 +191,7 @@ function on_update(self, dt)
                         isOpen  = true
                         iconsDisabledForever = true
                         play_3d_sfx(SFX_GATE_OPEN)
+                        hide_entity_401()
                         publish_can_unlock()
                         print("[Level2Gate] Gate opening")
                     else
@@ -189,6 +203,7 @@ function on_update(self, dt)
                     isOpen  = true
                     iconsDisabledForever = true
                     play_3d_sfx(SFX_GATE_OPEN)
+                    hide_entity_401()
                     print("[Level2Gate] Gate opening")
                 end
             end

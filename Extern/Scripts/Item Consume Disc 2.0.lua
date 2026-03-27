@@ -18,6 +18,9 @@ local ITEM_QTY = 1
 
 local TARGET_ENTITY_ID = 0
 
+-- ID of the nearby notes interactable — forward unused E presses to it
+local NOTES_FORWARD_ID = 822
+
 -- Once we consume one disc, never show any icons again
 local iconsDisabledForever = false
 
@@ -89,6 +92,18 @@ end
 local function hide_icons_forever(targetId)
     send_have_icon_cmd(targetId, "hide")
     send_nodisc_icon_cmd(targetId, "hide")
+end
+
+-- Forward an E press to the notes interactable if the player is in its zone
+local function try_forward_to_notes(cmd)
+    if not (SHARED and SHARED.INTERACT_IN_ZONE and SHARED.INTERACT_IN_ZONE[NOTES_FORWARD_ID]) then
+        return
+    end
+    SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
+    SHARED.DOOR_CMD[NOTES_FORWARD_ID] = cmd
+    if DEBUG then
+        print("[Test_ConsumeDisc_Shared] Forwarding command to notes id=" .. tostring(NOTES_FORWARD_ID))
+    end
 end
 
 local function update_icons(targetId)
@@ -198,14 +213,16 @@ function on_update(Self, dt)
         return
     end
 
-    if iconsDisabledForever then
-        return
-    end
-
     if not SHARED.DOOR_CMD then return end
 
     local cmd = consume_shared_cmd(SHARED.DOOR_CMD, targetId)
     if not cmd_is_interact(cmd) then
+        return
+    end
+
+    -- Disc already consumed — pass E through to the notes if player is in that zone
+    if iconsDisabledForever then
+        try_forward_to_notes(cmd)
         return
     end
 
@@ -224,8 +241,9 @@ function on_update(Self, dt)
 
     if disc_count() <= 0 then
         if DEBUG then
-            print("[Test_ConsumeDisc_Shared] No Music Disc to consume")
+            print("[Test_ConsumeDisc_Shared] No Music Disc to consume — forwarding to notes")
         end
+        try_forward_to_notes(cmd)
         return
     end
 
@@ -260,6 +278,11 @@ function on_update(Self, dt)
     pendingTimer = 0.0
 
     -- After first successful consume, disable icons forever
+    -- and remove from the interaction zone so nearby interactables (e.g. playroom notes)
+    -- can receive E-press commands without the disc entity stealing them
     iconsDisabledForever = true
     hide_icons_forever(targetId)
+    if SHARED.INTERACT_IN_ZONE then
+        SHARED.INTERACT_IN_ZONE[targetId] = false
+    end
 end
