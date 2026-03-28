@@ -99,8 +99,8 @@ function on_update(self, dt)
 
     if pausePressed then
         if UI_IsCutscenePlaying == nil or not UI_IsCutscenePlaying() then
-            UI_CloseAllMenus()
-            UI_DisplayMenu("PauseMenu")
+            --UI_CloseAllMenus()
+            --UI_DisplayMenu("PauseMenu")
             StateMachine_SetTrigger("PauseGame")
             print("========================================= PauseGame Trigger ============================================================")
             

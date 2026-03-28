@@ -45,6 +45,13 @@ function on_create(self)
 end
 
 function on_update(self, dt)
+
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        UI_CloseMenu(MENU_NAME)
+        return
+    end
+
     -- Auto-close if player walked out of the zone while the UI was open
     if SHARED[UI_TABLE][BOOK_ID] == true
        and not (SHARED.INTERACT_IN_ZONE and SHARED.INTERACT_IN_ZONE[BOOK_ID] == true) then

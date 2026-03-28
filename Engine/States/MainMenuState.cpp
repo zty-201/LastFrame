@@ -14,7 +14,17 @@ void MainMenuState::OnEnter(Engine::StateMachine& machine)
     LOGI("[State] Enter MainMenu");
 
     EngineFramework::UI_System::GetInstance().closeAllMenu();
+    EngineFramework::UI_System::GetInstance().closeAllMenu(true); //clearing
     EngineFramework::UI_System::GetInstance().displayMenu("StartMenu");
+
+    
+
+#if defined(PLATFORM_ANDROID)
+    EngineFramework::UI_System::GetInstance().closeMenu("Android_Inventory_Buttons");
+    EngineFramework::UI_System::GetInstance().closeMenu("AndroidInputOverlay");
+    
+#endif
+
 }
 
 void MainMenuState::OnExit(Engine::StateMachine& machine)

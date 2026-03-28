@@ -64,6 +64,14 @@ end
 
 function on_update(self, dt)
 
+    --comment this code if u dont want other states to close it
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        set_visible(false)
+        return
+    end
+    --comment this code if u dont want other states to close it
+
     local itemId = get_item_id()
 
     if SHARED.UI_INVENTORY_OPEN ~= true then

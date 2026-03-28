@@ -721,7 +721,7 @@ void UI_System::Update(float deltaTime)
 
     void UI_System::displayMenu(std::string menuname)
     {
-        //std::cout << "[UI_System] displayMenu('" << menuname << "')\n";
+        std::cout << "[UI_System] displayMenu('" << menuname << "')\n";
 
         auto it = Menu_Mapping.find(menuname);
 
@@ -790,12 +790,29 @@ void UI_System::Update(float deltaTime)
         }
     }
 
-    void UI_System::closeAllMenu()
+    
+    //default saveState = false
+    void UI_System::closeAllMenu(bool saveState)
     {
+        if (saveState) {
+            current_menus.clear();
+            std::cout << "=========================== SAVING MENU STATE NOW () ======================================\n";
+        }
+        
         for (auto& [name, menu] : Menu_Mapping)
         {
             if (menu.first)
             {
+                if (menu.second) {
+                    if (saveState) {
+                        //save the menus that were active
+                        std::cout << "PUSHED menu: " << name << std::endl;
+                        current_menus.push_back(name);
+
+                    }
+                }
+                
+                
                 menu.first->draw_elements(false);
                 menu.second = false;
                 menu.first->set_AllbuttonState();
@@ -805,6 +822,22 @@ void UI_System::Update(float deltaTime)
         current_menu.clear();
 
         std::cout << "=========================== CLOSEEEEE ALLLLLL MENU () ======================================\n";
+    }
+
+    void UI_System::resumeActive_Menus() {
+
+        std::cout << "MENU RESUMED ====================================\n";
+
+
+        //resume the menus that were active
+        for (auto& name : current_menus)
+        {
+            std::cout << "menu: " << name << std::endl;
+            displayMenu(name);
+        }
+
+        std::cout << "MENU RESUMED END ====================================\n";
+
     }
 
     bool UI_System::IsMenuActive(const std::string& menuname) const

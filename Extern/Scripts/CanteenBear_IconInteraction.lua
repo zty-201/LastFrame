@@ -69,6 +69,13 @@ local function put_down_toy()
 end
 
 function on_update(self, dt)
+
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        UI_CloseMenu(MENU_NAME)
+        return
+    end
+
     -- Auto-close (put down) if player walked out of the zone while holding the toy
     if SHARED[UI_TABLE][TOY_ID] == true
        and not (SHARED.INTERACT_IN_ZONE and SHARED.INTERACT_IN_ZONE[TOY_ID] == true) then
