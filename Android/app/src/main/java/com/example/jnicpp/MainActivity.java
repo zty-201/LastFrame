@@ -229,8 +229,30 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
         //[Touch/Motion]
         if(isInitialized)
         {
+            int action = event.getActionMasked();
+            int pointerIndex = event.getActionIndex();
+            int pointerId = event.getPointerId(pointerIndex);
+
+            if(action == MotionEvent.ACTION_MOVE)
+            {
+                for(int i = 0; i < event.getPointerCount(); i++)
+                {
+                    int movePointerId = event.getPointerId(i);
+                    float x = event.getX(i);
+                    float y = event.getY(i);
+
+                    handleNativeTouchEvent(action, movePointerId, x, y);
+                }
+            }
+            else
+            {
+                float x = event.getX(pointerIndex);
+                float y = event.getY(pointerIndex);
+
+                handleNativeTouchEvent(action, pointerId, x, y);
+            }
             //Pass action type (Up, Down, etc), and primary pointer pos
-            handleNativeTouchEvent(event.getActionMasked(), event.getX(), event.getY());
+            //handleNativeTouchEvent(event.getActionMasked(), event.getX(), event.getY());
             return true;
         }
         return super.onTouchEvent(event);
@@ -268,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements GLSurfaceView.Ren
     /**
      * Handles touch motion events (DOWN, UP, MOVE, etc.)
      */
-    public native void handleNativeTouchEvent(int action, float x, float y);
+    public native void handleNativeTouchEvent(int action, int pointerId, float x, float y);
 
     /**
      * Handles key press events (keyboard or hardware buttons)

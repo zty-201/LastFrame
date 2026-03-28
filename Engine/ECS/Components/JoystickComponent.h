@@ -15,6 +15,8 @@ struct JoystickComponent {
 	std::string knobTargetName;
 
 	entt::entity knobEntity{ entt::null };
+
+	int activePointerId = -1; //-1 means no finger is currently dragging
 };
 
 #endif

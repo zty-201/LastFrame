@@ -318,15 +318,58 @@ namespace EngineFramework
         button.is_hover = false;
         button.is_clicked = false;
         button.is_released = false;
-
-        bool mousePressed = InputManager::GetInstance().GetMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT);
-        bool mouseHeld = InputManager::GetInstance().GetMouseButton(GLFW_MOUSE_BUTTON_LEFT);
-        bool mouseReleased = InputManager::GetInstance().GetMouseButtonUp(GLFW_MOUSE_BUTTON_LEFT);
-        bool touching = check_touch(e);
-
         button.curr_button_state = IDLE;
 
-        if (mousePressed)
+        bool isHandled = false;
+
+        for (int i = 0; i < 5; ++i)
+        {
+            bool mousePressed = InputManager::GetInstance().GetMouseButtonDown(i);
+            bool mouseHeld = InputManager::GetInstance().GetMouseButton(i);
+            bool mouseReleased = InputManager::GetInstance().GetMouseButtonUp(i);
+            
+            if (!mousePressed && !mouseHeld && !mouseReleased) continue;
+            
+            bool touching = check_touch(e, i);
+
+            if (mousePressed)
+            {
+                if (touching && button.activePointerId == -1)
+                {
+                    button.activePointerId = i;
+                    button.curr_button_state = CLICKED;
+                    button.is_clicked = true;
+                    isHandled = true;
+                }
+            }
+            else if (mouseHeld)
+            {
+                if (button.activePointerId == i)
+                {
+                    button.curr_button_state = CLICKED;
+                    button.is_clicked = true;
+                    isHandled = true;
+                }
+            }
+            else if (mouseReleased)
+            {
+                if (button.activePointerId == i)
+                {
+                    button.curr_button_state = RELEASED;
+                    button.is_released = true;
+
+                    if (touching)
+                    {
+                        button.curr_button_state = TRIGGERED;
+                    }
+
+                    button.activePointerId = -1;
+                    isHandled = true;
+                }
+            }
+        }
+
+        /*if (mousePressed)
         {
             if (touching && active_pressed_button == entt::null)
             {
@@ -359,19 +402,23 @@ namespace EngineFramework
             }
         }
         else
-        {
+        {*/
 #if defined(PLATFORM_WINDOWS)
-            if (touching)
+        if (!isHandled && button.activePointerId == -1)
+        {
+            // Finger 0 acts as the mouse cursor on Windows
+            if (check_touch(e, 0))
             {
                 button.curr_button_state = HOVER;
                 button.is_hover = true;
             }
-#endif
         }
+#endif
+        //}
      
     }
 
-    bool UI_Menu::check_touch(entt::entity e) {
+    bool UI_Menu::check_touch(entt::entity e, int pointerId) {
 
         if (!registry.valid(e)) return false;
         if (!registry.all_of<UIComponent>(e)) return false;
@@ -389,8 +436,10 @@ namespace EngineFramework
             mouseUI = glm::vec2(Screen::GetInstance().GetMouseInSceneUI());
         }
         else {
-            float MouseX = static_cast<float>(InputManager::GetInstance().GetMousePosition().first);
-            float MouseY = static_cast<float>(InputManager::GetInstance().GetMousePosition().second);
+            auto touchPair = InputManager::GetInstance().GetTouchPosition(pointerId);
+
+            float MouseX = static_cast<float>(touchPair.first);
+            float MouseY = static_cast<float>(touchPair.second);
 
             mouseUI = glm::vec2(MouseX, GraphicsSystem::GetInstance().Getscreen().y - MouseY);
         }
@@ -400,8 +449,11 @@ namespace EngineFramework
 
         //release
 #if defined(NDEBUG) && defined(PLATFORM_WINDOWS)
-        float MouseX = static_cast<float>(InputManager::GetInstance().GetMousePosition().first);
-        float MouseY = static_cast<float>(InputManager::GetInstance().GetMousePosition().second);
+
+        auto touchPair = InputManager::GetInstance().GetTouchPosition(pointerId);
+
+        float MouseX = static_cast<float>(touchPair.first);
+        float MouseY = static_cast<float>(touchPair.second);
 
         glm::vec2 mouseUI(MouseX, GraphicsSystem::GetInstance().Getscreen().y - MouseY);
 #endif
@@ -410,8 +462,10 @@ namespace EngineFramework
         /*
         * PLEASE CHANGE THIS ACCORDINGLY TO ANDROID INPUT (NOT TOO SURE ON THIS)
         */
-        float MouseX = static_cast<float>(InputManager::GetInstance().GetMousePosition().first);
-        float MouseY = static_cast<float>(InputManager::GetInstance().GetMousePosition().second);
+        auto touchPair = InputManager::GetInstance().GetTouchPosition(pointerId);
+
+        float MouseX = static_cast<float>(touchPair.first);
+        float MouseY = static_cast<float>(touchPair.second);
 
         glm::vec2 mouseUI(MouseX, GraphicsSystem::GetInstance().Getscreen().y - MouseY);
 

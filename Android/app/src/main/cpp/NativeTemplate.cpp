@@ -97,11 +97,12 @@ Java_com_example_jnicpp_MainActivity_handleNativeTouchEvent(
         JNIEnv* env,
         jobject /* this */,
         jint action,
+        jint pointerId,
         jfloat x,
         jfloat y) {
 
     //This calls static C++ function in InputManager
-    EngineFramework::InputManager::UpdateTouch(action, x, y);
+    EngineFramework::InputManager::UpdateTouch(action, pointerId, x, y);
 }
 
 //JNI function to handle key events (from Java's onKeyDown/Up)

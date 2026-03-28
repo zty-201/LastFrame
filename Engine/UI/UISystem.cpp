@@ -394,7 +394,7 @@ namespace EngineFramework
                 menu.first->removeAllEntities_Reg(); //only update those active ones
             }
         }
-
+        
         Menu_Mapping.clear();
         current_menu.clear();
 
@@ -513,9 +513,6 @@ void UI_System::Update(float deltaTime)
     {
         auto view = GameObjectSystem::GetRegistry().view<JoystickComponent>();
 
-        std::pair<double, double> mousePos = InputManager::GetInstance().GetMousePosition();
-        bool isTouchDown = InputManager::GetInstance().GetMouseButton(0);
-
         float screenWidth = (float)InputManager::GetInstance().GetScreenSize().first;
         float screenHeight = (float)InputManager::GetInstance().GetScreenSize().second;
         auto& lua = Engine::ScriptSystem::GetLuaState();
@@ -553,24 +550,36 @@ void UI_System::Update(float deltaTime)
             }
 
             glm::vec2 currentOffset{ 0.f, 0.f };
-            if (isTouchDown)
+
+            if (!joystick.isBeingDragged)
             {
-                //Check if clicked inside joystick area to start dragging
-                if (!joystick.isBeingDragged)
+                for (int i = 0; i < 5; ++i)
                 {
-                    float dist = glm::distance(glm::vec2(mousePos.first, mousePos.second), joystick.baseCenter);
-                    if (dist <= joystick.maxRadius)
+                    if (InputManager::GetInstance().GetMouseButton(i))
                     {
-                        joystick.isBeingDragged = true;
+                        auto touchPair = InputManager::GetInstance().GetTouchPosition(i);
+                        glm::vec2 touchPos((float)touchPair.first, (float)touchPair.second);
+
+                        float dist = glm::distance(touchPos, joystick.baseCenter);
+                        if (dist <= joystick.maxRadius)
+                        {
+                            joystick.isBeingDragged = true;
+                            joystick.activePointerId = i;
+                            break;
+                        }
                     }
                 }
-
-                if (joystick.isBeingDragged)
+            }
+            
+            if (joystick.isBeingDragged)
+            {
+                if (InputManager::GetInstance().GetMouseButton(joystick.activePointerId))
                 {
-                    glm::vec2 touchPos = { (float)mousePos.first, (float)mousePos.second };
+                    auto touchPair = InputManager::GetInstance().GetTouchPosition(joystick.activePointerId);
+                    glm::vec2 touchPos((float)touchPair.first, (float)touchPair.second);
+
                     currentOffset = touchPos - joystick.baseCenter;
 
-                    //Clamp distance
                     float dist = glm::length(currentOffset);
                     if (dist > joystick.maxRadius)
                     {
@@ -580,13 +589,10 @@ void UI_System::Update(float deltaTime)
                     joystick.outputX = currentOffset.x / joystick.maxRadius;
                     joystick.outputY = currentOffset.y / joystick.maxRadius;
                 }
-            }
-            else
-            {
-                //Release touch -> snap back to center
-                if (joystick.isBeingDragged)
+                else
                 {
                     joystick.isBeingDragged = false;
+                    joystick.activePointerId = -1;
                     joystick.outputX = 0.f;
                     joystick.outputY = 0.f;
                 }
