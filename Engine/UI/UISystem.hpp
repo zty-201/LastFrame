@@ -90,7 +90,7 @@ namespace EngineFramework
         void update_Buttons();
         void update_Button_State(ButtonComponent& button, entt::entity e); //update the button state based on input_manager
         void Trigger_Button_Event(ButtonComponent& button, BUTTON_STATE state);
-        bool check_touch(entt::entity e);
+        bool check_touch(entt::entity e, int pointerId);
        
 
     };

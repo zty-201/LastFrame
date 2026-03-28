@@ -33,6 +33,7 @@ struct ButtonComponent {
     bool stay_clicked;    //when true, button locks onto clicked_texture after being triggered (does not auto-revert to idle)
     bool clicked_locked;  //runtime state: true while button is held in its locked clicked state
 
+    int activePointerId = -1;
 };
 
 #endif
