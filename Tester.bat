@@ -11,8 +11,8 @@ if errorlevel 1 (
 )
 
 
-echo Starting Build and Test (Debug)
 if exist "build/VisualStudio" (
+echo Starting Build and Test (Debug)
     cd build/VisualStudio
     cmake --build . --target tester_executable --config Debug
     if errorlevel 1 (
@@ -24,10 +24,8 @@ if exist "build/VisualStudio" (
         echo Test failed!
         exit /b 1
     )
-)
 
 echo Starting Build and Test (Release)
-if exist "build/VisualStudio" (
     cmake --build . --target tester_executable --config Release
     if errorlevel 1 (
         echo Tester failed to build!
