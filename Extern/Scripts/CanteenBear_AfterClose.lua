@@ -40,6 +40,15 @@ local function do_crash()
         log("WARN: Audio_PlaySlot not available")
     end
 
+    -- Trigger screen shake
+    SHARED = SHARED or {}
+    SHARED.POV = SHARED.POV or {}
+    SHARED.POV.freeShake = true
+    SHARED.POV.shakeDuration = 0.6
+    SHARED.POV.shakeAmplitude = 4.5
+    SHARED.POV.shakeSpeed = 0.03
+    log("Triggered screen shake")
+
     -- Reposition and reorient entities
     for _, entry in ipairs(ENTITY_TRANSFORMS) do
         local tr = Query.GetTransform(entry.id)

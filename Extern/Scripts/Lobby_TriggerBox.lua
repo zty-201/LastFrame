@@ -11,6 +11,12 @@ local CHAIR_B_ID = 428
 local fired = false
 local playerInsideThisZone = false
 
+local VOICEOVER_SFX_ID = "VoiceOver"
+local VO_DELAY = 1.5
+
+local pendingVO = false
+local voTimer = 0.0
+
 local function trigger_chair_drag()
     if fired then return end
 
@@ -27,11 +33,14 @@ local function trigger_chair_drag()
         by = EntityID
     }
 
+    -- Start delayed VO
+    pendingVO = true
+    voTimer = 0.0
+
     fired = true
 
     if DEBUG then
-        print("[Lobby_ChairDragTrigger] Triggered chair drag for chairs " ..
-            tostring(CHAIR_A_ID) .. " and " .. tostring(CHAIR_B_ID))
+        print("[Lobby_ChairDragTrigger] Triggered chair drag + VO scheduled")
     end
 end
 
@@ -85,6 +94,26 @@ function on_trigger_exit(self, otherID)
     end
 
     playerInsideThisZone = false
+end
+
+function on_update(self, dt)
+    dt = dt or 0.016
+
+    if pendingVO then
+        voTimer = voTimer + dt
+        if voTimer >= VO_DELAY then
+            pendingVO = false
+            voTimer = 0.0
+
+            if type(Audio_PlaySlot) == "function" then
+                Audio_PlaySlot(EntityID, VOICEOVER_SFX_ID)
+            end
+
+            if DEBUG then
+                print("[Lobby_ChairDragTrigger] VoiceOver played after delay")
+            end
+        end
+    end
 end
 
 function on_destroy(self)

@@ -15,7 +15,7 @@ local DISABLE_KEY = "CANTEEN_LIGHTS_DISABLED"
 local LIGHT_BLOWOUT_SFX_ID = "LightBlowOut"
 local LIGHT_ON_SFX_ID = "LightOn"
 
-local SHUTDOWN_DELAY = 1.2
+local SHUTDOWN_DELAY = 0.5
 local FADE_ON_DURATION = 1.0
 
 local shutdownTimer = 0.0

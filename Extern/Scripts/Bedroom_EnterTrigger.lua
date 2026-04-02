@@ -7,8 +7,20 @@ local DEBUG = true
 local PLAYER_ENTITY_ID = 381
 
 local GIRL_ENTITY_ID = 251
-local LAUGH_SLOT     = "GirlLaughing"
 local TENSION_SLOT   = "Tension"
+
+local VOICEOVER_01_SFX_ID = "VoiceOver_01"
+local VO_DELAY = 3.0
+local VOICEOVER_02_SFX_ID = "VoiceOver_02"
+local EXIT_VO_DELAY = 3.0
+
+local hasPlayedVO = false
+local pendingVO = false
+local voTimer = 0.0
+
+local hasPlayedExitVO = false
+local pendingExitVO = false
+local exitVOTimer = 0.0
 
 local playerInside = false
 
@@ -24,11 +36,11 @@ local function activate_girl()
 
     SHARED.BEDROOM_GIRL_ACTIVE = true
 
-    Audio_SetSlotVolume(GIRL_ENTITY_ID, LAUGH_SLOT, 0.3)
-    Audio_PlaySlot(GIRL_ENTITY_ID, LAUGH_SLOT)
+    -- 🔥 NEW: tell LookAt script to start crying cycle
+    SHARED.BEDROOM_START_CRY = true
 
     if DEBUG then
-        print("[Bedroom_EnterTrigger] Activated bedroom girl")
+        print("[Bedroom_EnterTrigger] Activated bedroom girl + start cry cycle")
     end
 end
 
@@ -38,7 +50,6 @@ local function deactivate_girl_permanently()
     SHARED.BEDROOM_GIRL_DONE   = true
 
     if type(Audio_StopSlot) == "function" then
-        Audio_StopSlot(GIRL_ENTITY_ID, LAUGH_SLOT)
         Audio_StopSlot(GIRL_ENTITY_ID, TENSION_SLOT)
     end
 
@@ -71,14 +82,35 @@ function on_trigger_enter(self, otherID)
 
     playerInside = true
 
+    -- If girl is already permanently gone, do not reactivate her.
+    -- Instead, play VoiceOver_02 once after a delay.
     if SHARED and SHARED.BEDROOM_GIRL_DONE == true then
         if DEBUG then
-            print("[Bedroom_EnterTrigger] Enter ignored, girl is permanently gone")
+            print("[Bedroom_EnterTrigger] Entered room after girl permanently disappeared")
+        end
+
+        if not hasPlayedExitVO and not pendingExitVO then
+            pendingExitVO = true
+            exitVOTimer = 0.0
+
+            if DEBUG then
+                print("[Bedroom_EnterTrigger] VoiceOver_02 scheduled")
+            end
         end
         return
     end
 
     activate_girl()
+
+    -- First-time delayed VO
+    if not hasPlayedVO and not pendingVO then
+        pendingVO = true
+        voTimer = 0.0
+
+        if DEBUG then
+            print("[Bedroom_EnterTrigger] First entry -> VO scheduled")
+        end
+    end
 end
 
 function on_trigger_exit(self, otherID)
@@ -88,8 +120,72 @@ function on_trigger_exit(self, otherID)
 
     playerInside = false
 
-    if SHARED and SHARED.BEDROOM_CP_REACHED == true and SHARED.BEDROOM_GIRL_DONE ~= true then
-        deactivate_girl_permanently()
+    SHARED = SHARED or {}
+
+    -- ALWAYS deactivate girl when leaving
+    SHARED.BEDROOM_GIRL_ACTIVE = false
+
+    if type(Audio_StopSlot) == "function" then
+        Audio_StopSlot(GIRL_ENTITY_ID, TENSION_SLOT)
+    end
+
+    if DEBUG then
+        print("[Bedroom_EnterTrigger] Player exited -> girl deactivated")
+    end
+
+    ----------------------------------------------------------------
+    -- ONLY mark permanently gone if checkpoint was reached
+    ----------------------------------------------------------------
+    if SHARED.BEDROOM_CP_REACHED == true and SHARED.BEDROOM_GIRL_DONE ~= true then
+        SHARED.BEDROOM_GIRL_DONE = true
+
+        if DEBUG then
+            print("[Bedroom_EnterTrigger] Girl permanently removed after checkpoint")
+        end
+    end
+end
+
+function on_update(self, dt)
+    dt = dt or 0.016
+
+    ------------------------------------------------
+    -- VO 1 (first entry)
+    ------------------------------------------------
+    if pendingVO then
+        voTimer = voTimer + dt
+        if voTimer >= VO_DELAY then
+            pendingVO = false
+            voTimer = 0.0
+            hasPlayedVO = true
+
+            if type(Audio_PlaySlot) == "function" then
+                Audio_PlaySlot(EntityID, VOICEOVER_01_SFX_ID)
+            end
+
+            if DEBUG then
+                print("[Bedroom_EnterTrigger] VoiceOver_01 played")
+            end
+        end
+    end
+
+    ------------------------------------------------
+    -- VO 2 (re-enter after girl permanently gone)
+    ------------------------------------------------
+    if pendingExitVO then
+        exitVOTimer = exitVOTimer + dt
+        if exitVOTimer >= EXIT_VO_DELAY then
+            pendingExitVO = false
+            exitVOTimer = 0.0
+            hasPlayedExitVO = true
+
+            if type(Audio_PlaySlot) == "function" then
+                Audio_PlaySlot(EntityID, VOICEOVER_02_SFX_ID)
+            end
+
+            if DEBUG then
+                print("[Bedroom_EnterTrigger] VoiceOver_02 played")
+            end
+        end
     end
 end
 

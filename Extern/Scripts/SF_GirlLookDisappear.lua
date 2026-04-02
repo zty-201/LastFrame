@@ -28,6 +28,12 @@ local SCARE_SOUND_ID = "ScareSound"
 local THUNDER_SFX_ID = "Thunder"
 local LAUGH_SFX_ID   = "GirlLaughing"
 
+local VO_REACTION_SFX_ID = "VoiceOver"
+local VO_DELAY = 1.5
+
+local pendingVO = false
+local voTimer = 0.0
+
 ------------------------------------------------
 local function get_camera()
     local SHARED = rawget(_G, "SHARED")
@@ -128,8 +134,12 @@ local function trigger_scare()
     play_3d_sfx(THUNDER_SFX_ID)
     play_3d_sfx(LAUGH_SFX_ID)
 
+    -- Start delayed voice reaction
+    pendingVO = true
+    voTimer = 0.0
+
     if DEBUG then
-        print("[GhostGirl] Scare triggered + sounds played")
+        print("[GhostGirl] Scare triggered + sounds played + VO scheduled")
     end
 end
 
@@ -156,8 +166,27 @@ end
 
 ------------------------------------------------
 function on_update(self, dt)
-    if hasTriggered then return end
     dt = dt or 0.016
+
+    -- Delayed voice reaction must still run even after scare has triggered
+    if pendingVO then
+        voTimer = voTimer + dt
+        if voTimer >= VO_DELAY then
+            pendingVO = false
+            voTimer = 0.0
+            play_3d_sfx(VO_REACTION_SFX_ID)
+
+            if DEBUG then
+                print("[GhostGirl] VoiceReaction played after delay")
+            end
+        end
+    end
+
+    -- After scare has triggered, stop the look-detection logic
+    -- but do NOT stop the delayed VO logic above
+    if hasTriggered then
+        return
+    end
 
     if SHARED and SHARED.SF_GIRL_ACTIVE == true and not isVisible then
         show_girl()

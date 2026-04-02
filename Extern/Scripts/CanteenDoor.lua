@@ -26,6 +26,17 @@ local DOOR_OPEN_SFX_ID   = "OpenDoor"
 local DOOR_CLOSE_SFX_ID  = "CloseDoor"
 local DOOR_LOCKED_SFX_ID = "DoorLocked"
 
+local VOICEOVER_01_SFX_ID = "VoiceOver_01"
+local VOICEOVER_02_SFX_ID = "VoiceOver_02"
+
+local VOICEOVER_01_DELAY = 1.5
+local VOICEOVER_02_DELAY = 1.5
+
+local hasPlayedLockedVOSequence = false
+local pendingVOSequence = false
+local voTimer = 0.0
+local voStage = 0 -- 0 = waiting VO1, 1 = waiting VO2
+
 local function play_3d_sfx(slotId)
     if type(Audio_PlaySlot) == "function" and slotId ~= nil then
         Audio_PlaySlot(EntityID, slotId)
@@ -83,6 +94,31 @@ function on_update(self, dt)
     if tr == nil then return end
     dt = dt or 0.016
 
+    ----------------------------------------------------------------
+    -- VO Sequence Handler
+    ----------------------------------------------------------------
+    if pendingVOSequence then
+        voTimer = voTimer + dt
+
+        if voStage == 0 then
+            if voTimer >= VOICEOVER_01_DELAY then
+                play_3d_sfx(VOICEOVER_01_SFX_ID)
+                voTimer = 0.0
+                voStage = 1
+                print("[CanteenDoor] VoiceOver_01 played")
+            end
+
+        elseif voStage == 1 then
+            if voTimer >= VOICEOVER_02_DELAY then
+                play_3d_sfx(VOICEOVER_02_SFX_ID)
+                pendingVOSequence = false
+                voStage = 0
+                voTimer = 0.0
+                print("[CanteenDoor] VoiceOver_02 played")
+            end
+        end
+    end
+
     local isRotating = math.abs(targetY - currentY) > 0.05
 
     if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
@@ -96,7 +132,17 @@ function on_update(self, dt)
             if cmd == "toggle" then
                 if isLocked then
                     play_3d_sfx(DOOR_LOCKED_SFX_ID)
+
+                    if not hasPlayedLockedVOSequence then
+                        pendingVOSequence = true
+                        voTimer = 0.0
+                        voStage = 0
+                        hasPlayedLockedVOSequence = true
+                        print("[CanteenDoor] First locked attempt -> VO sequence started")
+                    end
+
                     print(string.format("[CanteenDoor] TOGGLE blocked, door is LOCKED by=%s", tostring(cmdObj.by)))
+
                 else
                     if isOpen then
                         if hasBeenOpenedByPlayer then
@@ -127,7 +173,17 @@ function on_update(self, dt)
             elseif cmd == "open" then
                 if isLocked then
                     play_3d_sfx(DOOR_LOCKED_SFX_ID)
+
+                    if not hasPlayedLockedVOSequence then
+                        pendingVOSequence = true
+                        voTimer = 0.0
+                        voStage = 0
+                        hasPlayedLockedVOSequence = true
+                        print("[CanteenDoor] First locked attempt -> VO sequence started")
+                    end
+
                     print(string.format("[CanteenDoor] OPEN blocked, door is LOCKED by=%s", tostring(cmdObj.by)))
+
                 else
                     targetY = openY
                     isOpen = true
@@ -176,16 +232,11 @@ function on_update(self, dt)
         end
     end
 
+    -- Rotation
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1
-        local speed = closeSpeed
-
-        if targetY == openY then
-            speed = openSpeed
-        else
-            speed = closeSpeed
-        end
+        local speed = (targetY == openY) and openSpeed or closeSpeed
 
         currentY = currentY + dir * speed * dt
 
