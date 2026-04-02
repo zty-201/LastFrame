@@ -28,6 +28,13 @@ local iconsDisabledForever = false
 local DISC_INSERT_SFX_ID = "DiscInsert"
 local DISC_INSERT_DELAY_SECONDS = 1.0
 
+local FIRST_HOVER_VOICEOVER_SFX_ID = "VoiceOver"
+local FIRST_HOVER_VOICEOVER_DELAY = 0.6
+
+local hasPlayedFirstHoverVoiceOver = false
+local firstHoverVoiceOverPending = false
+local firstHoverVoiceOverTimer = 0.0
+
 -- Disc visual timing
 local DISC_VISUAL_DELAY = 0.4
 local discVisualPending = false
@@ -154,6 +161,42 @@ function on_update(Self, dt)
 
     -- Always drive icons
     update_icons(targetId)
+
+    ------------------------------------------------
+    -- First hover greyed-out icon voiceover
+    -- Only once, only when player is in range with no disc
+    ------------------------------------------------
+    if (not hasPlayedFirstHoverVoiceOver)
+        and (not firstHoverVoiceOverPending)
+        and (not iconsDisabledForever)
+        and in_range(targetId)
+        and disc_count() <= 0 then
+
+        firstHoverVoiceOverPending = true
+        firstHoverVoiceOverTimer = 0.0
+
+        if DEBUG then
+            print("[Test_ConsumeDisc_Shared] First hover with no disc detected -> scheduling delayed VoiceOver")
+        end
+    end
+
+    if firstHoverVoiceOverPending then
+        firstHoverVoiceOverTimer = firstHoverVoiceOverTimer + dt
+
+        if firstHoverVoiceOverTimer >= FIRST_HOVER_VOICEOVER_DELAY then
+            firstHoverVoiceOverPending = false
+            firstHoverVoiceOverTimer = 0.0
+            hasPlayedFirstHoverVoiceOver = true
+
+            if type(Audio_PlaySlot) == "function" then
+                Audio_PlaySlot(EntityID, FIRST_HOVER_VOICEOVER_SFX_ID)
+
+                if DEBUG then
+                    print("[Test_ConsumeDisc_Shared] First hover no-disc -> delayed VoiceOver played")
+                end
+            end
+        end
+    end
 
     ------------------------------------------------
     -- Disc visual delay

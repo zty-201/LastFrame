@@ -15300,6 +15300,25 @@
 					"spatial": 0,
 					"useFade": false,
 					"volume": 0.703000009059906
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						13028122712528814115,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "VoiceOver",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 0.8220000267028809
 				}
 			]
 		},
@@ -20191,13 +20210,13 @@
 					"gameStateTag": 0,
 					"id": "CloseMaindoor",
 					"loop": false,
-					"maxDistance": 500.0,
+					"maxDistance": 400.0,
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 0.12300000339746475
+					"volume": 0.04800000041723251
 				},
 				{
 					"ambienceType": 0,
@@ -20217,6 +20236,25 @@
 					"spatial": 0,
 					"useFade": false,
 					"volume": 1.7869999408721924
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16486887226349355017,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "VoiceReaction",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
 				}
 			]
 		},
@@ -28075,6 +28113,25 @@
 					"spatial": 1,
 					"useFade": false,
 					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						13028122712528814097,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "VoiceOver",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 0.5040000081062317
 				}
 			]
 		},
@@ -33153,7 +33210,7 @@
 					"minDistance": 10000.0,
 					"pitch": 1.0,
 					"playOnStart": false,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": true,
 					"volume": 0.9929999709129333
 				},
@@ -33172,7 +33229,7 @@
 					"minDistance": 10000.0,
 					"pitch": 1.0,
 					"playOnStart": false,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": true,
 					"volume": 1.0
 				},
@@ -33210,7 +33267,7 @@
 					"minDistance": 10000.0,
 					"pitch": 1.0,
 					"playOnStart": false,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": true,
 					"volume": 1.2599999904632568
 				}
@@ -33493,9 +33550,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-426.8741760253906,
+				6.592231750488281,
 				174.82949829101563,
-				417.6850891113281
+				-727.4326782226563
 			],
 			"rotation": [
 				0.0,
@@ -45367,9 +45424,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-426.8741760253906,
+				6.592231750488281,
 				174.0294952392578,
-				387.6850891113281
+				-757.4326782226563
 			],
 			"rotation": [
 				0.0,
@@ -54355,7 +54412,7 @@
 			],
 			"rotation": [
 				0.0,
-				133.97958374023438,
+				142.3005828857422,
 				0.0
 			],
 			"scale": [
@@ -54454,7 +54511,7 @@
 			],
 			"rotation": [
 				0.0,
-				133.97958374023438,
+				142.3005828857422,
 				0.0
 			],
 			"scale": [
@@ -78749,7 +78806,7 @@
 			],
 			"rotation": [
 				0.0,
-				-179.86927795410156,
+				163.87437438964844,
 				0.0
 			],
 			"scale": [
