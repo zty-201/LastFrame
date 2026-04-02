@@ -84,7 +84,7 @@ function on_update(self, dt)
     if not UI_is_MenuOpen("Android_Inventory_Buttons") then
         return
     end
-    
+
     ensure_tables()
 
     local entity_name = get_item_id()
@@ -95,13 +95,13 @@ function on_update(self, dt)
         --debug_print("android_inventory_close_state")
     end
 
-    if entity_name == "UIAndroid_InventoryOpen" then   
+    if entity_name == "UIAndroid_InventoryOpen" then
         if SHARED.UI_INVENTORY_ANDROID_STATE then
             set_visible(true)
         else
             set_visible(false)
         end
-        
+
     elseif entity_name == "UIAndroid_InventoryClose" then
 
         if SHARED.UI_INVENTORY_ANDROID_STATE then

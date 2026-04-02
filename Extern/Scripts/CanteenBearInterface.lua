@@ -67,8 +67,15 @@ function on_update(self, dt)
 
     -- Only on transitions do we change cursor/lock
     if open ~= uiWasOpen then
-        set_ui_input(open)
         uiWasOpen = open
+
+        if open then
+            -- Opening: show cursor so player can interact with the UI
+            set_ui_input(true)
+        end
+        -- Closing: do NOT force-hide cursor here.
+        -- The camera script re-locks it naturally when the player resumes movement.
+
         if DEBUG then
             print("[CanteenToyInterface_Root] UI open changed ->", tostring(open))
         end
