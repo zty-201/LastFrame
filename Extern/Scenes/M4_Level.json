@@ -44450,21 +44450,40 @@
 		"NameComponent": {
 			"name": "Canteen_Light_01"
 		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 3.0,
+			"maxStartSpeed": 6.0,
+			"minLifetime": 0.5,
+			"minStartSpeed": 2.0,
+			"spawnRate": 5.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 0.5
+		},
 		"TransformComponent": {
 			"position": [
-				220.89999389648438,
-				153.8000030517578,
-				539.2000122070313
+				220.30331420898438,
+				146.00836181640625,
+				539.6585083007813
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},

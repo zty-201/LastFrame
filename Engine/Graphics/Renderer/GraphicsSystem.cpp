@@ -117,8 +117,13 @@ namespace EngineFramework
         m_instancingSystem = std::make_unique<InstancingSystem>();
         m_instancingSystem->Initialize(MAX_INSTANCES);
 
+		// Initialize Geometry Data Buffer
         m_geometryBuffer = std::make_unique<GeometryDataBuffer>();
         m_geometryBuffer->Initialize(5000000, 15000000);
+
+		// Initialize Particle System
+        m_particleSystem = std::make_unique<ParticleSystem>();
+        m_particleSystem->Initialize();
 
         LoadBlueNoiseTextures();
         PreGeneratePrimitives();
@@ -278,8 +283,8 @@ namespace EngineFramework
 
     void GraphicsSystem::Update(float deltaTime)
     {
-        UNREFERENCED_PARAMETER(deltaTime);
-        RenderScene();
+        m_particleSystem->Update(deltaTime);
+        RenderScene(deltaTime);
     }
 
     void GraphicsSystem::PostUpdate(float deltaTime)
@@ -290,7 +295,7 @@ namespace EngineFramework
 #endif
     }
 
-    void GraphicsSystem::RenderScene()
+    void GraphicsSystem::RenderScene(float deltaTime)
     {
         // Call for ApplyPendingResize function at the top here once
         // This is so that the framebuffer reallocation happens exactly once per frame and never mid-resize event
@@ -336,6 +341,8 @@ namespace EngineFramework
             m_pointLightViewProjMatrices
         );
 
+		// Update particle system and dispatch compute
+        m_particleSystem->DispatchCompute(deltaTime);
 		
 		// ---------------------------- Rendering Passes -----------------------------
         m_geometryBuffer->Bind();
@@ -355,6 +362,7 @@ namespace EngineFramework
         // 6. Skybox pass
         SkyboxPass();
 
+        m_particleSystem->RenderParticles(viewProj, V);
 #ifdef PLATFORM_ANDROID
         GodRayPass();
 #endif

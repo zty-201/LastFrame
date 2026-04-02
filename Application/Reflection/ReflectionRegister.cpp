@@ -26,6 +26,7 @@
 #include "NameComponent.h"
 #include "ButtonComponent.hpp"
 #include "JoystickComponent.h"
+#include "ParticleEmitterComponent.h"
 
 
 /*
@@ -919,6 +920,23 @@ namespace EngineFramework
 			.func<&Remover<JoystickComponent>::RemoveComponent>("remove")
 			.func<&Getter<JoystickComponent>::GetComponent>("get")
 			.func<&GetRef<JoystickComponent>>("get_ref");
+
+		// Register joystick component
+		entt::meta_factory<ParticleEmitterComponent>()
+			.type("ParticleEmitterComponent")
+			.data<&ParticleEmitterComponent::isEmitting>("isEmitting")
+			.data<&ParticleEmitterComponent::spawnRate>("spawnRate")
+			.data<&ParticleEmitterComponent::localOffset>("localOffset")
+			.data<&ParticleEmitterComponent::minLifetime>("minLifetime")
+			.data<&ParticleEmitterComponent::maxLifetime>("maxLifetime")
+			.data<&ParticleEmitterComponent::minStartSpeed>("minStartSpeed")
+			.data<&ParticleEmitterComponent::maxStartSpeed>("maxStartSpeed")
+			.data<&ParticleEmitterComponent::startSize>("startSize")
+			.data<&ParticleEmitterComponent::startColor>("startColor")
+			.func<&Emplacer<ParticleEmitterComponent>::EmplaceComponent>("emplace")
+			.func<&Remover<ParticleEmitterComponent>::RemoveComponent>("remove")
+			.func<&Getter<ParticleEmitterComponent>::GetComponent>("get")
+			.func<&GetRef<ParticleEmitterComponent>>("get_ref");
 	}
 
 	//Helper function to cast json to the correct data type, and set comp_data.

@@ -39,5 +39,12 @@
   "Composite" : {
     "vertex":   "Extern/Graphics/Shader/GodRay.vert",
     "fragment": "Extern/Graphics/Shader/Composite.frag"
+  },
+  "ParticleSimulation" : {
+    "compute":   "Extern/Graphics/Shader/ParticleSimulation.comp"
+  },
+  "ParticleRender" : {
+    "vertex":   "Extern/Graphics/Shader/ParticleRender.vert",
+    "fragment": "Extern/Graphics/Shader/ParticleRender.frag"
   }
 }

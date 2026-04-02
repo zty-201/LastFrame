@@ -24,6 +24,7 @@
 #include "scene.h"
 #include "InstancingSystem.h"
 #include "GeometryDataBuffer.h"
+#include "ParticleSystem.h"
 
 namespace EngineFramework
 {
@@ -59,7 +60,7 @@ namespace EngineFramework
         void Update(float deltaTime) override;
         void PostUpdate(float deltaTime) override;
 
-        void RenderScene(); 
+        void RenderScene(float deltaTime);
 
         static GraphicsSystem& GetInstance(){ return *this_graphics_ptr; }
 
@@ -99,6 +100,7 @@ namespace EngineFramework
             return view.front();
         }
 
+		std::unordered_map<std::string, std::shared_ptr<Mesh::MeshData>> GetMeshCache() { return meshCache; }
         // Simple get and set functions for Fog Control Parameters
         // Anisotrophy
         void SetAnisotrophy(float value) { m_anisotropy = value; }
@@ -196,6 +198,7 @@ namespace EngineFramework
 		// Instancing system for batching and culling
         std::unique_ptr<InstancingSystem> m_instancingSystem;
         std::unique_ptr<GeometryDataBuffer> m_geometryBuffer;
+		std::unique_ptr<ParticleSystem> m_particleSystem;
 
 		// Shader GUIDs
         xresource::full_guid mesh_shader_guid;
@@ -213,8 +216,7 @@ namespace EngineFramework
 
 		// Cached resources
         std::unordered_map<std::string, std::shared_ptr<Mesh::MeshData>> meshCache;
-        std::unordered_map<std::string, std::pair<GLuint, size_t>> meshCacheWire;
-
+        
 		// Shadow mapping resources
         static const int CASCADE_COUNT = 3;
 
