@@ -554,12 +554,13 @@
 				815,
 				816,
 				991,
-				1002
+				1002,
+				409
 			],
 			"name": "Bedroom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				39,
 				163,
@@ -615,7 +616,7 @@
 			"name": "Storeroom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				408,
 				410,
@@ -799,7 +800,7 @@
 			"name": "SF_Ceiling"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				184,
 				185,
@@ -817,7 +818,7 @@
 			"name": "SF_Corridor"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				724,
 				747,
@@ -865,11 +866,12 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				5,
 				2,
-				381
+				381,
+				12
 			],
 			"name": "Player"
 		},

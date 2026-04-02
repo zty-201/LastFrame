@@ -48,7 +48,41 @@ local function consume_toggle(id)
     return true
 end
 
+-- Shared put-down logic: close UI, unlock canteen door, restore lights
+local function put_down_toy()
+    SHARED[UI_TABLE][TOY_ID] = false
+
+    SHARED[DOOR_CMD_TABLE][CANTEEN_DOOR_ID] = {
+        cmd = "unlock",
+        by = EntityID
+    }
+
+    SHARED[LIGHTS_CMD_TABLE]["CANTEEN_LIGHTS_ON"]       = true
+    SHARED[LIGHTS_CMD_TABLE]["CANTEEN_LIGHTS_OFF"]      = false
+    SHARED[LIGHTS_CMD_TABLE]["CANTEEN_LIGHTS_DISABLED"] = false
+
+    if UI_DisplayMenu then UI_DisplayMenu(MENU_NAME) end
+
+    if DEBUG then
+        print("[CanteenToy_TriggerBox] Toy put down -> unlocking canteen door, lights on")
+    end
+end
+
 function on_update(self, dt)
+
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        UI_CloseMenu(MENU_NAME)
+        return
+    end
+
+    -- Auto-close (put down) if player walked out of the zone while holding the toy
+    if SHARED[UI_TABLE][TOY_ID] == true
+       and not (SHARED.INTERACT_IN_ZONE and SHARED.INTERACT_IN_ZONE[TOY_ID] == true) then
+        if DEBUG then print("[CanteenToy_TriggerBox] Auto put-down: player left zone") end
+        put_down_toy()
+    end
+
     if not consume_toggle(TOY_ID) then return end
 
     local wasOpen = (SHARED[UI_TABLE][TOY_ID] == true)
@@ -75,23 +109,9 @@ function on_update(self, dt)
             print("[CanteenToy_TriggerBox] UI_OPEN =", tostring(SHARED[UI_TABLE][TOY_ID]))
         end
     else
-        -- PUT DOWN TOY -> UNLOCK CANTEEN DOOR + TURN LIGHTS BACK ON
-        SHARED[DOOR_CMD_TABLE][CANTEEN_DOOR_ID] = {
-            cmd = "unlock",
-            by = EntityID
-        }
-
-        SHARED[LIGHTS_CMD_TABLE]["CANTEEN_LIGHTS_ON"] = true
-        SHARED[LIGHTS_CMD_TABLE]["CANTEEN_LIGHTS_OFF"] = false
-        SHARED[LIGHTS_CMD_TABLE]["CANTEEN_LIGHTS_DISABLED"] = false
-
-        if UI_DisplayMenu then
-            UI_DisplayMenu(MENU_NAME)
-        end
-
+        -- PUT DOWN TOY manually
+        put_down_toy()
         if DEBUG then
-            print("[CanteenToy_TriggerBox] Toy put down -> unlocking canteen door")
-            print("[CanteenToy_TriggerBox] Triggered CANTEEN_LIGHTS_ON")
             print("[CanteenToy_TriggerBox] UI_OPEN =", tostring(SHARED[UI_TABLE][TOY_ID]))
         end
     end

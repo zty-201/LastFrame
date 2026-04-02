@@ -66,6 +66,22 @@ function on_create(self)
 end
 
 function on_update(self, dt)
+
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        UI_CloseMenu(MENU_NAME)
+        return
+    end
+
+
+    -- Auto-close if player walked out of the zone while the UI was open
+    if SHARED[UI_TABLE][TOY_ID] == true
+       and not (SHARED.INTERACT_IN_ZONE and SHARED.INTERACT_IN_ZONE[TOY_ID] == true) then
+        if UI_CloseMenu ~= nil then UI_CloseMenu(MENU_NAME) end
+        SHARED[UI_TABLE][TOY_ID] = false
+        if DEBUG then print("[ExplosionToy_TriggerBox] Auto-closed: player left zone") end
+    end
+
     if not consume_toggle(TOY_ID) then
         return
     end

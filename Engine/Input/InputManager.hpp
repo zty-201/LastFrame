@@ -90,6 +90,7 @@ namespace EngineFramework
         static std::pair<double, double> GetMousePosition();
         static std::pair<double, double> GetMouseDelta();
         static std::pair<double, double> GetScrollDelta();
+        static std::pair<double, double> GetTouchPosition(int pointerId);
 
         // --- Window events ---
         static std::pair<int, int> GetWindowSize();
@@ -109,7 +110,7 @@ namespace EngineFramework
         static void UpdateGyroscope(float x, float y, float z, long long timestamp);
 
         static void UpdateKey(int keyCode, bool isDown);
-        static void UpdateTouch(int action, float x, float y);
+        static void UpdateTouch(int action, int pointerId, float x, float y);
 
         //Mutators for JNI
         static void SetWindowWidth(int width);
@@ -146,6 +147,7 @@ namespace EngineFramework
 
         // --- State storage ---
         static std::unordered_map<int, KeyState> mouseButtonStates;
+        static std::unordered_map<int, std::pair<double, double>> touchPositions;
 
         static double mouseX, mouseY;
         static double lastMouseX, lastMouseY;

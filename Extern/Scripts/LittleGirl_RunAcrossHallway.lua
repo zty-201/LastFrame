@@ -8,6 +8,7 @@
 local DEBUG = true
 
 local RUN_AUDIO_SLOT = "Running"
+local LAUGH_AUDIO_SLOT = "Laughing"
 
 local runActive = false
 local runTimer = 0.0
@@ -70,6 +71,8 @@ function on_update(self, dt)
         if type(Audio_PlaySlot) == "function" then
             Audio_StopSlot(EntityID, RUN_AUDIO_SLOT)
             Audio_PlaySlot(EntityID, RUN_AUDIO_SLOT)
+                Audio_StopSlot(EntityID, LAUGH_AUDIO_SLOT)
+            Audio_PlaySlot(EntityID, LAUGH_AUDIO_SLOT)
         end
 
         if DEBUG then
@@ -102,6 +105,7 @@ function on_update(self, dt)
         -- Stop running sound
         if type(Audio_StopSlot) == "function" then
             Audio_StopSlot(EntityID, RUN_AUDIO_SLOT)
+            Audio_StopSlot(EntityID, LAUGH_AUDIO_SLOT)
         end
 
         hide_girl()

@@ -207,12 +207,17 @@ function on_create(self)
 end
 
 function on_update(self, dt)
+
+    --comment this code if u dont want other states to close it
     local state_name = StateMachine_GetCurrentStateName()
     if state_name ~= "Gameplay" then
+        set_visible(false)
         return
     end
+    --comment this code if u dont want other states to close it
 
     ensure_tables()
+
     
     -- Android state control
     if PLATFORM == "android" then
@@ -255,6 +260,14 @@ function on_update(self, dt)
         end
         prevTogglePressed = pressed
     end
+
+    --comment this code if u dont want other states to close it
+    if SHARED.UI_INVENTORY_OPEN then
+        set_visible(true)
+    else
+        set_visible(false)
+    end
+    --comment this code if u dont want other states to close it
     
         
 end

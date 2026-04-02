@@ -18,12 +18,22 @@ local ITEM_QTY = 1
 
 local TARGET_ENTITY_ID = 0
 
+-- ID of the nearby notes interactable — forward unused E presses to it
+local NOTES_FORWARD_ID = 822
+
 -- Once we consume one disc, never show any icons again
 local iconsDisabledForever = false
 
 -- Audio / timing
 local DISC_INSERT_SFX_ID = "DiscInsert"
 local DISC_INSERT_DELAY_SECONDS = 1.0
+
+local FIRST_HOVER_VOICEOVER_SFX_ID = "VoiceOver"
+local FIRST_HOVER_VOICEOVER_DELAY = 0.6
+
+local hasPlayedFirstHoverVoiceOver = false
+local firstHoverVoiceOverPending = false
+local firstHoverVoiceOverTimer = 0.0
 
 -- Disc visual timing
 local DISC_VISUAL_DELAY = 0.4
@@ -91,6 +101,18 @@ local function hide_icons_forever(targetId)
     send_nodisc_icon_cmd(targetId, "hide")
 end
 
+-- Forward an E press to the notes interactable if the player is in its zone
+local function try_forward_to_notes(cmd)
+    if not (SHARED and SHARED.INTERACT_IN_ZONE and SHARED.INTERACT_IN_ZONE[NOTES_FORWARD_ID]) then
+        return
+    end
+    SHARED.DOOR_CMD = SHARED.DOOR_CMD or {}
+    SHARED.DOOR_CMD[NOTES_FORWARD_ID] = cmd
+    if DEBUG then
+        print("[Test_ConsumeDisc_Shared] Forwarding command to notes id=" .. tostring(NOTES_FORWARD_ID))
+    end
+end
+
 local function update_icons(targetId)
     if iconsDisabledForever then
         hide_icons_forever(targetId)
@@ -139,6 +161,42 @@ function on_update(Self, dt)
 
     -- Always drive icons
     update_icons(targetId)
+
+    ------------------------------------------------
+    -- First hover greyed-out icon voiceover
+    -- Only once, only when player is in range with no disc
+    ------------------------------------------------
+    if (not hasPlayedFirstHoverVoiceOver)
+        and (not firstHoverVoiceOverPending)
+        and (not iconsDisabledForever)
+        and in_range(targetId)
+        and disc_count() <= 0 then
+
+        firstHoverVoiceOverPending = true
+        firstHoverVoiceOverTimer = 0.0
+
+        if DEBUG then
+            print("[Test_ConsumeDisc_Shared] First hover with no disc detected -> scheduling delayed VoiceOver")
+        end
+    end
+
+    if firstHoverVoiceOverPending then
+        firstHoverVoiceOverTimer = firstHoverVoiceOverTimer + dt
+
+        if firstHoverVoiceOverTimer >= FIRST_HOVER_VOICEOVER_DELAY then
+            firstHoverVoiceOverPending = false
+            firstHoverVoiceOverTimer = 0.0
+            hasPlayedFirstHoverVoiceOver = true
+
+            if type(Audio_PlaySlot) == "function" then
+                Audio_PlaySlot(EntityID, FIRST_HOVER_VOICEOVER_SFX_ID)
+
+                if DEBUG then
+                    print("[Test_ConsumeDisc_Shared] First hover no-disc -> delayed VoiceOver played")
+                end
+            end
+        end
+    end
 
     ------------------------------------------------
     -- Disc visual delay
@@ -198,14 +256,16 @@ function on_update(Self, dt)
         return
     end
 
-    if iconsDisabledForever then
-        return
-    end
-
     if not SHARED.DOOR_CMD then return end
 
     local cmd = consume_shared_cmd(SHARED.DOOR_CMD, targetId)
     if not cmd_is_interact(cmd) then
+        return
+    end
+
+    -- Disc already consumed — pass E through to the notes if player is in that zone
+    if iconsDisabledForever then
+        try_forward_to_notes(cmd)
         return
     end
 
@@ -224,8 +284,9 @@ function on_update(Self, dt)
 
     if disc_count() <= 0 then
         if DEBUG then
-            print("[Test_ConsumeDisc_Shared] No Music Disc to consume")
+            print("[Test_ConsumeDisc_Shared] No Music Disc to consume — forwarding to notes")
         end
+        try_forward_to_notes(cmd)
         return
     end
 
@@ -260,6 +321,11 @@ function on_update(Self, dt)
     pendingTimer = 0.0
 
     -- After first successful consume, disable icons forever
+    -- and remove from the interaction zone so nearby interactables (e.g. playroom notes)
+    -- can receive E-press commands without the disc entity stealing them
     iconsDisabledForever = true
     hide_icons_forever(targetId)
+    if SHARED.INTERACT_IN_ZONE then
+        SHARED.INTERACT_IN_ZONE[targetId] = false
+    end
 end

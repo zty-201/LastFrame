@@ -13,6 +13,11 @@ local isUnlocked = false
 local currentY   = 0.0
 local targetY    = 0.0
 
+local hasPlayedLockedVoiceOver = false
+local pendingVoiceOverDelay = false
+local voiceOverTimer = 0.0
+local VOICE_OVER_DELAY = 1.5
+
 -- ✅ NEW: once door has opened at least once, icons never show again
 local iconsDisabledForever = false
 
@@ -20,6 +25,7 @@ local iconsDisabledForever = false
 local SFX_DOOR_LOCKED  = "DoorLocked"
 local SFX_DOOR_UNLOCK  = "DoorUnlock"
 local SFX_DOOR_OPEN    = "DoorOpen"
+local SFX_VOICE_OVER    = "VoiceOver"
 
 local function play_3d_sfx(slotId)
     if type(Audio_PlaySlot) == "function" and type(slotId) == "string" then
@@ -198,6 +204,8 @@ function on_update(self, dt)
     local tr = Query.GetTransform(EntityID)
     if tr == nil then return end
 
+    dt = dt or 0.016
+
     publish_can_unlock()
     update_icons()
 
@@ -210,8 +218,12 @@ function on_update(self, dt)
 
         local cmd = cmdObj.cmd
 
+        -- Once opened, ignore all further interaction commands
+        if iconsDisabledForever then
+            -- command already consumed/cleared above; just let rotation finish
+
         -- Ignore interaction while the door is still rotating
-        if not isRotating then
+        elseif not isRotating then
             -- ========================================================
             -- STATE 1/2: LOCKED or UNLOCKABLE -> handle unlock attempt
             -- ========================================================
@@ -219,6 +231,14 @@ function on_update(self, dt)
                 if not inv_has_key(REQUIRED_KEY_ID) then
                     -- LOCKED
                     play_3d_sfx(SFX_DOOR_LOCKED)
+
+                    -- Only schedule the voiceover the first time
+                    if not hasPlayedLockedVoiceOver then
+                        pendingVoiceOverDelay = true
+                        voiceOverTimer = VOICE_OVER_DELAY
+                        hasPlayedLockedVoiceOver = true
+                    end
+
                     if DEBUG then
                         print("[PlayroomDoor] LOCKED -> DoorLocked SFX")
                     end
@@ -291,8 +311,20 @@ function on_update(self, dt)
         end
     end
 
+    -- delayed first-time locked voiceover
+    if pendingVoiceOverDelay then
+        voiceOverTimer = voiceOverTimer - dt
+        if voiceOverTimer <= 0.0 then
+            pendingVoiceOverDelay = false
+            play_3d_sfx(SFX_VOICE_OVER)
+
+            if DEBUG then
+                print("[PlayroomDoor] First locked attempt -> delayed VoiceOver SFX")
+            end
+        end
+    end
+
     -- rotation
-    dt = dt or 0.016
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1

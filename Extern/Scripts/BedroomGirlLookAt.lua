@@ -8,14 +8,26 @@ local DEBUG               = true
 local LOG_EVERY_N_FRAMES  = 15
 
 local MAX_DISTANCE            = 3000.0
-local LOOK_DOT_THRESHOLD      = 0.95
+local LOOK_DOT_THRESHOLD      = 0.97
 local REQUIRED_LOOK_TIME      = 0.10   -- seconds to confirm look (plays SubtleJingle, starts ramp)
 local STOP_LOOKING_DELAY      = 6.0    -- seconds of continuous look before silence + StopLooking
 local SILENCE_BEFORE_JINGLE   = 0.0    -- seconds of silence after threshold before StopLooking plays
 local EPIC_SOUND_OFFSET       = 0.0    -- seconds into silence when EpicSound plays (before StopLooking)
 local GIRL_LOOK_HEIGHT_OFFSET = 60.0
 
-local LAUGH_SLOT       = "GirlLaughing"
+local CRY_SLOTS = {
+    { name = "Cry_01", duration = 3.5 },
+    { name = "Cry_02", duration = 2.6 },
+    { name = "Cry_03", duration = 2.1 },
+    { name = "Cry_04", duration = 1.8 },
+    { name = "Cry_05", duration = 1.4 }
+}
+
+local currentCryIndex = -1
+local cryTimer = 0.0
+local cryDuration = 0.0
+local currentCrySlot = nil
+
 local TENSION_SLOT     = "Tension"
 local LAUGH_VOL_MIN    = 0.3   -- volume when player is not looking
 local LAUGH_VOL_MAX    = 1.0   -- volume at full 3s look threshold
@@ -27,7 +39,6 @@ local isLooking         = false   -- player is currently looking at girl
 local thresholdMet      = false   -- 3s look threshold reached; silence delay counting
 local stopLookingPlayed = false   -- StopLooking already fired this look session
 local epicSoundPlayed   = false   -- EpicSound already fired this look session
-local jinglePlayed      = false   -- SubtleJingle fires only once ever
 local lookTimer         = 0.0
 local silenceTimer      = 0.0
 local frame             = 0
@@ -103,7 +114,32 @@ local function stop_tension()
     end
 end
 
+local function play_random_cry()
+    if #CRY_SLOTS == 0 then return end
+
+    local index
+    repeat
+        index = math.random(1, #CRY_SLOTS)
+    until index ~= currentCryIndex
+
+    currentCryIndex = index
+    local cry = CRY_SLOTS[index]
+
+    currentCrySlot = cry.name
+    cryDuration = cry.duration
+    cryTimer = 0.0
+
+    Audio_SetSlotVolume(EntityID, currentCrySlot, LAUGH_VOL_MIN)
+    Audio_PlaySlot(EntityID, currentCrySlot)
+
+    if DEBUG then
+        print("[BedroomGirlLookAt] Playing cry:", currentCrySlot)
+    end
+end
+
 local function reset_look_state()
+    local wasLooking = isLooking
+    
     isLooking         = false
     thresholdMet      = false
     stopLookingPlayed = false
@@ -113,8 +149,29 @@ local function reset_look_state()
 
     stop_tension()
 
-    Audio_SetSlotVolume(EntityID, LAUGH_SLOT, LAUGH_VOL_MIN)
-    Audio_PlaySlot(EntityID, LAUGH_SLOT)
+    ------------------------------------------------
+    -- PLAY TENSION OFF (only when player looked before)
+    ------------------------------------------------
+    if wasLooking then
+        if type(Audio_PlaySlot) == "function" then
+            Audio_PlaySlot(EntityID, "TensionOff")
+        end
+
+        if DEBUG then
+            print("[BedroomGirlLookAt] TensionOff played (look ended)")
+        end
+    end
+
+    if currentCrySlot and type(Audio_StopSlot) == "function" then
+        Audio_StopSlot(EntityID, currentCrySlot)
+    end
+
+    currentCrySlot = nil
+
+    if SHARED and SHARED.POV then
+        SHARED.POV.shake = false
+        SHARED.POV.freeShakeSustain = false
+    end
 end
 
 local function deactivate_look_state()
@@ -127,8 +184,14 @@ local function deactivate_look_state()
 
     stop_tension()
 
-    if type(Audio_StopSlot) == "function" then
-        Audio_StopSlot(EntityID, LAUGH_SLOT)
+    if currentCrySlot and type(Audio_StopSlot) == "function" then
+        Audio_StopSlot(EntityID, currentCrySlot)
+    end
+
+    if SHARED and SHARED.POV then
+        SHARED.POV.shake = false
+        SHARED.POV.freeShake = false
+        SHARED.POV.freeShakeSustain = false
     end
 end
 
@@ -166,7 +229,6 @@ function on_create(self)
     thresholdMet      = false
     stopLookingPlayed = false
     epicSoundPlayed   = false
-    jinglePlayed      = false
     tensionPlaying    = false
     lookTimer         = 0.0
     silenceTimer      = 0.0
@@ -186,15 +248,76 @@ function on_update(self, dt)
     local girlDone   = SHARED and SHARED.BEDROOM_GIRL_DONE == true
     local girlActive = SHARED and SHARED.BEDROOM_GIRL_ACTIVE == true and not girlDone
 
+    local inZone = SHARED and SHARED.INTERACT_IN_ZONE and SHARED.INTERACT_IN_ZONE[TRIGGER_ZONE_ID] == true
+
     if girlActive and not isGirlVisible then
         show_girl()
     elseif ((not girlActive) or girlDone) and isGirlVisible then
         hide_girl()
     end
 
-    if (not girlActive) or girlDone then
+    ------------------------------------------------
+    -- 🔴 HARD STOP if player NOT in bedroom
+    ------------------------------------------------
+    if not inZone or (not girlActive) or girlDone then
+        if currentCrySlot and type(Audio_StopSlot) == "function" then
+            Audio_StopSlot(EntityID, currentCrySlot)
+        end
+
+        currentCrySlot = nil
         deactivate_look_state()
         return
+    end
+
+    ------------------------------------------------
+    -- START CRY when activated
+    ------------------------------------------------
+    if SHARED and SHARED.BEDROOM_START_CRY == true then
+        SHARED.BEDROOM_START_CRY = false
+
+        if currentCrySlot and type(Audio_StopSlot) == "function" then
+            Audio_StopSlot(EntityID, currentCrySlot)
+        end
+
+        play_random_cry()
+
+        if DEBUG then
+            print("[BedroomGirlLookAt] Initial cry started")
+        end
+    end
+
+    ------------------------------------------------
+    -- CONTINUOUS CRY LOOP (ONLY when inside room)
+    ------------------------------------------------
+    if not isLooking and not thresholdMet then
+        if currentCrySlot == nil then
+            play_random_cry()
+        else
+            cryTimer = cryTimer + dt
+
+            if cryTimer >= cryDuration then
+                if currentCrySlot and type(Audio_StopSlot) == "function" then
+                    Audio_StopSlot(EntityID, currentCrySlot)
+                end
+
+                play_random_cry()
+            end
+        end
+    end
+
+    -- Start crying cycle when activated
+    if SHARED and SHARED.BEDROOM_START_CRY == true then
+        SHARED.BEDROOM_START_CRY = false
+
+        if currentCrySlot and type(Audio_StopSlot) == "function" then
+            Audio_StopSlot(EntityID, currentCrySlot)
+        end
+
+        play_random_cry()
+
+        if DEBUG then
+            print("[BedroomGirlLookAt] Initial cry started")
+        end
     end
 
     -- Rotate girl to 270 degrees after pull finishes
@@ -253,39 +376,69 @@ function on_update(self, dt)
     if inRange and d >= LOOK_DOT_THRESHOLD then
         lookTimer = lookTimer + dt
 
-        -- Confirm look (0.10s): play SubtleJingle once, mark looking
+        -- Confirm look: play SubtleJingle once, mark looking
         if not isLooking and lookTimer >= REQUIRED_LOOK_TIME then
             isLooking = true
             start_tension()
+        end
 
-            if not jinglePlayed then
-                jinglePlayed = true
-                Audio_PlaySlot(EntityID, "SubtleJingle")
-                if DEBUG then
-                    print("[BedroomGirlLookAt] Look confirmed -> play SubtleJingle")
-                end
+        -- Ramp cry + camera shake intensity as player stares
+        if isLooking and not thresholdMet then
+            ------------------------------------------------
+            -- AUDIO INTENSITY (optional scaling)
+            ------------------------------------------------
+            local t = math.min(lookTimer / STOP_LOOKING_DELAY, 1.0)
+
+            local vol = LAUGH_VOL_MIN + (LAUGH_VOL_MAX - LAUGH_VOL_MIN) * t
+            if currentCrySlot then
+                Audio_SetSlotVolume(EntityID, currentCrySlot, vol)
+            end
+
+            ------------------------------------------------
+            -- CAMERA SHAKE (progressively stronger, subtle)
+            ------------------------------------------------
+            SHARED = SHARED or {}
+            SHARED.POV = SHARED.POV or {}
+
+            SHARED.POV.freeShakeSustain = true
+
+            -- smoother curve (ease-in instead of linear)
+            local tSmooth = t * t   -- slow start, ramps later
+
+            -- MUCH more subtle values
+            SHARED.POV.freeShakeAmplitude = 0.3 + (2.2 * tSmooth)
+
+            -- slower jitter (less chaotic)
+            SHARED.POV.freeShakeSpeed = 0.08 - (0.05 * tSmooth)
+
+            if SHARED.POV.freeShakeSpeed < 0.02 then
+                SHARED.POV.freeShakeSpeed = 0.02
+            end
+
+            if DEBUG then
+                print(string.format(
+                    "[BedroomGirlLookAt] Subtle shake t=%.2f amp=%.2f speed=%.3f",
+                    tSmooth,
+                    SHARED.POV.freeShakeAmplitude,
+                    SHARED.POV.freeShakeSpeed
+                ))
             end
         end
 
-        -- Ramp laugh volume up toward 3s threshold
-        if isLooking and not thresholdMet then
-            local t = math.min(lookTimer / STOP_LOOKING_DELAY, 1.0)
-            local vol = LAUGH_VOL_MAX
-            Audio_SetSlotVolume(EntityID, LAUGH_SLOT, vol)
-        end
-
-        -- 3s threshold: stop laugh, begin silence
+        -- Threshold reached: stop cry, begin silence
         if isLooking and not thresholdMet and lookTimer >= STOP_LOOKING_DELAY then
             thresholdMet = true
             silenceTimer = 0.0
             stop_tension()
-            Audio_StopSlot(EntityID, LAUGH_SLOT)
+            if currentCrySlot then
+                Audio_StopSlot(EntityID, currentCrySlot)
+            end
             if DEBUG then
-                print("[BedroomGirlLookAt] 3s threshold -> stop laugh, silence starts")
+                print("[BedroomGirlLookAt] Threshold reached -> stop cry, silence starts")
             end
         end
 
-        -- Silence countdown: EpicSound at 0.5s, StopLooking at 1s
+        -- Silence countdown: EpicSound / StopLooking
         if thresholdMet then
             silenceTimer = silenceTimer + dt
 
@@ -294,14 +447,14 @@ function on_update(self, dt)
                 Audio_PlaySlot(EntityID, "EpicSound")
                 Audio_PlaySlot(EntityID, "Lightning")
                 if DEBUG then
-                    print("[BedroomGirlLookAt] 0.5s -> play EpicSound")
+                    print("[BedroomGirlLookAt] EpicSound triggered")
                 end
             end
 
             if not stopLookingPlayed and silenceTimer >= SILENCE_BEFORE_JINGLE then
                 stopLookingPlayed = true
                 Audio_PlaySlot(EntityID, "StopLooking")
-                -- Lock camera onto the doll + violent shake
+
                 SHARED = SHARED or {}
                 SHARED.POV = SHARED.POV or {}
                 SHARED.POV.locked           = true
@@ -313,8 +466,9 @@ function on_update(self, dt)
                 SHARED.POV.shakePullAmount  = 1500.0
                 rotateAfterPull = true
                 rotateTimer     = 0.0
+
                 if DEBUG then
-                    print("[BedroomGirlLookAt] 1s -> play StopLooking + lock + shake")
+                    print("[BedroomGirlLookAt] StopLooking + lock + shake triggered")
                 end
             end
         end
@@ -322,7 +476,7 @@ function on_update(self, dt)
         if isLooking or tensionPlaying or lookTimer > 0.0 then
             reset_look_state()
             if DEBUG then
-                print("[BedroomGirlLookAt] LOOK END -> reset tension + resume laugh")
+                print("[BedroomGirlLookAt] LOOK END -> reset tension + resume cry")
             end
         else
             lookTimer = 0.0
@@ -337,7 +491,6 @@ function on_destroy(self)
     thresholdMet      = false
     stopLookingPlayed = false
     epicSoundPlayed   = false
-    jinglePlayed      = false
     lookTimer         = 0.0
     silenceTimer      = 0.0
 end

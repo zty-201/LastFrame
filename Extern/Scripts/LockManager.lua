@@ -158,6 +158,7 @@ function on_update(self, dt)
         do_success           = false
         SHARED[UI_TABLE]     = false
         SHARED.LOCK_DISABLED = true
+        SHARED.LOCK_SUCCESS  = true
         reset_pressed()
         UI_CloseAllMenus()
         if PLATFORM == "android" then

@@ -26,6 +26,25 @@ function on_create(self)
 end
 
 function on_update(self, dt)
+
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        UI_CloseMenu(MENU_NAME)
+        return
+    end
+    
+    -- Auto-close if player walked out of the zone while the UI was open
+    if SHARED[UI_TABLE][FOLDER_ID] == true
+       and not (SHARED.INTERACT_IN_ZONE and SHARED.INTERACT_IN_ZONE[FOLDER_ID] == true) then
+        if UI_CloseAllMenus ~= nil then UI_CloseAllMenus() end
+        SHARED[UI_TABLE][FOLDER_ID] = false
+        if PLATFORM == "android" then
+            if UI_DisplayMenu_InvisibleLayer ~= nil then UI_DisplayMenu_InvisibleLayer("Android_Inventory_Buttons") end
+            if UI_DisplayMenu ~= nil then UI_DisplayMenu("AndroidInputOverlay") end
+        end
+        print("[Folder_TriggerBox] Auto-closed: player left zone")
+    end
+
     if not consume_toggle(FOLDER_ID) then return end
 
     local nowOpen = not (SHARED[UI_TABLE][FOLDER_ID] == true)

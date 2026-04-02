@@ -1,7 +1,12 @@
 {
+    "BackIcon": 8317419081744449537,
     "Background_Albedo": 6617529915295449089,
     "Background_Normal": 4888147658385178627,
     "Background_Roughness": 16417362704453648389,
+    "Battery1Bar": 3705733063317061635,
+    "Battery2Bar": 10046801338654720005,
+    "BatteryEmpty": 2552811558710214663,
+    "BatteryFull": 14082026604778684425,
     "BoltCutter_Icon": 17603014649418219521,
     "Bronze": 2791977153955069953,
     "BrownWood": 12015349190809845763,

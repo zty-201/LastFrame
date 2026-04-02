@@ -14,4 +14,13 @@ function on_update(self, dt)
     if not UI then return end
     local page = SHARED.FOLDER_PAGE or 0
     UI:SetVisible(folder_open() and PAGE_NUM <= page)
+
+
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        --UI_CloseMenu(MENU_NAME)
+        UI:SetVisible(false)
+        --return
+    end
+    
 end

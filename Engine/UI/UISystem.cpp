@@ -394,7 +394,7 @@ namespace EngineFramework
                 menu.first->removeAllEntities_Reg(); //only update those active ones
             }
         }
-
+        
         Menu_Mapping.clear();
         current_menu.clear();
 
@@ -428,66 +428,90 @@ namespace EngineFramework
         return true;
     }
 
-    void UI_System::Update(float deltaTime)
+void UI_System::Update(float deltaTime)
+{
+    // Allow skipping cutscenes with Space (desktop) or tap anywhere (Android)
+    if (gCutscene.playing)
     {
-        // Allow skipping cutscenes with Space (desktop) or tap anywhere (Android)
-        if (gCutscene.playing)
+        bool shouldSkip = false;
+
+        // Desktop / existing input
+        if (InputManager::GetInstance().GetAction("JUMP"))
         {
-            bool shouldSkip = false;
-
-            // Desktop / existing input
-            if (InputManager::GetInstance().GetAction("JUMP"))
-            {
-                shouldSkip = true;
-            }
-
-#if defined(PLATFORM_ANDROID)
-            // Tap-anywhere skip (rising edge only)
-            static bool wasTouchDownLastFrame = false;
-            bool isTouchDownThisFrame = InputManager::GetInstance().GetMouseButton(0);
-
-            if (isTouchDownThisFrame && !wasTouchDownLastFrame)
-            {
-                shouldSkip = true;
-            }
-
-            wasTouchDownLastFrame = isTouchDownThisFrame;
-#endif
-
-            if (shouldSkip)
-            {
-                gCutscene.Skip();
-            }
+            shouldSkip = true;
         }
 
-        // 1) Tick cutscene sequence FIRST
-        gCutscene.Update(deltaTime);
-        // 2) Tick rolling credits
-        gCreditsRoll.Update(deltaTime);
+#if defined(PLATFORM_ANDROID)
+        // Tap-anywhere skip (rising edge only)
+        static bool wasTouchDownLastFrame = false;
+        bool isTouchDownThisFrame = InputManager::GetInstance().GetMouseButton(0);
 
-        // 2) Update only active menus
-        for (auto& [name, menu] : Menu_Mapping)
+        if (isTouchDownThisFrame && !wasTouchDownLastFrame)
         {
-            if (menu.first)
+            shouldSkip = true;
+        }
+
+        wasTouchDownLastFrame = isTouchDownThisFrame;
+#endif
+
+        if (shouldSkip)
+        {
+            gCutscene.Skip();
+        }
+    }
+
+    // Fast-forward credits while holding input
+    if (gCreditsRoll.playing)
+    {
+        float creditsMultiplier = 1.0f;
+
+        // Desktop: hold jump / space to scroll faster
+        if (InputManager::GetInstance().GetAction("JUMP"))
+        {
+            creditsMultiplier = 4.0f; // change to 3.0f / 5.0f if you want
+        }
+
+#if defined(PLATFORM_ANDROID)
+        // Android: hold touch to fast-forward
+        if (InputManager::GetInstance().GetMouseButton(0))
+        {
+            creditsMultiplier = 4.0f;
+        }
+#endif
+
+        gCreditsRoll.speedMultiplier = creditsMultiplier;
+    }
+    else
+    {
+        gCreditsRoll.speedMultiplier = 1.0f;
+    }
+
+    // 1) Tick cutscene sequence FIRST
+    gCutscene.Update(deltaTime);
+
+    // 2) Tick rolling credits
+    gCreditsRoll.Update(deltaTime);
+
+    // 3) Update only active menus
+    for (auto& [name, menu] : Menu_Mapping)
+    {
+        if (menu.first)
+        {
+            if (menu.second)
             {
-                if (menu.second)
+                menu.first->Update();
+                if (name == "AndroidInputOverlay")
                 {
-                    menu.first->Update();
-                    if (name == "AndroidInputOverlay")
-                    {
-                        update_Joysticks();
-                    }
+                    update_Joysticks();
                 }
             }
         }
     }
+}
 
     void UI_System::update_Joysticks()
     {
         auto view = GameObjectSystem::GetRegistry().view<JoystickComponent>();
-
-        std::pair<double, double> mousePos = InputManager::GetInstance().GetMousePosition();
-        bool isTouchDown = InputManager::GetInstance().GetMouseButton(0);
 
         float screenWidth = (float)InputManager::GetInstance().GetScreenSize().first;
         float screenHeight = (float)InputManager::GetInstance().GetScreenSize().second;
@@ -526,24 +550,36 @@ namespace EngineFramework
             }
 
             glm::vec2 currentOffset{ 0.f, 0.f };
-            if (isTouchDown)
+
+            if (!joystick.isBeingDragged)
             {
-                //Check if clicked inside joystick area to start dragging
-                if (!joystick.isBeingDragged)
+                for (int i = 0; i < 5; ++i)
                 {
-                    float dist = glm::distance(glm::vec2(mousePos.first, mousePos.second), joystick.baseCenter);
-                    if (dist <= joystick.maxRadius)
+                    if (InputManager::GetInstance().GetMouseButton(i))
                     {
-                        joystick.isBeingDragged = true;
+                        auto touchPair = InputManager::GetInstance().GetTouchPosition(i);
+                        glm::vec2 touchPos((float)touchPair.first, (float)touchPair.second);
+
+                        float dist = glm::distance(touchPos, joystick.baseCenter);
+                        if (dist <= joystick.maxRadius)
+                        {
+                            joystick.isBeingDragged = true;
+                            joystick.activePointerId = i;
+                            break;
+                        }
                     }
                 }
-
-                if (joystick.isBeingDragged)
+            }
+            
+            if (joystick.isBeingDragged)
+            {
+                if (InputManager::GetInstance().GetMouseButton(joystick.activePointerId))
                 {
-                    glm::vec2 touchPos = { (float)mousePos.first, (float)mousePos.second };
+                    auto touchPair = InputManager::GetInstance().GetTouchPosition(joystick.activePointerId);
+                    glm::vec2 touchPos((float)touchPair.first, (float)touchPair.second);
+
                     currentOffset = touchPos - joystick.baseCenter;
 
-                    //Clamp distance
                     float dist = glm::length(currentOffset);
                     if (dist > joystick.maxRadius)
                     {
@@ -553,13 +589,10 @@ namespace EngineFramework
                     joystick.outputX = currentOffset.x / joystick.maxRadius;
                     joystick.outputY = currentOffset.y / joystick.maxRadius;
                 }
-            }
-            else
-            {
-                //Release touch -> snap back to center
-                if (joystick.isBeingDragged)
+                else
                 {
                     joystick.isBeingDragged = false;
+                    joystick.activePointerId = -1;
                     joystick.outputX = 0.f;
                     joystick.outputY = 0.f;
                 }
@@ -694,7 +727,7 @@ namespace EngineFramework
 
     void UI_System::displayMenu(std::string menuname)
     {
-        //std::cout << "[UI_System] displayMenu('" << menuname << "')\n";
+        std::cout << "[UI_System] displayMenu('" << menuname << "')\n";
 
         auto it = Menu_Mapping.find(menuname);
 
@@ -763,12 +796,29 @@ namespace EngineFramework
         }
     }
 
-    void UI_System::closeAllMenu()
+    
+    //default saveState = false
+    void UI_System::closeAllMenu(bool saveState)
     {
+        if (saveState) {
+            current_menus.clear();
+            std::cout << "=========================== SAVING MENU STATE NOW () ======================================\n";
+        }
+        
         for (auto& [name, menu] : Menu_Mapping)
         {
             if (menu.first)
             {
+                if (menu.second) {
+                    if (saveState) {
+                        //save the menus that were active
+                        std::cout << "PUSHED menu: " << name << std::endl;
+                        current_menus.push_back(name);
+
+                    }
+                }
+                
+                
                 menu.first->draw_elements(false);
                 menu.second = false;
                 menu.first->set_AllbuttonState();
@@ -778,6 +828,22 @@ namespace EngineFramework
         current_menu.clear();
 
         std::cout << "=========================== CLOSEEEEE ALLLLLL MENU () ======================================\n";
+    }
+
+    void UI_System::resumeActive_Menus() {
+
+        std::cout << "MENU RESUMED ====================================\n";
+
+
+        //resume the menus that were active
+        for (auto& name : current_menus)
+        {
+            std::cout << "menu: " << name << std::endl;
+            displayMenu(name);
+        }
+
+        std::cout << "MENU RESUMED END ====================================\n";
+
     }
 
     bool UI_System::IsMenuActive(const std::string& menuname) const

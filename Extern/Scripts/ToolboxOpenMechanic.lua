@@ -21,6 +21,13 @@ local VIEW_LOCK_SFX_ID = "ViewLock"
 local UNLOCK_SFX_ID = "Unlock"
 local DISCOVERY_SFX_ID = "Discovery"
 
+local VOICEOVER_SFX_ID = "VoiceOver"
+local VOICEOVER_DELAY = 0.6
+
+local hasPlayedFirstPadlockVO = false
+local pendingPadlockVO = false
+local padlockVOTimer = 0.0
+
 local isOpen = false
 
 -- ---------------------------------------
@@ -72,6 +79,7 @@ function on_create(self)
     SHARED.TRIGGER_ICON_CMD          = SHARED.TRIGGER_ICON_CMD or {}
     SHARED[UI_TABLE]                 = false
     SHARED.LOCK_DISABLED             = false
+    SHARED.LOCK_SUCCESS              = false
     SHARED.TOOLBOX_UNLOCK_AUDIO_PLAYED = false
 end
 
@@ -86,10 +94,39 @@ function on_update(self, dt)
         if DEBUG then print("[ToolboxOpenMechanic] isOpen synced to false from SHARED") end
     end
 
+    -- Auto-close if player walked out of the zone while LockScreen was open
+    if isOpen and not in_range(id) then
+        if UI_CloseAllMenus ~= nil then UI_CloseAllMenus() end
+        SHARED[UI_TABLE] = false
+        isOpen = false
+        if DEBUG then print("[ToolboxOpenMechanic] Auto-closed: player left zone") end
+    end
+
+    ----------------------------------------------------------------
+    -- Delayed first-time padlock VoiceOver
+    ----------------------------------------------------------------
+    if pendingPadlockVO then
+        padlockVOTimer = padlockVOTimer + dt
+
+        if padlockVOTimer >= VOICEOVER_DELAY then
+            pendingPadlockVO = false
+            padlockVOTimer = 0.0
+            hasPlayedFirstPadlockVO = true
+
+            if type(Audio_PlaySlot) == "function" then
+                Audio_PlaySlot(id, VOICEOVER_SFX_ID)
+            end
+
+            if DEBUG then
+                print("[ToolboxOpenMechanic] First padlock open -> delayed VoiceOver played")
+            end
+        end
+    end
+
     ----------------------------------------------------------------
     -- If lock has just been disabled (success), play unlock audio
     ----------------------------------------------------------------
-    if SHARED and SHARED.LOCK_DISABLED and not SHARED.TOOLBOX_UNLOCK_AUDIO_PLAYED then
+    if SHARED and SHARED.LOCK_SUCCESS and not SHARED.TOOLBOX_UNLOCK_AUDIO_PLAYED then
         SHARED.TOOLBOX_UNLOCK_AUDIO_PLAYED = true
 
         if type(Audio_PlaySlot) == "function" then
@@ -140,6 +177,16 @@ function on_update(self, dt)
 
         SHARED[UI_TABLE] = true
         isOpen = true
+
+        -- First-time delayed VO
+        if not hasPlayedFirstPadlockVO and not pendingPadlockVO then
+            pendingPadlockVO = true
+            padlockVOTimer = 0.0
+
+            if DEBUG then
+                print("[ToolboxOpenMechanic] First padlock open -> scheduling VoiceOver")
+            end
+        end
 
         if DEBUG then print("[ToolboxOpenMechanic] Opened: " .. MENU_NAME) end
     else

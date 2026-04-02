@@ -15,17 +15,23 @@ void GameplayState::OnEnter(Engine::StateMachine& machine)
 
     auto& ui = EngineFramework::UI_System::GetInstance();
     ui.closeAllMenu();
+    ui.resumeActive_Menus();
 
     // Put your gameplay scene/runtime-start logic here.
 #if defined(PLATFORM_ANDROID)
+    
     ui.displayMenu_InvisibleLayer("Android_Inventory_Buttons");
     ui.displayMenu("AndroidInputOverlay");
+        
+    
 #endif
 }
 
 void GameplayState::OnExit(Engine::StateMachine& machine)
 {
     UNREFERENCED_PARAMETER(machine);
+    auto& ui = EngineFramework::UI_System::GetInstance();
+    ui.closeAllMenu(true);
     LOGI("[State] Exit Gameplay");
 }
 
@@ -103,16 +109,17 @@ void EndCreditState::OnEnter(Engine::StateMachine& machine)
 
     LOGI("[State] Enter EndCredit state");
     auto& ui = EngineFramework::UI_System::GetInstance();
-    ui.closeAllMenu();
-    ui.displayMenu("CreditsMenu");
+
+    ui.StartCreditsRoll("CreditsMenu", 120.0f, 8.26f, true);
 }
 
 void EndCreditState::OnExit(Engine::StateMachine& machine)
 {
     UNREFERENCED_PARAMETER(machine);
     LOGI("[State] Exit EndCredit state");
+
     auto& ui = EngineFramework::UI_System::GetInstance();
-    ui.closeAllMenu();
+    ui.StopCreditsRoll(true);
 }
 
 void EndCreditState::Update(Engine::StateMachine& machine, float dt)

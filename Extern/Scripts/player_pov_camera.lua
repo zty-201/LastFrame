@@ -26,7 +26,63 @@ local shakeOffsetPitch = 0.0
 local shakeTickTimer   = 0.0
 local SHAKE_TICK       = 0.04
 
+local sustainedFreeShake = false
+local shakeFadeOut = false
+local shakeFadeTimer = 0.0
+local shakeFadeDuration = 0.4
+local fadeStartAmplitude = 0.0
+
 local function tickShake(dt)
+    ------------------------------------------------
+    -- SUSTAINED SHAKE (while staring at girl)
+    ------------------------------------------------
+    if sustainedFreeShake then
+        shakeTickTimer = shakeTickTimer + dt
+
+        if shakeTickTimer >= shakeSpeed then
+            shakeTickTimer = 0.0
+
+            -- softer shake (reduced intensity multiplier)
+            shakeOffsetYaw   = (math.random() * 2.0 - 1.0) * shakeAmplitude * 0.5
+            shakeOffsetPitch = (math.random() * 2.0 - 1.0) * shakeAmplitude * 0.5
+        end
+
+        return
+    end
+
+    ------------------------------------------------
+    -- FADE-OUT SHAKE (when player looks away)
+    ------------------------------------------------
+    if shakeFadeOut then
+        shakeFadeTimer = shakeFadeTimer + dt
+
+        local t = shakeFadeTimer / shakeFadeDuration
+        if t >= 1.0 then
+            shakeFadeOut = false
+            shakeOffsetYaw = 0.0
+            shakeOffsetPitch = 0.0
+            return
+        end
+
+        -- smooth ease-out curve
+        local decay = 1.0 - (t * t)
+
+        shakeTickTimer = shakeTickTimer + dt
+        if shakeTickTimer >= shakeSpeed then
+            shakeTickTimer = 0.0
+
+            local amp = fadeStartAmplitude * decay
+
+            shakeOffsetYaw   = (math.random() * 2.0 - 1.0) * amp * 0.5
+            shakeOffsetPitch = (math.random() * 2.0 - 1.0) * amp * 0.5
+        end
+
+        return
+    end
+
+    ------------------------------------------------
+    -- DEFAULT ONE-SHOT SHAKE (existing behaviour)
+    ------------------------------------------------
     if shakeTimer >= shakeDuration then
         shakeOffsetYaw = 0.0
         shakeOffsetPitch = 0.0
@@ -43,6 +99,7 @@ local function tickShake(dt)
 
     if shakeTickTimer >= shakeSpeed then
         shakeTickTimer = 0.0
+
         shakeOffsetYaw   = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay * 0.7
         shakeOffsetPitch = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay * 0.7
     end
@@ -224,20 +281,55 @@ end
 function on_update(self, dt)
     if not camera or not transform then return end
 
+
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        return
+    end
+    
+
     local SHARED = getGlobalShared()
+
+    -- ============================================================
+    -- MENU CAMERA MODE
+    -- When main menu is active, do NOT let the player camera fight
+    -- with the dedicated MainMenuCamera entity.
+    -- ============================================================
+    if _G.GAME_STATE == "MENU" then
+        return
+    end
 
     -- ======================================
     -- FREE SHAKE (no camera lock required)
     -- ======================================
-    if SHARED and SHARED.POV and SHARED.POV.freeShake then
-        SHARED.POV.freeShake = false
-        shakeTimer     = 0.0
-        shakeTickTimer = 0.0
-        shakeDuration  = SHARED.POV.shakeDuration  or 0.8
-        shakeAmplitude = SHARED.POV.shakeAmplitude or 6.0
-        shakeSpeed     = SHARED.POV.shakeSpeed     or 0.04
-        shakeOffsetYaw   = 0.0
-        shakeOffsetPitch = 0.0
+    if SHARED and SHARED.POV and SHARED.POV.freeShakeSustain then
+        sustainedFreeShake = true
+        shakeAmplitude = SHARED.POV.freeShakeAmplitude or 3.0
+        shakeSpeed     = SHARED.POV.freeShakeSpeed or 0.04
+
+        if shakeSpeed < 0.005 then
+            shakeSpeed = 0.005
+        end
+    else
+        if sustainedFreeShake then
+            sustainedFreeShake = false
+
+            -- start smooth fade-out instead of instant stop
+            shakeFadeOut = true
+            shakeFadeTimer = 0.0
+            fadeStartAmplitude = shakeAmplitude
+        end
+
+        if SHARED and SHARED.POV and SHARED.POV.freeShake then
+            SHARED.POV.freeShake = false
+            shakeTimer     = 0.0
+            shakeTickTimer = 0.0
+            shakeDuration  = SHARED.POV.shakeDuration  or 0.8
+            shakeAmplitude = SHARED.POV.shakeAmplitude or 6.0
+            shakeSpeed     = SHARED.POV.shakeSpeed     or 0.04
+            shakeOffsetYaw   = 0.0
+            shakeOffsetPitch = 0.0
+        end
     end
 
     -- ======================================
@@ -283,7 +375,6 @@ function on_update(self, dt)
             end
         end
 
-        -- Start shake if requested
         if SHARED.POV.shake then
             SHARED.POV.shake = false
             shakeTimer     = 0.0
@@ -322,14 +413,17 @@ function on_update(self, dt)
 
         tickShake(dt)
 
+        -- Drive the pull animation toward the lock target
         if pullActive then
             pullTimer = pullTimer + dt
-            local t = math.min(pullTimer / pullDuration, 1.0)
-            if t >= 1.0 then pullActive = false end
-
-            lockedCamX = pullStartX + (pullTargetX - pullStartX) * t
-            lockedCamY = pullStartY + (pullTargetY - pullStartY) * t
-            lockedCamZ = pullStartZ + (pullTargetZ - pullStartZ) * t
+            local t   = math.min(pullTimer / pullDuration, 1.0)
+            local ease = t * t * (3.0 - 2.0 * t)
+            lockedCamX = pullStartX + (pullTargetX - pullStartX) * ease
+            lockedCamY = pullStartY + (pullTargetY - pullStartY) * ease
+            lockedCamZ = pullStartZ + (pullTargetZ - pullStartZ) * ease
+            if t >= 1.0 then
+                pullActive = false
+            end
         end
 
         if lockedCamX then
@@ -345,7 +439,6 @@ function on_update(self, dt)
     -- WINDOWS LOOK CONTROL
     -- ======================================
     if PLATFORM == "windows" then
-
         if recenterActive then
             recenterTime = recenterTime + dt
             local t = recenterTime / recenterDuration
@@ -389,7 +482,6 @@ function on_update(self, dt)
     -- ANDROID GYRO LOOK
     -- ======================================
     if PLATFORM == "android" and gyroEnabled then
-
         if recenterActive then
             recenterTime = recenterTime + dt
             local t = recenterTime / recenterDuration
@@ -409,15 +501,12 @@ function on_update(self, dt)
 
         local gx, gy, gz = Input.GetGyroscopeRotatioRate()
 
-        -- Step 1: Dead zone — discard readings too small to be intentional
         local dzGx = applyDeadZone(gx)
         local dzGy = applyDeadZone(gy)
 
-        -- Step 2: EMA — smooths frame-to-frame variance on surviving values
         smoothedGx = smoothedGx + (dzGx - smoothedGx) * GYRO_ALPHA
         smoothedGy = smoothedGy + (dzGy - smoothedGy) * GYRO_ALPHA
 
-        -- Step 3: Apply to yaw/pitch
         yaw   = yaw   + math.deg(smoothedGx) * dt * gyroSensitivity
         pitch = pitch - math.deg(smoothedGy) * dt * gyroSensitivity
 

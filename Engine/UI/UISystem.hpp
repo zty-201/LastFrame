@@ -90,7 +90,7 @@ namespace EngineFramework
         void update_Buttons();
         void update_Button_State(ButtonComponent& button, entt::entity e); //update the button state based on input_manager
         void Trigger_Button_Event(ButtonComponent& button, BUTTON_STATE state);
-        bool check_touch(entt::entity e);
+        bool check_touch(entt::entity e, int pointerId);
        
 
     };
@@ -123,7 +123,10 @@ namespace EngineFramework
 
         void closeMenu(std::string menu);
         
-        void closeAllMenu();
+        void closeAllMenu(bool saveState = false);
+        void resumeActive_Menus();
+        
+        std::vector <std::string> current_menus;
         std::vector<entt::entity> getMenu_Entities(std::string menu);
         std::unordered_set<entt::entity> getAllMenu_Entities();
 

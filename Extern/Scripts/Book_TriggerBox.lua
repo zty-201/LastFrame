@@ -16,6 +16,8 @@ local UI_TABLE       = "BOOK_UI_OPEN"
 local PAGE_FLIP_SFX_ID = "PageFlip"
 local DISCOVERY_SFX_ID = "Discovery"
 
+local hasPlayedDiscoveryOnce = false
+
 local function play_3d_sfx(slotId)
     if type(Audio_PlaySlot) == "function" and slotId ~= nil then
         Audio_PlaySlot(EntityID, slotId)
@@ -46,6 +48,20 @@ end
 
 function on_update(self, dt)
 
+    local state_name = StateMachine_GetCurrentStateName()
+    if state_name ~= "Gameplay" then
+        UI_CloseMenu(MENU_NAME)
+        return
+    end
+
+    -- Auto-close if player walked out of the zone while the UI was open
+    if SHARED[UI_TABLE][BOOK_ID] == true
+       and not (SHARED.INTERACT_IN_ZONE and SHARED.INTERACT_IN_ZONE[BOOK_ID] == true) then
+        if UI_CloseMenu ~= nil then UI_CloseMenu(MENU_NAME) end
+        SHARED[UI_TABLE][BOOK_ID] = false
+        if DEBUG then print("[Book_TriggerBox] Auto-closed: player left zone") end
+    end
+
     if not consume_toggle(BOOK_ID) then
         return
     end
@@ -69,7 +85,11 @@ function on_update(self, dt)
     -- Play page flip sound when opening
     if isNowOpen then
         play_3d_sfx(PAGE_FLIP_SFX_ID)
-        play_3d_sfx(DISCOVERY_SFX_ID)
+
+        if not hasPlayedDiscoveryOnce then
+            play_3d_sfx(DISCOVERY_SFX_ID)
+            hasPlayedDiscoveryOnce = true
+        end
 
         if DEBUG then
             print("[Book_TriggerBox] Page flipped")

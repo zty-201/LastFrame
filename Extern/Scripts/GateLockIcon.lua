@@ -1,4 +1,4 @@
--- PlayroomDoorLockIcon_UI.lua
+-- GateLockIcon_UI.lua
 -- Attach to LOCK ICON UI entity
 
 local DOOR_ID = 185
@@ -6,7 +6,7 @@ local armed = false
 
 local function set_visible(v)
     if EntityUI == nil then
-        print("[PlayroomDoorLockIcon_UI] ERROR: EntityUI is nil on entity " .. tostring(EntityID))
+        print("[GateLockIcon_UI] ERROR: EntityUI is nil on entity " .. tostring(EntityID))
         return
     end
     EntityUI:SetVisible(v)

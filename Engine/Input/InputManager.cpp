@@ -103,6 +103,7 @@ namespace EngineFramework
 //#endif   
 
     std::unordered_map<int, KeyState> InputManager::mouseButtonStates;
+    std::unordered_map<int, std::pair<double, double>> InputManager::touchPositions;
 
     double InputManager::mouseX = 0.0;
     double InputManager::mouseY = 0.0;
@@ -275,33 +276,33 @@ namespace EngineFramework
         }
     }
 
-    void InputManager::UpdateTouch(int action, float x, float y)
+    void InputManager::UpdateTouch(int action, int pointerId, float x, float y)
     {
         mouseX = (double)x;
         mouseY = (double)y;
 
-        constexpr int PRIMARY_BUTTON = 0; //Maps to GLFW_MOUSE_BUTTON_LEFT
-
+        touchPositions[pointerId] = { (double)x, (double)y };
+        int maskedAction = action & 0xff;
         //LOGI("Android Touch Input: Action=%d, Pos=(%.1f, %.1f)", action, x, y);
 
         switch (action)
         {
         case ACTION_DOWN:
         case ACTION_POINTER_DOWN:
-            mouseButtonStates[PRIMARY_BUTTON] = KeyState::Pressed;
+            mouseButtonStates[pointerId] = KeyState::Pressed;
             break;
 
         case ACTION_UP:
         case ACTION_POINTER_UP:
         case ACTION_CANCEL:
-            mouseButtonStates[PRIMARY_BUTTON] = KeyState::Released;
+            mouseButtonStates[pointerId] = KeyState::Released;
             break;
 
         case ACTION_MOVE:
-            if (mouseButtonStates[PRIMARY_BUTTON] == KeyState::Pressed)
+            /*if (mouseButtonStates[pointerId] == KeyState::Pressed)
             {
-                mouseButtonStates[PRIMARY_BUTTON] = KeyState::Down;
-            }
+                mouseButtonStates[pointerId] = KeyState::Down;
+            }*/
             break;
         }
     }
@@ -557,6 +558,16 @@ namespace EngineFramework
     std::pair<double, double> InputManager::GetScrollDelta()
     {
         return { scrollX, scrollY };
+    }
+
+    std::pair<double, double> InputManager::GetTouchPosition(int pointerId)
+    {
+        auto it = touchPositions.find(pointerId);
+        if (it != touchPositions.end()) return it->second;
+
+        if (pointerId == 0) return { mouseX, mouseY };
+
+        return { 0.0, 0.0 };
     }
 
     std::pair<int, int> InputManager::GetWindowSize()

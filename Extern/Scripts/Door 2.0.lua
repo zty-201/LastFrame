@@ -13,7 +13,12 @@ local targetY = 0.0
 local MAINDOOR_CLOSE_SFX_ID = "CloseMaindoor"
 local SCARY_SFX_ID    = "Scary"
 
+local VOICE_REACTION_SFX_ID = "VoiceReaction"
+local VOICE_REACTION_DELAY_SECONDS = 5.5
+
 local GIGGLE_DELAY_SECONDS = 0.5
+local voiceReactionPending = false
+local voiceReactionTimer = 0.0
 
 -- Which entities are the “main doors”
 local MAIN_DOORS = {
@@ -69,6 +74,16 @@ function on_update(Self, dt)
         end
     end
 
+    -- Handle delayed voice reaction
+    if voiceReactionPending then
+        voiceReactionTimer = voiceReactionTimer + dt
+        if voiceReactionTimer >= VOICE_REACTION_DELAY_SECONDS then
+            voiceReactionPending = false
+            voiceReactionTimer = 0.0
+            play_3d_sfx(VOICE_REACTION_SFX_ID)
+        end
+    end
+
     -- Only accept scripted close command
     if SHARED.DOOR_CMD and SHARED.DOOR_CMD[EntityID] then
         local cmdObj = SHARED.DOOR_CMD[EntityID]
@@ -81,9 +96,14 @@ function on_update(Self, dt)
 
             if is_main_door() then
                 play_3d_sfx(MAINDOOR_CLOSE_SFX_ID)
+
                 gigglePending = true
                 giggleTimer = 0.0
-                print("[Door] Scripted CLOSE -> close sound + giggle queued")
+
+                voiceReactionPending = true
+                voiceReactionTimer = 0.0
+
+                print("[Door] Scripted CLOSE -> close sound + scary queued + voice reaction queued")
             else
                 print("[Door] Scripted CLOSE")
             end

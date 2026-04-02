@@ -44,6 +44,13 @@ function on_create(self)
 end
 
 function on_update(self, dt)
+    -- Auto-close if player walked out of the zone while the UI was open
+    if SHARED[UI_TABLE][BOOK_ID] == true
+       and not (SHARED.INTERACT_IN_ZONE and SHARED.INTERACT_IN_ZONE[BOOK_ID] == true) then
+        if UI_CloseMenu ~= nil then UI_CloseMenu(MENU_NAME) end
+        SHARED[UI_TABLE][BOOK_ID] = false
+        if DEBUG then print("[SF_EvidenceTriggerBox] Auto-closed: player left zone") end
+    end
 
     if not consume_toggle(BOOK_ID) then
         return
