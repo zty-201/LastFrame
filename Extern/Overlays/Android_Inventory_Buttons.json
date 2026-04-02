@@ -1,4 +1,216 @@
 {
+	"469": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "UIAndroid_Battery1BarIcon"
+		},
+		"UIComponent": {
+			"Overlay_name": "Android_Inventory_Buttons",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				1670.25,
+				392.53497314453125
+			],
+			"position_NDC": [
+				0.75,
+				-0.23499999940395355
+			],
+			"size": [
+				98.25,
+				54.900001525878906
+			],
+			"size_NDC": [
+				0.05000000074505806,
+				0.05000000074505806
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				3705733063317061635,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"473": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "UIAndroid_Battery2BarIcon"
+		},
+		"UIComponent": {
+			"Overlay_name": "Android_Inventory_Buttons",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				1670.25,
+				392.53497314453125
+			],
+			"position_NDC": [
+				0.75,
+				-0.23499999940395355
+			],
+			"size": [
+				98.25,
+				54.900001525878906
+			],
+			"size_NDC": [
+				0.05000000074505806,
+				0.05000000074505806
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				10046801338654720005,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"474": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "UIAndroid_Battery3BarIcon"
+		},
+		"UIComponent": {
+			"Overlay_name": "Android_Inventory_Buttons",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				1670.25,
+				392.53497314453125
+			],
+			"position_NDC": [
+				0.75,
+				-0.23499999940395355
+			],
+			"size": [
+				98.25,
+				54.900001525878906
+			],
+			"size_NDC": [
+				0.05000000074505806,
+				0.05000000074505806
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				14082026604778684425,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"477": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": []
+		},
+		"NameComponent": {
+			"name": "UIAndroid_Battery0BarIcon"
+		},
+		"UIComponent": {
+			"Overlay_name": "Android_Inventory_Buttons",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				1670.25,
+				392.53497314453125
+			],
+			"position_NDC": [
+				0.75,
+				-0.23499999940395355
+			],
+			"size": [
+				98.25,
+				54.900001525878906
+			],
+			"size_NDC": [
+				0.05000000074505806,
+				0.05000000074505806
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				2552811558710214663,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
 	"496": {
 		"ButtonComponent": {
 			"clicked_texture": [
@@ -43,16 +255,16 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				2206.875,
-				40.625
+				1621.125,
+				27.449996948242188
 			],
 			"position_NDC": [
 				0.75,
 				-0.75
 			],
 			"size": [
-				267.5,
-				325.0
+				196.5,
+				219.60000610351563
 			],
 			"size_NDC": [
 				0.10000000149011612,
@@ -118,16 +330,16 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				2273.75,
-				406.2500305175781
+				1670.25,
+				274.5000305175781
 			],
 			"position_NDC": [
 				0.75,
 				-0.4000000059604645
 			],
 			"size": [
-				133.75,
-				162.5
+				98.25,
+				109.80000305175781
 			],
 			"size_NDC": [
 				0.05000000074505806,
@@ -193,20 +405,20 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				2206.875,
-				1287.8126220703125
+				1719.375,
+				941.5350341796875
 			],
 			"position_NDC": [
-				0.75,
-				0.7850000262260437
+				0.800000011920929,
+				0.8149999976158142
 			],
 			"size": [
-				267.5,
-				325.0
+				98.25,
+				109.80000305175781
 			],
 			"size_NDC": [
-				0.10000000149011612,
-				0.20000000298023224
+				0.05000000074505806,
+				0.10000000149011612
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
@@ -343,16 +555,16 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				2099.875,
-				312.8125
+				1542.5250244140625,
+				211.36502075195313
 			],
 			"position_NDC": [
 				0.6200000047683716,
 				-0.5149999856948853
 			],
 			"size": [
-				133.75,
-				162.5
+				98.25,
+				109.80000305175781
 			],
 			"size_NDC": [
 				0.05000000074505806,
@@ -418,16 +630,16 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				2099.875,
-				312.8125
+				1542.5250244140625,
+				211.36502075195313
 			],
 			"position_NDC": [
 				0.6200000047683716,
 				-0.5149999856948853
 			],
 			"size": [
-				133.75,
-				162.5
+				98.25,
+				109.80000305175781
 			],
 			"size_NDC": [
 				0.05000000074505806,
