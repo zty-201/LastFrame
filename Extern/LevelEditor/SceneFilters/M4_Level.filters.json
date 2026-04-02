@@ -292,7 +292,7 @@
 			"name": "Playroom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				79,
 				400,
@@ -436,7 +436,7 @@
 			"name": "Canteen"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				80,
 				240,

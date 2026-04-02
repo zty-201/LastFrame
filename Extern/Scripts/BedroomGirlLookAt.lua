@@ -8,8 +8,8 @@ local DEBUG               = true
 local LOG_EVERY_N_FRAMES  = 15
 
 local MAX_DISTANCE            = 3000.0
-local LOOK_DOT_THRESHOLD      = 0.97
-local REQUIRED_LOOK_TIME      = 0.10   -- seconds to confirm look (plays SubtleJingle, starts ramp)
+local LOOK_DOT_THRESHOLD      = 0.93
+local REQUIRED_LOOK_TIME      = 0.10   -- seconds to confirm look (starts ramp)
 local STOP_LOOKING_DELAY      = 6.0    -- seconds of continuous look before silence + StopLooking
 local SILENCE_BEFORE_JINGLE   = 0.0    -- seconds of silence after threshold before StopLooking plays
 local EPIC_SOUND_OFFSET       = 0.0    -- seconds into silence when EpicSound plays (before StopLooking)
@@ -42,6 +42,10 @@ local epicSoundPlayed   = false   -- EpicSound already fired this look session
 local lookTimer         = 0.0
 local silenceTimer      = 0.0
 local frame             = 0
+
+local TENSION_COOLDOWN     = 3.0   -- seconds before tension can retrigger after stopping
+local LOOK_DECAY_RATE      = 2.0   -- how many times faster lookTimer drains vs accumulates
+local tensionCooldownTimer = 0.0
 
 local VISIBLE_SCALE_X = 1.0
 local VISIBLE_SCALE_Y = 1.0
@@ -108,6 +112,7 @@ local function stop_tension()
     if tensionPlaying then
         Audio_StopSlot(EntityID, TENSION_SLOT)
         tensionPlaying = false
+        tensionCooldownTimer = TENSION_COOLDOWN
         if DEBUG then
             print("[BedroomGirlLookAt] Tension sound stopped")
         end
@@ -225,15 +230,16 @@ function on_create(self)
     SHARED.BEDROOM_CP_REACHED = SHARED.BEDROOM_CP_REACHED or false
     SHARED.BEDROOM_GIRL_DONE = SHARED.BEDROOM_GIRL_DONE or false
 
-    isLooking         = false
-    thresholdMet      = false
-    stopLookingPlayed = false
-    epicSoundPlayed   = false
-    tensionPlaying    = false
-    lookTimer         = 0.0
-    silenceTimer      = 0.0
-    frame             = 0
-    isGirlVisible     = false
+    isLooking            = false
+    thresholdMet         = false
+    stopLookingPlayed    = false
+    epicSoundPlayed      = false
+    tensionPlaying       = false
+    lookTimer            = 0.0
+    silenceTimer         = 0.0
+    tensionCooldownTimer = 0.0
+    frame                = 0
+    isGirlVisible        = false
 
     hide_girl()
 
@@ -244,6 +250,10 @@ end
 
 function on_update(self, dt)
     dt = dt or 0.016
+
+    if tensionCooldownTimer > 0.0 then
+        tensionCooldownTimer = tensionCooldownTimer - dt
+    end
 
     local girlDone   = SHARED and SHARED.BEDROOM_GIRL_DONE == true
     local girlActive = SHARED and SHARED.BEDROOM_GIRL_ACTIVE == true and not girlDone
@@ -376,9 +386,14 @@ function on_update(self, dt)
     if inRange and d >= LOOK_DOT_THRESHOLD then
         lookTimer = lookTimer + dt
 
-        -- Confirm look: play SubtleJingle once, mark looking
+        -- Confirm look after brief delay
         if not isLooking and lookTimer >= REQUIRED_LOOK_TIME then
             isLooking = true
+        end
+
+        -- Delay tension audio until player has been looking for 1 second,
+        -- and only if the cooldown from the last stop has expired
+        if isLooking and not tensionPlaying and lookTimer >= 1.0 and tensionCooldownTimer <= 0.0 then
             start_tension()
         end
 
@@ -473,13 +488,39 @@ function on_update(self, dt)
             end
         end
     else
-        if isLooking or tensionPlaying or lookTimer > 0.0 then
-            reset_look_state()
-            if DEBUG then
-                print("[BedroomGirlLookAt] LOOK END -> reset tension + resume cry")
+        -- Player left cone: decay timer slowly instead of instant reset
+        if isLooking then
+            isLooking = false
+            local wasTensionPlaying = tensionPlaying
+            stop_tension()
+            if wasTensionPlaying and type(Audio_PlaySlot) == "function" then
+                Audio_PlaySlot(EntityID, "TensionOff")
             end
-        else
-            lookTimer = 0.0
+            if SHARED and SHARED.POV then
+                SHARED.POV.freeShakeSustain = false
+            end
+            if DEBUG then
+                print("[BedroomGirlLookAt] LOOK END -> decaying timer")
+            end
+        end
+
+        if lookTimer > 0.0 then
+            lookTimer = lookTimer - (dt * LOOK_DECAY_RATE)
+            if lookTimer <= 0.0 then
+                lookTimer = 0.0
+                thresholdMet      = false
+                stopLookingPlayed = false
+                epicSoundPlayed   = false
+                silenceTimer      = 0.0
+                if currentCrySlot and type(Audio_StopSlot) == "function" then
+                    Audio_StopSlot(EntityID, currentCrySlot)
+                end
+                currentCrySlot = nil
+                if DEBUG then
+                    print("[BedroomGirlLookAt] Timer fully drained -> full reset")
+                end
+            end
+        elseif tensionPlaying then
             stop_tension()
         end
     end
