@@ -228,6 +228,9 @@ function on_update(self, dt)
                 local light = Query.GetLight(pending_fail_light)
                 if light then light:SetIntensity(0) end
 
+                local pe = Query.GetParticleEmitter(pending_fail_light)
+                if pe then pe.isEmitting = false end
+
                 local glowId = FAIL_GLOW_LIGHTS[pending_fail_light]
                 if glowId then
                     SHARED.STOREROOM_FLICKER_OFF[glowId] = true
@@ -265,6 +268,9 @@ function on_update(self, dt)
                 -- Blow out the candle at peak zoom
                 local light = Query.GetLight(pending_fail_light)
                 if light then light:SetIntensity(0) end
+
+                local pe = Query.GetParticleEmitter(pending_fail_light)
+                if pe then pe.isEmitting = false end
 
                 local glowId = FAIL_GLOW_LIGHTS[pending_fail_light]
                 if glowId then

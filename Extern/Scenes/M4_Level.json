@@ -44373,11 +44373,30 @@
 		"NameComponent": {
 			"name": "Storeroom_Light_01"
 		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 1.5,
+			"maxStartSpeed": 6.0,
+			"minLifetime": 0.5,
+			"minStartSpeed": 2.0,
+			"spawnRate": 5.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 0.20000000298023224
+		},
 		"TransformComponent": {
 			"position": [
-				647.1500244140625,
-				145.60000610351563,
-				171.47743225097656
+				649.2841796875,
+				142.4295654296875,
+				167.40492248535156
 			],
 			"rotation": [
 				0.0,
@@ -44435,21 +44454,40 @@
 		"NameComponent": {
 			"name": "Storeroom_Light_02"
 		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				-3.049999952316284,
+				0.0
+			],
+			"maxLifetime": 1.5,
+			"maxStartSpeed": 6.0,
+			"minLifetime": 0.5,
+			"minStartSpeed": 2.0,
+			"spawnRate": 5.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 0.20000000298023224
+		},
 		"TransformComponent": {
 			"position": [
-				635.0999755859375,
-				146.0,
+				636.5579223632813,
+				145.6720733642578,
 				168.25
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
@@ -44497,21 +44535,40 @@
 		"NameComponent": {
 			"name": "Storeroom_Light_03"
 		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				1.7000000476837158,
+				2.4000000953674316,
+				4.449999809265137
+			],
+			"maxLifetime": 1.5,
+			"maxStartSpeed": 6.0,
+			"minLifetime": 0.5,
+			"minStartSpeed": 2.0,
+			"spawnRate": 5.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 0.20000000298023224
+		},
 		"TransformComponent": {
 			"position": [
-				629.5499877929688,
-				141.5500030517578,
-				168.25
+				626.125,
+				141.91061401367188,
+				167.88058471679688
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},

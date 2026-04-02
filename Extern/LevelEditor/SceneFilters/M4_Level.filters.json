@@ -436,7 +436,7 @@
 			"name": "Canteen"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				80,
 				240,
@@ -560,7 +560,7 @@
 			"name": "Bedroom"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				39,
 				163,

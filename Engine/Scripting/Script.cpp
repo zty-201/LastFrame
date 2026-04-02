@@ -43,6 +43,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 #include "AudioComponent.h"
 #include "Audio.hpp"
 
+// For Particles
+#include "ParticleEmitterComponent.h"
+
 // For Game/Scene
 #include "System_GameObjectSystem.hpp"
 #include "SceneManager.hpp"
@@ -532,6 +535,17 @@ namespace Engine {
         );
 
         LOGI("[ScriptSystem] LightComponent bindings complete.");
+
+        // ===============================================================
+        // ParticleEmitterComponent bindings
+        // ===============================================================
+        s_Lua.new_usertype<ParticleEmitterComponent>("ParticleEmitterComponent",
+            "isEmitting", sol::property(
+                [](ParticleEmitterComponent& p) { return p.isEmitting; },
+                [](ParticleEmitterComponent& p, bool v) { p.isEmitting = v; }
+            )
+        );
+
 
         // ===============================================================
         // Game / Scene bindings
@@ -1028,6 +1042,17 @@ namespace Engine {
             if (!s_RuntimeRegistry->all_of<LightComponent>(e)) return nullptr;
 
             return &s_RuntimeRegistry->get<LightComponent>(e);
+            });
+
+        queryTable.set_function("GetParticleEmitter", [](uint32_t entityId) -> ParticleEmitterComponent* {
+            if (!s_RuntimeRegistry) return nullptr;
+
+            entt::entity e = static_cast<entt::entity>(entityId);
+            if (!s_RuntimeRegistry->valid(e)) return nullptr;
+
+            if (!s_RuntimeRegistry->all_of<ParticleEmitterComponent>(e)) return nullptr;
+
+            return &s_RuntimeRegistry->get<ParticleEmitterComponent>(e);
             });
 
 
