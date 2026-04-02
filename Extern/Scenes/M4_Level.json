@@ -10468,6 +10468,25 @@
 					"spatial": 1,
 					"useFade": false,
 					"volume": 1.0149999856948853
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						7839975941798002709,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "VoiceOver",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
 				}
 			]
 		},
@@ -17665,12 +17684,12 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-452.2381286621094,
+				-455.1178283691406,
 				0.0,
 				897.7496337890625
 			],
 			"rotation": [
-				-1.7000000476837158,
+				-1.6999965906143188,
 				0.0,
 				0.0
 			],
@@ -33586,9 +33605,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				495.90081787109375,
+				554.1747436523438,
 				174.82949829101563,
-				-370.3467712402344
+				368.0174560546875
 			],
 			"rotation": [
 				0.0,
@@ -43466,7 +43485,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "ViewLock",
 					"loop": false,
 					"maxDistance": 150.0,
@@ -43485,7 +43504,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "Unlock",
 					"loop": false,
 					"maxDistance": 100000.0,
@@ -43504,7 +43523,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "Discovery",
 					"loop": false,
 					"maxDistance": 100000.0,
@@ -43514,6 +43533,25 @@
 					"spatial": 0,
 					"useFade": false,
 					"volume": 1.1330000162124634
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						922446914156920855,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "VoiceOver",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
 				}
 			]
 		},
@@ -44183,7 +44221,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						1085543999116279813,
+						922446914156920893,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44195,9 +44233,9 @@
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": false,
-					"volume": 1.0130000114440918
+					"volume": 0.5860000252723694
 				}
 			]
 		},
@@ -44245,7 +44283,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						1085543999116279813,
+						6687054437191155775,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44257,9 +44295,9 @@
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": false,
-					"volume": 0.7519999742507935
+					"volume": 0.4390000104904175
 				}
 			]
 		},
@@ -44307,7 +44345,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						1085543999116279813,
+						922446914156920893,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44319,7 +44357,7 @@
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": false,
 					"volume": 0.5120000243186951
 				}
@@ -45460,9 +45498,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				495.90081787109375,
+				554.1747436523438,
 				174.0294952392578,
-				-400.3467712402344
+				338.0174560546875
 			],
 			"rotation": [
 				0.0,
@@ -54448,7 +54486,7 @@
 			],
 			"rotation": [
 				0.0,
-				137.75198364257813,
+				108.65242767333984,
 				0.0
 			],
 			"scale": [
@@ -54547,7 +54585,7 @@
 			],
 			"rotation": [
 				0.0,
-				137.75198364257813,
+				108.65242767333984,
 				0.0
 			],
 			"scale": [
@@ -77462,6 +77500,25 @@
 					"spatial": 1,
 					"useFade": false,
 					"volume": 0.5009999871253967
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						922446914156920893,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 0,
+					"id": "Laughing",
+					"loop": false,
+					"maxDistance": 400.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
 				}
 			]
 		},
@@ -78842,7 +78899,7 @@
 			],
 			"rotation": [
 				0.0,
-				141.02120971679688,
+				112.2505111694336,
 				0.0
 			],
 			"scale": [

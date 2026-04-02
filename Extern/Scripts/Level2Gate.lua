@@ -22,6 +22,13 @@ local iconsDisabledForever = false
 local SFX_GATE_LOCKED  = "DoorLocked"
 local SFX_GATE_UNLOCK  = "DoorUnlock"
 local SFX_GATE_OPEN    = "DoorOpen"
+local VOICEOVER_SFX_ID = "VoiceOver"
+local VOICEOVER_DELAY = 1.0
+
+local hasPlayedFirstLockVO = false
+local wasInRangeLastFrame = false
+local pendingLockVO = false
+local lockVOTimer = 0.0
 
 local function play_3d_sfx(slotId)
     if type(Audio_PlaySlot) == "function" and type(slotId) == "string" then
@@ -161,8 +168,45 @@ function on_update(self, dt)
     if tr == nil then return end
     dt = dt or 0.016
 
-    -- Update icons every frame so they show/hide as player enters/leaves range
+    -- Update icons every frame
     update_icons()
+
+    local inRangeNow = in_range()
+
+    ----------------------------------------------------------------
+    -- First-time lock VO trigger (better here than UI)
+    ----------------------------------------------------------------
+    if (not hasPlayedFirstLockVO)
+        and (not pendingLockVO)
+        and inRangeNow
+        and (not wasInRangeLastFrame)
+        and (not isUnlocked)
+        and (not inv_has_item(REQUIRED_KEY_ID)) then
+
+        pendingLockVO = true
+        lockVOTimer = 0.0
+
+        if DEBUG then
+            print("[Level2Gate] First lock view -> scheduling VO")
+        end
+    end
+
+    wasInRangeLastFrame = inRangeNow
+
+    -- Delayed VO
+    if pendingLockVO then
+        lockVOTimer = lockVOTimer + dt
+        if lockVOTimer >= VOICEOVER_DELAY then
+            pendingLockVO = false
+            hasPlayedFirstLockVO = true
+
+            play_3d_sfx(VOICEOVER_SFX_ID)
+
+            if DEBUG then
+                print("[Level2Gate] Delayed VO played")
+            end
+        end
+    end
 
     local isRotating = math.abs(targetY - currentY) > 0.05
 
@@ -176,41 +220,46 @@ function on_update(self, dt)
             if cmd == "toggle" or cmd == "open" then
                 if isOpen then
                     print("[Level2Gate] Already open, ignoring command")
+
                 elseif not isUnlocked then
-                    -- Try to unlock with boltcutter
                     if inv_has_item(REQUIRED_KEY_ID) then
                         if consumeOnFirstUse then
                             inv_consume_item(REQUIRED_KEY_ID)
                         end
+
                         isUnlocked = true
                         play_3d_sfx(SFX_GATE_UNLOCK)
-                        print("[Level2Gate] Unlocked with boltcutter")
 
-                        -- Open immediately after unlocking
                         targetY = openAngle
                         isOpen  = true
                         iconsDisabledForever = true
+
                         play_3d_sfx(SFX_GATE_OPEN)
                         hide_entity_401()
                         publish_can_unlock()
+
                         print("[Level2Gate] Gate opening")
+
                     else
                         play_3d_sfx(SFX_GATE_LOCKED)
                         print("[Level2Gate] Locked - need boltcutter")
                     end
+
                 else
                     targetY = openAngle
                     isOpen  = true
                     iconsDisabledForever = true
+
                     play_3d_sfx(SFX_GATE_OPEN)
                     hide_entity_401()
+
                     print("[Level2Gate] Gate opening")
                 end
             end
         end
     end
 
-    -- Rotate gate towards target
+    -- Rotation
     local diff = targetY - currentY
     if math.abs(diff) > 0.05 then
         local dir = (diff > 0) and 1 or -1
