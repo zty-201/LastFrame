@@ -413,6 +413,19 @@ function on_update(self, dt)
 
         tickShake(dt)
 
+        -- Drive the pull animation toward the lock target
+        if pullActive then
+            pullTimer = pullTimer + dt
+            local t   = math.min(pullTimer / pullDuration, 1.0)
+            local ease = t * t * (3.0 - 2.0 * t)
+            lockedCamX = pullStartX + (pullTargetX - pullStartX) * ease
+            lockedCamY = pullStartY + (pullTargetY - pullStartY) * ease
+            lockedCamZ = pullStartZ + (pullTargetZ - pullStartZ) * ease
+            if t >= 1.0 then
+                pullActive = false
+            end
+        end
+
         if lockedCamX then
             applyLook(lockedCamX, lockedCamY, lockedCamZ)
         else
