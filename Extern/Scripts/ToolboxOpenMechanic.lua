@@ -79,6 +79,7 @@ function on_create(self)
     SHARED.TRIGGER_ICON_CMD          = SHARED.TRIGGER_ICON_CMD or {}
     SHARED[UI_TABLE]                 = false
     SHARED.LOCK_DISABLED             = false
+    SHARED.LOCK_SUCCESS              = false
     SHARED.TOOLBOX_UNLOCK_AUDIO_PLAYED = false
 end
 
@@ -125,7 +126,7 @@ function on_update(self, dt)
     ----------------------------------------------------------------
     -- If lock has just been disabled (success), play unlock audio
     ----------------------------------------------------------------
-    if SHARED and SHARED.LOCK_DISABLED and not SHARED.TOOLBOX_UNLOCK_AUDIO_PLAYED then
+    if SHARED and SHARED.LOCK_SUCCESS and not SHARED.TOOLBOX_UNLOCK_AUDIO_PLAYED then
         SHARED.TOOLBOX_UNLOCK_AUDIO_PLAYED = true
 
         if type(Audio_PlaySlot) == "function" then

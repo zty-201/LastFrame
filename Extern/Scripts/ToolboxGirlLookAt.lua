@@ -142,7 +142,7 @@ function on_update(self, dt)
         SHARED.POV.shakeDuration    = 0.8
         SHARED.POV.shakeAmplitude   = 18.0
         SHARED.POV.shakeSpeed       = 0.01
-        SHARED.POV.shakePullAmount  = 1500.0
+        SHARED.POV.shakePullAmount  = 410.0
 
         rotateAfterPull = true
         rotateTimer     = 0.0
