@@ -26,7 +26,63 @@ local shakeOffsetPitch = 0.0
 local shakeTickTimer   = 0.0
 local SHAKE_TICK       = 0.04
 
+local sustainedFreeShake = false
+local shakeFadeOut = false
+local shakeFadeTimer = 0.0
+local shakeFadeDuration = 0.4
+local fadeStartAmplitude = 0.0
+
 local function tickShake(dt)
+    ------------------------------------------------
+    -- SUSTAINED SHAKE (while staring at girl)
+    ------------------------------------------------
+    if sustainedFreeShake then
+        shakeTickTimer = shakeTickTimer + dt
+
+        if shakeTickTimer >= shakeSpeed then
+            shakeTickTimer = 0.0
+
+            -- softer shake (reduced intensity multiplier)
+            shakeOffsetYaw   = (math.random() * 2.0 - 1.0) * shakeAmplitude * 0.5
+            shakeOffsetPitch = (math.random() * 2.0 - 1.0) * shakeAmplitude * 0.5
+        end
+
+        return
+    end
+
+    ------------------------------------------------
+    -- FADE-OUT SHAKE (when player looks away)
+    ------------------------------------------------
+    if shakeFadeOut then
+        shakeFadeTimer = shakeFadeTimer + dt
+
+        local t = shakeFadeTimer / shakeFadeDuration
+        if t >= 1.0 then
+            shakeFadeOut = false
+            shakeOffsetYaw = 0.0
+            shakeOffsetPitch = 0.0
+            return
+        end
+
+        -- smooth ease-out curve
+        local decay = 1.0 - (t * t)
+
+        shakeTickTimer = shakeTickTimer + dt
+        if shakeTickTimer >= shakeSpeed then
+            shakeTickTimer = 0.0
+
+            local amp = fadeStartAmplitude * decay
+
+            shakeOffsetYaw   = (math.random() * 2.0 - 1.0) * amp * 0.5
+            shakeOffsetPitch = (math.random() * 2.0 - 1.0) * amp * 0.5
+        end
+
+        return
+    end
+
+    ------------------------------------------------
+    -- DEFAULT ONE-SHOT SHAKE (existing behaviour)
+    ------------------------------------------------
     if shakeTimer >= shakeDuration then
         shakeOffsetYaw = 0.0
         shakeOffsetPitch = 0.0
@@ -43,6 +99,7 @@ local function tickShake(dt)
 
     if shakeTickTimer >= shakeSpeed then
         shakeTickTimer = 0.0
+
         shakeOffsetYaw   = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay * 0.7
         shakeOffsetPitch = (math.random() * 2.0 - 1.0) * shakeAmplitude * decay * 0.7
     end
@@ -245,15 +302,34 @@ function on_update(self, dt)
     -- ======================================
     -- FREE SHAKE (no camera lock required)
     -- ======================================
-    if SHARED and SHARED.POV and SHARED.POV.freeShake then
-        SHARED.POV.freeShake = false
-        shakeTimer     = 0.0
-        shakeTickTimer = 0.0
-        shakeDuration  = SHARED.POV.shakeDuration  or 0.8
-        shakeAmplitude = SHARED.POV.shakeAmplitude or 6.0
-        shakeSpeed     = SHARED.POV.shakeSpeed     or 0.04
-        shakeOffsetYaw   = 0.0
-        shakeOffsetPitch = 0.0
+    if SHARED and SHARED.POV and SHARED.POV.freeShakeSustain then
+        sustainedFreeShake = true
+        shakeAmplitude = SHARED.POV.freeShakeAmplitude or 3.0
+        shakeSpeed     = SHARED.POV.freeShakeSpeed or 0.04
+
+        if shakeSpeed < 0.005 then
+            shakeSpeed = 0.005
+        end
+    else
+        if sustainedFreeShake then
+            sustainedFreeShake = false
+
+            -- start smooth fade-out instead of instant stop
+            shakeFadeOut = true
+            shakeFadeTimer = 0.0
+            fadeStartAmplitude = shakeAmplitude
+        end
+
+        if SHARED and SHARED.POV and SHARED.POV.freeShake then
+            SHARED.POV.freeShake = false
+            shakeTimer     = 0.0
+            shakeTickTimer = 0.0
+            shakeDuration  = SHARED.POV.shakeDuration  or 0.8
+            shakeAmplitude = SHARED.POV.shakeAmplitude or 6.0
+            shakeSpeed     = SHARED.POV.shakeSpeed     or 0.04
+            shakeOffsetYaw   = 0.0
+            shakeOffsetPitch = 0.0
+        end
     end
 
     -- ======================================

@@ -10486,7 +10486,7 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 1.0
+					"volume": 2.061000108718872
 				}
 			]
 		},
@@ -19082,50 +19082,12 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						15921659061987917825,
+						345986161853497415,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
-					"id": "GirlLaughing",
-					"loop": true,
-					"maxDistance": 500.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"useFade": false,
-					"volume": 5.0
-				},
-				{
-					"ambienceType": 0,
-					"audio_guid": [
-						3691342623965118479,
-						11537445004664754516
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"gameStateTag": 0,
-					"id": "SubtleJingle",
-					"loop": false,
-					"maxDistance": 500.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 0,
-					"useFade": false,
-					"volume": 1.1260000467300415
-				},
-				{
-					"ambienceType": 0,
-					"audio_guid": [
-						9417264931441426433,
-						11537445004664754516
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "StopLooking",
 					"loop": false,
 					"maxDistance": 500.0,
@@ -19144,7 +19106,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "EpicSound",
 					"loop": false,
 					"maxDistance": 500.0,
@@ -19163,7 +19125,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "Lightning",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -19182,7 +19144,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "Tension",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -19192,6 +19154,120 @@
 					"spatial": 0,
 					"useFade": false,
 					"volume": 5.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						2651829171067191355,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "Cry_01",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						14757504969439084597,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "Cry_02",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						14757504969439084595,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "Cry_03",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						14757504969439084601,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "Cry_04",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						8416436694101426231,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "Cry_05",
+					"loop": false,
+					"maxDistance": 500.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						15071648642782183427,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "TensionOff",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
 				}
 			]
 		},
@@ -33605,9 +33681,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				554.1747436523438,
+				-426.2647399902344,
 				174.82949829101563,
-				368.0174560546875
+				-377.5692138671875
 			],
 			"rotation": [
 				0.0,
@@ -35334,7 +35410,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "OpenDoor",
 					"loop": false,
 					"maxDistance": 100.0,
@@ -35353,7 +35429,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "CloseDoor",
 					"loop": false,
 					"maxDistance": 500.0,
@@ -35362,7 +35438,7 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 0.19200000166893005
+					"volume": 0.06499999761581421
 				},
 				{
 					"ambienceType": 0,
@@ -35372,7 +35448,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "DoorLocked",
 					"loop": false,
 					"maxDistance": 100.0,
@@ -35382,6 +35458,44 @@
 					"spatial": 1,
 					"useFade": false,
 					"volume": 0.9900000095367432
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						9569358198708273171,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "VoiceOver_01",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						3804750675674038317,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "VoiceOver_02",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
 				}
 			]
 		},
@@ -45498,9 +45612,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				554.1747436523438,
+				-185.71905517578125,
 				174.0294952392578,
-				338.0174560546875
+				415.28070068359375
 			],
 			"rotation": [
 				0.0,
@@ -54486,7 +54600,7 @@
 			],
 			"rotation": [
 				0.0,
-				108.65242767333984,
+				98.18778991699219,
 				0.0
 			],
 			"scale": [
@@ -54585,7 +54699,7 @@
 			],
 			"rotation": [
 				0.0,
-				108.65242767333984,
+				98.18778991699219,
 				0.0
 			],
 			"scale": [
@@ -78756,7 +78870,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "Thunder",
 					"loop": false,
 					"maxDistance": 500.0,
@@ -78775,7 +78889,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "ScareSound",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -78789,12 +78903,12 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						1085543999116279813,
+						12765805633568489473,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "GirlLaughing",
 					"loop": false,
 					"maxDistance": 500.0,
@@ -78803,7 +78917,26 @@
 					"playOnStart": false,
 					"spatial": 1,
 					"useFade": false,
-					"volume": 0.09000000357627869
+					"volume": 1.0299999713897705
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						10722279703315120177,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "VoiceOver",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
 				}
 			]
 		},
@@ -78899,7 +79032,7 @@
 			],
 			"rotation": [
 				0.0,
-				112.2505111694336,
+				-0.22704067826271057,
 				0.0
 			],
 			"scale": [
@@ -79350,6 +79483,29 @@
 		}
 	},
 	"843": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						15333965721742508039,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "VoiceOver",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
 		"LuaScriptComponent": {
 			"Enabled": true,
 			"Scripts": [
@@ -92878,6 +93034,48 @@
 		}
 	},
 	"991": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						922446914156920859,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "VoiceOver_01",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						6110593684887732249,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "VoiceOver_02",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 1.0
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				0.5,

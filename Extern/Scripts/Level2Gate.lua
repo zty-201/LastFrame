@@ -23,7 +23,7 @@ local SFX_GATE_LOCKED  = "DoorLocked"
 local SFX_GATE_UNLOCK  = "DoorUnlock"
 local SFX_GATE_OPEN    = "DoorOpen"
 local VOICEOVER_SFX_ID = "VoiceOver"
-local VOICEOVER_DELAY = 1.0
+local VOICEOVER_DELAY = 1.5
 
 local hasPlayedFirstLockVO = false
 local wasInRangeLastFrame = false
