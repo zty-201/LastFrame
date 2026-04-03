@@ -438,32 +438,13 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						15921659061987917825,
+						2651829171067191355,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "GirlLaughing",
-					"loop": true,
-					"maxDistance": 500.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"useFade": false,
-					"volume": 5.0
-				},
-				{
-					"ambienceType": 0,
-					"audio_guid": [
-						3691342623965118479,
-						11537445004664754516
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"gameStateTag": 0,
-					"id": "SubtleJingle",
 					"loop": false,
 					"maxDistance": 500.0,
 					"minDistance": 1.0,
@@ -471,17 +452,17 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 1.1260000467300415
+					"volume": 5.0
 				},
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						9417264931441426433,
+						345986161853497415,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "StopLooking",
 					"loop": false,
 					"maxDistance": 500.0,
@@ -500,7 +481,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "EpicSound",
 					"loop": false,
 					"maxDistance": 500.0,
@@ -519,7 +500,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "Lightning",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -538,7 +519,7 @@
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "Tension",
 					"loop": false,
 					"maxDistance": 25.0,
@@ -649,38 +630,60 @@
 			]
 		}
 	},
+	"1006": {
+		"NameComponent": {
+			"name": "Playroom_EM_03"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				574.30712890625,
+				143.10525512695313,
+				-570.9077758789063
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
 	"1007": {
 		"AudioComponent": {
 			"Slots": [
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						15921659061987917825,
+						14757504969439084597,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "GirlLaughing",
-					"loop": true,
-					"maxDistance": 500.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 1,
-					"useFade": false,
-					"volume": 5.0
-				},
-				{
-					"ambienceType": 0,
-					"audio_guid": [
-						3691342623965118479,
-						11537445004664754516
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"gameStateTag": 0,
-					"id": "SubtleJingle",
 					"loop": false,
 					"maxDistance": 500.0,
 					"minDistance": 1.0,
@@ -688,12 +691,12 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 1.1260000467300415
+					"volume": 5.0
 				},
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						9417264931441426433,
+						345986161853497415,
 						11537445004664754516
 					],
 					"category": 0,
@@ -1086,6 +1089,238 @@
 			]
 		}
 	},
+	"1015": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 4051604238741061633
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Hallway_EM_01"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.7799999713897705,
+			"maxStartSpeed": 15.970000267028809,
+			"minLifetime": 0.5,
+			"minStartSpeed": 13.5,
+			"spawnRate": 0.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 2.5299999713897705
+		},
+		"TransformComponent": {
+			"position": [
+				-67.16403198242188,
+				185.09681701660156,
+				-480.8993835449219
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1016": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 4051604238741061633
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Hallway_EM_02"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.7799999713897705,
+			"maxStartSpeed": 15.970000267028809,
+			"minLifetime": 0.5,
+			"minStartSpeed": 13.5,
+			"spawnRate": 0.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 2.5299999713897705
+		},
+		"TransformComponent": {
+			"position": [
+				-468.03948974609375,
+				185.31494140625,
+				41.45410919189453
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1017": {
+		"NameComponent": {
+			"name": "Hallway_EM_03"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.7799999713897705,
+			"maxStartSpeed": 15.970000267028809,
+			"minLifetime": 0.5,
+			"minStartSpeed": 13.5,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 2.5299999713897705
+		},
+		"TransformComponent": {
+			"position": [
+				-75.44060516357422,
+				185.31494140625,
+				871.4841918945313
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1018": {
+		"NameComponent": {
+			"name": "Hallway_EM_04"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.7799999713897705,
+			"maxStartSpeed": 15.970000267028809,
+			"minLifetime": 0.5,
+			"minStartSpeed": 13.5,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 2.5299999713897705
+		},
+		"TransformComponent": {
+			"position": [
+				398.78448486328125,
+				185.31494140625,
+				871.4841918945313
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1019": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 17310201541780914181
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Storeroom_EM_01"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				640.3394165039063,
+				140.21812438964844,
+				163.196044921875
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
 	"102": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -1176,6 +1411,506 @@
 			]
 		}
 	},
+	"1020": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 17310201541780914181
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Storeroom_EM_02"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				630.9202880859375,
+				137.2622833251953,
+				159.4919891357422
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1021": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 17310201541780914181
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Storeroom_EM_03"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				649.2197265625,
+				137.7834930419922,
+				167.18209838867188
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1022": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_01"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				217.86537170410156,
+				144.30857849121094,
+				551.0982666015625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1023": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_02"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				221.15206909179688,
+				141.48654174804688,
+				541.5848999023438
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1024": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_03"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				213.6405029296875,
+				141.9459686279297,
+				559.8869018554688
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1025": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_04"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				261.71234130859375,
+				111.98385620117188,
+				272.3030700683594
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1026": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_05"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				267.19598388671875,
+				110.54426574707031,
+				264.3823547363281
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1027": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_06"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				256.17681884765625,
+				109.06001281738281,
+				280.7432861328125
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1028": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_07"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				7.467750549316406,
+				111.91952514648438,
+				181.88648986816406
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1029": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_08"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				15.177961349487305,
+				110.54426574707031,
+				175.587890625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
 	"103": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -1263,6 +1998,479 @@
 				1.0,
 				1.0,
 				0.9999996423721313
+			]
+		}
+	},
+	"1030": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_09"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				0.08787798881530762,
+				109.06001281738281,
+				189.0932159423828
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1031": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_10"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				-38.65473175048828,
+				111.91952514648438,
+				529.789306640625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1032": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_11"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				-42.69224166870117,
+				110.54426574707031,
+				520.7396850585938
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1033": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_12"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				-34.006778717041016,
+				109.06001281738281,
+				538.596435546875
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1034": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_13"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				-163.32290649414063,
+				111.91952514648438,
+				195.07186889648438
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1035": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_15"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				-162.64630126953125,
+				109.00243377685547,
+				205.20687866210938
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1036": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 16733740789446131715
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "Canteen_EM_14"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				-162.6707000732422,
+				110.14903259277344,
+				185.51596069335938
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1037": {
+		"NameComponent": {
+			"name": "SF_MasterRoom_EM_01"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				-140.4194793701172,
+				680.43115234375,
+				1062.2607421875
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1038": {
+		"NameComponent": {
+			"name": "SF_MasterRoom_EM_02"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				-140.2171173095703,
+				677.2715454101563,
+				1072.2493896484375
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		}
+	},
+	"1039": {
+		"NameComponent": {
+			"name": "SF_MasterRoom_EM_03"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				-140.45114135742188,
+				678.0172119140625,
+				1052.6051025390625
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
@@ -7904,6 +9112,29 @@
 		}
 	},
 	"163": {
+		"AudioComponent": {
+			"Slots": [
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						10722279703315120203,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "LockButtonPress",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 2.0179998874664307
+				}
+			]
+		},
 		"ColliderComponent": {
 			"maxBounds": [
 				38.170021057128906,
@@ -7992,7 +9223,7 @@
 			"visibility": true
 		},
 		"NameComponent": {
-			"name": "Storeroom_Shelf_05"
+			"name": "Storeroom_Shelf_05 (LockManager.lua)"
 		},
 		"PhysicsComponent": {
 			"_prevUseGravity": false,
@@ -19247,25 +20478,6 @@
 					"pitch": 1.0,
 					"playOnStart": false,
 					"spatial": 1,
-					"useFade": false,
-					"volume": 1.0
-				},
-				{
-					"ambienceType": 0,
-					"audio_guid": [
-						15071648642782183427,
-						11537445004664754516
-					],
-					"category": 0,
-					"fadeDuration": 1.0,
-					"gameStateTag": 4,
-					"id": "TensionOff",
-					"loop": false,
-					"maxDistance": 25.0,
-					"minDistance": 1.0,
-					"pitch": 1.0,
-					"playOnStart": false,
-					"spatial": 0,
 					"useFade": false,
 					"volume": 1.0
 				}
@@ -33681,9 +34893,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-185.71905517578125,
-				174.82949829101563,
-				445.28070068359375
+				16.579689025878906,
+				174.8000030517578,
+				-727.3493041992188
 			],
 			"rotation": [
 				0.0,
@@ -41834,16 +43046,16 @@
 			"position": [
 				652.1344604492188,
 				163.5998992919922,
-				603.506103515625
+				603.7088623046875
 			],
 			"rotation": [
-				0.0,
-				-90.0,
-				0.0
+				-179.99989318847656,
+				-89.99994659423828,
+				-179.99989318847656
 			],
 			"scale": [
 				0.9999999403953552,
-				1.0,
+				0.9999999403953552,
 				0.9999999403953552
 			]
 		}
@@ -43606,9 +44818,9 @@
 					"minDistance": 1.0,
 					"pitch": 1.0,
 					"playOnStart": false,
-					"spatial": 1,
+					"spatial": 0,
 					"useFade": false,
-					"volume": 1.2419999837875366
+					"volume": 1.9919999837875366
 				},
 				{
 					"ambienceType": 0,
@@ -43627,7 +44839,7 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 1.100000023841858
+					"volume": 2.0179998874664307
 				},
 				{
 					"ambienceType": 0,
@@ -44335,12 +45547,12 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						922446914156920893,
+						12765805633568489473,
 						11537445004664754516
 					],
 					"category": 0,
 					"fadeDuration": 1.0,
-					"gameStateTag": 0,
+					"gameStateTag": 4,
 					"id": "Candles",
 					"loop": false,
 					"maxDistance": 250.0,
@@ -44349,7 +45561,26 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 0.5860000252723694
+					"volume": 2.4149999618530273
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16532090323042058245,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "BlowOut",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 0.8050000071525574
 				}
 			]
 		},
@@ -44372,25 +45603,6 @@
 		},
 		"NameComponent": {
 			"name": "Storeroom_Light_01"
-		},
-		"ParticleEmitterComponent": {
-			"isEmitting": true,
-			"localOffset": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"maxLifetime": 1.5,
-			"maxStartSpeed": 6.0,
-			"minLifetime": 0.5,
-			"minStartSpeed": 2.0,
-			"spawnRate": 5.0,
-			"startColor": [
-				1.0,
-				0.6000000238418579,
-				0.10000000149011612
-			],
-			"startSize": 0.20000000298023224
 		},
 		"TransformComponent": {
 			"position": [
@@ -44416,7 +45628,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						6687054437191155775,
+						14757504969439084601,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44430,7 +45642,26 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 0.4390000104904175
+					"volume": 2.071000099182129
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16532090323042058245,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "BlowOut",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 0.8309999704360962
 				}
 			]
 		},
@@ -44453,25 +45684,6 @@
 		},
 		"NameComponent": {
 			"name": "Storeroom_Light_02"
-		},
-		"ParticleEmitterComponent": {
-			"isEmitting": true,
-			"localOffset": [
-				0.0,
-				-3.049999952316284,
-				0.0
-			],
-			"maxLifetime": 1.5,
-			"maxStartSpeed": 6.0,
-			"minLifetime": 0.5,
-			"minStartSpeed": 2.0,
-			"spawnRate": 5.0,
-			"startColor": [
-				1.0,
-				0.6000000238418579,
-				0.10000000149011612
-			],
-			"startSize": 0.20000000298023224
 		},
 		"TransformComponent": {
 			"position": [
@@ -44497,7 +45709,7 @@
 				{
 					"ambienceType": 0,
 					"audio_guid": [
-						922446914156920893,
+						2651829171067191355,
 						11537445004664754516
 					],
 					"category": 0,
@@ -44511,7 +45723,26 @@
 					"playOnStart": false,
 					"spatial": 0,
 					"useFade": false,
-					"volume": 0.5120000243186951
+					"volume": 2.1110000610351563
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						16532090323042058245,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 4,
+					"id": "BlowOut",
+					"loop": false,
+					"maxDistance": 25.0,
+					"minDistance": 1.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 0,
+					"useFade": false,
+					"volume": 0.8309999704360962
 				}
 			]
 		},
@@ -44534,25 +45765,6 @@
 		},
 		"NameComponent": {
 			"name": "Storeroom_Light_03"
-		},
-		"ParticleEmitterComponent": {
-			"isEmitting": true,
-			"localOffset": [
-				1.7000000476837158,
-				2.4000000953674316,
-				4.449999809265137
-			],
-			"maxLifetime": 1.5,
-			"maxStartSpeed": 6.0,
-			"minLifetime": 0.5,
-			"minStartSpeed": 2.0,
-			"spawnRate": 5.0,
-			"startColor": [
-				1.0,
-				0.6000000238418579,
-				0.10000000149011612
-			],
-			"startSize": 0.20000000298023224
 		},
 		"TransformComponent": {
 			"position": [
@@ -44837,25 +46049,6 @@
 		},
 		"NameComponent": {
 			"name": "Canteen_Light_01"
-		},
-		"ParticleEmitterComponent": {
-			"isEmitting": true,
-			"localOffset": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"maxLifetime": 3.0,
-			"maxStartSpeed": 6.0,
-			"minLifetime": 0.5,
-			"minStartSpeed": 2.0,
-			"spawnRate": 5.0,
-			"startColor": [
-				1.0,
-				0.6000000238418579,
-				0.10000000149011612
-			],
-			"startSize": 0.5
 		},
 		"TransformComponent": {
 			"position": [
@@ -45351,7 +46544,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -45359,24 +46552,33 @@
 			"radius": 600.0,
 			"type": 1
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6930785349034000389
+				}
+			]
+		},
 		"NameComponent": {
 			"name": "Hall_Light_03"
 		},
 		"TransformComponent": {
 			"position": [
-				398.5,
-				195.4499969482422,
-				866.7999877929688
+				398.8963623046875,
+				192.53126525878906,
+				871.1621704101563
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
@@ -45390,7 +46592,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -45398,24 +46600,33 @@
 			"radius": 600.0,
 			"type": 1
 		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 6930785349034000389
+				}
+			]
+		},
 		"NameComponent": {
 			"name": "Hall_Light_04"
 		},
 		"TransformComponent": {
 			"position": [
-				-76.69999694824219,
-				195.4499969482422,
-				866.0
+				-75.18458557128906,
+				191.4669189453125,
+				871.8426513671875
 			],
 			"rotation": [
 				0.0,
-				0.0,
+				-0.0,
 				0.0
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
@@ -45688,9 +46899,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-185.71905517578125,
-				174.0294952392578,
-				415.28070068359375
+				16.579689025878906,
+				174.0,
+				-757.3493041992188
 			],
 			"rotation": [
 				0.0,
@@ -54676,7 +55887,7 @@
 			],
 			"rotation": [
 				0.0,
-				95.49088287353516,
+				228.76870727539063,
 				0.0
 			],
 			"scale": [
@@ -54775,7 +55986,7 @@
 			],
 			"rotation": [
 				0.0,
-				95.49088287353516,
+				228.76870727539063,
 				0.0
 			],
 			"scale": [
@@ -62703,7 +63914,7 @@
 			]
 		},
 		"NameComponent": {
-			"name": "Storeroom_Glow_01"
+			"name": "Storeroom_Glow_03"
 		},
 		"TransformComponent": {
 			"position": [
@@ -78053,9 +79264,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				309.9382019042969,
-				126.93507385253906,
-				28.642425537109375
+				244.0166015625,
+				105.74827575683594,
+				20.959821701049805
 			],
 			"rotation": [
 				0.0,
@@ -78078,9 +79289,9 @@
 			],
 			"enabled": true,
 			"halfExtents": [
+				150.0,
 				100.0,
-				100.0,
-				100.0
+				68.25
 			],
 			"localEulerDeg": [
 				0.0,
@@ -79108,7 +80319,7 @@
 			],
 			"rotation": [
 				0.0,
-				143.4119110107422,
+				163.52125549316406,
 				0.0
 			],
 			"scale": [
@@ -79774,6 +80985,47 @@
 				0.9999998211860657,
 				1.0,
 				0.9999998211860657
+			]
+		}
+	},
+	"852": {
+		"NameComponent": {
+			"name": "Playroom_EM_01"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				567.6510009765625,
+				145.69688415527344,
+				-578.3175048828125
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},
@@ -82844,7 +84096,7 @@
 			]
 		},
 		"NameComponent": {
-			"name": "Storeroom_Glow_03"
+			"name": "Storeroom_Glow_01"
 		},
 		"TransformComponent": {
 			"position": [
@@ -83781,6 +85033,47 @@
 				0.9999926686286926,
 				0.9999991655349731,
 				1.100000023841858
+			]
+		}
+	},
+	"904": {
+		"NameComponent": {
+			"name": "Playroom_EM_02"
+		},
+		"ParticleEmitterComponent": {
+			"isEmitting": true,
+			"localOffset": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"maxLifetime": 0.75,
+			"maxStartSpeed": 17.239999771118164,
+			"minLifetime": 0.5,
+			"minStartSpeed": 6.579999923706055,
+			"spawnRate": 50.0,
+			"startColor": [
+				1.0,
+				0.6000000238418579,
+				0.10000000149011612
+			],
+			"startSize": 1.8200000524520874
+		},
+		"TransformComponent": {
+			"position": [
+				560.57470703125,
+				142.3549041748047,
+				-585.0763549804688
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
 			]
 		}
 	},

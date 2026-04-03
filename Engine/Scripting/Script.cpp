@@ -543,8 +543,138 @@ namespace Engine {
             "isEmitting", sol::property(
                 [](ParticleEmitterComponent& p) { return p.isEmitting; },
                 [](ParticleEmitterComponent& p, bool v) { p.isEmitting = v; }
-            )
+                ),
+
+            "spawnRate", sol::property(
+                [](ParticleEmitterComponent& p) { return p.spawnRate; },
+                [](ParticleEmitterComponent& p, float v) { p.spawnRate = v; }
+                ),
+
+            "timeSinceLastSpawn", sol::property(
+                [](ParticleEmitterComponent& p) { return p.timeSinceLastSpawn; },
+                [](ParticleEmitterComponent& p, float v) { p.timeSinceLastSpawn = v; }
+                ),
+
+            "minLifetime", sol::property(
+                [](ParticleEmitterComponent& p) { return p.minLifetime; },
+                [](ParticleEmitterComponent& p, float v) { p.minLifetime = v; }
+                ),
+
+            "maxLifetime", sol::property(
+                [](ParticleEmitterComponent& p) { return p.maxLifetime; },
+                [](ParticleEmitterComponent& p, float v) { p.maxLifetime = v; }
+                ),
+
+            "minStartSpeed", sol::property(
+                [](ParticleEmitterComponent& p) { return p.minStartSpeed; },
+                [](ParticleEmitterComponent& p, float v) { p.minStartSpeed = v; }
+                ),
+
+            "maxStartSpeed", sol::property(
+                [](ParticleEmitterComponent& p) { return p.maxStartSpeed; },
+                [](ParticleEmitterComponent& p, float v) { p.maxStartSpeed = v; }
+                ),
+
+            "startSize", sol::property(
+                [](ParticleEmitterComponent& p) { return p.startSize; },
+                [](ParticleEmitterComponent& p, float v) { p.startSize = v; }
+                ),
+
+            "GetLocalOffset", [](ParticleEmitterComponent& p) {
+                return std::make_tuple(p.localOffset.x, p.localOffset.y, p.localOffset.z);
+            },
+            "SetLocalOffset", [](ParticleEmitterComponent& p, float x, float y, float z) {
+                p.localOffset = glm::vec3(x, y, z);
+            },
+
+            "GetStartColor", [](ParticleEmitterComponent& p) {
+                return std::make_tuple(p.startColor.r, p.startColor.g, p.startColor.b);
+            },
+            "SetStartColor", [](ParticleEmitterComponent& p, float r, float g, float b) {
+                p.startColor = glm::vec3(r, g, b);
+            }
         );
+
+        // ===============================================================
+        // Particle helpers
+        // ===============================================================
+        s_Lua.set_function("Particle_StartEmitter",
+            [](uint32_t entityId)
+            {
+                if (!s_RuntimeRegistry) return;
+
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!s_RuntimeRegistry->valid(e)) return;
+                if (!s_RuntimeRegistry->all_of<ParticleEmitterComponent>(e)) return;
+
+                auto& emitter = s_RuntimeRegistry->get<ParticleEmitterComponent>(e);
+                emitter.isEmitting = true;
+            });
+
+        s_Lua.set_function("Particle_StopEmitter",
+            [](uint32_t entityId)
+            {
+                if (!s_RuntimeRegistry) return;
+
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!s_RuntimeRegistry->valid(e)) return;
+                if (!s_RuntimeRegistry->all_of<ParticleEmitterComponent>(e)) return;
+
+                auto& emitter = s_RuntimeRegistry->get<ParticleEmitterComponent>(e);
+                emitter.isEmitting = false;
+            });
+
+        s_Lua.set_function("Particle_ResetEmitterTimer",
+            [](uint32_t entityId)
+            {
+                if (!s_RuntimeRegistry) return;
+
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!s_RuntimeRegistry->valid(e)) return;
+                if (!s_RuntimeRegistry->all_of<ParticleEmitterComponent>(e)) return;
+
+                auto& emitter = s_RuntimeRegistry->get<ParticleEmitterComponent>(e);
+                emitter.timeSinceLastSpawn = 0.0f;
+            });
+
+        s_Lua.set_function("Particle_SetSpawnRate",
+            [](uint32_t entityId, float spawnRate)
+            {
+                if (!s_RuntimeRegistry) return;
+
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!s_RuntimeRegistry->valid(e)) return;
+                if (!s_RuntimeRegistry->all_of<ParticleEmitterComponent>(e)) return;
+
+                auto& emitter = s_RuntimeRegistry->get<ParticleEmitterComponent>(e);
+                emitter.spawnRate = spawnRate;
+            });
+
+        s_Lua.set_function("Particle_SetStartColor",
+            [](uint32_t entityId, float r, float g, float b)
+            {
+                if (!s_RuntimeRegistry) return;
+
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!s_RuntimeRegistry->valid(e)) return;
+                if (!s_RuntimeRegistry->all_of<ParticleEmitterComponent>(e)) return;
+
+                auto& emitter = s_RuntimeRegistry->get<ParticleEmitterComponent>(e);
+                emitter.startColor = glm::vec3(r, g, b);
+            });
+
+        s_Lua.set_function("Particle_SetLocalOffset",
+            [](uint32_t entityId, float x, float y, float z)
+            {
+                if (!s_RuntimeRegistry) return;
+
+                entt::entity e = static_cast<entt::entity>(entityId);
+                if (!s_RuntimeRegistry->valid(e)) return;
+                if (!s_RuntimeRegistry->all_of<ParticleEmitterComponent>(e)) return;
+
+                auto& emitter = s_RuntimeRegistry->get<ParticleEmitterComponent>(e);
+                emitter.localOffset = glm::vec3(x, y, z);
+            });
 
 
         // ===============================================================

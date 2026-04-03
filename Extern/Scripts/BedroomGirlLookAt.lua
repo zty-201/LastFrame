@@ -143,8 +143,6 @@ local function play_random_cry()
 end
 
 local function reset_look_state()
-    local wasLooking = isLooking
-    
     isLooking         = false
     thresholdMet      = false
     stopLookingPlayed = false
@@ -155,23 +153,10 @@ local function reset_look_state()
     stop_tension()
 
     ------------------------------------------------
-    -- PLAY TENSION OFF (only when player looked before)
+    -- Do NOT stop or restart the crying sequence here.
+    -- Crying should continue naturally regardless of
+    -- whether the player is looking at her or not.
     ------------------------------------------------
-    if wasLooking then
-        if type(Audio_PlaySlot) == "function" then
-            Audio_PlaySlot(EntityID, "TensionOff")
-        end
-
-        if DEBUG then
-            print("[BedroomGirlLookAt] TensionOff played (look ended)")
-        end
-    end
-
-    if currentCrySlot and type(Audio_StopSlot) == "function" then
-        Audio_StopSlot(EntityID, currentCrySlot)
-    end
-
-    currentCrySlot = nil
 
     if SHARED and SHARED.POV then
         SHARED.POV.shake = false
@@ -189,9 +174,10 @@ local function deactivate_look_state()
 
     stop_tension()
 
-    if currentCrySlot and type(Audio_StopSlot) == "function" then
-        Audio_StopSlot(EntityID, currentCrySlot)
-    end
+    ------------------------------------------------
+    -- Do NOT stop the crying sequence here.
+    -- Let the room-level active/inactive logic decide that.
+    ------------------------------------------------
 
     if SHARED and SHARED.POV then
         SHARED.POV.shake = false
@@ -267,7 +253,7 @@ function on_update(self, dt)
     end
 
     ------------------------------------------------
-    -- 🔴 HARD STOP if player NOT in bedroom
+    -- HARD STOP if player NOT in bedroom / girl inactive
     ------------------------------------------------
     if not inZone or (not girlActive) or girlDone then
         if currentCrySlot and type(Audio_StopSlot) == "function" then
@@ -297,9 +283,12 @@ function on_update(self, dt)
     end
 
     ------------------------------------------------
-    -- CONTINUOUS CRY LOOP (ONLY when inside room)
+    -- CONTINUOUS CRY LOOP
+    -- Keep crying sequence running regardless of whether
+    -- the player is looking at her or not, until the
+    -- actual threshold event stops it.
     ------------------------------------------------
-    if not isLooking and not thresholdMet then
+    if not thresholdMet then
         if currentCrySlot == nil then
             play_random_cry()
         else
@@ -312,21 +301,6 @@ function on_update(self, dt)
 
                 play_random_cry()
             end
-        end
-    end
-
-    -- Start crying cycle when activated
-    if SHARED and SHARED.BEDROOM_START_CRY == true then
-        SHARED.BEDROOM_START_CRY = false
-
-        if currentCrySlot and type(Audio_StopSlot) == "function" then
-            Audio_StopSlot(EntityID, currentCrySlot)
-        end
-
-        play_random_cry()
-
-        if DEBUG then
-            print("[BedroomGirlLookAt] Initial cry started")
         end
     end
 
@@ -400,7 +374,7 @@ function on_update(self, dt)
         -- Ramp cry + camera shake intensity as player stares
         if isLooking and not thresholdMet then
             ------------------------------------------------
-            -- AUDIO INTENSITY (optional scaling)
+            -- AUDIO INTENSITY
             ------------------------------------------------
             local t = math.min(lookTimer / STOP_LOOKING_DELAY, 1.0)
 
@@ -410,20 +384,16 @@ function on_update(self, dt)
             end
 
             ------------------------------------------------
-            -- CAMERA SHAKE (progressively stronger, subtle)
+            -- CAMERA SHAKE
             ------------------------------------------------
             SHARED = SHARED or {}
             SHARED.POV = SHARED.POV or {}
 
             SHARED.POV.freeShakeSustain = true
 
-            -- smoother curve (ease-in instead of linear)
-            local tSmooth = t * t   -- slow start, ramps later
+            local tSmooth = t * t
 
-            -- MUCH more subtle values
             SHARED.POV.freeShakeAmplitude = 0.3 + (2.2 * tSmooth)
-
-            -- slower jitter (less chaotic)
             SHARED.POV.freeShakeSpeed = 0.08 - (0.05 * tSmooth)
 
             if SHARED.POV.freeShakeSpeed < 0.02 then
@@ -448,6 +418,7 @@ function on_update(self, dt)
             if currentCrySlot then
                 Audio_StopSlot(EntityID, currentCrySlot)
             end
+            currentCrySlot = nil
             if DEBUG then
                 print("[BedroomGirlLookAt] Threshold reached -> stop cry, silence starts")
             end
@@ -491,11 +462,7 @@ function on_update(self, dt)
         -- Player left cone: decay timer slowly instead of instant reset
         if isLooking then
             isLooking = false
-            local wasTensionPlaying = tensionPlaying
             stop_tension()
-            if wasTensionPlaying and type(Audio_PlaySlot) == "function" then
-                Audio_PlaySlot(EntityID, "TensionOff")
-            end
             if SHARED and SHARED.POV then
                 SHARED.POV.freeShakeSustain = false
             end
@@ -512,12 +479,14 @@ function on_update(self, dt)
                 stopLookingPlayed = false
                 epicSoundPlayed   = false
                 silenceTimer      = 0.0
-                if currentCrySlot and type(Audio_StopSlot) == "function" then
-                    Audio_StopSlot(EntityID, currentCrySlot)
-                end
-                currentCrySlot = nil
+
+                ------------------------------------------------
+                -- Do NOT stop or restart cry here.
+                -- Keep her crying sequence going naturally.
+                ------------------------------------------------
+
                 if DEBUG then
-                    print("[BedroomGirlLookAt] Timer fully drained -> full reset")
+                    print("[BedroomGirlLookAt] Timer fully drained -> look reset only")
                 end
             end
         elseif tensionPlaying then
