@@ -44,6 +44,11 @@ namespace EngineFramework {
                 ParticleData p;
                 glm::vec3 worldPos = glm::vec3(transform.modelMatrix * glm::vec4(emitter.localOffset, 1.0f));
 
+				// Ensure maxLifetime is not less than minLifetime to avoid invalid random range
+                if (emitter.maxLifetime < emitter.minLifetime) {
+                    emitter.maxLifetime = emitter.minLifetime;
+				}
+
                 p.position_life = glm::vec4(worldPos, RandomFloat(emitter.minLifetime, emitter.maxLifetime));
 
                 // Shoot upward with a slight random spread
@@ -160,6 +165,9 @@ namespace EngineFramework {
 
     float ParticleSystem::RandomFloat(float min, float max) {
         static std::mt19937 rng(std::random_device{}());
+        if (min > max) {
+            std::swap(min, max);
+        }
         std::uniform_real_distribution<float> dist(min, max);
         return dist(rng);
     }

@@ -93,6 +93,7 @@ namespace EngineFramework
     {
         m_instancingSystem.reset();
         m_geometryBuffer.reset();
+		m_particleSystem.reset();
         if (m_lightSSBOs[0] != 0) {
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_lightSSBOs);
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_volumetricUBOs);
