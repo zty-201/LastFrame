@@ -24,6 +24,11 @@ local waitingForShutdown = false
 local fadeOnTimer = 0.0
 local isFadingOn = false
 
+local LIGHT_ON_DELAY = 0.5
+
+local lightOnDelayTimer = 0.0
+local waitingToFadeOn = false
+
 local originalIntensity = 1.0
 local isCurrentlyOff = false
 
@@ -50,6 +55,9 @@ function on_create(self)
 
     fadeOnTimer = 0.0
     isFadingOn = false
+
+    lightOnDelayTimer = 0.0
+    waitingToFadeOn = false
 
     isCurrentlyOff = false
 
@@ -84,21 +92,51 @@ function on_update(self, dt)
 
     ----------------------------------------------------------------
     -- LIGHTS ON REQUEST
+    -- Start the flame first, then delay the glow fade
     ----------------------------------------------------------------
     if t[EVENT_ON_KEY] == true then
-        if isCurrentlyOff and not isFadingOn then
-            isFadingOn = true
-            fadeOnTimer = 0.0
+        if isCurrentlyOff and not isFadingOn and not waitingToFadeOn then
+            waitingToFadeOn = true
+            lightOnDelayTimer = 0.0
+
             waitingForShutdown = false
             shutdownTimer = 0.0
             t[DISABLE_KEY] = false
 
+            -- Keep the light fully dark during the lead-in delay
+            EntityLight:SetIntensity(0.0)
+
+            if DEBUG then
+                print(string.format("[CanteenLightOffOnTrigger] Glow delay started | Entity=%d", EntityID))
+            end
+        end
+    end
+
+    ----------------------------------------------------------------
+    -- Hold darkness while waiting for delayed glow start
+    ----------------------------------------------------------------
+    if waitingToFadeOn then
+        EntityLight:SetIntensity(0.0)
+
+        lightOnDelayTimer = lightOnDelayTimer + dt
+
+        if lightOnDelayTimer >= LIGHT_ON_DELAY then
+            waitingToFadeOn = false
+            lightOnDelayTimer = 0.0
+
+            isFadingOn = true
+            fadeOnTimer = 0.0
+
+            -- Start fade from complete darkness
+            EntityLight:SetIntensity(0.0)
             play_3d_sfx(LIGHT_ON_SFX_ID)
 
             if DEBUG then
                 print(string.format("[CanteenLightOffOnTrigger] Fade ON started | Entity=%d", EntityID))
             end
         end
+
+        return
     end
 
     if isFadingOn then
@@ -127,6 +165,9 @@ function on_update(self, dt)
             waitingForShutdown = true
             shutdownTimer = 0.0
 
+            waitingToFadeOn = false
+            lightOnDelayTimer = 0.0
+
             if DEBUG then
                 print("[CanteenLightOffOnTrigger] Shutdown timer started")
             end
@@ -143,6 +184,9 @@ function on_update(self, dt)
             isCurrentlyOff = true
             isFadingOn = false
             fadeOnTimer = 0.0
+
+            waitingToFadeOn = false
+            lightOnDelayTimer = 0.0
 
             waitingForShutdown = false
             shutdownTimer = 0.0

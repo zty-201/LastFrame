@@ -11,12 +11,27 @@ local COMBO      = { [0]=true, [9]=true, [1]=true, [3]=true }
 local MAX_FAILS  = 3
 local UI_TABLE   = "LOCKSCREEN_OPEN"
 
+local BUTTON_PRESS_SFX_ID = "LockButtonPress"
+local CANDLE_BLOWOUT_SFX_ID = "BlowOut"
+
 local TOOLBOX_LOCKED_ID = 479   -- closed toolbox (hide on success)
 local TOOLBOX_OPEN_ID   = 480   -- open toolbox   (show on success)
 local BOLT_CUTTER_ID    = 481   -- bolt cutter    (move into toolbox position on success)
 
 -- Light entities dimmed on each fail (fail 1 -> 485, fail 2 -> 484, fail 3 -> 483)
 local FAIL_LIGHTS = { 485, 484, 483 }
+
+local FAIL_GLOW_LIGHTS = {
+    [485] = 689,
+    [484] = 846,
+    [483] = 883,
+}
+
+local FAIL_EMITTERS = {
+    [485] = 1020, -- replace with emitter entity for candle light 485
+    [484] = 1019, -- replace with emitter entity for candle light 484
+    [483] = 1021, -- replace with emitter entity for candle light 483
+}
 
 -- Position of the closed toolbox — bolt cutter moves here on success
 local TOOLBOX_POS_X = 642.8716430664063
@@ -76,6 +91,11 @@ end
 local function handle_digit(digit)
     if not is_open() then return end
     if SHARED.LOCK_DISABLED then return end
+
+    ----------------------------------------------------------------
+    -- 🔊 Play button press sound
+    ----------------------------------------------------------------
+    play_sfx(EntityID, BUTTON_PRESS_SFX_ID)
 
     -- Toggle the digit in our tracking set
     if pressed[digit] then
@@ -138,12 +158,6 @@ end
 
 function on_update(self, dt)
     local open = is_open()
-
-    local FAIL_GLOW_LIGHTS = {
-        [485] = 689,
-        [484] = 846,
-        [483] = 883,
-    }
 
     SHARED = SHARED or {}
     SHARED.STOREROOM_FLICKER_OFF = SHARED.STOREROOM_FLICKER_OFF or {}
@@ -228,8 +242,14 @@ function on_update(self, dt)
                 local light = Query.GetLight(pending_fail_light)
                 if light then light:SetIntensity(0) end
 
-                local pe = Query.GetParticleEmitter(pending_fail_light)
-                if pe then pe.isEmitting = false end
+                local emitterId = FAIL_EMITTERS[pending_fail_light]
+                if emitterId then
+                    SHARED.FAIL_CANDLE_EMITTER_CMD = SHARED.FAIL_CANDLE_EMITTER_CMD or {}
+                    SHARED.FAIL_CANDLE_EMITTER_CMD[emitterId] = {
+                        cmd = "off",
+                        by = pending_fail_light
+                    }
+                end
 
                 local glowId = FAIL_GLOW_LIGHTS[pending_fail_light]
                 if glowId then
@@ -238,6 +258,7 @@ function on_update(self, dt)
                 end
 
                 play_sfx(pending_fail_light, "Candles")
+                play_sfx(pending_fail_light, CANDLE_BLOWOUT_SFX_ID)
                 pending_fail_light = nil
             end
         end
@@ -269,8 +290,14 @@ function on_update(self, dt)
                 local light = Query.GetLight(pending_fail_light)
                 if light then light:SetIntensity(0) end
 
-                local pe = Query.GetParticleEmitter(pending_fail_light)
-                if pe then pe.isEmitting = false end
+                local emitterId = FAIL_EMITTERS[pending_fail_light]
+                if emitterId then
+                    SHARED.FAIL_CANDLE_EMITTER_CMD = SHARED.FAIL_CANDLE_EMITTER_CMD or {}
+                    SHARED.FAIL_CANDLE_EMITTER_CMD[emitterId] = {
+                        cmd = "off",
+                        by = pending_fail_light
+                    }
+                end
 
                 local glowId = FAIL_GLOW_LIGHTS[pending_fail_light]
                 if glowId then
@@ -279,6 +306,7 @@ function on_update(self, dt)
                 end
 
                 play_sfx(pending_fail_light, "Candles")
+                play_sfx(pending_fail_light, CANDLE_BLOWOUT_SFX_ID)
             end
 
         elseif cinematic_phase == 2 then

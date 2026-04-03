@@ -26,14 +26,20 @@ local IMMEDIATE_UNHIDE_ENTITY_ID = 893
 local HALL_LIGHT_CASCADE = { 488, 486 }
 local LIGHT_CASCADE_DELAY = 0.5
 
+local HALL_EMITTER_CASCADE = { 1015, 1016 } -- replace with your emitter entity IDs
+local EMITTER_CASCADE_DELAY = 0.5
+
+local EMITTER_LEAD_TIME = 0.8
+local pendingLightSteps = {}
+
 local cascadeIndex = 1
 local cascadeTimer = 0.0
 local cascadeActive = false
 local lightFadeStates = {}
 
 local LIGHT_TARGET_INTENSITY = 500.0
-local LIGHT_FADE_SECONDS = 0.7
-local LIGHT_DELAY_SECONDS = 2.0
+local LIGHT_FADE_SECONDS = 1.5
+local LIGHT_DELAY_SECONDS = 1.0
 
 -- If your pickup entity is NOT the same entity this script is on,
 -- set this to that entity id. Otherwise leave as 0 (auto = EntityID).
@@ -107,7 +113,16 @@ local function send_light_set_all(value, byId)
     end
 end
 
--- ✅ NEW: icon command bus for key pickup icon
+local function send_emitter_cmd(id, cmd, byId)
+    SHARED.EMITTER_CMD = SHARED.EMITTER_CMD or {}
+    SHARED.EMITTER_CMD[id] =
+    {
+        cmd = cmd,
+        by = byId
+    }
+end
+
+-- Icon command bus for key pickup icon
 local function send_key_icon_cmd(keyId, cmd)
     SHARED.KEY_ICON_CMD = SHARED.KEY_ICON_CMD or {}
     SHARED.KEY_ICON_CMD[keyId] = { cmd = cmd, by = keyId }
@@ -140,9 +155,10 @@ end
 function on_update(Self, dt)
 
     local pickupId = (TARGET_ENTITY_ID ~= 0) and TARGET_ENTITY_ID or EntityID
+    dt = dt or 0.016
 
     ----------------------------------------------------------------
-    -- ✅ NEW: drive pickup icon while not picked up
+    -- drive pickup icon while not picked up
     ----------------------------------------------------------------
     if not pickedUp then
         if key_in_range(pickupId) then
@@ -151,12 +167,11 @@ function on_update(Self, dt)
             send_key_icon_cmd(pickupId, "hide")
         end
     else
-        -- once picked up: force hidden forever
         send_key_icon_cmd(pickupId, "hide")
     end
 
     ----------------------------------------------------------------
-    -- After pickup: wait, then cascade lights
+    -- After pickup: wait, then cascade emitters first, lights shortly after
     ----------------------------------------------------------------
     if pickedUp then
 
@@ -175,6 +190,9 @@ function on_update(Self, dt)
             end
         end
 
+        ----------------------------------------------------------------
+        -- Start emitter first, then queue the light fade slightly later
+        ----------------------------------------------------------------
         if cascadeActive then
             cascadeTimer = cascadeTimer + dt
 
@@ -184,11 +202,23 @@ function on_update(Self, dt)
                 local lid = HALL_LIGHT_CASCADE[cascadeIndex]
 
                 if lid ~= nil then
-                    lightFadeStates[lid] =
+                    ----------------------------------------------------------------
+                    -- Trigger emitter first for this step
+                    ----------------------------------------------------------------
+                    if HALL_EMITTER_CASCADE ~= nil then
+                        local emitterId = HALL_EMITTER_CASCADE[cascadeIndex]
+                        if emitterId ~= nil and emitterId ~= 0 then
+                            send_emitter_cmd(emitterId, "on", pickupId)
+                        end
+                    end
+
+                    ----------------------------------------------------------------
+                    -- Queue the light to begin fading after a short lead time
+                    ----------------------------------------------------------------
+                    pendingLightSteps[#pendingLightSteps + 1] =
                     {
-                        t = 0.0,
-                        start = 0.0,
-                        target = LIGHT_TARGET_INTENSITY
+                        lid = lid,
+                        wait = EMITTER_LEAD_TIME
                     }
 
                     cascadeIndex = cascadeIndex + 1
@@ -201,6 +231,28 @@ function on_update(Self, dt)
             end
         end
 
+        ----------------------------------------------------------------
+        -- Process delayed light starts
+        ----------------------------------------------------------------
+        for i = #pendingLightSteps, 1, -1 do
+            local step = pendingLightSteps[i]
+            step.wait = step.wait - dt
+
+            if step.wait <= 0.0 then
+                lightFadeStates[step.lid] =
+                {
+                    t = 0.0,
+                    start = 0.0,
+                    target = LIGHT_TARGET_INTENSITY
+                }
+
+                table.remove(pendingLightSteps, i)
+            end
+        end
+
+        ----------------------------------------------------------------
+        -- Light fade update
+        ----------------------------------------------------------------
         for lid, state in pairs(lightFadeStates) do
             state.t = state.t + dt
             local progress = state.t / LIGHT_FADE_SECONDS
@@ -226,7 +278,6 @@ function on_update(Self, dt)
 
     ----------------------------------------------------------------
     -- Wait for InteractionBox "pickup/use" command
-    -- (you currently reuse SHARED.DOOR_CMD for pickups)
     ----------------------------------------------------------------
     if not SHARED.DOOR_CMD then return end
 
@@ -265,14 +316,24 @@ function on_update(Self, dt)
     end
 
     ----------------------------------------------------------------
-    -- 4) Start LIGHT DELAY
+    -- 4) Start light delay + turn off emitters first
     ----------------------------------------------------------------
     if has_any_lights() then
         lightDelayActive = true
         lightDelayTime = 0.0
         lightFading = false
         lightTime = 0.0
+        pendingLightSteps = {}
+
         send_light_set_all(0.0, pickupId)
+
+        if HALL_EMITTER_CASCADE ~= nil then
+            for _, eid in ipairs(HALL_EMITTER_CASCADE) do
+                if eid ~= 0 then
+                    send_emitter_cmd(eid, "off", pickupId)
+                end
+            end
+        end
     end
 
     ----------------------------------------------------------------

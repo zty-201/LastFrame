@@ -11,8 +11,8 @@ local DEBUG = false
 -- INTENSITY CONFIG
 -- =========================
 
-local NORMAL_INTENSITY = 50000.0
-local SCARE_INTENSITY  = 100000.0
+local NORMAL_INTENSITY = 10.0
+local SCARE_INTENSITY  = 10.0
 local OFF_INTENSITY = 0.0
 
 -- =========================

@@ -4,10 +4,17 @@
 
 local DEBUG = false
 
-local SPEED_MIN = 1800.0
-local SPEED_MAX = 2000.0
+local SPEED_MIN = 1300.0
+local SPEED_MAX = 1500.0
 local FALL_DISTANCE = 500.0
 local RESPAWN_RADIUS = 15.0
+
+local FALL_DRIFT_X = 80.0
+local FALL_DRIFT_Z = 25.0
+
+local DROP_ROT_X = 0.0
+local DROP_ROT_Y = 0.0
+local DROP_ROT_Z = -10.0
 
 local WIND_DRIFT = 40.0
 
@@ -74,6 +81,7 @@ local function respawn_drop(tr)
     currentSpeed = random_range(SPEED_MIN, SPEED_MAX)
 
     tr:SetPosition(currentX, currentY, currentZ)
+    apply_drop_rotation(tr)
 
     if DEBUG then
         print(string.format(
@@ -81,6 +89,11 @@ local function respawn_drop(tr)
             currentX, currentY, currentZ, currentSpeed
         ))
     end
+end
+
+local function apply_drop_rotation(tr)
+    if tr == nil then return end
+    tr:SetRotation(DROP_ROT_X, DROP_ROT_Y, DROP_ROT_Z)
 end
 
 local function init_if_needed(tr)
@@ -106,6 +119,7 @@ local function init_if_needed(tr)
     end
 
     tr:SetPosition(currentX, currentY, currentZ)
+    apply_drop_rotation(tr)
 
     hasInitialized = true
 
@@ -135,6 +149,7 @@ local function reactivate_drop(tr)
     end
 
     tr:SetPosition(currentX, currentY, currentZ)
+    apply_drop_rotation(tr)
 
     if DEBUG then
         print("[RainDrop] Reactivated")
@@ -186,9 +201,13 @@ function on_update(self, dt)
 
     currentFall = currentFall + (currentSpeed * dt)
     currentY = startY - currentFall
-    currentX = currentX + random_range(-WIND_DRIFT, WIND_DRIFT) * dt
+
+    -- Fall at a slanted angle instead of straight down
+    currentX = currentX - (FALL_DRIFT_X * dt) + random_range(-WIND_DRIFT, WIND_DRIFT) * dt
+    currentZ = currentZ - (FALL_DRIFT_Z * dt)
 
     tr:SetPosition(currentX, currentY, currentZ)
+    apply_drop_rotation(tr)
 
     if currentFall >= FALL_DISTANCE then
         respawn_drop(tr)

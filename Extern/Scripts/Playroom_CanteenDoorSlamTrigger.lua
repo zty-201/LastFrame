@@ -106,6 +106,20 @@ function on_trigger_exit(self, otherID)
         return
     end
 
+    ----------------------------------------------------------------
+    -- Fix case where player was already inside the trigger zone
+    -- before the hidden wall opened, so on_trigger_enter never got
+    -- a chance to fire the slam logic.
+    --
+    -- Only try this on EXIT if the slam has not already happened.
+    ----------------------------------------------------------------
+    if not fired then
+        if DEBUG then
+            print("[Playroom_CanteenDoorSlamTrigger] EXIT fallback -> attempting trigger_slam()")
+        end
+        trigger_slam()
+    end
+
     playerInsideThisZone = false
 end
 
