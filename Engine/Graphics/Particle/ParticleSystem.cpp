@@ -165,9 +165,6 @@ namespace EngineFramework {
 
     float ParticleSystem::RandomFloat(float min, float max) {
         static std::mt19937 rng(std::random_device{}());
-        if (min > max) {
-            std::swap(min, max);
-        }
         std::uniform_real_distribution<float> dist(min, max);
         return dist(rng);
     }
