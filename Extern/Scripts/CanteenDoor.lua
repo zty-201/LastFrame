@@ -103,9 +103,19 @@ function on_update(self, dt)
         if voStage == 0 then
             if voTimer >= VOICEOVER_01_DELAY then
                 play_3d_sfx(VOICEOVER_01_SFX_ID)
+
+                ------------------------------------------------
+                -- Trigger ONE subtitle for the full VO1 + VO2 line
+                ------------------------------------------------
+                SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+                SHARED.SUBTITLE_CMD["CANTEEN_DOOR_LOCKED_SEQUENCE"] = {
+                    trigger = true,
+                    by = EntityID
+                }
+
                 voTimer = 0.0
                 voStage = 1
-                print("[CanteenDoor] VoiceOver_01 played")
+                print("[CanteenDoor] VoiceOver_01 played + combined subtitle shown")
             end
 
         elseif voStage == 1 then

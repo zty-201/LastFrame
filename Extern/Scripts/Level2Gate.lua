@@ -202,8 +202,17 @@ function on_update(self, dt)
 
             play_3d_sfx(VOICEOVER_SFX_ID)
 
+            ------------------------------------------------
+            -- Trigger subtitle
+            ------------------------------------------------
+            SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+            SHARED.SUBTITLE_CMD["LEVEL2_GATE_LOCKED"] = {
+                trigger = true,
+                by = EntityID
+            }
+
             if DEBUG then
-                print("[Level2Gate] Delayed VO played")
+                print("[Level2Gate] Delayed VO + subtitle played")
             end
         end
     end

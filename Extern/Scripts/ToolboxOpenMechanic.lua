@@ -117,8 +117,17 @@ function on_update(self, dt)
                 Audio_PlaySlot(id, VOICEOVER_SFX_ID)
             end
 
+            ------------------------------------------------
+            -- Trigger subtitle
+            ------------------------------------------------
+            SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+            SHARED.SUBTITLE_CMD["TOOLBOX_PADLOCK_REACTION"] = {
+                trigger = true,
+                by = id
+            }
+
             if DEBUG then
-                print("[ToolboxOpenMechanic] First padlock open -> delayed VoiceOver played")
+                print("[ToolboxOpenMechanic] VoiceOver + subtitle played")
             end
         end
     end
