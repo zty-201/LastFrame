@@ -1675,6 +1675,11 @@ namespace EngineFramework
             );
 
             compShader->disuse();
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, 0);
         }
 
         // 7. Restore Global State for the UI pass
