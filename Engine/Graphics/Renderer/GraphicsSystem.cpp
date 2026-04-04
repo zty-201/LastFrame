@@ -364,36 +364,34 @@ namespace EngineFramework
         SkyboxPass();
 
         m_particleSystem->RenderParticles(viewProj, V);
+
 #ifdef PLATFORM_ANDROID
+        // On Android, this now blits the scene to 0, then composites rays to 0
         GodRayPass();
-#endif
-		// 7. UI pass
-		RenderUI();
-
-#if defined(PLATFORM_ANDROID)
-        const GLenum depthDiscard[] = { GL_DEPTH_ATTACHMENT };
-
-        // Shadow maps no longer needed
-        /*glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_spotShadowFBO.handle);
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);*/
-
-        // Main FBO depth no longer needed either
-        glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
-#endif
-        // 8. Copy to screen if we are not in level editor
+#else
+        // On PC, if we aren't in the editor, move the scene to the screen BEFORE the UI draws
         if (!m_isRenderingToFBO) {
             glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
             glBlitFramebuffer(0, 0, (GLint)screen.x, (GLint)screen.y,
-                              0, 0, (GLint)screen.x, (GLint)screen.y,
-                              GL_COLOR_BUFFER_BIT, GL_NEAREST);
+                0, 0, (GLint)screen.x, (GLint)screen.y,
+                GL_COLOR_BUFFER_BIT, GL_NEAREST);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
+#endif
+
+        // 7. UI pass 
+        // This now brilliantly draws directly to the screen (0) on Android, 
+        // saving massive FBO fill rate!
+        RenderUI();
+
+#if defined(PLATFORM_ANDROID)
+        const GLenum depthDiscard[] = { GL_DEPTH_ATTACHMENT };
+
+        // Main FBO depth no longer needed
+        glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+#endif
 
         m_geometryBuffer->Unbind();
         m_prev_view_projection = viewProj;
@@ -1630,15 +1628,25 @@ namespace EngineFramework
         // --- STEP 4: THE COMPOSITE PASS ---
         // ==========================================
 
-        // 1. Bind the main FBO to draw over our 3D scene
-        glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
+        // 1. Bind the DEFAULT screen (0) instead of mainFBO
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
 
-        // 2. Enable Additive Blending (This makes the light add to the existing pixels)
+        // 2. Move the 3D scene from mainFBO to the screen (0)
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBlitFramebuffer(0, 0, (GLint)screen.x, (GLint)screen.y,
+            0, 0, (GLint)screen.x, (GLint)screen.y,
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+        // Ensure we are fully bound to 0 for drawing
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // 3. Enable Additive Blending (This makes the god rays add to the existing pixels)
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
 
-        // 3. Fetch the Composite Shader
+        // 4. Fetch the Composite Shader
         std::shared_ptr<ShaderProgram> compShader{};
         if (composite_shader_guid != xresource::full_guid{}) {
             compShader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(composite_shader_guid);
@@ -1652,12 +1660,12 @@ namespace EngineFramework
         if (compShader) {
             compShader->use();
 
-            // 4. Bind the blurred God Ray texture we just created
+            // 5. Bind the blurred God Ray texture
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, m_godRayTextureID);
             compShader->setUniform("s_Texture", 0);
 
-            // 5. Draw the Full-Screen Quad again
+            // 6. Draw the Full-Screen Quad directly to the screen
             glDrawElementsBaseVertex(
                 GL_TRIANGLES,
                 meshData->subMeshes[0].indexCount,
@@ -1669,7 +1677,7 @@ namespace EngineFramework
             compShader->disuse();
         }
 
-        // 6. Restore Global State so we don't break the UI pass!
+        // 7. Restore Global State for the UI pass
         glDisable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);

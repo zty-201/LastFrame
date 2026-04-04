@@ -1,6 +1,6 @@
 #version 320 es
-precision highp float;
-precision highp sampler2D; 
+precision mediump float;
+precision mediump sampler2D; 
 // ------------------------------------------------------------------
 // OUTPUT VARIABLES  ------------------------------------------------
 // ------------------------------------------------------------------
@@ -11,14 +11,14 @@ out vec4 FS_OUT_Color;
 // INPUT VARIABLES  -------------------------------------------------
 // ------------------------------------------------------------------
 
-in vec2 FS_IN_TexCoord;
+in highp vec2 FS_IN_TexCoord;
 
 // ------------------------------------------------------------------
 // UNIFORMS ---------------------------------------------------------
 // ------------------------------------------------------------------
 
 uniform sampler2D s_Texture;
-uniform vec2 u_SunPos;
+uniform highp vec2 u_SunPos;
 uniform float u_Intensity;
 
 // Mobile-Optimized Hardcoded Constants
@@ -34,12 +34,12 @@ const float EXPOSURE = 0.6;   // Final brightness multiplier
 void main() {
     
     // Calculate the vector pointing from the current pixel to the sun
-    vec2 deltaTextCoord = FS_IN_TexCoord - u_SunPos;
+    highp vec2 deltaTextCoord = FS_IN_TexCoord - u_SunPos;
     
     // Divide the vector into small steps based on our sample count
     deltaTextCoord *= 1.0 / float(NUM_SAMPLES) * DENSITY;
 
-    vec2 currentUV = FS_IN_TexCoord;
+    highp vec2 currentUV = FS_IN_TexCoord;
     vec4 color = texture(s_Texture, currentUV);
     float illuminationDecay = 1.0;
 
