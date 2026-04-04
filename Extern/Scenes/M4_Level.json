@@ -20649,6 +20649,25 @@
 					"spatial": 1,
 					"useFade": false,
 					"volume": 1.0
+				},
+				{
+					"ambienceType": 0,
+					"audio_guid": [
+						8992897446404849733,
+						11537445004664754516
+					],
+					"category": 0,
+					"fadeDuration": 1.0,
+					"gameStateTag": 0,
+					"id": "Scream",
+					"loop": false,
+					"maxDistance": 1200.0,
+					"minDistance": 100.0,
+					"pitch": 1.0,
+					"playOnStart": false,
+					"spatial": 1,
+					"useFade": false,
+					"volume": 1.0
 				}
 			]
 		},
@@ -20780,9 +20799,9 @@
 				-0.00010427424422232434
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -35062,9 +35081,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				16.579689025878906,
-				174.8000030517578,
-				-727.3493041992188
+				-49.22673797607422,
+				184.6888885498047,
+				792.3840942382813
 			],
 			"rotation": [
 				0.0,
@@ -46034,7 +46053,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 449.6744384765625,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46379,7 +46398,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 440.4961853027344,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46473,7 +46492,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 515.9758911132813,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46567,7 +46586,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 431.8722839355469,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46661,7 +46680,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 461.0887145996094,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46761,7 +46780,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 462.53106689453125,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46981,14 +47000,14 @@
 		"CharacterControllerComponent": {
 			"controlVelocity": [
 				0.0,
-				0.0,
+				-2.0,
 				0.0
 			],
 			"gravityFactor": 25.0,
 			"groundNormal": [
 				0.0,
-				1.0,
-				0.0
+				0.9999926686286926,
+				0.003839715151116252
 			],
 			"height": 350.0,
 			"isGrounded": true,
@@ -47068,9 +47087,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				16.579689025878906,
-				174.0,
-				-757.3493041992188
+				-49.22673797607422,
+				183.88888549804688,
+				762.3840942382813
 			],
 			"rotation": [
 				0.0,
@@ -56056,7 +56075,7 @@
 			],
 			"rotation": [
 				0.0,
-				5.035572052001953,
+				15.595979690551758,
 				0.0
 			],
 			"scale": [
@@ -56155,7 +56174,7 @@
 			],
 			"rotation": [
 				0.0,
-				5.035572052001953,
+				15.595979690551758,
 				0.0
 			],
 			"scale": [
@@ -64065,7 +64084,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 99.32441711425781,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -80488,7 +80507,7 @@
 			],
 			"rotation": [
 				0.0,
-				163.52125549316406,
+				86.45792388916016,
 				0.0
 			],
 			"scale": [
@@ -84247,7 +84266,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 95.54317474365234,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,

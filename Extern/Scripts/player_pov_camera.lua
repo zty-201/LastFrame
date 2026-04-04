@@ -115,6 +115,13 @@ local pullTargetX, pullTargetY, pullTargetZ = 0.0, 0.0, 0.0
 -- Holds the last pulled position so camera stays there after pull ends (while still locked)
 local lockedCamX, lockedCamY, lockedCamZ   = nil, nil, nil
 
+-- Post-pull positional shift (drift up/forward from locked position)
+local shiftActive   = false
+local shiftTimer    = 0.0
+local shiftDuration = 0.0
+local shiftStartX, shiftStartY, shiftStartZ     = 0.0, 0.0, 0.0
+local shiftTargetX, shiftTargetY, shiftTargetZ  = 0.0, 0.0, 0.0
+
 -- Recenter smoothing
 local recenterActive        = false
 local recenterTime          = 0.0
@@ -424,6 +431,52 @@ function on_update(self, dt)
             if t >= 1.0 then
                 pullActive = false
             end
+        end
+
+        -- Shake only (no pull) during locked state
+        if SHARED.POV.shakeOnly then
+            SHARED.POV.shakeOnly = false
+            shakeTimer     = 0.0
+            shakeTickTimer = 0.0
+            shakeDuration  = SHARED.POV.shakeOnlyDuration  or 0.5
+            shakeAmplitude = SHARED.POV.shakeOnlyAmplitude or 15.0
+            shakeSpeed     = SHARED.POV.shakeOnlySpeed     or 0.02
+            shakeOffsetYaw   = 0.0
+            shakeOffsetPitch = 0.0
+        end
+
+        -- Positional shift: drift camera up/forward from its current locked spot
+        if SHARED.POV.camShift and lockedCamX then
+            SHARED.POV.camShift = false
+            shiftActive   = true
+            shiftTimer    = 0.0
+            shiftDuration = SHARED.POV.camShiftDuration or 0.8
+
+            shiftStartX, shiftStartY, shiftStartZ = lockedCamX, lockedCamY, lockedCamZ
+
+            -- Forward direction from current yaw/pitch
+            local radYaw   = math.rad(yaw)
+            local radPitch = math.rad(pitch)
+            local cosPitch = math.cos(radPitch)
+            local fwdX = cosPitch * math.sin(radYaw)
+            local fwdZ = cosPitch * math.cos(radYaw)
+
+            local upAmt  = SHARED.POV.camShiftUp      or 25.0
+            local fwdAmt = SHARED.POV.camShiftForward or 0.0
+
+            shiftTargetX = lockedCamX + fwdX * fwdAmt
+            shiftTargetY = lockedCamY + upAmt
+            shiftTargetZ = lockedCamZ + fwdZ * fwdAmt
+        end
+
+        if shiftActive then
+            shiftTimer = shiftTimer + dt
+            local t    = math.min(shiftTimer / shiftDuration, 1.0)
+            local ease = t * t * (3.0 - 2.0 * t)
+            lockedCamX = shiftStartX + (shiftTargetX - shiftStartX) * ease
+            lockedCamY = shiftStartY + (shiftTargetY - shiftStartY) * ease
+            lockedCamZ = shiftStartZ + (shiftTargetZ - shiftStartZ) * ease
+            if t >= 1.0 then shiftActive = false end
         end
 
         if lockedCamX then
