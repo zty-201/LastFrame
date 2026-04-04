@@ -2,7 +2,7 @@
 
 // 1. The Global 16-bit Override
 precision mediump float;
-precision mediump int; 
+precision highp int; 
 precision mediump sampler2D; 
 
 // 2. Protect 3D and Depth Samplers
