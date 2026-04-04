@@ -64,6 +64,12 @@ end
 
 function on_update(self, dt)
 
+    if PLATFORM == "android" then
+        SIZE_Y =  0.1
+        EntityUI:SetSize_NDC(SIZE_X,0.1)
+        --debug_print("SIZE_Y = 0.1")
+    end
+
     --comment this code if u dont want other states to close it
     local state_name = StateMachine_GetCurrentStateName()
     if state_name ~= "Gameplay" then

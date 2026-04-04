@@ -11,8 +11,6 @@ local START_X   = -0.32
 local START_Y   = -0.8
 local SPACING_X =  0.17
 
-
-
 local function debug_print(...)
     if DEBUG then
         print("[UI_Inventory]", ...)
@@ -101,6 +99,12 @@ local function recalculate_positions()
         local iconData = icons[entityId]
 
         if iconData ~= nil then
+
+            if PLATFORM == "android" then
+                START_X = -0.37
+                START_Y = 0.0
+            end
+
             iconData.ndc_x = START_X + visibleIndex * SPACING_X
             iconData.ndc_y = START_Y
 
@@ -120,6 +124,9 @@ local function recalculate_positions()
 end
 
 function on_create(self)
+
+    
+
     
     reset_inventory_state()
     ensure_tables()
@@ -221,6 +228,8 @@ function on_update(self, dt)
     
     -- Android state control
     if PLATFORM == "android" then
+        EntityUI:SetSize_NDC(0.5,0.35)
+        EntityUI:SetPosition_NDC(-0.05, 0.0)
         if SHARED.UI_INVENTORY_ANDROID_STATE ~= nil then
             if SHARED.UI_INVENTORY_ANDROID_STATE ~= inventoryOpen then
                 inventoryOpen = SHARED.UI_INVENTORY_ANDROID_STATE
