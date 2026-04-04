@@ -458,7 +458,7 @@
 			"name": "Canteen"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				80,
 				240,
@@ -895,7 +895,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				5,
 				2,
