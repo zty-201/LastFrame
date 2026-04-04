@@ -109,8 +109,17 @@ function on_update(self, dt)
                 Audio_PlaySlot(EntityID, VOICEOVER_SFX_ID)
             end
 
+            ------------------------------------------------
+            -- Trigger matching subtitle
+            ------------------------------------------------
+            SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+            SHARED.SUBTITLE_CMD["LOBBY_CHAIR_DRAG_REACTION"] = {
+                trigger = true,
+                by = EntityID
+            }
+
             if DEBUG then
-                print("[Lobby_ChairDragTrigger] VoiceOver played after delay")
+                print("[Lobby_ChairDragTrigger] VoiceOver + subtitle played after delay")
             end
         end
     end

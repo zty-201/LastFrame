@@ -191,8 +191,14 @@ function on_update(Self, dt)
             if type(Audio_PlaySlot) == "function" then
                 Audio_PlaySlot(EntityID, FIRST_HOVER_VOICEOVER_SFX_ID)
 
+                SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+                SHARED.SUBTITLE_CMD["MUSICBOX_NO_DISC"] = {
+                    trigger = true,
+                    by = EntityID
+                }
+
                 if DEBUG then
-                    print("[Test_ConsumeDisc_Shared] First hover no-disc -> delayed VoiceOver played")
+                    print("[Test_ConsumeDisc_Shared] First hover no-disc -> delayed VoiceOver + subtitle played")
                 end
             end
         end

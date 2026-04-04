@@ -81,6 +81,15 @@ function on_update(Self, dt)
             voiceReactionPending = false
             voiceReactionTimer = 0.0
             play_3d_sfx(VOICE_REACTION_SFX_ID)
+
+            ------------------------------------------------
+            -- Trigger matching subtitle at the same time
+            ------------------------------------------------
+            SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+            SHARED.SUBTITLE_CMD["MAIN_DOOR_REACTION"] = {
+                trigger = true,
+                by = EntityID
+            }
         end
     end
 

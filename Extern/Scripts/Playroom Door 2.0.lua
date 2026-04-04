@@ -318,8 +318,17 @@ function on_update(self, dt)
             pendingVoiceOverDelay = false
             play_3d_sfx(SFX_VOICE_OVER)
 
+            ------------------------------------------------
+            -- Trigger matching subtitle
+            ------------------------------------------------
+            SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+            SHARED.SUBTITLE_CMD["PLAYROOM_DOOR_LOCKED"] = {
+                trigger = true,
+                by = EntityID
+            }
+
             if DEBUG then
-                print("[PlayroomDoor] First locked attempt -> delayed VoiceOver SFX")
+                print("[PlayroomDoor] First locked attempt -> delayed VoiceOver SFX + subtitle")
             end
         end
     end
