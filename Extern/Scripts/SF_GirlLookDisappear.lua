@@ -176,8 +176,17 @@ function on_update(self, dt)
             voTimer = 0.0
             play_3d_sfx(VO_REACTION_SFX_ID)
 
+            ------------------------------------------------
+            -- Trigger matching subtitle
+            ------------------------------------------------
+            SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+            SHARED.SUBTITLE_CMD["SF_GIRL_REACTION"] = {
+                trigger = true,
+                by = EntityID
+            }
+
             if DEBUG then
-                print("[GhostGirl] VoiceReaction played after delay")
+                print("[GhostGirl] VoiceReaction + subtitle played after delay")
             end
         end
     end

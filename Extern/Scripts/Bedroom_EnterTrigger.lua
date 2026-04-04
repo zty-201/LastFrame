@@ -36,7 +36,7 @@ local function activate_girl()
 
     SHARED.BEDROOM_GIRL_ACTIVE = true
 
-    -- 🔥 NEW: tell LookAt script to start crying cycle
+    -- Tell LookAt script to start crying cycle
     SHARED.BEDROOM_START_CRY = true
 
     if DEBUG then
@@ -162,8 +162,14 @@ function on_update(self, dt)
                 Audio_PlaySlot(EntityID, VOICEOVER_01_SFX_ID)
             end
 
+            SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+            SHARED.SUBTITLE_CMD["BEDROOM_ENTRY_REACTION"] = {
+                trigger = true,
+                by = EntityID
+            }
+
             if DEBUG then
-                print("[Bedroom_EnterTrigger] VoiceOver_01 played")
+                print("[Bedroom_EnterTrigger] VoiceOver_01 + subtitle played")
             end
         end
     end
@@ -182,8 +188,14 @@ function on_update(self, dt)
                 Audio_PlaySlot(EntityID, VOICEOVER_02_SFX_ID)
             end
 
+            SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+            SHARED.SUBTITLE_CMD["BEDROOM_RETURN_REACTION"] = {
+                trigger = true,
+                by = EntityID
+            }
+
             if DEBUG then
-                print("[Bedroom_EnterTrigger] VoiceOver_02 played")
+                print("[Bedroom_EnterTrigger] VoiceOver_02 + subtitle played")
             end
         end
     end

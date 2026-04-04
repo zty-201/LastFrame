@@ -19,11 +19,18 @@ local CP1_SLOT_ID = "TTLS_Start"
 local CP1_TENSION_SLOT_ID = "Tension"
 local CP1_LENGTH_SECONDS = 10.1
 
+local CP1_VOICEOVER_SLOT_ID = "VoiceOver_02"
+local CP1_VOICEOVER_DELAY_SECONDS = 6.5
+
 -- =========================
 -- CP2 CONFIG
 -- =========================
 local CP2_DELAY_SECONDS = 1.6
 local HIDDEN_DOOR_ID = 43
+
+local CP2_REACTION_SLOT_ID = "VoiceOver_03"
+local CP2_REACTION_DELAY = 0.5
+local CP2_TO_CP3_DELAY_AFTER_REACTION = 0.6
 
 -- =========================
 -- CP3 CONFIG
@@ -53,12 +60,16 @@ function on_create(Self)
 
     -- CP1 flags
     Self.cp1Started = false
+    Self.cp1VoiceOverDone = false
 
     -- CP2 flags
     Self.cp2Started = false
     Self.cp2DoorDone = false
     Self.cp2ScatterDone = false
     Self.cp2ChairAudioDone = false
+    Self.cp2ReactionVoiceDone = false
+    Self.cp2ReactionVoiceTimer = 0.0
+    Self.cp2ReadyForCP3 = false
 
     -- CP3 flags
     Self.cp3Started = false
@@ -78,10 +89,14 @@ function on_create(Self)
         s.timer = 0.0
 
         s.cp1Started = false
+        s.cp1VoiceOverDone = false
         s.cp2Started = false
         s.cp2DoorDone = false
         s.cp2ScatterDone = false
         s.cp2ChairAudioDone = false
+        s.cp2ReactionVoiceDone = false
+        s.cp2ReactionVoiceTimer = 0.0
+        s.cp2ReadyForCP3 = false
         s.cp3Started = false
 
         if DEBUG then
@@ -93,7 +108,6 @@ function on_create(Self)
         local s = SHARED.StateController._self
         if not s then return end
 
-        -- stop tension right before silence / CP2 pause
         stop_slot_from(EntityID, CP1_TENSION_SLOT_ID)
 
         s.state = STATE_CP2
@@ -103,6 +117,9 @@ function on_create(Self)
         s.cp2DoorDone = false
         s.cp2ScatterDone = false
         s.cp2ChairAudioDone = false
+        s.cp2ReactionVoiceDone = false
+        s.cp2ReactionVoiceTimer = 0.0
+        s.cp2ReadyForCP3 = false
 
         if DEBUG then
             print("[StateController] TriggerCP2 -> state=CP2")
@@ -131,6 +148,7 @@ local function Checkpoint1(Self, dt)
     if not Self.cp1Started then
         Self.cp1Started = true
         Self.timer = 0.0
+        Self.cp1VoiceOverDone = false
 
         if DEBUG then
             print("[StateController] CP1: playing slots:", CP1_SLOT_ID, "and", CP1_TENSION_SLOT_ID)
@@ -141,6 +159,24 @@ local function Checkpoint1(Self, dt)
     end
 
     Self.timer = Self.timer + dt
+
+    ------------------------------------------------
+    -- Play VoiceOver_02 later in CP1, after the girl-run portion
+    ------------------------------------------------
+    if (not Self.cp1VoiceOverDone) and Self.timer >= CP1_VOICEOVER_DELAY_SECONDS then
+        Self.cp1VoiceOverDone = true
+        play_slot_from(EntityID, CP1_VOICEOVER_SLOT_ID)
+
+        SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+        SHARED.SUBTITLE_CMD["CP1_DETECTIVE_REACTION"] = {
+            trigger = true,
+            by = EntityID
+        }
+
+        if DEBUG then
+            print("[StateController] CP1 -> played delayed voiceover + subtitle:", CP1_VOICEOVER_SLOT_ID)
+        end
+    end
 
     if Self.timer >= CP1_LENGTH_SECONDS then
         if DEBUG then
@@ -158,6 +194,9 @@ local function Checkpoint2(Self, dt)
     if not Self.cp2Started then
         Self.cp2Started = true
         Self.timer = 0.0
+        Self.cp2ReactionVoiceTimer = 0.0
+        Self.cp2ReactionVoiceDone = false
+        Self.cp2ReadyForCP3 = false
 
         if DEBUG then
             print("[StateController] CP2: waiting", CP2_DELAY_SECONDS, "seconds before chair explode")
@@ -166,6 +205,9 @@ local function Checkpoint2(Self, dt)
 
     Self.timer = Self.timer + dt
 
+    ------------------------------------------------
+    -- Explosion moment
+    ------------------------------------------------
     if Self.timer >= CP2_DELAY_SECONDS then
         if not Self.cp2DoorDone then
             Self.cp2DoorDone = true
@@ -183,6 +225,7 @@ local function Checkpoint2(Self, dt)
 
         if not Self.cp2ScatterDone then
             Self.cp2ScatterDone = true
+
             if SHARED.ChairScatter and SHARED.ChairScatter.Trigger then
                 SHARED.ChairScatter.Trigger()
                 if DEBUG then
@@ -191,17 +234,56 @@ local function Checkpoint2(Self, dt)
             else
                 print("[StateController] CP2 WARN: ChairScatter not found")
             end
+
+            SHARED = SHARED or {}
+            SHARED.POV = SHARED.POV or {}
+            SHARED.POV.freeShake      = true
+            SHARED.POV.shakeDuration  = 0.7
+            SHARED.POV.shakeAmplitude = 10.0
+            SHARED.POV.shakeSpeed     = 0.03
+
+            Self.cp2ReactionVoiceTimer = 0.0
+            Self.cp2ReadyForCP3 = false
+
+            if DEBUG then
+                print("[StateController] CP2 -> triggered free camera shake")
+            end
         end
+    end
 
-        SHARED = SHARED or {}
-        SHARED.POV = SHARED.POV or {}
-        SHARED.POV.freeShake      = true
-        SHARED.POV.shakeDuration  = 0.7
-        SHARED.POV.shakeAmplitude = 10.0
-        SHARED.POV.shakeSpeed     = 0.03
+    ------------------------------------------------
+    -- Delayed Woah! reaction after explosion
+    ------------------------------------------------
+    if Self.cp2ScatterDone and (not Self.cp2ReactionVoiceDone) then
+        Self.cp2ReactionVoiceTimer = Self.cp2ReactionVoiceTimer + dt
 
+        if Self.cp2ReactionVoiceTimer >= CP2_REACTION_DELAY then
+            Self.cp2ReactionVoiceDone = true
+            play_slot_from(EntityID, CP2_REACTION_SLOT_ID)
+
+            SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+            SHARED.SUBTITLE_CMD["CP2_WOAH"] = {
+                trigger = true,
+                by = EntityID
+            }
+
+            if DEBUG then
+                print("[StateController] CP2 -> Woah! voice + subtitle")
+            end
+        end
+    end
+
+    ------------------------------------------------
+    -- Wait a little after the reaction before moving to CP3
+    ------------------------------------------------
+    if Self.cp2ScatterDone and Self.cp2ReactionVoiceDone and (not Self.cp2ReadyForCP3) then
+        if Self.cp2ReactionVoiceTimer >= (CP2_REACTION_DELAY + CP2_TO_CP3_DELAY_AFTER_REACTION) then
+            Self.cp2ReadyForCP3 = true
+        end
+    end
+
+    if Self.cp2ReadyForCP3 then
         if DEBUG then
-            print("[StateController] CP2 -> triggered free camera shake")
             print("[StateController] CP2 complete -> triggering CP3")
         end
 
