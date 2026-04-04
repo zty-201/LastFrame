@@ -1,11 +1,7 @@
 #version 320 es
-
-// 1. The Global 16-bit Override
-precision mediump float;
+precision highp float;
 precision highp int; 
-precision mediump sampler2D; 
-
-// 2. Protect 3D and Depth Samplers
+precision highp sampler2D; 
 precision highp sampler3D;
 precision highp sampler2DArrayShadow;
 precision highp samplerCubeArrayShadow;
@@ -29,11 +25,11 @@ layout(location=0) out vec4 FS_OUT_Color;
 // INPUT VARIABLES  -------------------------------------------------
 // ------------------------------------------------------------------
 
-in highp vec3 FS_IN_WorldPos;   
-in highp vec2 FS_IN_TexCoord;   
-in mediump vec3 FS_IN_Normal;   
-in mediump vec3 FS_IN_Tangent;
-in mediump vec3 FS_IN_Bitangent;
+in vec3 FS_IN_WorldPos;
+in vec3 FS_IN_Normal;
+in vec2 FS_IN_TexCoord;
+in vec3 FS_IN_Tangent;
+in vec3 FS_IN_Bitangent;
 
 //in flat float FS_IN_Roughness;
 //in flat float FS_IN_Metallic;
