@@ -57,6 +57,18 @@ local rotateAfterPull       = false   -- waiting to rotate girl after pull finis
 local rotateTimer           = 0.0
 local ROTATE_AFTER_PULL_DELAY = 1.2   -- matches shakeDuration
 
+-- Post-death zoom-in phase
+local zoomAfterDeath   = false
+local zoomTimer        = 0.0
+local zoomTriggered      = false
+local screamPlayed       = false
+local preScreamShaken    = false
+local screamShakeStopped = false
+local ZOOM_DELAY          = 0.2   -- seconds after girl rotates before shift kicks in
+local ZOOM_SHIFT_DURATION = 0.8   -- must match camShiftDuration below
+local PRE_SCREAM_SHAKE_OFFSET = 0.0   -- shake triggers at same time as scream
+local SCREAM_DURATION    = 2.0   -- match this to the length of your Scream audio clip
+
 ------------------------------------------------
 local function get_camera()
     local SHARED = rawget(_G, "SHARED")
@@ -312,8 +324,67 @@ function on_update(self, dt)
             Transform_SetRotation(EntityID, 0.0, 270.0, 0.0)
             SHARED = SHARED or {}
             SHARED.PLAYER_DEAD = true
+
+            -- Begin post-death shift phase (scream plays once shift completes)
+            zoomAfterDeath   = true
+            zoomTimer        = 0.0
+            zoomTriggered    = false
+            screamPlayed     = false
+            preScreamShaken  = false
+            screamShakeStopped = false
+
             if DEBUG then
                 print("[BedroomGirlLookAt] Pull done -> rotated girl to 270 degrees, signalling game over")
+            end
+        end
+    end
+
+    -- Shift camera up from its current pulled position after she turns
+    if zoomAfterDeath then
+        zoomTimer = zoomTimer + dt
+        if not zoomTriggered and zoomTimer >= ZOOM_DELAY then
+            zoomTriggered = true
+            SHARED = SHARED or {}
+            SHARED.POV = SHARED.POV or {}
+            SHARED.POV.camShift         = true
+            SHARED.POV.camShiftUp       = 5.0   -- world units upward from pulled position
+            SHARED.POV.camShiftForward  = 9.0   -- push forward slightly for zoom
+            SHARED.POV.camShiftDuration = ZOOM_SHIFT_DURATION
+            if DEBUG then
+                print("[BedroomGirlLookAt] Death camera shift triggered")
+            end
+        end
+
+        -- Vigorous sustained shake just before the scream
+        if not preScreamShaken and zoomTimer >= ZOOM_DELAY + ZOOM_SHIFT_DURATION - PRE_SCREAM_SHAKE_OFFSET then
+            preScreamShaken = true
+            SHARED = SHARED or {}
+            SHARED.POV = SHARED.POV or {}
+            SHARED.POV.freeShakeSustain   = true
+            SHARED.POV.freeShakeAmplitude = 40.0
+            SHARED.POV.freeShakeSpeed     = 0.018
+            if DEBUG then
+                print("[BedroomGirlLookAt] Pre-scream shake triggered")
+            end
+        end
+
+        -- Scream plays once the shift has fully completed
+        if not screamPlayed and zoomTimer >= ZOOM_DELAY + ZOOM_SHIFT_DURATION then
+            screamPlayed = true
+            Audio_PlaySlot(EntityID, "Scream")
+            if DEBUG then
+                print("[BedroomGirlLookAt] Scream triggered")
+            end
+        end
+
+        -- Stop shake when scream finishes
+        if screamPlayed and not screamShakeStopped and zoomTimer >= ZOOM_DELAY + ZOOM_SHIFT_DURATION + SCREAM_DURATION then
+            screamShakeStopped = true
+            SHARED = SHARED or {}
+            SHARED.POV = SHARED.POV or {}
+            SHARED.POV.freeShakeSustain = false
+            if DEBUG then
+                print("[BedroomGirlLookAt] Scream shake stopped")
             end
         end
     end

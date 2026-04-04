@@ -12,7 +12,7 @@
 ----------------------------------------------------------------
 
 local BLACK_SCREEN_ID = 1004
-local WAIT_DURATION   = 0.6
+local WAIT_DURATION   = 2.5
 local FADE_DURATION   = 0.8
 local HOLD_DURATION   = 3.0
 
@@ -81,8 +81,7 @@ function on_update(self, dt)
     elseif state == STATE_HOLD then
         if timer >= HOLD_DURATION then
             if EntityUI then EntityUI:SetVisible(false) end
-            local bs = black_screen()
-            if bs then bs:SetVisible(false) end
+            -- Keep black screen visible to cover the scene reload gap
 
             SHARED = SHARED or {}
             SHARED.PLAYER_DEAD                = false

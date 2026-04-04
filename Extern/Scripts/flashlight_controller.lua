@@ -15,7 +15,7 @@ local baseIntensity = 10000.0
 -- -----------------------------------------------
 -- Battery config
 -- -----------------------------------------------
-local STABLE_TIME  = 15.0   -- seconds at FULL before flickering starts
+local STABLE_TIME  = 30.0   -- seconds at FULL before flickering starts
 local FLICKER_TIME = 10.0   -- seconds of flicker before empty
 
 -- Battery level thresholds (based on cumulative onTimer):
