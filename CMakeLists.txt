@@ -72,14 +72,14 @@ target_compile_options(engine_library PUBLIC
 	$<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
 	# === MSVC Release Optimizations ===
 	# /O2 (Max speed), /Oi (Intrinsics), /Ot (Favor fast code), /fp:fast (Fast math), /Zc:inline (Remove unreferenced COMDATs), /Gw (Optimize Global Data)
-	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:MSVC>>:/O2 /Oi /Ot /fp:fast /Zc:inline /Gw>
+	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:MSVC>>:/O2 /Oi /Ot /Zc:inline /Gw>
 	
 	
 	# GCC/Clang specific warnings
 	$<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
 	
 	# === GCC/Clang Release Optimizations ===
-	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU,Clang>>:-O3 -ffast-math>
+	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU,Clang>>:-O3>
 	
 	$<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
 )
@@ -91,7 +91,7 @@ target_compile_options(engine_library PUBLIC
 	
 	# === MSVC Release Optimizations ===
 	# /O2 (Max speed), /Oi (Intrinsics), /Ot (Favor fast code), /fp:fast (Fast math), /Zc:inline (Remove unreferenced COMDATs), /Gw (Optimize Global Data)
-	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:MSVC>>:/O2 /Oi /Ot /fp:fast /Zc:inline /Gw>
+	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:MSVC>>:/O2 /Oi /Ot /Zc:inline /Gw>
 	
 	# /fsanitize=address is enabled for ASAN 
 	$<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address>>
@@ -100,7 +100,7 @@ target_compile_options(engine_library PUBLIC
 	$<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
 	
 	# === GCC/Clang Release Optimizations ===
-	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU,Clang>>:-O3 -ffast-math>
+	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU,Clang>>:-O3>
 	
 	$<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
 )
@@ -159,7 +159,7 @@ message("Building for Android")
   target_compile_definitions(jnicpp PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG> ENGINE_ENABLE_LUA)
 # Android (Clang) Compiler Optimizations
   target_compile_options(jnicpp PUBLIC 
-      $<$<CONFIG:Release>:-O3 -ffast-math -ftree-vectorize>
+      $<$<CONFIG:Release>:-O3 -ftree-vectorize>
   )
   target_link_options(jnicpp PRIVATE 
       $<$<CONFIG:Release>:-Wl,--gc-sections,-O2> # Linker garbage collection

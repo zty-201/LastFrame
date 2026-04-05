@@ -95,7 +95,7 @@ namespace Engine {
                 if (!message.empty()) {
                     message.pop_back();
                 }
-                LOGI("[LuaPrint] %s", message.c_str());
+                //LOGI("[LuaPrint] %s", message.c_str());
             };
     }
 #endif
@@ -1701,9 +1701,9 @@ namespace Engine {
                 EngineFramework::AssetManagerSystem::SCRIPT_GUID
             );
 
-            LOGI("[LuaRuntime] Loading script '%s' (GUID %llu) for entity %u",
+            /*LOGI("[LuaRuntime] Loading script '%s' (GUID %llu) for entity %u",
                 EngineFramework::AssetManagerSystem::GetName(full_guid).c_str(),
-                inst.ScriptGuid.m_Value, static_cast<unsigned>(e));
+                inst.ScriptGuid.m_Value, static_cast<unsigned>(e));*/
 
             // Prepare entity-specific data
             TransformComponent* entityTransform = nullptr;
