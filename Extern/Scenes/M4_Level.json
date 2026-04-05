@@ -3024,6 +3024,258 @@
 			"visible": false
 		}
 	},
+	"1066": {
+		"ColliderComponent": {
+			"maxBounds": [
+				6.318634033203125,
+				111.29669189453125,
+				140.6710662841797
+			],
+			"minBounds": [
+				-7.304443359375,
+				-1.5283203125,
+				-142.1470184326172
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						6.8115386962890625,
+						56.412506103515625,
+						141.40904235839844
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.4929044246673584,
+						54.884185791015625,
+						-0.73797607421875
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17554697654112632945,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1413796589616775283,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				14672393892595515509,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				8907786369561280631,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				8907786369561280633,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "railing",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "SF_Railing_02"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-498.94805908203125,
+				554.160888671875,
+				719.0536499023438
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				1.0,
+				0.9999991655349731,
+				1.0499999523162842
+			]
+		}
+	},
+	"1068": {
+		"ColliderComponent": {
+			"maxBounds": [
+				6.318634033203125,
+				111.29669189453125,
+				140.6710662841797
+			],
+			"minBounds": [
+				-7.304443359375,
+				-1.5283203125,
+				-142.1470184326172
+			],
+			"mode": 0,
+			"shapes": [
+				{
+					"boxHalfExtents": [
+						6.8115386962890625,
+						56.412506103515625,
+						141.40904235839844
+					],
+					"capsuleHeight": 1.0,
+					"capsuleRadius": 0.25,
+					"offsetPosition": [
+						-0.4929044246673584,
+						54.884185791015625,
+						-0.73797607421875
+					],
+					"offsetRotation": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"sphereRadius": 0.5,
+					"type": 0
+				}
+			]
+		},
+		"MaterialComponent": {
+			"albedoFactor": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"albedoMap": [
+				17554697654112632945,
+				3711223656383638553
+			],
+			"ambientOcclusionMap": [
+				1413796589616775283,
+				3711223656383638553
+			],
+			"metallicFactor": 1.0,
+			"metallicMap": [
+				14672393892595515509,
+				3711223656383638553
+			],
+			"name": "Floor",
+			"normalMap": [
+				8907786369561280631,
+				3711223656383638553
+			],
+			"roughnessFactor": 1.0,
+			"roughnessMap": [
+				8907786369561280633,
+				3711223656383638553
+			],
+			"uvOffset": [
+				0.0,
+				0.0
+			],
+			"uvTiling": [
+				1.0,
+				1.0
+			]
+		},
+		"MeshComponent": {
+			"meshName": "railing",
+			"visibility": true
+		},
+		"NameComponent": {
+			"name": "SF_Railing_01"
+		},
+		"PhysicsComponent": {
+			"_prevUseGravity": false,
+			"acceleration": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"editorOverride": false,
+			"gravityFactor": 1.0,
+			"mass": 1.0,
+			"useGravity": false,
+			"velocity": [
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"PhysicsMaterialComponent": {
+			"_prevIsStatic": true,
+			"density": 1000.0,
+			"friction": 0.5,
+			"isStatic": true,
+			"layer": 1,
+			"restitution": 0.0
+		},
+		"SceneRenderPass": null,
+		"TransformComponent": {
+			"position": [
+				-798.1212158203125,
+				554.160888671875,
+				720.8839721679688
+			],
+			"rotation": [
+				0.0,
+				89.99974822998047,
+				0.0
+			],
+			"scale": [
+				1.0,
+				0.9999991655349731,
+				1.0499999523162842
+			]
+		}
+	},
 	"107": {
 		"MaterialComponent": {
 			"albedoFactor": [
@@ -20877,9 +21129,9 @@
 				-0.00010427424422232434
 			],
 			"scale": [
-				1.0,
-				1.0,
-				1.0
+				0.0,
+				0.0,
+				0.0
 			]
 		}
 	},
@@ -36142,132 +36394,6 @@
 			]
 		}
 	},
-	"395": {
-		"ColliderComponent": {
-			"maxBounds": [
-				18.906177520751953,
-				310.0,
-				152.1049041748047
-			],
-			"minBounds": [
-				-11.093822479248047,
-				10.0,
-				-147.8950958251953
-			],
-			"mode": 1,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						15.0,
-						150.0,
-						150.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.906177520751953,
-						160.0,
-						2.1049041748046875
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				17554697654112632945,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				1413796589616775283,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				14672393892595515509,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				8907786369561280631,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				8907786369561280633,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "railing",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "SF_railing_02"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-499.0402526855469,
-				563.469970703125,
-				721.151611328125
-			],
-			"rotation": [
-				0.0,
-				89.99974822998047,
-				0.0
-			],
-			"scale": [
-				0.9999909996986389,
-				0.9999991655349731,
-				0.9999957084655762
-			]
-		}
-	},
 	"396": {
 		"ColliderComponent": {
 			"maxBounds": [
@@ -36391,132 +36517,6 @@
 				0.9999946355819702,
 				0.9999991059303284,
 				1.0
-			]
-		}
-	},
-	"397": {
-		"ColliderComponent": {
-			"maxBounds": [
-				18.906177520751953,
-				310.0,
-				152.1049041748047
-			],
-			"minBounds": [
-				-11.093822479248047,
-				10.0,
-				-147.8950958251953
-			],
-			"mode": 1,
-			"shapes": [
-				{
-					"boxHalfExtents": [
-						15.0,
-						150.0,
-						150.0
-					],
-					"capsuleHeight": 1.0,
-					"capsuleRadius": 0.25,
-					"offsetPosition": [
-						3.906177520751953,
-						160.0,
-						2.1049041748046875
-					],
-					"offsetRotation": [
-						0.0,
-						0.0,
-						0.0
-					],
-					"sphereRadius": 0.5,
-					"type": 0
-				}
-			]
-		},
-		"MaterialComponent": {
-			"albedoFactor": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"albedoMap": [
-				17554697654112632945,
-				3711223656383638553
-			],
-			"ambientOcclusionMap": [
-				1413796589616775283,
-				3711223656383638553
-			],
-			"metallicFactor": 1.0,
-			"metallicMap": [
-				14672393892595515509,
-				3711223656383638553
-			],
-			"name": "Floor",
-			"normalMap": [
-				8907786369561280631,
-				3711223656383638553
-			],
-			"roughnessFactor": 1.0,
-			"roughnessMap": [
-				8907786369561280633,
-				3711223656383638553
-			],
-			"uvOffset": [
-				0.0,
-				0.0
-			],
-			"uvTiling": [
-				1.0,
-				1.0
-			]
-		},
-		"MeshComponent": {
-			"meshName": "railing",
-			"visibility": true
-		},
-		"NameComponent": {
-			"name": "SF_railing_01"
-		},
-		"PhysicsComponent": {
-			"_prevUseGravity": false,
-			"acceleration": [
-				0.0,
-				0.0,
-				0.0
-			],
-			"editorOverride": false,
-			"gravityFactor": 1.0,
-			"mass": 1.0,
-			"useGravity": false,
-			"velocity": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"PhysicsMaterialComponent": {
-			"_prevIsStatic": true,
-			"density": 1000.0,
-			"friction": 0.5,
-			"isStatic": true,
-			"layer": 1,
-			"restitution": 0.0
-		},
-		"SceneRenderPass": null,
-		"TransformComponent": {
-			"position": [
-				-799.8067016601563,
-				567.0181274414063,
-				721.151611328125
-			],
-			"rotation": [
-				0.0,
-				89.99974822998047,
-				0.0
-			],
-			"scale": [
-				0.9999909996986389,
-				0.9999991655349731,
-				0.9999957084655762
 			]
 		}
 	},
@@ -46154,7 +46154,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 443.1397705078125,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46315,7 +46315,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 451.7876892089844,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46781,7 +46781,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 475.454345703125,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46881,7 +46881,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 494.177490234375,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -47194,7 +47194,7 @@
 			],
 			"rotation": [
 				0.0,
-				-0.0,
+				180.0,
 				0.0
 			],
 			"scale": [
