@@ -527,7 +527,12 @@ void main()
     
     // Point lights
     if (u_AndroidPlatform) {
-        int lightCount = min(u_NumPointLights, 8);
+        
+        // limits number of point lights on mobile 
+        // (in future, we can implement a in game graphics spec adjusting menu to allow user 
+        // to adjust the graphics based on their requirements -- smooth gameplay vs detailed scene)
+
+        int lightCount = min(u_NumPointLights, 8); 
         for (int i = 0; i < lightCount; i++) {
             color += calculatePointLight(i, FS_IN_WorldPos, N, Wo, F0, diffuse_color, roughness);
         }
@@ -537,6 +542,7 @@ void main()
         }
     }
 
+    
     // Ambient
     vec3 skyColor = vec3(0.5, 0.7, 1.0); // Blueish Sky
     vec3 groundColor = vec3(0.2, 0.2, 0.2); // Dark Ground
