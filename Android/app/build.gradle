@@ -14,7 +14,6 @@ android {
             ndk {
                 abiFilters "arm64-v8a"
             }
-            // Pass ABI to CMake as a define
             externalNativeBuild {
                 cmake {
                     arguments "-DANDROID_ABI=arm64-v8a"
@@ -27,7 +26,6 @@ android {
             ndk {
                 abiFilters "x86_64"
             }
-            // Pass ABI to CMake as a define
             externalNativeBuild {
                 cmake {
                     arguments "-DANDROID_ABI=x86_64"
@@ -36,6 +34,7 @@ android {
             buildConfigField "String", "TARGET_ABI", "\"x86_64\""
         }
     }
+
     defaultConfig {
         applicationId "com.example.jnicpp"
         minSdk 29
@@ -45,9 +44,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "boolean", "IS_DEBUG_BUILD", "false"
-        ndk {
-            abiFilters "arm64-v8a", "armeabi-v7a", "x86_64"
-        }
+
         externalNativeBuild {
             cmake {
                 cppFlags "-fms-extensions"
@@ -57,23 +54,16 @@ android {
 
     buildTypes {
         release {
-            // Enable R8 code shrinking, obfuscation, and optimization
-            minifyEnabled true
-            shrinkResources true
-
-            // Explicitly strip debug configurations
             debuggable false
             jniDebuggable false
-
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "IS_DEBUG_BUILD", "false"
             signingConfig signingConfigs.debug
 
-            // Fully optimize C/C++ natively and strip out debug symbols (-O3 for speed, -g0 for no debug info)
             externalNativeBuild {
                 cmake {
-                    cFlags "-O3 -g0"
-                    cppFlags "-O3 -g0"
+                    cFlags   "-O3 -g0"
+                    cppFlags "-fms-extensions -O3 -g0"
                 }
             }
         }
@@ -81,18 +71,27 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "IS_DEBUG_BUILD", "true"
+
+            externalNativeBuild {
+                cmake {
+                    cppFlags "-fms-extensions"
+                }
+            }
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
     externalNativeBuild {
         cmake {
             path file('../../CMakeLists.txt')
             version '3.22.1'
         }
     }
+
     buildFeatures {
         viewBinding true
         buildConfig = true
