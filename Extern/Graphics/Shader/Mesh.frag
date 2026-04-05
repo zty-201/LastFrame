@@ -364,6 +364,27 @@ vec3 evaluate_uber_brdf(in vec3 diffuse_color, in float roughness, in vec3 N, in
 
 // ------------------------------------------------------------------------
 
+vec3 evaluate_mobile_brdf(in vec3 diffuse_color, in float roughness, in vec3 N, in vec3 F0, in vec3 Wh)
+{
+    // 1. Cheap Lambertian Diffuse (Same as PC, very fast)
+    vec3 diffuse = diffuse_color / M_PI;
+
+    // 2. Convert PBR Roughness to Blinn-Phong Shininess 
+    // This allows your existing PBR textures to drive the fake lighting!
+    float shininess = exp2(10.0 * (1.0 - roughness) + 1.0);
+    
+    // 3. Ultra-Cheap Specular Calculation (One dot product, one pow)
+    float NdotH = max(dot(N, Wh), 0.0);
+    float specFactor = pow(NdotH, shininess);
+    
+    // 4. Combine (Skip the expensive Fresnel/Geometry math entirely)
+    vec3 specular = F0 * specFactor;
+
+    return diffuse + specular;
+}
+
+// ------------------------------------------------------------------------
+
 vec3 direct_lighting(in vec3 Wo, in vec3 N, in vec3 P, in vec3 F0, in vec3 diffuse_color, in float roughness)
 {
     vec3 Wi = -light_direction.xyz;
@@ -443,7 +464,12 @@ vec3 calculatePointLight(int lightIndex, vec3 worldPos, vec3 N, vec3 Wo, vec3 F0
                                light.attenuation_type.z * dist * dist;
     float attenuation = 1.0 / max(attenuationDivisor, 0.0001);
     
-    vec3 brdf = evaluate_uber_brdf(diffuse_color, roughness, N, F0, Wo, Wh, Wi);
+    vec3 brdf;
+    if (u_AndroidPlatform) {
+        brdf = evaluate_mobile_brdf(diffuse_color, roughness, N, F0, Wh);
+    } else {
+        brdf = evaluate_uber_brdf(diffuse_color, roughness, N, F0, Wo, Wh, Wi);
+    }
     
     // Shadow Logic (Using stored index at .w)
     float shadow = 1.0;
@@ -500,10 +526,23 @@ void main()
     vec3 color = direct_lighting(Wo, N, FS_IN_WorldPos, F0, diffuse_color, roughness);
     
     // Point lights
-    for (int i = 0; i < u_NumPointLights; i++) {
-        color += calculatePointLight(i, FS_IN_WorldPos, N, Wo, F0, diffuse_color, roughness);
+    if (u_AndroidPlatform) {
+        
+        // limits number of point lights on mobile 
+        // (in future, we can implement a in game graphics spec adjusting menu to allow user 
+        // to adjust the graphics based on their requirements -- smooth gameplay vs detailed scene)
+
+        int lightCount = min(u_NumPointLights, 8); 
+        for (int i = 0; i < lightCount; i++) {
+            color += calculatePointLight(i, FS_IN_WorldPos, N, Wo, F0, diffuse_color, roughness);
+        }
+    } else {
+        for (int i = 0; i < u_NumPointLights; i++) {
+            color += calculatePointLight(i, FS_IN_WorldPos, N, Wo, F0, diffuse_color, roughness);
+        }
     }
 
+    
     // Ambient
     vec3 skyColor = vec3(0.5, 0.7, 1.0); // Blueish Sky
     vec3 groundColor = vec3(0.2, 0.2, 0.2); // Dark Ground
