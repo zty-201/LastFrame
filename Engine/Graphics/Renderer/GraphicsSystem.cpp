@@ -452,13 +452,9 @@ namespace EngineFramework
         m_LightData.clear();
         m_lightEntityMap.clear();
 
-        // 1. COLLECT (Iterate once)
-        // We separate them immediately so we don't need to sort later.
-        static std::vector<entt::entity> pointEntities; // prevent reallocation every frame
-        static std::vector<entt::entity> spotEntities;
-
-        pointEntities.clear();
-        spotEntities.clear();
+        // 1. COLLECT (Unified)
+        static std::vector<entt::entity> activeLights;
+        activeLights.clear();
 
         auto EulerToDirection = [](const glm::vec3& eulerDegrees) {
             float pitch = glm::radians(eulerDegrees.x);
@@ -474,127 +470,125 @@ namespace EngineFramework
         auto view = registry.view<LightComponent>();
         for (auto entity : view) {
             auto& light = view.get<LightComponent>(entity);
-            if (light.type == LightComponent::POINT) pointEntities.push_back(entity);
-            else if (light.type == LightComponent::SPOT) spotEntities.push_back(entity);
+            // Grab BOTH Point and Spot lights together
+            if (light.type == LightComponent::POINT || light.type == LightComponent::SPOT) {
+                activeLights.push_back(entity);
+            }
         }
 
-        // After collecting pointEntities and spotEntities, before processing:
-		// sort them by distance to camera so that we prioritize closer lights in the SSBO (for shader loop unrolling benefits)
-        glm::vec3 camPos(0.0f);
+        // 2. GET TARGET POS (Player or Camera Fallback)
+        glm::vec3 targetPos(0.0f);
+
+
         auto cam_entity = GetFirstActiveCamera();
-        if (cam_entity != entt::null)
-            camPos = registry.get<CameraComponent>(cam_entity).position;
+        if (cam_entity != entt::null) {
+            targetPos = registry.get<CameraComponent>(cam_entity).position;
+        }
+        
 
-
+        // 3. SORT (Unified, using distance2 to avoid square root overhead)
         auto sortByDist = [&](entt::entity a, entt::entity b) {
             glm::vec3 posA = registry.get<TransformComponent>(a).position;
             glm::vec3 posB = registry.get<TransformComponent>(b).position;
-            return glm::distance(camPos, posA) < glm::distance(camPos, posB);
+            return glm::distance(targetPos, posA) < glm::distance(targetPos, posB);
             };
 
-        std::sort(pointEntities.begin(), pointEntities.end(), sortByDist);
-        std::sort(spotEntities.begin(), spotEntities.end(), sortByDist);
+        std::sort(activeLights.begin(), activeLights.end(), sortByDist);
 
-        // 2. PROCESS POINT LIGHTS (Indices 0 to 63)
+        // 4. PROCESS LIGHTS (Single Loop)
+        // Fallback to 8 on Android, use MAX_LIGHTS on PC
+        size_t maxMobileLights = m_androidPlatform ? 8 : MAX_LIGHTS;
+
         int pointShadowCount = 0;
-        m_pointLightViewProjMatrices.resize(MAX_SHADOW_CASTING_POINT_LIGHTS * 6, glm::mat4(1.0f)); // Add this
-
-        for (auto entity : pointEntities) {
-            if (m_LightData.size() >= MAX_LIGHTS) break;
-
-            m_lightEntityMap.push_back(entity);
-            auto& light = registry.get<LightComponent>(entity);
-            auto& transform = registry.get<TransformComponent>(entity);
-            glm::vec3 lightDir = EulerToDirection(transform.rotation);
-
-            LightSSBO data;
-
-			data.position_radius = glm::vec4(transform.position, light.radius); // w component is radius for points
-			data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f); // w component is unused for points
-			data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 1.0f); // w component is type (1.0 for point)
-			data.spot_cutoffs = glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f); // not used for points
-
-            int shadowIndex = -1;
-			if (pointShadowCount < MAX_SHADOW_CASTING_POINT_LIGHTS) { // assign shadow index if we have shadow slots available
-                shadowIndex = pointShadowCount++;
-            }
-
-			data.direction_shadow = glm::vec4(lightDir, (float)shadowIndex); // w component is shadow index 
-
-            // --- CALCULATE THE 6 CUBEMAP MATRICES (standard algo) ---
-            if (shadowIndex != -1) {
-                glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, light.radius);
-                glm::vec3 pos = transform.position;
-                int baseIdx = shadowIndex * 6;
-                m_pointLightViewProjMatrices[baseIdx + 0] = shadowProj * glm::lookAt(pos, pos + glm::vec3(1, 0, 0), glm::vec3(0, -1, 0));
-                m_pointLightViewProjMatrices[baseIdx + 1] = shadowProj * glm::lookAt(pos, pos + glm::vec3(-1, 0, 0), glm::vec3(0, -1, 0));
-                m_pointLightViewProjMatrices[baseIdx + 2] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, 1, 0), glm::vec3(0, 0, 1));
-                m_pointLightViewProjMatrices[baseIdx + 3] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, -1, 0), glm::vec3(0, 0, -1));
-                m_pointLightViewProjMatrices[baseIdx + 4] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, 0, 1), glm::vec3(0, -1, 0));
-                m_pointLightViewProjMatrices[baseIdx + 5] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));
-            }
-
-			// DIRTY CHECK 
-            if (light._lastShadowIndex != shadowIndex) {
-                light._isDirty = true;
-                light._lastShadowIndex = shadowIndex;
-            }
-            m_LightData.push_back(data);
-        }
-
-		// resize the point light view-proj matrix array to the actual number of shadow-casting point lights * 6 (for cubemap faces) 
-        // to save memory and avoid confusion in the shader.
-        m_pointLightViewProjMatrices.resize(pointShadowCount * 6);
-
-        // 3. PROCESS SPOT LIGHTS (Indices 64 to 127)
         int spotShadowCount = 0;
+
+        m_pointLightViewProjMatrices.resize(MAX_SHADOW_CASTING_POINT_LIGHTS * 6, glm::mat4(1.0f));
         m_spotLightViewProjMatrices.resize(MAX_SHADOW_CASTING_SPOTLIGHTS, glm::mat4(1.0f));
-        for (auto entity : spotEntities) {
-            if (m_LightData.size() >= MAX_LIGHTS) break; // enforce max light count
+
+        for (auto entity : activeLights) {
+            // Enforce the hardware limit strictly based on total processed lights
+            if (m_LightData.size() >= maxMobileLights) break;
 
             m_lightEntityMap.push_back(entity);
             auto& light = registry.get<LightComponent>(entity);
             auto& transform = registry.get<TransformComponent>(entity);
             glm::vec3 lightDir = EulerToDirection(transform.rotation);
+
             LightSSBO data;
 
-			data.position_radius = glm::vec4(transform.position, light.radius); // w component is radius for spots (used for attenuation)
-			data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f); // w component is unused for spots
-			data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 2.0f); // Type 2.0 for spot
+            // Base properties shared by both types
+            data.position_radius = glm::vec4(transform.position, light.radius);
+            data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f);
 
-			// For spotlights, we pack the inner and outer cone cosines into the cutoffs field for shader use.
-            float inner = glm::cos(glm::radians(light.innerConeAngle));
-            float outer = glm::cos(glm::radians(light.outerConeAngle));
-            data.spot_cutoffs = glm::vec4(inner, outer, 0.0f, 0.0f);
+            if (light.type == LightComponent::POINT) {
+                // --- POINT LIGHT LOGIC ---
+                data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 1.0f);
+                data.spot_cutoffs = glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f);
 
-            // --- SIMPLE ASSIGNMENT ---
-            int shadowIndex = -1;
-            if (spotShadowCount < MAX_SHADOW_CASTING_SPOTLIGHTS) {
-                shadowIndex = spotShadowCount++;
+                int shadowIndex = -1;
+                if (pointShadowCount < MAX_SHADOW_CASTING_POINT_LIGHTS) {
+                    shadowIndex = pointShadowCount++;
+                }
+                data.direction_shadow = glm::vec4(lightDir, (float)shadowIndex);
+
+                // Calculate the 6 cubemap matrices
+                if (shadowIndex != -1) {
+                    glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, light.radius);
+                    glm::vec3 pos = transform.position;
+                    int baseIdx = shadowIndex * 6;
+                    m_pointLightViewProjMatrices[baseIdx + 0] = shadowProj * glm::lookAt(pos, pos + glm::vec3(1, 0, 0), glm::vec3(0, -1, 0));
+                    m_pointLightViewProjMatrices[baseIdx + 1] = shadowProj * glm::lookAt(pos, pos + glm::vec3(-1, 0, 0), glm::vec3(0, -1, 0));
+                    m_pointLightViewProjMatrices[baseIdx + 2] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, 1, 0), glm::vec3(0, 0, 1));
+                    m_pointLightViewProjMatrices[baseIdx + 3] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, -1, 0), glm::vec3(0, 0, -1));
+                    m_pointLightViewProjMatrices[baseIdx + 4] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, 0, 1), glm::vec3(0, -1, 0));
+                    m_pointLightViewProjMatrices[baseIdx + 5] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));
+                }
+
+                // Dirty check
+                if (light._lastShadowIndex != shadowIndex) {
+                    light._isDirty = true;
+                    light._lastShadowIndex = shadowIndex;
+                }
+
             }
-            data.direction_shadow = glm::vec4(lightDir, (float)shadowIndex);
+            else if (light.type == LightComponent::SPOT) {
+                // --- SPOT LIGHT LOGIC ---
+                data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 2.0f); // Type 2.0
 
-            // CALCULATE MATRIX (Required for Spots)
-            if (shadowIndex != -1) {
-                float fov = glm::radians(light.outerConeAngle * 2.0f);
-                glm::mat4 P = glm::perspective(fov, 1.0f, 1.0f, light.radius);
-                glm::mat4 V = glm::lookAt(transform.position, transform.position + lightDir, glm::vec3(0, 1, 0));
-                data.view_proj = P * V;
-                // Store for later use in shadow pass
-                m_spotLightViewProjMatrices[shadowIndex] = data.view_proj;
+                float inner = glm::cos(glm::radians(light.innerConeAngle));
+                float outer = glm::cos(glm::radians(light.outerConeAngle));
+                data.spot_cutoffs = glm::vec4(inner, outer, 0.0f, 0.0f);
+
+                int shadowIndex = -1;
+                if (spotShadowCount < MAX_SHADOW_CASTING_SPOTLIGHTS) {
+                    shadowIndex = spotShadowCount++;
+                }
+                data.direction_shadow = glm::vec4(lightDir, (float)shadowIndex);
+
+                // Calculate Matrix
+                if (shadowIndex != -1) {
+                    float fov = glm::radians(light.outerConeAngle * 2.0f);
+                    glm::mat4 P = glm::perspective(fov, 1.0f, 1.0f, light.radius);
+                    glm::mat4 V = glm::lookAt(transform.position, transform.position + lightDir, glm::vec3(0, 1, 0));
+                    data.view_proj = P * V;
+                    m_spotLightViewProjMatrices[shadowIndex] = data.view_proj;
+                }
+
+                if (light._lastShadowIndex != shadowIndex) {
+                    light._isDirty = true;
+                    light._lastShadowIndex = shadowIndex;
+                }
             }
 
-            // DIRTY CHECK
-            if (light._lastShadowIndex != shadowIndex) {
-                light._isDirty = true;
-                light._lastShadowIndex = shadowIndex;
-            }
-
+            // Push data (Type is already handled dynamically in shader)
             m_LightData.push_back(data);
         }
-        m_spotLightViewProjMatrices.resize(spotShadowCount); // Shrink to actual count
 
-        // 4. UPLOAD
+        // Shrink arrays to actual used shadow counts
+        m_pointLightViewProjMatrices.resize(pointShadowCount * 6);
+        m_spotLightViewProjMatrices.resize(spotShadowCount);
+
+        // 5. UPLOAD
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_lightSSBOs[ringIdx]);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(LightSSBO) * m_LightData.size(), m_LightData.data());
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);

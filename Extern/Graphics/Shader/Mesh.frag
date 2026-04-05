@@ -541,7 +541,6 @@ void main()
             color += calculatePointLight(i, FS_IN_WorldPos, N, Wo, F0, diffuse_color, roughness);
         }
     }
-
     
     // Ambient
     vec3 skyColor = vec3(0.5, 0.7, 1.0); // Blueish Sky
