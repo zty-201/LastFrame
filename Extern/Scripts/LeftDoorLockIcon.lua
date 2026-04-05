@@ -22,9 +22,10 @@ local function door_in_range()
 end
 
 function on_create(self)
+    armed = false
     SHARED.LOCK_ICON_CMD = SHARED.LOCK_ICON_CMD or {}
-    SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {} -- ✅ NEW safeguard
-    set_visible(false) -- keep invisible until triggered
+    SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
+    set_visible(false)
 end
 
 function on_update(self, dt)

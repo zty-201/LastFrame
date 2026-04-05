@@ -76,6 +76,8 @@ local function play_3d_sfx_from(entityId, slotId)
 end
 
 function on_create(Self)
+    pickedUp = false
+
     if DEBUG then
         print("[BoltCutterPickup] on_create EntityID:", EntityID)
     end

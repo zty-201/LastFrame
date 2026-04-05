@@ -20,6 +20,7 @@ local function key_in_range()
 end
 
 function on_create(self)
+    armed = false
     SHARED.KEY_ICON_CMD = SHARED.KEY_ICON_CMD or {}
     SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
     set_visible(false)

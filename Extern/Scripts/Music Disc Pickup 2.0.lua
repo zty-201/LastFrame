@@ -77,6 +77,8 @@ local function disc_in_range(discId)
 end
 
 function on_create(Self)
+    pickedUp = false
+
     if DEBUG then
         print("[Test_AddMusicDisc_Shared] on_create EntityID:", EntityID)
         if not SHARED.Inventory or not SHARED.Inventory.Add then
