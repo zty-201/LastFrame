@@ -1,3 +1,38 @@
+/**
+ * @file    InstancingSystem.cpp
+ * @author  Zhang TongYan (tongyan.zhang)
+ * @brief   GPU-driven batching, memory synchronization, and compute culling system.
+ *
+ * @detail
+ * [ ARCHITECTURE ]
+ * Acts as the critical bridge between the CPU-side Entity Component System (EnTT)
+ * and the GPU. It aggregates all static mesh instances, groups them by their
+ * Material/Mesh signatures (BatchKey), and flattens them into contiguous memory
+ * arrays for GPU consumption.
+ *
+ * [ MEMORY SYNCHRONIZATION (Triple Buffering) ]
+ * To prevent CPU-GPU synchronization stalls, all dynamic buffers (SSBOs, Indirect
+ * Command Buffers, Culling UBOs, and Data Textures) are allocated using a
+ * FRAMES_IN_FLIGHT ring buffer. This ensures the CPU can write to frame N while
+ * the GPU is simultaneously executing frame N-1 or N-2.
+ *
+ * [ COMPUTE CULLING & INDIRECT DRAWING ]
+ * Eliminates CPU draw-call overhead by offloading frustum culling to a Compute
+ * Shader (`Culling.comp`). The CPU packs up to 132 view-projection matrices
+ * (Main Camera, CSM Cascades, Spot/Point lights) into a UBO. The compute shader
+ * tests instance bounding spheres against all frustums and populates the
+ * `glDrawElementsIndirect` command buffer, allowing the entire static scene
+ * to be rendered in a single API call per batch.
+ *
+ * [ DYNAMIC SCENE MANAGEMENT ]
+ * Subscribes to EnTT observer events to handle real-time scene modifications
+ * (from the Level Editor or gameplay). Utilizes dirty-flag tracking for TRS
+ * (Translate/Rotate/Scale) updates, and implements a tombstone/free-list
+ * system to safely handle entity destruction without stalling the pipeline.
+ *
+ * @note    PLATFORM OPTIMIZATION: Instance data is duplicated into a GL_RGBA32F
+ * texture to bypass a known integer-alignment bug on Mali mobile architectures.
+ */
 #include "pch.hpp"
 #include "InstancingSystem.h"
 #include "GraphicsSystem.h" 
@@ -17,6 +52,13 @@ namespace EngineFramework
         }
     }
 
+    /**
+     * @brief   Pre-allocates all GPU buffers and textures for the instancing ring buffer.
+     * @details Allocates SSBOs, Indirect Buffers, and UBOs multiplied by FRAMES_IN_FLIGHT
+     * to ensure stall-free memory updates. Pre-calculates 2D texture dimensions
+     * needed to pack linear instance data for strict mobile hardware compatibility.
+     * @param   maxTotalInstances The absolute hardware ceiling for static objects.
+     */
     void InstancingSystem::Initialize(size_t maxTotalInstances) {
 
         m_maxTotalInstances = maxTotalInstances;
@@ -72,6 +114,14 @@ namespace EngineFramework
         LOGI("InstancingSystem initialized with capacity for %zu instances.", m_maxTotalInstances);
     }
 
+    /**
+     * @brief   Constructs the GPU-friendly flattened arrays from the EnTT registry.
+     * @details Iterates over all valid static entities. Generates a unique `BatchKey`
+     * based on the mesh and material properties. Groups identical keys into
+     * `RenderBatch` structs, calculates bounding spheres, and pre-populates
+     * the base parameters for the Indirect Command array.
+     * @note    Animated entities are deliberately excluded and pushed to a separate list.
+     */
     void InstancingSystem::BuildSceneBatches()
     {
         m_globalInstanceData.clear();
@@ -202,6 +252,20 @@ namespace EngineFramework
 
     }
 
+    /**
+     * @brief   The hot-path execution loop for instance updates and compute culling.
+     * @details
+     * 1. Executes deferred entity creations or full batch rebuilds if flagged.
+     * 2. Scans for dirty transform updates (TRS) and patches the flattened CPU array.
+     * 3. Rotates the FRAMES_IN_FLIGHT ring buffer to obtain safe GPU memory pointers.
+     * 4. Packs the Main, Cascade, Spot, and Point light matrices into a single UBO.
+     * 5. Uploads the flattened instance array and dispatches `Culling.comp`.
+     * 6. Inserts memory barriers to ensure data visibility before the MeshPass.
+     * * @param   mainViewProj Main camera view-projection matrix.
+     * @param   cascadeProj  Array of CSM cascade view-projection matrices.
+     * @param   spotProj     Vector of active spotlight shadow matrices.
+     * @param   pointProj    Vector of active point light cubemap face matrices.
+    */
     void InstancingSystem::UpdateAndDispatchCompute(
         const glm::mat4& mainViewProj,
         const std::array<glm::mat4, 3>& cascadeProj,
@@ -336,6 +400,11 @@ namespace EngineFramework
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
+    /**
+     * @brief   Constructs a standard TRS Model Matrix and caches the previous state.
+     * @details Caches `prevPosition`, `prevRotation`, and `prevScale` to allow for
+     * fast dirty-checking in the main update loop.
+     */
     void InstancingSystem::CalculateModelMatrix(TransformComponent& transform, glm::mat4& modelMatrix)
     {
         // Store previous frame's transform data 
@@ -360,6 +429,12 @@ namespace EngineFramework
         //transform.prevModelMatrix = modelMatrix; // Store the initial model matrix as the previous one
     }
 
+    /**
+     * @brief   Hooks or unhooks EnTT signal observers for real-time scene editing.
+     * @details Connects callbacks for entity creation, destruction, and component updates
+     * (Mesh, Material, Animation) to allow the Level Editor to modify the instanced
+     * data without crashing the GPU buffers.
+     */
     void InstancingSystem::SetDynamicUpdatesEnabled(bool enabled)
     {
         if (enabled == m_isListening) return;
@@ -424,6 +499,12 @@ namespace EngineFramework
 		LOGI("MeshComponent removed from Entity %u, marked %zu instances for deletion.", static_cast<uint32_t>(entity), meta->ssboIndices.size());
     }
 
+    /**
+     * @brief   Processes a deferred entity creation.
+     * @details Evaluates the new entity's signature. If it matches an existing batch,
+     * it claims a slot from the free list or appends to the buffer. If it is a
+     * completely new signature, it safely triggers a full batch rebuild.
+     */
     void InstancingSystem::ProcessNewInstance(entt::entity entity)
     {
         auto* meshComp = registry.try_get<MeshComponent>(entity);

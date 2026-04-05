@@ -1,3 +1,32 @@
+/**
+ * @file    ParticleSystem.cpp
+ * @author  Zhang TongYan (tongyan.zhang)
+ * @brief   Compute-driven, GPU-simulated particle VFX system.
+ *
+ * @detail
+ * [ ARCHITECTURE (Hybrid CPU-GPU) ]
+ * Splits the workload to maximize performance. The CPU evaluates ECS Emitter
+ * Components and handles spawn-rate logic (Injection). The GPU executes all
+ * physics integration, lifetime decay, and color interpolation via Compute
+ * Shaders (Simulation).
+ *
+ * [ MEMORY MANAGEMENT (Ring Buffer Injection) ]
+ * Utilizes a fixed-size Shader Storage Buffer Object (SSBO) that persists in
+ * VRAM. Instead of re-uploading the entire array every frame, the CPU uses a
+ * circular "head index" to inject only newly spawned particles into the buffer
+ * via `glBufferSubData`. This drastically reduces CPU-to-GPU PCIe bandwidth.
+ *
+ * [ COMPUTE SIMULATION ]
+ * A Compute Shader (`ParticleSimulation`) processes the entire SSBO concurrently.
+ * Dead particles (life <= 0) are ignored. Alive particles update their positions
+ * based on velocity, gravity, and delta time natively on the GPU.
+ *
+ * [ RENDERING ]
+ * Renders the entire maximum particle pool using a single Instanced Draw Call
+ * (`glDrawElementsInstancedBaseVertex`) of a Quad mesh. Vertex shaders handle
+ * camera-facing billboarding and safely discard/collapse dead particles.
+ * Utilizes Additive Blending without depth writes for cinematic VFX glowing.
+ */
 #include "pch.hpp"
 #include "ParticleSystem.h"
 #include "AssetManager.hpp"
@@ -11,6 +40,12 @@ namespace EngineFramework {
         if (m_particleSSBO != 0) glDeleteBuffers(1, &m_particleSSBO);
     }
 
+    /**
+     * @brief   Allocates VRAM for the particle SSBO and pre-loads required shaders.
+     * @details Initializes the SSBO with zeroed-out memory (dead particles) to prevent
+     * garbage data rendering on startup. Pre-reserves CPU vector capacity to
+     * prevent mid-frame heap allocations during heavy spawning.
+     */
     void ParticleSystem::Initialize() {
         glGenBuffers(1, &m_particleSSBO);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_particleSSBO);
@@ -27,6 +62,16 @@ namespace EngineFramework {
         m_newParticlesThisFrame.reserve(2000);
     }
 
+    /**
+     * @brief   Evaluates emitter logic and injects new particles into the GPU Ring Buffer.
+     * @details
+     * 1. Iterates over active `ParticleEmitterComponent`s.
+     * 2. Calculates spawn counts based on `spawnRate` and accumulated `deltaTime`.
+     * 3. Generates randomized initial states (Position, Velocity, Lifetime, Size, Color).
+     * 4. Executes a wrapping `glBufferSubData` upload, advancing the `m_headIndex`
+     * safely around the limits of `m_maxParticles` to inject data without stalling.
+     * * @param   deltaTime Time elapsed since the last frame.
+     */
     void ParticleSystem::Update(float deltaTime) {
         m_newParticlesThisFrame.clear();
 
@@ -87,6 +132,14 @@ namespace EngineFramework {
         }
     }
 
+    /**
+     * @brief   Dispatches the Compute Shader to integrate particle physics natively in VRAM.
+     * @details Binds the persistent SSBO and dispatches work groups to cover `m_maxParticles`.
+     * Inserts `glMemoryBarrier` with `GL_SHADER_STORAGE_BARRIER_BIT` and
+     * `GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT` to guarantee physics calculations
+     * are completed before the geometry pass reads from the buffer.
+     * @param   deltaTime Time elapsed since the last frame.
+     */
     void ParticleSystem::DispatchCompute(float deltaTime) {
 
         std::shared_ptr<ShaderProgram> computeShader{};
@@ -119,6 +172,18 @@ namespace EngineFramework {
         computeShader->disuse();
     }
 
+    /**
+     * @brief   Renders the particle pool as camera-facing instanced billboards.
+     * @details
+     * [ RENDER STATE CHANGES ]
+     * - Enables Additive Blending (`GL_SRC_ALPHA`, `GL_ONE`) for glowing overlap.
+     * - Disables Depth Writes (`glDepthMask(GL_FALSE)`) to prevent particles from
+     * occluding each other or background geometry.
+     * * Dispatches a single `glDrawElementsInstancedBaseVertex` call for a Quad
+     * mesh, relying on the shader to read instance data from the bound SSBO.
+     * * @param   viewProj   Combined view-projection matrix for vertex transformation.
+     * @param   viewMatrix Used by the shader to extract right/up vectors for billboarding.
+     */
     void ParticleSystem::RenderParticles(const glm::mat4& viewProj, const glm::mat4& viewMatrix) {
 
         std::shared_ptr<ShaderProgram> renderShader{};

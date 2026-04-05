@@ -1,3 +1,55 @@
+/**
+ * @file    GraphicsSystem.cpp
+ * @author  Zhang TongYan (tongyan.zhang)
+ * @brief   Core rendering pipeline and hardware-interfacing layer of the engine.
+ *
+ * @detail
+ * [ ARCHITECTURE ]
+ * A hybrid Forward Rendering pipeline built on OpenGL ES 3.2. It utilizes a heavily
+ * GPU-driven architecture, offloading culling and instancing to Compute Shaders
+ * to minimize CPU-to-GPU draw call overhead.
+ *
+ * [ RENDER PIPELINE (Per-Frame Execution) ]
+ * 1. Data Processing: Entity transforms and lights are gathered, sorted by distance,
+ * and uploaded to GPU buffers (SSBO/UBO).
+ * 2. Compute Culling: Dispatch compute shaders to perform frustum culling against
+ * main camera, CSM cascades, and point/spot shadow bounds.
+ * 3. Shadow Pass: Renders directional cascades (CSM), spot light shadow arrays,
+ * and point light cubemap arrays using glDrawElementsIndirect.
+ * 4. Volumetric Pass (PC Only): Dispatches compute shaders for 3D voxel-grid
+ * light injection and ray marching.
+ * 5. Mesh Pass: Primary color pass evaluating physically based rendering (PBR)
+ * materials, integrating shadow maps, and evaluating fog/scattering.
+ * 6. Skybox & Particles: Renders the background environment and dispatch/render
+ * compute-driven particle systems.
+ * 7. God Ray Pass (Android Only): Executes a half-resolution 2D radial blur
+ * post-processing pass as a lightweight fallback for volumetrics.
+ * 8. UI Pass: Evaluates alpha-blended UI elements via orthographic projection.
+ *
+ * [ LIGHTING & MATERIAL SYSTEM ]
+ * - Supports Directional, Point, and Spot lights.
+ * - Materials utilize a metallic-roughness PBR workflow (Albedo, Normal, M/R maps).
+ * - Light data is dynamically sorted by distance to the active camera on the CPU
+ * to ensure only the most relevant lights are evaluated per pixel.
+ *
+ * [ CROSS-PLATFORM SCALABILITY (PC vs. Android) ]
+ * - PC Profile:
+ * Executes full Schlick-GGX BRDF math with dynamic loop limits (up to 64 lights)
+ * and high-resolution shadow maps. Implements true physically-based volumetric
+ * lighting using 3D textures, light injection, and ray marching.
+ * - Mobile Profile (Adreno/Mali):
+ * Implements aggressive ALU/Memory optimizations. Falls back to a Blinn-Phong
+ * BRDF approximation, hardcodes shader loops to a strict hardware ceiling (8 lights)
+ * for compiler unrolling, and bypasses expensive point-light shadow cubemap fetches.
+ * Completely disables 3D voxel volumetrics in favor of an optimized, screen-space
+ * Radial Blur (God Rays) illusion.
+ *
+ * [ MEMORY MANAGEMENT ]
+ * - Utilizes a persistent GeometryDataBuffer (Mega-Buffer) to store all mesh
+ * vertices/indices globally.
+ * - Uses Ring Buffers (Frames-in-Flight) for volatile UBO/SSBO data (Lights,
+ * Camera matrices) to prevent CPU-GPU synchronization stalls.
+ */
 #include "pch.hpp"
 #include <algorithm>
 #include <unordered_map>
@@ -125,7 +177,10 @@ namespace EngineFramework
         m_particleSystem = std::make_unique<ParticleSystem>();
         m_particleSystem->Initialize();
 
+		// loading of blue noise textures for volumetric rendering (pc specific)
         LoadBlueNoiseTextures();
+
+		// pre generate primitive meshes (cube, sphere, quad) to be used for rendering and culling
         PreGeneratePrimitives();
 
         // Listen for events
@@ -141,7 +196,7 @@ namespace EngineFramework
             throw std::runtime_error("Failed to initialize GLFW");
         }
 
-        // Configure GLFW for OpenGL ES 3.2 on desktop
+		// Configure GLFW for OpenGL ES 3.2 on desktop to esure android compatibility. 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -149,7 +204,7 @@ namespace EngineFramework
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
         glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
-        pWindow = glfwCreateWindow(WIDTH, HEIGHT, "Framework", NULL, NULL);
+        pWindow = glfwCreateWindow(WIDTH, HEIGHT, "LastFrame", NULL, NULL);
 
         if (!pWindow) {
             glfwTerminate();
@@ -169,8 +224,6 @@ namespace EngineFramework
 
         InputManager::RegisterCallbacks(pWindow);
 #endif
-
-
 
         // Print OpenGL info
         LOGI("OpenGL Version: %s", glGetString(GL_VERSION));
@@ -201,6 +254,7 @@ namespace EngineFramework
         m_pointShadowFBO = std::move(tempPointShadowFBO);
 
 #ifdef PLATFORM_ANDROID
+		// Android specific framebuffer for god ray pass (half resolution for performance)
         FBO tempGodRayFBO(FBO::Texture, WIDTH / 2, HEIGHT / 2, &m_godRayTextureID);
         m_godRayFBO = std::move(tempGodRayFBO);
 #endif
@@ -229,7 +283,7 @@ namespace EngineFramework
         glBindBufferBase(GL_UNIFORM_BUFFER, 3, skinningUBO); // binding = 0 in shader
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-        // Create default textures
+        // Create default fallback textures
         glGenTextures(1, &m_defaultWhiteTexture);
         glBindTexture(GL_TEXTURE_2D, m_defaultWhiteTexture);
         unsigned char white[] = { 255, 255, 255, 255 };
@@ -315,6 +369,9 @@ namespace EngineFramework
             return;
         }
 
+		// ring buffer logic for SSBO/UBO updates to avoid GPU sync issues. 
+        // Each frame, we write to the next slot in the buffer array, 
+        // allowing the GPU to read from previous frames without waiting.
         ringIdx = m_frame_idx % FRAMES_IN_FLIGHT;
 
         CameraComponent* active_camera = &registry.get<CameraComponent>(active_camera_entity);
@@ -331,8 +388,6 @@ namespace EngineFramework
         // Update point light SSBO (1ms)
         UpdateLightSSBO();
 
-        //->BuildSceneBatches();
-        //->BuildSceneBatches();
         // Update the instancing system (modelmatrix update + batch building + compute culling dispatch)
         m_instancingSystem->UpdateAndDispatchCompute(
             viewProj,
@@ -354,7 +409,7 @@ namespace EngineFramework
 #ifdef PLATFORM_WINDOWS
         // 3. Volumetric light injection
         VolumetricLightInjectionPass();
-        //// 4. Volumetric ray march
+        // 4. Volumetric ray march
         VolumetricRayMarchPass();
 #endif
         // 5. Mesh pass (3ms)
@@ -364,23 +419,16 @@ namespace EngineFramework
 
         m_particleSystem->RenderParticles(viewProj, V);
 #ifdef PLATFORM_ANDROID
+		// 6.5. Android -specific God Ray pass (half-res radial blur)
         GodRayPass();
 #endif
-        // 7. UI pass
+        // 7. UI pass 
         RenderUI();
 
 #if defined(PLATFORM_ANDROID)
         const GLenum depthDiscard[] = { GL_DEPTH_ATTACHMENT };
 
-        // Shadow maps no longer needed
-        /*glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_spotShadowFBO.handle);
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);*/
-
-        // Main FBO depth no longer needed either
+        // Main FBO depth no longer needed 
         glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
         glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
 #endif
@@ -431,6 +479,7 @@ namespace EngineFramework
         }
 
         // After collecting pointEntities and spotEntities, before processing:
+		// sort them by distance to camera so that we prioritize closer lights in the SSBO (for shader loop unrolling benefits)
         glm::vec3 camPos(0.0f);
         auto cam_entity = GetFirstActiveCamera();
         if (cam_entity != entt::null)
@@ -459,18 +508,20 @@ namespace EngineFramework
             glm::vec3 lightDir = EulerToDirection(transform.rotation);
 
             LightSSBO data;
-            data.position_radius = glm::vec4(transform.position, light.radius);
-            data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f);
-            data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 1.0f);
-            data.spot_cutoffs = glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f);
+
+			data.position_radius = glm::vec4(transform.position, light.radius); // w component is radius for points
+			data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f); // w component is unused for points
+			data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 1.0f); // w component is type (1.0 for point)
+			data.spot_cutoffs = glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f); // not used for points
 
             int shadowIndex = -1;
-            if (pointShadowCount < MAX_SHADOW_CASTING_POINT_LIGHTS) {
+			if (pointShadowCount < MAX_SHADOW_CASTING_POINT_LIGHTS) { // assign shadow index if we have shadow slots available
                 shadowIndex = pointShadowCount++;
             }
-            data.direction_shadow = glm::vec4(lightDir, (float)shadowIndex);
 
-            // --- CALCULATE THE 6 CUBEMAP MATRICES ---
+			data.direction_shadow = glm::vec4(lightDir, (float)shadowIndex); // w component is shadow index 
+
+            // --- CALCULATE THE 6 CUBEMAP MATRICES (standard algo) ---
             if (shadowIndex != -1) {
                 glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, light.radius);
                 glm::vec3 pos = transform.position;
@@ -483,6 +534,7 @@ namespace EngineFramework
                 m_pointLightViewProjMatrices[baseIdx + 5] = shadowProj * glm::lookAt(pos, pos + glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));
             }
 
+			// DIRTY CHECK 
             if (light._lastShadowIndex != shadowIndex) {
                 light._isDirty = true;
                 light._lastShadowIndex = shadowIndex;
@@ -490,23 +542,27 @@ namespace EngineFramework
             m_LightData.push_back(data);
         }
 
+		// resize the point light view-proj matrix array to the actual number of shadow-casting point lights * 6 (for cubemap faces) 
+        // to save memory and avoid confusion in the shader.
         m_pointLightViewProjMatrices.resize(pointShadowCount * 6);
 
         // 3. PROCESS SPOT LIGHTS (Indices 64 to 127)
         int spotShadowCount = 0;
         m_spotLightViewProjMatrices.resize(MAX_SHADOW_CASTING_SPOTLIGHTS, glm::mat4(1.0f));
         for (auto entity : spotEntities) {
-            if (m_LightData.size() >= MAX_LIGHTS) break;
+            if (m_LightData.size() >= MAX_LIGHTS) break; // enforce max light count
 
             m_lightEntityMap.push_back(entity);
             auto& light = registry.get<LightComponent>(entity);
             auto& transform = registry.get<TransformComponent>(entity);
             glm::vec3 lightDir = EulerToDirection(transform.rotation);
             LightSSBO data;
-            data.position_radius = glm::vec4(transform.position, light.radius);
-            data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f);
-            data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 2.0f); // Type 2.0
 
+			data.position_radius = glm::vec4(transform.position, light.radius); // w component is radius for spots (used for attenuation)
+			data.color_intensity = glm::vec4(light.color * light.intensity, 0.0f); // w component is unused for spots
+			data.attenuation_type = glm::vec4(light.constant, light.linear, light.quadratic, 2.0f); // Type 2.0 for spot
+
+			// For spotlights, we pack the inner and outer cone cosines into the cutoffs field for shader use.
             float inner = glm::cos(glm::radians(light.innerConeAngle));
             float outer = glm::cos(glm::radians(light.outerConeAngle));
             data.spot_cutoffs = glm::vec4(inner, outer, 0.0f, 0.0f);
@@ -544,9 +600,12 @@ namespace EngineFramework
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
-    /*
-        Rendering the directional light shadow map using cascaded shadow mapping.
-    */
+    /**
+     * @brief   Generates Cascaded Shadow Maps (CSM) for the primary directional light.
+     * @details Renders scene geometry into a 2D Texture Array (one layer per cascade)
+     * using `glDrawElementsIndirect`. Utilizes slope-scaled depth bias to
+     * mitigate shadow acne.
+     */
     void GraphicsSystem::RenderDirectionalShadow()
     {
         TransformComponent* dirLightTransform = nullptr;
@@ -602,8 +661,8 @@ namespace EngineFramework
 
         // Bind our Indirect Commands buffer globally for this pass
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_instancingSystem->GetIndirectBuffer());
-        //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_instancingSystem->GetInstanceSSBO()); // Required for ShadowMap.vert instances[]
-        //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_instancingSystem->GetVisibleIndicesBuffer());
+
+		// Bind instance data and visible index textures for the shader to access during culling and drawing
         glActiveTexture(GL_TEXTURE0 + TextureUnits::INSTANCE_DATA_UNIT);
         glBindTexture(GL_TEXTURE_2D, m_instancingSystem->GetInstanceTexture());
         shader->setUniform("s_InstanceData", TextureUnits::INSTANCE_DATA_UNIT);
@@ -623,7 +682,7 @@ namespace EngineFramework
             int batchIndex = 0;
 
             // Strict OpenGL ES 3.2 Fallback (Fast Loop)
-            // Zero state changes means this loop is blazing fast on the mobile CPU
+            // Zero state changes 
             for (const auto& batch : m_instancingSystem->GetBatches()) {
 
                 int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
@@ -647,9 +706,17 @@ namespace EngineFramework
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
     }
-
+    /**
+     * @brief   Generates shadow cubemaps for active point lights.
+     * @details Uses a Cubemap Array to store depth information for up to
+     * MAX_SHADOW_CASTING_POINT_LIGHTS. Geometry is rendered to all 6 faces
+     * sequentially.
+     * @note    If a light's `isStatic` flag is true and it is not dirty, the draw call
+     * is bypassed to save CPU/GPU overhead.
+     */
     void GraphicsSystem::RenderPointLightShadows()
     {
+        // get shader
         std::shared_ptr<ShaderProgram> shader{};
         if (point_shadow_shader_guid != xresource::full_guid{}) {
             shader = AssetManagerSystem::GetResource<ShaderProgram>(point_shadow_shader_guid);
@@ -688,13 +755,14 @@ namespace EngineFramework
             entt::entity e = m_lightEntityMap[i];
             auto& lightComp = registry.get<LightComponent>(e);
 
-            if (lightComp.isStatic && !lightComp._isDirty) continue;
+			if (lightComp.isStatic && !lightComp._isDirty) continue; // Skip if static and not dirty
 
             int shadowIndex = (int)lightData.direction_shadow.w;
-            if (shadowIndex >= MAX_SHADOW_CASTING_POINT_LIGHTS) continue;
+			if (shadowIndex >= MAX_SHADOW_CASTING_POINT_LIGHTS) continue; // Sanity check
 
             glm::vec3 lightPos = glm::vec3(lightData.position_radius);
             float lightRadius = lightData.position_radius.w;
+			// Set shader uniforms specific to point light shadow rendering
             shader->setUniform("u_LightPos", lightPos);
             shader->setUniform("u_FarPlane", lightRadius);
 
@@ -706,18 +774,21 @@ namespace EngineFramework
                 glClear(GL_DEPTH_BUFFER_BIT);
 
                 glm::mat4 lightMatrix = m_pointLightViewProjMatrices[layer];
-                shader->setUniform("u_LightMatrix", lightMatrix);
+				shader->setUniform("u_LightMatrix", lightMatrix); // Set the correct view-projection matrix for this face of the cubemap
 
-                int passOffset = 36 + layer;
+				int passOffset = 36 + layer; // Passes 36-71 belong to point light faces (6 faces per light * 6 lights = 36 passes)
                 int batchIndex = 0;
 
                 for (const auto& batch : m_instancingSystem->GetBatches()) {
 
+					// Calculate the visible index offset for this pass and batch
                     int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
                     shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
 
+					// Calculate the indirect command buffer address for this pass and batch
                     void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
 
+					// Draw the batch using indirect drawing. The shader will use the visible index offset to determine which instances to render for this face of the cubemap.
                     glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectCmdAddress);
 
                     batchIndex++;
@@ -725,7 +796,7 @@ namespace EngineFramework
 
             }
 
-            if (lightComp.isStatic) lightComp._isDirty = false;
+			if (lightComp.isStatic) lightComp._isDirty = false; // Reset dirty flag after rendering static light
         }
         // Explicitly detach the texture from the depth attachment before unbinding.
         // This is required on Mali/Adreno to avoid feedback loop UB when sampling later.
@@ -736,8 +807,13 @@ namespace EngineFramework
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
     }
-
+    /**
+     * @brief   Generates 2D shadow maps for active spotlights.
+     * @details Renders depth into a 2D Texture Array. Bypasses static lights if unmarked.
+     */
     void GraphicsSystem::RenderSpotLightShadows() {
+
+		// get shader
         std::shared_ptr<ShaderProgram> shader{};
         if (shadow_shader_guid != xresource::full_guid{}) {
             shader = AssetManagerSystem::GetResource<ShaderProgram>(shadow_shader_guid);
@@ -750,6 +826,7 @@ namespace EngineFramework
         if (!shader) return;
         shader->use();
 
+		// Set up OpenGL state for spotlight shadow rendering
         glBindFramebuffer(GL_FRAMEBUFFER, m_spotShadowFBO.handle);
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glEnable(GL_CULL_FACE);
@@ -770,15 +847,17 @@ namespace EngineFramework
         for (size_t i = 0; i < m_LightData.size(); i++) {
             const auto& lightData = m_LightData[i];
 
-            if (lightData.attenuation_type.w < 1.5f || lightData.direction_shadow.w < 0.0f) continue;
+            // Skip if not a valid spotlight (point lights have type 1.0, spots have type 2.0, 
+            // so anything below 1.5 is a point light and should be skipped here)
+			if (lightData.attenuation_type.w < 1.5f || lightData.direction_shadow.w < 0.0f) continue; 
 
             entt::entity e = m_lightEntityMap[i];
             auto& lightComp = registry.get<LightComponent>(e);
 
-            if (lightComp.isStatic && !lightComp._isDirty) continue;
+			if (lightComp.isStatic && !lightComp._isDirty) continue; // Skip if static and not dirty
 
             int shadowIndex = (int)lightData.direction_shadow.w;
-            if (shadowIndex >= MAX_SHADOW_CASTING_SPOTLIGHTS) continue;
+			if (shadowIndex >= MAX_SHADOW_CASTING_SPOTLIGHTS) continue; //  Sanity check
 
             // Bind appropriate texture layer
             glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_spotTextureArray, 0, shadowIndex);
@@ -791,9 +870,11 @@ namespace EngineFramework
 
             for (const auto& batch : m_instancingSystem->GetBatches()) {
 
+				// Calculate the visible index offset for this pass and batch
                 int visibleIndexOffset = static_cast<int>((passOffset * MAX_INSTANCES) + batch.instanceOffset);
                 shader->setUniform("u_VisibleIndexOffset", visibleIndexOffset);
 
+				// Calculate the indirect command buffer address for this pass and batch
                 void* indirectCmdAddress = (void*)(((passOffset * MAX_BATCHES) + batchIndex) * sizeof(DrawElementsIndirectCommand));
 
                 glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, indirectCmdAddress);
@@ -801,7 +882,7 @@ namespace EngineFramework
                 batchIndex++;
             }
 
-            if (lightComp.isStatic) lightComp._isDirty = false;
+			if (lightComp.isStatic) lightComp._isDirty = false; // Reset dirty flag after rendering static light
         }
 
         // Explicitly detach the texture from the depth attachment before unbinding.
@@ -816,6 +897,11 @@ namespace EngineFramework
 
     }
 
+    /**
+     * @brief   Orchestrates the generation of all shadow maps for the current frame.
+     * @details Sequentially calls RenderDirectionalShadow(), RenderPointLightShadows(),
+     * and RenderSpotLightShadows().
+     */
     void GraphicsSystem::ShadowPass()
     {
         RenderDirectionalShadow();
@@ -823,6 +909,7 @@ namespace EngineFramework
         RenderSpotLightShadows();
     }
 
+	// Update all global uniform buffers related to lighting, camera, and cascades for the main rendering pass
     void GraphicsSystem::UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P)
     {
         VolumetricUBO uboData;
@@ -857,12 +944,14 @@ namespace EngineFramework
             intensity = dirLight->intensity;
         }
 
+		// standard camera and light data
         uboData.view = V;
         uboData.projection = P;
         uboData.view_proj = P * V;
         uboData.prev_view_proj = m_frame_idx == 0 ? P * V : m_prev_view_projection;
         uboData.inv_view_proj = glm::inverse(uboData.view_proj);
 
+        // cascade data
         for (int i = 0; i < CASCADE_COUNT; i++) {
             uboData.cascade_view_proj[i] = m_cascadeViewProjMatrices[i];
         }
@@ -881,9 +970,15 @@ namespace EngineFramework
             m_cascadeBiases[3]
         );
 
+		// directional light data (packed into a single vec4 for direction and a single vec4 for 
+        // color+intensity to save uniform space, since we only support 1 directional light)
         uboData.light_direction = glm::vec4(direction, 0.0f);
         uboData.light_color = glm::vec4(color * intensity, m_ambient_light_intensity);
+
+		// camera data 
         uboData.camera_position = glm::vec4(camera.position, 1.0f);
+
+		// other parameters for shadows and volumetrics
         uboData.bias_near_far_pow = glm::vec4(
             m_shadow_bias,
             camera.nearPlane,
@@ -896,15 +991,22 @@ namespace EngineFramework
             m_scattering,
             m_absorption
         );
+        // time not used for now
         uboData.width_height_time = glm::vec4(static_cast<float>(SHADOW_WIDTH), static_cast<float>(SHADOW_HEIGHT), static_cast<float>(get_native_time()), 0);
 
         glBindBuffer(GL_UNIFORM_BUFFER, m_volumetricUBOs[ringIdx]);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(VolumetricUBO), &uboData);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
-
+    /**
+     * @brief   [PC Only] Injects light and shadow data into a 3D voxel grid.
+     * @details Dispatches a Compute Shader to evaluate fog density, absorption, and
+     * scattering per voxel. Integrates blue noise and temporal accumulation
+     * to reduce banding.
+     */
     void GraphicsSystem::VolumetricLightInjectionPass()
     {
+		// get shader
         std::shared_ptr<ShaderProgram> shader{};
         if (light_injection_shader_guid != xresource::full_guid{})
         {
@@ -919,38 +1021,48 @@ namespace EngineFramework
 
         shader->use();
 
+		// Bind the volumetric UBO and light SSBO for the compute shader to access
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBOs[ringIdx]);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_lightSSBOs[ringIdx]);
 
+		// Set up image and texture bindings for the compute shader
         uint32_t read_idx = static_cast<uint32_t>(m_ping_pong);
         uint32_t write_idx = static_cast<uint32_t>(!m_ping_pong);
 
+		// Bind the output 3D texture for writing the integrated volumetric lighting results
         glBindImageTexture(0, m_temporal_integration_voxel_grid[write_idx],
             0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
 
+		// Bind the previous frame's integrated volumetric lighting as input for temporal accumulation
         glActiveTexture(GL_TEXTURE0 + TextureUnits::VOLUMETRIC_HISTORY_UNIT);
         glBindTexture(GL_TEXTURE_3D, m_temporal_integration_voxel_grid[read_idx]);
         shader->setUniform("s_History", TextureUnits::VOLUMETRIC_HISTORY_UNIT);
 
+		// Bind the blue noise texture for dithering in the compute shader
         glActiveTexture(GL_TEXTURE0 + TextureUnits::VOLUMETRIC_BLUE_NOISE_UNIT);
         glBindTexture(GL_TEXTURE_2D, m_blue_noise_textures[m_temporal_accumulation ? m_frame_idx % NUM_BLUE_NOISE_TEXTURES : 0]);
         shader->setUniform("s_BlueNoise", TextureUnits::VOLUMETRIC_BLUE_NOISE_UNIT);
 
+		// Bind shadow maps for sampling in the compute shader to apply shadows to the volumetric lighting
         glActiveTexture(GL_TEXTURE0 + TextureUnits::SHADOW_MAP_UNIT);
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_csmTextureArray);
         shader->setUniform("s_CascadeShadowMaps", TextureUnits::SHADOW_MAP_UNIT);
 
+		// Bind spotlight shadow maps
         glActiveTexture(GL_TEXTURE0 + TextureUnits::SPOT_LIGHT_MAP_UNIT);
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_spotTextureArray);
         shader->setUniform("s_SpotShadowMaps", TextureUnits::SPOT_LIGHT_MAP_UNIT);
 
+		// Bind point light shadow cubemap array
         glActiveTexture(GL_TEXTURE0 + TextureUnits::POINT_SHADOW_MAP_UNIT);
         glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, m_pointShadowArray); // Bind the array
         shader->setUniform("s_PointShadowArray", TextureUnits::POINT_SHADOW_MAP_UNIT);
 
+		// Set other uniforms for the compute shader
         shader->setUniform("u_NumPointLights", (int)m_LightData.size());
         shader->setUniform("u_Accumulation", m_frame_idx > 0 && m_temporal_accumulation);
 
+		// Dispatch the compute shader with enough workgroups to cover the entire voxel grid. Each workgroup is 8x8x8, so we divide the grid size by 8 and round up.
         glDispatchCompute((VOXEL_GRID_SIZE_X + 7) / 8,
             (VOXEL_GRID_SIZE_Y + 7) / 8,
             (VOXEL_GRID_SIZE_Z + 0) / 1);
@@ -959,9 +1071,14 @@ namespace EngineFramework
         m_ping_pong = !m_ping_pong;
         shader->disuse();
     }
-
+    /**
+     * @brief   [PC Only] Ray-marches the injected 3D voxel grid to accumulate scattering.
+     * @details Dispatches a Compute Shader to march through the volumetric grid from the
+     * camera's perspective, writing the final accumulated transmittance to a 3D texture.
+     */
     void GraphicsSystem::VolumetricRayMarchPass()
     {
+		// get shader
         std::shared_ptr<ShaderProgram> shader{};
         if (ray_march_shader_guid != xresource::full_guid{})
         {
@@ -976,21 +1093,45 @@ namespace EngineFramework
 
         shader->use();
 
+		// Bind the volumetric UBO for the compute shader to access camera and light data
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_volumetricUBOs[ringIdx]);
         glBindImageTexture(0, m_ray_march_voxel_grid, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
 
+		// Bind the integrated volumetric lighting from the previous pass as input for ray marching
         uint32_t read_idx = static_cast<uint32_t>(m_ping_pong);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_3D, m_temporal_integration_voxel_grid[read_idx]);
+
+		// Bind shadow maps for sampling in the compute shader to apply shadows during ray marching
         shader->setUniform("s_VoxelGrid", 0);
 
         glDispatchCompute((VOXEL_GRID_SIZE_X + 7) / 8,
             (VOXEL_GRID_SIZE_Y + 7) / 8,
             1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT); // Ensure the ray marching writes are visible to subsequent rendering stages
         shader->disuse();
     }
 
+    /**
+     * @brief   Executes the primary color pass, split into two distinct rendering paths
+     * for static instanced geometry and dynamic skeletal animation.
+     * * @details
+     * [ PASS 1: INSTANCED STATIC GEOMETRY ]
+     * Binds the `MeshInstanced` shader. Executes a highly optimized indirect pipeline
+     * (`glDrawElementsIndirect`) for batched static meshes. Reads per-instance
+     * transform data and Compute-Shader-generated visibility indices directly
+     * from texture buffers.
+     * * [ PASS 2: SKELETAL ANIMATED GEOMETRY ]
+     * Binds the standard `Mesh` shader. Iterates through the active animated entities,
+     * uploading dynamic bone matrices to the Skinning UBO per-entity, and evaluates
+     * skeletal deformation using standard direct draw calls (`glDrawElementsBaseVertex`).
+     * * Both rendering paths bind global UBOs, Light SSBOs, and evaluate PBR materials
+     * (Albedo, Normal, M/R) against active shadow maps and volumetric data.
+     * * @note    [ PLATFORM SCALING ]
+     * - PC: Evaluates full Schlick-GGX BRDF and samples 3D volumetric textures.
+     * - Android: Reverts to optimized Blinn-Phong BRDF, analytical fog, and
+     * hardcoded light loops to respect Adreno/Mali hardware constraints.
+     */
     void GraphicsSystem::MeshPass()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
@@ -1001,6 +1142,7 @@ namespace EngineFramework
         glCullFace(GL_BACK);
         glDepthFunc(GL_LESS);
 
+		// instanced mesh shader (used for main scene geometry with instancing)
         std::shared_ptr<ShaderProgram> instanced_shader{};
         if (mesh_instanced_shader_guid != xresource::full_guid{})
         {
@@ -1246,6 +1388,11 @@ namespace EngineFramework
 
     }
 
+    /**
+     * @brief   Renders the skybox environment map.
+     * @details Drawn after the MeshPass with `glDepthFunc(GL_LEQUAL)` to ensure it
+     * only renders on pixels not occluded by level geometry, saving fill rate.
+     */
     void GraphicsSystem::SkyboxPass()
     {
         std::shared_ptr<ShaderProgram> shader{};
@@ -1303,6 +1450,12 @@ namespace EngineFramework
         shader->disuse();
     }
 
+    /**
+     * @brief   Renders the 2D User Interface over the 3D scene.
+     * @details Disables depth testing and uses an orthographic projection. Sorts UI
+     * components by layer and handles alpha-blended quads, text, and
+     * video texture playback.
+     */
     void GraphicsSystem::RenderUI() {
         // 1. Setup Orthographic Projection (0,0 is Bottom-Left, ScreenWidth,ScreenHeight is Top-Right)
         glm::mat4 projection = glm::ortho(0.0f, screen.x, 0.0f, screen.y);
@@ -1530,6 +1683,13 @@ namespace EngineFramework
     }
 
 #ifdef PLATFORM_ANDROID
+    /**
+     * @brief   [Android Only] Screen-space God Ray (Radial Blur) post-processing.
+     * @details Acts as a lightweight mobile fallback for true 3D volumetrics.
+     * Projects the directional light to screen-space and executes a radial
+     * blur on a half-resolution FBO, which is then additively blended
+     * over the main scene.
+     */
     void GraphicsSystem::GodRayPass()
     {
         // 1. Get the Active Camera
@@ -1595,11 +1755,11 @@ namespace EngineFramework
 
 
 
-        // --- At this point, sunUV is the exact 2D coordinate of your sun! ---
+        // --- At this point, sunUV is the exact 2D coordinate of the sun ---
 
         // --- STEP 3: EXECUTE THE RADIAL BLUR ---
 
-        // 1. Bind our new Half-Resolution God Ray FBO
+        // 1. Bind new Half-Resolution God Ray FBO
         glBindFramebuffer(GL_FRAMEBUFFER, m_godRayFBO.handle);
 
         // Dynamically scale viewport to half of the current screen size
@@ -1687,7 +1847,7 @@ namespace EngineFramework
             compShader->disuse();
         }
 
-        // 6. Restore Global State so we don't break the UI pass!
+        // 6. Restore Global State so we don't break the UI pass
         glDisable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
