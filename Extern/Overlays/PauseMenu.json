@@ -1,33 +1,7 @@
 {
 	"694": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "VolumeChange2",
-			"hover_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 8526044737832501259
-				}
-			]
-		},
 		"NameComponent": {
-			"name": "Vol2"
+			"name": "VolumeTitle"
 		},
 		"UIComponent": {
 			"Overlay_name": "PauseMenu",
@@ -37,32 +11,32 @@
 				1.0
 			],
 			"event_received": "",
-			"hide_first": false,
+			"hide_first": true,
 			"is_NDC": true,
 			"layer": 1,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				712.25,
-				363.9399719238281
+				600.25,
+				569.3900146484375
 			],
 			"position_NDC": [
-				-0.23000000417232513,
-				-0.3400000035762787
+				-0.12999999523162842,
+				0.07000000029802322
 			],
 			"size": [
-				57.75,
-				46.959999084472656
+				291.5500183105469,
+				117.4000015258789
 			],
 			"size_NDC": [
-				0.029999999329447746,
-				0.03999999910593033
+				0.17000000178813934,
+				0.10000000149011612
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				8518163340552814593,
+				2753881454155759619,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
@@ -120,19 +94,19 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				890.3125,
+				132.91250610351563,
 				525.364990234375
 			],
 			"position_NDC": [
-				0.0,
+				-0.7599999904632568,
 				-0.029999999329447746
 			],
 			"size": [
-				144.375,
+				145.77500915527344,
 				88.05000305175781
 			],
 			"size_NDC": [
-				0.07500000298023224,
+				0.08500000089406967,
 				0.07500000298023224
 			],
 			"subtitle_reveal_progress": 1.0,
@@ -152,34 +126,8 @@
 		}
 	},
 	"697": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "VolumeChange3",
-			"hover_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 8526044737832501259
-				}
-			]
-		},
 		"NameComponent": {
-			"name": "Vol3"
+			"name": "GyroTitle"
 		},
 		"UIComponent": {
 			"Overlay_name": "PauseMenu",
@@ -189,336 +137,32 @@
 				1.0
 			],
 			"event_received": "",
-			"hide_first": false,
+			"hide_first": true,
 			"is_NDC": true,
 			"layer": 1,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				779.6250610351563,
-				363.9399719238281
+				557.375,
+				862.8899536132813
 			],
 			"position_NDC": [
-				-0.1599999964237213,
-				-0.3400000035762787
+				0.0,
+				0.5699999928474426
 			],
 			"size": [
-				57.75,
-				46.959999084472656
+				600.25,
+				117.4000015258789
 			],
 			"size_NDC": [
-				0.029999999329447746,
-				0.03999999910593033
+				0.3499999940395355,
+				0.10000000149011612
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
-	},
-	"698": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "VolumeChange4",
-			"hover_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 8526044737832501259
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "Vol4"
-		},
-		"UIComponent": {
-			"Overlay_name": "PauseMenu",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"hide_first": false,
-			"is_NDC": true,
-			"layer": 1,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				846.9999389648438,
-				363.9399719238281
-			],
-			"position_NDC": [
-				-0.09000000357627869,
-				-0.3400000035762787
-			],
-			"size": [
-				57.75,
-				46.959999084472656
-			],
-			"size_NDC": [
-				0.029999999329447746,
-				0.03999999910593033
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
-	},
-	"699": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "VolumeChange5",
-			"hover_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 8526044737832501259
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "Vol5"
-		},
-		"UIComponent": {
-			"Overlay_name": "PauseMenu",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"hide_first": false,
-			"is_NDC": true,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				914.375,
-				363.9399719238281
-			],
-			"position_NDC": [
-				-0.019999999552965164,
-				-0.3400000035762787
-			],
-			"size": [
-				57.75,
-				46.959999084472656
-			],
-			"size_NDC": [
-				0.029999999329447746,
-				0.03999999910593033
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
-	},
-	"700": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "VolumeChange6",
-			"hover_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 8526044737832501259
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "Vol6"
-		},
-		"UIComponent": {
-			"Overlay_name": "PauseMenu",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"hide_first": false,
-			"is_NDC": true,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				981.7499389648438,
-				363.9399719238281
-			],
-			"position_NDC": [
-				0.05000000074505806,
-				-0.3400000035762787
-			],
-			"size": [
-				57.75,
-				46.959999084472656
-			],
-			"size_NDC": [
-				0.029999999329447746,
-				0.03999999910593033
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"use_subtitle_reveal": false,
-			"video_audio_group": 1,
-			"video_audio_volume": 1.0,
-			"videoid": [
-				0,
-				0
-			],
-			"visible": false
-		}
-	},
-	"701": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "VolumeChange7",
-			"hover_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 8526044737832501259
-				}
-			]
-		},
-		"NameComponent": {
-			"name": "Vol7"
-		},
-		"UIComponent": {
-			"Overlay_name": "PauseMenu",
-			"color": [
-				1.0,
-				1.0,
-				1.0
-			],
-			"event_received": "",
-			"hide_first": false,
-			"is_NDC": true,
-			"layer": 0,
-			"lock_luminance": false,
-			"luminance": 1.0,
-			"play_video_audio": true,
-			"position": [
-				1049.125,
-				363.9399719238281
-			],
-			"position_NDC": [
-				0.11999999731779099,
-				-0.3400000035762787
-			],
-			"size": [
-				57.75,
-				46.959999084472656
-			],
-			"size_NDC": [
-				0.029999999329447746,
-				0.03999999910593033
-			],
-			"subtitle_reveal_progress": 1.0,
-			"subtitle_reveal_softness": 0.029999999329447746,
-			"textureid": [
-				8518163340552814593,
+				7365567472583147521,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
@@ -534,18 +178,18 @@
 	"839": {
 		"ButtonComponent": {
 			"clicked_texture": [
-				16267019915880398851,
-				3711223656383638553
+				0,
+				0
 			],
 			"event_hover": "",
-			"event_trigger": "VolumeChange8",
+			"event_trigger": "SliderDrag",
 			"hover_texture": [
-				16267019915880398851,
-				3711223656383638553
+				0,
+				0
 			],
 			"idle_texture": [
-				8518163340552814593,
-				3711223656383638553
+				0,
+				0
 			],
 			"stay_clicked": false
 		},
@@ -554,48 +198,48 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 8526044737832501259
+					"ScriptGuid": 3142857001234567891
 				}
 			]
 		},
 		"NameComponent": {
-			"name": "Vol8"
+			"name": "GyroController"
 		},
 		"UIComponent": {
 			"Overlay_name": "PauseMenu",
 			"color": [
-				1.0,
-				1.0,
-				1.0
+				0.38823530077934265,
+				0.24705882370471954,
+				0.125490203499794
 			],
 			"event_received": "",
 			"hide_first": false,
 			"is_NDC": true,
-			"layer": 0,
+			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1116.5,
-				363.9399719238281
+				1500.625,
+				768.9700317382813
 			],
 			"position_NDC": [
-				0.1899999976158142,
-				-0.3400000035762787
+				0.7699999809265137,
+				0.3700000047683716
 			],
 			"size": [
-				57.75,
-				46.959999084472656
+				34.29999923706055,
+				70.43999481201172
 			],
 			"size_NDC": [
-				0.029999999329447746,
-				0.03999999910593033
+				0.019999999552965164,
+				0.05999999865889549
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				8518163340552814593,
-				3711223656383638553
+				0,
+				0
 			],
 			"use_subtitle_reveal": false,
 			"video_audio_group": 1,
@@ -608,70 +252,44 @@
 		}
 	},
 	"844": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "VolumeChange10",
-			"hover_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 8526044737832501259
-				}
-			]
-		},
 		"NameComponent": {
-			"name": "Vol10"
+			"name": "VolumeBar"
 		},
 		"UIComponent": {
 			"Overlay_name": "PauseMenu",
 			"color": [
-				1.0,
-				1.0,
-				1.0
+				0.7490347623825073,
+				0.7063578367233276,
+				0.6275696754455566
 			],
 			"event_received": "",
 			"hide_first": false,
 			"is_NDC": true,
-			"layer": 0,
+			"layer": 1,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1251.25,
-				363.9399719238281
+				634.5499267578125,
+				526.5390014648438
 			],
 			"position_NDC": [
-				0.33000001311302185,
-				-0.3400000035762787
+				0.25999999046325684,
+				-0.10000000149011612
 			],
 			"size": [
-				57.75,
-				46.959999084472656
+				891.7999877929688,
+				3.5220000743865967
 			],
 			"size_NDC": [
-				0.029999999329447746,
-				0.03999999910593033
+				0.5199999809265137,
+				0.003000000026077032
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				8518163340552814593,
-				3711223656383638553
+				0,
+				0
 			],
 			"use_subtitle_reveal": false,
 			"video_audio_group": 1,
@@ -728,15 +346,15 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				818.125,
-				672.114990234375
+				111.4749755859375,
+				689.7249755859375
 			],
 			"position_NDC": [
-				0.0,
-				0.2199999988079071
+				-0.7200000286102295,
+				0.25
 			],
 			"size": [
-				288.75,
+				257.25,
 				88.05000305175781
 			],
 			"size_NDC": [
@@ -760,41 +378,15 @@
 		}
 	},
 	"881": {
-		"ButtonComponent": {
-			"clicked_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"event_hover": "",
-			"event_trigger": "VolumeChange9",
-			"hover_texture": [
-				16267019915880398851,
-				3711223656383638553
-			],
-			"idle_texture": [
-				8518163340552814593,
-				3711223656383638553
-			],
-			"stay_clicked": false
-		},
-		"LuaScriptComponent": {
-			"Enabled": true,
-			"Scripts": [
-				{
-					"Loaded": true,
-					"ScriptGuid": 8526044737832501259
-				}
-			]
-		},
 		"NameComponent": {
-			"name": "Vol9"
+			"name": "GyroBar"
 		},
 		"UIComponent": {
 			"Overlay_name": "PauseMenu",
 			"color": [
-				1.0,
-				1.0,
-				1.0
+				0.7490196228027344,
+				0.7058823704719543,
+				0.6274510025978088
 			],
 			"event_received": "",
 			"hide_first": false,
@@ -804,26 +396,26 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1183.875,
-				363.9399719238281
+				625.9749755859375,
+				802.4290161132813
 			],
 			"position_NDC": [
-				0.25999999046325684,
-				-0.3400000035762787
+				0.25,
+				0.3700000047683716
 			],
 			"size": [
-				57.75,
-				46.959999084472656
+				891.7999877929688,
+				3.5220000743865967
 			],
 			"size_NDC": [
-				0.029999999329447746,
-				0.03999999910593033
+				0.5199999809265137,
+				0.003000000026077032
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				8518163340552814593,
-				3711223656383638553
+				0,
+				0
 			],
 			"use_subtitle_reveal": false,
 			"video_audio_group": 1,
@@ -837,7 +429,7 @@
 	},
 	"882": {
 		"NameComponent": {
-			"name": "VolumeBtn"
+			"name": "PauseBG"
 		},
 		"UIComponent": {
 			"Overlay_name": "PauseMenu",
@@ -849,30 +441,30 @@
 			"event_received": "",
 			"hide_first": false,
 			"is_NDC": true,
-			"layer": 1,
+			"layer": 0,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				519.7500610351563,
-				352.1999816894531
+				0.0,
+				0.0
 			],
 			"position_NDC": [
-				-0.4099999964237213,
-				-0.3499999940395355
+				0.0,
+				0.0
 			],
 			"size": [
-				96.25,
-				58.70000076293945
+				1715.0,
+				1174.0
 			],
 			"size_NDC": [
-				0.05000000074505806,
-				0.05000000074505806
+				1.0,
+				1.0
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				7066209955997663235,
+				5094020429993082881,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
@@ -888,18 +480,18 @@
 	"884": {
 		"ButtonComponent": {
 			"clicked_texture": [
-				16267019915880398851,
-				3711223656383638553
+				0,
+				0
 			],
 			"event_hover": "",
-			"event_trigger": "VolumeChange1",
+			"event_trigger": "VolumeSliderDrag",
 			"hover_texture": [
-				16267019915880398851,
-				3711223656383638553
+				0,
+				0
 			],
 			"idle_texture": [
-				8518163340552814593,
-				3711223656383638553
+				0,
+				0
 			],
 			"stay_clicked": false
 		},
@@ -908,48 +500,48 @@
 			"Scripts": [
 				{
 					"Loaded": true,
-					"ScriptGuid": 8526044737832501259
+					"ScriptGuid": 3271828001234567893
 				}
 			]
 		},
 		"NameComponent": {
-			"name": "Vol1"
+			"name": "VolumeController"
 		},
 		"UIComponent": {
 			"Overlay_name": "PauseMenu",
 			"color": [
-				1.0,
-				1.0,
-				1.0
+				0.3899613618850708,
+				0.24774500727653503,
+				0.12496830523014069
 			],
 			"event_received": "",
 			"hide_first": false,
 			"is_NDC": true,
-			"layer": 1,
+			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				635.25,
-				363.9399719238281
+				1500.625,
+				493.0799865722656
 			],
 			"position_NDC": [
-				-0.3100000023841858,
-				-0.3400000035762787
+				0.7699999809265137,
+				-0.10000000149011612
 			],
 			"size": [
-				57.75,
-				46.959999084472656
+				34.29999923706055,
+				70.43999481201172
 			],
 			"size_NDC": [
-				0.029999999329447746,
-				0.03999999910593033
+				0.019999999552965164,
+				0.05999999865889549
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				8518163340552814593,
-				3711223656383638553
+				0,
+				0
 			],
 			"use_subtitle_reveal": false,
 			"video_audio_group": 1,
