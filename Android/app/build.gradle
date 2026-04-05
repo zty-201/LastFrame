@@ -57,10 +57,25 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            // Enable R8 code shrinking, obfuscation, and optimization
+            minifyEnabled true
+            shrinkResources true
+
+            // Explicitly strip debug configurations
+            debuggable false
+            jniDebuggable false
+
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "IS_DEBUG_BUILD", "false"
             signingConfig signingConfigs.debug
+
+            // Fully optimize C/C++ natively and strip out debug symbols (-O3 for speed, -g0 for no debug info)
+            externalNativeBuild {
+                cmake {
+                    cFlags "-O3 -g0"
+                    cppFlags "-O3 -g0"
+                }
+            }
         }
         debug {
             minifyEnabled false
@@ -85,7 +100,6 @@ android {
 }
 
 dependencies {
-
     implementation libs.appcompat
     implementation libs.material
     implementation libs.constraintlayout
