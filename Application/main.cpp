@@ -386,6 +386,9 @@ void Game_Update()
 
 		LOGI("[App] Restart requested -> reloading %s", g_MainSceneFile);
 
+		// Clear stale Android touch pointers so old gameplay touches don't block the new menu
+		EngineFramework::InputManager::ClearTouchState();
+
 		// 0) STOP scripting runtime (IMPORTANT)
 		Engine::ScriptSystem::OnRuntimeStop(registry);
 

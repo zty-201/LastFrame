@@ -892,7 +892,7 @@ namespace EngineFramework
 			.data<&UIComponent::layer>("layer")
 			.data<&UIComponent::Overlay_name>("Overlay_name")
 			.data<&UIComponent::event_received>("event_received")
-			//.data<&UIComponent::hide_first>("hide_first")
+			.data<&UIComponent::hide_first>("hide_first")
 			.func<&Emplacer<UIComponent>::EmplaceComponent>("emplace")
 			.func<&Remover<UIComponent>::RemoveComponent>("remove")
 			.func<&Getter<UIComponent>::GetComponent>("get")

@@ -55,6 +55,9 @@ prior written consent of DigiPen Institute of Technology is prohibited.
 
 #include "StateMachineSystem.hpp"
 #include "UISystem.hpp"
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+#include "Screen.hpp"
+#endif
 
 namespace Engine {
 
@@ -1328,6 +1331,22 @@ namespace Engine {
             auto [w, h] = EngineFramework::InputManager::GetInstance().GetWindowSize();
             return std::make_tuple(w, h);
          });
+
+        // Returns mouse position in UI pixel space (bottom-left origin).
+        // In editor mode, accounts for the ImGui scene panel offset so coordinates
+        // match UIComponent.position / .size exactly — same mapping as check_touch.
+        inputTable.set_function("GetUIMousePosition", []() -> std::tuple<float, float> {
+#if defined(PLATFORM_WINDOWS) && defined(_DEBUG)
+            if (EngineFramework::InputManager::GetInstance().editor_running) {
+                glm::vec2 p = EngineFramework::Screen::GetInstance().GetMouseInSceneUI();
+                return std::make_tuple(p.x, p.y);
+            }
+#endif
+            auto [mx, my] = EngineFramework::InputManager::GetMousePosition();
+            auto [w, h]   = EngineFramework::InputManager::GetInstance().GetWindowSize();
+            return std::make_tuple(static_cast<float>(mx),
+                                   static_cast<float>(h) - static_cast<float>(my));
+        });
 
         LOGI("[ScriptSystem] InputManager bindings complete (static table approach)");
 

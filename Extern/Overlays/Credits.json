@@ -20,6 +20,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -27,15 +28,15 @@
 			"play_video_audio": true,
 			"position": [
 				0.0,
-				-3779.0888671875
+				-4040.6650390625
 			],
 			"position_NDC": [
 				0.0,
 				2.1164135932922363
 			],
 			"size": [
-				1965.0,
-				10980.0
+				1925.0,
+				11740.0
 			],
 			"size_NDC": [
 				1.0,

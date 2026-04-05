@@ -11,6 +11,7 @@
 				0.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -25,8 +26,8 @@
 				0.0
 			],
 			"size": [
-				1725.0,
-				1032.0
+				1925.0,
+				1174.0
 			],
 			"size_NDC": [
 				1.0,

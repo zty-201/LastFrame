@@ -104,6 +104,14 @@ namespace EngineFramework
         const std::unordered_map<int, KeyState>& GetKeyStates() const { return keyStates; }
         const std::unordered_map<int, KeyState>& GetMouseButtonStates() const { return mouseButtonStates; }
 
+        // Clears all touch/mouse button states and positions. Call on scene restart to
+        // prevent stale Android touch pointers from interfering with the new session.
+        static void ClearTouchState()
+        {
+            mouseButtonStates.clear();
+            touchPositions.clear();
+        }
+
 
 #ifdef PLATFORM_ANDROID
         static void RegisterCallbacks(struct android_app* app);

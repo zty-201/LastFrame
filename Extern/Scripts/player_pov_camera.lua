@@ -560,8 +560,9 @@ function on_update(self, dt)
         smoothedGx = smoothedGx + (dzGx - smoothedGx) * GYRO_ALPHA
         smoothedGy = smoothedGy + (dzGy - smoothedGy) * GYRO_ALPHA
 
-        yaw   = yaw   + math.deg(smoothedGx) * dt * gyroSensitivity
-        pitch = pitch - math.deg(smoothedGy) * dt * gyroSensitivity
+        local activeSens = (SHARED and SHARED.GYRO_SENSITIVITY) or gyroSensitivity
+        yaw   = yaw   + math.deg(smoothedGx) * dt * activeSens
+        pitch = pitch - math.deg(smoothedGy) * dt * activeSens
 
         tickShake(dt)
         applyLook()

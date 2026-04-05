@@ -86,6 +86,7 @@ namespace EngineFramework
                 button.is_released = false;
                 //button.is_active = false;
                 button.clicked_locked = false;
+                button.activePointerId = -1; // Reset so stale touches don't block new presses
 
                 button.curr_button_state = IDLE;
                 button.prev_button_state = NO_STATE; // Force texture reset on first update
@@ -424,7 +425,8 @@ namespace EngineFramework
         if (!registry.all_of<UIComponent>(e)) return false;
 
         const UIComponent& ui = registry.get<UIComponent>(e);
-        if (!ui.visible) return false;
+        // hide_first entities are invisible but still receive clicks.
+        if (!ui.visible && !ui.hide_first) return false;
 
         
  //debug       
@@ -475,6 +477,21 @@ namespace EngineFramework
         std::cout << "Screen Y: " << GraphicsSystem::GetInstance().Getscreen().y << std::endl;
 */
 
+        if (ui.is_NDC)
+        {
+            // NDC buttons are authored and rendered in resolution-independent space.
+            // Compare in NDC so the hit area matches the visual position on any screen size.
+            const glm::vec2 screen = GraphicsSystem::GetInstance().Getscreen();
+            const float ndcMouseX = (mouseUI.x / screen.x) * 2.0f - 1.0f;
+            const float ndcMouseY = (mouseUI.y / screen.y) * 2.0f - 1.0f;
+
+            // position_NDC is the element's centre; size_NDC is the full width/height.
+            const float halfW = std::abs(ui.size_NDC.x) * 0.5f;
+            const float halfH = std::abs(ui.size_NDC.y) * 0.5f;
+            return (ndcMouseX >= ui.position_NDC.x - halfW && ndcMouseX <= ui.position_NDC.x + halfW &&
+                    ndcMouseY >= ui.position_NDC.y - halfH && ndcMouseY <= ui.position_NDC.y + halfH);
+        }
+
         const glm::vec2 pos = ui.position;
         const glm::vec2 size = ui.size;
 
@@ -519,6 +536,7 @@ namespace EngineFramework
                 auto& b = registry.get<ButtonComponent>(entity);
                 b.curr_button_state = state;
                 b.prev_button_state = state;
+                b.activePointerId = -1;
 
             }
         }
@@ -539,6 +557,12 @@ namespace EngineFramework
                     SWAPPING OF TEXTURES FOR UI COMPONENT
                 */
                 auto& ui = registry.get<UIComponent>(entity);
+                // hide_first: entity stays invisible regardless of menu open/close.
+                // Useful for invisible hit-area buttons that should never render.
+                if (ui.hide_first) {
+                    ui.visible = false;
+                    continue;
+                }
                 ui.visible = value;
 
             }

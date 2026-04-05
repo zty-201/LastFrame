@@ -15,22 +15,23 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1670.25,
-				392.53497314453125
+				1636.25,
+				419.7049865722656
 			],
 			"position_NDC": [
 				0.75,
 				-0.23499999940395355
 			],
 			"size": [
-				98.25,
-				54.900001525878906
+				96.25,
+				58.70000076293945
 			],
 			"size_NDC": [
 				0.05000000074505806,
@@ -68,22 +69,23 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1670.25,
-				392.53497314453125
+				1636.25,
+				419.7049865722656
 			],
 			"position_NDC": [
 				0.75,
 				-0.23499999940395355
 			],
 			"size": [
-				98.25,
-				54.900001525878906
+				96.25,
+				58.70000076293945
 			],
 			"size_NDC": [
 				0.05000000074505806,
@@ -121,13 +123,14 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1457.75,
+				1636.25,
 				419.7049865722656
 			],
 			"position_NDC": [
@@ -135,7 +138,7 @@
 				-0.23499999940395355
 			],
 			"size": [
-				85.75,
+				96.25,
 				58.70000076293945
 			],
 			"size_NDC": [
@@ -174,22 +177,23 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1670.25,
-				392.53497314453125
+				1636.25,
+				419.7049865722656
 			],
 			"position_NDC": [
 				0.75,
 				-0.23499999940395355
 			],
 			"size": [
-				98.25,
-				54.900001525878906
+				96.25,
+				58.70000076293945
 			],
 			"size_NDC": [
 				0.05000000074505806,
@@ -249,22 +253,23 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1621.125,
-				27.449996948242188
+				1588.125,
+				29.349998474121094
 			],
 			"position_NDC": [
 				0.75,
 				-0.75
 			],
 			"size": [
-				196.5,
-				219.60000610351563
+				192.5,
+				234.8000030517578
 			],
 			"size_NDC": [
 				0.10000000149011612,
@@ -324,22 +329,23 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1670.25,
-				274.5000305175781
+				1636.25,
+				293.5
 			],
 			"position_NDC": [
 				0.75,
 				-0.4000000059604645
 			],
 			"size": [
-				98.25,
-				109.80000305175781
+				96.25,
+				117.4000015258789
 			],
 			"size_NDC": [
 				0.05000000074505806,
@@ -399,22 +405,23 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1719.375,
-				941.5350341796875
+				1684.375,
+				1006.7050170898438
 			],
 			"position_NDC": [
 				0.800000011920929,
 				0.8149999976158142
 			],
 			"size": [
-				98.25,
-				109.80000305175781
+				96.25,
+				117.4000015258789
 			],
 			"size_NDC": [
 				0.05000000074505806,
@@ -474,6 +481,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
@@ -549,22 +557,23 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1542.5250244140625,
-				211.36502075195313
+				1511.125,
+				225.99501037597656
 			],
 			"position_NDC": [
 				0.6200000047683716,
 				-0.5149999856948853
 			],
 			"size": [
-				98.25,
-				109.80000305175781
+				96.25,
+				117.4000015258789
 			],
 			"size_NDC": [
 				0.05000000074505806,
@@ -624,22 +633,23 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1542.5250244140625,
-				211.36502075195313
+				1511.125,
+				225.99501037597656
 			],
 			"position_NDC": [
 				0.6200000047683716,
 				-0.5149999856948853
 			],
 			"size": [
-				98.25,
-				109.80000305175781
+				96.25,
+				117.4000015258789
 			],
 			"size_NDC": [
 				0.05000000074505806,
