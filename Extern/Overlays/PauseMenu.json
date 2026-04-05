@@ -11,7 +11,7 @@
 				1.0
 			],
 			"event_received": "",
-			"hide_first": true,
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 1,
 			"lock_luminance": false,
@@ -137,7 +137,7 @@
 				1.0
 			],
 			"event_received": "",
-			"hide_first": true,
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 1,
 			"lock_luminance": false,
@@ -220,7 +220,7 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				1500.625,
+				1063.2999267578125,
 				768.9700317382813
 			],
 			"position_NDC": [
