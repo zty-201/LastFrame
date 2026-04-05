@@ -66,6 +66,11 @@ local function hide_drop(tr)
     tr:SetPosition(currentX, -99999.0, currentZ)
 end
 
+local function apply_drop_rotation(tr)
+    if tr == nil then return end
+    tr:SetRotation(DROP_ROT_X, DROP_ROT_Y, DROP_ROT_Z)
+end
+
 local function respawn_drop(tr)
     if tr == nil then return end
 
@@ -89,11 +94,6 @@ local function respawn_drop(tr)
             currentX, currentY, currentZ, currentSpeed
         ))
     end
-end
-
-local function apply_drop_rotation(tr)
-    if tr == nil then return end
-    tr:SetRotation(DROP_ROT_X, DROP_ROT_Y, DROP_ROT_Z)
 end
 
 local function init_if_needed(tr)
