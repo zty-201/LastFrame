@@ -486,8 +486,8 @@ namespace EngineFramework
             const float ndcMouseY = (mouseUI.y / screen.y) * 2.0f - 1.0f;
 
             // position_NDC is the element's centre; size_NDC is the full width/height.
-            const float halfW = ui.size_NDC.x * 0.5f;
-            const float halfH = ui.size_NDC.y * 0.5f;
+            const float halfW = std::abs(ui.size_NDC.x) * 0.5f;
+            const float halfH = std::abs(ui.size_NDC.y) * 0.5f;
             return (ndcMouseX >= ui.position_NDC.x - halfW && ndcMouseX <= ui.position_NDC.x + halfW &&
                     ndcMouseY >= ui.position_NDC.y - halfH && ndcMouseY <= ui.position_NDC.y + halfH);
         }

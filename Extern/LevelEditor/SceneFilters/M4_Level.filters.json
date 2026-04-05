@@ -299,7 +299,7 @@
 			"name": "Playroom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				79,
 				400,
@@ -844,7 +844,7 @@
 			"name": "SF_Corridor"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				724,
 				747,
@@ -895,7 +895,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				5,
 				2,
