@@ -1,29 +1,125 @@
 ----------------------------------------------------------------
 -- Credits.lua
--- Attach to any persistent entity (e.g. 1014).
--- Controls entity 13 (CreditsPng) inside CreditsMenu.
+-- Attach to any persistent entity.
+--
+-- Controls 6 separate credit UI entities:
+--   Credits_1
+--   Credits_2
+--   Credits_3
+--   Credits_4
+--   Credits_5
+--   Credits_6
 --
 -- Detects when the StateMachine enters "EndCredit" and:
---   1. Resets position_NDC.y to START_Y  (-9)  every time (no leftover state)
---   2. Scrolls upward at SPEED NDC/s
---   3. When y >= END_Y (9) fires ReturnToMenu
+--   1. Resets all 6 images into one continuous vertical sequence
+--   2. Scrolls them upward together
+--   3. When the last image has fully passed END_Y, fires ReturnToMenu
 ----------------------------------------------------------------
 
-local CREDITS_STATE  = "EndCredit"
-local CREDITS_ENTITY = 13          -- entity with the Credits.png UIComponent
-local START_Y        = -9.0
-local END_Y          =  9.0
-local SPEED          = 0.3         -- NDC units per second (tweak to taste)
+local CREDITS_STATE = "EndCredit"
 
-local wasInCredits   = false
-local playing        = false
+local CREDIT_ENTITIES = {
+    700, -- Credits_1
+    395, -- Credits_2
+    397, -- Credits_3
+    698, -- Credits_4
+    701, -- Credits_5
+    699  -- Credits_6
+}
+
+-- Where the FIRST credit starts
+local START_Y = -2.0
+
+-- When the LAST credit passes this, credits end
+local END_Y   =  2.0
+
+local SPEED   =  0.3
+
+-- IMPORTANT:
+-- This controls how closely each credit "attaches" to the next one.
+-- If your images overlap, increase this.
+-- If the gap is too large, decrease this.
+--
+-- Since Y increases upward, the next image is placed BELOW the previous one,
+-- so we subtract this value each time.
+local CREDIT_SPACING = 2.0
+
+local wasInCredits = false
+local playing      = false
+local creditData   = {}
 
 ----------------------------------------------------------------
 
 function on_create(self)
     wasInCredits = false
     playing      = false
+    creditData   = {}
     print("[Credits] Script loaded on entity " .. tostring(EntityID))
+end
+
+local function ResetCreditsPositions()
+    creditData = {}
+
+    local currentY = START_Y
+
+    for i = 1, #CREDIT_ENTITIES do
+        local entityID = CREDIT_ENTITIES[i]
+        local img = GetEntityUI(entityID)
+
+        if img then
+            local x, _ = img:GetPosition_NDC()
+            img:SetPosition_NDC(x, currentY)
+
+            creditData[i] = {
+                entityID = entityID,
+                x = x,
+                y = currentY
+            }
+
+            -- Place the next credit directly below the current one
+            currentY = currentY - CREDIT_SPACING
+        else
+            print("[Credits] Warning: missing UI entity ID " .. tostring(entityID))
+        end
+    end
+end
+
+local function UpdateCredits(dt)
+    local lastCredit = creditData[#creditData]
+    if not lastCredit then
+        return true
+    end
+
+    for i = 1, #creditData do
+        local data = creditData[i]
+        local img = GetEntityUI(data.entityID)
+
+        if img then
+            data.y = data.y + SPEED * dt
+            img:SetPosition_NDC(data.x, data.y)
+        end
+    end
+
+    -- End only after the LAST credit has moved out of screen
+    return (lastCredit.y >= END_Y)
+end
+
+local function FinishCredits()
+    playing = false
+    print("[Credits] Final credit finished -> ReturnToMenu")
+
+    SHARED = SHARED or {}
+    SHARED.PLAYER_DEAD                = false
+    SHARED.UI_INVENTORY_OPEN          = false
+    SHARED.UI_INVENTORY_ANDROID_STATE = false
+    SHARED.EVIDENCE_FOLDER_FINISHED   = false
+    _G.GAME_STATE = "MENU"
+
+    if Scene_RequestRestart then Scene_RequestRestart() end
+    if UI_CloseAllMenus    then UI_CloseAllMenus()     end
+    if StateMachine_SetTrigger then
+        StateMachine_SetTrigger("ReturnToMenu")
+    end
 end
 
 function on_update(self, dt)
@@ -37,18 +133,13 @@ function on_update(self, dt)
         wasInCredits = true
         playing      = true
 
-        -- Always reset to the top so replaying starts fresh
-        local img = GetEntityUI(CREDITS_ENTITY)
-        if img then
-            local x, _ = img:GetPosition_NDC()
-            img:SetPosition_NDC(x, START_Y)
-        end
+        ResetCreditsPositions()
 
-        print("[Credits] Entering EndCredit -> reset y to " .. START_Y)
+        print("[Credits] Entering EndCredit -> reset continuous credit roll")
         return
     end
 
-    -- Detect exit from credits state (e.g. stopped mid-play in editor)
+    -- Detect exit from credits state
     if not inCredits then
         if wasInCredits then
             print("[Credits] Left EndCredit state -> stopping")
@@ -60,36 +151,15 @@ function on_update(self, dt)
 
     if not playing then return end
 
-    -- Scroll upward
-    local img = GetEntityUI(CREDITS_ENTITY)
-    if not img then return end
+    local finished = UpdateCredits(dt)
 
-    local x, y = img:GetPosition_NDC()
-    y = y + SPEED * dt
-    img:SetPosition_NDC(x, y)
-
-    -- Finished
-    if y >= END_Y then
-        playing = false
-        print("[Credits] Reached END_Y (" .. END_Y .. ") -> ReturnToMenu")
-
-        -- Reset scene state so pressing Play again starts fresh
-        SHARED = SHARED or {}
-        SHARED.PLAYER_DEAD                = false
-        SHARED.UI_INVENTORY_OPEN          = false
-        SHARED.UI_INVENTORY_ANDROID_STATE = false
-        SHARED.EVIDENCE_FOLDER_FINISHED   = false
-        _G.GAME_STATE = "MENU"
-
-        if Scene_RequestRestart then Scene_RequestRestart() end
-        if UI_CloseAllMenus    then UI_CloseAllMenus()     end
-        if StateMachine_SetTrigger then
-            StateMachine_SetTrigger("ReturnToMenu")
-        end
+    if finished then
+        FinishCredits()
     end
 end
 
 function on_destroy(self)
     playing      = false
     wasInCredits = false
+    creditData   = {}
 end

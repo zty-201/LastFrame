@@ -21129,9 +21129,9 @@
 				-0.00010427424422232434
 			],
 			"scale": [
-				0.0,
-				0.0,
-				0.0
+				1.0,
+				1.0,
+				1.0
 			]
 		}
 	},
@@ -35411,9 +35411,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-534.9786376953125,
-				186.31039428710938,
-				370.090087890625
+				-3.1110591888427734,
+				185.8000030517578,
+				-710.3260498046875
 			],
 			"rotation": [
 				0.0,
@@ -46154,7 +46154,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 457.93572998046875,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46499,7 +46499,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 429.0024719238281,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46687,7 +46687,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 502.1310729980469,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46781,7 +46781,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 445.8245849609375,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -47101,14 +47101,14 @@
 		"CharacterControllerComponent": {
 			"controlVelocity": [
 				0.0,
-				0.0,
+				-2.0,
 				0.0
 			],
 			"gravityFactor": 25.0,
 			"groundNormal": [
 				0.0,
-				0.9999926686286926,
-				0.003839715151116252
+				1.0,
+				0.0
 			],
 			"height": 350.0,
 			"isGrounded": true,
@@ -47189,7 +47189,7 @@
 		"TransformComponent": {
 			"position": [
 				-3.1110591888427734,
-				185.51039123535156,
+				185.0,
 				-740.3260498046875
 			],
 			"rotation": [
@@ -56188,7 +56188,7 @@
 			],
 			"rotation": [
 				0.0,
-				146.91876220703125,
+				88.45983123779297,
 				0.0
 			],
 			"scale": [
@@ -56287,7 +56287,7 @@
 			],
 			"rotation": [
 				0.0,
-				146.91876220703125,
+				88.45983123779297,
 				0.0
 			],
 			"scale": [
@@ -80645,7 +80645,7 @@
 			],
 			"rotation": [
 				0.0,
-				-164.73193359375,
+				164.04457092285156,
 				0.0
 			],
 			"scale": [
@@ -81186,7 +81186,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 100.45465087890625,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -84404,7 +84404,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 97.94387817382813,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,

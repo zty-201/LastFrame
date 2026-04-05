@@ -16,15 +16,15 @@
 			"play_video_audio": true,
 			"position": [
 				0.0,
-				-5605.47265625
+				1798.919921875
 			],
 			"position_NDC": [
 				0.0,
-				9.450642585754395
+				26.800315856933594
 			],
 			"size": [
-				2077.0,
-				23480.0
+				755.0,
+				10120.0
 			],
 			"size_NDC": [
 				1.0,
@@ -46,9 +46,9 @@
 			"visible": false
 		}
 	},
-	"13": {
+	"395": {
 		"NameComponent": {
-			"name": "CreditsPng"
+			"name": "CreditsPng_2"
 		},
 		"UIComponent": {
 			"Overlay_name": "CreditsMenu",
@@ -66,24 +66,274 @@
 			"play_video_audio": true,
 			"position": [
 				0.0,
-				-8002.62890625
+				-506.0
 			],
 			"position_NDC": [
 				0.0,
-				-5.63309907913208
+				-1.3100370168685913
 			],
 			"size": [
-				2077.0,
-				10566.0
+				755.0,
+				506.0
 			],
 			"size_NDC": [
 				1.0,
-				9.0
+				1.0
 			],
 			"subtitle_reveal_progress": 1.0,
 			"subtitle_reveal_softness": 0.029999999329447746,
 			"textureid": [
-				13700258550081060865,
+				7767241060554276867,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"397": {
+		"NameComponent": {
+			"name": "CreditsPng_3"
+		},
+		"UIComponent": {
+			"Overlay_name": "CreditsMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				-614.7900390625
+			],
+			"position_NDC": [
+				0.0,
+				-1.3100370168685913
+			],
+			"size": [
+				755.0,
+				506.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				3732015794430312453,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"698": {
+		"NameComponent": {
+			"name": "CreditsPng_4"
+		},
+		"UIComponent": {
+			"Overlay_name": "CreditsMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				-506.0
+			],
+			"position_NDC": [
+				0.0,
+				-1.3100370168685913
+			],
+			"size": [
+				755.0,
+				506.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				10073084069767970823,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"699": {
+		"NameComponent": {
+			"name": "CreditsPng_6"
+		},
+		"UIComponent": {
+			"Overlay_name": "CreditsMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				-506.0
+			],
+			"position_NDC": [
+				0.0,
+				-1.3100370168685913
+			],
+			"size": [
+				755.0,
+				506.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				14108309335891935243,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"700": {
+		"NameComponent": {
+			"name": "CreditsPng_1"
+		},
+		"UIComponent": {
+			"Overlay_name": "CreditsMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				-1.1714712381362915
+			],
+			"size": [
+				755.0,
+				506.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				5461398051340582913,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"701": {
+		"NameComponent": {
+			"name": "CreditsPng_5"
+		},
+		"UIComponent": {
+			"Overlay_name": "CreditsMenu",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				-506.0
+			],
+			"position_NDC": [
+				0.0,
+				-1.3100370168685913
+			],
+			"size": [
+				755.0,
+				506.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				6037858803644006409,
 				3711223656383638553
 			],
 			"use_subtitle_reveal": false,
