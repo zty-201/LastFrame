@@ -3,9 +3,9 @@ A 3D Horror Game
 Made by Team Cheerios as part of our 3rd year project.
 
 1. Building
-- Double click and run Configure_VisualStudio.bat for code analysis and asan, Run Configure_VisualStudio_No_Analysis.bat otherwise
+- Double click and run Configure_VisualStudio_No_Analysis.bat
 - open up the .sln in generated build folder 
-- run program
+- run program in Visual Studio
 
 2. Level Editor
 - Press on File and Open Scene to load the scene from json file

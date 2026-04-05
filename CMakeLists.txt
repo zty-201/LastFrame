@@ -19,8 +19,13 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project("LastFrame" VERSION 1.0 LANGUAGES C CXX)
 if(WIN32)
   set(CMAKE_VS_USE_POWERSHELL 0)
+  if(MSVC)
+    # Add /FS to prevent PDB access conflicts during parallel builds
+    add_compile_options(/FS)
+  endif()
 endif()
-
+# Enable IPO (LTO) exclusively for Release configurations globally
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
 # -------------------------------------------------------------------------------------
 # Global compile setting: align all Debug iterator levels with Jolt (Release-like)
 # This ensures the precompiled header (cmake_pch.obj) and all TUs agree with Jolt.lib.
@@ -63,21 +68,40 @@ if(WIN32)
 
 if(NOT CODE_ANALYSIS_ON_BUILD)
 target_compile_options(engine_library PUBLIC 
-	# MSVC (Windows) specific warnings
+# MSVC (Windows) specific warnings
 	$<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+	# === MSVC Release Optimizations ===
+	# /O2 (Max speed), /Oi (Intrinsics), /Ot (Favor fast code), /fp:fast (Fast math), /Zc:inline (Remove unreferenced COMDATs), /Gw (Optimize Global Data)
+	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:MSVC>>:/O2 /Oi /Ot /fp:fast /Zc:inline /Gw>
+	
+	
 	# GCC/Clang specific warnings
 	$<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+	
+	# === GCC/Clang Release Optimizations ===
+	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU,Clang>>:-O3 -ffast-math>
+	
 	$<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
 )
 message("ASAN is off")
 else() 
 target_compile_options(engine_library PUBLIC 
-	# MSVC (Windows) specific warnings
+# MSVC (Windows) specific warnings
 	$<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-	# /fsanitize=address is enabled for ASAN. 
+	
+	# === MSVC Release Optimizations ===
+	# /O2 (Max speed), /Oi (Intrinsics), /Ot (Favor fast code), /fp:fast (Fast math), /Zc:inline (Remove unreferenced COMDATs), /Gw (Optimize Global Data)
+	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:MSVC>>:/O2 /Oi /Ot /fp:fast /Zc:inline /Gw>
+	
+	# /fsanitize=address is enabled for ASAN 
 	$<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:/fsanitize=address>>
+	
 	# GCC/Clang specific warnings
 	$<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+	
+	# === GCC/Clang Release Optimizations ===
+	$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU,Clang>>:-O3 -ffast-math>
+	
 	$<$<CXX_COMPILER_ID:GNU,Clang>:$<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fsanitize=leak>>
 )
 endif()
@@ -116,6 +140,10 @@ set_target_properties(application_executable PROPERTIES
 target_link_options(application_executable PRIVATE
 		"$<$<CONFIG:Debug>:/SUBSYSTEM:CONSOLE>"
 		"$<$<CONFIG:Release>:/SUBSYSTEM:WINDOWS>"
+
+    # === MSVC Linker Release Optimizations ===
+		# /OPT:REF (Eliminates functions/data never referenced), /OPT:ICF (Folds identical functions to save cache/space), /INCREMENTAL:NO (Required for maximum release optimization)
+		$<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:MSVC>>:/OPT:REF /OPT:ICF /INCREMENTAL:NO>
 	)
 #==============WINDOWS END==================
 
@@ -129,7 +157,13 @@ message("Building for Android")
   target_precompile_headers(jnicpp PUBLIC ${CMAKE_CURRENT_LIST_DIR}/Application/Utility/pch.hpp)
   #Preprocessor Definitions 
   target_compile_definitions(jnicpp PUBLIC $<$<CONFIG:Debug>:DEBUG _DEBUG> $<$<CONFIG:Release>:NDEBUG _NDEBUG> ENGINE_ENABLE_LUA)
-
+# Android (Clang) Compiler Optimizations
+  target_compile_options(jnicpp PUBLIC 
+      $<$<CONFIG:Release>:-O3 -ffast-math -ftree-vectorize>
+  )
+  target_link_options(jnicpp PRIVATE 
+      $<$<CONFIG:Release>:-Wl,--gc-sections,-O2> # Linker garbage collection
+  )
 
 #Copies assets to android apk directory.
 #This is necessary for apk to find it.
@@ -205,6 +239,9 @@ add_subdirectory(Lib)
 # Safety: enforce CRT on Jolt target
 if (TARGET Jolt)
   set_property(TARGET Jolt PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
+  # Manually force LTO *only* for the Release configuration on Jolt
+  set_property(TARGET Jolt PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
 endif()
 #---------------------------------------------END JOLT CONFIG----------------------------------------------------------------
 
