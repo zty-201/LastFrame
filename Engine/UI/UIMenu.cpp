@@ -86,6 +86,7 @@ namespace EngineFramework
                 button.is_released = false;
                 //button.is_active = false;
                 button.clicked_locked = false;
+                button.activePointerId = -1; // Reset so stale touches don't block new presses
 
                 button.curr_button_state = IDLE;
                 button.prev_button_state = NO_STATE; // Force texture reset on first update
@@ -520,6 +521,7 @@ namespace EngineFramework
                 auto& b = registry.get<ButtonComponent>(entity);
                 b.curr_button_state = state;
                 b.prev_button_state = state;
+                b.activePointerId = -1;
 
             }
         }
