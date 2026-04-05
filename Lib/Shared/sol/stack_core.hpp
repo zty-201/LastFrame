@@ -339,7 +339,6 @@ namespace sol {
 				else {
 					luaL_error(L, "aligned allocation of userdata block (data section) for '%s' failed", detail::demangle<T>().c_str());
 				}
-				return nullptr;
 			}
 
 			T** pointerpointer = reinterpret_cast<T**>(pointer_adjusted);
