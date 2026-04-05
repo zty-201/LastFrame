@@ -11,7 +11,6 @@
 #include "Audio.hpp"
 #include "MaterialComponent.h"
 #include "AnimationComponent.h"
-
 #include "UIComponent.h"
 #include "SceneManager.hpp"
 
@@ -431,6 +430,22 @@ namespace EngineFramework
             else if (light.type == LightComponent::SPOT) spotEntities.push_back(entity);
         }
 
+        // After collecting pointEntities and spotEntities, before processing:
+        glm::vec3 camPos(0.0f);
+        auto cam_entity = GetFirstActiveCamera();
+        if (cam_entity != entt::null)
+            camPos = registry.get<CameraComponent>(cam_entity).position;
+
+
+        auto sortByDist = [&](entt::entity a, entt::entity b) {
+            glm::vec3 posA = registry.get<TransformComponent>(a).position;
+            glm::vec3 posB = registry.get<TransformComponent>(b).position;
+            return glm::distance(camPos, posA) < glm::distance(camPos, posB);
+            };
+
+        std::sort(pointEntities.begin(), pointEntities.end(), sortByDist);
+        std::sort(spotEntities.begin(), spotEntities.end(), sortByDist);
+
         // 2. PROCESS POINT LIGHTS (Indices 0 to 63)
         int pointShadowCount = 0;
         m_pointLightViewProjMatrices.resize(MAX_SHADOW_CASTING_POINT_LIGHTS * 6, glm::mat4(1.0f)); // Add this
@@ -522,6 +537,7 @@ namespace EngineFramework
             m_LightData.push_back(data);
         }
         m_spotLightViewProjMatrices.resize(spotShadowCount); // Shrink to actual count
+
         // 4. UPLOAD
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_lightSSBOs[ringIdx]);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(LightSSBO) * m_LightData.size(), m_LightData.data());
