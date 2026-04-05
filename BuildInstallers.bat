@@ -113,4 +113,8 @@ if exist "%AndroidArm64BuildDir%" (
 
 echo.
 echo All builds complete. Check %InstallerBuildDir% for Windows and Android outputs.
+echo Uploading to github releases
+
+call UploadToGitHub.bat
+
 exit /b 0
