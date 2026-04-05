@@ -134,6 +134,11 @@ local function update_icons(targetId)
 end
 
 function on_create(Self)
+    iconsDisabledForever = false
+    hasPlayedFirstHoverVoiceOver = false
+    firstHoverVoiceOverPending = false
+    firstHoverVoiceOverTimer = 0.0
+
     if DEBUG then
         print("[Test_ConsumeDisc_Shared] on_create EntityID:", EntityID)
     end

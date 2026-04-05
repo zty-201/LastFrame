@@ -134,6 +134,14 @@ end
 -- Lifecycle
 -- -------------------------
 function on_create(self)
+    isOpen = false
+    isUnlocked = false
+    iconsDisabledForever = false
+    hasPlayedFirstLockVO = false
+    wasInRangeLastFrame = false
+    pendingLockVO = false
+    lockVOTimer = 0.0
+
     print("[Level2Gate] on_create EntityID=" .. tostring(EntityID) .. " INTERACTABLE_ID=" .. tostring(INTERACTABLE_ID))
 
     local tr = Query.GetTransform(EntityID)

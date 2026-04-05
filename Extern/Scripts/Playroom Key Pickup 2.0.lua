@@ -143,6 +143,17 @@ local function play_3d_sfx_from(entityId, slotId)
 end
 
 function on_create(Self)
+    pickedUp = false
+    lightDelayActive = false
+    lightDelayTime = 0.0
+    lightFading = false
+    lightTime = 0.0
+    cascadeIndex = 1
+    cascadeTimer = 0.0
+    cascadeActive = false
+    lightFadeStates = {}
+    pendingLightSteps = {}
+
     if DEBUG then
         print("[Key_Shared] on_create EntityID:", EntityID)
     end

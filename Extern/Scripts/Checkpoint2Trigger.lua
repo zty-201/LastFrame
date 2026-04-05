@@ -18,6 +18,8 @@ local function in_interaction_zone()
 end
 
 function on_create(self)
+    triggeredOnce = false
+
     SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
 
     if DEBUG then

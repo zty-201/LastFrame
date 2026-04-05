@@ -70,6 +70,11 @@ end
 -- Lifecycle
 -- ---------------------------------------
 function on_create(self)
+    isOpen = false
+    hasPlayedFirstPadlockVO = false
+    pendingPadlockVO = false
+    padlockVOTimer = 0.0
+
     if DEBUG then
         print("[ToolboxOpenMechanic] on_create EntityID=" .. tostring(EntityID))
     end

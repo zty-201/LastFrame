@@ -20,6 +20,7 @@ local function disc_in_range()
 end
 
 function on_create(self)
+    armed = false
     SHARED.DISC_ICON_CMD = SHARED.DISC_ICON_CMD or {}
     SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
     set_visible(false)

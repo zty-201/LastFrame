@@ -170,6 +170,13 @@ end
 -- Lifecycle
 -- -------------------------
 function on_create(self)
+    isOpen = false
+    isUnlocked = false
+    iconsDisabledForever = false
+    hasPlayedLockedVoiceOver = false
+    pendingVoiceOverDelay = false
+    voiceOverTimer = 0.0
+
     print("[PlayroomDoor] on_create EntityID=" .. tostring(EntityID) .. " INTERACTABLE_ID=" .. tostring(INTERACTABLE_ID))
 
     local tr = Query.GetTransform(EntityID)

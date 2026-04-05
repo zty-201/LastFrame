@@ -18,6 +18,7 @@ local function in_range()
 end
 
 function on_create(self)
+    armed = false
     SHARED.DISC_USE_NODISC_ICON_CMD = SHARED.DISC_USE_NODISC_ICON_CMD or {}
     SHARED.INTERACT_IN_ZONE = SHARED.INTERACT_IN_ZONE or {}
     set_visible(false)
