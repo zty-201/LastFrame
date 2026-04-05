@@ -53,9 +53,9 @@ class LevelEditor; // forward declaration
 #include <time.h>
 
 static inline double get_native_time() {
-   struct timespec now;
-   clock_gettime(CLOCK_MONOTONIC, &now);
-   return (double)now.tv_sec + (double)now.tv_nsec / 1e9;
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    return (double)now.tv_sec + (double)now.tv_nsec / 1e9;
 }
 
 #endif
@@ -93,7 +93,7 @@ namespace EngineFramework
     {
         m_instancingSystem.reset();
         m_geometryBuffer.reset();
-		m_particleSystem.reset();
+        m_particleSystem.reset();
         if (m_lightSSBOs[0] != 0) {
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_lightSSBOs);
             glDeleteBuffers(FRAMES_IN_FLIGHT, m_volumetricUBOs);
@@ -118,17 +118,17 @@ namespace EngineFramework
         m_instancingSystem = std::make_unique<InstancingSystem>();
         m_instancingSystem->Initialize(MAX_INSTANCES);
 
-		// Initialize Geometry Data Buffer
+        // Initialize Geometry Data Buffer
         m_geometryBuffer = std::make_unique<GeometryDataBuffer>();
         m_geometryBuffer->Initialize(5000000, 15000000);
 
-		// Initialize Particle System
+        // Initialize Particle System
         m_particleSystem = std::make_unique<ParticleSystem>();
         m_particleSystem->Initialize();
 
         LoadBlueNoiseTextures();
         PreGeneratePrimitives();
-            
+
         // Listen for events
         event_dispatcher.sink<Event_Level_Editor_Toggled>().connect<&GraphicsSystem::HANDLE_EVENT_LevelEditorToggled>(this);
         event_dispatcher.sink<Event_Window_Resized>().connect<&GraphicsSystem::HANDLE_EVENT_WindowResized>(this);
@@ -189,11 +189,11 @@ namespace EngineFramework
         FBO tempFBO(FBO::Texture, WIDTH, HEIGHT, &sceneTextureID);
         mainFBO = std::move(tempFBO);
 
-		// Create the shadow map framebuffer for directional light cascades
+        // Create the shadow map framebuffer for directional light cascades
         FBO tempShadowFBO(FBO::DepthTextureArray, SHADOW_WIDTH, SHADOW_HEIGHT, &m_csmTextureArray, CASCADE_COUNT);
         m_shadowFBO = std::move(tempShadowFBO);
 
-		// Create the shadow map framebuffer for spotlights (using texture array to store multiple shadow maps)
+        // Create the shadow map framebuffer for spotlights (using texture array to store multiple shadow maps)
         FBO tempSpotShadowFBO(FBO::DepthTextureArray, SHADOW_WIDTH, SHADOW_HEIGHT, &m_spotTextureArray, MAX_SHADOW_CASTING_SPOTLIGHTS);
         m_spotShadowFBO = std::move(tempSpotShadowFBO);
 
@@ -202,11 +202,11 @@ namespace EngineFramework
         m_pointShadowFBO = std::move(tempPointShadowFBO);
 
 #ifdef PLATFORM_ANDROID
-		FBO tempGodRayFBO(FBO::Texture, WIDTH / 2, HEIGHT / 2, &m_godRayTextureID);
-		m_godRayFBO = std::move(tempGodRayFBO);
+        FBO tempGodRayFBO(FBO::Texture, WIDTH / 2, HEIGHT / 2, &m_godRayTextureID);
+        m_godRayFBO = std::move(tempGodRayFBO);
 #endif
 
-        
+
         // 1. Create SSBOs for lights
         glGenBuffers(FRAMES_IN_FLIGHT, m_lightSSBOs);
         for (int i = 0; i < FRAMES_IN_FLIGHT; ++i) {
@@ -279,7 +279,7 @@ namespace EngineFramework
         }
         glBindTexture(GL_TEXTURE_3D, 0);
 
-        
+
     }
 
     void GraphicsSystem::Update(float deltaTime)
@@ -325,8 +325,8 @@ namespace EngineFramework
 
         glm::mat4 viewProj = P * V;
 
-		// ---------------------------- Prerocessing -----------------------------
-		// Update cascade splits and matrices
+        // ---------------------------- Prerocessing -----------------------------
+        // Update cascade splits and matrices
         UpdateCascadeMatrices(*active_camera, V);
 
         // Update point light SSBO (1ms)
@@ -334,18 +334,18 @@ namespace EngineFramework
 
         //->BuildSceneBatches();
         //->BuildSceneBatches();
-		// Update the instancing system (modelmatrix update + batch building + compute culling dispatch)
+        // Update the instancing system (modelmatrix update + batch building + compute culling dispatch)
         m_instancingSystem->UpdateAndDispatchCompute(
-            viewProj, 
-            m_cascadeViewProjMatrices, 
-            m_spotLightViewProjMatrices, 
+            viewProj,
+            m_cascadeViewProjMatrices,
+            m_spotLightViewProjMatrices,
             m_pointLightViewProjMatrices
         );
 
-		// Update particle system and dispatch compute
+        // Update particle system and dispatch compute
         m_particleSystem->DispatchCompute(deltaTime);
-		
-		// ---------------------------- Rendering Passes -----------------------------
+
+        // ---------------------------- Rendering Passes -----------------------------
         m_geometryBuffer->Bind();
         // 1. Shadow pass (directional + point) (around 2ms)
         ShadowPass();
@@ -364,12 +364,28 @@ namespace EngineFramework
         SkyboxPass();
 
         m_particleSystem->RenderParticles(viewProj, V);
-
 #ifdef PLATFORM_ANDROID
-        // On Android, this now blits the scene to 0, then composites rays to 0
         GodRayPass();
-#else
-        // On PC, if we aren't in the editor, move the scene to the screen BEFORE the UI draws
+#endif
+        // 7. UI pass
+        RenderUI();
+
+#if defined(PLATFORM_ANDROID)
+        const GLenum depthDiscard[] = { GL_DEPTH_ATTACHMENT };
+
+        // Shadow maps no longer needed
+        /*glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_spotShadowFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_pointShadowFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);*/
+
+        // Main FBO depth no longer needed either
+        glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
+#endif
+        // 8. Copy to screen if we are not in level editor
         if (!m_isRenderingToFBO) {
             glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -378,20 +394,6 @@ namespace EngineFramework
                 GL_COLOR_BUFFER_BIT, GL_NEAREST);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
-#endif
-
-        // 7. UI pass 
-        // This now brilliantly draws directly to the screen (0) on Android, 
-        // saving massive FBO fill rate!
-        RenderUI();
-
-#if defined(PLATFORM_ANDROID)
-        const GLenum depthDiscard[] = { GL_DEPTH_ATTACHMENT };
-
-        // Main FBO depth no longer needed
-        glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, depthDiscard);
-#endif
 
         m_geometryBuffer->Unbind();
         m_prev_view_projection = viewProj;
@@ -405,11 +407,11 @@ namespace EngineFramework
 
         // 1. COLLECT (Iterate once)
         // We separate them immediately so we don't need to sort later.
-		static std::vector<entt::entity> pointEntities; // prevent reallocation every frame
+        static std::vector<entt::entity> pointEntities; // prevent reallocation every frame
         static std::vector<entt::entity> spotEntities;
 
-		pointEntities.clear();
-		spotEntities.clear();
+        pointEntities.clear();
+        spotEntities.clear();
 
         auto EulerToDirection = [](const glm::vec3& eulerDegrees) {
             float pitch = glm::radians(eulerDegrees.x);
@@ -507,8 +509,8 @@ namespace EngineFramework
                 glm::mat4 P = glm::perspective(fov, 1.0f, 1.0f, light.radius);
                 glm::mat4 V = glm::lookAt(transform.position, transform.position + lightDir, glm::vec3(0, 1, 0));
                 data.view_proj = P * V;
-				// Store for later use in shadow pass
-				m_spotLightViewProjMatrices[shadowIndex] = data.view_proj;
+                // Store for later use in shadow pass
+                m_spotLightViewProjMatrices[shadowIndex] = data.view_proj;
             }
 
             // DIRTY CHECK
@@ -519,7 +521,7 @@ namespace EngineFramework
 
             m_LightData.push_back(data);
         }
-		m_spotLightViewProjMatrices.resize(spotShadowCount); // Shrink to actual count
+        m_spotLightViewProjMatrices.resize(spotShadowCount); // Shrink to actual count
         // 4. UPLOAD
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_lightSSBOs[ringIdx]);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(LightSSBO) * m_LightData.size(), m_LightData.data());
@@ -527,7 +529,7 @@ namespace EngineFramework
     }
 
     /*
-		Rendering the directional light shadow map using cascaded shadow mapping.
+        Rendering the directional light shadow map using cascaded shadow mapping.
     */
     void GraphicsSystem::RenderDirectionalShadow()
     {
@@ -537,7 +539,7 @@ namespace EngineFramework
             if (light.type == LightComponent::DIRECTIONAL) {
 
                 if (auto* transform = registry.try_get<TransformComponent>(entity)) {
-                    dirLightTransform = transform;                    
+                    dirLightTransform = transform;
                 }
                 /*else {
                     std::cout << "Directional light missing TransformComponent!\n";
@@ -723,7 +725,8 @@ namespace EngineFramework
         std::shared_ptr<ShaderProgram> shader{};
         if (shadow_shader_guid != xresource::full_guid{}) {
             shader = AssetManagerSystem::GetResource<ShaderProgram>(shadow_shader_guid);
-        } else {
+        }
+        else {
             using E_AM = AssetManagerSystem;
             shadow_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "Shadow");
             shader = E_AM::GetResource<ShaderProgram>(shadow_shader_guid);
@@ -734,7 +737,7 @@ namespace EngineFramework
         glBindFramebuffer(GL_FRAMEBUFFER, m_spotShadowFBO.handle);
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT); 
+        glCullFace(GL_FRONT);
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0f, 1.0f);
 
@@ -790,7 +793,7 @@ namespace EngineFramework
         glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 0, 0, 0);
         glDisable(GL_POLYGON_OFFSET_FILL);
         glCullFace(GL_BACK);
-		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // unbind indirect buffer
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0); // unbind indirect buffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind framebuffer
         shader->disuse();
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
@@ -801,7 +804,7 @@ namespace EngineFramework
     {
         RenderDirectionalShadow();
         RenderPointLightShadows();
-		RenderSpotLightShadows();
+        RenderSpotLightShadows();
     }
 
     void GraphicsSystem::UpdateUBOs(const CameraComponent& camera, const glm::mat4& V, const glm::mat4& P)
@@ -809,7 +812,7 @@ namespace EngineFramework
         VolumetricUBO uboData;
 
         TransformComponent* dirLightTransform = nullptr;
-		LightComponent* dirLight = nullptr;
+        LightComponent* dirLight = nullptr;
         for (auto [entity, light] : registry.view<LightComponent>().each()) {
             if (light.type == LightComponent::DIRECTIONAL) {
                 dirLight = &light;
@@ -907,7 +910,7 @@ namespace EngineFramework
         uint32_t write_idx = static_cast<uint32_t>(!m_ping_pong);
 
         glBindImageTexture(0, m_temporal_integration_voxel_grid[write_idx],
-                           0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+            0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
 
         glActiveTexture(GL_TEXTURE0 + TextureUnits::VOLUMETRIC_HISTORY_UNIT);
         glBindTexture(GL_TEXTURE_3D, m_temporal_integration_voxel_grid[read_idx]);
@@ -933,8 +936,8 @@ namespace EngineFramework
         shader->setUniform("u_Accumulation", m_frame_idx > 0 && m_temporal_accumulation);
 
         glDispatchCompute((VOXEL_GRID_SIZE_X + 7) / 8,
-                          (VOXEL_GRID_SIZE_Y + 7) / 8,
-                          (VOXEL_GRID_SIZE_Z + 0) / 1);
+            (VOXEL_GRID_SIZE_Y + 7) / 8,
+            (VOXEL_GRID_SIZE_Z + 0) / 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
         m_ping_pong = !m_ping_pong;
@@ -966,8 +969,8 @@ namespace EngineFramework
         shader->setUniform("s_VoxelGrid", 0);
 
         glDispatchCompute((VOXEL_GRID_SIZE_X + 7) / 8,
-                          (VOXEL_GRID_SIZE_Y + 7) / 8,
-                          1);
+            (VOXEL_GRID_SIZE_Y + 7) / 8,
+            1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         shader->disuse();
     }
@@ -993,7 +996,7 @@ namespace EngineFramework
             mesh_instanced_shader_guid = E_AM::GetFullGuid(E_AM::SHADER_GUID, "MeshInstanced");
             instanced_shader = E_AM::GetResource<ShaderProgram>(mesh_instanced_shader_guid);
         }
-       
+
 
         if (instanced_shader) {
             instanced_shader->use();
@@ -1025,7 +1028,7 @@ namespace EngineFramework
             glBindTexture(GL_TEXTURE_3D, m_ray_march_voxel_grid);
             instanced_shader->setUniform("s_VoxelGrid", TextureUnits::VOLUMETRIC_VOXEL_GRID_UNIT);
             instanced_shader->setUniform("u_Tricubic", m_tricubic_filtering);
-			instanced_shader->setUniform("u_AndroidPlatform", m_androidPlatform);
+            instanced_shader->setUniform("u_AndroidPlatform", m_androidPlatform);
             instanced_shader->setUniform("u_NumPointLights", (int)m_LightData.size());
             instanced_shader->setUniform("s_Albedo", TextureUnits::MESH_ALBEDO_UNIT);
             instanced_shader->setUniform("s_Normal", TextureUnits::MESH_NORMAL_UNIT);
@@ -1085,9 +1088,10 @@ namespace EngineFramework
             }
             glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
             instanced_shader->disuse();
-        } else {
+        }
+        else {
             LOGE("Mesh instanced shader not found!");
-			return;
+            return;
         }
 
         std::shared_ptr<ShaderProgram> standard_shader{};
@@ -1223,7 +1227,7 @@ namespace EngineFramework
 
             standard_shader->disuse();
         }
-        
+
     }
 
     void GraphicsSystem::SkyboxPass()
@@ -1341,10 +1345,10 @@ namespace EngineFramework
 
         std::stable_sort(drawList.begin(), drawList.end(), [](const UIRenderItem& a, const UIRenderItem& b) {
             return a.layer < b.layer;
-        });
+            });
 
 
-        
+
         for (const auto& item : drawList)
         {
             if (!registry.valid(item.entity) || !registry.all_of<UIComponent>(item.entity)) continue;
@@ -1480,11 +1484,11 @@ namespace EngineFramework
                 (void*)(meshData->subMeshes[0].firstIndex * sizeof(Mesh::IndexType)),
                 meshData->subMeshes[0].baseVertex
             );
-                
+
         }
 
-        
-        
+
+
 
         for (VideoClip* clip : m_activeVideoAudio)
         {
@@ -1573,7 +1577,7 @@ namespace EngineFramework
         // The 0.05f is the "fade speed". Lower = slower fade, Higher = faster fade.
         m_currentGodRayIntensity = glm::mix(m_currentGodRayIntensity, targetIntensity, 0.05f);
 
-        
+
 
         // --- At this point, sunUV is the exact 2D coordinate of your sun! ---
 
@@ -1628,25 +1632,15 @@ namespace EngineFramework
         // --- STEP 4: THE COMPOSITE PASS ---
         // ==========================================
 
-        // 1. Bind the DEFAULT screen (0) instead of mainFBO
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // 1. Bind the main FBO to draw over our 3D scene
+        glBindFramebuffer(GL_FRAMEBUFFER, mainFBO.handle);
         glViewport(0, 0, (GLsizei)screen.x, (GLsizei)screen.y);
 
-        // 2. Move the 3D scene from mainFBO to the screen (0)
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, mainFBO.handle);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glBlitFramebuffer(0, 0, (GLint)screen.x, (GLint)screen.y,
-            0, 0, (GLint)screen.x, (GLint)screen.y,
-            GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-        // Ensure we are fully bound to 0 for drawing
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        // 3. Enable Additive Blending (This makes the god rays add to the existing pixels)
+        // 2. Enable Additive Blending (This makes the light add to the existing pixels)
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
 
-        // 4. Fetch the Composite Shader
+        // 3. Fetch the Composite Shader
         std::shared_ptr<ShaderProgram> compShader{};
         if (composite_shader_guid != xresource::full_guid{}) {
             compShader = EngineFramework::AssetManagerSystem::GetResource<ShaderProgram>(composite_shader_guid);
@@ -1660,12 +1654,12 @@ namespace EngineFramework
         if (compShader) {
             compShader->use();
 
-            // 5. Bind the blurred God Ray texture
+            // 4. Bind the blurred God Ray texture we just created
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, m_godRayTextureID);
             compShader->setUniform("s_Texture", 0);
 
-            // 6. Draw the Full-Screen Quad directly to the screen
+            // 5. Draw the Full-Screen Quad again
             glDrawElementsBaseVertex(
                 GL_TRIANGLES,
                 meshData->subMeshes[0].indexCount,
@@ -1677,7 +1671,7 @@ namespace EngineFramework
             compShader->disuse();
         }
 
-        // 7. Restore Global State for the UI pass
+        // 6. Restore Global State so we don't break the UI pass!
         glDisable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
