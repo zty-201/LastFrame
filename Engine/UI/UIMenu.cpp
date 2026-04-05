@@ -424,7 +424,8 @@ namespace EngineFramework
         if (!registry.all_of<UIComponent>(e)) return false;
 
         const UIComponent& ui = registry.get<UIComponent>(e);
-        if (!ui.visible) return false;
+        // hide_first entities are invisible but still receive clicks.
+        if (!ui.visible && !ui.hide_first) return false;
 
         
  //debug       
@@ -539,6 +540,12 @@ namespace EngineFramework
                     SWAPPING OF TEXTURES FOR UI COMPONENT
                 */
                 auto& ui = registry.get<UIComponent>(entity);
+                // hide_first: entity stays invisible regardless of menu open/close.
+                // Useful for invisible hit-area buttons that should never render.
+                if (ui.hide_first) {
+                    ui.visible = false;
+                    continue;
+                }
                 ui.visible = value;
 
             }

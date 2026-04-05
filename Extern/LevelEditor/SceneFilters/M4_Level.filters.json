@@ -299,7 +299,7 @@
 			"name": "Playroom"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				79,
 				400,
@@ -458,7 +458,7 @@
 			"name": "Canteen"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				80,
 				240,
@@ -844,7 +844,7 @@
 			"name": "SF_Corridor"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				724,
 				747,

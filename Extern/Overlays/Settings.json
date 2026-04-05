@@ -1,0 +1,456 @@
+{
+	"1057": {
+		"NameComponent": {
+			"name": "SettingsPage"
+		},
+		"UIComponent": {
+			"Overlay_name": "Settings",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1925.0,
+				1174.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				7812048356609736707,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"1058": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				8317419081744449537,
+				3711223656383638553
+			],
+			"event_hover": "",
+			"event_trigger": "SettingsBack",
+			"hover_texture": [
+				8317419081744449537,
+				3711223656383638553
+			],
+			"idle_texture": [
+				8317419081744449537,
+				3711223656383638553
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 9134461778645417985
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "BackBtn"
+		},
+		"UIComponent": {
+			"Overlay_name": "Settings",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				19.250022888183594,
+				41.09000778198242
+			],
+			"position_NDC": [
+				-0.8999999761581421,
+				-0.8299999833106995
+			],
+			"size": [
+				154.0,
+				117.4000015258789
+			],
+			"size_NDC": [
+				0.07999999821186066,
+				0.10000000149011612
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				8317419081744449537,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"1059": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "",
+			"event_trigger": "SliderDrag",
+			"hover_texture": [
+				0,
+				0
+			],
+			"idle_texture": [
+				0,
+				0
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 10287383283257982979
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "SliderController"
+		},
+		"UIComponent": {
+			"Overlay_name": "Settings",
+			"color": [
+				0.2471042275428772,
+				0.24233388900756836,
+				0.24233388900756836
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				1068.375,
+				545.9099731445313
+			],
+			"position_NDC": [
+				0.12999999523162842,
+				0.0
+			],
+			"size": [
+				38.5,
+				82.18000030517578
+			],
+			"size_NDC": [
+				0.019999999552965164,
+				0.07000000029802322
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				0,
+				0
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"1060": {
+		"NameComponent": {
+			"name": "SliderBar"
+		},
+		"UIComponent": {
+			"Overlay_name": "Settings",
+			"color": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": false,
+			"position": [
+				654.5,
+				584.0650024414063
+			],
+			"position_NDC": [
+				0.12999999523162842,
+				0.0
+			],
+			"size": [
+				866.25,
+				5.869999885559082
+			],
+			"size_NDC": [
+				0.44999998807907104,
+				0.004999999888241291
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				0,
+				0
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"1061": {
+		"NameComponent": {
+			"name": "SliderBarVolume"
+		},
+		"UIComponent": {
+			"Overlay_name": "Settings",
+			"color": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": false,
+			"position": [
+				654.5,
+				308.17498779296875
+			],
+			"position_NDC": [
+				0.12999999523162842,
+				-0.4699999988079071
+			],
+			"size": [
+				866.25,
+				5.869999885559082
+			],
+			"size_NDC": [
+				0.44999998807907104,
+				0.004999999888241291
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				0,
+				0
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"1062": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "",
+			"event_trigger": "VolumeSliderDrag",
+			"hover_texture": [
+				0,
+				0
+			],
+			"idle_texture": [
+				0,
+				0
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 9502921318478938125
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "SliderControllerVolume"
+		},
+		"UIComponent": {
+			"Overlay_name": "Settings",
+			"color": [
+				0.2471042275428772,
+				0.24233388900756836,
+				0.24233388900756836
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 2,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				1482.25,
+				270.0199890136719
+			],
+			"position_NDC": [
+				0.5600000023841858,
+				-0.4699999988079071
+			],
+			"size": [
+				38.5,
+				82.18000030517578
+			],
+			"size_NDC": [
+				0.019999999552965164,
+				0.07000000029802322
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				0,
+				0
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	},
+	"1063": {
+		"ButtonComponent": {
+			"clicked_texture": [
+				0,
+				0
+			],
+			"event_hover": "",
+			"event_trigger": "SettingsToControls",
+			"hover_texture": [
+				0,
+				0
+			],
+			"idle_texture": [
+				0,
+				0
+			],
+			"stay_clicked": false
+		},
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 12593226292477722629
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "ToControlsButton"
+		},
+		"UIComponent": {
+			"Overlay_name": "Settings",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": true,
+			"is_NDC": true,
+			"layer": 1,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				606.375,
+				986.1599731445313
+			],
+			"position_NDC": [
+				0.11999999731779099,
+				0.8100000023841858
+			],
+			"size": [
+				943.25,
+				152.6199951171875
+			],
+			"size_NDC": [
+				0.49000000953674316,
+				0.12999999523162842
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				0,
+				0
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
+		}
+	}
+}

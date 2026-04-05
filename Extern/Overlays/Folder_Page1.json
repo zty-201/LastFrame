@@ -20,6 +20,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,

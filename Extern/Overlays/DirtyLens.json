@@ -11,6 +11,7 @@
 				0.44999998807907104
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 100,
 			"lock_luminance": false,

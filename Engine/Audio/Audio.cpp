@@ -292,7 +292,7 @@ namespace EngineFramework
 			HandlePlayOnStart(ecs);
 #endif
 
-		// 3) Process queued play/stop commands — skip new play commands when paused
+		// 3) Process queued play/stop commands ï¿½ skip new play commands when paused
 		if (m_isPaused)
 			m_commands.clear(); // discard all commands while paused
 		else
@@ -402,6 +402,10 @@ namespace EngineFramework
 					if (m_groupAmbience) channel->setChannelGroup(m_groupAmbience);
 					break;
 			}
+		}
+		else
+		{
+			if (auto* grp = pickGroup(group)) channel->setChannelGroup(grp);
 		}
 
 		// Fade
@@ -893,7 +897,7 @@ namespace EngineFramework
 		m_currentGameState = state;
 
 #ifndef DISABLE_FMOD
-		// Pause/unpause is handled by PauseAll via Pause_Event — don't stop any sounds
+		// Pause/unpause is handled by PauseAll via Pause_Event ï¿½ don't stop any sounds
 		if (state == "Pause" || previousState == "Pause")
 			return;
 

@@ -301,6 +301,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -2945,6 +2946,82 @@
 				1.0,
 				1.0
 			]
+		}
+	},
+	"1065": {
+		"LuaScriptComponent": {
+			"Enabled": true,
+			"Scripts": [
+				{
+					"Loaded": true,
+					"ScriptGuid": 943962135629545477
+				}
+			]
+		},
+		"NameComponent": {
+			"name": "SF_Master_Folder_Icon"
+		},
+		"TransformComponent": {
+			"position": [
+				-106.19022369384766,
+				650.7601928710938,
+				1059.7413330078125
+			],
+			"rotation": [
+				0.0,
+				-0.0,
+				0.0
+			],
+			"scale": [
+				0.0010000000474974513,
+				0.0010000000474974513,
+				0.0010000000474974513
+			]
+		},
+		"UIComponent": {
+			"Overlay_name": "",
+			"color": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"event_received": "",
+			"hide_first": false,
+			"is_NDC": true,
+			"layer": 0,
+			"lock_luminance": false,
+			"luminance": 1.0,
+			"play_video_audio": true,
+			"position": [
+				0.0,
+				0.0
+			],
+			"position_NDC": [
+				0.0,
+				0.0
+			],
+			"size": [
+				1102.0,
+				833.0
+			],
+			"size_NDC": [
+				1.0,
+				1.0
+			],
+			"subtitle_reveal_progress": 1.0,
+			"subtitle_reveal_softness": 0.029999999329447746,
+			"textureid": [
+				15304296428018171923,
+				3711223656383638553
+			],
+			"use_subtitle_reveal": false,
+			"video_audio_group": 1,
+			"video_audio_volume": 1.0,
+			"videoid": [
+				0,
+				0
+			],
+			"visible": false
 		}
 	},
 	"107": {
@@ -6420,6 +6497,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -20799,9 +20877,9 @@
 				-0.00010427424422232434
 			],
 			"scale": [
-				1.0,
-				1.0,
-				1.0
+				0.0,
+				0.0,
+				0.0
 			]
 		}
 	},
@@ -35081,9 +35159,9 @@
 		},
 		"TransformComponent": {
 			"position": [
-				-49.22673797607422,
-				184.6888885498047,
-				792.3840942382813
+				500.0067138671875,
+				723.4638671875,
+				1003.5745849609375
 			],
 			"rotation": [
 				0.0,
@@ -35153,6 +35231,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -35202,6 +35281,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -35268,6 +35348,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -35334,6 +35415,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -35380,6 +35462,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -35443,6 +35526,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -35509,6 +35593,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -35558,6 +35643,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -35714,6 +35800,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -35780,6 +35867,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -35826,6 +35914,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -35889,6 +35978,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -37183,6 +37273,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -37232,6 +37323,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -37298,6 +37390,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -37364,6 +37457,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -37410,6 +37504,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -37473,6 +37568,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -40797,6 +40893,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -40846,6 +40943,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -40912,6 +41010,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -40978,6 +41077,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -41024,6 +41124,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -46053,7 +46154,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 449.6744384765625,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46398,7 +46499,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 440.4961853027344,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46492,7 +46593,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 515.9758911132813,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46586,7 +46687,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 431.8722839355469,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46680,7 +46781,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 461.0887145996094,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46780,7 +46881,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 462.53106689453125,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -47000,7 +47101,7 @@
 		"CharacterControllerComponent": {
 			"controlVelocity": [
 				0.0,
-				-2.0,
+				0.0,
 				0.0
 			],
 			"gravityFactor": 25.0,
@@ -47087,9 +47188,9 @@
 		"SceneRenderPass": null,
 		"TransformComponent": {
 			"position": [
-				-49.22673797607422,
-				183.88888549804688,
-				762.3840942382813
+				21.228832244873047,
+				148.62002563476563,
+				-734.0595092773438
 			],
 			"rotation": [
 				0.0,
@@ -47270,6 +47371,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -47319,6 +47421,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -47385,6 +47488,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -47451,6 +47555,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -47497,6 +47602,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -47560,6 +47666,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -49423,6 +49530,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -49472,6 +49580,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -49538,6 +49647,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -49604,6 +49714,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -49650,6 +49761,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -49713,6 +49825,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": false,
 			"layer": 0,
 			"lock_luminance": false,
@@ -56075,7 +56188,7 @@
 			],
 			"rotation": [
 				0.0,
-				15.595979690551758,
+				92.0087661743164,
 				0.0
 			],
 			"scale": [
@@ -56174,7 +56287,7 @@
 			],
 			"rotation": [
 				0.0,
-				15.595979690551758,
+				92.0087661743164,
 				0.0
 			],
 			"scale": [
@@ -57476,6 +57589,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -57551,6 +57665,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -57626,6 +57741,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -57827,6 +57943,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -57902,6 +58019,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -57977,6 +58095,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -58052,6 +58171,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 1,
 			"lock_luminance": false,
@@ -58127,6 +58247,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -58202,6 +58323,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -58277,6 +58399,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -58352,6 +58475,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -58427,6 +58551,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -58502,6 +58627,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -58667,6 +58793,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -63975,6 +64102,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -64084,7 +64212,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 99.32441711425781,
+			"intensity": 100.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -64286,6 +64414,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -64361,6 +64490,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -64436,6 +64566,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -78806,6 +78937,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -79247,6 +79379,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
@@ -79615,6 +79748,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
@@ -79673,6 +79807,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
@@ -79731,6 +79866,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
@@ -79789,6 +79925,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 2,
 			"lock_luminance": false,
@@ -79847,6 +79984,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 1,
 			"lock_luminance": false,
@@ -80507,7 +80645,7 @@
 			],
 			"rotation": [
 				0.0,
-				86.45792388916016,
+				75.78935241699219,
 				0.0
 			],
 			"scale": [
@@ -84266,7 +84404,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 95.54317474365234,
+			"intensity": 100.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -84918,6 +85056,7 @@
 				1.0
 			],
 			"event_received": "",
+			"hide_first": false,
 			"is_NDC": true,
 			"layer": 0,
 			"lock_luminance": false,
