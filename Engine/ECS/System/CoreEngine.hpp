@@ -89,6 +89,7 @@ namespace EngineFramework
 
 		static void RequestSceneRestart()
 		{
+			std::cout << "hello there ================================================================================\n";
 			g_RequestSceneRestart = true;
 		}
 

@@ -223,6 +223,19 @@ namespace Engine {
         DispatchLuaEvent(*s_RuntimeRegistry, e.other, "on_trigger_stay", e.trigger);
     }
 
+    void ScriptSystem::ResetLuaState() {
+#if defined(ENGINE_ENABLE_LUA)
+        LOGI("[ScriptSystem] Nuking and rebuilding Lua state to clear dirty memory...");
+
+        // 1. Completely destroy the old Lua state and create a brand new, empty one.
+        // This incinerates all corrupted variables and dangling strings!
+        s_Lua = sol::state();
+
+        // 2. Re-run your Init() function to bind all C++ functions to the fresh state.
+        Init();
+#endif
+    }
+
     void ScriptSystem::Init() {
 #if defined(ENGINE_ENABLE_LUA)
         s_Lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math,
