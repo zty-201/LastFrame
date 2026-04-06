@@ -843,7 +843,7 @@
 			"name": "SF_Corridor"
 		},
 		{
-			"expanded": false,
+			"expanded": true,
 			"members": [
 				724,
 				747,
