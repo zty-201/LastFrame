@@ -33,6 +33,7 @@ local SUBTITLES = {
     BEDROOM_RETURN_REACTION = { entity = 1051, duration = 1.5 },
     TOOLBOX_PADLOCK_REACTION = { entity = 1052, duration = 3.0 },
     GRAVES_REVEAL_REACTION = { entity = 1054, duration = 1.5 },
+    MASTERGIRL_VO16 = { entity = 13, duration = 0.8 },
 }
 
 ----------------------------------------------------------------

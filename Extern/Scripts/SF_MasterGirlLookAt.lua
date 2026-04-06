@@ -171,7 +171,14 @@ function on_update(self, dt)
     if not voPlayed and sequenceTimer >= T_VO then
         voPlayed = true
         Audio_PlaySlot(EntityID, "VoiceOver_16")
-        if DEBUG then print("[MasterGirlLookAt] VoiceOver_16 playing") end
+
+        SHARED.SUBTITLE_CMD = SHARED.SUBTITLE_CMD or {}
+        SHARED.SUBTITLE_CMD["MASTERGIRL_VO16"] = {
+            trigger = true,
+            by = EntityID
+        }
+
+        if DEBUG then print("[MasterGirlLookAt] VoiceOver_16 + subtitle playing") end
     end
 
     -- Girl turns to face player + DontLookAtMe plays + laugh ramps up + rain starts fading
@@ -210,12 +217,12 @@ function on_update(self, dt)
         zoomTriggered = true
         SHARED = SHARED or {}
         SHARED.POV = SHARED.POV or {}
-        SHARED.POV.locked           = true
-        SHARED.POV.lockTargetEntity = EntityID
-        SHARED.POV.shake            = true
-        SHARED.POV.shakeDuration    = PULL_DURATION
-        SHARED.POV.shakeAmplitude   = PULL_AMPLITUDE
-        SHARED.POV.shakeSpeed       = 0.01
+        SHARED.POV.locked             = true
+        SHARED.POV.lockTargetEntity   = EntityID
+        SHARED.POV.shake              = true
+        SHARED.POV.shakeDuration      = PULL_DURATION
+        SHARED.POV.shakeAmplitude     = PULL_AMPLITUDE
+        SHARED.POV.shakeSpeed         = 0.01
         SHARED.POV.shakePullAmount    = PULL_AMOUNT
         SHARED.POV.freeShakeSustain   = true
         SHARED.POV.freeShakeAmplitude = VIG_SHAKE_AMPLITUDE

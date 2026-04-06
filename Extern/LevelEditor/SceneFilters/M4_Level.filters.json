@@ -200,7 +200,7 @@
 			"name": "Hall"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				32,
 				33,
@@ -582,7 +582,7 @@
 			"name": "Bedroom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				39,
 				163,
@@ -843,7 +843,7 @@
 			"name": "SF_Corridor"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				724,
 				747,
@@ -879,7 +879,7 @@
 			"name": "SF_MasterRoom"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				259,
 				377,
@@ -894,7 +894,7 @@
 			"name": "SFX"
 		},
 		{
-			"expanded": true,
+			"expanded": false,
 			"members": [
 				5,
 				2,
