@@ -35412,7 +35412,7 @@
 		"TransformComponent": {
 			"position": [
 				-3.1110591888427734,
-				186.31039428710938,
+				185.8000030517578,
 				-710.3260498046875
 			],
 			"rotation": [
@@ -46154,7 +46154,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 457.93572998046875,
+			"intensity": 504.8665771484375,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46499,7 +46499,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 429.0024719238281,
+			"intensity": 500.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46593,7 +46593,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 448.69287109375,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46687,7 +46687,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 502.1310729980469,
+			"intensity": 491.9525451660156,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46781,7 +46781,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 445.8245849609375,
+			"intensity": 516.4295043945313,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -46881,7 +46881,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 500.0,
+			"intensity": 513.9462890625,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -56188,7 +56188,7 @@
 			],
 			"rotation": [
 				0.0,
-				212.8994140625,
+				73.67011260986328,
 				0.0
 			],
 			"scale": [
@@ -56287,7 +56287,7 @@
 			],
 			"rotation": [
 				0.0,
-				212.8994140625,
+				73.67011260986328,
 				0.0
 			],
 			"scale": [
@@ -64212,7 +64212,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.0,
+			"intensity": 92.6668930053711,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -81186,7 +81186,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 100.45465087890625,
+			"intensity": 100.0,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,
@@ -84404,7 +84404,7 @@
 			],
 			"constant": 4.699999809265137,
 			"innerConeAngle": 12.5,
-			"intensity": 97.94387817382813,
+			"intensity": 99.50465393066406,
 			"isStatic": true,
 			"linear": 0.09000000357627869,
 			"outerConeAngle": 17.5,

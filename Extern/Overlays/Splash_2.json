@@ -15,10 +15,10 @@
 			"is_NDC": true,
 			"layer": 6,
 			"lock_luminance": false,
-			"luminance": 1.0,
+			"luminance": 0.9191005229949951,
 			"play_video_audio": true,
 			"position": [
-				428.75,
+				188.75,
 				0.0
 			],
 			"position_NDC": [
@@ -26,8 +26,8 @@
 				0.0
 			],
 			"size": [
-				857.5,
-				1174.0
+				377.5,
+				506.0
 			],
 			"size_NDC": [
 				0.5,
@@ -73,8 +73,8 @@
 				0.0
 			],
 			"size": [
-				1715.0,
-				1174.0
+				755.0,
+				506.0
 			],
 			"size_NDC": [
 				1.0,

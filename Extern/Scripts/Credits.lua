@@ -28,7 +28,7 @@ local CREDIT_ENTITIES = {
 }
 
 -- Where the FIRST credit starts
-local START_Y = -2.0
+local START_Y = 0.0
 
 -- When the LAST credit passes this, credits end
 local END_Y   =  2.0
@@ -67,7 +67,9 @@ local function ResetCreditsPositions()
         local img = GetEntityUI(entityID)
 
         if img then
-            local x, _ = img:GetPosition_NDC()
+            -- Force center X = 0
+            local x = 0.0
+
             img:SetPosition_NDC(x, currentY)
 
             creditData[i] = {
@@ -76,7 +78,7 @@ local function ResetCreditsPositions()
                 y = currentY
             }
 
-            -- Place the next credit directly below the current one
+            -- Stack next credit BELOW
             currentY = currentY - CREDIT_SPACING
         else
             print("[Credits] Warning: missing UI entity ID " .. tostring(entityID))
