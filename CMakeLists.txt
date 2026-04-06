@@ -135,11 +135,11 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT a
 
 #Set windows or Console Subsystem
 set_target_properties(application_executable PROPERTIES
-	WIN32_EXECUTABLE "$<$<CONFIG:Debug>:FALSE> $<$<CONFIG:Release>:FALSE>"
+	WIN32_EXECUTABLE "$<$<CONFIG:Debug>:FALSE> $<$<CONFIG:Release>:TRUE>"
 )
 target_link_options(application_executable PRIVATE
 		"$<$<CONFIG:Debug>:/SUBSYSTEM:CONSOLE>"
-		"$<$<CONFIG:Release>:/SUBSYSTEM:CONSOLE>"
+		"$<$<CONFIG:Release>:/SUBSYSTEM:WINDOWS>"
 
     # === MSVC Linker Release Optimizations ===
 		# /OPT:REF (Eliminates functions/data never referenced), /OPT:ICF (Folds identical functions to save cache/space), /INCREMENTAL:NO (Required for maximum release optimization)

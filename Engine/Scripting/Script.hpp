@@ -93,6 +93,8 @@ namespace Engine {
     // ----------------------------------------------------------------
     class ScriptSystem {
     public:
+
+        static void ResetLuaState();
         static void Init();
         static void Init_Keyaction();
         static void Shutdown();

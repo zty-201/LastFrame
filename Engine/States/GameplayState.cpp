@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include "GameplayState.hpp"
 #include "UISystem.hpp"
+#include "Script.hpp"
 
 const std::string& GameplayState::GetName() const
 {
@@ -16,6 +17,7 @@ void GameplayState::OnEnter(Engine::StateMachine& machine)
     auto& ui = EngineFramework::UI_System::GetInstance();
     ui.closeAllMenu();
     ui.resumeActive_Menus();
+    //EngineFramework::CoreEngine::RequestSceneRestart();
 
     // Put your gameplay scene/runtime-start logic here.
 #if defined(PLATFORM_ANDROID)
