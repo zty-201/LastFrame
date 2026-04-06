@@ -46,23 +46,9 @@ local rotateAfterPull         = false
 local rotateTimer             = 0.0
 local ROTATE_AFTER_PULL_DELAY = 1.2
 
--- Post-death zoom-in phase (mirrors BedroomGirlLookAt sequence)
-local zoomAfterDeath      = false
-local zoomTimer           = 0.0
-local zoomTriggered       = false
-local screamPlayed        = false
-local preScreamShaken     = false
-local screamShakeStopped  = false
-local creditsFired        = false
-local ZOOM_DELAY          = 0.5   -- pause after girl rotates before camera shifts
-local ZOOM_SHIFT_DURATION = 0.8   -- must match camShiftDuration
-local PRE_SCREAM_SHAKE_OFFSET = 0.0
-local SCREAM_DURATION     = 4.0   -- match to Scream audio clip length
-
--- Post-activation voiceover (plays after camera turns to face girl)
-local turnVOPlayed  = false
-local turnVOTimer   = 0.0
-local TURN_VO_DELAY = 2.0   -- seconds after activation before VO plays (camera snap time)
+local creditsCountdown        = false
+local creditsTimer            = 0.0
+local CREDITS_DELAY           = 0.5
 
 ------------------------------------------------
 local function get_camera()
@@ -225,17 +211,10 @@ function on_create(self)
     lookTimer         = 0.0
     silenceTimer      = 0.0
     frame             = 0
-    rotateAfterPull    = false
-    rotateTimer        = 0.0
-    zoomAfterDeath     = false
-    zoomTimer          = 0.0
-    zoomTriggered      = false
-    screamPlayed       = false
-    preScreamShaken    = false
-    screamShakeStopped = false
-    creditsFired       = false
-    turnVOPlayed       = false
-    turnVOTimer        = 0.0
+    rotateAfterPull   = false
+    rotateTimer       = 0.0
+    creditsCountdown  = false
+    creditsTimer      = 0.0
 
     hide_girl()
 
@@ -257,92 +236,25 @@ function on_update(self, dt)
         return
     end
 
-    -- Play Detective VoiceOver 16 once the camera has turned to face the girl
-    if not turnVOPlayed then
-        turnVOTimer = turnVOTimer + dt
-        if turnVOTimer >= TURN_VO_DELAY then
-            turnVOPlayed = true
-            Audio_PlaySlot(EntityID, "VoiceOver_16")
-            if DEBUG then
-                print("[EvidenceGirlLookAt] Detective VoiceOver_16 played after camera turn")
-            end
-        end
-    end
-
     if rotateAfterPull then
         rotateTimer = rotateTimer + dt
         if rotateTimer >= ROTATE_AFTER_PULL_DELAY then
             rotateAfterPull  = false
             Transform_SetRotation(EntityID, 0.0, 270.0, 0.0)
-            zoomAfterDeath   = true
-            zoomTimer        = 0.0
-            zoomTriggered    = false
-            screamPlayed     = false
-            preScreamShaken  = false
-            screamShakeStopped = false
-            creditsFired     = false
+            creditsCountdown = true
+            creditsTimer     = 0.0
             if DEBUG then
-                print("[EvidenceGirlLookAt] Pull done -> rotated girl, starting zoom phase")
+                print("[EvidenceGirlLookAt] Pull done -> rotated girl, starting credits countdown")
             end
         end
     end
 
-    -- Zoom into face -> scream -> credits
-    if zoomAfterDeath then
-        zoomTimer = zoomTimer + dt
-
-        -- After 0.5s pause, shift camera forward into her face
-        if not zoomTriggered and zoomTimer >= ZOOM_DELAY then
-            zoomTriggered = true
-            SHARED = SHARED or {}
-            SHARED.POV = SHARED.POV or {}
-            SHARED.POV.camShift         = true
-            SHARED.POV.camShiftUp       = 5.0
-            SHARED.POV.camShiftForward  = 4.0
-            SHARED.POV.camShiftDuration = ZOOM_SHIFT_DURATION
+    if creditsCountdown then
+        creditsTimer = creditsTimer + dt
+        if creditsTimer >= CREDITS_DELAY then
+            creditsCountdown = false
             if DEBUG then
-                print("[EvidenceGirlLookAt] Death camera shift triggered")
-            end
-        end
-
-        -- Vigorous shake just before scream
-        if not preScreamShaken and zoomTimer >= ZOOM_DELAY + ZOOM_SHIFT_DURATION - PRE_SCREAM_SHAKE_OFFSET then
-            preScreamShaken = true
-            SHARED = SHARED or {}
-            SHARED.POV = SHARED.POV or {}
-            SHARED.POV.freeShakeSustain   = true
-            SHARED.POV.freeShakeAmplitude = 70.0
-            SHARED.POV.freeShakeSpeed     = 0.03
-            if DEBUG then
-                print("[EvidenceGirlLookAt] Pre-scream shake triggered")
-            end
-        end
-
-        -- Scream once shift completes
-        if not screamPlayed and zoomTimer >= ZOOM_DELAY + ZOOM_SHIFT_DURATION then
-            screamPlayed = true
-            Audio_PlaySlot(EntityID, "Scream")
-            if DEBUG then
-                print("[EvidenceGirlLookAt] Scream triggered")
-            end
-        end
-
-        -- Stop shake after scream finishes
-        if screamPlayed and not screamShakeStopped and zoomTimer >= ZOOM_DELAY + ZOOM_SHIFT_DURATION + SCREAM_DURATION then
-            screamShakeStopped = true
-            SHARED = SHARED or {}
-            SHARED.POV = SHARED.POV or {}
-            SHARED.POV.freeShakeSustain = false
-            if DEBUG then
-                print("[EvidenceGirlLookAt] Scream shake stopped")
-            end
-        end
-
-        -- Trigger credits after everything settles
-        if screamShakeStopped and not creditsFired then
-            creditsFired = true
-            if DEBUG then
-                print("[EvidenceGirlLookAt] Triggering ToEndCredit")
+                print("[EvidenceGirlLookAt] Credits delay elapsed -> triggering ToEndCredit")
             end
             if StateMachine_SetTrigger then
                 StateMachine_SetTrigger("ToEndCredit")
@@ -428,7 +340,7 @@ function on_update(self, dt)
                 SHARED.POV.shakeDuration    = 0.8
                 SHARED.POV.shakeAmplitude   = 18.0
                 SHARED.POV.shakeSpeed       = 0.01
-                SHARED.POV.shakePullAmount  = 1200.0
+                SHARED.POV.shakePullAmount  = 1500.0
 
                 rotateAfterPull = true
                 rotateTimer     = 0.0
@@ -458,13 +370,6 @@ function on_destroy(self)
     jinglePlayed      = false
     lookTimer         = 0.0
     silenceTimer      = 0.0
-    zoomAfterDeath     = false
-    zoomTimer          = 0.0
-    zoomTriggered      = false
-    screamPlayed       = false
-    preScreamShaken    = false
-    screamShakeStopped = false
-    creditsFired       = false
-    turnVOPlayed       = false
-    turnVOTimer        = 0.0
+    creditsCountdown  = false
+    creditsTimer      = 0.0
 end
