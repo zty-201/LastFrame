@@ -391,6 +391,7 @@ void Game_Update()
 
 		// 0) STOP scripting runtime (IMPORTANT)
 		Engine::ScriptSystem::OnRuntimeStop(registry);
+		Engine::ScriptSystem::ResetLuaState();
 
 		// 1) Close UI first
 		EngineFramework::UI_System::GetInstance().closeAllMenu();
