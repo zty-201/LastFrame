@@ -27,7 +27,7 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				463.5,
+				514.5,
 				0.0
 			],
 			"position_NDC": [
@@ -35,8 +35,8 @@
 				0.0
 			],
 			"size": [
-				618.0,
-				1158.0
+				686.0,
+				1174.0
 			],
 			"size_NDC": [
 				0.4000000059604645,
@@ -86,7 +86,7 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				445.5,
+				514.5,
 				0.0
 			],
 			"position_NDC": [
@@ -94,8 +94,8 @@
 				0.0
 			],
 			"size": [
-				594.0,
-				1158.0
+				686.0,
+				1174.0
 			],
 			"size_NDC": [
 				0.4000000059604645,
@@ -145,8 +145,8 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				772.5,
-				579.0
+				857.5,
+				587.0
 			],
 			"position_NDC": [
 				0.0,
@@ -204,7 +204,7 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				463.5,
+				514.5,
 				0.0
 			],
 			"position_NDC": [
@@ -212,8 +212,8 @@
 				0.0
 			],
 			"size": [
-				618.0,
-				1158.0
+				686.0,
+				1174.0
 			],
 			"size_NDC": [
 				0.4000000059604645,
@@ -263,7 +263,7 @@
 			"luminance": 1.0,
 			"play_video_audio": true,
 			"position": [
-				463.5,
+				514.5,
 				0.0
 			],
 			"position_NDC": [
@@ -271,8 +271,8 @@
 				0.0
 			],
 			"size": [
-				618.0,
-				1158.0
+				686.0,
+				1174.0
 			],
 			"size_NDC": [
 				0.4000000059604645,
